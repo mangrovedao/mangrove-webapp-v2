@@ -23,24 +23,29 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./*"
       ],
       "@components/*": [
-        "./src/components/*"
+        "./components/*"
       ],
       "@constants": [
-        "./src/constants/index.js"
+        "./constants/*"
       ],
       "@helpers/*": [
-        "./src/helpers/*"
+        "./helpers/*"
       ],
       "@hooks/*": [
-        "./src/hooks/*"
+        "./hooks/*"
       ],
       "@utils": [
-        "./src/utils/index.js"
+        "./utils/¨*"
       ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     ".eslintrc.cjs",
@@ -48,7 +53,8 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mjs"
+    "**/*.mjs",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
