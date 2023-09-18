@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google"
 
-import WalletConnectProvider from "@/providers/wallet-connect"
+import { RootProvider } from "@/providers/root-provider"
 import { cn } from "utils"
 import "./globals.css"
 
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(inter.className, "dark")}>
-        <WalletConnectProvider>{children}</WalletConnectProvider>
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
   )

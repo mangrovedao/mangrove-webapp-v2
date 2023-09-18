@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { getWalletIcon, shortenAddress } from "@/utils/wallet"
 import { ClientOnly } from "./client-only"
+import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 export function Navbar() {
   return (
@@ -77,11 +78,17 @@ function WalletButton() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button className="space-x-2">
-            <img
-              className="h-7 w-7 rounded-md"
-              src={iconUrl}
-              alt={`${connector?.name} logo"`}
-            />
+            <span className="bg-gray-500 h-7 w-7 rounded-md relative overflow-hidden">
+              {iconUrl ? (
+                <ImageWithHideOnError
+                  src={iconUrl}
+                  alt={`${connector?.name} logo"`}
+                  fill
+                  objectFit="contain"
+                />
+              ) : undefined}
+            </span>
+
             <span>{shortenAddress(address ?? "")}</span>
           </Button>
         </DropdownMenuTrigger>
