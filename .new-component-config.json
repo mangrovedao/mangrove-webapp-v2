@@ -1,3 +1,4 @@
 {
-  "lang": "ts"
+  "lang": "ts",
+  "dir": "./components"
 }
