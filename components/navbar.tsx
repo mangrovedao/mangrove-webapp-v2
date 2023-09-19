@@ -3,7 +3,6 @@
 import { useWeb3Modal } from "@web3modal/wagmi/react"
 import { Copy, ExternalLink, LogOut, Network, Wallet } from "lucide-react"
 import Link from "next/link"
-import React from "react"
 import { useAccount, useDisconnect, useNetwork } from "wagmi"
 
 import { Button } from "@/components/ui/button"
@@ -58,10 +57,7 @@ function WalletButton() {
   const { isConnected, connector, address } = useAccount()
   const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
-  const iconUrl = React.useMemo(
-    () => (connector ? getWalletIcon(connector.name) : undefined),
-    [connector],
-  )
+  const iconUrl = connector ? getWalletIcon(connector.name) : undefined
 
   if (!isConnected) {
     return (
@@ -94,7 +90,12 @@ function WalletButton() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 mt-1">
           <DropdownMenuLabel>Wallet: {connector?.name}</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => open({ view: "Connect" })}>
+          <DropdownMenuItem
+            onClick={() => {
+              disconnect()
+              open({ view: "Connect" })
+            }}
+          >
             <Wallet className="mr-2 h-4 w-4" />
             <span>Change wallet</span>
           </DropdownMenuItem>
