@@ -3,8 +3,8 @@
 import Mangrove from "@mangrovedao/mangrove.js"
 import React from "react"
 
+import { useChangeNetworkDialogStore } from "@/stores/change-network-dialog.store"
 import { useEthersSigner } from "@/utils/adapters"
-import { getErrorMessage } from "@/utils/errors"
 import { useWeb3Modal } from "@web3modal/wagmi/react"
 import { useAccount, useNetwork } from "wagmi"
 
@@ -14,6 +14,9 @@ const useMangroveContext = () => {
   const { chain } = useNetwork()
   const { address } = useAccount()
   const [mangrove, setMangrove] = React.useState<Mangrove | null>()
+  const setChangeNetworkDialogOpened = useChangeNetworkDialogStore(
+    (store) => store.setOpened,
+  )
 
   React.useEffect(() => {
     if (!address || !signer || chain?.unsupported) {
@@ -29,10 +32,12 @@ const useMangroveContext = () => {
           mgv.disconnect()
         }
       } catch (e) {
-        throw new Error(getErrorMessage(e))
+        setChangeNetworkDialogOpened(true)
+        // TODO: Try to show the global-error component instead
+        // throw new Error(getErrorMessage(e))
       }
     })()
-  }, [signer, chain?.unsupported, address])
+  }, [signer, chain?.unsupported, address, setChangeNetworkDialogOpened])
 
   // Close web3modal after changing chain
   React.useEffect(() => {
