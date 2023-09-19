@@ -10,7 +10,6 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-4">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex-col space-y-4">
         <h1>Webapp</h1>
-        <ChangeNetworkDialog />
         {mangrove ? (
           <div>
             <h2>Connected to mangrove</h2>
@@ -24,6 +23,8 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <ChangeNetworkDialog />
     </main>
   )
 }
