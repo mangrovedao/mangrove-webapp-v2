@@ -1,27 +1,43 @@
 "use client"
 
-import React from "react"
-// import Mangrove from "@mangrovedao/mangrove.js";
 import Mangrove from "louis-mangrove-mangrove.js"
+import React from "react"
 
-import { useEthersProvider, useEthersSigner } from "@/utils/adapters"
+import { useEthersSigner } from "@/utils/adapters"
+import { getErrorMessage } from "@/utils/errors"
+import { useWeb3Modal } from "@web3modal/wagmi/react"
+import { useAccount, useNetwork } from "wagmi"
 
 const useMangroveContext = () => {
   const signer = useEthersSigner()
-  const provider = useEthersProvider()
-  const [mangrove, setMangrove] = React.useState<Mangrove>()
+  const { close } = useWeb3Modal()
+  const { chain } = useNetwork()
+  const { address } = useAccount()
+  const [mangrove, setMangrove] = React.useState<Mangrove | null>()
 
   React.useEffect(() => {
-    if (!signer || !provider) return
+    if (!address || !signer || chain?.unsupported) {
+      setMangrove(null)
+      return
+    }
     ;(async () => {
-      const mangrove = await Mangrove.connect({ signer, provider })
-      setMangrove(mangrove)
+      try {
+        const mgv = await Mangrove.connect({ signer })
+        setMangrove(mgv)
 
-      return () => {
-        mangrove.disconnect()
+        return () => {
+          mgv.disconnect()
+        }
+      } catch (e) {
+        throw new Error(getErrorMessage(e))
       }
     })()
-  }, [signer, provider])
+  }, [signer, chain?.unsupported, address])
+
+  // Close web3modal after changing chain
+  React.useEffect(() => {
+    if (chain?.id) close()
+  }, [chain?.id, close])
 
   return { mangrove }
 }

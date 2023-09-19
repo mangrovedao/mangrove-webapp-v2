@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google"
 
-import { RootProvider } from "@/providers/root-provider"
+import { RootProvider } from "@/providers/root"
 import { cn } from "utils"
 import "./globals.css"
 
