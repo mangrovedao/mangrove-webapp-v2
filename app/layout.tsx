@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google"
 
+import { Navbar } from "@/components/navbar"
 import { RootProvider } from "@/providers/root"
 import { cn } from "utils"
 import "./globals.css"
@@ -14,7 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn(inter.className, "dark")}>
-        <RootProvider>{children}</RootProvider>
+        <RootProvider>
+          <Navbar />
+          {children}
+        </RootProvider>
       </body>
     </html>
   )

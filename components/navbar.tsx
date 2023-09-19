@@ -21,7 +21,7 @@ import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 export function Navbar() {
   return (
-    <nav className="flex w-full justify-between">
+    <nav className="flex w-full justify-between min-h-[40px] border-b p-4">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -54,16 +54,21 @@ export function Navbar() {
 
 function WalletButton() {
   const { open } = useWeb3Modal()
-  const { isConnected, connector, address } = useAccount()
+  const { isConnected, connector, address, isConnecting } = useAccount()
   const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
   const iconUrl = connector ? getWalletIcon(connector.name) : undefined
 
   if (!isConnected) {
     return (
-      <Button onClick={() => open({ view: "Networks" })}>
-        Connect to wallet
-      </Button>
+      <>
+        <Button
+          onClick={() => open({ view: "Networks" })}
+          disabled={isConnecting}
+        >
+          Connect to wallet
+        </Button>
+      </>
     )
   }
 
