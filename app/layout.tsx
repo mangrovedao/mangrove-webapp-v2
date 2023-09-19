@@ -1,4 +1,5 @@
 import { Inter } from "next/font/google"
+import { Toaster } from "react-hot-toast"
 
 import { Navbar } from "@/components/navbar"
 import { RootProvider } from "@/providers/root"
@@ -19,6 +20,7 @@ export default function RootLayout({
           <Navbar />
           {children}
         </RootProvider>
+        <Toaster position="bottom-center" />
       </body>
     </html>
   )

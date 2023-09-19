@@ -1,4 +1,5 @@
 "use client"
+import toast from "react-hot-toast"
 
 import { Button } from "@/components/ui/button"
 
@@ -8,6 +9,7 @@ export default function Rewards() {
       <h1>Rewards</h1>
       <Button
         onClick={() => {
+          toast.error("test error")
           throw new Error("test error")
         }}
       >
