@@ -21,7 +21,7 @@ import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 export function Navbar() {
   return (
-    <nav className="flex w-full justify-between min-h-[40px] border-b p-4">
+    <nav className="flex w-full justify-between items-center min-h-[40px] border-b p-4">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -73,12 +73,12 @@ function WalletButton() {
   }
 
   return (
-    <div className="inline-flex space-x-2">
+    <div className="inline-flex space-x-2 items-center">
       <w3m-network-button />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="space-x-2">
+          <Button className="space-x-2" size={"sm"}>
             <span className="bg-gray-500 h-7 w-7 rounded-md relative overflow-hidden">
               {iconUrl ? (
                 <ImageWithHideOnError

@@ -1,3 +1,22 @@
+# Configuration
+
+## Env vars
+
+This web app supports the following env vars:
+
+| Env var                               | Description                                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------- |
+| NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID | The `project_id` to setup the [Walletconnect](https://walletconnect.com/) user wallet |
+| NEXT_PUBLIC_WHITELISTED_CHAIN_IDS     | The whitelisted chain ids to show with walletconnect                                  |
+
+# Prerequisites
+
+This project is using [NPM](https://www.npmjs.com/) and Node v16.x
+
+1. Create the `.env` file and fill it with values in the `.env.example`
+2. Create an account on [Walletconnect](https://walletconnect.com/) in order to get the `project id` and assign that value to the `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID` env variable.
+3. Create the `NEXT_PUBLIC_WHITELISTED_CHAIN_IDS` env variable and set the default network id (ex: `80001` for Polygon Mumbai or `137` for Polygon Mainnet). If the user doesn't have that network configured or is connected to another unsupported chain, the default chainId will be proposed to the user. You can also specify multiple chain ids separated by a comma (`80001,137`), the first will be the default network (which will be proposed to the user first)
+
 # Create T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.

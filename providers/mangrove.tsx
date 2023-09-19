@@ -1,6 +1,6 @@
 "use client"
 
-import Mangrove from "louis-mangrove-mangrove.js"
+import Mangrove from "@mangrovedao/mangrove.js"
 import React from "react"
 
 import { useEthersSigner } from "@/utils/adapters"
