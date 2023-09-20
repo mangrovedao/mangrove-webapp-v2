@@ -33,5 +33,5 @@ function openWrongNetworkAlertDialog({
 export const networkService = {
   changeNetwork,
   openWrongNetworkAlertDialog,
-  close: alertDialogs.close,
+  closeWrongNetworkAlertDialog: alertDialogs.close,
 }

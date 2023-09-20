@@ -28,7 +28,7 @@ const useMangroveContext = () => {
     }
     ;(async () => {
       try {
-        networkService.close()
+        networkService.closeWrongNetworkAlertDialog()
         const mgv = await Mangrove.connect({ signer })
         setMangrove(mgv)
 
