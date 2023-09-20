@@ -12,7 +12,7 @@ function open({
   ],
 }: {
   children?: React.ReactNode
-  title?: string | React.ReactNode
+  title?: React.ReactNode
   actionButtons?: ActionButton[]
 }) {
   useAlertDialogStore.setState({

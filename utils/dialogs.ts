@@ -8,8 +8,8 @@ export function openConfirmDialog({
 }: {
   onConfirm: () => void
   children?: React.ReactNode
-  title?: string | React.ReactNode
-  description?: string | React.ReactNode
+  title?: React.ReactNode
+  description?: React.ReactNode
 }) {
   useDialogStore.setState({
     opened: true,
