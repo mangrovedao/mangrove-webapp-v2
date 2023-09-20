@@ -19,7 +19,11 @@ const useMangroveContext = () => {
   )
 
   React.useEffect(() => {
-    if (!address || !signer || chain?.unsupported) {
+    if (chain?.unsupported) {
+      setMangrove(null)
+      setChangeNetworkDialogOpened(true)
+    }
+    if (!address || !signer) {
       setMangrove(null)
       return
     }
