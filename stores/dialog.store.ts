@@ -5,6 +5,7 @@ import type { Button } from "@/components/ui/button"
 
 export type ActionButton = React.ComponentProps<typeof Button> & {
   isClosing?: boolean
+  id: string
 }
 
 export type DialogStore = {

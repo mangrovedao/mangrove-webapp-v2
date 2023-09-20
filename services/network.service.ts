@@ -25,6 +25,7 @@ function openWrongNetworkAlertDialog({
       {
         onClick: changeNetwork,
         children: "Change network",
+        id: "change-network",
       },
     ],
   })

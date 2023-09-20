@@ -7,6 +7,7 @@ function open({
   actionButtons = [
     {
       isClosing: true,
+      id: "cancel",
     },
   ],
 }: {

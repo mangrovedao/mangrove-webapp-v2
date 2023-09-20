@@ -19,10 +19,12 @@ export function openConfirmDialog({
     actionButtons: [
       {
         isClosing: true,
+        id: "cancel",
       },
       {
         onClick: onConfirm,
         children: "Confirm",
+        id: "confirm",
       },
     ],
   })
