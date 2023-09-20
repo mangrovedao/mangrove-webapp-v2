@@ -1,6 +1,7 @@
 "use client"
 
 import ChangeNetworkDialog from "@/components/change-network-dialog"
+import Dialog from "@/components/dialog"
 import useMangrove from "@/providers/mangrove"
 
 export default function Home() {
@@ -25,6 +26,7 @@ export default function Home() {
       </div>
 
       <ChangeNetworkDialog />
+      <Dialog />
     </main>
   )
 }
