@@ -1,12 +1,13 @@
 "use client"
 
 import Mangrove from "@mangrovedao/mangrove.js"
-import React from "react"
-
-import { useChangeNetworkDialogStore } from "@/stores/change-network-dialog.store"
-import { useEthersSigner } from "@/utils/adapters"
 import { useWeb3Modal } from "@web3modal/wagmi/react"
+import React from "react"
 import { useAccount, useNetwork } from "wagmi"
+
+import { networkService } from "@/services/network.service"
+import { useEthersSigner } from "@/utils/adapters"
+import { getErrorMessage } from "@/utils/errors"
 
 const useMangroveContext = () => {
   const signer = useEthersSigner()
@@ -14,14 +15,12 @@ const useMangroveContext = () => {
   const { chain } = useNetwork()
   const { address } = useAccount()
   const [mangrove, setMangrove] = React.useState<Mangrove | null>()
-  const setChangeNetworkDialogOpened = useChangeNetworkDialogStore(
-    (store) => store.setOpened,
-  )
 
   React.useEffect(() => {
     if (chain?.unsupported) {
       setMangrove(null)
-      setChangeNetworkDialogOpened(true)
+      networkService.openWrongNetworkAlertDialog()
+      return
     }
     if (!address || !signer) {
       setMangrove(null)
@@ -29,6 +28,7 @@ const useMangroveContext = () => {
     }
     ;(async () => {
       try {
+        networkService.close()
         const mgv = await Mangrove.connect({ signer })
         setMangrove(mgv)
 
@@ -36,12 +36,14 @@ const useMangroveContext = () => {
           mgv.disconnect()
         }
       } catch (e) {
-        setChangeNetworkDialogOpened(true)
-        // TODO: Try to show the global-error component instead
-        // throw new Error(getErrorMessage(e))
+        networkService.openWrongNetworkAlertDialog({
+          title: "Error connecting to Mangrove",
+          children: getErrorMessage(e),
+        })
+        console.error(getErrorMessage(e))
       }
     })()
-  }, [signer, chain?.unsupported, address, setChangeNetworkDialogOpened])
+  }, [signer, chain?.unsupported, address])
 
   // Close web3modal after changing chain
   React.useEffect(() => {

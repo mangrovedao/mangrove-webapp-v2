@@ -14,7 +14,7 @@ const wagmiConfig = defaultWagmiConfig({
   appName: "Mangrove DEX",
 })
 
-createWeb3Modal({ wagmiConfig, projectId, chains })
+export const web3modal = createWeb3Modal({ wagmiConfig, projectId, chains })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
   return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>

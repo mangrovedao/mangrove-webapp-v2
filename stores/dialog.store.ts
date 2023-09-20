@@ -1,28 +1,29 @@
 import type React from "react"
-import { create } from "zustand"
+import { create, type StateCreator } from "zustand"
 
 import type { Button } from "@/components/ui/button"
 
-type ActionButton = React.ComponentProps<typeof Button> & {
+export type ActionButton = React.ComponentProps<typeof Button> & {
   isClosing?: boolean
 }
 
-type Store = {
+export type DialogStore = {
   type?: "info" | "confirm" | "error" | "success"
   opened: boolean
-  title: string | React.ReactNode
+  title: React.ReactNode
   children?: React.ReactNode
-  description?: string | React.ReactNode
+  description?: React.ReactNode
   actionButtons?: ActionButton[]
 }
 
-type Actions = {
+export type DialogActions = {
   setOpened: (opened: boolean) => void
 }
 
-export const useDialogStore = create<Store & Actions>((set) => ({
+export const dialogStateCreator: StateCreator<DialogStore & DialogActions> = (
+  set,
+) => ({
   opened: false,
-  setOpened: (opened) => set({ opened }),
   type: "info",
   title: "Dialog",
   children: undefined,
@@ -40,4 +41,11 @@ export const useDialogStore = create<Store & Actions>((set) => ({
       ],
     */
   actionButtons: undefined,
-}))
+
+  /**
+   * Actions
+   */
+  setOpened: (opened) => set({ opened }),
+})
+
+export const useDialogStore = create(dialogStateCreator)
