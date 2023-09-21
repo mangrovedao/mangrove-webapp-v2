@@ -33,10 +33,10 @@ const InfoContent = (
 export function SlippageSettings() {
   const slippageOptions = ["0.1", "0.5", "1.0"]
   const [slippage, setSlippage] = React.useState<string>("0.5")
-  const [showControls, setShowControls] = React.useState<boolean>(false)
+  const [hideControls, sethideControls] = React.useState<boolean>(true)
 
   return (
-    <div className="space-y-2 bg-gray-400 rounded-md p-4 overflow-hidden">
+    <div className="space-y-2 bg-gray-600 rounded-md p-4 overflow-hidden">
       <h1 className="font-semibold">Automatic Slippage Tolerence</h1>
 
       <div className="flex justify-between">
@@ -44,8 +44,8 @@ export function SlippageSettings() {
           Turn off automatic slippage tolerance to adjust the value.
         </p>
         <Switch
-          checked={showControls}
-          onCheckedChange={() => setShowControls(!showControls)}
+          checked={hideControls}
+          onCheckedChange={() => sethideControls(!hideControls)}
         />
       </div>
 
@@ -66,7 +66,7 @@ export function SlippageSettings() {
 
         <p>{slippage}%</p>
       </div>
-      {showControls ? (
+      {!hideControls ? (
         <div className="flex items-center space-x-5 px-2 py-1 rounded-xl bg-secondary border-primary border-1">
           <RadioGroup
             defaultValue={slippage}
@@ -92,7 +92,7 @@ export function SlippageSettings() {
 
           {/* @Anas note: check numeric input */}
           <Input
-            className="w-full border-primary bg-secondary text-primary focus:bg-primary focus:text-secondary"
+            className="w-full border-primary bg-secondary text-primary focus:bg-primary focus:text-secondary hover:bg-muted-foreground"
             onChange={(e) => setSlippage(e.currentTarget.value)}
             value={slippage}
             placeholder="Custom"
