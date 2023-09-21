@@ -2,6 +2,7 @@
 
 import { AlertDialog } from "@/components/stateful/alert-dialog"
 import { Dialog } from "@/components/stateful/dialog"
+import { SlippageSettings } from "@/components/stateful/slippage-settings"
 import useMangrove from "@/providers/mangrove"
 import { useAlertDialogStore } from "@/stores/alert-dialog.store"
 
@@ -13,6 +14,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-4">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex-col space-y-4">
         <h1>Webapp</h1>
+        <SlippageSettings />
         {/* <Button
           onClick={() =>
             openAlertDialog({
