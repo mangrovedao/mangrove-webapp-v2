@@ -53,7 +53,7 @@ export function SlippageSettings() {
 
       <div className="flex justify-between">
         <div className="flex space-x-1.5 items-center">
-          <h3 className="font-semibold">Slippage</h3>
+          <h1 className="font-semibold">Slippage</h1>
           <Root.TooltipProvider>
             <Root.Tooltip>
               <Root.TooltipTrigger asChild>
@@ -88,7 +88,7 @@ export function SlippageSettings() {
             ))}
           </RadioGroup>
 
-          <Separator orientation="vertical" className="bg-primary h-4" />
+          <Separator orientation="vertical" className="bg-primary h-[1.5rem]" />
 
           {/* @Anas note: check numeric input */}
           <Input
