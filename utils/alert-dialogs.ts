@@ -7,11 +7,12 @@ function open({
   actionButtons = [
     {
       isClosing: true,
+      id: "cancel",
     },
   ],
 }: {
   children?: React.ReactNode
-  title?: string | React.ReactNode
+  title?: React.ReactNode
   actionButtons?: ActionButton[]
 }) {
   useAlertDialogStore.setState({

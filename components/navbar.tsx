@@ -21,12 +21,12 @@ import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 export function Navbar() {
   return (
-    <nav className="flex w-full justify-between items-center min-h-[40px] border-b p-4">
+    <nav className="flex w-full justify-between items-center min-h-[40px] border-b px-4 py-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 462 79"
-        height={30}
+        height={25}
       >
         <g clipPath="url(#a)">
           <path
@@ -65,6 +65,7 @@ function WalletButton() {
         <Button
           onClick={() => open({ view: "Networks" })}
           disabled={isConnecting}
+          size="sm"
         >
           Connect to wallet
         </Button>
@@ -78,8 +79,8 @@ function WalletButton() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="space-x-2" size={"sm"}>
-            <span className="bg-gray-500 h-7 w-7 rounded-md relative overflow-hidden">
+          <Button className="space-x-2" size="sm">
+            <span className="bg-gray-500 h-6 w-6 rounded-md relative overflow-hidden">
               {iconUrl ? (
                 <ImageWithHideOnError
                   src={iconUrl}

@@ -17,17 +17,17 @@ export function Dialog() {
         </Root.DialogHeader>
         {children}
         <div className="flex space-x-2 justify-end">
-          {actionButtons?.map(({ isClosing, ...props }, i) => {
+          {actionButtons?.map(({ isClosing, id, ...props }) => {
             if (isClosing) {
               return (
-                <Root.DialogClose key={i}>
+                <Root.DialogClose key={id} aria-label={id}>
                   <Button {...props} variant={"outline"}>
                     Close
                   </Button>
                 </Root.DialogClose>
               )
             }
-            return <Button key={i} {...props} />
+            return <Button key={id} {...props} aria-label={id} />
           })}
         </div>
       </Root.DialogContent>

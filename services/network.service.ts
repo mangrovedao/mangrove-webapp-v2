@@ -16,7 +16,7 @@ function openWrongNetworkAlertDialog({
   children = "Mangrove does not support this network yet.",
 }: {
   children?: React.ReactNode
-  title?: string | React.ReactNode
+  title?: React.ReactNode
 } = {}) {
   alertDialogs.open({
     title,
@@ -25,6 +25,7 @@ function openWrongNetworkAlertDialog({
       {
         onClick: changeNetwork,
         children: "Change network",
+        id: "change-network",
       },
     ],
   })
