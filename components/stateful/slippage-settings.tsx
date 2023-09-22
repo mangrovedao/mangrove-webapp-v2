@@ -35,6 +35,10 @@ export function SlippageSettings() {
   const [slippage, setSlippage] = React.useState<string>("0.5")
   const [hideControls, sethideControls] = React.useState<boolean>(true)
 
+  const toggleAutoSlippage = () => {
+    sethideControls(!hideControls)
+    if (!hideControls) setSlippage("0.5")
+  }
   return (
     <div className="space-y-2 bg-gray-600 rounded-md p-4 overflow-hidden">
       <h1 className="font-semibold">Automatic Slippage Tolerence</h1>
@@ -43,10 +47,7 @@ export function SlippageSettings() {
         <p className="text-xs">
           Turn off automatic slippage tolerance to adjust the value.
         </p>
-        <Switch
-          checked={hideControls}
-          onCheckedChange={() => sethideControls(!hideControls)}
-        />
+        <Switch checked={hideControls} onCheckedChange={toggleAutoSlippage} />
       </div>
 
       <Separator />
