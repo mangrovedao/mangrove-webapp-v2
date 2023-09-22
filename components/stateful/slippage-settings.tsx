@@ -2,7 +2,7 @@ import { Info, Percent } from "lucide-react"
 import React from "react"
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Input } from "@components/ui/input"
+import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
 import { Separator } from "@components/ui/separator"
 import { Switch } from "@components/ui/switch"
@@ -91,9 +91,9 @@ export function SlippageSettings() {
           <Separator orientation="vertical" className="bg-primary h-[1.5rem]" />
 
           {/* @Anas note: check numeric input */}
-          <Input
+          <CustomNumericInput
             className="w-full border-primary bg-secondary text-primary focus:bg-primary focus:text-secondary hover:bg-muted-foreground"
-            onChange={(e) => setSlippage(e.currentTarget.value)}
+            onUserInput={setSlippage}
             value={slippage}
             placeholder="Custom"
             icon={<Percent size="15" />}
