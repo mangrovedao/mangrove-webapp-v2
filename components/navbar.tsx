@@ -1,23 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client"
 
-import { useWeb3Modal } from "@web3modal/wagmi/react"
-import { Copy, ExternalLink, LogOut, Network, Wallet } from "lucide-react"
-import Link from "next/link"
-import { useAccount, useDisconnect, useNetwork } from "wagmi"
-
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { getWalletIcon, shortenAddress } from "@/utils/wallet"
+import { useSDK } from "@metamask/sdk-react"
 import { ClientOnly } from "./client-only"
-import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
+import { Button } from "./ui/button"
 
 export function Navbar() {
   return (
@@ -53,92 +40,26 @@ export function Navbar() {
 }
 
 function WalletButton() {
-  const { open } = useWeb3Modal()
-  const { isConnected, connector, address, isConnecting } = useAccount()
-  const { chain } = useNetwork()
-  const { disconnect } = useDisconnect()
-  const iconUrl = connector ? getWalletIcon(connector.name) : undefined
+  // const { open } = useWeb3Modal()
+  // const { isConnected, connector, address, isConnecting } = useAccount()
+  // const { chain } = useNetwork()
+  // const { disconnect } = useDisconnect()
+  // const iconUrl = connector ? getWalletIcon(connector.name) : undefined
+  const { sdk, account, status } = useSDK()
 
-  if (!isConnected) {
-    return (
-      <>
-        <Button
-          onClick={() => open({ view: "Networks" })}
-          disabled={isConnecting}
-          size="sm"
-        >
-          Connect to wallet
-        </Button>
-      </>
-    )
+  async function connect() {
+    await sdk?.connect()
+  }
+
+  async function disconnect() {
+    await sdk?.disconnect()
   }
 
   return (
-    <div className="inline-flex space-x-2 items-center">
-      <w3m-network-button />
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button className="space-x-2" size="sm">
-            <span className="bg-gray-500 h-6 w-6 rounded-md relative overflow-hidden">
-              {iconUrl ? (
-                <ImageWithHideOnError
-                  src={iconUrl}
-                  alt={`${connector?.name} logo"`}
-                  fill
-                  objectFit="contain"
-                />
-              ) : undefined}
-            </span>
-
-            <span>{shortenAddress(address ?? "")}</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 mt-1">
-          <DropdownMenuLabel>Wallet: {connector?.name}</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => {
-              disconnect()
-              open({ view: "Connect" })
-            }}
-          >
-            <Wallet className="mr-2 h-4 w-4" />
-            <span>Change wallet</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Chain: {chain?.name}</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => open({ view: "Networks" })}>
-            <Network className="mr-2 h-4 w-4" />
-            <span>Change network</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => {
-                address && navigator.clipboard.writeText(address)
-              }}
-            >
-              <Copy className="mr-2 h-4 w-4" />
-              <span>Copy address</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link
-                href={`${chain?.blockExplorers?.default.url}/address/${address}`}
-                target="_blank"
-                className="inline-flex"
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                <span>Open in {chain?.blockExplorers?.default.name}</span>
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-
-          <DropdownMenuItem onClick={() => disconnect()}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Disconnect</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div>
+      {JSON.stringify(status)}
+      {account} <Button onClick={connect}>Connect</Button>{" "}
+      <Button onClick={connect}>disconnect</Button>
     </div>
   )
 }
