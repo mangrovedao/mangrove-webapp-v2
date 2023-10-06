@@ -1,6 +1,6 @@
 "use client"
 
-import Mangrove from "@mangrovedao/mangrove.js"
+import Mangrove, { enableLogging, type Market } from "@mangrovedao/mangrove.js"
 import { useWeb3Modal } from "@web3modal/wagmi/react"
 import React from "react"
 import { useAccount, useNetwork } from "wagmi"
@@ -9,12 +9,17 @@ import { networkService } from "@/services/network.service"
 import { useEthersSigner } from "@/utils/adapters"
 import { getErrorMessage } from "@/utils/errors"
 
+enableLogging()
+
 const useMangroveContext = () => {
   const signer = useEthersSigner()
   const { close } = useWeb3Modal()
   const { chain } = useNetwork()
   const { address } = useAccount()
   const [mangrove, setMangrove] = React.useState<Mangrove | null>()
+  const [globalConfig, setGlobalConfig] =
+    React.useState<Mangrove.GlobalConfig | null>(null)
+  const [openMarkets, setOpenMarkets] = React.useState<Market[] | null>(null)
 
   React.useEffect(() => {
     if (chain?.unsupported) {
@@ -44,6 +49,27 @@ const useMangroveContext = () => {
       }
     })()
   }, [signer, chain?.unsupported, address])
+
+  React.useEffect(() => {
+    if (!mangrove) return
+    ;(async () => {
+      try {
+        console.log("START: getconfig and openmarkets")
+        const [conf, openMarkets] = await Promise.all([
+          mangrove.config(),
+          mangrove.openMarkets(),
+        ])
+
+        console.log("END: getconfig and openmarkets", { conf, openMarkets })
+        setGlobalConfig(conf)
+        setOpenMarkets(openMarkets)
+      } catch (e) {
+        console.error(getErrorMessage(e))
+        setGlobalConfig(null)
+        setOpenMarkets(null)
+      }
+    })()
+  }, [mangrove])
 
   // Close web3modal after changing chain
   React.useEffect(() => {
