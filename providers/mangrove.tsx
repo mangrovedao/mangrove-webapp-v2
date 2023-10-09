@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client"
 
-import Mangrove, { enableLogging, type Market } from "@mangrovedao/mangrove.js"
+import { networkService } from "@/services/network.service"
+import { getErrorMessage } from "@/utils/errors"
+import Mangrove, { type Market } from "@mangrovedao/mangrove.js"
 // import { useWeb3Modal } from "@web3modal/wagmi/react"
 import { useSDK } from "@metamask/sdk-react"
 import React from "react"
 
-enableLogging()
+// enableLogging()
 
 const useMangroveContext = () => {
   // const signer = useEthersSigner()
@@ -28,58 +31,56 @@ const useMangroveContext = () => {
     })
   }, [account, provider, chainId])
 
-  // React.useEffect(() => {
-  //   // if (chain?.unsupported) {
-  //   //   setMangrove(null)
-  //   //   networkService.openWrongNetworkAlertDialog()
-  //   //   return
-  //   // }
-  //   if (!account || !provider) {
-  //     setMangrove(null)
-  //     return
-  //   }
-  //   debugger
-  //   ;(async () => {
-  //     try {
-  //       debugger
-  //       networkService.closeWrongNetworkAlertDialog()
-  //       const mgv = await Mangrove.connect({ provider: provider })
-  //       debugger
-  //       setMangrove(mgv)
+  React.useEffect(() => {
+    // if (chain?.unsupported) {
+    //   setMangrove(null)
+    //   networkService.openWrongNetworkAlertDialog()
+    //   return
+    // }
+    if (!account || !provider) {
+      setMangrove(null)
+      return
+    }
+    ;(async () => {
+      try {
+        networkService.closeWrongNetworkAlertDialog()
+        // @ts-ignore
+        const mgv = await Mangrove.connect({ provider: provider })
+        setMangrove(mgv)
 
-  //       return () => {
-  //         mgv.disconnect()
-  //       }
-  //     } catch (e) {
-  //       networkService.openWrongNetworkAlertDialog({
-  //         title: "Error connecting to Mangrove",
-  //         children: getErrorMessage(e),
-  //       })
-  //       console.error(getErrorMessage(e))
-  //     }
-  //   })()
-  // }, [account, provider, chainId])
+        return () => {
+          mgv.disconnect()
+        }
+      } catch (e) {
+        networkService.openWrongNetworkAlertDialog({
+          title: "Error connecting to Mangrove",
+          children: getErrorMessage(e),
+        })
+        console.error(getErrorMessage(e))
+      }
+    })()
+  }, [account, provider, chainId])
 
-  // React.useEffect(() => {
-  //   if (!mangrove) return
-  //   ;(async () => {
-  //     try {
-  //       console.log("START: getconfig and openmarkets")
-  //       const [conf, openMarkets] = await Promise.all([
-  //         mangrove.config(),
-  //         mangrove.openMarkets(),
-  //       ])
+  React.useEffect(() => {
+    if (!mangrove) return
+    ;(async () => {
+      try {
+        console.log("START: getconfig and openmarkets")
+        const [conf, openMarkets] = await Promise.all([
+          mangrove.config(),
+          mangrove.openMarkets(),
+        ])
 
-  //       console.log("END: getconfig and openmarkets", { conf, openMarkets })
-  //       setGlobalConfig(conf)
-  //       setOpenMarkets(openMarkets)
-  //     } catch (e) {
-  //       console.error(getErrorMessage(e))
-  //       setGlobalConfig(null)
-  //       setOpenMarkets(null)
-  //     }
-  //   })()
-  // }, [mangrove])
+        console.log("END: getconfig and openmarkets", { conf, openMarkets })
+        setGlobalConfig(conf)
+        setOpenMarkets(openMarkets)
+      } catch (e) {
+        console.error(getErrorMessage(e))
+        setGlobalConfig(null)
+        setOpenMarkets(null)
+      }
+    })()
+  }, [mangrove])
 
   // Close web3modal after changing chain
   // React.useEffect(() => {
