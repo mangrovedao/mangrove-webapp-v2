@@ -87,7 +87,16 @@ const useMangroveContext = () => {
   //   if (chain?.id) close()
   // }, [chain?.id, close])
 
-  return { mangrove }
+  const connect = React.useCallback(async () => {
+    console.log("connect", sdk)
+    await sdk?.connect()
+  }, [sdk])
+  const disconnect = React.useCallback(() => {
+    console.log("disconnect", sdk)
+    sdk?.disconnect()
+  }, [sdk])
+
+  return { mangrove, connect, disconnect }
 }
 
 const MangroveContext = React.createContext<

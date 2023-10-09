@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client"
 
+import useMangrove from "@/providers/mangrove"
 import { useSDK } from "@metamask/sdk-react"
 import { ClientOnly } from "./client-only"
 import { Button } from "./ui/button"
@@ -45,21 +46,18 @@ function WalletButton() {
   // const { chain } = useNetwork()
   // const { disconnect } = useDisconnect()
   // const iconUrl = connector ? getWalletIcon(connector.name) : undefined
+  const { connect, disconnect } = useMangrove()
   const { sdk, account, status } = useSDK()
 
-  async function connect() {
-    await sdk?.connect()
-  }
-
-  async function disconnect() {
-    await sdk?.disconnect()
-  }
+  // React.useEffect(() => {
+  //   console.log({ sdk })
+  // }, [sdk])
 
   return (
     <div>
       {JSON.stringify(status)}
       {account} <Button onClick={connect}>Connect</Button>{" "}
-      <Button onClick={connect}>disconnect</Button>
+      <Button onClick={disconnect}>disconnect</Button>
     </div>
   )
 }
