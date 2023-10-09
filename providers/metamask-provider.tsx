@@ -6,6 +6,7 @@ export function MetamaskProvider({ children }: React.PropsWithChildren) {
   return (
     <MetaMaskProvider
       sdkOptions={{
+        checkInstallationImmediately: true,
         dappMetadata: {
           name: "Demo UI React App",
           url: window.location.host,

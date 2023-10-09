@@ -5,12 +5,12 @@
 
 import { networkService } from "@/services/network.service"
 import { getErrorMessage } from "@/utils/errors"
-import Mangrove, { type Market } from "@mangrovedao/mangrove.js"
+import Mangrove, { enableLogging, type Market } from "@mangrovedao/mangrove.js"
 // import { useWeb3Modal } from "@web3modal/wagmi/react"
 import { useSDK } from "@metamask/sdk-react"
 import React from "react"
 
-// enableLogging()
+enableLogging()
 
 const useMangroveContext = () => {
   // const signer = useEthersSigner()
@@ -70,6 +70,7 @@ const useMangroveContext = () => {
           mangrove.config(),
           mangrove.openMarkets(),
         ])
+        location.reload()
 
         console.log("END: getconfig and openmarkets", { conf, openMarkets })
         setGlobalConfig(conf)
