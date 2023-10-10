@@ -1,6 +1,7 @@
 "use client"
 
-import Mangrove, { enableLogging, type Market } from "@mangrovedao/mangrove.js"
+import Mangrove from "@mangrovedao/mangrove.js"
+import { useQuery } from "@tanstack/react-query"
 import { useWeb3Modal } from "@web3modal/wagmi/react"
 import React from "react"
 import { useAccount, useNetwork } from "wagmi"
@@ -9,37 +10,29 @@ import { networkService } from "@/services/network.service"
 import { useEthersSigner } from "@/utils/adapters"
 import { getErrorMessage } from "@/utils/errors"
 
-enableLogging()
+// enableLogging()
 
 const useMangroveContext = () => {
   const signer = useEthersSigner()
   const { close } = useWeb3Modal()
   const { chain } = useNetwork()
   const { address } = useAccount()
-  const [mangrove, setMangrove] = React.useState<Mangrove | null>()
-  const [globalConfig, setGlobalConfig] =
-    React.useState<Mangrove.GlobalConfig | null>(null)
-  const [openMarkets, setOpenMarkets] = React.useState<Market[] | null>(null)
 
-  React.useEffect(() => {
-    if (chain?.unsupported) {
-      setMangrove(null)
-      networkService.openWrongNetworkAlertDialog()
-      return
-    }
-    if (!address || !signer) {
-      setMangrove(null)
-      return
-    }
-    ;(async () => {
+  const { data: mangrove } = useQuery({
+    queryKey: [
+      "mangroveInstance",
+      signer?._address,
+      address,
+      chain?.id,
+      chain?.unsupported,
+    ],
+    queryFn: async () => {
+      if (chain?.unsupported) {
+        networkService.openWrongNetworkAlertDialog()
+        return null
+      }
       try {
-        networkService.closeWrongNetworkAlertDialog()
-        const mgv = await Mangrove.connect({ signer })
-        setMangrove(mgv)
-
-        return () => {
-          mgv.disconnect()
-        }
+        return Mangrove.connect({ signer })
       } catch (e) {
         networkService.openWrongNetworkAlertDialog({
           title: "Error connecting to Mangrove",
@@ -47,36 +40,23 @@ const useMangroveContext = () => {
         })
         console.error(getErrorMessage(e))
       }
-    })()
-  }, [signer, chain?.unsupported, address])
+    },
+    enabled: !!signer?._address && !!address,
+  })
 
-  React.useEffect(() => {
-    if (!mangrove) return
-    ;(async () => {
-      try {
-        console.log("START: getconfig and openmarkets")
-        const [conf, openMarkets] = await Promise.all([
-          mangrove.config(),
-          mangrove.openMarkets(),
-        ])
-
-        console.log("END: getconfig and openmarkets", { conf, openMarkets })
-        setGlobalConfig(conf)
-        setOpenMarkets(openMarkets)
-      } catch (e) {
-        console.error(getErrorMessage(e))
-        setGlobalConfig(null)
-        setOpenMarkets(null)
-      }
-    })()
-  }, [mangrove])
+  const configs = useQuery({
+    queryKey: ["configs", mangrove?.address],
+    queryFn: () => Promise.all([mangrove?.config(), mangrove?.openMarkets()]),
+    enabled: !!mangrove?.address,
+  })
+  const [globalConfig, openMarkets] = configs.data ?? [null, null]
 
   // Close web3modal after changing chain
   React.useEffect(() => {
     if (chain?.id) close()
   }, [chain?.id, close])
 
-  return { mangrove }
+  return { mangrove, globalConfig, openMarkets }
 }
 
 const MangroveContext = React.createContext<

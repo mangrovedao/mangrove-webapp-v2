@@ -3,6 +3,7 @@
 import { useWeb3Modal } from "@web3modal/wagmi/react"
 import { Copy, ExternalLink, LogOut, Network, Wallet } from "lucide-react"
 import Link from "next/link"
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { useAccount, useDisconnect, useNetwork } from "wagmi"
 
 import { Button } from "@/components/ui/button"
@@ -15,9 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getWalletIcon, shortenAddress } from "@/utils/wallet"
+import { shortenAddress } from "@/utils/wallet"
 import { ClientOnly } from "./client-only"
-import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 export function Navbar() {
   return (
@@ -57,7 +57,6 @@ function WalletButton() {
   const { isConnected, connector, address, isConnecting } = useAccount()
   const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
-  const iconUrl = connector ? getWalletIcon(connector.name) : undefined
 
   if (!isConnected) {
     return (
@@ -80,17 +79,9 @@ function WalletButton() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button className="space-x-2" size="sm">
-            <span className="bg-gray-500 h-6 w-6 rounded-md relative overflow-hidden">
-              {iconUrl ? (
-                <ImageWithHideOnError
-                  src={iconUrl}
-                  alt={`${connector?.name} logo"`}
-                  fill
-                  objectFit="contain"
-                />
-              ) : undefined}
+            <span className="bg-gray-500 h-6 w-6 rounded-full relative overflow-hidden">
+              {address && <Jazzicon seed={jsNumberForAddress(address)} />}
             </span>
-
             <span>{shortenAddress(address ?? "")}</span>
           </Button>
         </DropdownMenuTrigger>
