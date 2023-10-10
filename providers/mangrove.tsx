@@ -60,6 +60,8 @@ const useMangroveContext = () => {
           mangrove.openMarkets(),
         ])
 
+        location.reload()
+
         console.log("END: getconfig and openmarkets", { conf, openMarkets })
         setGlobalConfig(conf)
         setOpenMarkets(openMarkets)
