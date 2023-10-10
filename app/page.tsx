@@ -2,6 +2,7 @@
 
 import { AlertDialog } from "@/components/stateful/alert-dialog"
 import { Dialog } from "@/components/stateful/dialog"
+import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
 import useMangrove from "@/providers/mangrove"
 
 export default function Home() {
@@ -24,6 +25,8 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <TVChartContainer />
 
       <Dialog />
       <AlertDialog />
