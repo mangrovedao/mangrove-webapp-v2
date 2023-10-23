@@ -8,6 +8,8 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
+export const runtime = "edge"
+
 export default function RootLayout({
   children,
 }: {
