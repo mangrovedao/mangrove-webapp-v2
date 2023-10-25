@@ -10,8 +10,6 @@ import { networkService } from "@/services/network.service"
 import { useEthersSigner } from "@/utils/adapters"
 import { getErrorMessage } from "@/utils/errors"
 
-// enableLogging()
-
 const useMangroveContext = () => {
   const signer = useEthersSigner()
   const { close } = useWeb3Modal()
@@ -34,11 +32,12 @@ const useMangroveContext = () => {
       try {
         return Mangrove.connect({ signer })
       } catch (e) {
+        const message = getErrorMessage(e)
         networkService.openWrongNetworkAlertDialog({
           title: "Error connecting to Mangrove",
-          children: getErrorMessage(e),
+          children: message,
         })
-        console.error(getErrorMessage(e))
+        console.error(message)
       }
     },
     enabled: !!signer?._address && !!address,
