@@ -1,10 +1,10 @@
-import Book from "./sections/book"
-import Market from "./sections/market"
-import Trade from "./sections/trade"
+import Book from "./sections/book/book"
+import Market from "./sections/market/market"
+import Trade from "./sections/trade/trade"
 
 export default function Page() {
   return (
-    <div className="grid grid-cols-4 gap-8 h-screen p-10">
+    <div className="grid grid-cols-4 gap-3 h-screen p-1">
       <div className="border border-solid border-white rounded-md">
         <Trade />
       </div>
