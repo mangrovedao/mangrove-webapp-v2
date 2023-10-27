@@ -42,5 +42,5 @@ yarn-error.log*
 *.tsbuildinfo
 
 # Charting Library
-public/tradingview
-public/datafeed
+public/charting_library
+public/datafeeds

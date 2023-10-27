@@ -15,6 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script src="datafeeds/udf/dist/bundle.js"></script>
+      </head>
       <body className={cn(inter.className, "dark")}>
         <RootProvider>
           <Navbar />

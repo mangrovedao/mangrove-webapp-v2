@@ -9,7 +9,10 @@
     "start": "next start",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "postinstall": "tar -xzC public -f tradingview/tradingview.tgz"
+    "postinstall": "mkdir -p public && pnpm run tradingview:chartinglibrary && pnpm run tradingview:datafeeds && pnpm run tradingview:css ",
+    "tradingview:chartinglibrary": "cp -R lib/tradingview/charting_library public",
+    "tradingview:datafeeds": "cp -R lib/tradingview/datafeeds public",
+    "tradingview:css": "cp -R lib/tradingview/css public/charting_library"
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
