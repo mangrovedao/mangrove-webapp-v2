@@ -34,12 +34,18 @@ const accessors = {
   yAccessor: (offer: Offer) => toNumberIfBig(offer.volume),
 }
 
-export declare enum OrderSide {
-  BUY = "BUY",
-  SELL = "SELL",
+type Props = {
+  baseDecimals?: number
+  quoteDecimals?: number
+  baseSymbol?: string
+  quoteSymbol?: string
 }
-
-export default function DepthChart() {
+export default function DepthChart({
+  baseDecimals = 3,
+  quoteDecimals = 4,
+  baseSymbol = "WBTC",
+  quoteSymbol = "USDT",
+}: Props) {
   const {
     cumulativeAsks,
     cumulativeBids,
@@ -48,10 +54,8 @@ export default function DepthChart() {
     onDepthChartZoom,
     range,
     zoomDomain,
-    highestAsk,
     lowestAsk,
     highestBid,
-    lowestBid,
   } = useDepthChart()
 
   if (!(zoomDomain && midPrice)) {
@@ -157,7 +161,7 @@ export default function DepthChart() {
               strokeWidth={0.25}
             />
             <Tooltip<Offer>
-              unstyled
+              detectBounds={true}
               applyPositionStyle
               snapTooltipToDatumX
               snapTooltipToDatumY
@@ -165,6 +169,11 @@ export default function DepthChart() {
               showVerticalCrosshair
               verticalCrosshairStyle={crosshairStyle}
               horizontalCrosshairStyle={crosshairStyle}
+              style={{
+                opacity: 1,
+                zIndex: 999,
+              }}
+              showDatumGlyph={true}
               renderTooltip={({ tooltipData, colorScale }) => {
                 if (
                   !(
@@ -175,13 +184,30 @@ export default function DepthChart() {
                 )
                   return
 
-                const color = colorScale(tooltipData.nearestDatum.key)
+                const key = tooltipData.nearestDatum.key
+                const color = colorScale(key)
+                const price = accessors.xAccessor(
+                  tooltipData.nearestDatum.datum,
+                )
+                const volume = accessors.yAccessor(
+                  tooltipData.nearestDatum.datum,
+                )
                 return (
-                  <div>
-                    <div style={{ color }}>{tooltipData.nearestDatum.key}</div>
-                    {accessors.xAccessor(tooltipData.nearestDatum.datum)}
-                    {", "}
-                    {accessors.yAccessor(tooltipData.nearestDatum.datum)}
+                  <div className="border bg-black p-4 rounded-md">
+                    {price ? (
+                      <div>
+                        <b>Price:</b> {price.toFixed(quoteDecimals)}{" "}
+                        {quoteSymbol}
+                      </div>
+                    ) : undefined}
+                    {key !== DataKeyType.MID_PRICE.toString() && (
+                      <div>
+                        <b style={{ color }}>{key}:</b>{" "}
+                        <span>
+                          {volume.toFixed(baseDecimals)} {baseSymbol}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )
               }}
