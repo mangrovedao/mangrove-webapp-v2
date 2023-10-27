@@ -4,6 +4,7 @@ import { clamp } from "@/utils/interpolation"
 import { orderbookSchema } from "./schema"
 import { calculateCumulative } from "./utils"
 
+import Big from "big.js"
 import mock from "./mock.json"
 
 const { asks, bids } = orderbookSchema.parse(mock)
@@ -14,7 +15,8 @@ const lowestAsk = asks[0]
 const highestBid = bids[0]
 const lowestBid = bids[bids.length - 1]
 const highestAsk = asks[asks.length - 1]
-const midPrice = lowestAsk?.price.add(highestBid?.price ?? 0).div(2)
+let midPrice = lowestAsk?.price.add(highestBid?.price ?? 0).div(2)
+if (!midPrice) midPrice = Big(28000)
 
 export function useDepthChart() {
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
@@ -31,7 +33,7 @@ export function useDepthChart() {
         ),
       )
     }
-  }, [zoomDomain, midPrice])
+  }, [zoomDomain])
 
   const { domain, range } = React.useMemo(() => {
     if (
@@ -74,6 +76,8 @@ export function useDepthChart() {
     return { domain, range }
   }, [zoomDomain])
 
+  console.log({ domain, midPrice })
+
   const onDepthChartZoom = ({ deltaY }: React.WheelEvent) => {
     if (
       !(
@@ -109,5 +113,9 @@ export function useDepthChart() {
     domain,
     range,
     midPrice,
+    highestAsk,
+    lowestAsk,
+    highestBid,
+    lowestBid,
   }
 }

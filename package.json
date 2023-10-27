@@ -23,6 +23,7 @@
     "@tanstack/react-query-devtools": "^4.36.1",
     "@visx/axis": "^3.4.0",
     "@visx/curve": "^3.3.0",
+    "@visx/event": "^3.3.0",
     "@visx/gradient": "^3.3.0",
     "@visx/group": "^3.3.0",
     "@visx/point": "^3.3.0",
