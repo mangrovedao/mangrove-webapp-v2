@@ -2,7 +2,6 @@
 
 import { AlertDialog } from "@/components/stateful/alert-dialog"
 import { Dialog } from "@/components/stateful/dialog"
-import DepthChart from "@/components/ui/depth-chart"
 import useMangrove from "@/providers/mangrove"
 
 export default function Home() {
@@ -24,9 +23,7 @@ export default function Home() {
             <h2>Not connected to mangrove</h2>
           </div>
         )}
-        <div className="w-full h-96">
-          <DepthChart />
-        </div>
+        <div className="w-full h-96">{/* <DepthChart /> */}</div>
       </div>
 
       <Dialog />

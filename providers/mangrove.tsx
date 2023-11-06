@@ -6,6 +6,8 @@ import { useWeb3Modal } from "@web3modal/wagmi/react"
 import React from "react"
 import { useAccount, useNetwork } from "wagmi"
 
+import { mangroveConfig } from "@/schemas/mangrove-config"
+import { getWhitelistedMarkets } from "@/services/markets.service"
 import { networkService } from "@/services/network.service"
 import { useEthersSigner } from "@/utils/adapters"
 import { getErrorMessage } from "@/utils/errors"
@@ -30,7 +32,10 @@ const useMangroveContext = () => {
         return null
       }
       try {
-        return Mangrove.connect({ signer })
+        const mangrove = await Mangrove.connect({ signer })
+        // overwrite the mangrove's configuration thanks to the mangroveConfig env variable
+        mangrove.updateConfiguration(mangroveConfig)
+        return mangrove
       } catch (e) {
         const message = getErrorMessage(e)
         networkService.openWrongNetworkAlertDialog({
@@ -43,19 +48,22 @@ const useMangroveContext = () => {
     enabled: !!signer?._address && !!address,
   })
 
-  const configs = useQuery({
-    queryKey: ["configs", mangrove?.address],
-    queryFn: () => Promise.all([mangrove?.config(), mangrove?.openMarkets()]),
-    enabled: !!mangrove?.address,
+  const { data: markets } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ["whitelistedMarkets", mangrove?.address, chain?.id],
+    queryFn: async () => {
+      if (!mangrove?.address || !chain?.id) return null
+      return getWhitelistedMarkets(mangrove, chain.id)
+    },
+    enabled: !!(mangrove?.address && chain?.id),
   })
-  const [globalConfig, openMarkets] = configs.data ?? [null, null]
 
   // Close web3modal after changing chain
   React.useEffect(() => {
     if (chain?.id) close()
   }, [chain?.id, close])
 
-  return { mangrove, globalConfig, openMarkets }
+  return { mangrove, markets }
 }
 
 const MangroveContext = React.createContext<
