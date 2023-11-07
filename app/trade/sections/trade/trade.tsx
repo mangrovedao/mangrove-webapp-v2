@@ -11,13 +11,15 @@ import MarketOrder from "./components/market-order"
 import Menu from "./components/menu"
 
 export default function TradeInputs() {
-  const [marketTytpe, setMarketType] = React.useState("Market")
+  const [marketType, setMarketType] = React.useState("Market")
 
   return (
     <div>
-      <Menu marketType={marketTytpe} setMarketType={setMarketType} />
+      {/* Menu */}
+      <Menu marketType={marketType} setMarketType={setMarketType} />
       <Separator />
       <div className="px-4 space-y-4">
+        {/* Switch Input*/}
         <Tabs defaultValue="buy" className="pt-5">
           <TabsList className="w-full h-[3.5rem] p-2 rounded-lg">
             <TabsTrigger value="buy" className="w-full h-[2.5rem] rounded-lg">
@@ -28,22 +30,21 @@ export default function TradeInputs() {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <div>
-          <Label> Buy amount</Label>
-          <CustomNumericInput icon="ETH" />
-          <span className="pt-2 text-xs float-right ">
-            Balance: {"1234.12"} {"ETH"}
-          </span>
-        </div>
-        <div>
-          <Label> Pay amount</Label>
-          <CustomNumericInput icon="USDC" />
-          <span className="pt-2 text-xs float-right ">
-            Balance: {"1234.12"} {"USDC"}
-          </span>
-        </div>
-        {marketTytpe === "Limit" ? <LimitOrder /> : null}
-        {marketTytpe === "Market" ? <MarketOrder /> : null}
+        {/* Buy Input*/}
+        <Label> Buy amount</Label>
+        <CustomNumericInput icon="ETH" />
+        <span className="pt-2 text-xs float-right ">
+          Balance: {"1234.12"} {"ETH"}
+        </span>
+        {/* Pay Input */}
+        <Label> Pay amount</Label>
+        <CustomNumericInput icon="USDC" />
+        <span className="pt-2 text-xs float-right ">
+          Balance: {"1234.12"} {"USDC"}
+        </span>
+        {/* Conditional Inputs */}
+        {marketType === "Limit" ? <LimitOrder /> : null}
+        {marketType === "Market" ? <MarketOrder /> : null}
         <Button className="w-full">Buy</Button>
       </div>
     </div>
