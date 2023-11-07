@@ -31,10 +31,8 @@ const data = [
 ]
 
 const calculateBackgroundColor = (volume: number, type: string) => {
-  // Calculate the width percentage based on the "volume"
   const widthPercentage = (volume / 10000) * 100
 
-  // Use the calculated percentage to set the background color
   return `linear-gradient(to left, ${
     type === "buy" ? "#052e16" : "#450a0a"
   } ${widthPercentage}%, transparent ${widthPercentage}%)`
