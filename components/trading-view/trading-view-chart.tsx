@@ -29,7 +29,7 @@ export const TVChartContainer = (
       library_path: "charting_library/",
       locale: "en",
       fullscreen: false,
-      debug: true,
+      // debug: true,
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [
@@ -46,7 +46,7 @@ export const TVChartContainer = (
         "timeframes_toolbar",
       ],
       overrides: {
-        "paneProperties.background": "black",
+        "paneProperties.background": "#020817",
         "paneProperties.backgroundType": "solid",
       },
       // isolatedModules: false,
@@ -139,28 +139,9 @@ export const TVChartContainer = (
 
     const tvWidget = new widget(widgetOptions)
 
-    tvWidget.onChartReady(() => {
-      tvWidget.headerReady().then(() => {
-        const button = tvWidget.createButton()
-        button.setAttribute("title", "Click to show a notification popup")
-        button.classList.add("apply-common-tooltip")
-        button.addEventListener("click", () =>
-          tvWidget.showNoticeDialog({
-            title: "Notification",
-            body: "TradingView Charting Library API works correctly",
-            callback: () => {
-              console.log("Noticed!")
-            },
-          }),
-        )
-
-        button.innerHTML = "Check API"
-      })
-    })
-
     return () => {
       tvWidget.remove()
     }
   }, [props])
-  return <div ref={chartContainerRef} className="flex" />
+  return <div ref={chartContainerRef} className="flex w-full text-center" />
 }

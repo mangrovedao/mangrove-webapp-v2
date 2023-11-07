@@ -17,7 +17,7 @@ const CustomNumericInput = React.forwardRef<
         {...props}
       />
       {icon && (
-        <div className="flex items-center absolute inset-y-0 right-0 p-3">
+        <div className="flex items-center absolute inset-y-0 right-0 p-3 opacity-60">
           {icon}
         </div>
       )}

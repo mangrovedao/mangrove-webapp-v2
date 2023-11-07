@@ -3,13 +3,12 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useDialogStore } from "@/stores/dialog.store"
 import { Button } from "@components/ui/button"
-import { ChevronDown } from "lucide-react"
 
 const DialogContent = () => {
   return (
     <div>
       <Input placeholder="Search pairs" />
-      <Separator />s
+      <Separator />
     </div>
   )
 }
@@ -29,10 +28,16 @@ export default function SelectMarket() {
   return (
     <div>
       <Button
-        className="w-full justify-between bg-[#020817] text-primary hover:text-secondary hover:bg-primary"
-        onClick={openMarketDialog}
+        className="w-full 
+                  bg-muted 
+                  text-primary 
+                  hover:text-foreground hover:bg-background 
+                  hover:border 
+                  hover:border-solid 
+                  hover:border-secondary"
+        onClick={() => openMarketDialog()}
       >
-        BASE/QUOTE <ChevronDown />
+        ETH/USDC
       </Button>
       <Dialog />
     </div>

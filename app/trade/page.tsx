@@ -1,18 +1,22 @@
-import Book from "./sections/book/book"
-import Market from "./sections/market/market"
+import Market from "./sections/charts/market"
+import Header from "./sections/header/header"
+import Book from "./sections/orderbook/book"
 import Trade from "./sections/trade/trade"
 
 export default function Page() {
   return (
-    <div className="grid grid-cols-4 gap-3 h-screen p-1">
-      <div className="border border-solid border-white rounded-md">
-        <Trade />
-      </div>
-      <div className="border border-solid border-white rounded-md">
-        <Book />
-      </div>
-      <div className="col-span-2 border border-solid border-white rounded-md">
-        <Market />
+    <div className="p-2">
+      <Header />
+      <div className="grid grid-cols-4 gap-3">
+        <div className="sm:col-span-4 md:col-span-2 lg:col-span-1 border border-solid border-muted rounded-md">
+          <Trade />
+        </div>
+        <div className="sm:col-span-4 md:col-span-2 lg:col-span-1 border border-solid border-muted rounded-md">
+          <Book />
+        </div>
+        <div className="sm:col-span-4 md:col-span-4 lg:col-span-2 border border-solid border-muted rounded-md">
+          <Market />
+        </div>
       </div>
     </div>
   )

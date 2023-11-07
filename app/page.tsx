@@ -2,14 +2,10 @@
 
 import { AlertDialog } from "@/components/stateful/alert-dialog"
 import { Dialog } from "@/components/stateful/dialog"
-import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
-import { ResolutionString } from "@/lib/tradingview/charting_library/charting_library"
 import useMangrove from "@/providers/mangrove"
-
 
 export default function Home() {
   const { mangrove } = useMangrove()
-
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4">
@@ -28,8 +24,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      <TVChartContainer symbol={'AAPL'} interval={`1D` as ResolutionString}/>
 
       <Dialog />
       <AlertDialog />
