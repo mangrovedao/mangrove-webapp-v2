@@ -37,7 +37,6 @@ export default function TradeInputs() {
         </div>
         <div>
           <Label> Pay amount</Label>
-
           <CustomNumericInput icon="USDC" />
           <span className="pt-2 text-xs float-right ">
             Balance: {"1234.12"} {"USDC"}

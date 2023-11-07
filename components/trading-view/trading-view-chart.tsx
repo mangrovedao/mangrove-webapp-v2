@@ -28,7 +28,7 @@ export const TVChartContainer = (
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
-      fullscreen: false,
+      fullscreen: true,
       // debug: true,
       theme: "dark",
       custom_css_url: "css/styles.css",
@@ -143,5 +143,5 @@ export const TVChartContainer = (
       tvWidget.remove()
     }
   }, [props])
-  return <div ref={chartContainerRef} className="flex w-full text-center" />
+  return <div ref={chartContainerRef} />
 }

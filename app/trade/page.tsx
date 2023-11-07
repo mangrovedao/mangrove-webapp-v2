@@ -1,6 +1,6 @@
-import Market from "./sections/charts/market"
 import Header from "./sections/header/header"
-import Book from "./sections/orderbook/book"
+import Market from "./sections/market/market"
+import Book from "./sections/orderbook/orderbook"
 import Trade from "./sections/trade/trade"
 
 export default function Page() {
