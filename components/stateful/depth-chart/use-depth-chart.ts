@@ -2,7 +2,7 @@ import { Mangrove } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 import React from "react"
 
-import useMangrove from "@/providers/mangrove"
+import useMarket from "@/providers/market"
 import { clamp } from "@/utils/interpolation"
 import { calculateCumulative } from "./utils"
 
@@ -15,10 +15,13 @@ function disablePageScroll() {
 }
 
 export function useDepthChart() {
-  const { asks, bids, pair } = useMangrove()
+  const { requestBookQuery, selectedMarket } = useMarket()
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const [isScrolling, setIsScrolling] = React.useState(false)
 
+  const asks = requestBookQuery.data?.asks
+  const bids = requestBookQuery.data?.bids
+  const isLoading = requestBookQuery.isLoading
   const cumulativeAsks = calculateCumulative(asks)
   const cumulativeBids = calculateCumulative(bids)
   const lowestAsk = asks?.[0]
@@ -33,12 +36,14 @@ export function useDepthChart() {
   }, [asks?.length, bids?.length, highestBid?.price, lowestAsk?.price])
 
   const baseDecimals = React.useMemo(() => {
-    return Mangrove.getDisplayedDecimals(pair?.base.symbol)
-  }, [pair?.base.symbol])
+    if (!selectedMarket?.base.name) return
+    return Mangrove.getDisplayedDecimals(selectedMarket?.base.name)
+  }, [selectedMarket?.base.name])
 
   const priceDecimals = React.useMemo(() => {
-    return Mangrove.getDisplayedPriceDecimals(pair?.quote.symbol)
-  }, [pair?.quote.symbol])
+    if (!selectedMarket?.quote.name) return
+    return Mangrove.getDisplayedPriceDecimals(selectedMarket?.quote.name)
+  }, [selectedMarket?.quote.name])
 
   function onMouseOut() {
     setIsScrolling(false)
@@ -98,12 +103,12 @@ export function useDepthChart() {
           ]
         : ([
             clamp(
-              midPrice.minus(zoomDomain || 0).toNumber(),
+              midPrice.minus(zoomDomain ?? 0).toNumber(),
               0,
               Big(highestBid?.price ?? 0).toNumber(),
             ),
             clamp(
-              midPrice.plus(zoomDomain || 0).toNumber(),
+              midPrice.plus(zoomDomain ?? 0).toNumber(),
               Big(lowestAsk?.price ?? 0).toNumber(),
               Big(highestAsk?.price ?? 0).toNumber(),
             ),
@@ -179,8 +184,9 @@ export function useDepthChart() {
     onMouseMove,
     baseDecimals,
     priceDecimals,
-    pair,
+    selectedMarket,
     asks,
     bids,
+    isLoading,
   }
 }

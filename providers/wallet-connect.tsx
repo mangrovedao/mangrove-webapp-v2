@@ -11,7 +11,9 @@ const chains = getWhitelistedChainObjects()
 const wagmiConfig = defaultWagmiConfig({
   chains,
   projectId,
-  appName: "Mangrove DEX",
+  metadata: {
+    name: "Mangrove DEX",
+  },
 })
 
 export const web3modal = createWeb3Modal({

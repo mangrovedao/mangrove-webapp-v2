@@ -48,7 +48,7 @@ const useMangroveContext = () => {
     enabled: !!signer?._address && !!address,
   })
 
-  const { data: markets } = useQuery({
+  const marketsQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["whitelistedMarkets", mangrove?.address, chain?.id],
     queryFn: async () => {
@@ -63,7 +63,7 @@ const useMangroveContext = () => {
     if (chain?.id) close()
   }, [chain?.id, close])
 
-  return { mangrove, markets }
+  return { mangrove, marketsQuery }
 }
 
 const MangroveContext = React.createContext<

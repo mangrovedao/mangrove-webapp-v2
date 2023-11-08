@@ -2,7 +2,6 @@
 
 import { AlertDialog } from "@/components/stateful/alert-dialog"
 import { Dialog } from "@/components/stateful/dialog"
-import MarketSelector from "@/components/stateful/market-selector"
 import useMangrove from "@/providers/mangrove"
 
 export default function Home() {
@@ -18,9 +17,6 @@ export default function Home() {
             <p>Mangrove address: {mangrove.address}</p>
             <p>Network name: {mangrove.network.name}</p>
             <p>Network id: {mangrove.network.id}</p>
-            <div className="mt-10">
-              <MarketSelector />
-            </div>
           </div>
         ) : (
           <div>
