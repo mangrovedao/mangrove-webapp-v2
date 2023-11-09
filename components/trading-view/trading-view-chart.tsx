@@ -28,7 +28,6 @@ export const TVChartContainer = (
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
-      fullscreen: true,
       // debug: true,
       theme: "dark",
       custom_css_url: "css/styles.css",
@@ -139,6 +138,15 @@ export const TVChartContainer = (
 
     const tvWidget = new widget(widgetOptions)
 
+    tvWidget.onChartReady(() => {
+      tvWidget.headerReady().then(() => {
+        const element = chartContainerRef.current.querySelector(
+          '[id^="tradingview"]',
+        )
+        if (!element) return
+        element.classList.add("w-full")
+      })
+    })
     return () => {
       tvWidget.remove()
     }
