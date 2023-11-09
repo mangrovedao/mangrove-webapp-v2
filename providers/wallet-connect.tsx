@@ -22,12 +22,14 @@ export const web3modal = createWeb3Modal({
   chains,
   themeMode: "dark",
   themeVariables: {
-    "--w3m-border-radius-master": "4px",
+    "--w3m-border-radius-master": "0.3px",
     "--w3m-font-family": "Inter, sans-serif",
     "--w3m-z-index": 1000,
   },
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
+  // @Anas note: puting wagmiConfig.publicClient or .webSocketPublicClient fixes the type issue but web3modal doesn't work anymore then.
+  // @ts-ignore
   return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>
 }
