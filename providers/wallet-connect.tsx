@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react"
@@ -11,7 +12,9 @@ const chains = getWhitelistedChainObjects()
 const wagmiConfig = defaultWagmiConfig({
   chains,
   projectId,
-  appName: "Mangrove DEX",
+  metadata: {
+    name: "Mangrove DEX",
+  },
 })
 
 export const web3modal = createWeb3Modal({
@@ -20,12 +23,14 @@ export const web3modal = createWeb3Modal({
   chains,
   themeMode: "dark",
   themeVariables: {
-    "--w3m-border-radius-master": "4px",
+    "--w3m-border-radius-master": "0.3px",
     "--w3m-font-family": "Inter, sans-serif",
     "--w3m-z-index": 1000,
   },
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
+  // @Anas note: puting wagmiConfig.publicClient or .webSocketPublicClient fixes the type issue but web3modal doesn't work anymore then.
+  // @ts-expect-error
   return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>
 }

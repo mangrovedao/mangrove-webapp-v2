@@ -33,6 +33,10 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    --color-red: hsl(357, 79%, 62%);
+    --color-green: hsl(158, 61%, 53%);
+
+    --border-width: 1px;
   }
 
   .dark {
