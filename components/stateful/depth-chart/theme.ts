@@ -1,14 +1,14 @@
-import { buildChartTheme, darkTheme } from "@visx/xychart";
+import { buildChartTheme, darkTheme } from "@visx/xychart"
 
-const borderVar = "hsl(var(--border))";
-const borderWidthVar = "var(--border-width)";
-const greenColorVar = "var(--color-green)";
-const redColorVar = "var(--color-red)";
+const borderVar = "hsl(var(--border))"
+const borderWidthVar = "var(--border-width)"
+const greenColorVar = "var(--color-green)"
+const redColorVar = "var(--color-red)"
 const crosshairStyle = {
   strokeWidth: 1,
   strokeDasharray: "5 5",
   opacity: 0.7,
-} as React.SVGProps<SVGLineElement>;
+} as React.SVGProps<SVGLineElement>
 
 const theme = buildChartTheme({
   ...darkTheme,
@@ -16,7 +16,7 @@ const theme = buildChartTheme({
   tickLength: 0,
   gridColor: borderVar,
   gridColorDark: borderVar,
-});
+})
 
 export {
   borderVar,
@@ -25,4 +25,4 @@ export {
   greenColorVar,
   redColorVar,
   theme,
-};
+}
