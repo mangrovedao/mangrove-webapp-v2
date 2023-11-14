@@ -8,7 +8,7 @@ export default function Home() {
   const { mangrove } = useMangrove()
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-4">
+    <main className="flex h-full flex-col items-center justify-between p-4">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex-col space-y-4">
         <h1>Webapp</h1>
         {mangrove ? (
@@ -23,6 +23,7 @@ export default function Home() {
             <h2>Not connected to mangrove</h2>
           </div>
         )}
+        <div className="w-full h-96">{/* <DepthChart /> */}</div>
       </div>
 
       <Dialog />
