@@ -58,7 +58,7 @@
   ],
   "exclude": [
     "node_modules",
-    "lib/tradingview/**/*",
+    "lib/tradingview",
     "public"
   ]
 }
