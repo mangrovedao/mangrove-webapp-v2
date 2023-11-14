@@ -1,12 +1,9 @@
-import { Inter } from "next/font/google"
 import { Toaster } from "sonner"
 
 import { Navbar } from "@/components/navbar"
 import { RootProvider } from "@/providers/root"
-import { cn } from "utils"
-import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+import "./globals.css"
 
 export default function RootLayout({
   children,
@@ -17,8 +14,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <script src="datafeeds/udf/dist/bundle.js"></script>
+        <link rel="stylesheet" href="fonts/fonts.css" />
       </head>
-      <body className={cn(inter.className, "dark")}>
+      <body>
         <RootProvider>
           <Navbar />
           {children}

@@ -45,7 +45,7 @@ export const TVChartContainer = (
         "timeframes_toolbar",
       ],
       overrides: {
-        "paneProperties.background": "#020817",
+        "paneProperties.background": "#010e0e",
         "paneProperties.backgroundType": "solid",
       },
       // isolatedModules: false,
