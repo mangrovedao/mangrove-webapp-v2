@@ -31,6 +31,6 @@ export const web3modal = createWeb3Modal({
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
   // @Anas note: puting wagmiConfig.publicClient or .webSocketPublicClient fixes the type issue but web3modal doesn't work anymore then.
-  // @ts-ignore
+  // @ts-expect-error
   return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>
 }
