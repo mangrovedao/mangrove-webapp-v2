@@ -40,3 +40,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# Charting Library
+public/charting_library
+public/datafeeds

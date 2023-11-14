@@ -1,14 +1,22 @@
-import DepthChart from "@/components/stateful/depth-chart/depth-chart"
-import MarketSelector from "@/components/stateful/market-selector"
+import Header from "./sections/header/header"
+import Market from "./sections/market/market"
+import Book from "./sections/orderbook/orderbook"
+import Trade from "./sections/trade/trade"
 
-export default function Trade() {
+export default function Page() {
   return (
-    <div>
-      <h1>Trade Page</h1>
-      <MarketSelector />
-
-      <div className="mt-20 min-h-[400px] inline-grid w-full">
-        <DepthChart />
+    <div className="p-2">
+      <Header />
+      <div className="grid grid-cols-4 gap-3">
+        <div className="sm:col-span-4 md:col-span-2 lg:col-span-1 border border-solid border-muted rounded-md">
+          <Trade />
+        </div>
+        <div className="sm:col-span-4 md:col-span-2 lg:col-span-1 border border-solid border-muted rounded-md">
+          <Book />
+        </div>
+        <div className="sm:col-span-4 md:col-span-4 lg:col-span-2 border border-solid border-muted rounded-md">
+          <Market />
+        </div>
       </div>
     </div>
   )
