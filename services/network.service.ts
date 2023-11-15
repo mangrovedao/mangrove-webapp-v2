@@ -1,5 +1,5 @@
 import { web3modal } from "@/providers/wallet-connect"
-import { alertDialogs } from "@/utils/alert-dialogs"
+import { alertDialogs } from "@/services/alert-dialogs.service"
 
 // Close the alert dialog saying that the network is wrong
 // and open the network selection modal from wallet connect

@@ -18,6 +18,13 @@ const useMangroveContext = () => {
   const { chain } = useNetwork()
   const { address } = useAccount()
 
+  // React.useEffect(() => {
+  //   networkService.openWrongNetworkAlertDialog({
+  //     title: "Error connecting to Mangrove",
+  //     children: "Toast",
+  //   })
+  // }, [])
+
   const { data: mangrove } = useQuery({
     queryKey: [
       "mangroveInstance",
