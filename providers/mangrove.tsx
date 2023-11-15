@@ -63,6 +63,13 @@ const useMangroveContext = () => {
     if (chain?.id) close()
   }, [chain?.id, close])
 
+  // Close wrong network alert dialog after connecting to the right network
+  React.useEffect(() => {
+    if (!chain?.unsupported) {
+      networkService.closeWrongNetworkAlertDialog()
+    }
+  }, [chain?.unsupported])
+
   return { mangrove, marketsQuery }
 }
 
