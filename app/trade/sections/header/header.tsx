@@ -1,7 +1,7 @@
 "use client"
 
 import MarketSelector from "@/components/stateful/market-selector"
-import StatusBar from "./components/status-bar"
+import MarketInfoBar from "../../components/market-infos-bar"
 
 export default function Header() {
   return (
@@ -10,7 +10,7 @@ export default function Header() {
         <MarketSelector />
       </div>
       <div className="col-span-3">
-        <StatusBar />
+        <MarketInfoBar />
       </div>
     </div>
   )

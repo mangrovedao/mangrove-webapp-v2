@@ -52,6 +52,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cryptocurrency-icons": "^0.18.1",
+    "get-user-locale": "^2.3.1",
     "lucide-react": "^0.279.0",
     "next": "^14.0.2",
     "next-ssl-redirect-middleware": "^0.1.5",
