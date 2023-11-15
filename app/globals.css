@@ -48,3 +48,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+body.mouse-down *:focus {
+  outline: 0;
+  --tw-ring-color: transparent;
+}
