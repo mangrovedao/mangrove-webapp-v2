@@ -18,13 +18,6 @@ const useMangroveContext = () => {
   const { chain } = useNetwork()
   const { address } = useAccount()
 
-  // React.useEffect(() => {
-  //   networkService.openWrongNetworkAlertDialog({
-  //     title: "Error connecting to Mangrove",
-  //     children: "Toast",
-  //   })
-  // }, [])
-
   const { data: mangrove } = useQuery({
     queryKey: [
       "mangroveInstance",
@@ -69,6 +62,13 @@ const useMangroveContext = () => {
   React.useEffect(() => {
     if (chain?.id) close()
   }, [chain?.id, close])
+
+  // Close wrong network alert dialog after connecting to the right network
+  React.useEffect(() => {
+    if (!chain?.unsupported) {
+      networkService.closeWrongNetworkAlertDialog()
+    }
+  }, [chain?.unsupported])
 
   return { mangrove, marketsQuery }
 }
