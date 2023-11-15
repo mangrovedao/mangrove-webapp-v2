@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import { TokenIcon } from "../token-icon"
 
 function getName(market?: Market) {
   if (!market) return
@@ -41,7 +42,7 @@ export default function MarketSelector() {
       onValueChange={onValueChange}
       disabled={marketsQuery.isLoading}
     >
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="border-none h-6 p-0">
         <SelectValue placeholder="Select a market" />
       </SelectTrigger>
       <SelectContent>
@@ -50,7 +51,13 @@ export default function MarketSelector() {
             key={`${market.base.address}/${market.quote.address}`}
             value={getValue(market)}
           >
-            {getName(market)}
+            <div className="flex items-center space-x-2">
+              <div className="flex -space-x-2">
+                <TokenIcon symbol={market.base.name} />
+                <TokenIcon symbol={market.quote.name} />
+              </div>
+              <span>{getName(market)}</span>
+            </div>
           </SelectItem>
         ))}
       </SelectContent>

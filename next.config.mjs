@@ -20,6 +20,15 @@ const config = {
   images: {
     domains: ["explorer-api.walletconnect.com"],
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/trade',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 export default config
