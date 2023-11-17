@@ -2,6 +2,7 @@
 
 import React from "react"
 
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
@@ -96,66 +97,71 @@ export default function MarketInfosBar() {
   const variation24h = oneMinuteClose - oneDayClose
 
   return (
-    <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full">
-      <Item
-        label="Price"
-        value={oneMinutePriceQuery?.data?.close}
-        skeleton={oneMinutePriceQuery?.isLoading}
-        quoteName={selectedMarket?.quote.name}
-        showSymbol
-      />
+    <ScrollArea className="w-full h-full">
+      <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full">
+        <Item
+          label="Price"
+          value={oneMinutePriceQuery?.data?.close}
+          skeleton={oneMinutePriceQuery?.isLoading}
+          quoteName={selectedMarket?.quote.name}
+          showSymbol
+        />
 
-      <Separator orientation="vertical" className="h-4" />
+        <Separator orientation="vertical" className="h-4" />
 
-      <Item
-        label={`24h Change`}
-        value={variation24h}
-        quoteName={selectedMarket?.quote.name}
-        skeleton={oneDayPriceQuery?.isLoading || oneMinutePriceQuery?.isLoading}
-        rightElement={
-          <span
-            className={cn("space-x-[2px] text-xs inline-flex ml-2", {
-              "text-green-500": variation24h >= 0,
-              "text-red-500": variation24h < 0,
-            })}
-          >
-            <VariationArrow
-              className={cn("h-3", {
-                "rotate-180": variation24h < 0,
+        <Item
+          label={`24h Change`}
+          value={variation24h}
+          quoteName={selectedMarket?.quote.name}
+          skeleton={
+            oneDayPriceQuery?.isLoading || oneMinutePriceQuery?.isLoading
+          }
+          rightElement={
+            <span
+              className={cn("space-x-[2px] text-xs inline-flex ml-2", {
+                "text-green-500": variation24h >= 0,
+                "text-red-500": variation24h < 0,
               })}
-            />
-            <span>
-              {new Intl.NumberFormat(undefined, {
-                style: "percent",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(variationPercentageAbs / 100)}
+            >
+              <VariationArrow
+                className={cn("h-3", {
+                  "rotate-180": variation24h < 0,
+                })}
+              />
+              <span>
+                {new Intl.NumberFormat(undefined, {
+                  style: "percent",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(variationPercentageAbs / 100)}
+              </span>
             </span>
-          </span>
-        }
-      />
+          }
+        />
 
-      {Object.entries(keyLabels).map(([key, label]) => (
-        <React.Fragment key={key}>
-          <Separator orientation="vertical" className="h-4" />
+        {Object.entries(keyLabels).map(([key, label]) => (
+          <React.Fragment key={key}>
+            <Separator orientation="vertical" className="h-4" />
 
-          <Item
-            label={label}
-            value={oneDayPriceQuery?.data?.[key as keyof typeof keyLabels]}
-            quoteName={selectedMarket?.quote.name}
-            skeleton={oneDayPriceQuery?.isLoading}
-          />
-        </React.Fragment>
-      ))}
+            <Item
+              label={label}
+              value={oneDayPriceQuery?.data?.[key as keyof typeof keyLabels]}
+              quoteName={selectedMarket?.quote.name}
+              skeleton={oneDayPriceQuery?.isLoading}
+            />
+          </React.Fragment>
+        ))}
 
-      <Separator orientation="vertical" className="h-4" />
+        <Separator orientation="vertical" className="h-4" />
 
-      <Item
-        label={quoteName ? `24h Volume (${quoteName})` : `24h Volume`}
-        value={oneDayPriceQuery?.data?.volume}
-        quoteName={selectedMarket?.quote.name}
-        skeleton={oneDayPriceQuery?.isLoading}
-      />
-    </div>
+        <Item
+          label={quoteName ? `24h Volume (${quoteName})` : `24h Volume`}
+          value={oneDayPriceQuery?.data?.volume}
+          quoteName={selectedMarket?.quote.name}
+          skeleton={oneDayPriceQuery?.isLoading}
+        />
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
   )
 }
