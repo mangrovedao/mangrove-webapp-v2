@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 
 const data = [
@@ -51,32 +52,56 @@ function OrderBookTableCell({ children, className }: TableCellProps) {
   )
 }
 
-export default function Book() {
-  const [marketTytpe, setMarketType] = React.useState("Book")
+type SemiBookProps = {
+  type: "asks" | "bids"
+}
 
+function SemiBook({ type }: SemiBookProps) {
+  const { requestBookQuery } = useMarket()
+  const offers = requestBookQuery.data?.[type]
   return (
-    <div className="grid">
-      <div className="flex start">
-        <Button
-          variant={"link"}
-          className={`${marketTytpe === "Book" && `underline`}`}
-          onClick={() => setMarketType("Book")}
-        >
-          Book
-        </Button>
-        <Button
-          variant={"link"}
-          className={`${marketTytpe === "Trades" && `underline`}`}
-          onClick={() => setMarketType("Trades")}
-        >
-          Trades
-        </Button>
+    <>
+      {(offers || []).map(({ price, id, volume }, i) => (
+        <TableRow key={`${type}-${id}`} className={`relative h-6 border-none`}>
+          <OrderBookTableCell
+            className={cn(
+              "text-left",
+              type === "bids" ? "text-green" : "text-red",
+            )}
+          >
+            {volume.toFixed(2)}
+          </OrderBookTableCell>
+          <OrderBookTableCell>{price?.toFixed(2)}</OrderBookTableCell>
+          <OrderBookTableCell>
+            {price?.mul(volume).toFixed(2)}
+          </OrderBookTableCell>
+          <td
+            className={cn(
+              "absolute inset-y-[2px] left-0 w-full -z-10 rounded-[2px]",
+              type === "bids" ? "text-green" : "text-red",
+            )}
+            style={{
+              width: `${(volume.toNumber() / 10000) * 100}%`,
+              background: type === "bids" ? "#021B1A" : "rgba(255, 0, 0, 0.15)",
+            }}
+          ></td>
+        </TableRow>
+      ))}
+    </>
+  )
+}
+
+export default function Book({ className }: React.ComponentProps<"div">) {
+  return (
+    <div className={className}>
+      <div className="min-h-[54px] flex items-center">
+        <Button variant={"link"}>Book</Button>
       </div>
       <Separator />
-      <div>
+      <div className="px-1 overflow-y-scroll h-full">
         <Table className="text-xs">
-          <TableHeader>
-            <TableRow>
+          <TableHeader className="sticky top-0">
+            <TableRow className="border-none">
               <OrderBookTableHead className="text-left">
                 Size (ETH)
               </OrderBookTableHead>
@@ -84,35 +109,9 @@ export default function Book() {
               <OrderBookTableHead>Total</OrderBookTableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {data.map(({ price, time, volume, type }, i) => (
-              <TableRow
-                key={`order-book-${i}`}
-                className={`relative h-6 border-none`}
-              >
-                <OrderBookTableCell
-                  className={cn(
-                    "text-left",
-                    type === "buy" ? "text-green" : "text-red",
-                  )}
-                >
-                  {volume}
-                </OrderBookTableCell>
-                <OrderBookTableCell>{price}</OrderBookTableCell>
-                <OrderBookTableCell>{time}</OrderBookTableCell>
-                <td
-                  className={cn(
-                    "absolute inset-y-[2px] left-0 w-full -z-10 rounded-r-[2px]",
-                    type === "buy" ? "text-green" : "text-red",
-                  )}
-                  style={{
-                    width: `${(volume / 10000) * 100}%`,
-                    background:
-                      type === "buy" ? "#021B1A" : "rgba(255, 0, 0, 0.15)",
-                  }}
-                ></td>
-              </TableRow>
-            ))}
+          <TableBody className="">
+            <SemiBook type="asks" />
+            <SemiBook type="bids" />
           </TableBody>
         </Table>
       </div>

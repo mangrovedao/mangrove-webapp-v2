@@ -10,11 +10,13 @@ import LimitOrder from "./components/limit-order"
 import MarketOrder from "./components/market-order"
 import Menu from "./components/menu"
 
-export default function TradeInputs() {
+export default function TradeInputs({
+  className,
+}: React.ComponentProps<"div">) {
   const [marketType, setMarketType] = React.useState("Market")
 
   return (
-    <div>
+    <div className={className}>
       {/* Menu */}
       <Menu marketType={marketType} setMarketType={setMarketType} />
       <Separator />
