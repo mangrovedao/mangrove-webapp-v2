@@ -41,7 +41,6 @@ function Item({
   quoteName?: string
   rightElement?: React.ReactElement
 }) {
-  const showPlaceholder = skeleton && !value && !quoteName
   const displayedPriceDecimals = determinePriceDecimalsFromTokenName(
     value,
     quoteName,
@@ -50,7 +49,7 @@ function Item({
   return (
     <Container>
       <Label>{label}</Label>
-      {showPlaceholder ? (
+      {skeleton ? (
         <Skeleton className="w-16 h-4" />
       ) : value ? (
         <Value>
@@ -66,7 +65,7 @@ function Item({
           </div>
         </Value>
       ) : (
-        <span className="text-red">unk</span>
+        <span className="text-red">N/A</span>
       )}
     </Container>
   )
