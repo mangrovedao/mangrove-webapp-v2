@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/utils"
 
 const data = [
   { volume: 1234.56, price: 0.92, time: 5.0, type: "sell" },
@@ -30,12 +31,24 @@ const data = [
   { volume: 5432.1, price: 0.97, time: 10.0, type: "buy" },
 ]
 
-const calculateBackgroundColor = (volume: number, type: string) => {
-  const widthPercentage = (volume / 10000) * 100
+type TableCellProps = {
+  className?: string
+} & React.PropsWithChildren
 
-  return `linear-gradient(to left, ${
-    type === "buy" ? "#052e16" : "#450a0a"
-  } ${widthPercentage}%, transparent ${widthPercentage}%)`
+function OrderBookTableHead({ children, className }: TableCellProps) {
+  return (
+    <TableHead className={cn("p-0 px-[13px] text-right", className)}>
+      {children}
+    </TableHead>
+  )
+}
+
+function OrderBookTableCell({ children, className }: TableCellProps) {
+  return (
+    <TableCell className={cn("p-0 px-[13px] text-right", className)}>
+      {children}
+    </TableCell>
+  )
 }
 
 export default function Book() {
@@ -61,24 +74,43 @@ export default function Book() {
       </div>
       <Separator />
       <div>
-        <Table>
+        <Table className="text-xs">
           <TableHeader>
             <TableRow>
-              <TableHead>Size (ETH)</TableHead>
-              <TableHead>Price (USDC)</TableHead>
-              <TableHead>Time</TableHead>
+              <OrderBookTableHead className="text-left">
+                Size (ETH)
+              </OrderBookTableHead>
+              <OrderBookTableHead>Price (USDC)</OrderBookTableHead>
+              <OrderBookTableHead>Total</OrderBookTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.map(({ price, time, volume, type }, i) => (
               <TableRow
                 key={`order-book-${i}`}
-                className={`text-center hover:opacity-90`}
-                style={{ background: calculateBackgroundColor(volume, type) }}
+                className={`relative h-6 border-none`}
               >
-                <TableCell>{volume}</TableCell>
-                <TableCell>{price}</TableCell>
-                <TableCell>{time}</TableCell>
+                <OrderBookTableCell
+                  className={cn(
+                    "text-left",
+                    type === "buy" ? "text-green" : "text-red",
+                  )}
+                >
+                  {volume}
+                </OrderBookTableCell>
+                <OrderBookTableCell>{price}</OrderBookTableCell>
+                <OrderBookTableCell>{time}</OrderBookTableCell>
+                <td
+                  className={cn(
+                    "absolute inset-y-[2px] left-0 w-full -z-10 rounded-r-[2px]",
+                    type === "buy" ? "text-green" : "text-red",
+                  )}
+                  style={{
+                    width: `${(volume / 10000) * 100}%`,
+                    background:
+                      type === "buy" ? "#021B1A" : "rgba(255, 0, 0, 0.15)",
+                  }}
+                ></td>
               </TableRow>
             ))}
           </TableBody>
