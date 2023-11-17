@@ -28,6 +28,7 @@ export async function getTokenPriceInToken(
       const fallbackResponse = await fetch(
         `https://min-api.cryptocompare.com/data/price?fsym=${tokenSymbol}&tsyms=${priceTokenSymbol}`,
       )
+
       if (fallbackResponse.ok) {
         const fallbackJson = await fallbackResponse.json()
         const fallback = cryptoComparePriceResponseSchema.parse(fallbackJson)

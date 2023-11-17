@@ -1,10 +1,17 @@
 "use client"
+
+import React from "react"
+
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
-import { formatNumber } from "@/utils/numbers"
-import React from "react"
+import { VariationArrow } from "@/svgs"
+import { cn } from "@/utils"
+import {
+  determinePriceDecimalsFromTokenName,
+  formatNumber,
+} from "@/utils/numbers"
 
 function Container({ children }: React.PropsWithChildren) {
   return <span className="text-xs font-medium space-y-[2px]">{children}</span>
@@ -22,30 +29,43 @@ function Item({
   label,
   value,
   skeleton = true,
-  decimals = 2,
   showSymbol = false,
+  quoteName,
+  rightElement,
 }: {
   label: string
   value?: number | bigint
   skeleton?: boolean
-  decimals?: number
   showSymbol?: boolean
+  quoteName?: string
+  rightElement?: React.ReactElement
 }) {
+  const showPlaceholder = skeleton && !value && !quoteName
+  const displayedPriceDecimals = determinePriceDecimalsFromTokenName(
+    value,
+    quoteName,
+  )
+
   return (
     <Container>
       <Label>{label}</Label>
-      {!skeleton ? (
+      {showPlaceholder ? (
+        <Skeleton className="w-16 h-4" />
+      ) : value ? (
         <Value>
-          {formatNumber(value ?? 0, {
-            style: showSymbol ? "currency" : undefined,
-            currencyDisplay: showSymbol ? "symbol" : undefined,
-            currency: showSymbol ? "USD" : undefined,
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals,
-          })}
+          <div className="flex items-center">
+            {formatNumber(value ?? 0, {
+              style: showSymbol ? "currency" : undefined,
+              currencyDisplay: showSymbol ? "symbol" : undefined,
+              currency: showSymbol ? "USD" : undefined,
+              minimumFractionDigits: displayedPriceDecimals,
+              maximumFractionDigits: displayedPriceDecimals,
+            })}
+            {rightElement}
+          </div>
         </Value>
       ) : (
-        <Skeleton className="w-16 h-4" />
+        <span className="text-red">unk</span>
       )}
     </Container>
   )
@@ -67,17 +87,52 @@ export default function MarketInfosBar() {
     selectedMarket?.quote.name,
     "1d",
   )
-  const displayedDecimals = selectedMarket?.quote.displayedDecimals
   const quoteName = selectedMarket?.quote.name
+
+  const oneMinuteClose = oneMinutePriceQuery?.data?.close ?? 0
+  const oneDayClose = oneDayPriceQuery?.data?.close ?? 0
+  const variationPercentage = (oneMinuteClose * 100) / oneDayClose - 100
+  const variationPercentageAbs = Math.abs(variationPercentage)
+  const variation24h = oneMinuteClose - oneDayClose
 
   return (
     <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full">
       <Item
         label="Price"
         value={oneMinutePriceQuery?.data?.close}
-        decimals={displayedDecimals}
         skeleton={oneMinutePriceQuery?.isLoading}
+        quoteName={selectedMarket?.quote.name}
         showSymbol
+      />
+
+      <Separator orientation="vertical" className="h-4" />
+
+      <Item
+        label={`24h Change`}
+        value={variation24h}
+        quoteName={selectedMarket?.quote.name}
+        skeleton={oneDayPriceQuery?.isLoading || oneMinutePriceQuery?.isLoading}
+        rightElement={
+          <span
+            className={cn("space-x-[2px] text-xs inline-flex ml-2", {
+              "text-green-500": variation24h >= 0,
+              "text-red-500": variation24h < 0,
+            })}
+          >
+            <VariationArrow
+              className={cn("h-3", {
+                "rotate-180": variation24h < 0,
+              })}
+            />
+            <span>
+              {new Intl.NumberFormat(undefined, {
+                style: "percent",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(variationPercentageAbs / 100)}
+            </span>
+          </span>
+        }
       />
 
       {Object.entries(keyLabels).map(([key, label]) => (
@@ -87,7 +142,7 @@ export default function MarketInfosBar() {
           <Item
             label={label}
             value={oneDayPriceQuery?.data?.[key as keyof typeof keyLabels]}
-            decimals={displayedDecimals}
+            quoteName={selectedMarket?.quote.name}
             skeleton={oneDayPriceQuery?.isLoading}
           />
         </React.Fragment>
@@ -96,9 +151,9 @@ export default function MarketInfosBar() {
       <Separator orientation="vertical" className="h-4" />
 
       <Item
-        label={`24h Volume (${quoteName})`}
+        label={quoteName ? `24h Volume (${quoteName})` : `24h Volume`}
         value={oneDayPriceQuery?.data?.volume}
-        decimals={displayedDecimals}
+        quoteName={selectedMarket?.quote.name}
         skeleton={oneDayPriceQuery?.isLoading}
       />
     </div>

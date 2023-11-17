@@ -58,6 +58,9 @@ export default {
         green: {
           DEFAULT: "var(--color-green)",
         },
+        red: {
+          DEFAULT: "var(--color-red)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

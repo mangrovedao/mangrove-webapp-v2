@@ -12,6 +12,8 @@ const useTokenPriceQuery = (
     queryKey: ["tokenPrice", tokenSymbol, priceTokenSymbol, interval],
     queryFn: () =>
       getTokenPriceInToken(tokenSymbol, priceTokenSymbol, interval),
+    enabled: !!tokenSymbol && !!priceTokenSymbol,
+    refetchInterval: interval === "1m" ? 1000 * 60 : false, // every minute for 1m interval only
   })
 }
 

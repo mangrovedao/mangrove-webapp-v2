@@ -24,7 +24,7 @@ export function convertToMangroveApiResponse(
 ): PartialMangrovePriceResponseSchema {
   const tokenName = Object.keys(response)[0]
   if (!tokenName) throw new Error("Invalid response from CryptoCompare API")
-  return mangrovePriceResponseSchema.partial({}).parse({
+  return partialMangrovePriceResponseSchema.parse({
     close: response[tokenName],
   })
 }
