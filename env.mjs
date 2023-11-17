@@ -21,6 +21,7 @@ export const env = createEnv({
     NEXT_PUBLIC_WHITELISTED_CHAIN_IDS: z.string(),
     NEXT_PUBLIC_MARKETS: z.string(),
     NEXT_PUBLIC_MANGROVE_CONFIG: z.string(),
+    NEXT_PUBLIC_PRICE_API_URL: z.string().url(),
   },
 
   /**
@@ -35,6 +36,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_WHITELISTED_CHAIN_IDS,
     NEXT_PUBLIC_MARKETS: process.env.NEXT_PUBLIC_MARKETS,
     NEXT_PUBLIC_MANGROVE_CONFIG: process.env.NEXT_PUBLIC_MANGROVE_CONFIG,
+    NEXT_PUBLIC_PRICE_API_URL: process.env.NEXT_PUBLIC_PRICE_API_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

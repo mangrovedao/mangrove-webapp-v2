@@ -34,3 +34,19 @@ export function Bell(props: React.ComponentProps<"svg">) {
     </svg>
   )
 }
+
+export function VariationArrow(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 12 12"
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="M5.584 3.627a.5.5 0 01.832 0l2.398 3.596A.5.5 0 018.398 8H3.602a.5.5 0 01-.416-.777l2.398-3.595z"
+      ></path>
+    </svg>
+  )
+}
