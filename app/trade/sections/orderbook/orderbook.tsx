@@ -2,7 +2,6 @@
 import React from "react"
 
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import {
   Table,
   TableBody,
@@ -91,14 +90,16 @@ function SemiBook({ type }: SemiBookProps) {
   )
 }
 
-export default function Book({ className }: React.ComponentProps<"div">) {
+export default function Book({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
-    <div className={className}>
-      <div className="min-h-[54px] flex items-center">
+    <div className={className} {...props}>
+      <div className="min-h-[54px] flex items-center border-b">
         <Button variant={"link"}>Book</Button>
       </div>
-      <Separator />
-      <div className="px-1 overflow-y-scroll h-full">
+      <div className="px-1">
         <Table className="text-xs">
           <TableHeader className="sticky top-0">
             <TableRow className="border-none">

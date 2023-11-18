@@ -16,7 +16,7 @@ export default function RootLayout({
         <script src="datafeeds/udf/dist/bundle.js"></script>
         <link rel="stylesheet" href="fonts/fonts.css" />
       </head>
-      <body className="h-screen w-screen overflow-hidden">
+      <body className="grid grid-areas-layout">
         <RootProvider>
           <Navbar />
           {children}

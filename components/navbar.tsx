@@ -34,7 +34,7 @@ export function Navbar() {
   const currentRoute = usePathname()
   const clipPathId = React.useId()
   return (
-    <nav className="flex w-full justify-between items-center min-h-[40px] border-b px-4 py-[11px] text-sm">
+    <nav className="flex w-full justify-between items-center border-b px-4 text-sm grid-in-header">
       <span className="flex items-center space-x-8 h-8 py-1">
         <svg
           xmlns="http://www.w3.org/2000/svg"

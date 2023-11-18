@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ResolutionString } from "@/public/charting_library/charting_library"
 
-export default function Market({ className }: React.ComponentProps<"div">) {
+export default function Market({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const [marketTytpe, setMarketType] = React.useState("Market Chart")
 
   return (
-    <div className={className}>
+    <div className={className} {...props}>
       <div className="flex start px-4">
         <Button
           variant={"link"}
@@ -29,7 +32,7 @@ export default function Market({ className }: React.ComponentProps<"div">) {
       </div>
       <Separator />
       {/* @Anas note: added p-0.5 because in some cases the chart goes outside of the div */}
-      <div className="px-4">
+      <div className="px-4 h-full">
         <TVChartContainer symbol={"AAPL"} interval={`1D` as ResolutionString} />
       </div>
     </div>

@@ -53,3 +53,24 @@ body.mouse-down *:focus {
   outline: 0;
   --tw-ring-color: transparent;
 }
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: grid;
+  grid-template:
+    "header" 54px
+    "main" minmax(min-content, 1fr);
+}
+
+main {
+  display: grid;
+  grid-template-columns: 20.5rem 1fr;
+  grid-template-rows: auto 361px;
+  grid-template-areas:
+    "trade content"
+    "trade tables";
+}

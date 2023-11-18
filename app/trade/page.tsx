@@ -49,26 +49,66 @@ const data = [
 
 export default function Page() {
   return (
-    <div className="h-full">
-      <div className="h-full flex">
-        <div className="max-w-xs">
+    <main
+      style={{
+        gridArea: "main",
+        maxHeight: "calc(100vh - 54px)",
+      }}
+    >
+      <section
+        style={{
+          gridArea: "trade",
+        }}
+      >
+        <div className="">
           <div className="px-4 py-[15px] border-b">
             <MarketSelector />
           </div>
-          <Trade className="h-full" />
+          <Trade className="" />
         </div>
-        <Book className="h-full max-w-xs w-full border-x" />
-        <div className="w-full h-full">
+      </section>
+      <section
+        className="grid border-x"
+        style={{
+          gridArea: "content",
+          gridTemplateAreas: `
+            "book chart"
+          `,
+          gridTemplateColumns: "20.5rem 1fr",
+          gridTemplateRows: "minmax(0, calc(100vh - 54px - 361px))",
+        }}
+      >
+        <Book
+          className="overflow-hidden border-r"
+          style={{ gridArea: "book" }}
+        />
+        <div
+          style={{
+            gridArea: "chart",
+          }}
+        >
           <MarketInfoBar />
-          <Market className="w-full border-t" />
+          <Market
+            className="w-full border-t"
+            style={{
+              height: "calc(100% - 54px - 44px - 1px);",
+            }}
+          />
         </div>
-      </div>
-      <Tables />
-    </div>
+      </section>
+      <section
+        className="overflow-y-auto border-x border-t"
+        style={{
+          gridArea: "tables",
+        }}
+      >
+        <Tables />
+      </section>
+    </main>
   )
 }
 
-function Tables({ className }: React.ComponentProps<"div">) {
+export function Tables({ className }: React.ComponentProps<"div">) {
   return (
     <div className={className}>
       <div className="m-5 flex space-x-5">
