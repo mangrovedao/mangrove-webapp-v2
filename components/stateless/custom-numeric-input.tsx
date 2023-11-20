@@ -1,24 +1,32 @@
 import { NumericInput, NumericInputProps } from "@components/ui/numeric-input"
 import * as React from "react"
+import { TokenIcon } from "../token-icon"
 
 interface CustomNumericInputProps extends NumericInputProps {
-  icon?: React.ReactNode
+  symbol?: React.ReactNode
+  icon?: string
 }
 
 const CustomNumericInput = React.forwardRef<
   HTMLInputElement,
   CustomNumericInputProps
->(({ className, type, icon, onUserInput, ...props }, ref) => {
+>(({ className, type, icon, symbol, onUserInput, ...props }, ref) => {
   return (
     <div className="flex w-full relative">
+      {icon && (
+        <div className="flex items-center absolute inset-y-0 left-0 p-3">
+          <TokenIcon symbol={icon} />
+        </div>
+      )}
       <NumericInput
-        className={className}
+        className={`${icon && "pl-11"}  ${className}`} // Adjust padding for spacing
         onUserInput={onUserInput}
         {...props}
+        ref={ref}
       />
-      {icon && (
-        <div className="flex items-center absolute inset-y-0 right-0 p-3 opacity-60">
-          {icon}
+      {symbol && (
+        <div className="flex items-center absolute inset-y-0 right-0 p-3 opacity-20">
+          {symbol}
         </div>
       )}
     </div>

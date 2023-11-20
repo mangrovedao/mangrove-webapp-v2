@@ -20,11 +20,15 @@ export default function MarketOrder() {
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
-    <div className="space-y-3 pt-5">
-      <div className="flex justify-between">
-        <Label>Average market price</Label>
+    <div className="space-y-5 pt-5">
+      <Separator />
+      <div className="flex justify-between items-baseline">
+        <Label className="text-secondary">Average market price</Label>
         <span>$0.00</span>
       </div>
+
+      <Separator />
+
       <div className="flex justify-between">
         <Label>Slippage Tolerence</Label>
         <span>{slippage} %</span>
@@ -68,19 +72,20 @@ export default function MarketOrder() {
       </RadioGroup>
       {customSlippage ? (
         <>
-          <Separator />
           <CustomNumericInput
-            className="w-full bg-secondary text-primary "
+            className="w-full  text-primary "
             onUserInput={(e) => {
               if (!e) setSlippage("0")
               else setSlippage(e)
             }}
             value={slippage}
             placeholder="Custom"
-            icon={<Percent size="15" />}
+            symbol={<Percent size="15" />}
           />
         </>
       ) : null}
+      <Separator />
+
       <div className="py-5">
         <Collapsible
           open={isOpen}
@@ -99,20 +104,20 @@ export default function MarketOrder() {
             </CollapsibleTrigger>
           </div>
           <div className="flex justify-between text-md">
-            <Label>Taker fee</Label>
+            <Label className="text-secondary">Taker fee</Label>
             <span>$ 0.00</span>
           </div>
           <CollapsibleContent className="space-y-2">
             <div className="flex justify-between text-xs">
-              <Label>Tick size</Label>
+              <Label className="text-secondary">Tick size</Label>
               <span>$ 0.00</span>
             </div>
             <div className="flex justify-between text-xs">
-              <Label>Current spot price</Label>
+              <Label className="text-secondary">Current spot price</Label>
               <span>$ 0.00</span>
             </div>
             <div className="flex justify-between text-xs">
-              <Label>Current spot price</Label>
+              <Label className="text-secondary">Current spot price</Label>
               <span>$ 0.00</span>
             </div>
           </CollapsibleContent>

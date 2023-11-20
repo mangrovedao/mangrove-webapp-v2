@@ -26,11 +26,14 @@ export default function LimitOrder() {
   const [isSourcing, setIsSourcing] = React.useState(false)
 
   return (
-    <div className="space-y-3 pt-5">
+    <div className="space-y-5 pt-5">
+      <Separator />
       <div>
         <Label> Limit price</Label>
-        <CustomNumericInput icon="USDC" />
+        <CustomNumericInput symbol="USDC" />
       </div>
+      <Separator />
+
       <div className="space-y-2">
         <div className="flex justify-between text-xs">
           <Label>Fee</Label>
@@ -131,37 +134,38 @@ export default function LimitOrder() {
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value="wallet">
-                    <div className="flex justify-between">
-                      <div className="grid start">
+                    <div className="flex">
+                      <div className="grid">
                         <span>Wallet</span>
-                        <span>Est. APY over 7 days </span>
+                        <span>Est. APY over 7 days</span>
                       </div>
+
                       <span>1.50TH</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="aave">
-                    <div className="flex justify-between">
-                      <div className="grid start">
+                    <div className="flex">
+                      <div className="grid">
                         <span>AAVE</span>
-                        <span>Est. APY over 7 days </span>
+                        <span>Est. APY over 7 days</span>
                       </div>
                       <span>1.50TH</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="stargate">
-                    <div className="flex justify-between">
-                      <div className="grid start">
+                    <div className="flex">
+                      <div className="grid">
                         <span>Stargate</span>
-                        <span>Est. APY over 7 days </span>
+                        <span>Est. APY over 7 days</span>
                       </div>
                       <span>1.50TH</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="beefy">
-                    <div className="flex justify-between">
-                      <div className="grid start">
+                    <div className="flex">
+                      <div className="grid">
                         <span>Beefy</span>
-                        <span>Est. APY over 7 days </span>
+                        <span>Est. APY over 7 days</span>
                       </div>
                       <span>1.50TH</span>
                     </div>
