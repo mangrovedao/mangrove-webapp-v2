@@ -1,22 +1,97 @@
-import Header from "./sections/header/header"
+"use client"
+import MarketSelector from "@/components/stateful/market-selector"
+import MarketInfoBar from "./components/market-infos-bar"
 import Market from "./sections/market/market"
 import Book from "./sections/orderbook/orderbook"
 import Trade from "./sections/trade/trade"
 
 export default function Page() {
   return (
-    <div className="py-2 h-full">
-      <Header />
-      <div className="grid grid-cols-4 gap-3 h-full">
-        <div className="sm:col-span-4 md:col-span-2 lg:col-span-1 border border-solid border-muted rounded-md">
-          <Trade />
+    <main>
+      <section className="trade-section">
+        <div className="px-4 py-[15px] border-b">
+          <MarketSelector />
         </div>
-        <div className="sm:col-span-4 md:col-span-2 lg:col-span-1 border border-solid border-muted rounded-md">
-          <Book />
+        <Trade />
+      </section>
+
+      <section className="border-x fluid-section">
+        <Book
+          className="overflow-hidden border-r"
+          style={{ gridArea: "book" }}
+        />
+        <div
+          style={{
+            gridArea: "chart",
+          }}
+        >
+          <MarketInfoBar />
+          <Market
+            className="w-full border-t"
+            style={{
+              height: "calc(100% - 54px - 44px - 1px)",
+            }}
+          />
         </div>
-        <div className="sm:col-span-4 md:col-span-4 lg:col-span-2 border border-solid border-muted rounded-md">
-          <Market />
-        </div>
+      </section>
+
+      <section className="overflow-y-auto border-x border-t tables-section">
+        <Tables />
+      </section>
+
+      <style jsx global>{`
+        body {
+          display: grid;
+          grid-template:
+            "header" var(--bar-height)
+            "main" minmax(0, 1fr);
+        }
+      `}</style>
+
+      <style jsx>{`
+        main {
+          display: grid;
+          grid-area: main;
+          max-height: calc(100vh - var(--bar-height));
+          grid-template-columns: 20.5rem 1fr;
+          grid-template-rows: auto var(--history-table-height);
+          grid-template-areas:
+            "trade content"
+            "trade tables";
+        }
+
+        .tables-section {
+          grid-area: tables;
+        }
+
+        .trade-section {
+          grid-area: trade;
+        }
+
+        .fluid-section {
+          display: grid;
+          grid-area: content;
+          grid-template-areas: "book chart";
+          grid-template-columns: 20.5rem 1fr;
+          grid-template-rows: minmax(
+            0,
+            calc(100vh - var(--bar-height) - var(--history-table-height))
+          );
+        }
+      `}</style>
+    </main>
+  )
+}
+
+export function Tables({ className }: React.ComponentProps<"div">) {
+  return (
+    <div className={className}>
+      <div className="m-5 flex space-x-5">
+        <span>Open Orders (0)</span>
+        <span>History (0)</span>
+      </div>
+      <div className="px-5">
+        <span>Empty</span>
       </div>
     </div>
   )

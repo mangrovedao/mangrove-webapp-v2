@@ -96,8 +96,8 @@ export default function MarketInfosBar() {
   const variation24h = oneMinuteClose - oneDayClose
 
   return (
-    <ScrollArea className="w-full h-full">
-      <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full">
+    <ScrollArea>
+      <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
         <Item
           label="Price"
           value={oneMinutePriceQuery?.data?.close}
