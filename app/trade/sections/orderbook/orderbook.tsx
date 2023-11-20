@@ -96,7 +96,7 @@ export default function Book({
 }: React.ComponentProps<"div">) {
   return (
     <div className={className} {...props}>
-      <div className="min-h-[54px] flex items-center border-b">
+      <div className="min-h-[54px] flex items-center border-b text-sm">
         <Button variant={"link"}>Book</Button>
       </div>
       <div className="px-1">

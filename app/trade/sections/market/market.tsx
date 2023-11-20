@@ -5,6 +5,7 @@ import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ResolutionString } from "@/public/charting_library/charting_library"
+import { cn } from "@/utils"
 
 export default function Market({
   className,
@@ -13,7 +14,7 @@ export default function Market({
   const [marketTytpe, setMarketType] = React.useState("Market Chart")
 
   return (
-    <div className={className} {...props}>
+    <div {...props} className={cn(className)}>
       <div className="flex start px-4">
         <Button
           variant={"link"}
