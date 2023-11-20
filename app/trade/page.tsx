@@ -46,21 +46,18 @@ export default function Page() {
             "header" var(--bar-height)
             "main" minmax(0, 1fr);
         }
+      `}</style>
 
+      <style jsx>{`
         main {
           display: grid;
+          grid-area: main;
+          max-height: calc(100vh - var(--bar-height));
           grid-template-columns: 20.5rem 1fr;
           grid-template-rows: auto var(--history-table-height);
           grid-template-areas:
             "trade content"
             "trade tables";
-        }
-      `}</style>
-
-      <style jsx>{`
-        main {
-          grid-area: main;
-          max-height: calc(100vh - var(--bar-height));
         }
 
         .tables-section {
