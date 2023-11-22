@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import useMarket from "@/providers/market"
 import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
-import { LucideChevronRightCircle } from "lucide-react"
+import { LucideChevronRight } from "lucide-react"
 import LimitOrder from "./components/limit-order"
 import MarketOrder from "./components/market-order"
 import Menu from "./components/menu"
@@ -73,11 +73,14 @@ export default function TradeInputs({
         </div>
 
         {/* Conditional Inputs */}
-        {marketType === "Limit" ? <LimitOrder /> : null}
-        {marketType === "Market" ? <MarketOrder /> : null}
+        {marketType === "Limit" && <LimitOrder />}
+        {marketType === "Market" && <MarketOrder />}
 
-        <Button className="w-full bg-green hover:bg-transparent hover:border hover:border-green hover:text-primary">
-          Buy <LucideChevronRightCircle className="ml-2" />
+        <Button className="w-full bg-caribbean-green hover:bg-transparent hover:border hover:border-caribbean-green hover:text-primary">
+          Buy
+          <div className="bg-white h-6 w-6 rounded-full">
+            <LucideChevronRight />
+          </div>
         </Button>
       </div>
     </div>

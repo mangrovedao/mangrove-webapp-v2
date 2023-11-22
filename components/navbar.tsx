@@ -66,7 +66,7 @@ export function Navbar() {
               <span>{name}</span>
               <span
                 className={cn(
-                  "h-1 w-full bg-green inset-x-0 -bottom-3 absolute opacity-0 transition-all",
+                  "h-1 w-full bg-caribbean-green inset-x-0 -bottom-3 absolute opacity-0 transition-all",
                   {
                     "opacity-100": currentRoute === href,
                   },
