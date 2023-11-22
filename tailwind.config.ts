@@ -55,11 +55,27 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        green: {
+          caribbean: "hsl(var(--color-caribbean-green))",
+          bangladesh: "hsl(var(--color-bangladesh-green))",
+        },
         "caribbean-green": {
           DEFAULT: " hsl(var(--color-caribbean-green)) ",
         },
-        "--color-bangladesh-green": {
+        "bangladesh-green": {
           DEFAULT: " hsl(var(--color-bangladesh-green)) ",
+        },
+        black: {
+          rich: " hsl(var(--color-rich-black)) ",
+        },
+        white: {
+          DEFAULT: "hsl(var(--color-anti-flash-white)) ",
+        },
+        gray: {
+          "scale-200": "hsl(var(--color-gray-scale-200)) ",
+          "scale-400": "hsl(var(--color-gray-scale-400)) ",
+          "scale-500": "hsl(var(--color-gray-scale-500)) ",
+          "scale-600": "hsl(var(--color-gray-scale-600)) ",
         },
         red: {
           100: "hsl(var(--color-red-100))",
