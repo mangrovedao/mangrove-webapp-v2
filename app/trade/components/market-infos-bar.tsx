@@ -113,7 +113,7 @@ export default function MarketInfosBar() {
           value={variation24h}
           quoteName={selectedMarket?.quote.name}
           skeleton={
-            oneDayPriceQuery?.isLoading || oneMinutePriceQuery?.isLoading
+            oneDayPriceQuery?.isLoading ?? oneMinutePriceQuery?.isLoading
           }
           rightElement={
             <span

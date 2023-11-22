@@ -21,13 +21,13 @@ const config = {
     domains: ["explorer-api.walletconnect.com"],
   },
   async redirects() {
-    return [
+    return Promise.resolve([
       {
-        source: '/',
-        destination: '/trade',
+        source: "/",
+        destination: "/trade",
         permanent: true,
       },
-    ];
+    ])
   },
 }
 

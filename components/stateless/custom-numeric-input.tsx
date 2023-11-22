@@ -1,4 +1,7 @@
-import { NumericInput, NumericInputProps } from "@components/ui/numeric-input"
+import {
+  NumericInput,
+  type NumericInputProps,
+} from "@components/ui/numeric-input"
 import * as React from "react"
 import { TokenIcon } from "../token-icon"
 
@@ -10,7 +13,7 @@ interface CustomNumericInputProps extends NumericInputProps {
 const CustomNumericInput = React.forwardRef<
   HTMLInputElement,
   CustomNumericInputProps
->(({ className, type, icon, symbol, onUserInput, ...props }, ref) => {
+>(({ className, icon, symbol, onUserInput, ...props }, ref) => {
   return (
     <div className="flex w-full relative">
       {icon && (

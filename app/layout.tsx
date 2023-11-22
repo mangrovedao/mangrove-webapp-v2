@@ -13,8 +13,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script src="datafeeds/udf/dist/bundle.js"></script>
-        <link rel="stylesheet" href="fonts/fonts.css" />
+        <script src="datafeeds/udf/dist/bundle.js" async></script>
       </head>
       <body className="grid grid-areas-layout">
         <RootProvider>

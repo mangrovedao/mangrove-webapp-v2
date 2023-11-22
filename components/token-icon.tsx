@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { getSvgUrl, getTokenInfos } from "@/utils/tokens"
 
 export function TokenIcon({ symbol }: { symbol: string }) {

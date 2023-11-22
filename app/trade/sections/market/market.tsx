@@ -4,7 +4,7 @@ import React from "react"
 import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { ResolutionString } from "@/public/charting_library/charting_library"
+import { type ResolutionString } from "@/public/charting_library/charting_library"
 import { cn } from "@/utils"
 
 export default function Market({

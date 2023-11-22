@@ -1,3 +1,5 @@
+@import "../public/fonts/fonts.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -45,9 +47,7 @@
     --bar-height: 54px;
     --history-table-height: 361px;
   }
-}
 
-@layer base {
   * {
     @apply border-border font-axiforma;
   }

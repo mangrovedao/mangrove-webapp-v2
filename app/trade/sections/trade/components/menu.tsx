@@ -30,8 +30,9 @@ const MENU_ITEMS = [
 export default function Menu({ marketType, setMarketType }: Props) {
   return (
     <div className="flex justify-between ">
-      {MENU_ITEMS.map(({ name }, i) => (
+      {MENU_ITEMS.map(({ name }) => (
         <Button
+          key={name}
           variant={"invisible"}
           className="relative"
           onClick={() => setMarketType(name)}

@@ -13,24 +13,6 @@ import {
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 
-const data = [
-  { volume: 1234.56, price: 0.92, time: 5.0, type: "sell" },
-  { volume: 7890.12, price: 0.95, time: 7.0, type: "sell" },
-  { volume: 567.89, price: 0.88, time: 15.0, type: "sell" },
-  { volume: 2345.67, price: 0.91, time: 18.0, type: "sell" },
-  { volume: 9012.34, price: 0.89, time: 9.0, type: "sell" },
-  { volume: 4321.0, price: 0.93, time: 3.0, type: "sell" },
-  { volume: 10000.0, price: 0.94, time: 12.0, type: "sell" },
-  { volume: 8765.43, price: 0.9, time: 20.0, type: "buy" },
-  { volume: 987.65, price: 0.88, time: 23.0, type: "buy" },
-  { volume: 3456.78, price: 0.96, time: 2.0, type: "buy" },
-  { volume: 6789.01, price: 0.88, time: 6.0, type: "buy" },
-  { volume: 2109.87, price: 0.89, time: 4.0, type: "buy" },
-  { volume: 5432.1, price: 0.97, time: 10.0, type: "buy" },
-  { volume: 5432.1, price: 0.97, time: 10.0, type: "buy" },
-  { volume: 5432.1, price: 0.97, time: 10.0, type: "buy" },
-]
-
 type TableCellProps = {
   className?: string
 } & React.PropsWithChildren
@@ -60,7 +42,7 @@ function SemiBook({ type }: SemiBookProps) {
   const offers = requestBookQuery.data?.[type]
   return (
     <>
-      {(offers || []).map(({ price, id, volume }, i) => (
+      {(offers ?? []).map(({ price, id, volume }) => (
         <TableRow key={`${type}-${id}`} className={`relative h-6 border-none`}>
           <OrderBookTableCell
             className={cn(

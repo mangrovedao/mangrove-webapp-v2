@@ -2,8 +2,7 @@
 const config = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: false,
-    tsconfigRootDir: __dirname,
+    project: true,
   },
   plugins: ["@typescript-eslint", "@tanstack/query"],
   extends: [
@@ -41,7 +40,6 @@ const config = {
     ],
     "@typescript-eslint/no-floating-promises": "off",
   },
-  
 }
 
 module.exports = config

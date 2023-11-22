@@ -83,7 +83,7 @@ export default function Page() {
   )
 }
 
-export function Tables({ className }: React.ComponentProps<"div">) {
+function Tables({ className }: React.ComponentProps<"div">) {
   return (
     <div className={className}>
       <div className="m-5 flex space-x-5">
