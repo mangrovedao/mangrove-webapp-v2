@@ -73,6 +73,7 @@ export default {
         },
         gray: {
           "scale-200": "hsl(var(--color-gray-scale-200)) ",
+          "scale-300": "hsl(var(--color-gray-scale-300)) ",
           "scale-400": "hsl(var(--color-gray-scale-400)) ",
           "scale-500": "hsl(var(--color-gray-scale-500)) ",
           "scale-600": "hsl(var(--color-gray-scale-600)) ",
