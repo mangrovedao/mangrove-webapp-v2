@@ -2,7 +2,6 @@
 import React from "react"
 
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import {
   Table,
   TableBody,
@@ -11,6 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import useMarket from "@/providers/market"
+import { cn } from "@/utils"
 
 const data = [
   { volume: 1234.56, price: 0.92, time: 5.0, type: "sell" },
@@ -30,57 +31,88 @@ const data = [
   { volume: 5432.1, price: 0.97, time: 10.0, type: "buy" },
 ]
 
-const calculateBackgroundColor = (volume: number, type: string) => {
-  const widthPercentage = (volume / 10000) * 100
+type TableCellProps = {
+  className?: string
+} & React.PropsWithChildren
 
-  return `linear-gradient(to left, ${
-    type === "buy" ? "#052e16" : "#450a0a"
-  } ${widthPercentage}%, transparent ${widthPercentage}%)`
+function OrderBookTableHead({ children, className }: TableCellProps) {
+  return (
+    <TableHead className={cn("p-0 px-[13px] text-right", className)}>
+      {children}
+    </TableHead>
+  )
 }
 
-export default function Book() {
-  const [marketTytpe, setMarketType] = React.useState("Book")
-
+function OrderBookTableCell({ children, className }: TableCellProps) {
   return (
-    <div className="grid">
-      <div className="flex start">
-        <Button
-          variant={"link"}
-          className={`${marketTytpe === "Book" && `underline`}`}
-          onClick={() => setMarketType("Book")}
-        >
-          Book
-        </Button>
-        <Button
-          variant={"link"}
-          className={`${marketTytpe === "Trades" && `underline`}`}
-          onClick={() => setMarketType("Trades")}
-        >
-          Trades
-        </Button>
+    <TableCell className={cn("p-0 px-[13px] text-right", className)}>
+      {children}
+    </TableCell>
+  )
+}
+
+type SemiBookProps = {
+  type: "asks" | "bids"
+}
+
+function SemiBook({ type }: SemiBookProps) {
+  const { requestBookQuery } = useMarket()
+  const offers = requestBookQuery.data?.[type]
+  return (
+    <>
+      {(offers || []).map(({ price, id, volume }, i) => (
+        <TableRow key={`${type}-${id}`} className={`relative h-6 border-none`}>
+          <OrderBookTableCell
+            className={cn(
+              "text-left",
+              type === "bids" ? "text-green" : "text-red",
+            )}
+          >
+            {volume.toFixed(2)}
+          </OrderBookTableCell>
+          <OrderBookTableCell>{price?.toFixed(2)}</OrderBookTableCell>
+          <OrderBookTableCell>
+            {price?.mul(volume).toFixed(2)}
+          </OrderBookTableCell>
+          <td
+            className={cn(
+              "absolute inset-y-[2px] left-0 w-full -z-10 rounded-[2px]",
+              type === "bids" ? "text-green" : "text-red",
+            )}
+            style={{
+              width: `${(volume.toNumber() / 10000) * 100}%`,
+              background: type === "bids" ? "#021B1A" : "rgba(255, 0, 0, 0.15)",
+            }}
+          ></td>
+        </TableRow>
+      ))}
+    </>
+  )
+}
+
+export default function Book({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div className={className} {...props}>
+      <div className="min-h-[54px] flex items-center border-b text-sm">
+        <Button variant={"link"}>Book</Button>
       </div>
-      <Separator />
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Size (ETH)</TableHead>
-              <TableHead>Price (USDC)</TableHead>
-              <TableHead>Time</TableHead>
+      <div className="px-1">
+        <Table className="text-xs">
+          <TableHeader className="sticky top-0">
+            <TableRow className="border-none">
+              <OrderBookTableHead className="text-left">
+                Size (ETH)
+              </OrderBookTableHead>
+              <OrderBookTableHead>Price (USDC)</OrderBookTableHead>
+              <OrderBookTableHead>Total</OrderBookTableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {data.map(({ price, time, volume, type }, i) => (
-              <TableRow
-                key={`order-book-${i}`}
-                className={`text-center hover:opacity-90`}
-                style={{ background: calculateBackgroundColor(volume, type) }}
-              >
-                <TableCell>{volume}</TableCell>
-                <TableCell>{price}</TableCell>
-                <TableCell>{time}</TableCell>
-              </TableRow>
-            ))}
+          <TableBody className="">
+            <SemiBook type="asks" />
+            <SemiBook type="bids" />
           </TableBody>
         </Table>
       </div>

@@ -55,11 +55,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        green: {
-          DEFAULT: "var(--color-green)",
+        "caribbean-green": {
+          DEFAULT: " hsl(var(--color-caribbean-green)) ",
+        },
+        "--color-bangladesh-green": {
+          DEFAULT: " hsl(var(--color-bangladesh-green)) ",
         },
         red: {
-          DEFAULT: "var(--color-red)",
+          100: "hsl(var(--color-red-100))",
+          400: "hsl(var(--color-red-400))",
+          500: "hsl(var(--color-red-500))",
         },
       },
       borderRadius: {

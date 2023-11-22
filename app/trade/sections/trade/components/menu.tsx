@@ -8,67 +8,81 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/utils"
 
 type Props = {
   marketType: string
   setMarketType: (type: string) => void
 }
 
+const MENU_ITEMS = [
+  {
+    name: "Limit",
+  },
+  {
+    name: "Market",
+  },
+  {
+    name: "Amplified",
+  },
+]
+
 export default function Menu({ marketType, setMarketType }: Props) {
   return (
-    <div className="flex justify-between">
-      <Button
-        variant={"link"}
-        className={`${marketType === "Market" && `underline`}`}
-        onClick={() => setMarketType("Market")}
-      >
-        Market
-      </Button>
-      <Button
-        variant={"link"}
-        className={`${marketType === "Limit" && `underline`}`}
-        onClick={() => setMarketType("Limit")}
-      >
-        Limit
-      </Button>
-      <Button
-        variant={"link"}
-        className={`${marketType === "Amplified" && `underline`}`}
-        onClick={() => setMarketType("Amplified")}
-      >
-        Amplified
-      </Button>
+    <div className="flex justify-between ">
+      {MENU_ITEMS.map(({ name }, i) => (
+        <Button
+          variant={"invisible"}
+          className="relative"
+          onClick={() => setMarketType(name)}
+        >
+          {name}
+          <span
+            className={cn(
+              "h-[0.10rem] w-full bg-caribbean-green inset-x-0 -bottom-1 absolute opacity-0 transition-all",
+              {
+                "opacity-100": marketType === name,
+              },
+            )}
+          />
+        </Button>
+      ))}
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="link"
-            className={`${marketType === "Stop" && `underline`} `}
-            onClick={() => setMarketType("Stop")}
-          >
+          <Button variant="invisible" className="relative">
             Stop <ChevronDown className="h-4 w-4" />
+            <span
+              className={cn(
+                "h-[0.10rem] w-full bg-caribbean-green inset-x-0 -bottom-1 absolute opacity-0 transition-all",
+                {
+                  "opacity-100": marketType === "Stop",
+                },
+              )}
+            />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setMarketType("Stop")}>
             <span>Stop Limit</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setMarketType("Stop")}>
             <span>Stop Market</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setMarketType("Stop")}>
             <span>Trailling Stop</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setMarketType("Stop")}>
             <span>Take Profit Stop</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setMarketType("Stop")}>
             <span>Take Profit Market</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

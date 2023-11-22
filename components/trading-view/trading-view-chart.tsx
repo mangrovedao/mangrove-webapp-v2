@@ -146,11 +146,12 @@ export const TVChartContainer = (
         )
         if (!element) return
         element.classList.add("w-full")
+        element.classList.add("h-full")
       })
     })
     return () => {
       tvWidget.remove()
     }
   }, [props])
-  return <div ref={chartContainerRef} />
+  return <div className="h-full" ref={chartContainerRef} />
 }
