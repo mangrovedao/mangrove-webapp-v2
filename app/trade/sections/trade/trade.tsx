@@ -76,9 +76,9 @@ export default function TradeInputs({
         {marketType === "Limit" && <LimitOrder />}
         {marketType === "Market" && <MarketOrder />}
 
-        <Button className="w-full bg-caribbean-green hover:bg-transparent hover:border hover:border-caribbean-green hover:text-primary">
+        <Button className="w-full bg-caribbean-green hover:bg-muted hover:border hover:border-muted hover:text-primary">
           Buy
-          <div className="bg-white h-6 w-6 rounded-full">
+          <div className="ml-2 bg-white h-6 w-6 rounded-full text-secondary">
             <LucideChevronRight />
           </div>
         </Button>
