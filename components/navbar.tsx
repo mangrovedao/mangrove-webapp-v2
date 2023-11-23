@@ -112,8 +112,8 @@ function RightPart() {
     <div className="flex space-x-4 items-center h-8 py-1">
       <Button
         variant="invisible"
-        className="space-x-4"
-        size="xs"
+        className="space-x-4 flex items-center"
+        size="sm"
         onClick={handleChangeNetwork}
       >
         <span className="text-sm">{chain?.name}</span>
@@ -124,7 +124,11 @@ function RightPart() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="invisible" className="space-x-4" size="xs">
+          <Button
+            variant="invisible"
+            className="space-x-4 flex items-center"
+            size="sm"
+          >
             <span className="inline-flex items-center space-x-2">
               <span className="bg-gray-500 h-[18px] w-[18px] rounded-full relative overflow-hidden">
                 {address && <Jazzicon seed={jsNumberForAddress(address)} />}
@@ -180,7 +184,7 @@ function RightPart() {
         </DropdownMenuContent>
       </DropdownMenu>
       <Separator orientation="vertical" />
-      <Button variant={"invisible"} size="xs" className="h-full">
+      <Button variant={"invisible"} size="sm" className="h-full">
         <Bell className="text-white w-4" />
       </Button>
     </div>
