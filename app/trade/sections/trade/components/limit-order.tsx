@@ -50,7 +50,7 @@ export default function LimitOrder() {
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-semibold">Advanced</h4>
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="">
+            <Button variant="invisible" size="sm">
               {!isAdvanced && <ChevronDown className="h-6 w-6" />}
               {isAdvanced && <ChevronUp className="h-6 w-6" />}
 
@@ -112,7 +112,7 @@ export default function LimitOrder() {
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-semibold">Liquidity sourcing</h4>
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="">
+            <Button variant="invisible" size="sm">
               {!isSourcing && <ChevronDown className="h-6 w-6" />}
               {isSourcing && <ChevronUp className="h-6 w-6" />}
 

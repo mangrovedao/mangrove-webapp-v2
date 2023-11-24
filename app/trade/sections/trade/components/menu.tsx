@@ -38,8 +38,12 @@ export default function Menu({ marketType, setMarketType }: Props) {
         onValueChange={(e) => setMarketType(e)}
       >
         <CustomTabsList className="w-full">
-          {MENU_ITEMS.map(({ name }, i) => (
-            <CustomTabsTrigger value={name} className="w-full h-8 rounded-3xl">
+          {MENU_ITEMS.map(({ name }) => (
+            <CustomTabsTrigger
+              key={`${name}-tab`}
+              value={name}
+              className="w-full h-8 rounded-3xl"
+            >
               {name}
             </CustomTabsTrigger>
           ))}
