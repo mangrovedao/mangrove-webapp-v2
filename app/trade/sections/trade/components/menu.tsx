@@ -40,7 +40,7 @@ export default function Menu({ marketType, setMarketType }: Props) {
           {name}
           <span
             className={cn(
-              "h-[0.10rem] w-full bg-caribbean-green inset-x-0 -bottom-1 absolute opacity-0 transition-all",
+              "h-[0.10rem] w-full bg-green-caribbean inset-x-0 -bottom-1 absolute opacity-0 transition-all",
               {
                 "opacity-100": marketType === name,
               },
@@ -55,7 +55,7 @@ export default function Menu({ marketType, setMarketType }: Props) {
             Stop <ChevronDown className="h-4 w-4" />
             <span
               className={cn(
-                "h-[0.10rem] w-full bg-caribbean-green inset-x-0 -bottom-1 absolute opacity-0 transition-all",
+                "h-[0.10rem] w-full bg-green-caribbean inset-x-0 -bottom-1 absolute opacity-0 transition-all",
                 {
                   "opacity-100": marketType === "Stop",
                 },
