@@ -59,12 +59,6 @@ export default {
           caribbean: "hsl(var(--color-green-caribbean))",
           bangladesh: "hsl(var(--color-green-bangladesh))",
         },
-        "green-caribbean": {
-          DEFAULT: " hsl(var(--color-green-caribbean)) ",
-        },
-        "green-bangladesh": {
-          DEFAULT: " hsl(var(--color-green-bangladesh)) ",
-        },
         black: {
           rich: " hsl(var(--color-black-rich)) ",
         },
