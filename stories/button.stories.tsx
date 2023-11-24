@@ -29,7 +29,7 @@ export const Default: Story = {
 
 export const Icon: Story = {
   render: (args) => (
-    <Button {...args} size={"icon"}>
+    <Button {...args}>
       <ArrowBigDown />
     </Button>
   ),

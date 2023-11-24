@@ -95,7 +95,7 @@ export default function MarketOrder() {
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold">Details</h4>
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm" className="">
+              <Button variant="invisible" size="sm">
                 {!isOpen && <ChevronDown className="h-6 w-6" />}
                 {isOpen && <ChevronUp className="h-6 w-6" />}
 
