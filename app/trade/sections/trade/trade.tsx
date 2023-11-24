@@ -1,9 +1,12 @@
 "use client"
 import React from "react"
 
+import {
+  CustomRadioGroup,
+  CustomRadioGroupItem,
+} from "@/components/stateless/custom-radio-group"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import useMarket from "@/providers/market"
 import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
@@ -24,21 +27,19 @@ export default function TradeInputs({
       <Menu marketType={marketType} setMarketType={setMarketType} />
       <Separator />
       <div className="px-4 space-y-8">
-        {/* Switch Input*/}
-        <Tabs
-          defaultValue="buy"
-          className="pt-5"
-          onValueChange={(e) => console.log(e)}
-        >
-          <TabsList className="w-full h-10 rounded-3xl">
-            <TabsTrigger value="buy" className="w-full h-8 rounded-3xl">
-              Buy
-            </TabsTrigger>
-            <TabsTrigger value="sell" className="w-full h-8 rounded-3xl">
-              Sell
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Radio Input*/}
+        <CustomRadioGroup defaultValue="Buy" className="mt-4">
+          <div className="flex justify-center w-full">
+            <CustomRadioGroupItem value="Buy" id="r1">
+              <Label htmlFor="r1">Buy</Label>
+            </CustomRadioGroupItem>
+          </div>
+          <div className="flex justify-center w-full">
+            <CustomRadioGroupItem value="Sell" id="r2">
+              <Label htmlFor="r2">Sell</Label>
+            </CustomRadioGroupItem>
+          </div>
+        </CustomRadioGroup>
 
         <div>
           {/* Buy Input*/}
