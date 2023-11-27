@@ -35,16 +35,21 @@ export default function Market({
             </CustomTabsTrigger>
           ))}
         </CustomTabsList>
-        <CustomTabsContent value="Price chart" className="h-full">
+        <CustomTabsContent value="Price chart">
           <TVChartContainer
             symbol={"AAPL"}
             interval={`1D` as ResolutionString}
           />
         </CustomTabsContent>
-        <CustomTabsContent value="Depth chart" className="h-full">
+        <CustomTabsContent value="Depth chart">
           <DepthChart />
         </CustomTabsContent>
       </CustomTabs>
+      <style global jsx>{`
+        div[role="tabpanel"] {
+          height: calc(100% - var(--bar-height));
+        }
+      `}</style>
     </div>
   )
 }
