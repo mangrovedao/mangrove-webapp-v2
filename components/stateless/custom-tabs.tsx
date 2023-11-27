@@ -9,14 +9,7 @@ const CustomTabs = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root>
 >(({ className, ...props }, ref) => (
-  <TabsPrimitive.Root
-    ref={ref}
-    className={cn(
-      "py-3", // Add py-3 class here
-      className,
-    )}
-    {...props}
-  />
+  <TabsPrimitive.Root ref={ref} className={cn(className)} {...props} />
 ))
 CustomTabs.displayName = TabsPrimitive.Root.displayName
 
@@ -27,7 +20,7 @@ const CustomTabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-baseline justify-center p-1 text-primary ",
+      "flex items-baseline justify-center text-primary h-[var(--bar-height)]",
       className,
     )}
     {...props}
@@ -43,7 +36,7 @@ const CustomTabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "inline-flex items-baseline justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:underline  data-[state=active]:underline-offset-[1.7rem]  data-[state=active]:decoration-green-caribbean  data-[state=active]:decoration-2  data-[state=active]:shadow-sm",
+        "justify-center whitespace-nowrap rounded-sm px-3 text-sm leading-[22px] font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:underline  data-[state=active]:underline-offset-[1.35rem]  data-[state=active]:decoration-green-caribbean  data-[state=active]:decoration-2  data-[state=active]:shadow-sm items-center h-full",
         className,
       )}
       {...props}
@@ -59,7 +52,7 @@ const CustomTabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       className,
     )}
     {...props}
