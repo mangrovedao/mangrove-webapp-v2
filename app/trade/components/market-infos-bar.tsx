@@ -118,8 +118,8 @@ export default function MarketInfosBar() {
           rightElement={
             <span
               className={cn("space-x-[2px] text-xs inline-flex ml-2", {
-                "text-green-500": variation24h >= 0,
-                "text-red-500": variation24h < 0,
+                "text-green-caribbean": variation24h >= 0,
+                "text-red-100": variation24h < 0,
               })}
             >
               <VariationArrow
