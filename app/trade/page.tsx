@@ -27,9 +27,9 @@ export default function Page() {
         >
           <MarketInfoBar />
           <Market
-            className="w-full border-t"
+            className="w-full border-t "
             style={{
-              height: "calc(100% - 54px)",
+              height: "calc(100% - var(--bar-height))",
             }}
           />
         </div>
