@@ -27,6 +27,9 @@ export const web3modal = createWeb3Modal({
     "--w3m-font-family": "Inter, sans-serif",
     "--w3m-z-index": 1000,
   },
+  chainImages: {
+    80001: "assets/chains/80001.webp",
+  },
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
