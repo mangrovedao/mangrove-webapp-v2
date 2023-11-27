@@ -25,7 +25,7 @@ export function getWhitelistedChainObjects() {
       result.push(chainObject)
     }
   }
-  return result
+  return renameChainNames(result)
 }
 
 export function getChainObjectById(chainId: string): Chain | undefined {
@@ -40,4 +40,13 @@ export function getChainObjectById(chainId: string): Chain | undefined {
 
   // return undefined if no matching chain is found
   return undefined
+}
+
+function renameChainNames(chains: wagmiChains.Chain[]) {
+  return chains.map((chain) => {
+    if (chain.id === wagmiChains.polygonMumbai.id) {
+      return { ...chain, name: "Mumbai" }
+    }
+    return chain
+  })
 }

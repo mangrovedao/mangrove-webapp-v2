@@ -21,6 +21,7 @@ import { Bell, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import { ClientOnly } from "./client-only"
+import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 
 const LINKS = [
@@ -116,7 +117,17 @@ function RightPart() {
         size="sm"
         onClick={handleChangeNetwork}
       >
-        <span className="text-sm">{chain?.name}</span>
+        <span className="flex space-x-2">
+          <ImageWithHideOnError
+            src={`/assets/chains/${chain?.id}.webp`}
+            width={16}
+            height={16}
+            className="h-4 rounded-sm"
+            key={chain?.id}
+            alt={`${chain?.name}-logo`}
+          />
+          <span className="text-sm">{chain?.name}</span>
+        </span>
         <ChevronDown className="w-3" />
       </Button>
 
