@@ -2,8 +2,8 @@ import { buildChartTheme, darkTheme } from "@visx/xychart"
 
 const borderVar = "hsl(var(--border))"
 const borderWidthVar = "var(--border-width)"
-const greenColorVar = "var(--color-green)"
-const redColorVar = "var(--color-red)"
+const greenColorVar = "hsl(var(--color-green-caribbean))"
+const redColorVar = "hsl(var(--color-red-100))"
 const crosshairStyle = {
   strokeWidth: 1,
   strokeDasharray: "5 5",

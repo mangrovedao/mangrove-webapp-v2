@@ -56,6 +56,7 @@ const useMangroveContext = () => {
       return getWhitelistedMarkets(mangrove, chain.id)
     },
     enabled: !!(mangrove?.address && chain?.id),
+    refetchOnWindowFocus: false,
   })
 
   // Close web3modal after changing chain
