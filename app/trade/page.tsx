@@ -67,6 +67,7 @@ export default function Page() {
 
         .trade-section {
           grid-area: trade;
+          max-height: calc(100vh - var(--bar-height));
         }
 
         .fluid-section {
