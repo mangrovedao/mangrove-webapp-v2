@@ -2,6 +2,7 @@ import React from "react"
 
 import { ChevronDown, ChevronUp } from "lucide-react"
 
+import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
 import {
   Collapsible,
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
 
 export default function LimitOrder() {
@@ -30,7 +30,7 @@ export default function LimitOrder() {
       <Separator />
       <div>
         <Label> Limit price</Label>
-        <CustomNumericInput symbol="USDC" />
+        <NumericInput symbol="USDC" />
       </div>
       <Separator />
 

@@ -35,7 +35,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="overflow-y-auto border-x border-t tables-section">
+      <section className="overflow-y-auto border-x border-t tables-section z-50 bg-background">
         <Tables />
       </section>
 

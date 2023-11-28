@@ -5,10 +5,10 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/stateless/custom-radio-group"
+import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import useMarket from "@/providers/market"
-import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
 import { LucideChevronRight } from "lucide-react"
 import LimitOrder from "./components/limit-order"
@@ -43,11 +43,10 @@ export default function TradeInputs({
 
         <div>
           {/* Buy Input*/}
-          <Label> Send amount</Label>
-          <CustomNumericInput
+          <Label>Send amount</Label>
+          <NumericInput
             icon={selectedMarket?.base.name}
             symbol={selectedMarket?.base.name}
-            className="h-[3rem] rounded-xl"
           />
           <span className="pt-2 text-xs text-secondary float-left">
             Balance:
@@ -59,11 +58,10 @@ export default function TradeInputs({
 
         <div>
           {/* Pay Input */}
-          <Label> Receive amount</Label>
-          <CustomNumericInput
+          <Label>Receive amount</Label>
+          <NumericInput
             icon={selectedMarket?.quote.name}
             symbol={selectedMarket?.quote.name}
-            className="h-[3rem] rounded-xl"
           />
           <span className="pt-2 text-xs text-secondary float-left">
             Balance:
