@@ -26,7 +26,7 @@ export default function LimitOrder() {
   const [isSourcing, setIsSourcing] = React.useState(false)
 
   return (
-    <div className="space-y-5 pt-5">
+    <div className="space-y-5 pt-5 text-xs">
       <Separator />
       <div>
         <Label> Limit price</Label>
