@@ -2,6 +2,7 @@ import React from "react"
 
 import { ChevronDown, ChevronUp, Percent } from "lucide-react"
 
+import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
 import {
   Collapsible,
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/collapsible"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
-import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
 
 export default function MarketOrder() {
@@ -72,12 +72,12 @@ export default function MarketOrder() {
       </RadioGroup>
       {customSlippage ? (
         <>
-          <CustomNumericInput
+          <NumericInput
             className="w-full  text-primary "
-            onUserInput={(e) => {
-              if (!e) setSlippage("0")
-              else setSlippage(e)
-            }}
+            // onUserInput={(e) => {
+            //   if (!e) setSlippage("0")
+            //   else setSlippage(e)
+            // }}
             value={slippage}
             placeholder="Custom"
             symbol={<Percent size="15" />}

@@ -58,3 +58,9 @@ export function determinePriceDecimalsFromTokenName(
   const decimals = tokenName ? Mangrove.getDisplayedPriceDecimals(tokenName) : 2
   return determineDecimals(value, decimals)
 }
+
+export function getSeparator() {
+  return Intl.NumberFormat("en-US")
+    .formatToParts(123.4)
+    .find?.((x) => x.type === "decimal")?.value
+}
