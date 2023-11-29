@@ -11,19 +11,22 @@ const Ticks = ({
 }: {
   position: string
   value: number[] | undefined
-}) => (
-  <div className={`flex gap-4 absolute left-1 ${position}-[9px]`}>
-    {Array.from({ length: 17 }, (_, index) => (
-      <span
-        key={`slider-top-decoration-${index}`}
-        className={cn("h-[2px] w-[2px] rounded-full bg-green-bangladesh", {
-          "bg-green-caribbean": (Number(value) / 100) * 18 > index,
-          "bg-muted": (Number(value) / 100) * 18 <= index,
-        })}
-      />
-    ))}
-  </div>
-)
+}) => {
+  console.log(position, value)
+  return (
+    <div className={`flex gap-4 absolute left-1 ${position}-[9px]`}>
+      {Array.from({ length: 17 }, (_, index) => (
+        <span
+          key={`slider-top-decoration-${index}`}
+          className={cn("h-[2px] w-[2px] rounded-full bg-green-bangladesh", {
+            "bg-green-caribbean": (Number(value) / 100) * 18 > index,
+            "bg-muted": (Number(value) / 100) * 18 <= index,
+          })}
+        />
+      ))}
+    </div>
+  )
+}
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
