@@ -95,6 +95,7 @@ export default function MarketInfosBar() {
   const variationPercentageAbs = Math.abs(variationPercentage)
   const variation24h = oneMinuteClose - oneDayClose
 
+  return null
   return (
     <ScrollArea>
       <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">

@@ -1,9 +1,9 @@
 "use client"
 import MarketSelector from "@/components/stateful/market-selector"
 import MarketInfoBar from "./components/market-infos-bar"
-import Market from "./sections/market/market"
-import Book from "./sections/orderbook/orderbook"
-import Trade from "./sections/trade/trade"
+import Market from "./components/market/market"
+import Book from "./components/orderbook/orderbook"
+import Trade from "./components/trade/trade"
 
 export default function Page() {
   return (

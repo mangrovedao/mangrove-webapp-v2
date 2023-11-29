@@ -25,7 +25,7 @@ export default function TradeInputs({
   return (
     <div className={className}>
       {/* Menu */}
-      <Menu marketType={marketType} setMarketType={setMarketType} />
+      <Menu setMarketType={setMarketType} />
       <Separator />
       <ScrollArea className="h-[calc(100vh-(var(--bar-height)*3)-1rem)] overflow-hidden">
         <div className="px-4 space-y-8">
