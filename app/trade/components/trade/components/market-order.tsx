@@ -32,11 +32,11 @@ export default function MarketOrder() {
           max={100}
           onValueChange={(e) => setSlider(e)}
         />
-        <div className="flex space-x-2 space-around">
+        <div className="flex space-x-3">
           {[[25], [50], [75], [100]].map((value) => (
             <Button
               key={`slider-value-${value}`}
-              className="bg-transparent text-primary rounded-full text-xs pt-[4px] pb-[2px] px-4 border-[1px] border-green-bangladesh"
+              className="bg-transparent text-primary rounded-full text-xs pt-1 pb-[2px] w-16 border-[1px] border-green-bangladesh"
               onClick={() => setSlider(value)}
             >
               {value}%
