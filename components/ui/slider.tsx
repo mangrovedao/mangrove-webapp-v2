@@ -12,8 +12,8 @@ const Ticks = ({
   position: string
   value: number[] | undefined
 }) => (
-  <div className={`flex gap-4 absolute ${position}-[9px]`}>
-    {Array.from({ length: 18 }, (_, index) => (
+  <div className={`flex gap-4 absolute left-1 ${position}-[9px]`}>
+    {Array.from({ length: 17 }, (_, index) => (
       <span
         key={`slider-top-decoration-${index}`}
         className={cn("h-[2px] w-[2px] rounded-full bg-green-bangladesh", {
@@ -39,7 +39,7 @@ const Slider = React.forwardRef<
       {...props}
     >
       <SliderPrimitive.Track className="relative h-[5px] w-full grow rounded-full bg-muted ">
-        <Ticks value={props.defaultValue} position="top" />
+        <Ticks value={props.defaultValue} position="bottom" />
         <SliderPrimitive.Range className="absolute rounded-full h-full bg-green-bangladesh" />
         <div className="flex justify-between">
           {Array.from({ length: 4 }, (_, index) => (
@@ -49,7 +49,7 @@ const Slider = React.forwardRef<
             />
           ))}
         </div>
-        <Ticks value={props.defaultValue} position="bottom" />
+        <Ticks value={props.defaultValue} position="top" />
       </SliderPrimitive.Track>
       <SliderPrimitive.Thumb className=" align-middle cursor-pointer whitespace-nowrap rounded-xl border-[1px] border-green-bangladesh bg-background transition-colors disabled:pointer-events-none disabled:opacity-50 ">
         <span className="text-xs px-2">{props.defaultValue} % </span>
