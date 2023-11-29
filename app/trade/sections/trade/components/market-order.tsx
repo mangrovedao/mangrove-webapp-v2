@@ -1,7 +1,8 @@
 import React from "react"
 
-import { ChevronDown, ChevronUp, Percent } from "lucide-react"
+import { ChevronDown, Percent } from "lucide-react"
 
+import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
 import {
   Collapsible,
@@ -11,7 +12,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
-import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
+import { cn } from "@/utils"
 import { Label } from "@components/ui/label"
 
 export default function MarketOrder() {
@@ -60,62 +61,57 @@ export default function MarketOrder() {
       </div>
 
       <Separator />
-      <div className="flex justify-between items-baseline">
-        <Label className="text-secondary">Average market price</Label>
+      <div className="flex justify-between items-baseline text-xs">
+        <Label>Average market price</Label>
         <span>$0.00</span>
       </div>
 
       <Separator />
 
-      <div className="flex justify-between">
+      <div className="space-y-2">
         <Label>Slippage Tolerence</Label>
-        <span>{slippage} %</span>
-      </div>
 
-      <RadioGroup
-        defaultValue={slippage}
-        onValueChange={(e) => {
-          if (e === "custom") {
-            setCustomSlippage(!customSlippage)
-          } else {
-            setSlippage(e)
-            setCustomSlippage(false)
-          }
-        }}
-      >
-        {slippageOptions.map((item, i) => (
+        <RadioGroup
+          defaultValue={slippage}
+          onValueChange={(e) => {
+            if (e === "custom") {
+              setCustomSlippage(!customSlippage)
+            } else {
+              setSlippage(e)
+              setCustomSlippage(false)
+            }
+          }}
+        >
+          {slippageOptions.map((item, i) => (
+            <RadioGroupItem
+              key={i}
+              value={item}
+              id={item}
+              className="flex items-center space-x-2"
+            >
+              <Label
+                htmlFor={item}
+                // TODO: move cursor pointer inside radio UI component
+                className="cursor-pointer"
+              >{`${item}%`}</Label>
+            </RadioGroupItem>
+          ))}
           <RadioGroupItem
-            key={i}
-            value={item}
-            id={item}
+            key={"custom-slippage"}
+            value={"custom"}
+            id={"custom"}
             className="flex items-center space-x-2"
           >
-            <Label
-              htmlFor={item}
-              // TODO: move cursor pointer inside radio UI component
-              className="cursor-pointer"
-            >{`${item}%`}</Label>
+            <Label htmlFor={"custom-slippage"} className="cursor-pointer">
+              Custom
+            </Label>
           </RadioGroupItem>
-        ))}
-        <RadioGroupItem
-          key={"custom-slippage"}
-          value={"custom"}
-          id={"custom"}
-          className="flex items-center space-x-2"
-        >
-          <Label htmlFor={"custom-slippage"} className="cursor-pointer">
-            Custom
-          </Label>
-        </RadioGroupItem>
-      </RadioGroup>
+        </RadioGroup>
+      </div>
       {customSlippage ? (
         <>
-          <CustomNumericInput
-            className="w-full  text-primary "
-            onUserInput={(e) => {
-              if (!e) setSlippage("0")
-              else setSlippage(e)
-            }}
+          <NumericInput
+            className="w-full text-primary"
             value={slippage}
             placeholder="Custom"
             symbol={<Percent size="15" />}
@@ -124,43 +120,44 @@ export default function MarketOrder() {
       ) : null}
       <Separator />
 
-      <div className="py-5">
-        <Collapsible
-          open={isOpen}
-          onOpenChange={setIsOpen}
-          className="w-full space-y-2"
-        >
+      <Collapsible
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        className="w-full space-y-2 cursor-pointer text-xs"
+      >
+        <CollapsibleTrigger asChild>
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold">Details</h4>
-            <CollapsibleTrigger asChild>
-              <Button variant="invisible" size="sm">
-                {!isOpen && <ChevronDown className="h-6 w-6" />}
-                {isOpen && <ChevronUp className="h-6 w-6" />}
+            <h4 className="font-semibold">Market details</h4>
+            <Button variant="invisible" size="sm">
+              <ChevronDown
+                className={cn("h-4 w-4 transition-all", {
+                  "rotate-180": isOpen,
+                })}
+              />
 
-                <span className="sr-only">Toggle</span>
-              </Button>
-            </CollapsibleTrigger>
+              <span className="sr-only">Toggle</span>
+            </Button>
           </div>
-          <div className="flex justify-between text-md">
-            <Label className="text-secondary">Taker fee</Label>
+        </CollapsibleTrigger>
+        <div className="flex justify-between">
+          <Label className="text-secondary">Taker fee</Label>
+          <span>$ 0.00</span>
+        </div>
+        <CollapsibleContent className="space-y-2">
+          <div className="flex justify-between">
+            <Label className="text-secondary">Tick size</Label>
             <span>$ 0.00</span>
           </div>
-          <CollapsibleContent className="space-y-2">
-            <div className="flex justify-between text-xs">
-              <Label className="text-secondary">Tick size</Label>
-              <span>$ 0.00</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <Label className="text-secondary">Current spot price</Label>
-              <span>$ 0.00</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <Label className="text-secondary">Current spot price</Label>
-              <span>$ 0.00</span>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
+          <div className="flex justify-between">
+            <Label className="text-secondary">Current spot price</Label>
+            <span>$ 0.00</span>
+          </div>
+          <div className="flex justify-between">
+            <Label className="text-secondary">Current spot price</Label>
+            <span>$ 0.00</span>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   )
 }

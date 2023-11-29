@@ -20,7 +20,7 @@ const CustomTabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-baseline justify-center text-primary h-[var(--bar-height)]",
+      "flex items-baseline justify-center text-primary h-[var(--bar-height)] px-4 space-x-6",
       className,
     )}
     {...props}
@@ -36,7 +36,12 @@ const CustomTabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "justify-center whitespace-nowrap rounded-sm px-3 text-sm leading-[22px] font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:underline  data-[state=active]:underline-offset-[1.35rem]  data-[state=active]:decoration-green-caribbean  data-[state=active]:decoration-2  data-[state=active]:shadow-sm items-center h-full",
+        "justify-center whitespace-nowrap rounded-sm text-sm leading-[22px] font-medium ring-offset-background transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=active]:underline data-[state=active]:underline-offset-[1.35rem]  data-[state=active]:decoration-green-caribbean data-[state=active]:decoration-2 items-center h-full",
+        "disabled:data-[state=active]:text-gray-scale-300 disabled:data-[state=active]:decoration-gray-scale-200 disabled:text-gray-scale-400",
+        "text-gray-scale-300 data-[state=active]:text-white",
+        "hover:underline hover:underline-offset-[1.35rem] hover:decoration-green-caribbean hover:decoration-2",
+        "active:!text-gray-scale-200",
         className,
       )}
       {...props}

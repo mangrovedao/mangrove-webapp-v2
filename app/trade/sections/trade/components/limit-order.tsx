@@ -2,6 +2,7 @@ import React from "react"
 
 import { ChevronDown, ChevronUp } from "lucide-react"
 
+import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
 import {
   Collapsible,
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
 
 export default function LimitOrder() {
@@ -26,11 +26,11 @@ export default function LimitOrder() {
   const [isSourcing, setIsSourcing] = React.useState(false)
 
   return (
-    <div className="space-y-5 pt-5">
+    <div className="space-y-5 pt-5 text-xs">
       <Separator />
-      <div>
+      <div className="space-y-1">
         <Label> Limit price</Label>
-        <CustomNumericInput symbol="USDC" />
+        <NumericInput symbol="USDC" />
       </div>
       <Separator />
 
@@ -48,7 +48,7 @@ export default function LimitOrder() {
         className="w-full space-y-2"
       >
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold">Advanced</h4>
+          <h4 className="font-semibold">Advanced</h4>
           <CollapsibleTrigger asChild>
             <Button variant="invisible" size="sm">
               {!isAdvanced && <ChevronDown className="h-6 w-6" />}
@@ -110,7 +110,7 @@ export default function LimitOrder() {
         className="w-full space-y-2"
       >
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold">Liquidity sourcing</h4>
+          <h4 className="font-semibold">Liquidity sourcing</h4>
           <CollapsibleTrigger asChild>
             <Button variant="invisible" size="sm">
               {!isSourcing && <ChevronDown className="h-6 w-6" />}

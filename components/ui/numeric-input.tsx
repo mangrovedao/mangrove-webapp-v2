@@ -26,7 +26,6 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
         onChange={({ target }) => {
           enforcer(target.value.replace(/,/g, "."))
         }}
-        type={type ?? "text"}
         pattern="^[0-9]*[.,]?[0-9]*$"
         placeholder={placeholder ?? "0.0"}
         minLength={1}
