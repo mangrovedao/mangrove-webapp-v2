@@ -53,9 +53,8 @@ export default function Page() {
         main {
           display: grid;
           grid-area: main;
-          max-height: calc(100vh - var(--bar-height));
           grid-template-columns: 20.5rem minmax(0, 1fr);
-          grid-template-rows: auto var(--history-table-height);
+          grid-template-rows: 1fr var(--history-table-height);
           grid-template-areas:
             "trade content"
             "trade tables";
@@ -67,7 +66,6 @@ export default function Page() {
 
         .trade-section {
           grid-area: trade;
-          max-height: calc(100vh - var(--bar-height));
         }
 
         .fluid-section {
@@ -75,6 +73,7 @@ export default function Page() {
           grid-area: content;
           grid-template-areas: "book chart";
           grid-template-columns: 20.5rem minmax(0, 1fr);
+
           grid-template-rows: minmax(
             0,
             calc(100vh - var(--bar-height) - var(--history-table-height))
