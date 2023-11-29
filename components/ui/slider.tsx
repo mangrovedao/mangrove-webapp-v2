@@ -6,15 +6,19 @@ import * as React from "react"
 import { cn } from "utils"
 
 const Ticks = ({
-  position,
+  position = "top",
   value,
 }: {
   position: string
   value: number[] | undefined
 }) => {
-  console.log(position, value)
   return (
-    <div className={`flex gap-4 absolute left-1 ${position}-[9px]`}>
+    <div
+      className={cn("flex gap-4 absolute left-1", {
+        "top-[9px]": position === "top",
+        "bottom-[9px]": position === "bottom",
+      })}
+    >
       {Array.from({ length: 17 }, (_, index) => (
         <span
           key={`slider-top-decoration-${index}`}
@@ -36,13 +40,13 @@ const Slider = React.forwardRef<
     <SliderPrimitive.Root
       ref={ref}
       className={cn(
-        "relative flex w-full touch-none select-none items-center ",
+        "relative flex w-full touch-none select-none items-center",
         className,
       )}
       {...props}
     >
-      <SliderPrimitive.Track className="relative h-[5px] w-full grow rounded-full bg-muted ">
-        <Ticks value={props.defaultValue} position="bottom" />
+      <Ticks value={props.defaultValue} position="bottom" />
+      <SliderPrimitive.Track className="relative h-[5px] w-full grow rounded-full bg-muted">
         <SliderPrimitive.Range className="absolute rounded-full h-full bg-green-bangladesh" />
         <div className="flex justify-between">
           {Array.from({ length: 4 }, (_, index) => (
@@ -52,10 +56,10 @@ const Slider = React.forwardRef<
             />
           ))}
         </div>
-        <Ticks value={props.defaultValue} position="top" />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb className=" align-middle cursor-pointer whitespace-nowrap rounded-xl border-[1px] border-green-bangladesh bg-background transition-colors disabled:pointer-events-none disabled:opacity-50 ">
-        <span className="text-xs px-2">{props.defaultValue} % </span>
+      <Ticks value={props.defaultValue} position="top" />
+      <SliderPrimitive.Thumb className="focus-visible:outline-none active:!text-gray-scale-200 cursor-pointer whitespace-nowrap rounded-xl border-[1px] border-green-bangladesh bg-background transition-colors disabled:pointer-events-none disabled:opacity-50 ">
+        <span className="text-xs px-2">{props.defaultValue}% </span>
       </SliderPrimitive.Thumb>
     </SliderPrimitive.Root>
   </>

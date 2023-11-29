@@ -32,31 +32,16 @@ export default function MarketOrder() {
           max={100}
           onValueChange={(e) => setSlider(e)}
         />
-        <div className="space-x-3">
-          <Button
-            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
-            onClick={() => setSlider([25])}
-          >
-            25%
-          </Button>
-          <Button
-            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
-            onClick={() => setSlider([50])}
-          >
-            50%
-          </Button>
-          <Button
-            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
-            onClick={() => setSlider([75])}
-          >
-            75%
-          </Button>
-          <Button
-            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
-            onClick={() => setSlider([100])}
-          >
-            100%
-          </Button>
+        <div className="flex space-x-2 space-around">
+          {[[25], [50], [75], [100]].map((value) => (
+            <Button
+              key={`slider-value-${value}`}
+              className="bg-transparent text-primary rounded-full text-xs pt-[4px] pb-[2px] px-4 border-[1px] border-green-bangladesh"
+              onClick={() => setSlider(value)}
+            >
+              {value}%
+            </Button>
+          ))}
         </div>
       </div>
 
