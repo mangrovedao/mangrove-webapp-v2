@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/collapsible"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
 import { CustomNumericInput } from "@components/stateless/custom-numeric-input"
 import { Label } from "@components/ui/label"
 
@@ -18,9 +19,46 @@ export default function MarketOrder() {
   const [slippage, setSlippage] = React.useState<string>("0.5")
   const [customSlippage, setCustomSlippage] = React.useState<boolean>(false)
   const [isOpen, setIsOpen] = React.useState(false)
+  const [slider, setSlider] = React.useState([25])
 
   return (
     <div className="space-y-5 pt-5">
+      <div className="space-y-5">
+        <Slider
+          defaultValue={slider}
+          value={slider}
+          step={25}
+          max={100}
+          onValueChange={(e) => setSlider(e)}
+        />
+        <div className="space-x-3">
+          <Button
+            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
+            onClick={() => setSlider([25])}
+          >
+            25%
+          </Button>
+          <Button
+            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
+            onClick={() => setSlider([50])}
+          >
+            50%
+          </Button>
+          <Button
+            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
+            onClick={() => setSlider([75])}
+          >
+            75%
+          </Button>
+          <Button
+            className="bg-transparent text-primary rounded-full py-1 px-4 border-[1px] border-green-bangladesh"
+            onClick={() => setSlider([100])}
+          >
+            100%
+          </Button>
+        </div>
+      </div>
+
       <Separator />
       <div className="flex justify-between items-baseline">
         <Label className="text-secondary">Average market price</Label>
