@@ -49,6 +49,7 @@ export default function TradeInputs({
             <NumericInput
               icon={selectedMarket?.base.name}
               symbol={selectedMarket?.base.name}
+              disabled={!selectedMarket}
             />
             <span className="pt-2 text-xs text-secondary float-left">
               Balance:
@@ -64,6 +65,7 @@ export default function TradeInputs({
             <NumericInput
               icon={selectedMarket?.quote.name}
               symbol={selectedMarket?.quote.name}
+              disabled={!selectedMarket}
             />
             <span className="pt-2 text-xs text-secondary float-left">
               Balance:

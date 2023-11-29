@@ -16,6 +16,8 @@ export enum InputType {
 const inputClasses =
   "flex h-14 w-full px-4 py-3 rounded-lg border focus:border-input group-hover:!border-green-caribbean active:!border-green-bangladesh transition-all bg-muted text-md placeholder:text-muted-foreground focus-visible:!outline-none disabled:cursor-not-allowed disabled:bg-gray-scale-600 disabled:!border-transparent disabled:text-gray-scale-300"
 
+const disabledClasses = "border-none"
+
 export type InputProps = {
   value?: string | number | null | undefined
   allowNegative?: boolean
@@ -42,6 +44,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       onChange,
       value = undefined,
       placeholder,
+      disabled,
       ...rest
     },
     ref,
@@ -52,17 +55,26 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         ref={ref}
         type={type}
-        className={cn(inputClasses, className)}
+        className={cn(
+          inputClasses,
+          disabled ? disabledClasses : undefined,
+          className,
+        )}
         onInput={onInput}
         placeholder={placeholder}
         value={value}
+        disabled={disabled}
         {...rest}
       />
     ) : (
       <NumericFormat
         // @ts-expect-error
         ref={ref}
-        className={cn(inputClasses, className)}
+        className={cn(
+          inputClasses,
+          disabled ? disabledClasses : undefined,
+          className,
+        )}
         allowNegative={allowNegative}
         decimalScale={decimals}
         decimalSeparator={decimalSeparator}
@@ -70,6 +82,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         value={value}
         onInput={onInput}
         onChange={onChange}
+        disabled={disabled}
       />
     )
   },
