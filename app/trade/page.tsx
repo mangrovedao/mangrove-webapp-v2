@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <main>
       <section className="trade-section">
-        <div className="px-4 py-[15px] border-b">
+        <div className="px-4 border-b h-[var(--bar-height)] flex items-center">
           <MarketSelector />
         </div>
         <Trade />
@@ -53,9 +53,8 @@ export default function Page() {
         main {
           display: grid;
           grid-area: main;
-          max-height: calc(100vh - var(--bar-height));
-          grid-template-columns: 20.5rem 1fr;
-          grid-template-rows: auto var(--history-table-height);
+          grid-template-columns: 20.5rem minmax(0, 1fr);
+          grid-template-rows: 1fr var(--history-table-height);
           grid-template-areas:
             "trade content"
             "trade tables";
@@ -67,14 +66,14 @@ export default function Page() {
 
         .trade-section {
           grid-area: trade;
-          max-height: calc(100vh - var(--bar-height));
         }
 
         .fluid-section {
           display: grid;
           grid-area: content;
           grid-template-areas: "book chart";
-          grid-template-columns: 20.5rem 1fr;
+          grid-template-columns: 20.5rem minmax(0, 1fr);
+
           grid-template-rows: minmax(
             0,
             calc(100vh - var(--bar-height) - var(--history-table-height))

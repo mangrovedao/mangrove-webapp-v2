@@ -42,7 +42,7 @@ export default function MarketSelector() {
       onValueChange={onValueChange}
       disabled={marketsQuery.isLoading}
     >
-      <SelectTrigger className="border-none h-6 p-0 rounded-none">
+      <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
         <SelectValue placeholder="Select a market" />
       </SelectTrigger>
       <SelectContent>

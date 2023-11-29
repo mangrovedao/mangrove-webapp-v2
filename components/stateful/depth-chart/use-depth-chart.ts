@@ -1,4 +1,4 @@
-import { Mangrove } from "@mangrovedao/mangrove.js"
+import { Mangrove, type Market } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 import React from "react"
 
@@ -14,13 +14,59 @@ function disablePageScroll() {
   document.body.classList.add("overflow-hidden")
 }
 
+function removeCrossedOrders(
+  bids: Market.Offer[],
+  asks: Market.Offer[],
+): { bids: Market.Offer[]; asks: Market.Offer[] } {
+  // Sort bids and asks by price (descending for bids, ascending for asks)
+  bids.sort((a, b) =>
+    Big(b.price ?? 0)
+      .minus(a.price ?? 0)
+      .toNumber(),
+  )
+  asks.sort((a, b) =>
+    Big(a.price ?? 0)
+      .minus(b.price ?? 0)
+      .toNumber(),
+  )
+
+  const i = 0
+  const j = 0
+
+  // Iterate through bids and asks
+  while (i < bids.length && j < asks.length) {
+    const bid = bids[i]
+    const ask = asks[j]
+
+    // Compare bid and ask prices
+    const comparison = Big(bid?.price ?? 0).cmp(ask?.price ?? 0)
+
+    if (comparison === -1) {
+      // Bid price is less than ask price, no more crossed orders
+      break
+    } else if (comparison === 0) {
+      // Bid and ask prices are equal, remove both orders
+      bids.splice(i, 1)
+      asks.splice(j, 1)
+    } else {
+      // Bid price is greater than ask price, remove the ask order
+      asks.splice(j, 1)
+    }
+  }
+
+  // Return the updated bids and asks arrays
+  return { bids, asks }
+}
+
 export function useDepthChart() {
   const { requestBookQuery, selectedMarket } = useMarket()
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const [isScrolling, setIsScrolling] = React.useState(false)
 
-  const asks = requestBookQuery.data?.asks
-  const bids = requestBookQuery.data?.bids
+  const { asks, bids } = removeCrossedOrders(
+    requestBookQuery.data?.bids ?? [],
+    requestBookQuery.data?.asks ?? [],
+  )
   const isLoading = requestBookQuery.isLoading
   const cumulativeAsks = calculateCumulative(asks)
   const cumulativeBids = calculateCumulative(bids)

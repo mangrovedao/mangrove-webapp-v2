@@ -1,7 +1,13 @@
 "use client"
+import { type Market } from "@mangrovedao/mangrove.js"
 import React from "react"
 
-import { Button } from "@/components/ui/button"
+import {
+  CustomTabs,
+  CustomTabsContent,
+  CustomTabsList,
+  CustomTabsTrigger,
+} from "@/components/stateless/custom-tabs"
 import {
   Table,
   TableBody,
@@ -34,7 +40,7 @@ function OrderBookTableCell({ children, className }: TableCellProps) {
 }
 
 type SemiBookProps = {
-  type: "asks" | "bids"
+  type: Market.BA
 }
 
 function SemiBook({ type }: SemiBookProps) {
@@ -74,30 +80,39 @@ function SemiBook({ type }: SemiBookProps) {
 
 export default function Book({
   className,
-  ...props
-}: React.ComponentProps<"div">) {
+  style,
+}: {
+  className?: string
+  style?: React.CSSProperties | undefined
+}) {
   return (
-    <div className={className} {...props}>
-      <div className="min-h-[54px] flex items-center border-b text-sm">
-        <Button variant={"link"}>Book</Button>
-      </div>
-      <div className="px-1">
-        <Table className="text-xs">
-          <TableHeader className="sticky top-0">
-            <TableRow className="border-none">
-              <OrderBookTableHead className="text-left">
-                Size (ETH)
-              </OrderBookTableHead>
-              <OrderBookTableHead>Price (USDC)</OrderBookTableHead>
-              <OrderBookTableHead>Total</OrderBookTableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="">
-            <SemiBook type="asks" />
-            <SemiBook type="bids" />
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+    <CustomTabs
+      style={style}
+      defaultValue={"book"}
+      className={cn("h-full", className)}
+    >
+      <CustomTabsList className="w-full flex justify-start border-b">
+        <CustomTabsTrigger value={"book"}>Book</CustomTabsTrigger>
+      </CustomTabsList>
+      <CustomTabsContent value="book">
+        <div className="px-1">
+          <Table className="text-xs">
+            <TableHeader className="sticky top-0">
+              <TableRow className="border-none">
+                <OrderBookTableHead className="text-left">
+                  Size (ETH)
+                </OrderBookTableHead>
+                <OrderBookTableHead>Price (USDC)</OrderBookTableHead>
+                <OrderBookTableHead>Total</OrderBookTableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="">
+              <SemiBook type="asks" />
+              <SemiBook type="bids" />
+            </TableBody>
+          </Table>
+        </div>
+      </CustomTabsContent>
+    </CustomTabs>
   )
 }
