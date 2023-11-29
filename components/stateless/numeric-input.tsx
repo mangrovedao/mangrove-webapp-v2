@@ -29,7 +29,7 @@ const NumericInput = React.forwardRef<HTMLInputElement, Props>(
         {symbol && (
           <div
             className={cn(
-              "flex items-center absolute inset-y-0 right-4",
+              "flex items-center absolute inset-y-0 right-4 text-base",
               {
                 "text-gray-scale-400": props.disabled,
                 "text-gray-scale-300": !props.disabled,

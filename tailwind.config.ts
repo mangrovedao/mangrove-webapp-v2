@@ -30,6 +30,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          "dark-green": "hsl(var(--color-primary-dark-geen))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -76,6 +77,9 @@ export default {
           100: "hsl(var(--color-red-100))",
           400: "hsl(var(--color-red-400))",
           500: "hsl(var(--color-red-500))",
+        },
+        "blue-light": {
+          100: "hsl(var(--color-blue-light-100))",
         },
       },
       borderRadius: {

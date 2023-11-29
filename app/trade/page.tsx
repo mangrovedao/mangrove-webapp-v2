@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <main>
       <section className="trade-section">
-        <div className="px-4 py-[15px] border-b">
+        <div className="px-4 border-b h-[var(--bar-height)] flex items-center">
           <MarketSelector />
         </div>
         <Trade />
