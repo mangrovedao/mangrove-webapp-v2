@@ -45,11 +45,6 @@ export default function Market({
           <DepthChart />
         </CustomTabsContent>
       </CustomTabs>
-      <style global jsx>{`
-        div[role="tabpanel"] {
-          height: calc(100% - var(--bar-height));
-        }
-      `}</style>
     </div>
   )
 }
