@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import useScrollToMiddle from "./use-scroll-to-middle"
 
 type TableCellProps = {
   className?: string
@@ -42,48 +43,49 @@ function OrderBookTableCell({ children, className }: TableCellProps) {
 
 type SemiBookProps = {
   type: Market.BA
+  offers?: Market.Offer[]
 }
 
-function SemiBook({ type }: SemiBookProps) {
-  const { requestBookQuery } = useMarket()
-  const offers = requestBookQuery.data?.[type]
-  return (
-    <>
-      {(offers ?? []).map(({ price, id, volume }) => (
-        <TableRow
-          key={`${type}-${id}`}
-          className={`relative h-6 border-none hover:opacity-80 transition-opacity cursor-default`}
-        >
-          <OrderBookTableCell
-            className={cn(
-              "text-left",
-              type === "bids" ? "text-green-caribbean" : "text-red-100",
-            )}
-          >
-            {volume.toFixed(2)}
-          </OrderBookTableCell>
-          <OrderBookTableCell>{price?.toFixed(2)}</OrderBookTableCell>
-          <OrderBookTableCell className="text-gray">
-            {price?.mul(volume).toFixed(2)}
-          </OrderBookTableCell>
-          <td
-            className={cn(
-              "absolute inset-y-[2px] left-0 w-full -z-10 rounded-[2px] order-book-line-bg",
-            )}
-          ></td>
-          <style jsx>{`
-            .order-book-line-bg {
-              width: 100%;
-              background: ${type === "bids"
-                ? "#021B1A"
-                : "rgba(255, 0, 0, 0.15)"};
-            }
-          `}</style>
-        </TableRow>
-      ))}
-    </>
-  )
-}
+const SemiBook = React.forwardRef<
+  React.ElementRef<typeof TableRow>,
+  SemiBookProps
+>(({ type, offers }, ref) => {
+  const refIndex = type === "bids" ? 0 : offers?.length ? offers.length - 1 : 0
+
+  return (offers ?? []).map(({ price, id, volume }, i) => (
+    <TableRow
+      ref={refIndex === i ? ref : null}
+      key={`${type}-${id}`}
+      className={`relative h-6 border-none hover:opacity-80 transition-opacity cursor-default`}
+    >
+      <OrderBookTableCell
+        className={cn(
+          "text-left",
+          type === "bids" ? "text-green-caribbean" : "text-red-100",
+        )}
+      >
+        {volume.toFixed(2)}
+      </OrderBookTableCell>
+      <OrderBookTableCell>{price?.toFixed(2)}</OrderBookTableCell>
+      <OrderBookTableCell className="text-gray">
+        {price?.mul(volume).toFixed(2)}
+      </OrderBookTableCell>
+      <td
+        className={cn(
+          "absolute inset-y-[2px] left-0 w-full -z-10 rounded-[2px] order-book-line-bg",
+        )}
+      ></td>
+      <style jsx>{`
+        .order-book-line-bg {
+          width: 100%;
+          background: ${type === "bids" ? "#021B1A" : "rgba(255, 0, 0, 0.15)"};
+        }
+      `}</style>
+    </TableRow>
+  ))
+})
+
+SemiBook.displayName = "SemiBook"
 
 export default function Book({
   className,
@@ -92,6 +94,9 @@ export default function Book({
   className?: string
   style?: React.CSSProperties | undefined
 }) {
+  const { requestBookQuery } = useMarket()
+  const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
+
   return (
     <CustomTabs
       style={style}
@@ -103,7 +108,11 @@ export default function Book({
       </CustomTabsList>
       <CustomTabsContent value="book">
         <div className="px-1 relative h-full">
-          <ScrollArea className="h-full" scrollHideDelay={200}>
+          <ScrollArea
+            className="h-full"
+            scrollHideDelay={200}
+            ref={scrollAreaRef}
+          >
             <Table className="text-sm leading-5 h-full select-none">
               <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
                 <TableRow className="border-none">
@@ -114,9 +123,17 @@ export default function Book({
                   <OrderBookTableHead>Total</OrderBookTableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody className="overflow-scroll">
-                <SemiBook type="asks" />
-                <SemiBook type="bids" />
+              <TableBody className="overflow-scroll" ref={bodyRef}>
+                <SemiBook
+                  type="asks"
+                  ref={bestAskRef}
+                  offers={requestBookQuery.data?.asks}
+                />
+                <SemiBook
+                  type="bids"
+                  ref={bestBidRef}
+                  offers={requestBookQuery.data?.bids}
+                />
               </TableBody>
             </Table>
             <ScrollBar orientation="vertical" className="z-50" />
