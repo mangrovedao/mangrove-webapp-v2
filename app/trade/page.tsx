@@ -26,12 +26,7 @@ export default function Page() {
           }}
         >
           <MarketInfoBar />
-          <Market
-            className="w-full border-t "
-            style={{
-              height: "calc(100% - var(--bar-height))",
-            }}
-          />
+          <Market className="w-full border-t h-full" />
         </div>
       </section>
 
@@ -45,7 +40,6 @@ export default function Page() {
           grid-template:
             "header" var(--bar-height)
             "main" minmax(0, 1fr);
-          overflow: hidden;
         }
       `}</style>
 
@@ -73,11 +67,7 @@ export default function Page() {
           grid-area: content;
           grid-template-areas: "book chart";
           grid-template-columns: 20.5rem minmax(0, 1fr);
-
-          grid-template-rows: minmax(
-            0,
-            calc(100vh - var(--bar-height) - var(--history-table-height))
-          );
+          grid-template-rows: var(--book-chart-height);
         }
       `}</style>
     </main>

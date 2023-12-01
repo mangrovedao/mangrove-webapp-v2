@@ -11,10 +11,7 @@ const CustomRadioGroup = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Root
-      className={cn(
-        " flex w-full gap-1 p-[0.19rem] h-10 rounded-3xl bg-muted",
-        className,
-      )}
+      className={cn("flex w-full rounded-3xl bg-muted gap-1 p-1", className)}
       {...props}
       ref={ref}
     />
@@ -30,10 +27,10 @@ const CustomRadioGroupItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        ` w-full text-secondary rounded-3xl aria-checked:border aria-checked:border-green-caribbean aria-checked:text-primary
-            hover:bg-green-caribbean hover:cursor-pointer hover:text-primary
-            ring-offset-background focus:outline-none focus-visible:ring-2  
-            focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`,
+        `w-full text-secondary rounded-3xl border border-transparent aria-checked:border-green-caribbean aria-checked:text-primary
+            hover:bg-green-caribbean hover:cursor-pointer hover:text-primary transition-colors
+            ring-offset-background focus:outline-none focus-visible:ring-2 py-2 px-3
+            focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-sm font-medium`,
         className,
       )}
       {...props}

@@ -67,6 +67,7 @@ export default {
           DEFAULT: "hsl(var(--color-white-anti-flash)) ",
         },
         gray: {
+          DEFAULT: "hsl(var(--color-gray))",
           "scale-200": "hsl(var(--color-gray-scale-200)) ",
           "scale-300": "hsl(var(--color-gray-scale-300)) ",
           "scale-400": "hsl(var(--color-gray-scale-400)) ",
