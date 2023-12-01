@@ -20,6 +20,7 @@ export default {
     extend: {
       fontFamily: {
         axiforma: ["Axiforma", ...defaultTheme.fontFamily.sans],
+        roboto: ["RobotoMono", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         border: "hsl(var(--border))",
