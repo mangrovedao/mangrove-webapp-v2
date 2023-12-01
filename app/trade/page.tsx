@@ -41,6 +41,7 @@ export default function Page() {
           grid-template:
             "header" var(--bar-height)
             "main" minmax(0, 1fr);
+          overflow: hidden;
         }
       `}</style>
 
