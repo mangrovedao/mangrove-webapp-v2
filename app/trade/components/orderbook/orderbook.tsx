@@ -1,5 +1,4 @@
 "use client"
-import { type Market } from "@mangrovedao/mangrove.js"
 import React from "react"
 
 import {
@@ -8,75 +7,13 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/stateless/custom-tabs"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-
-type TableCellProps = {
-  className?: string
-} & React.PropsWithChildren
-
-function OrderBookTableHead({ children, className }: TableCellProps) {
-  return (
-    <TableHead className={cn("p-0 px-[13px] text-right", className)}>
-      {children}
-    </TableHead>
-  )
-}
-
-function OrderBookTableCell({ children, className }: TableCellProps) {
-  return (
-    <TableCell className={cn("p-0 px-[13px] text-right", className)}>
-      {children}
-    </TableCell>
-  )
-}
-
-type SemiBookProps = {
-  type: Market.BA
-}
-
-function SemiBook({ type }: SemiBookProps) {
-  const { requestBookQuery } = useMarket()
-  const offers = requestBookQuery.data?.[type]
-  return (
-    <>
-      {(offers ?? []).map(({ price, id, volume }) => (
-        <TableRow key={`${type}-${id}`} className={`relative h-6 border-none`}>
-          <OrderBookTableCell
-            className={cn(
-              "text-left",
-              type === "bids" ? "text-green" : "text-red",
-            )}
-          >
-            {volume.toFixed(2)}
-          </OrderBookTableCell>
-          <OrderBookTableCell>{price?.toFixed(2)}</OrderBookTableCell>
-          <OrderBookTableCell>
-            {price?.mul(volume).toFixed(2)}
-          </OrderBookTableCell>
-          <td
-            className={cn(
-              "absolute inset-y-[2px] left-0 w-full -z-10 rounded-[2px]",
-              type === "bids" ? "text-green" : "text-red",
-            )}
-            style={{
-              width: `${(volume.toNumber() / 10000) * 100}%`,
-              background: type === "bids" ? "#021B1A" : "rgba(255, 0, 0, 0.15)",
-            }}
-          ></td>
-        </TableRow>
-      ))}
-    </>
-  )
-}
+import { SemiBook } from "./semibook"
+import { OrderBookTableHead } from "./table-head"
+import useScrollToMiddle from "./use-scroll-to-middle"
 
 export default function Book({
   className,
@@ -85,6 +22,9 @@ export default function Book({
   className?: string
   style?: React.CSSProperties | undefined
 }) {
+  const { requestBookQuery, selectedMarket } = useMarket()
+  const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
+
   return (
     <CustomTabs
       style={style}
@@ -95,22 +35,39 @@ export default function Book({
         <CustomTabsTrigger value={"book"}>Book</CustomTabsTrigger>
       </CustomTabsList>
       <CustomTabsContent value="book">
-        <div className="px-1">
-          <Table className="text-xs">
-            <TableHeader className="sticky top-0">
-              <TableRow className="border-none">
-                <OrderBookTableHead className="text-left">
-                  Size (ETH)
-                </OrderBookTableHead>
-                <OrderBookTableHead>Price (USDC)</OrderBookTableHead>
-                <OrderBookTableHead>Total</OrderBookTableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className="">
-              <SemiBook type="asks" />
-              <SemiBook type="bids" />
-            </TableBody>
-          </Table>
+        <div className="px-1 relative h-full">
+          <ScrollArea
+            className="h-full"
+            scrollHideDelay={200}
+            ref={scrollAreaRef}
+          >
+            <Table className="text-sm leading-5 h-full select-none">
+              <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
+                <TableRow className="border-none">
+                  <OrderBookTableHead className="text-left">
+                    Size ({selectedMarket?.base.name})
+                  </OrderBookTableHead>
+                  <OrderBookTableHead>
+                    Price ({selectedMarket?.quote.name})
+                  </OrderBookTableHead>
+                  <OrderBookTableHead>Total</OrderBookTableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="overflow-scroll" ref={bodyRef}>
+                <SemiBook
+                  type="asks"
+                  ref={bestAskRef}
+                  data={requestBookQuery.data}
+                />
+                <SemiBook
+                  type="bids"
+                  ref={bestBidRef}
+                  data={requestBookQuery.data}
+                />
+              </TableBody>
+            </Table>
+            <ScrollBar orientation="vertical" className="z-50" />
+          </ScrollArea>
         </div>
       </CustomTabsContent>
     </CustomTabs>
