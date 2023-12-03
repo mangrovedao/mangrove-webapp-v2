@@ -11,8 +11,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { OrderBookTableHead } from "./orderbook-table-head"
 import { SemiBook } from "./semibook"
+import { OrderBookTableHead } from "./table-head"
 import useScrollToMiddle from "./use-scroll-to-middle"
 
 export default function Book({
@@ -44,11 +44,11 @@ export default function Book({
             <Table className="text-sm leading-5 h-full select-none">
               <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
                 <TableRow className="border-none">
-                  <OrderBookTableHead>
-                    Price ({selectedMarket?.quote.name})
-                  </OrderBookTableHead>
                   <OrderBookTableHead className="text-left">
                     Size ({selectedMarket?.base.name})
+                  </OrderBookTableHead>
+                  <OrderBookTableHead>
+                    Price ({selectedMarket?.quote.name})
                   </OrderBookTableHead>
                   <OrderBookTableHead>Total</OrderBookTableHead>
                 </TableRow>
@@ -57,12 +57,12 @@ export default function Book({
                 <SemiBook
                   type="asks"
                   ref={bestAskRef}
-                  offers={requestBookQuery.data?.asks}
+                  data={requestBookQuery.data}
                 />
                 <SemiBook
                   type="bids"
                   ref={bestBidRef}
-                  offers={requestBookQuery.data?.bids}
+                  data={requestBookQuery.data}
                 />
               </TableBody>
             </Table>
