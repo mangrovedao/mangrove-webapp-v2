@@ -4,12 +4,12 @@ import { cn } from "@/utils"
 import { TokenIcon } from "../token-icon"
 import { Input, type InputProps } from "../ui/input"
 
-type Props = {
+export type NumericInputProps = {
   symbol?: React.ReactNode
   icon?: string
 } & InputProps
 
-const NumericInput = React.forwardRef<HTMLInputElement, Props>(
+const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
   ({ className, icon, symbol, ...props }, ref) => {
     return (
       <div className="w-full relative group">

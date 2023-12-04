@@ -3,7 +3,7 @@ import MarketSelector from "@/components/stateful/market-selector"
 import MarketInfoBar from "./components/market-infos-bar"
 import Market from "./components/market/market"
 import Book from "./components/orderbook/orderbook"
-import Trade from "./components/trade/trade"
+import TradeContainer from "./components/trade-container/trade-container"
 
 export default function Page() {
   return (
@@ -12,7 +12,7 @@ export default function Page() {
         <div className="px-4 border-b h-[var(--bar-height)] flex items-center">
           <MarketSelector />
         </div>
-        <Trade />
+        <TradeContainer />
       </section>
 
       <section className="border-x book-and-chart">

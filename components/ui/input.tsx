@@ -45,6 +45,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       value = undefined,
       placeholder,
       disabled,
+      name,
       ...rest
     },
     ref,
@@ -64,6 +65,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         placeholder={placeholder}
         value={value}
         disabled={disabled}
+        name={name}
         {...rest}
       />
     ) : (
@@ -83,6 +85,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         onInput={onInput}
         onChange={onChange}
         disabled={disabled}
+        name={name}
       />
     )
   },
