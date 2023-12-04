@@ -17,8 +17,6 @@ export const TVChartContainer = (
     React.useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>
 
   React.useEffect(() => {
-    console.log(chartContainerRef)
-
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: props.symbol,
       // BEWARE: no trailing slash is expected in feed URL

@@ -1,5 +1,3 @@
-import React from "react"
-
 import { ChevronDown, Percent } from "lucide-react"
 
 import { NumericInput } from "@/components/stateless/numeric-input"
@@ -14,6 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { Label } from "@components/ui/label"
+import React from "react"
 
 export default function MarketOrder() {
   const slippageOptions = ["0.1", "0.5", "1.0"]
@@ -25,13 +24,16 @@ export default function MarketOrder() {
   return (
     <div className="space-y-5 pt-5">
       <div className="space-y-5">
-        <Slider
-          defaultValue={slider}
-          value={slider}
-          step={25}
-          max={100}
-          onValueChange={(e) => setSlider(e)}
-        />
+        <div className="px-3">
+          <Slider
+            defaultValue={slider}
+            value={slider}
+            step={25}
+            max={100}
+            onValueChange={(e) => setSlider(e)}
+          />
+        </div>
+
         <div className="flex space-x-3">
           {[[25], [50], [75], [100]].map((value) => (
             <Button

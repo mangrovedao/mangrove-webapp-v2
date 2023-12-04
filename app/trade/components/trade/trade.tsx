@@ -1,5 +1,6 @@
 "use client"
-import React from "react"
+import { Market } from "@mangrovedao/mangrove.js"
+import { LucideChevronRight } from "lucide-react"
 
 import {
   CustomRadioGroup,
@@ -9,9 +10,12 @@ import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMarket from "@/providers/market"
 import { Label } from "@components/ui/label"
-import { LucideChevronRight } from "lucide-react"
+import React from "react"
+
 import LimitOrder from "./components/limit-order"
 import MarketOrder from "./components/market-order"
 import Menu from "./components/menu"
@@ -19,13 +23,19 @@ import Menu from "./components/menu"
 export default function TradeInputs({
   className,
 }: React.ComponentProps<"div">) {
-  const [marketType, setMarketType] = React.useState("Market")
+  const [marketType, setMarketType] = React.useState("Limit")
   const { selectedMarket } = useMarket()
+
+  const { formattedWithSymbol: baseFormated, isFetching: baseFetching } =
+    useTokenBalance(selectedMarket?.base.address)
+
+  const { formattedWithSymbol: quoteFormated, isFetching: quoteFetching } =
+    useTokenBalance(selectedMarket?.quote.address)
 
   return (
     <div className={className}>
       {/* Menu */}
-      <Menu setMarketType={setMarketType} />
+      <Menu marketType={marketType} setMarketType={setMarketType} />
       <Separator />
       <ScrollArea className="h-[calc(100vh-(var(--bar-height)*3)-1rem)] overflow-hidden">
         <div className="px-4 space-y-8">
@@ -54,7 +64,7 @@ export default function TradeInputs({
               Balance:
             </span>
             <span className="pt-2 text-xs float-right">
-              {"1234.12"} {selectedMarket?.base.name}
+              {displayBalances(baseFetching, selectedMarket, baseFormated)}
             </span>
           </div>
 
@@ -69,7 +79,7 @@ export default function TradeInputs({
               Balance:
             </span>
             <span className="pt-2 text-xs float-right">
-              {"1234.12"} {selectedMarket?.quote.name}
+              {displayBalances(quoteFetching, selectedMarket, quoteFormated)}
             </span>
           </div>
 
@@ -91,4 +101,15 @@ export default function TradeInputs({
       </ScrollArea>
     </div>
   )
+}
+
+const displayBalances = (
+  isLoading: boolean,
+  selectedMarket?: Market,
+  formattedWithSymbol?: string,
+) => {
+  if (!selectedMarket || isLoading) {
+    return <Skeleton className="h-full w-full" />
+  }
+  return formattedWithSymbol
 }

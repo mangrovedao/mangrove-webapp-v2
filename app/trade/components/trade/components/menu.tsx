@@ -5,6 +5,7 @@ import {
 } from "@/components/stateless/custom-tabs"
 
 type Props = {
+  marketType: string
   setMarketType: (type: string) => void
 }
 
@@ -17,11 +18,11 @@ const MENU_ITEMS = [
   },
 ]
 
-export default function Menu({ setMarketType }: Props) {
+export default function Menu({ marketType, setMarketType }: Props) {
   return (
     <div className="inline-block align-middle">
       <CustomTabs
-        defaultValue={MENU_ITEMS[0]?.name}
+        defaultValue={marketType}
         onValueChange={(e) => setMarketType(e)}
       >
         <CustomTabsList className="w-full py-0">

@@ -1,5 +1,6 @@
 "use client"
 import type { Market } from "@mangrovedao/mangrove.js"
+import { useAccount } from "wagmi"
 
 import {
   Select,
@@ -10,6 +11,8 @@ import {
 } from "@/components/ui/select"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import React from "react"
+
 import { TokenIcon } from "../token-icon"
 
 function getName(market?: Market) {
@@ -22,6 +25,7 @@ function getValue(market: Market) {
 }
 
 export default function MarketSelector() {
+  const { isConnected } = useAccount()
   const { marketsQuery } = useMangrove()
   const { selectedMarket, setSelectedMarket } = useMarket()
 
@@ -36,14 +40,20 @@ export default function MarketSelector() {
 
   const value = selectedMarket ? getValue(selectedMarket) : undefined
 
+  const selectPlaceholder = React.useMemo(() => {
+    if (!isConnected) return "Connect wallet"
+    else if (!marketsQuery) return "Select a market"
+    else return "Empty Markets"
+  }, [isConnected, marketsQuery])
+
   return (
     <Select
       value={value}
       onValueChange={onValueChange}
-      disabled={marketsQuery.isLoading}
+      disabled={marketsQuery.isLoading || !selectedMarket || !isConnected}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
-        <SelectValue placeholder="Select a market" />
+        <SelectValue placeholder={selectPlaceholder} />
       </SelectTrigger>
       <SelectContent>
         {marketsQuery.data?.map((market) => (
