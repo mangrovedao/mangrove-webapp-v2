@@ -19,7 +19,7 @@ export default function MarketOrder() {
   const [slippage, setSlippage] = React.useState<string>("0.5")
   const [customSlippage, setCustomSlippage] = React.useState<boolean>(false)
   const [isOpen, setIsOpen] = React.useState(false)
-  const [slider, setSlider] = React.useState([25])
+  const [slider, setSlider] = React.useState<number[]>([25])
 
   return (
     <div className="space-y-5 pt-5">
@@ -35,9 +35,9 @@ export default function MarketOrder() {
         </div>
 
         <div className="flex space-x-3">
-          {[[25], [50], [75], [100]].map((value) => (
+          {[[25], [50], [75], [100]].map((value, i) => (
             <Button
-              key={`slider-value-${value}`}
+              key={`slider-value-${i}`}
               className="bg-transparent text-primary rounded-full text-xs pt-1 pb-[2px] w-16 border-[1px] border-green-bangladesh"
               onClick={() => setSlider(value)}
             >
