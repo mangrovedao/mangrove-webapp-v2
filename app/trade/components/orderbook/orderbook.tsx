@@ -73,10 +73,10 @@ function BookContent() {
         <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
           <TableRow className="border-none">
             <OrderBookTableHead className="text-left">
-              Size ({selectedMarket?.base.name})
+              Size ({selectedMarket?.base.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>
-              Price ({selectedMarket?.quote.name})
+              Price ({selectedMarket?.quote.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>Total</OrderBookTableHead>
           </TableRow>

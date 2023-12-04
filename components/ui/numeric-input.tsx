@@ -10,7 +10,7 @@ export type NumericInputProps = React.ComponentProps<typeof Input> & {
 const REGEX = RegExp(`^\\d*(?:\\\\[.])?\\d*$`)
 
 const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
-  ({ type, placeholder, onUserInput, ...props }, ref) => {
+  ({ placeholder, onUserInput, ...props }, ref) => {
     const enforcer = (nextUserInput: string) => {
       if (nextUserInput === "" || REGEX.test(escapeRegExp(nextUserInput))) {
         onUserInput?.(nextUserInput)

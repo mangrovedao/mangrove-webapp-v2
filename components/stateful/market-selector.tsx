@@ -12,9 +12,9 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { TokenIcon } from "../token-icon"
 
-function getName(market?: Market) {
+function getSymbol(market?: Market) {
   if (!market) return
-  return `${market?.base?.name}/${market?.quote?.name}`
+  return `${market?.base?.symbol}/${market?.quote?.symbol}`
 }
 
 function getValue(market: Market) {
@@ -53,10 +53,10 @@ export default function MarketSelector() {
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">
-                <TokenIcon symbol={market.base.name} />
-                <TokenIcon symbol={market.quote.name} />
+                <TokenIcon symbol={market.base.symbol} />
+                <TokenIcon symbol={market.quote.symbol} />
               </div>
-              <span>{getName(market)}</span>
+              <span>{getSymbol(market)}</span>
             </div>
           </SelectItem>
         ))}

@@ -1,5 +1,6 @@
 "use client"
 
+import type { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
@@ -9,10 +10,7 @@ import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
-import {
-  determinePriceDecimalsFromTokenName,
-  formatNumber,
-} from "@/utils/numbers"
+import { determinePriceDecimalsFromToken, formatNumber } from "@/utils/numbers"
 
 function Container({ children }: React.PropsWithChildren) {
   return <span className="text-xs font-medium space-y-[2px]">{children}</span>
@@ -31,20 +29,17 @@ function Item({
   value,
   skeleton = true,
   showSymbol = false,
-  quoteName,
+  quote,
   rightElement,
 }: {
   label: string
   value?: number | bigint
   skeleton?: boolean
   showSymbol?: boolean
-  quoteName?: string
+  quote?: Token
   rightElement?: React.ReactElement
 }) {
-  const displayedPriceDecimals = determinePriceDecimalsFromTokenName(
-    value,
-    quoteName,
-  )
+  const displayedPriceDecimals = determinePriceDecimalsFromToken(value, quote)
 
   return (
     <Container>
@@ -78,16 +73,10 @@ const keyLabels = {
 
 export default function MarketInfosBar() {
   const { selectedMarket } = useMarket()
-  const oneMinutePriceQuery = useTokenPriceQuery(
-    selectedMarket?.base.name,
-    selectedMarket?.quote.name,
-  )
-  const oneDayPriceQuery = useTokenPriceQuery(
-    selectedMarket?.base.name,
-    selectedMarket?.quote.name,
-    "1d",
-  )
-  const quoteName = selectedMarket?.quote.name
+  const base = selectedMarket?.base
+  const quote = selectedMarket?.quote
+  const oneMinutePriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol)
+  const oneDayPriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol, "1d")
 
   const oneMinuteClose = oneMinutePriceQuery?.data?.close ?? 0
   const oneDayClose = oneDayPriceQuery?.data?.close ?? 0
@@ -102,7 +91,7 @@ export default function MarketInfosBar() {
           label="Price"
           value={oneMinutePriceQuery?.data?.close}
           skeleton={oneMinutePriceQuery?.isLoading}
-          quoteName={selectedMarket?.quote.name}
+          quote={quote}
           showSymbol
         />
 
@@ -111,7 +100,7 @@ export default function MarketInfosBar() {
         <Item
           label={`24h Change`}
           value={variation24h}
-          quoteName={selectedMarket?.quote.name}
+          quote={quote}
           skeleton={
             oneDayPriceQuery?.isLoading ?? oneMinutePriceQuery?.isLoading
           }
@@ -145,7 +134,7 @@ export default function MarketInfosBar() {
             <Item
               label={label}
               value={oneDayPriceQuery?.data?.[key as keyof typeof keyLabels]}
-              quoteName={selectedMarket?.quote.name}
+              quote={quote}
               skeleton={oneDayPriceQuery?.isLoading}
             />
           </React.Fragment>
@@ -154,9 +143,9 @@ export default function MarketInfosBar() {
         <Separator orientation="vertical" className="h-4" />
 
         <Item
-          label={quoteName ? `24h Volume (${quoteName})` : `24h Volume`}
+          label={quote?.symbol ? `24h Volume (${quote?.symbol})` : `24h Volume`}
           value={oneDayPriceQuery?.data?.volume}
-          quoteName={selectedMarket?.quote.name}
+          quote={quote}
           skeleton={oneDayPriceQuery?.isLoading}
         />
       </div>

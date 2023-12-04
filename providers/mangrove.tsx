@@ -43,6 +43,7 @@ const useMangroveContext = () => {
           children: "Failed loading the page. Please refresh",
         })
         console.error(message)
+        return null
       }
     },
     enabled: !!signer?._address && !!address,

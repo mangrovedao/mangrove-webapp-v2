@@ -247,7 +247,7 @@ export default function DepthChart() {
                             :
                           </b>{" "}
                           {price.toFixed(priceDecimals)}{" "}
-                          {selectedMarket?.quote.name}
+                          {selectedMarket?.quote.symbol}
                         </div>
                       ) : undefined}
                       {key !== DataKeyType.MID_PRICE.toString() && (
@@ -257,7 +257,7 @@ export default function DepthChart() {
                           </b>{" "}
                           <span>
                             {volume.toFixed(baseDecimals)}{" "}
-                            {selectedMarket?.base.name}
+                            {selectedMarket?.base.symbol}
                           </span>
                         </div>
                       )}

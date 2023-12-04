@@ -21,6 +21,8 @@ export default function TradeInputs({
 }: React.ComponentProps<"div">) {
   const [marketType, setMarketType] = React.useState("Market")
   const { selectedMarket } = useMarket()
+  const baseSymbol = selectedMarket?.base.symbol
+  const quoteSymbol = selectedMarket?.quote.symbol
 
   return (
     <div className={className}>
@@ -44,8 +46,8 @@ export default function TradeInputs({
               {/* Buy Input*/}
               <Label>Send amount</Label>
               <NumericInput
-                icon={selectedMarket?.base.name}
-                symbol={selectedMarket?.base.name}
+                icon={baseSymbol}
+                symbol={baseSymbol}
                 disabled={!selectedMarket}
               />
               <div>
@@ -53,7 +55,7 @@ export default function TradeInputs({
                   Balance:
                 </span>
                 <span className="pt-2 text-xs float-right">
-                  {"1234.12"} {selectedMarket?.base.name}
+                  {"1234.12"} {baseSymbol}
                 </span>
               </div>
             </div>
@@ -62,8 +64,8 @@ export default function TradeInputs({
               {/* Pay Input */}
               <Label>Receive amount</Label>
               <NumericInput
-                icon={selectedMarket?.quote.name}
-                symbol={selectedMarket?.quote.name}
+                icon={quoteSymbol}
+                symbol={quoteSymbol}
                 disabled={!selectedMarket}
               />
               <div>
@@ -71,7 +73,7 @@ export default function TradeInputs({
                   Balance:
                 </span>
                 <span className="pt-2 text-xs float-right">
-                  {"1234.12"} {selectedMarket?.quote.name}
+                  {"1234.12"} {quoteSymbol}
                 </span>
               </div>
             </div>
