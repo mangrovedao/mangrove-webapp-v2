@@ -3,30 +3,24 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/stateless/custom-tabs"
+import { OrderTypes } from "../types"
 
 type Props = {
-  marketType: string
-  setMarketType: (type: string) => void
+  orderType: string
+  setOrderType: (type: string) => void
 }
 
-const MENU_ITEMS = [
-  {
-    name: "Limit",
-  },
-  {
-    name: "Market",
-  },
-]
+const orderTypesArray = Object.values(OrderTypes)
 
-export default function Menu({ marketType, setMarketType }: Props) {
+export default function Menu({ orderType, setOrderType }: Props) {
   return (
     <div className="inline-block align-middle">
       <CustomTabs
-        defaultValue={marketType}
-        onValueChange={(e) => setMarketType(e)}
+        defaultValue={orderType}
+        onValueChange={(e) => setOrderType(e)}
       >
         <CustomTabsList className="w-full py-0">
-          {MENU_ITEMS.map(({ name }) => (
+          {orderTypesArray.map((name) => (
             <CustomTabsTrigger key={`${name}-tab`} value={name}>
               {name}
             </CustomTabsTrigger>

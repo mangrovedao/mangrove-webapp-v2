@@ -1,5 +1,6 @@
 "use client"
 import type { Market } from "@mangrovedao/mangrove.js"
+import React from "react"
 import { useAccount } from "wagmi"
 
 import {
@@ -11,8 +12,6 @@ import {
 } from "@/components/ui/select"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import React from "react"
-
 import { TokenIcon } from "../token-icon"
 
 function getName(market?: Market) {
@@ -42,9 +41,13 @@ export default function MarketSelector() {
   const [selectPlaceholder, setSelectPlaceholder] = React.useState("")
 
   React.useEffect(() => {
-    if (!isConnected) setSelectPlaceholder("Connect wallet")
-    else if (!marketsQuery) setSelectPlaceholder("Select a market")
-    else setSelectPlaceholder("Empty Markets")
+    setSelectPlaceholder(
+      !isConnected
+        ? "Connect wallet"
+        : !marketsQuery
+          ? "Select a market"
+          : "Empty Markets",
+    )
   }, [isConnected, marketsQuery])
 
   return (

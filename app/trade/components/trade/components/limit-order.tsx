@@ -1,6 +1,5 @@
-import React from "react"
-
 import { ChevronDown, ChevronUp } from "lucide-react"
+import React from "react"
 
 import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
