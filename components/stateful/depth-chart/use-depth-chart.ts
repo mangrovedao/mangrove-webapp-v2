@@ -122,11 +122,17 @@ export function useDepthChart() {
       )
       return
     }
-    // set initial zoom domain to 3x spread
-    const newZoomDomain = Big(midPrice ?? 0)
-      .minus(highestBid?.price ?? 0)
-      .mul(3)
-      .toNumber()
+    // set initial zoom domain
+    const midPriceAsBig = Big(midPrice ?? 0)
+    const higestBidAsBig = Big(highestBid?.price ?? 0)
+    const lowestBidAsBig = Big(lowestBid?.price ?? 0)
+    const highestAskAsBig = Big(highestAsk?.price ?? 0)
+    const newZoomDomain = Math.max(
+      midPriceAsBig.minus(higestBidAsBig).mul(13).toNumber(),
+      midPriceAsBig.minus(lowestBidAsBig).div(2).toNumber(),
+      Big(highestAskAsBig).minus(midPriceAsBig).div(2).toNumber(),
+    )
+
     setZoomDomain(
       newZoomDomain > midPrice.toNumber() ? midPrice.toNumber() : newZoomDomain,
     )
@@ -135,6 +141,7 @@ export function useDepthChart() {
     bids?.length,
     highestAsk?.price,
     highestBid?.price,
+    lowestBid?.price,
     midPrice,
   ])
 
