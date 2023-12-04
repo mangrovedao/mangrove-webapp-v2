@@ -15,14 +15,15 @@ import { Label } from "@components/ui/label"
 import LimitOrder from "./components/limit-order"
 import MarketOrder from "./components/market-order"
 import Menu from "./components/menu"
+import { TokenBalance } from "./components/token-balance"
 
 export default function TradeInputs({
   className,
 }: React.ComponentProps<"div">) {
   const [marketType, setMarketType] = React.useState("Market")
   const { selectedMarket } = useMarket()
-  const baseSymbol = selectedMarket?.base.symbol
-  const quoteSymbol = selectedMarket?.quote.symbol
+  const base = selectedMarket?.base
+  const quote = selectedMarket?.quote
 
   return (
     <div className={className}>
@@ -46,36 +47,22 @@ export default function TradeInputs({
               {/* Buy Input*/}
               <Label>Send amount</Label>
               <NumericInput
-                icon={baseSymbol}
-                symbol={baseSymbol}
+                icon={base?.symbol}
+                symbol={base?.symbol}
                 disabled={!selectedMarket}
               />
-              <div>
-                <span className="pt-2 text-xs text-secondary float-left">
-                  Balance:
-                </span>
-                <span className="pt-2 text-xs float-right">
-                  {"1234.12"} {baseSymbol}
-                </span>
-              </div>
+              <TokenBalance token={base} />
             </div>
 
             <div className="flex-col flex">
               {/* Pay Input */}
               <Label>Receive amount</Label>
               <NumericInput
-                icon={quoteSymbol}
-                symbol={quoteSymbol}
+                icon={quote?.symbol}
+                symbol={quote?.symbol}
                 disabled={!selectedMarket}
               />
-              <div>
-                <span className="pt-2 text-xs text-secondary float-left">
-                  Balance:
-                </span>
-                <span className="pt-2 text-xs float-right">
-                  {"1234.12"} {quoteSymbol}
-                </span>
-              </div>
+              <TokenBalance token={quote} />
             </div>
 
             {/* Conditional Inputs */}
