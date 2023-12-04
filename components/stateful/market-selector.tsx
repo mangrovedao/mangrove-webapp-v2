@@ -39,11 +39,12 @@ export default function MarketSelector() {
   }
 
   const value = selectedMarket ? getValue(selectedMarket) : undefined
+  const [selectPlaceholder, setSelectPlaceholder] = React.useState("")
 
-  const selectPlaceholder = React.useMemo(() => {
-    if (!isConnected) return "Connect wallet"
-    else if (!marketsQuery) return "Select a market"
-    else return "Empty Markets"
+  React.useEffect(() => {
+    if (!isConnected) setSelectPlaceholder("Connect wallet")
+    else if (!marketsQuery) setSelectPlaceholder("Select a market")
+    else setSelectPlaceholder("Empty Markets")
   }, [isConnected, marketsQuery])
 
   return (
