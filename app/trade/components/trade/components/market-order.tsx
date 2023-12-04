@@ -1,6 +1,5 @@
-import React from "react"
-
 import { ChevronDown, Percent } from "lucide-react"
+import React from "react"
 
 import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
@@ -11,17 +10,45 @@ import {
 } from "@/components/ui/collapsible"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { Label } from "@components/ui/label"
 
+const sliderValues = [[25], [50], [75], [100]]
+const slippageOptions = ["0.1", "0.5", "1.0"]
+
 export default function MarketOrder() {
-  const slippageOptions = ["0.1", "0.5", "1.0"]
-  const [slippage, setSlippage] = React.useState<string>("0.5")
+  const [slippage, setSlippage] = React.useState(slippageOptions[1])
   const [customSlippage, setCustomSlippage] = React.useState<boolean>(false)
   const [isOpen, setIsOpen] = React.useState(false)
+  const [slider, setSlider] = React.useState(sliderValues[0])
 
   return (
     <div className="space-y-5 pt-5">
+      <div className="space-y-5">
+        <div className="px-3">
+          <Slider
+            defaultValue={slider}
+            value={slider}
+            step={25}
+            max={100}
+            onValueChange={(e) => setSlider(e)}
+          />
+        </div>
+
+        <div className="flex space-x-3">
+          {sliderValues.map((value, i) => (
+            <Button
+              key={`slider-value-${i}`}
+              className="bg-transparent text-primary rounded-full text-xs pt-1 pb-[2px] w-16 border-[1px] border-green-bangladesh"
+              onClick={() => setSlider(value)}
+            >
+              {value}%
+            </Button>
+          ))}
+        </div>
+      </div>
+
       <Separator />
       <div className="flex justify-between items-baseline text-xs">
         <Label>Average market price</Label>

@@ -1,5 +1,7 @@
 "use client"
 import type { Market } from "@mangrovedao/mangrove.js"
+import React from "react"
+import { useAccount } from "wagmi"
 
 import {
   Select,
@@ -22,6 +24,7 @@ function getValue(market: Market) {
 }
 
 export default function MarketSelector() {
+  const { isConnected } = useAccount()
   const { marketsQuery } = useMangrove()
   const { selectedMarket, setSelectedMarket } = useMarket()
 
@@ -35,15 +38,26 @@ export default function MarketSelector() {
   }
 
   const value = selectedMarket ? getValue(selectedMarket) : undefined
+  const [selectPlaceholder, setSelectPlaceholder] = React.useState("")
+
+  React.useEffect(() => {
+    setSelectPlaceholder(
+      !isConnected
+        ? "Connect wallet"
+        : !marketsQuery
+          ? "Select a market"
+          : "Empty Markets",
+    )
+  }, [isConnected, marketsQuery])
 
   return (
     <Select
       value={value}
       onValueChange={onValueChange}
-      disabled={marketsQuery.isLoading}
+      disabled={marketsQuery.isLoading || !selectedMarket || !isConnected}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
-        <SelectValue placeholder="Select a market" />
+        <SelectValue placeholder={selectPlaceholder} />
       </SelectTrigger>
       <SelectContent>
         {marketsQuery.data?.map((market) => (
