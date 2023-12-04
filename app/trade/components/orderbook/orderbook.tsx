@@ -8,6 +8,8 @@ import {
   CustomTabsTrigger,
 } from "@/components/stateless/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
@@ -22,9 +24,6 @@ export default function Book({
   className?: string
   style?: React.CSSProperties | undefined
 }) {
-  const { requestBookQuery, selectedMarket } = useMarket()
-  const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
-
   return (
     <CustomTabs
       style={style}
@@ -35,41 +34,59 @@ export default function Book({
         <CustomTabsTrigger value={"book"}>Book</CustomTabsTrigger>
       </CustomTabsList>
       <CustomTabsContent value="book">
-        <div className="px-1 relative h-full">
-          <ScrollArea
-            className="h-full"
-            scrollHideDelay={200}
-            ref={scrollAreaRef}
-          >
-            <Table className="text-sm leading-5 h-full select-none">
-              <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
-                <TableRow className="border-none">
-                  <OrderBookTableHead className="text-left">
-                    Size ({selectedMarket?.base.name})
-                  </OrderBookTableHead>
-                  <OrderBookTableHead>
-                    Price ({selectedMarket?.quote.name})
-                  </OrderBookTableHead>
-                  <OrderBookTableHead>Total</OrderBookTableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="overflow-scroll" ref={bodyRef}>
-                <SemiBook
-                  type="asks"
-                  ref={bestAskRef}
-                  data={requestBookQuery.data}
-                />
-                <SemiBook
-                  type="bids"
-                  ref={bestBidRef}
-                  data={requestBookQuery.data}
-                />
-              </TableBody>
-            </Table>
-            <ScrollBar orientation="vertical" className="z-50" />
-          </ScrollArea>
+        <div className="p-1 relative h-full">
+          <BookContent />
         </div>
       </CustomTabsContent>
     </CustomTabs>
+  )
+}
+
+function BookContent() {
+  const { requestBookQuery, selectedMarket } = useMarket()
+  const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
+
+  if (requestBookQuery.isLoading || !selectedMarket) {
+    return (
+      <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean">
+        <Spinner />
+      </Skeleton>
+    )
+  }
+
+  if (
+    requestBookQuery.data?.asks?.length === 0 &&
+    requestBookQuery.data?.bids?.length === 0 &&
+    !requestBookQuery.isLoading &&
+    !!selectedMarket
+  ) {
+    return (
+      <div className="w-full h-full flex justify-center items-center">
+        Empty market
+      </div>
+    )
+  }
+
+  return (
+    <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
+      <Table className="text-sm leading-5 h-full select-none">
+        <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
+          <TableRow className="border-none">
+            <OrderBookTableHead className="text-left">
+              Size ({selectedMarket?.base.name})
+            </OrderBookTableHead>
+            <OrderBookTableHead>
+              Price ({selectedMarket?.quote.name})
+            </OrderBookTableHead>
+            <OrderBookTableHead>Total</OrderBookTableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="overflow-scroll" ref={bodyRef}>
+          <SemiBook type="asks" ref={bestAskRef} data={requestBookQuery.data} />
+          <SemiBook type="bids" ref={bestBidRef} data={requestBookQuery.data} />
+        </TableBody>
+      </Table>
+      <ScrollBar orientation="vertical" className="z-50" />
+    </ScrollArea>
   )
 }
