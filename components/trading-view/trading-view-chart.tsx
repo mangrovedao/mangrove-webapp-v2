@@ -8,6 +8,7 @@ import {
   type ChartingLibraryWidgetOptions,
 } from "../../public/charting_library"
 import { Skeleton } from "../ui/skeleton"
+import { Spinner } from "../ui/spinner"
 
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
@@ -75,7 +76,11 @@ export const TVChartContainer = (
 
   return (
     <div className="w-full h-full relative">
-      {isLoading && <Skeleton className="absolute inset-0" />}
+      {isLoading && (
+        <Skeleton className="absolute inset-0 text-green-caribbean flex items-center justify-center">
+          <Spinner />
+        </Skeleton>
+      )}
       <div
         className={cn("h-full transition-opacity", { "opacity-0": isLoading })}
         ref={chartContainerRef}
