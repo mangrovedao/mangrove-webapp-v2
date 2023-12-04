@@ -15,23 +15,19 @@ export default function Page() {
         <Trade />
       </section>
 
-      <section className="border-x fluid-section">
+      <section className="border-x book-and-chart">
         <Book
-          className="overflow-hidden border-r"
+          className="overflow-hidden border-r book-container"
           style={{ gridArea: "book" }}
         />
         <div
+          className="market-chart-container"
           style={{
             gridArea: "chart",
           }}
         >
           <MarketInfoBar />
-          <Market
-            className="w-full border-t "
-            style={{
-              height: "calc(100% - var(--bar-height))",
-            }}
-          />
+          <Market className="w-full border-t h-full" />
         </div>
       </section>
 
@@ -68,16 +64,20 @@ export default function Page() {
           grid-area: trade;
         }
 
-        .fluid-section {
+        .book-and-chart {
           display: grid;
           grid-area: content;
           grid-template-areas: "book chart";
           grid-template-columns: 20.5rem minmax(0, 1fr);
-
-          grid-template-rows: minmax(
-            0,
-            calc(100vh - var(--bar-height) - var(--history-table-height))
-          );
+          grid-template-rows: var(--book-chart-height);
+        }
+      `}</style>
+      <style global jsx>{`
+        .market-chart-container div[role="tabpanel"] {
+          height: calc(100% - var(--bar-height) * 2);
+        }
+        .book-container div[role="tabpanel"] {
+          height: calc(100% - var(--bar-height));
         }
       `}</style>
     </main>

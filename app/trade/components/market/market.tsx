@@ -14,10 +14,10 @@ import { cn } from "@/utils"
 
 const MENU_ITEMS = [
   {
-    name: "Price chart",
+    name: "Depth chart",
   },
   {
-    name: "Depth chart",
+    name: "Price chart",
   },
 ]
 
@@ -35,21 +35,18 @@ export default function Market({
             </CustomTabsTrigger>
           ))}
         </CustomTabsList>
-        <CustomTabsContent value="Price chart">
-          <TVChartContainer
-            symbol={"AAPL"}
-            interval={`1D` as ResolutionString}
-          />
-        </CustomTabsContent>
-        <CustomTabsContent value="Depth chart">
-          <DepthChart />
-        </CustomTabsContent>
+        <div className="h-full w-full p-1">
+          <CustomTabsContent value="Depth chart">
+            <DepthChart />
+          </CustomTabsContent>
+          <CustomTabsContent value="Price chart">
+            <TVChartContainer
+              symbol={"AAPL"}
+              interval={`1D` as ResolutionString}
+            />
+          </CustomTabsContent>
+        </div>
       </CustomTabs>
-      <style global jsx>{`
-        div[role="tabpanel"] {
-          height: calc(100% - var(--bar-height));
-        }
-      `}</style>
     </div>
   )
 }

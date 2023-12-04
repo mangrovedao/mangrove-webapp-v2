@@ -14,6 +14,7 @@ import {
 } from "@visx/xychart"
 import Big from "big.js"
 
+import { Spinner } from "@/components/ui/spinner"
 import { lerp } from "@/utils/interpolation"
 import { Skeleton } from "@components/ui/skeleton"
 import { DataKeyType } from "./enums"
@@ -60,15 +61,12 @@ export default function DepthChart() {
     isLoading,
   } = useDepthChart()
 
-  if (isLoading) {
-    return (
-      <Skeleton className="w-full h-full flex justify-center items-center">
-        <span>Loading...</span>
-      </Skeleton>
-    )
-  }
-
-  if (asks?.length === 0 && bids?.length === 0 && !isLoading) {
+  if (
+    asks?.length === 0 &&
+    bids?.length === 0 &&
+    !isLoading &&
+    !!selectedMarket
+  ) {
     return (
       <div className="w-full h-full flex justify-center items-center">
         Empty market
@@ -76,8 +74,12 @@ export default function DepthChart() {
     )
   }
 
-  if (!(zoomDomain && midPrice)) {
-    return <Skeleton className="w-full h-full" />
+  if (!(zoomDomain && midPrice) || isLoading) {
+    return (
+      <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean">
+        <Spinner />
+      </Skeleton>
+    )
   }
 
   return (

@@ -20,6 +20,7 @@
     --color-gray-scale-400: 180, 8%, 20%;
     --color-gray-scale-500: 180, 9%, 12%;
     --color-gray-scale-600: 180, 7%, 8%;
+    --color-gray: 180, 10%, 64%;
     --color-blue-light-100: 167, 24%, 73%;
 
     --background: 180 86% 3%;
@@ -48,14 +49,15 @@
 
     --border: 177 72% 6%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: var(--color-green-bangladesh);
 
     --radius: 0.5rem;
 
     --border-width: 1px;
 
     --bar-height: 54px;
-    --history-table-height: 361px;
+    --history-table-height: calc(100% - var(--book-chart-height));
+    --book-chart-height: 31rem;
   }
 
   * {

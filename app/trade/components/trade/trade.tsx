@@ -1,4 +1,5 @@
 "use client"
+
 import { Market } from "@mangrovedao/mangrove.js"
 import { LucideChevronRight } from "lucide-react"
 
@@ -37,65 +38,73 @@ export default function TradeInputs({
       {/* Menu */}
       <Menu marketType={marketType} setMarketType={setMarketType} />
       <Separator />
-      <ScrollArea className="h-[calc(100vh-(var(--bar-height)*3)-1rem)] overflow-hidden">
-        <div className="px-4 space-y-8">
+      <ScrollArea className="h-[calc(100vh-(var(--bar-height)*3))] overflow-hidden">
+        <div className="px-4 space-y-4 mt-[24px]">
           {/* Radio Input*/}
-          <CustomRadioGroup defaultValue="Buy" className="mt-4">
-            <div className="flex justify-center w-full">
-              <CustomRadioGroupItem value="Buy" id="r1">
-                <Label htmlFor="r1">Buy</Label>
-              </CustomRadioGroupItem>
-            </div>
-            <div className="flex justify-center w-full">
-              <CustomRadioGroupItem value="Sell" id="r2">
-                <Label htmlFor="r2">Sell</Label>
-              </CustomRadioGroupItem>
-            </div>
+          <CustomRadioGroup defaultValue="Buy">
+            <CustomRadioGroupItem value="Buy" id="r1">
+              <div>Buy</div>
+            </CustomRadioGroupItem>
+            <CustomRadioGroupItem value="Sell" id="r2">
+              <div>Sell</div>
+            </CustomRadioGroupItem>
           </CustomRadioGroup>
 
-          <div>
-            {/* Buy Input*/}
-            <Label>Send amount</Label>
-            <NumericInput
-              icon={selectedMarket?.base.name}
-              symbol={selectedMarket?.base.name}
-            />
-            <span className="pt-2 text-xs text-secondary float-left">
-              Balance:
-            </span>
-            <span className="pt-2 text-xs float-right">
-              {displayBalances(baseFetching, selectedMarket, baseFormated)}
-            </span>
-          </div>
-
-          <div>
-            {/* Pay Input */}
-            <Label>Receive amount</Label>
-            <NumericInput
-              icon={selectedMarket?.quote.name}
-              symbol={selectedMarket?.quote.name}
-            />
-            <span className="pt-2 text-xs text-secondary float-left">
-              Balance:
-            </span>
-            <span className="pt-2 text-xs float-right">
-              {displayBalances(quoteFetching, selectedMarket, quoteFormated)}
-            </span>
-          </div>
-
-          {/* Conditional Inputs */}
-          {marketType === "Limit" && <LimitOrder />}
-          {marketType === "Market" && <MarketOrder />}
-
-          <Button
-            className="w-full flex items-center justify-center"
-            size={"lg"}
-          >
-            Buy
-            <div className="ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center">
-              <LucideChevronRight className="h-4 text-current" />
+          <div className="space-y-4 !mt-6">
+            <div className="flex-col flex">
+              {/* Buy Input*/}
+              <Label>Send amount</Label>
+              <NumericInput
+                icon={selectedMarket?.base.name}
+                symbol={selectedMarket?.base.name}
+                disabled={!selectedMarket}
+              />
+              <div>
+                <span className="pt-2 text-xs text-secondary float-left">
+                  Balance:
+                </span>
+                <span className="pt-2 text-xs float-right">
+                  {displayBalances(baseFetching, selectedMarket, baseFormated)}
+                </span>
+              </div>
             </div>
-          </Button>
+
+            <div className="flex-col flex">
+              {/* Pay Input */}
+              <Label>Receive amount</Label>
+              <NumericInput
+                icon={selectedMarket?.quote.name}
+                symbol={selectedMarket?.quote.name}
+                disabled={!selectedMarket}
+              />
+              <div>
+                <span className="pt-2 text-xs text-secondary float-left">
+                  Balance:
+                </span>
+                <span className="pt-2 text-xs float-right">
+                  {displayBalances(
+                    quoteFetching,
+                    selectedMarket,
+                    quoteFormated,
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* Conditional Inputs */}
+            {marketType === "Limit" && <LimitOrder />}
+            {marketType === "Market" && <MarketOrder />}
+
+            <Button
+              className="w-full flex items-center justify-center !mb-4"
+              size={"lg"}
+            >
+              Buy
+              <div className="ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center">
+                <LucideChevronRight className="h-4 text-current" />
+              </div>
+            </Button>
+          </div>
         </div>
         <ScrollBar orientation="vertical" />
       </ScrollArea>
