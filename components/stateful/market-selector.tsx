@@ -23,7 +23,7 @@ function getValue(market: Mangrove.OpenMarketInfo) {
 
 export default function MarketSelector() {
   const { marketsInfoQuery } = useMangrove()
-  const { market, selectMarketFromMarketInfo } = useMarket()
+  const { market, setMarketInfo } = useMarket()
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress] = value.split("/")
@@ -31,7 +31,7 @@ export default function MarketSelector() {
       ({ base, quote }) =>
         base.address === baseAddress && quote.address === quoteAddress,
     )
-    selectMarketFromMarketInfo(marketInfo)
+    setMarketInfo(marketInfo)
   }
 
   const value = market ? getValue(market) : undefined

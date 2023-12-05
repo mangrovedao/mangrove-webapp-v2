@@ -1,7 +1,6 @@
 "use client"
 
 import type Mangrove from "@mangrovedao/mangrove.js"
-import type { Market } from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
@@ -12,18 +11,17 @@ import useMangrove from "./mangrove"
 const useMarketContext = () => {
   const { chain } = useNetwork()
   const { mangrove, marketsInfoQuery } = useMangrove()
-  const [market, setMarket] = React.useState<Market | undefined>()
+  const [marketInfo, setMarketInfo] = React.useState<Mangrove.OpenMarketInfo>()
 
-  const selectMarketFromMarketInfo = React.useCallback(
-    async (marketInfo?: Mangrove.OpenMarketInfo) => {
+  const { data: market } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ["market", marketInfo?.base.symbol, marketInfo?.quote.symbol],
+    queryFn: () => {
       if (!marketInfo) return
-      const market = await mangrove?.market(
-        marketInfoToMarketParams(marketInfo),
-      )
-      setMarket(market)
+      return mangrove?.market(marketInfoToMarketParams(marketInfo))
     },
-    [mangrove],
-  )
+    enabled: !!marketInfo,
+  })
 
   const requestBookQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -38,11 +36,11 @@ const useMarketContext = () => {
   // create and store market instance from marketInfo
   React.useEffect(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
-    selectMarketFromMarketInfo(marketsInfoQuery.data[0])
-  }, [chain?.id, mangrove, marketsInfoQuery.data, selectMarketFromMarketInfo])
+    setMarketInfo(marketsInfoQuery.data[0])
+  }, [chain?.id, mangrove, marketsInfoQuery.data])
 
   return {
-    selectMarketFromMarketInfo,
+    setMarketInfo,
     requestBookQuery,
     market,
   }
