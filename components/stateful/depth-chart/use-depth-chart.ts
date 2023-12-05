@@ -1,4 +1,4 @@
-import { Mangrove, type Market } from "@mangrovedao/mangrove.js"
+import { type Market } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 import React from "react"
 
@@ -59,10 +59,11 @@ function removeCrossedOrders(
 }
 
 export function useDepthChart() {
-  const { requestBookQuery, selectedMarket } = useMarket()
+  const { requestBookQuery, market } = useMarket()
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const [isScrolling, setIsScrolling] = React.useState(false)
-
+  const baseDecimals = market?.base.decimals
+  const priceDecimals = market?.quote.displayedAsPriceDecimals
   const { asks, bids } = removeCrossedOrders(
     requestBookQuery.data?.bids ?? [],
     requestBookQuery.data?.asks ?? [],
@@ -80,16 +81,6 @@ export function useDepthChart() {
       .add(highestBid?.price ?? 0)
       .div(2)
   }, [asks?.length, bids?.length, highestBid?.price, lowestAsk?.price])
-
-  const baseDecimals = React.useMemo(() => {
-    if (!selectedMarket?.base.name) return
-    return Mangrove.getDisplayedDecimals(selectedMarket?.base.name)
-  }, [selectedMarket?.base.name])
-
-  const priceDecimals = React.useMemo(() => {
-    if (!selectedMarket?.quote.name) return
-    return Mangrove.getDisplayedPriceDecimals(selectedMarket?.quote.name)
-  }, [selectedMarket?.quote.name])
 
   function onMouseOut() {
     setIsScrolling(false)
@@ -237,7 +228,7 @@ export function useDepthChart() {
     onMouseMove,
     baseDecimals,
     priceDecimals,
-    selectedMarket,
+    market,
     asks,
     bids,
     isLoading,

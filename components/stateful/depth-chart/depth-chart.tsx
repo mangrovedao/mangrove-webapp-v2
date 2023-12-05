@@ -13,7 +13,9 @@ import {
   XYChart,
 } from "@visx/xychart"
 import Big from "big.js"
+import { useAccount } from "wagmi"
 
+import { ConnectToWalletPlaceholder } from "@/components/stateless/connect-to-wallet-placeholder"
 import { Spinner } from "@/components/ui/spinner"
 import { lerp } from "@/utils/interpolation"
 import { Skeleton } from "@components/ui/skeleton"
@@ -55,18 +57,18 @@ export default function DepthChart() {
     onMouseMove,
     baseDecimals,
     priceDecimals,
-    selectedMarket,
+    market,
     asks,
     bids,
     isLoading,
   } = useDepthChart()
+  const { isConnected } = useAccount()
 
-  if (
-    asks?.length === 0 &&
-    bids?.length === 0 &&
-    !isLoading &&
-    !!selectedMarket
-  ) {
+  if (!isConnected) {
+    return <ConnectToWalletPlaceholder />
+  }
+
+  if (asks?.length === 0 && bids?.length === 0 && !isLoading && !!market) {
     return (
       <div className="w-full h-full flex justify-center items-center">
         Empty market
@@ -246,8 +248,7 @@ export default function DepthChart() {
                               : "Mid price"}
                             :
                           </b>{" "}
-                          {price.toFixed(priceDecimals)}{" "}
-                          {selectedMarket?.quote.name}
+                          {price.toFixed(priceDecimals)} {market?.quote.symbol}
                         </div>
                       ) : undefined}
                       {key !== DataKeyType.MID_PRICE.toString() && (
@@ -256,8 +257,7 @@ export default function DepthChart() {
                             {key.slice(0, -1)}:
                           </b>{" "}
                           <span>
-                            {volume.toFixed(baseDecimals)}{" "}
-                            {selectedMarket?.base.name}
+                            {volume.toFixed(baseDecimals)} {market?.base.symbol}
                           </span>
                         </div>
                       )}

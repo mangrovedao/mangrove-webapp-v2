@@ -1,38 +1,49 @@
 "use client"
 
-import type { Market } from "@mangrovedao/mangrove.js"
+import type Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
+
+import { marketInfoToMarketParams } from "@/utils/market"
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
   const { chain } = useNetwork()
-  const { marketsQuery } = useMangrove()
-  const [selectedMarket, setSelectedMarket] = React.useState<
-    Market | undefined
-  >()
+  const { mangrove, marketsInfoQuery } = useMangrove()
+  const [marketInfo, setMarketInfo] = React.useState<Mangrove.OpenMarketInfo>()
+
+  const { data: market } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ["market", marketInfo?.base.symbol, marketInfo?.quote.symbol],
+    queryFn: () => {
+      if (!marketInfo) return
+      return mangrove?.market(marketInfoToMarketParams(marketInfo))
+    },
+    enabled: !!marketInfo,
+  })
 
   const requestBookQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [
-      "orderbook",
-      selectedMarket?.base.address,
-      selectedMarket?.quote.address,
-    ],
+    queryKey: ["orderbook", market?.base.symbol, market?.quote.symbol],
     queryFn: () => {
-      if (!selectedMarket) return null
-      return selectedMarket.requestBook()
+      if (!market) return null
+      return market.requestBook()
     },
-    enabled: !!(selectedMarket?.base.address && selectedMarket?.quote.address),
+    enabled: !!market,
   })
 
+  // create and store market instance from marketInfo
   React.useEffect(() => {
-    if (!(marketsQuery.data?.length && chain?.id)) return
-    setSelectedMarket(marketsQuery.data[0])
-  }, [chain?.id, marketsQuery.data])
+    if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
+    setMarketInfo(marketsInfoQuery.data[0])
+  }, [chain?.id, mangrove, marketsInfoQuery.data])
 
-  return { selectedMarket, setSelectedMarket, requestBookQuery }
+  return {
+    setMarketInfo,
+    requestBookQuery,
+    market,
+  }
 }
 
 const MarketContext = React.createContext<

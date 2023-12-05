@@ -13,6 +13,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import { useAccount } from "wagmi"
 import { SemiBook } from "./semibook"
 import { OrderBookTableHead } from "./table-head"
 import useScrollToMiddle from "./use-scroll-to-middle"
@@ -43,10 +44,19 @@ export default function Book({
 }
 
 function BookContent() {
-  const { requestBookQuery, selectedMarket } = useMarket()
+  const { requestBookQuery, market } = useMarket()
+  const { isConnected } = useAccount()
   const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
 
-  if (requestBookQuery.isLoading || !selectedMarket) {
+  if (!isConnected) {
+    return (
+      <Skeleton className="w-full h-full flex justify-center items-center">
+        Connect wallet to see orderbook
+      </Skeleton>
+    )
+  }
+
+  if (requestBookQuery.isLoading || !market) {
     return (
       <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean">
         <Spinner />
@@ -58,7 +68,7 @@ function BookContent() {
     requestBookQuery.data?.asks?.length === 0 &&
     requestBookQuery.data?.bids?.length === 0 &&
     !requestBookQuery.isLoading &&
-    !!selectedMarket
+    !!market
   ) {
     return (
       <div className="w-full h-full flex justify-center items-center">
@@ -73,10 +83,10 @@ function BookContent() {
         <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
           <TableRow className="border-none">
             <OrderBookTableHead className="text-left">
-              Size ({selectedMarket?.base.name})
+              Size ({market?.base.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>
-              Price ({selectedMarket?.quote.name})
+              Price ({market?.quote.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>Total</OrderBookTableHead>
           </TableRow>

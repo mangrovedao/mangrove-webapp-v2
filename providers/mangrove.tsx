@@ -7,7 +7,7 @@ import React from "react"
 import { useAccount, useNetwork } from "wagmi"
 
 import { mangroveConfig } from "@/schemas/mangrove-config"
-import { getWhitelistedMarkets } from "@/services/markets.service"
+import { getWhitelistedMarketsInfos } from "@/services/markets.service"
 import { networkService } from "@/services/network.service"
 import { useEthersSigner } from "@/utils/adapters"
 import { getErrorMessage } from "@/utils/errors"
@@ -43,17 +43,18 @@ const useMangroveContext = () => {
           children: "Failed loading the page. Please refresh",
         })
         console.error(message)
+        return null
       }
     },
     enabled: !!signer?._address && !!address,
   })
 
-  const marketsQuery = useQuery({
+  const marketsInfoQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["whitelistedMarkets", mangrove?.address, chain?.id],
+    queryKey: ["whitelistedMarketsInfos", mangrove?.address, chain?.id],
     queryFn: async () => {
       if (!mangrove?.address || !chain?.id) return null
-      return getWhitelistedMarkets(mangrove, chain.id)
+      return getWhitelistedMarketsInfos(mangrove, chain.id)
     },
     enabled: !!(mangrove?.address && chain?.id),
     refetchOnWindowFocus: false,
@@ -71,7 +72,7 @@ const useMangroveContext = () => {
     }
   }, [chain?.unsupported])
 
-  return { mangrove, marketsQuery }
+  return { mangrove, marketsInfoQuery }
 }
 
 const MangroveContext = React.createContext<

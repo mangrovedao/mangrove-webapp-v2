@@ -1,6 +1,6 @@
 "use client"
 
-import Mangrove from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mangrove.js"
 import getUserLocale from "get-user-locale"
 
 export function formatNumber(
@@ -51,12 +51,11 @@ export function determineDecimals(
   return decimalsToShow
 }
 
-export function determinePriceDecimalsFromTokenName(
+export function determinePriceDecimalsFromToken(
   value: number | bigint | undefined,
-  tokenName?: string,
+  token?: Token,
 ) {
-  const decimals = tokenName ? Mangrove.getDisplayedPriceDecimals(tokenName) : 2
-  return determineDecimals(value, decimals)
+  return determineDecimals(value, token?.displayedAsPriceDecimals)
 }
 
 export function getSeparator() {
