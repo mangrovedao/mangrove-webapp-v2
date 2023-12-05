@@ -1,7 +1,7 @@
 import { filterOpenMarketsWithMarketConfig } from "@/utils/whitelisted-markets"
 import type Mangrove from "@mangrovedao/mangrove.js"
 
-export async function getWhitelistedMarkets(
+export async function getWhitelistedMarketsInfos(
   mangrove: Mangrove,
   chainId: number,
 ) {

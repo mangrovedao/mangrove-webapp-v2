@@ -1,3 +1,4 @@
+"use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
@@ -12,7 +13,7 @@ import { TradeAction } from "../types"
 
 export function useLimit() {
   const { mangrove } = useMangrove()
-  const { selectedMarket } = useMarket()
+  const { market } = useMarket()
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -21,8 +22,8 @@ export function useLimit() {
       send: "",
       receive: "",
     },
-    onSubmit: async ({ tradeAction, send, receive, limitPrice }) => {
-      if (!selectedMarket) return
+    onSubmit: async ({ tradeAction, send, receive }) => {
+      if (!market) return
       try {
         // DOUBLE Approval for limit order's explanation:
         /** limit orders first calls take() on the underlying contract which consumes the given amount of allowance,
@@ -33,12 +34,9 @@ export function useLimit() {
 
         const { baseQuoteToSendReceive } =
           TRADEMODE_AND_ACTION_PRESENTATION.limit[tradeAction]
-        const [sendToken] = baseQuoteToSendReceive(
-          selectedMarket.base,
-          selectedMarket.quote,
-        )
+        const [sendToken] = baseQuoteToSendReceive(market.base, market.quote)
         await sendToken.increaseApproval(spender, send)
-        await selectedMarket?.buy({
+        await market.buy({
           gives: send,
           wants: receive,
         })
@@ -49,10 +47,11 @@ export function useLimit() {
     },
   })
   const tradeAction = form.useStore((state) => state.values.tradeAction)
-  const base = selectedMarket?.base
-  const quote = selectedMarket?.quote
-  const [sendToken, receiveToken] =
-    tradeAction === TradeAction.BUY ? [quote, base] : [base, quote]
+  const base = market?.base
+  const quote = market?.quote
+  const { baseQuoteToSendReceive } =
+    TRADEMODE_AND_ACTION_PRESENTATION.limit[tradeAction]
+  const [sendToken, receiveToken] = baseQuoteToSendReceive(base, quote)
   const sendTokenBalance = useTokenBalance(sendToken)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -70,7 +69,7 @@ export function useLimit() {
       .div(divider)
       .toString()
     form.setFieldValue("receive", receive)
-    form.validateAllFields("change")
+    form.validateAllFields("submit")
   }
 
   function computeSendAmount() {
@@ -81,12 +80,12 @@ export function useLimit() {
       .mul(Number(receive ?? 0))
       .toString()
     form.setFieldValue("send", send)
-    form.validateAllFields("change")
+    form.validateAllFields("submit")
   }
 
   React.useEffect(() => {
     form?.reset()
-  }, [form, selectedMarket?.base, selectedMarket?.quote])
+  }, [form, market?.base, market?.quote])
 
   return {
     computeReceiveAmount,
@@ -95,7 +94,7 @@ export function useLimit() {
     handleSubmit,
     form,
     quote,
-    selectedMarket,
+    market,
     sendToken,
     receiveToken,
   }

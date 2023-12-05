@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { Token } from "@mangrovedao/mangrove.js"
+import type { ValidationError } from "@tanstack/react-form"
 import { LucideChevronRight } from "lucide-react"
 import React from "react"
 
@@ -27,7 +28,7 @@ export function Limit() {
     handleSubmit,
     form,
     quote,
-    selectedMarket,
+    market,
     sendToken,
     receiveToken,
   } = useLimit()
@@ -65,24 +66,19 @@ export function Limit() {
         <div className="space-y-4 !mt-6">
           <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
             {(field) => (
-              <>
-                <TradeInput
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value)
-                    computeReceiveAmount()
-                  }}
-                  token={quote}
-                  label="Limit price"
-                  disabled={!selectedMarket}
-                />
-
-                {field.state.meta.touchedErrors ? (
-                  <em>{field.state.meta.touchedErrors}</em>
-                ) : null}
-              </>
+              <TradeInput
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => {
+                  field.handleChange(e.target.value)
+                  computeReceiveAmount()
+                }}
+                token={quote}
+                label="Limit price"
+                disabled={!market}
+                error={field.state.meta.errors}
+              />
             )}
           </form.Field>
 
@@ -91,46 +87,38 @@ export function Limit() {
             onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
           >
             {(field) => (
-              <>
-                <TradeInput
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={({ target: { value } }) => {
-                    field.handleChange(value)
-                    computeReceiveAmount()
-                  }}
-                  token={sendToken}
-                  label="Send amount"
-                  disabled={!selectedMarket}
-                  showBalance
-                />
-                {field.state.meta.touchedErrors ? (
-                  <em>{field.state.meta.touchedErrors}</em>
-                ) : null}
-              </>
+              <TradeInput
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={({ target: { value } }) => {
+                  field.handleChange(value)
+                  computeReceiveAmount()
+                }}
+                token={sendToken}
+                label="Send amount"
+                disabled={!market}
+                showBalance
+                error={field.state.meta.touchedErrors}
+              />
             )}
           </form.Field>
           <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
             {(field) => (
-              <>
-                <TradeInput
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={({ target: { value } }) => {
-                    field.handleChange(value)
-                    computeSendAmount()
-                  }}
-                  token={receiveToken}
-                  label="Receive amount"
-                  disabled={!(selectedMarket && form.state.isFormValid)}
-                  showBalance
-                />
-                {field.state.meta.touchedErrors ? (
-                  <em>{field.state.meta.touchedErrors}</em>
-                ) : null}
-              </>
+              <TradeInput
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={({ target: { value } }) => {
+                  field.handleChange(value)
+                  computeSendAmount()
+                }}
+                token={receiveToken}
+                label="Receive amount"
+                disabled={!(market && form.state.isFormValid)}
+                showBalance
+                error={field.state.meta.touchedErrors}
+              />
             )}
           </form.Field>
           <form.Subscribe
@@ -141,23 +129,19 @@ export function Limit() {
             ]}
           >
             {([canSubmit, isSubmitting, tradeAction]) => {
-              console.log({
-                canSubmit,
-                isSubmitting,
-              })
               return (
                 <Button
                   className="w-full flex items-center justify-center !mb-4 capitalize"
                   size={"lg"}
                   type="submit"
-                  disabled={!canSubmit || !selectedMarket}
+                  disabled={!canSubmit || !market}
                 >
                   {isSubmitting ? "Processing..." : tradeAction}
                   <div
                     className={cn(
                       "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
                       {
-                        "opacity-10": !selectedMarket,
+                        "opacity-10": !market,
                       },
                     )}
                   >
@@ -178,10 +162,11 @@ type TradeInputProps = {
   disabled?: boolean
   label: string
   showBalance?: boolean
+  error?: ValidationError[]
 } & NumericInputProps
 
 const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
-  ({ label, token, showBalance = false, ...inputProps }, ref) => {
+  ({ label, token, showBalance = false, error, ...inputProps }, ref) => {
     return (
       <div className="flex-col flex">
         <Label>{label}</Label>
@@ -190,8 +175,14 @@ const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
           ref={ref}
           icon={token?.symbol}
           symbol={token?.symbol}
+          aria-invalid={!!error?.length}
         />
-        {showBalance && <TokenBalance token={token} />}
+        {error && (
+          <p role="aria-live" className="text-red-100 text-xs leading-4 mt-1">
+            {error}
+          </p>
+        )}
+        {!error?.length && showBalance && <TokenBalance token={token} />}
       </div>
     )
   },

@@ -43,10 +43,10 @@ export default function Book({
 }
 
 function BookContent() {
-  const { requestBookQuery, selectedMarket } = useMarket()
+  const { requestBookQuery, market } = useMarket()
   const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
 
-  if (requestBookQuery.isLoading || !selectedMarket) {
+  if (requestBookQuery.isLoading || !market) {
     return (
       <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean">
         <Spinner />
@@ -58,7 +58,7 @@ function BookContent() {
     requestBookQuery.data?.asks?.length === 0 &&
     requestBookQuery.data?.bids?.length === 0 &&
     !requestBookQuery.isLoading &&
-    !!selectedMarket
+    !!market
   ) {
     return (
       <div className="w-full h-full flex justify-center items-center">
@@ -73,10 +73,10 @@ function BookContent() {
         <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
           <TableRow className="border-none">
             <OrderBookTableHead className="text-left">
-              Size ({selectedMarket?.base.symbol})
+              Size ({market?.base.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>
-              Price ({selectedMarket?.quote.symbol})
+              Price ({market?.quote.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>Total</OrderBookTableHead>
           </TableRow>

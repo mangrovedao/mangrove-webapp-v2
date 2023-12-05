@@ -71,10 +71,10 @@ const keyLabels = {
   low: "24h Low",
 }
 
-export default function MarketInfosBar() {
-  const { selectedMarket } = useMarket()
-  const base = selectedMarket?.base
-  const quote = selectedMarket?.quote
+export default function MarketInfoBar() {
+  const { market } = useMarket()
+  const base = market?.base
+  const quote = market?.quote
   const oneMinutePriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol)
   const oneDayPriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol, "1d")
 

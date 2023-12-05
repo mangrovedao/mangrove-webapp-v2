@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
-    "@mangrovedao/mangrove.js": "2.0.0-10",
+    "@mangrovedao/mangrove.js": "2.0.0-12",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.5",

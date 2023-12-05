@@ -9,8 +9,8 @@ dependencies:
     specifier: ^5.7.2
     version: 5.7.2
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.0-10
-    version: 2.0.0-10
+    specifier: 2.0.0-12
+    version: 2.0.0-12
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
@@ -2420,8 +2420,8 @@ packages:
       '@mangrovedao/mangrove-core': 2.0.0-4
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.0-10:
-    resolution: {integrity: sha512-5XT9X7D9NYOjm68pH2SncuZsYd7f6QxYnjcW1TU9MBQq2zWHSFs+Uws04zVteCE2kWgP6yYwMWadHi5M1yDV3Q==}
+  /@mangrovedao/mangrove.js@2.0.0-12:
+    resolution: {integrity: sha512-qXwZPNz0onqHGKgCc3U8gIqz2tUfPDaaQfxfxIhM+2aj0teUfXPDM0UiUJZjzce/lng+aTRbPK9hAZieDvJCmw==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0

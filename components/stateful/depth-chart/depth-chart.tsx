@@ -55,18 +55,13 @@ export default function DepthChart() {
     onMouseMove,
     baseDecimals,
     priceDecimals,
-    selectedMarket,
+    market,
     asks,
     bids,
     isLoading,
   } = useDepthChart()
 
-  if (
-    asks?.length === 0 &&
-    bids?.length === 0 &&
-    !isLoading &&
-    !!selectedMarket
-  ) {
+  if (asks?.length === 0 && bids?.length === 0 && !isLoading && !!market) {
     return (
       <div className="w-full h-full flex justify-center items-center">
         Empty market
@@ -246,8 +241,7 @@ export default function DepthChart() {
                               : "Mid price"}
                             :
                           </b>{" "}
-                          {price.toFixed(priceDecimals)}{" "}
-                          {selectedMarket?.quote.symbol}
+                          {price.toFixed(priceDecimals)} {market?.quote.symbol}
                         </div>
                       ) : undefined}
                       {key !== DataKeyType.MID_PRICE.toString() && (
@@ -256,8 +250,7 @@ export default function DepthChart() {
                             {key.slice(0, -1)}:
                           </b>{" "}
                           <span>
-                            {volume.toFixed(baseDecimals)}{" "}
-                            {selectedMarket?.base.symbol}
+                            {volume.toFixed(baseDecimals)} {market?.base.symbol}
                           </span>
                         </div>
                       )}

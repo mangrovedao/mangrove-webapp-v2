@@ -1,11 +1,11 @@
-import { type Market } from "@mangrovedao/mangrove.js"
+import type Mangrove from "@mangrovedao/mangrove.js"
 
 import { getJsonFromMarketsConfig } from "@/schemas/whitelisted-markets"
 
 export function filterOpenMarketsWithMarketConfig(
-  openMarkets: Market[],
+  openMarkets: Mangrove.OpenMarketInfo[],
   chainId: number,
-): Market[] {
+): Mangrove.OpenMarketInfo[] {
   const marketsConfig = getJsonFromMarketsConfig()
   if (!marketsConfig) return []
   return openMarkets.filter(({ base, quote }) => {

@@ -1,5 +1,5 @@
 "use client"
-import type { Market } from "@mangrovedao/mangrove.js"
+import type { Mangrove } from "@mangrovedao/mangrove.js"
 
 import {
   Select,
@@ -12,41 +12,41 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { TokenIcon } from "../token-icon"
 
-function getSymbol(market?: Market) {
+function getSymbol(market?: Mangrove.OpenMarketInfo) {
   if (!market) return
   return `${market?.base?.symbol}/${market?.quote?.symbol}`
 }
 
-function getValue(market: Market) {
+function getValue(market: Mangrove.OpenMarketInfo) {
   return `${market.base.address}/${market.quote.address}`
 }
 
 export default function MarketSelector() {
-  const { marketsQuery } = useMangrove()
-  const { selectedMarket, setSelectedMarket } = useMarket()
+  const { marketsInfoQuery } = useMangrove()
+  const { market, selectMarketFromMarketInfo } = useMarket()
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress] = value.split("/")
-    const market = marketsQuery.data?.find(
+    const marketInfo = marketsInfoQuery.data?.find(
       ({ base, quote }) =>
         base.address === baseAddress && quote.address === quoteAddress,
     )
-    setSelectedMarket(market)
+    selectMarketFromMarketInfo(marketInfo)
   }
 
-  const value = selectedMarket ? getValue(selectedMarket) : undefined
+  const value = market ? getValue(market) : undefined
 
   return (
     <Select
       value={value}
       onValueChange={onValueChange}
-      disabled={marketsQuery.isLoading}
+      disabled={marketsInfoQuery.isLoading}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
         <SelectValue placeholder="Select a market" />
       </SelectTrigger>
       <SelectContent>
-        {marketsQuery.data?.map((market) => (
+        {marketsInfoQuery.data?.map((market) => (
           <SelectItem
             key={`${market.base.address}/${market.quote.address}`}
             value={getValue(market)}

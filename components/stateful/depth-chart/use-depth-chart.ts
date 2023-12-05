@@ -59,11 +59,11 @@ function removeCrossedOrders(
 }
 
 export function useDepthChart() {
-  const { requestBookQuery, selectedMarket } = useMarket()
+  const { requestBookQuery, market } = useMarket()
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const [isScrolling, setIsScrolling] = React.useState(false)
-  const baseDecimals = selectedMarket?.base.decimals
-  const priceDecimals = selectedMarket?.quote.displayedAsPriceDecimals
+  const baseDecimals = market?.base.decimals
+  const priceDecimals = market?.quote.displayedAsPriceDecimals
   const { asks, bids } = removeCrossedOrders(
     requestBookQuery.data?.bids ?? [],
     requestBookQuery.data?.asks ?? [],
@@ -228,7 +228,7 @@ export function useDepthChart() {
     onMouseMove,
     baseDecimals,
     priceDecimals,
-    selectedMarket,
+    market,
     asks,
     bids,
     isLoading,
