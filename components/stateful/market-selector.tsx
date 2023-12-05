@@ -1,5 +1,6 @@
 "use client"
 import type { Mangrove } from "@mangrovedao/mangrove.js"
+import { useAccount } from "wagmi"
 
 import {
   Select,
@@ -24,6 +25,7 @@ function getValue(market: Mangrove.OpenMarketInfo) {
 export default function MarketSelector() {
   const { marketsInfoQuery } = useMangrove()
   const { market, setMarketInfo } = useMarket()
+  const { isConnected } = useAccount()
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress] = value.split("/")
@@ -40,10 +42,18 @@ export default function MarketSelector() {
     <Select
       value={value}
       onValueChange={onValueChange}
-      disabled={marketsInfoQuery.isLoading}
+      disabled={marketsInfoQuery.isLoading || !market || !isConnected}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
-        <SelectValue placeholder="Select a market" />
+        <SelectValue
+          placeholder={
+            !isConnected
+              ? "Connect wallet"
+              : !market
+                ? "Select a market"
+                : "No markets"
+          }
+        />
       </SelectTrigger>
       <SelectContent>
         {marketsInfoQuery.data?.map((market) => (
