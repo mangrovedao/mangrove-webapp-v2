@@ -13,6 +13,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import { useAccount } from "wagmi"
 import { SemiBook } from "./semibook"
 import { OrderBookTableHead } from "./table-head"
 import useScrollToMiddle from "./use-scroll-to-middle"
@@ -44,7 +45,16 @@ export default function Book({
 
 function BookContent() {
   const { requestBookQuery, market } = useMarket()
+  const { isConnected } = useAccount()
   const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
+
+  if (!isConnected) {
+    return (
+      <Skeleton className="w-full h-full flex justify-center items-center">
+        Connect wallet to see orderbook
+      </Skeleton>
+    )
+  }
 
   if (requestBookQuery.isLoading || !market) {
     return (

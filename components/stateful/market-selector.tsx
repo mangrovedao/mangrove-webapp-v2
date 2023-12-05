@@ -46,13 +46,8 @@ export default function MarketSelector() {
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
         <SelectValue
-          placeholder={
-            !isConnected
-              ? "Connect wallet"
-              : !market
-                ? "Select a market"
-                : "No markets"
-          }
+          placeholder={!market ? "Select a market" : "No markets"}
+          suppressHydrationWarning
         />
       </SelectTrigger>
       <SelectContent>

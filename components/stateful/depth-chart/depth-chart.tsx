@@ -13,7 +13,9 @@ import {
   XYChart,
 } from "@visx/xychart"
 import Big from "big.js"
+import { useAccount } from "wagmi"
 
+import { ConnectToWalletPlaceholder } from "@/components/stateless/connect-to-wallet-placeholder"
 import { Spinner } from "@/components/ui/spinner"
 import { lerp } from "@/utils/interpolation"
 import { Skeleton } from "@components/ui/skeleton"
@@ -60,6 +62,11 @@ export default function DepthChart() {
     bids,
     isLoading,
   } = useDepthChart()
+  const { isConnected } = useAccount()
+
+  if (!isConnected) {
+    return <ConnectToWalletPlaceholder />
+  }
 
   if (asks?.length === 0 && bids?.length === 0 && !isLoading && !!market) {
     return (
