@@ -8,7 +8,6 @@ import {
   CustomTabsTrigger,
 } from "@/components/stateless/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Market } from "./components/market"
 import { Limit } from "./limit/limit"
 
 enum TradeType {
@@ -23,7 +22,7 @@ const TRADE_ITEMS = [
   },
   {
     title: TradeType.MARKET,
-    content: <Market />,
+    content: <div>TODO</div>,
   },
 ]
 

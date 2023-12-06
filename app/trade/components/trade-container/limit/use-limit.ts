@@ -47,6 +47,7 @@ export function useLimit() {
     },
   })
   const tradeAction = form.useStore((state) => state.values.tradeAction)
+  const send = form.useStore((state) => state.values.send)
   const base = market?.base
   const quote = market?.quote
   const { baseQuoteToSendReceive } =
@@ -96,6 +97,7 @@ export function useLimit() {
     quote,
     market,
     sendToken,
+    send,
     receiveToken,
   }
 }
