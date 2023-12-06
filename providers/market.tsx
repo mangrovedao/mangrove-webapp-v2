@@ -21,6 +21,7 @@ const useMarketContext = () => {
       return mangrove?.market(marketInfoToMarketParams(marketInfo))
     },
     enabled: !!marketInfo,
+    refetchOnWindowFocus: false,
   })
 
   const requestBookQuery = useQuery({
@@ -31,6 +32,7 @@ const useMarketContext = () => {
       return market.requestBook()
     },
     enabled: !!market,
+    refetchOnWindowFocus: false,
   })
 
   // create and store market instance from marketInfo
@@ -43,6 +45,7 @@ const useMarketContext = () => {
     setMarketInfo,
     requestBookQuery,
     market,
+    marketInfo,
   }
 }
 

@@ -27,7 +27,8 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
 import { TokenBalance } from "../components/token-balance"
-import { TradeAction } from "../types"
+import { TradeAction } from "../enums"
+import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./use-limit"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
@@ -45,6 +46,9 @@ export function Limit() {
     market,
     sendToken,
     receiveToken,
+    marketInfo,
+    feeInPercentageAsString,
+    timeInForce,
   } = useLimit()
 
   // const sliderPercentage = Math.min(
@@ -148,8 +152,8 @@ export function Limit() {
                 token={receiveToken}
                 label="Receive amount"
                 disabled={!(market && form.state.isFormValid)}
-                showBalance
                 error={field.state.meta.touchedErrors}
+                showBalance
               />
             )}
           </form.Field>
@@ -159,49 +163,91 @@ export function Limit() {
 
           <Separator className="!my-6" />
 
-          <Accordion title="Advanced">
-            <div className="grid text-md space-y-2">
-              <Label>Time in force</Label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Options" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="immediateOrCancel">
-                      Immediate or cancel
-                    </SelectItem>
-                    <SelectItem value="goodTillTime">Good till time</SelectItem>
-                    <SelectItem value="fillOrKill">Fill or kill</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex justify-between space-x-2">
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Options" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="3">3</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Options" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="day">Day</SelectItem>
-                    <SelectItem value="hour">Hour</SelectItem>
-                    <SelectItem value="minute">Minute</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+          <Accordion title="Advanced" defaultOpen>
+            <form.Field name="timeInForce">
+              {(field) => {
+                return (
+                  <div className="grid text-md space-y-2">
+                    <Label>Time in force</Label>
+                    <Select
+                      name={field.name}
+                      value={field.state.value}
+                      onValueChange={(value: TimeInForce) => {
+                        field.handleChange(value)
+                      }}
+                      disabled={!market}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select time in force" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {Object.values(TimeInForce).map((timeInForce) => (
+                            <SelectItem key={timeInForce} value={timeInForce}>
+                              {timeInForce}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )
+              }}
+            </form.Field>
+
+            <div
+              className={cn("flex justify-between space-x-2", {
+                hidden: timeInForce !== TimeInForce.GOOD_TIL_TIME,
+              })}
+            >
+              <form.Field
+                name="timeToLive"
+                onChange={isGreaterThanZeroValidator}
+              >
+                {(field) => (
+                  <TradeInput
+                    placeholder="1"
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={({ target: { value } }) => {
+                      if (!value) return
+                      field.handleChange(value)
+                    }}
+                    disabled={!(market && form.state.isFormValid)}
+                    error={field.state.meta.touchedErrors}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="timeToLiveUnit">
+                {(field) => (
+                  <Select
+                    name={field.name}
+                    value={field.state.value}
+                    onValueChange={(value: TimeToLiveUnit) => {
+                      field.handleChange(value)
+                    }}
+                    disabled={!market}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select time unit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {Object.values(TimeToLiveUnit).map((timeToLiveUnit) => (
+                          <SelectItem
+                            key={timeToLiveUnit}
+                            value={timeToLiveUnit}
+                          >
+                            {timeToLiveUnit}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              </form.Field>
             </div>
           </Accordion>
 
@@ -209,11 +255,17 @@ export function Limit() {
 
           {/* TODO: unmock market details */}
           <Accordion title="Market details" className="!mb-6">
-            <MarketDetailsLine title="Taker fee" value="5%" />
-            <MarketDetailsLine title="Total fees" value="$0.26" />
-            <MarketDetailsLine title="Tick size" value="1234" />
-            <MarketDetailsLine title="Current spot price" value="1234" />
-            <MarketDetailsLine title="Min. order size" value="12" />
+            <MarketDetailsLine
+              title="Taker fee"
+              value={feeInPercentageAsString}
+            />
+            {/* TODO: <MarketDetailsLine title="Total fees" value="$0.26" /> */}
+            <MarketDetailsLine
+              title="Tick size"
+              value={marketInfo?.tickSpacing.toString() ?? "-"}
+            />
+            {/* TODO: <MarketDetailsLine title="Current spot price" value="1234" />
+            <MarketDetailsLine title="Min. order size" value="12" /> */}
           </Accordion>
 
           <form.Subscribe
@@ -312,7 +364,7 @@ function MarketDetailsLine({ title, value }: MarketDetailsLineProps) {
 type TradeInputProps = {
   token?: Token
   disabled?: boolean
-  label: string
+  label?: string
   showBalance?: boolean
   error?: ValidationError[]
 } & NumericInputProps
@@ -321,7 +373,7 @@ const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
   ({ label, token, showBalance = false, error, ...inputProps }, ref) => {
     return (
       <div className="flex-col flex">
-        <Label>{label}</Label>
+        {label && <Label>{label}</Label>}
         <NumericInput
           {...inputProps}
           ref={ref}

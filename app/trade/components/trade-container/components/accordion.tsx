@@ -10,10 +10,14 @@ type Props = {
   title: string
   children: React.ReactNode
   className?: string
+  defaultOpen?: boolean | undefined
 }
-export function Accordion({ title, children, className }: Props) {
+export function Accordion({ title, children, defaultOpen, className }: Props) {
   return (
-    <Collapsible className={cn("w-full cursor-pointer group", className)}>
+    <Collapsible
+      className={cn("w-full cursor-pointer group", className)}
+      defaultOpen={defaultOpen}
+    >
       <CollapsibleTrigger asChild>
         <button className="flex items-center justify-between w-full mb-4 hover:opacity-80 transition-opacity">
           <h4 className="font-semibold">{title}</h4>

@@ -47,6 +47,7 @@ const useMangroveContext = () => {
       }
     },
     enabled: !!signer?._address && !!address,
+    refetchOnWindowFocus: false,
   })
 
   const marketsInfoQuery = useQuery({
