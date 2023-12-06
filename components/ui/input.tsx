@@ -14,8 +14,8 @@ export enum InputType {
 }
 
 const inputClasses =
-  "flex h-14 w-full px-4 py-3 rounded-lg border focus:border-input group-hover:!border-green-caribbean active:!border-green-bangladesh transition-all bg-muted text-md placeholder:text-muted-foreground focus-visible:!outline-none disabled:cursor-not-allowed disabled:bg-gray-scale-600 disabled:!border-transparent disabled:text-gray-scale-300"
-const errorClasses = "!border-red-100 group-hover:!border-red-100"
+  "flex h-14 w-full px-4 py-3 rounded-lg border focus:border-input group-hover/input:!border-green-caribbean active:!border-green-bangladesh transition-all bg-muted text-md placeholder:text-muted-foreground focus-visible:!outline-none disabled:cursor-not-allowed disabled:bg-gray-scale-600 disabled:!border-transparent disabled:text-gray-scale-300"
+const errorClasses = "!border-red-100 group-hover/input:!border-red-100"
 const disabledClasses = "border-none"
 
 export type InputProps = {

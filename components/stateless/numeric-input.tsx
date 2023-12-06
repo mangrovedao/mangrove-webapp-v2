@@ -12,7 +12,7 @@ export type NumericInputProps = {
 const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
   ({ className, icon, symbol, ...props }, ref) => {
     return (
-      <div className="w-full relative group">
+      <div className="w-full relative group/input">
         {icon && (
           <div
             className="flex items-center absolute inset-y-0 left-4"

@@ -1,11 +1,5 @@
-export enum TradeMode {
-  LIMIT = "limit",
-  MARKET = "market",
-}
-export enum TradeAction {
-  BUY = "buy",
-  SELL = "sell",
-}
+import { type TradeAction, type TradeMode } from "./enums"
+
 export type TradeModeValue = `${TradeMode}`
 export type TradeActionValue = `${TradeAction}`
 export type TradeModeAndActionPresentation = {
