@@ -40,7 +40,8 @@ const useMangroveContext = () => {
         const message = getErrorMessage(e)
         networkService.openWrongNetworkAlertDialog({
           title: "Error connecting to Mangrove",
-          children: "Failed loading the page. Please refresh",
+          children:
+            "Page failed to load. Please refresh page or change network",
         })
         console.error(message)
         return null

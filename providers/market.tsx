@@ -41,6 +41,20 @@ const useMarketContext = () => {
     setMarketInfo(marketsInfoQuery.data[0])
   }, [chain?.id, mangrove, marketsInfoQuery.data])
 
+  const updateOrderbook = React.useCallback(() => {
+    if (!market) return
+    requestBookQuery.refetch()
+  }, [market, requestBookQuery])
+
+  // subscribe to market events and refresh the book
+  React.useEffect(() => {
+    if (!market) return
+    market.subscribe(updateOrderbook)
+    return () => {
+      market.unsubscribe(updateOrderbook)
+    }
+  }, [market, updateOrderbook])
+
   return {
     setMarketInfo,
     requestBookQuery,

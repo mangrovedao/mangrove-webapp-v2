@@ -11,7 +11,6 @@ import { toast } from "sonner"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { getErrorMessage } from "@/utils/errors"
 import { TRADEMODE_AND_ACTION_PRESENTATION } from "../constants"
 import { TradeAction } from "../enums"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
@@ -106,8 +105,7 @@ export function useLimit() {
         form.reset()
       } catch (e) {
         console.error(e)
-        const message = getErrorMessage(e)
-        toast.error(message)
+        toast.error("An error occurred")
       }
     },
   })
