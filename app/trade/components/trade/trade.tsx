@@ -9,7 +9,6 @@ import {
 } from "@/components/stateless/custom-radio-group"
 import { NumericInput } from "@/components/stateless/numeric-input"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useTokenBalance } from "@/hooks/use-token-balance"
@@ -72,7 +71,7 @@ export default function TradeInputs({
                 </span>
               </div>
             </div>
-            <Checkbox />
+
             <div className="flex-col flex">
               {/* Pay Input */}
               <Label>Receive amount</Label>
