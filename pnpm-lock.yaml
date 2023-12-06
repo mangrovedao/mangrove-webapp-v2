@@ -9,14 +9,11 @@ dependencies:
     specifier: ^5.7.2
     version: 5.7.2
   '@mangrovedao/mangrove.js':
-    specifier: ^1.4.30
-    version: 1.4.30
+    specifier: 2.0.0-12
+    version: 2.0.0-12
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
-  '@radix-ui/react-checkbox':
-    specifier: ^1.0.4
-    version: 1.0.4(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-collapsible':
     specifier: ^1.0.3
     version: 1.0.3(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
@@ -57,17 +54,23 @@ dependencies:
     specifier: ^1.0.7
     version: 1.0.7(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
   '@storybook/preview-api':
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3
   '@t3-oss/env-nextjs':
     specifier: ^0.6.1
     version: 0.6.1(typescript@5.3.2)(zod@3.22.4)
+  '@tanstack/react-form':
+    specifier: 0.10.3
+    version: 0.10.3(react-dom@18.2.0)(react@18.2.0)
   '@tanstack/react-query':
-    specifier: ^5.9.0
+    specifier: ^5.12.2
     version: 5.12.2(react@18.2.0)
   '@tanstack/react-query-devtools':
-    specifier: ^5.9.0
+    specifier: ^5.12.2
     version: 5.12.2(@tanstack/react-query@5.12.2)(react@18.2.0)
+  '@tanstack/zod-form-adapter':
+    specifier: ^0.10.3
+    version: 0.10.3(zod@3.22.4)
   '@visx/axis':
     specifier: ^3.5.0
     version: 3.5.0(react@18.2.0)
@@ -144,10 +147,10 @@ dependencies:
     specifier: ^1.0.7
     version: 1.0.7(tailwindcss@3.3.6)
   viem:
-    specifier: ^1.19.9
+    specifier: ^1.19.11
     version: 1.19.11(typescript@5.3.2)(zod@3.22.4)
   wagmi:
-    specifier: ^1.4.7
+    specifier: ^1.4.8
     version: 1.4.8(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.2)(viem@1.19.11)(zod@3.22.4)
   zod:
     specifier: ^3.22.4
@@ -158,25 +161,25 @@ dependencies:
 
 devDependencies:
   '@storybook/addon-essentials':
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
   '@storybook/addon-interactions':
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3
   '@storybook/addon-links':
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3(react@18.2.0)
   '@storybook/addon-onboarding':
-    specifier: ^1.0.8
+    specifier: ^1.0.9
     version: 1.0.9(react-dom@18.2.0)(react@18.2.0)
   '@storybook/blocks':
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
   '@storybook/nextjs':
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3(@swc/core@1.3.100)(esbuild@0.18.20)(next@14.0.3)(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.2)(webpack@5.89.0)
   '@storybook/react':
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.2)
   '@storybook/testing-library':
     specifier: ^0.2.2
@@ -188,28 +191,28 @@ devDependencies:
     specifier: ^6.2.2
     version: 6.2.2
   '@types/eslint':
-    specifier: ^8.44.7
+    specifier: ^8.44.8
     version: 8.44.8
   '@types/node':
-    specifier: ^18.18.13
+    specifier: ^18.19.2
     version: 18.19.2
   '@types/react':
-    specifier: ^18.2.39
+    specifier: ^18.2.42
     version: 18.2.42
   '@types/react-dom':
     specifier: ^18.2.17
     version: 18.2.17
   '@typescript-eslint/eslint-plugin':
-    specifier: ^6.13.1
+    specifier: ^6.13.2
     version: 6.13.2(@typescript-eslint/parser@6.13.2)(eslint@8.55.0)(typescript@5.3.2)
   '@typescript-eslint/parser':
-    specifier: ^6.13.1
+    specifier: ^6.13.2
     version: 6.13.2(eslint@8.55.0)(typescript@5.3.2)
   autoprefixer:
     specifier: ^10.4.16
     version: 10.4.16(postcss@8.4.32)
   eslint:
-    specifier: ^8.54.0
+    specifier: ^8.55.0
     version: 8.55.0
   eslint-config-next:
     specifier: ^13.5.6
@@ -218,7 +221,7 @@ devDependencies:
     specifier: ^0.6.15
     version: 0.6.15(eslint@8.55.0)(typescript@5.3.2)
   postcss:
-    specifier: ^8.4.31
+    specifier: ^8.4.32
     version: 8.4.32
   prettier:
     specifier: ^3.1.0
@@ -227,13 +230,13 @@ devDependencies:
     specifier: ^3.2.4
     version: 3.2.4(prettier@3.1.0)(typescript@5.3.2)
   prettier-plugin-tailwindcss:
-    specifier: ^0.5.7
+    specifier: ^0.5.8
     version: 0.5.8(prettier-plugin-organize-imports@3.2.4)(prettier@3.1.0)
   storybook:
-    specifier: ^7.6.0
+    specifier: ^7.6.3
     version: 7.6.3
   tailwindcss:
-    specifier: ^3.3.5
+    specifier: ^3.3.6
     version: 3.3.6
   typescript:
     specifier: ^5.3.2
@@ -2398,16 +2401,37 @@ packages:
       '@lit-labs/ssr-dom-shim': 1.1.2
     dev: false
 
-  /@mangrovedao/mangrove-core@1.5.13:
-    resolution: {integrity: sha512-yOv60jKu+LR4YWb4dwZZvs5IS7Lp6mLp8Ncrg8saQyRNZcbuinnXeQeU8esZacT4/DWxS2TFjal6eMGoJMb90w==}
+  /@mangrovedao/context-addresses@0.0.2-5:
+    resolution: {integrity: sha512-VebAtqm/YPadxS+OtVrfYGp2aESyzQgVhBflN8kuHzK8FXzpIwLqv07wDcBSF4BGVL3XjBqYaS21q5+C9HGIOQ==}
+    dependencies:
+      semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove.js@1.4.30:
-    resolution: {integrity: sha512-W5QSZKzXI0P26IbxI6R8GG/MJezDYHkfs9PGOWucCjZLQjTtJncSk7GFCuJq+1Hhv42VRttX8TAUJ0IXMXG0Pg==}
+  /@mangrovedao/mangrove-core@2.0.0-4:
+    resolution: {integrity: sha512-mJiuYVCmjvHrGwCOEKZ/EkwhBs22LOjIl4F9vv6zLjUGeFZYJaskItST2AUR9FfxdV+ltjJ/nGBTs0mb9DmfDQ==}
+    dev: false
+
+  /@mangrovedao/mangrove-deployments@0.0.2-1:
+    resolution: {integrity: sha512-Lv5MGBCaVpzcx+9Ix3NTPrPmJK7AuPsn0ihvDxreb0tm2RtFYlX51yEf12C57A3Jmiq8D1GtHLecuS984wP+Ww==}
+    dependencies:
+      semver: 7.5.4
+    dev: false
+
+  /@mangrovedao/mangrove-strats@0.0.2-7:
+    resolution: {integrity: sha512-4ij+YMRc97GUN5CenNV9GlsSmCbetMiXYePJzKyl4pQJITiJWerYCLeePfAmWzcI2sZhZIECeXVX9irIZvwOwA==}
+    dependencies:
+      '@mangrovedao/mangrove-core': 2.0.0-4
+    dev: false
+
+  /@mangrovedao/mangrove.js@2.0.0-12:
+    resolution: {integrity: sha512-qXwZPNz0onqHGKgCc3U8gIqz2tUfPDaaQfxfxIhM+2aj0teUfXPDM0UiUJZjzce/lng+aTRbPK9hAZieDvJCmw==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
-      '@mangrovedao/mangrove-core': 1.5.13
+      '@mangrovedao/context-addresses': 0.0.2-5
+      '@mangrovedao/mangrove-core': 2.0.0-4
+      '@mangrovedao/mangrove-deployments': 0.0.2-1
+      '@mangrovedao/mangrove-strats': 0.0.2-7
       '@mangrovedao/reliable-event-subscriber': 1.1.29
       '@types/object-inspect': 1.8.4
       '@types/triple-beam': 1.3.5
@@ -2419,9 +2443,9 @@ packages:
       just-clone: 6.2.0
       logform: 2.6.0
       loglevel: 1.8.1
-      moize: 6.1.6
       node-cleanup: 2.1.2
       object-inspect: 1.13.1
+      semver: 7.5.4
       triple-beam: 1.4.1
       util: 0.12.5
       yargs: 17.7.2
@@ -2892,34 +2916,6 @@ packages:
       '@types/react-dom': 18.2.17
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-
-  /@radix-ui/react-checkbox@1.0.4(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-CBuGQa52aAYnADZVt/KBQzXrwx6TqnlwtcIPGtVt5JkkzQwMOLJjPukimhfKEr4GQNd43C+djUh5Ikopj8pSLg==}
-    peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
-      react: ^16.8 || ^17.0 || ^18.0
-      react-dom: ^16.8 || ^17.0 || ^18.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      '@types/react-dom':
-        optional: true
-    dependencies:
-      '@babel/runtime': 7.23.5
-      '@radix-ui/primitive': 1.0.1
-      '@radix-ui/react-compose-refs': 1.0.1(@types/react@18.2.42)(react@18.2.0)
-      '@radix-ui/react-context': 1.0.1(@types/react@18.2.42)(react@18.2.0)
-      '@radix-ui/react-presence': 1.0.1(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0)
-      '@radix-ui/react-use-controllable-state': 1.0.1(@types/react@18.2.42)(react@18.2.0)
-      '@radix-ui/react-use-previous': 1.0.1(@types/react@18.2.42)(react@18.2.0)
-      '@radix-ui/react-use-size': 1.0.1(@types/react@18.2.42)(react@18.2.0)
-      '@types/react': 18.2.42
-      '@types/react-dom': 18.2.17
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: false
 
   /@radix-ui/react-collapsible@1.0.3(@types/react-dom@18.2.17)(@types/react@18.2.42)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-UBmVDkmR6IvDsloHVN+3rtx4Mi5TFvylYXpluuv0f37dtaz3H99bp8No0LGXRigVpl3UAT4l9j6bIchh42S/Gg==}
@@ -5203,6 +5199,12 @@ packages:
       eslint: 8.55.0
     dev: true
 
+  /@tanstack/form-core@0.10.3:
+    resolution: {integrity: sha512-vjLrlnURoCBtVXzUpPYMi5VhgFhGzK3I0J8gA5WUS67swOa9c/T63K7IhwuG0JGN3qx/nFKqguNqmONkAgbwIg==}
+    dependencies:
+      '@tanstack/store': 0.1.3
+    dev: false
+
   /@tanstack/query-core@4.36.1:
     resolution: {integrity: sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==}
     dev: false
@@ -5225,6 +5227,25 @@ packages:
     resolution: {integrity: sha512-yMEt5hWe2+1eclf1agMtXHnPIkxEida0lYWkfdhR8U6KXk/lO4Vca6piJmhKI85t0NHlx3l/z6zX+t/Fn5O9NA==}
     dependencies:
       '@tanstack/query-persist-client-core': 4.36.1
+    dev: false
+
+  /@tanstack/react-form@0.10.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-kQiaycvv1R4a/+eMlVNK0kMmUxH3qJkeX7JJjstwiVNw9M2GNRmKDSLWoJg6v81OuUpoY2aEIY/Sgh41NtlEtw==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      '@tanstack/form-core': 0.10.3
+      '@tanstack/react-store': 0.1.3(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/store': 0.1.3
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@tanstack/react-query-devtools@5.12.2(@tanstack/react-query@5.12.2)(react@18.2.0):
@@ -5272,6 +5293,31 @@ packages:
     dependencies:
       '@tanstack/query-core': 5.12.1
       react: 18.2.0
+    dev: false
+
+  /@tanstack/react-store@0.1.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-nDOgSlarFFbIvVirAi/GcCyqyRMthgpuBhOhN87DkeQEau+ZNGsLKJifzrQYuWB0+4FXmgeoGaY/Dr383MPqZw==}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      '@tanstack/store': 0.1.3
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
+  /@tanstack/store@0.1.3:
+    resolution: {integrity: sha512-GnolmC8Fr4mvsHE1fGQmR3Nm0eBO3KnZjDU0a+P3TeQNM/dDscFGxtA7p31NplQNW3KwBw4t1RVFmz0VeKLxcw==}
+    dev: false
+
+  /@tanstack/zod-form-adapter@0.10.3(zod@3.22.4):
+    resolution: {integrity: sha512-cLFgvY3F4vPfu+fq6a06sSQGWaZ2WIygtVdT20ZJWcvi7J7+xQR9Mjnbr1qFlHDtorswPHcW43Z8rKiJ/xFLKA==}
+    peerDependencies:
+      zod: ^3.x
+    dependencies:
+      '@tanstack/form-core': 0.10.3
+      zod: 3.22.4
     dev: false
 
   /@testing-library/dom@9.3.3:
@@ -9586,10 +9632,6 @@ packages:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
     dev: true
 
-  /fast-equals@3.0.3:
-    resolution: {integrity: sha512-NCe8qxnZFARSHGztGMZOO/PC1qa5MIFB5Hp66WdzbCRAz8U8US3bx1UTgLS49efBQPcUtO9gf5oVEY8o7y/7Kg==}
-    dev: false
-
   /fast-fifo@1.3.2:
     resolution: {integrity: sha512-/d9sfos4yxzpwkDkuN7k2SqFKtYNmCTzgfEpz82x34IM9/zc8KGxQoXg1liNC/izpRM/MBdt44Nmx41ZWqk+FQ==}
     dev: true
@@ -11362,10 +11404,6 @@ packages:
     engines: {node: '>= 0.6'}
     dev: true
 
-  /micro-memoize@4.1.2:
-    resolution: {integrity: sha512-+HzcV2H+rbSJzApgkj0NdTakkC+bnyeiUxgT6/m7mjcz1CmM22KYFKp+EVj1sWe4UYcnriJr5uqHQD/gMHLD+g==}
-    dev: false
-
   /micromatch@4.0.5:
     resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==}
     engines: {node: '>=8.6'}
@@ -11507,13 +11545,6 @@ packages:
       pathe: 1.1.1
       pkg-types: 1.0.3
       ufo: 1.3.2
-    dev: false
-
-  /moize@6.1.6:
-    resolution: {integrity: sha512-vSKdIUO61iCmTqhdoIDrqyrtp87nWZUmBPniNjO0fX49wEYmyDO4lvlnFXiGcaH1JLE/s/9HbiK4LSHsbiUY6Q==}
-    dependencies:
-      fast-equals: 3.0.3
-      micro-memoize: 4.1.2
     dev: false
 
   /motion@10.16.2:

@@ -1,6 +1,5 @@
 "use client"
-import type { Market } from "@mangrovedao/mangrove.js"
-import React from "react"
+import type { Mangrove } from "@mangrovedao/mangrove.js"
 import { useAccount } from "wagmi"
 
 import {
@@ -14,63 +13,55 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { TokenIcon } from "../token-icon"
 
-function getName(market?: Market) {
+function getSymbol(market?: Mangrove.OpenMarketInfo) {
   if (!market) return
-  return `${market?.base?.name}/${market?.quote?.name}`
+  return `${market?.base?.symbol}/${market?.quote?.symbol}`
 }
 
-function getValue(market: Market) {
+function getValue(market: Mangrove.OpenMarketInfo) {
   return `${market.base.address}/${market.quote.address}`
 }
 
 export default function MarketSelector() {
+  const { marketsInfoQuery } = useMangrove()
+  const { market, setMarketInfo } = useMarket()
   const { isConnected } = useAccount()
-  const { marketsQuery } = useMangrove()
-  const { selectedMarket, setSelectedMarket } = useMarket()
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress] = value.split("/")
-    const market = marketsQuery.data?.find(
+    const marketInfo = marketsInfoQuery.data?.find(
       ({ base, quote }) =>
         base.address === baseAddress && quote.address === quoteAddress,
     )
-    setSelectedMarket(market)
+    setMarketInfo(marketInfo)
   }
 
-  const value = selectedMarket ? getValue(selectedMarket) : undefined
-  const [selectPlaceholder, setSelectPlaceholder] = React.useState("")
-
-  React.useEffect(() => {
-    setSelectPlaceholder(
-      !isConnected
-        ? "Connect wallet"
-        : !marketsQuery
-          ? "Select a market"
-          : "Empty Markets",
-    )
-  }, [isConnected, marketsQuery])
+  const value = market ? getValue(market) : undefined
 
   return (
     <Select
       value={value}
       onValueChange={onValueChange}
-      disabled={marketsQuery.isLoading || !selectedMarket || !isConnected}
+      disabled={marketsInfoQuery.isLoading || !market || !isConnected}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
-        <SelectValue placeholder={selectPlaceholder} />
+        <SelectValue
+          placeholder={!market ? "Select a market" : "No markets"}
+          suppressHydrationWarning
+        />
       </SelectTrigger>
       <SelectContent>
-        {marketsQuery.data?.map((market) => (
+        {marketsInfoQuery.data?.map((market) => (
           <SelectItem
             key={`${market.base.address}/${market.quote.address}`}
             value={getValue(market)}
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">
-                <TokenIcon symbol={market.base.name} />
-                <TokenIcon symbol={market.quote.name} />
+                <TokenIcon symbol={market.base.symbol} />
+                <TokenIcon symbol={market.quote.symbol} />
               </div>
-              <span>{getName(market)}</span>
+              <span>{getSymbol(market)}</span>
             </div>
           </SelectItem>
         ))}

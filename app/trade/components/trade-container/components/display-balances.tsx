@@ -1,4 +1,4 @@
-import { Market } from "@mangrovedao/mangrove.js"
+import type { Market } from "@mangrovedao/mangrove.js"
 import React from "react"
 
 import { Skeleton } from "@/components/ui/skeleton"

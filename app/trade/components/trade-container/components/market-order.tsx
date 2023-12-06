@@ -32,7 +32,7 @@ export default function MarketOrder() {
             value={slider}
             step={25}
             max={100}
-            onValueChange={(e) => setSlider(e)}
+            onValueChange={setSlider}
           />
         </div>
 

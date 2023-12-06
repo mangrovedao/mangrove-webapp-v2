@@ -1,7 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { getSvgUrl, getTokenInfos } from "@/utils/tokens"
 
-export function TokenIcon({ symbol }: { symbol: string }) {
+export function TokenIcon({ symbol }: { symbol?: string }) {
+  if (!symbol) return null
+
   const { color, name } = getTokenInfos(symbol)
   const src = getSvgUrl(symbol)
   return (
