@@ -15,8 +15,8 @@ import { TokenIcon } from "@/components/token-icon"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
+import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
-import { Pen } from "lucide-react"
 import { MOCKS } from "./mock"
 import type { Order } from "./schema"
 import { Timer } from "./timer"
@@ -26,11 +26,11 @@ const DEFAULT_DATA: Order[] = [...MOCKS, ...MOCKS, ...MOCKS, ...MOCKS]
 
 type Params = {
   data?: Order[]
-  onDelete: (order: Order) => void
+  onRetract: (order: Order) => void
   onEdit: (order: Order) => void
 }
 
-export function useTable({ data, onDelete, onEdit }: Params) {
+export function useTable({ data, onRetract, onEdit }: Params) {
   const { market } = useMarket()
   const columns = React.useMemo(
     () => [
@@ -142,34 +142,27 @@ export function useTable({ data, onDelete, onEdit }: Params) {
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => (
-          <div className="w-full h-full flex justify-end">
+          <div className="w-full h-full flex justify-end space-x-1">
             <IconButton
               tooltip="Modify"
               className="aspect-square w-6 rounded-full"
+              onClick={() => onEdit(row.original)}
             >
               <Pen />
             </IconButton>
+            <IconButton
+              tooltip="Retract offer"
+              className="aspect-square w-6 rounded-full"
+              onClick={() => onRetract(row.original)}
+            >
+              <Close />
+            </IconButton>
           </div>
         ),
-        // cell: ({ row }) => (
-        //   <div className="w-10 h-5">
-        //     <span className="items-center hidden gap-2 group-hover:inline-flex">
-        //       <IconButton tooltip="Modify" onClick={() => onEdit(row.original)}>
-        //         <Pen className="text-primary-main" />
-        //       </IconButton>
-        //       <IconButton
-        //         tooltip="Retract"
-        //         onClick={() => onDelete(row.original)}
-        //       >
-        //         <Trash className="text-red-500" />
-        //       </IconButton>
-        //     </span>
-        //   </div>
-        // ),
       }),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [market?.base.address, market?.quote.address, onDelete, onEdit],
+    [market?.base.address, market?.quote.address, onRetract, onEdit],
   )
 
   return useReactTable({

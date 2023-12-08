@@ -15,6 +15,7 @@ export function ChevronDown(props: React.ComponentProps<"svg">) {
     </svg>
   )
 }
+
 export function ChevronRight(props: React.ComponentProps<"svg">) {
   return (
     <svg
@@ -29,6 +30,48 @@ export function ChevronRight(props: React.ComponentProps<"svg">) {
         strokeLinejoin="round"
         strokeWidth="1.5"
         d="M6.5 11l3-3-3-3"
+      ></path>
+    </svg>
+  )
+}
+
+export function Pen(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.313"
+        d="M14.333 6.75l2.917 2.917-7.583 7.583H6.75v-2.917l7.583-7.583z"
+      ></path>
+    </svg>
+  )
+}
+
+export function Close(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M17 7L7 17M7 7l10 10"
       ></path>
     </svg>
   )

@@ -12,7 +12,7 @@ export function Orders() {
     onEdit: () => {
       console.log("edit")
     },
-    onDelete: () => {
+    onRetract: () => {
       console.log("delete")
     },
   })

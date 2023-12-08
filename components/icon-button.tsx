@@ -22,7 +22,7 @@ export function IconButton({ children: icon, tooltip, ...props }: Props) {
             {React.cloneElement(icon, {
               className: clsx(
                 icon.props.className,
-                "w-3 h-auto stroke-current",
+                "w-5 h-auto stroke-current",
               ),
             })}
           </Button>
