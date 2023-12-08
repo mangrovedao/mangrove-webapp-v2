@@ -8,11 +8,11 @@ import React from "react"
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
-} from "@/components/stateless/custom-radio-group"
+} from "@/components/custom-radio-group"
 import {
   NumericInput,
   type NumericInputProps,
-} from "@/components/stateless/numeric-input"
+} from "@/components/numeric-input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {

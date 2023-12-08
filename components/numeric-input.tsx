@@ -1,8 +1,8 @@
 import * as React from "react"
 
 import { cn } from "@/utils"
-import { TokenIcon } from "../token-icon"
-import { Input, type InputProps } from "../ui/input"
+import { TokenIcon } from "./token-icon"
+import { Input, type InputProps } from "./ui/input"
 
 export type NumericInputProps = {
   symbol?: React.ReactNode

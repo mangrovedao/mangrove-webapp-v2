@@ -95,7 +95,7 @@ const useMangrove = () => {
   const mangroveCtx = React.useContext(MangroveContext)
   if (!mangroveCtx) {
     throw new Error(
-      "mangroveCtx must be used within the MangroveContext.Provider",
+      "useMangrove must be used within the MangroveContext.Provider",
     )
   }
   return mangroveCtx

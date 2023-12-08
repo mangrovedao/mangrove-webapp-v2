@@ -78,13 +78,11 @@ export function MarketProvider({ children }: React.PropsWithChildren) {
 }
 
 const useMarket = () => {
-  const mangroveCtx = React.useContext(MarketContext)
-  if (!mangroveCtx) {
-    throw new Error(
-      "mangroveCtx must be used within the MarketContext.Provider",
-    )
+  const marketCtx = React.useContext(MarketContext)
+  if (!marketCtx) {
+    throw new Error("useMarket must be used within the MarketContext.Provider")
   }
-  return mangroveCtx
+  return marketCtx
 }
 
 export default useMarket

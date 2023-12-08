@@ -5,7 +5,7 @@ import {
   CustomTabsContent,
   CustomTabsList,
   CustomTabsTrigger,
-} from "@/components/stateless/custom-tabs"
+} from "@/components/custom-tabs"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 import { Orders } from "./orders/orders"

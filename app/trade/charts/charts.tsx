@@ -7,7 +7,7 @@ import {
   CustomTabsContent,
   CustomTabsList,
   CustomTabsTrigger,
-} from "@/components/stateless/custom-tabs"
+} from "@/components/custom-tabs"
 import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
 import { type ResolutionString } from "@/public/charting_library/charting_library"
 import { cn } from "@/utils"

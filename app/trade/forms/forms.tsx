@@ -6,7 +6,7 @@ import {
   CustomTabsContent,
   CustomTabsList,
   CustomTabsTrigger,
-} from "@/components/stateless/custom-tabs"
+} from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { renderElement } from "@/utils/render"
 import { Limit } from "./limit/limit"
