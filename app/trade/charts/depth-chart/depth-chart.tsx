@@ -38,7 +38,7 @@ const accessors = {
   yAccessor: (offer: Market.Offer) => toNumberIfBig(offer.volume),
 }
 
-export default function DepthChart() {
+export function DepthChart() {
   const {
     cumulativeAsks,
     cumulativeBids,

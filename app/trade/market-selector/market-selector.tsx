@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { TokenIcon } from "../token-icon"
+import { TokenIcon } from "../../../components/token-icon"
 
 function getSymbol(market?: Mangrove.OpenMarketInfo) {
   if (!market) return

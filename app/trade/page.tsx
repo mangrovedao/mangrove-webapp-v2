@@ -1,9 +1,10 @@
 "use client"
-import MarketSelector from "@/components/stateful/market-selector"
-import MarketInfoBar from "./components/market-infos-bar"
-import Market from "./components/market/market"
-import Book from "./components/orderbook/orderbook"
-import TradeContainer from "./components/trade-container/trade-container"
+import MarketSelector from "@/app/trade/market-selector/market-selector"
+import { Market } from "./charts/charts"
+import { Forms } from "./forms/forms"
+import { OrderBook } from "./orderbook/orderbook"
+import { PricesBar } from "./prices-bar/prices-bar"
+import { Tables } from "./tables/tables"
 
 export default function Page() {
   return (
@@ -12,11 +13,11 @@ export default function Page() {
         <div className="px-4 border-b h-[var(--bar-height)] flex items-center relative">
           <MarketSelector />
         </div>
-        <TradeContainer />
+        <Forms />
       </section>
 
       <section className="border-x book-and-chart">
-        <Book
+        <OrderBook
           className="overflow-hidden border-r book-container"
           style={{ gridArea: "book" }}
         />
@@ -26,7 +27,7 @@ export default function Page() {
             gridArea: "chart",
           }}
         >
-          <MarketInfoBar />
+          <PricesBar />
           <Market className="w-full border-t h-full" />
         </div>
       </section>
@@ -81,19 +82,5 @@ export default function Page() {
         }
       `}</style>
     </main>
-  )
-}
-
-function Tables({ className }: React.ComponentProps<"div">) {
-  return (
-    <div className={className}>
-      <div className="m-5 flex space-x-5">
-        <span>Open Orders (0)</span>
-        <span>History (0)</span>
-      </div>
-      <div className="px-5">
-        <span>Empty</span>
-      </div>
-    </div>
   )
 }

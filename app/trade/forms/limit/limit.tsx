@@ -163,7 +163,7 @@ export function Limit() {
 
           <Separator className="!my-6" />
 
-          <Accordion title="Advanced" defaultOpen>
+          <Accordion title="Advanced">
             <form.Field name="timeInForce">
               {(field) => {
                 return (
