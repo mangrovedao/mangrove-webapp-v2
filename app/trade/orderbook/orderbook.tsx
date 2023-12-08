@@ -17,7 +17,7 @@ import { SemiBook } from "./semibook"
 import { OrderBookTableHead } from "./table-head"
 import useScrollToMiddle from "./use-scroll-to-middle"
 
-export default function Book({
+export function OrderBook({
   className,
   style,
 }: {

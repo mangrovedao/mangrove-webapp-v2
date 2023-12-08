@@ -21,7 +21,7 @@ function Label({ children }: React.PropsWithChildren) {
 }
 
 function Value({ children }: React.PropsWithChildren) {
-  return <div className="">{children}</div>
+  return <div className="flex items-center">{children}</div>
 }
 
 function Item({
@@ -48,16 +48,14 @@ function Item({
         <Skeleton className="w-16 h-4" />
       ) : value ? (
         <Value>
-          <div className="flex items-center">
-            {formatNumber(value ?? 0, {
-              style: showSymbol ? "currency" : undefined,
-              currencyDisplay: showSymbol ? "symbol" : undefined,
-              currency: showSymbol ? "USD" : undefined,
-              minimumFractionDigits: displayedPriceDecimals,
-              maximumFractionDigits: displayedPriceDecimals,
-            })}
-            {rightElement}
-          </div>
+          {formatNumber(value ?? 0, {
+            style: showSymbol ? "currency" : undefined,
+            currencyDisplay: showSymbol ? "symbol" : undefined,
+            currency: showSymbol ? "USD" : undefined,
+            minimumFractionDigits: displayedPriceDecimals,
+            maximumFractionDigits: displayedPriceDecimals,
+          })}
+          {rightElement}
         </Value>
       ) : (
         <span className="text-red">N/A</span>
@@ -71,7 +69,7 @@ const keyLabels = {
   low: "24h Low",
 }
 
-export default function MarketInfoBar() {
+export function PricesBar() {
   const { market } = useMarket()
   const base = market?.base
   const quote = market?.quote
