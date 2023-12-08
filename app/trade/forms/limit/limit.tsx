@@ -277,24 +277,64 @@ export function Limit() {
           >
             {([canSubmit, isSubmitting, tradeAction]) => {
               return (
-                <Button
-                  className="w-full flex items-center justify-center !mb-4 capitalize"
-                  size={"lg"}
-                  type="submit"
-                  disabled={!canSubmit || !market}
-                >
-                  {isSubmitting ? "Processing..." : tradeAction}
-                  <div
-                    className={cn(
-                      "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
-                      {
-                        "opacity-10": !market,
-                      },
-                    )}
+                <>
+                  <Button
+                    className="w-full flex items-center justify-center !mb-4 capitalize"
+                    size={"lg"}
+                    type="submit"
+                    disabled={!canSubmit || !market}
                   >
-                    <LucideChevronRight className="h-4 text-current" />
-                  </div>
-                </Button>
+                    {isSubmitting ? "Processing..." : tradeAction}
+                    <div
+                      className={cn(
+                        "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
+                        {
+                          "opacity-10": !market,
+                        },
+                      )}
+                    >
+                      <LucideChevronRight className="h-4 text-current" />
+                    </div>
+                  </Button>
+                  <Button
+                    className="w-full flex items-center justify-center !mb-4 capitalize"
+                    size={"lg"}
+                    type="submit"
+                    disabled={!canSubmit || !market}
+                    variant={"secondary"}
+                  >
+                    {isSubmitting ? "Processing..." : tradeAction}
+                    <div
+                      className={cn(
+                        "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
+                        {
+                          "opacity-10": !market,
+                        },
+                      )}
+                    >
+                      <LucideChevronRight className="h-4 text-current" />
+                    </div>
+                  </Button>
+                  <Button
+                    className="w-full flex items-center justify-center !mb-4 capitalize"
+                    size={"lg"}
+                    type="submit"
+                    disabled={!canSubmit || !market}
+                    variant={"tertiary"}
+                  >
+                    {isSubmitting ? "Processing..." : tradeAction}
+                    <div
+                      className={cn(
+                        "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
+                        {
+                          "opacity-10": !market,
+                        },
+                      )}
+                    >
+                      <LucideChevronRight className="h-4 text-current" />
+                    </div>
+                  </Button>
+                </>
               )
             }}
           </form.Subscribe>

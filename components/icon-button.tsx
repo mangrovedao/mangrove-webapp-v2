@@ -1,5 +1,6 @@
 import clsx from "clsx"
 import React from "react"
+import { Button } from "./ui/button"
 import {
   Tooltip,
   TooltipContent,
@@ -7,7 +8,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip"
 
-type Props = React.ComponentProps<"button"> & {
+type Props = React.ComponentProps<typeof Button> & {
   tooltip?: string
   children: React.ReactElement
 }
@@ -15,22 +16,16 @@ type Props = React.ComponentProps<"button"> & {
 export function IconButton({ children: icon, tooltip, ...props }: Props) {
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>
-          <button
-            type="button"
-            {...props}
-            className={clsx(
-              "rounded-full aspect-square",
-              "inline-flex items-center justify-center",
-              "transition-transform hover:scale-125 disabled:scale-100 disabled:pointer-events-none",
-              props.className,
-            )}
-          >
+          <Button {...props} type="button" variant={"tertiary"} size={"icon"}>
             {React.cloneElement(icon, {
-              className: clsx(icon.props.className, "w-5 h-auto"),
+              className: clsx(
+                icon.props.className,
+                "w-3 h-auto stroke-current",
+              ),
             })}
-          </button>
+          </Button>
         </TooltipTrigger>
         <TooltipContent>{tooltip}</TooltipContent>
       </Tooltip>
