@@ -1,9 +1,9 @@
 import { z } from "zod"
 
 export const orderSchema = z.object({
-  creationDate: z.date(),
-  latestUpdateDate: z.date(),
-  expiryDate: z.date().optional(),
+  creationDate: z.string(),
+  latestUpdateDate: z.string(),
+  expiryDate: z.string().optional(),
   transactionHash: z.string(),
   isBid: z.boolean(),
   takerGot: z.string(),

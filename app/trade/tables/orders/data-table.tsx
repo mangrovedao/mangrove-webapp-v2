@@ -27,7 +27,7 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => {
               return (
-                <TableHead key={header.id}>
+                <TableHead key={header.id} className="px-2">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -46,10 +46,18 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
             <TableRow
               key={row.id}
               data-state={row.getIsSelected() && "selected"}
+              className="text-gray-scale-300 hover:text-white transition-colors group/row"
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                <TableCell key={cell.id} className="px-0 py-2 group/cell">
+                  <div className="group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg">
+                    <div className="px-2 h-6 flex items-center">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </div>
+                  </div>
                 </TableCell>
               ))}
             </TableRow>

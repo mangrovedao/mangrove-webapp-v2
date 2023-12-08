@@ -75,6 +75,7 @@ export default {
           "scale-400": "hsl(var(--color-gray-scale-400)) ",
           "scale-500": "hsl(var(--color-gray-scale-500)) ",
           "scale-600": "hsl(var(--color-gray-scale-600)) ",
+          "scale-700": "hsl(var(--color-gray-scale-700)) ",
         },
         red: {
           100: "hsl(var(--color-red-100))",

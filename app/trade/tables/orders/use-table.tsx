@@ -13,11 +13,13 @@ import React from "react"
 
 import { IconButton } from "@/components/icon-button"
 import { TokenIcon } from "@/components/token-icon"
+import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { MOCKS } from "./mock"
 import type { Order } from "./schema"
+import { Timer } from "./timer"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = [...MOCKS, ...MOCKS, ...MOCKS, ...MOCKS]
@@ -51,7 +53,7 @@ export function useTable({ data, onDelete, onEdit }: Params) {
             </div>
             {market ? (
               <span>
-                {market.base.symbol}/${market.quote.symbol}
+                {market.base.symbol}/{market.quote.symbol}
               </span>
             ) : (
               <Skeleton className="w-20 h-6" />
@@ -65,7 +67,7 @@ export function useTable({ data, onDelete, onEdit }: Params) {
           const isBid = row.getValue()
           return (
             <div
-              className={cn(isBid ? "text-green-caribbean" : "text-custom-red")}
+              className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
             >
               {isBid ? "Buy" : "Sell"}
             </div>
@@ -85,30 +87,62 @@ export function useTable({ data, onDelete, onEdit }: Params) {
             row.original
           const baseSymbol = market?.base.symbol
           const displayDecimals = market?.base.displayedDecimals
+          const filled = Big(isBid ? initialWants : initialGives).toFixed(
+            displayDecimals,
+          )
+          const amount = Big(isBid ? takerGot : takerGave).toFixed(
+            displayDecimals,
+          )
+          const progress = Math.min(
+            Math.round(Big(filled).mul(100).div(amount).toNumber()),
+            100,
+          )
           return market ? (
-            <div className={cn("flex flex-col")}>
-              <span className="text-sm">
-                {Big(isBid ? initialWants : initialGives).toFixed(
-                  displayDecimals,
-                )}{" "}
-                {baseSymbol}
+            <div className={cn("flex items-center")}>
+              <span className="text-sm text-muted-foreground">
+                {filled}
+                &nbsp;/
               </span>
-              <span className="text-xs opacity-50">
-                {Big(isBid ? takerGot : takerGave).toFixed(displayDecimals)}{" "}
-                {baseSymbol}
+              <span className="">
+                &nbsp;
+                {amount} {baseSymbol}
               </span>
+              <CircularProgressBar progress={progress} className="ml-3" />
             </div>
           ) : (
-            <Skeleton className="w-20 h-6" />
+            <Skeleton className="w-32 h-6" />
           )
         },
         enableSorting: false,
       }),
+      columnHelper.accessor("price", {
+        header: "Price",
+        cell: (row) =>
+          market ? (
+            row.getValue() ? (
+              <span>
+                {Big(row.getValue()).toFixed(market.quote.displayedDecimals)}{" "}
+                {market.quote.symbol}
+              </span>
+            ) : (
+              <span>-</span>
+            )
+          ) : (
+            <Skeleton className="w-20 h-6" />
+          ),
+      }),
+      columnHelper.accessor("expiryDate", {
+        header: "Time in force",
+        cell: (row) => {
+          const expiry = row.getValue()
+          return expiry ? <Timer expiry={expiry} /> : <div>-</div>
+        },
+      }),
       columnHelper.display({
         id: "actions",
-        header: "Action",
+        header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => (
-          <div className="w-10 h-5">
+          <div className="">
             <span className="items-center hidden gap-2 group-hover:inline-flex">
               <IconButton tooltip="Modify" onClick={() => onEdit(row.original)}>
                 <Pen className="text-primary-main" />
