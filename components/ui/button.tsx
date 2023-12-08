@@ -31,6 +31,9 @@ const buttonVariants = cva(
         lg: "p-3 leading-5 rounded-[32px]",
         icon: "flex justify-center items-center aspect-square p-0 h-6",
       },
+      rightIcon: {
+        true: "flex items-center justify-center space-x-1",
+      },
     },
     compoundVariants: [
       {
@@ -92,16 +95,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className, rightIcon }))}
         ref={ref}
         aria-disabled={props.disabled}
         {...props}
       >
         {props.loading ? <Spinner className="w-6" /> : props.children}
         {rightIcon && !props.loading && (
-          <div className={cn(rightIconVariants({ variant }))}>
+          <span className={cn(rightIconVariants({ variant }))}>
             <ChevronRight className="aspect-auto w-4" />
-          </div>
+          </span>
         )}
       </Comp>
     )

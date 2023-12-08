@@ -77,6 +77,27 @@ export function Close(props: React.ComponentProps<"svg">) {
   )
 }
 
+export function ExclamationMark(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="52"
+      height="52"
+      fill="none"
+      viewBox="0 0 52 52"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="3"
+        d="M23.36 10.582L9.44 33.82a3.287 3.287 0 002.81 4.93h27.84a3.286 3.286 0 002.81-4.93L28.98 10.582a3.287 3.287 0 00-5.62 0zM26.17 19.03v6.573M26.17 32.177h.017"
+      ></path>
+    </svg>
+  )
+}
+
 export function Bell(props: React.ComponentProps<"svg">) {
   return (
     <svg

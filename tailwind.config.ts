@@ -33,6 +33,7 @@ export default {
           foreground: "hsl(var(--primary-foreground))",
           "dark-green": "hsl(var(--color-primary-dark-geen))",
           "solid-black": "hsl(var(--color-primary-solid-black))",
+          "night-woods": "hsl(var(--color-primary-night-woods))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

@@ -24,8 +24,10 @@ function openWrongNetworkAlertDialog({
         onClick: changeNetwork,
         children: "Change network",
         id: "change-network",
+        className: "w-full",
       },
     ],
+    type: "error",
   })
 }
 

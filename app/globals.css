@@ -24,6 +24,7 @@
     --color-gray-scale-700: 180, 73%, 4%;
     --color-gray: 180, 10%, 64%;
     --color-blue-light-100: 167, 24%, 73%;
+    --color-primary-night-woods: 180, 86%, 3%;
 
     --tw-ring-color: var(hsl(--color-primary-dark-geen));
     --background: 180 86% 3%;
@@ -82,4 +83,8 @@ body.mouse-down *:focus {
 html,
 body {
   height: 100%;
+}
+
+.error-shadow {
+  box-shadow: 0px 0px 0px 16px rgba(56, 18, 18, 0.25);
 }

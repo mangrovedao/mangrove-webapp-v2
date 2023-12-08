@@ -10,16 +10,19 @@ function open({
       id: "cancel",
     },
   ],
+  type = "info",
 }: {
   children?: React.ReactNode
   title?: React.ReactNode
   actionButtons?: ActionButton[]
+  type?: "info" | "confirm" | "error" | "success"
 }) {
   useAlertDialogStore.setState({
     opened: true,
     title,
     children,
     actionButtons,
+    type,
   })
 }
 
