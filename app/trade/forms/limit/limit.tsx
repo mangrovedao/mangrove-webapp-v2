@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { Token } from "@mangrovedao/mangrove.js"
 import type { ValidationError } from "@tanstack/react-form"
-import { LucideChevronRight } from "lucide-react"
 import React from "react"
 
 import {
@@ -277,64 +276,16 @@ export function Limit() {
           >
             {([canSubmit, isSubmitting, tradeAction]) => {
               return (
-                <>
-                  <Button
-                    className="w-full flex items-center justify-center !mb-4 capitalize"
-                    size={"lg"}
-                    type="submit"
-                    disabled={!canSubmit || !market}
-                  >
-                    {isSubmitting ? "Processing..." : tradeAction}
-                    <div
-                      className={cn(
-                        "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
-                        {
-                          "opacity-10": !market,
-                        },
-                      )}
-                    >
-                      <LucideChevronRight className="h-4 text-current" />
-                    </div>
-                  </Button>
-                  <Button
-                    className="w-full flex items-center justify-center !mb-4 capitalize"
-                    size={"lg"}
-                    type="submit"
-                    disabled={!canSubmit || !market}
-                    variant={"secondary"}
-                  >
-                    {isSubmitting ? "Processing..." : tradeAction}
-                    <div
-                      className={cn(
-                        "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
-                        {
-                          "opacity-10": !market,
-                        },
-                      )}
-                    >
-                      <LucideChevronRight className="h-4 text-current" />
-                    </div>
-                  </Button>
-                  <Button
-                    className="w-full flex items-center justify-center !mb-4 capitalize"
-                    size={"lg"}
-                    type="submit"
-                    disabled={!canSubmit || !market}
-                    variant={"tertiary"}
-                  >
-                    {isSubmitting ? "Processing..." : tradeAction}
-                    <div
-                      className={cn(
-                        "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
-                        {
-                          "opacity-10": !market,
-                        },
-                      )}
-                    >
-                      <LucideChevronRight className="h-4 text-current" />
-                    </div>
-                  </Button>
-                </>
+                <Button
+                  className="w-full flex items-center justify-center !mb-4 capitalize"
+                  size={"lg"}
+                  type="submit"
+                  disabled={!canSubmit || !market}
+                  rightIcon
+                  loading={!!isSubmitting}
+                >
+                  {tradeAction}
+                </Button>
               )
             }}
           </form.Subscribe>

@@ -15,6 +15,7 @@
     --color-primary-solid-black: 177, 72%, 6%;
     --color-black-rich: 178, 86%, 6%;
     --color-white-anti-flash: 170, 27%, 96%;
+    --color-gray-scale-100: 167, 24%, 73%;
     --color-gray-scale-200: 180, 10%, 64%;
     --color-gray-scale-300: 180, 5%, 46%;
     --color-gray-scale-400: 180, 8%, 20%;
@@ -60,6 +61,9 @@
     --bar-height: 54px;
     --history-table-height: calc(100% - var(--book-chart-height));
     --book-chart-height: 31rem;
+
+    /* Sonner */
+    --success-bg: var(hsl(--bg-gray-scale-700));
   }
 
   * {

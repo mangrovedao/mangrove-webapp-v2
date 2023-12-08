@@ -1,12 +1,14 @@
+import { ChevronRight } from "@/svgs"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
 import { cn } from "utils"
+import { Spinner } from "./spinner"
 
 const buttonVariants = cva(
   [
-    "rounded-2xl text-black-rich box-border transition-colors active:text-gray-scale-200 disabled:text-gray-scale-400",
+    "rounded-2xl text-black-rich box-border transition-colors disabled:text-gray-scale-400 group/button font-medium",
     "focus-visible:ring-4 focus-visible:ring-primary-dark-green focus-visible:outline-0 focus-visible:ring-offset-0",
   ],
   {
@@ -18,7 +20,7 @@ const buttonVariants = cva(
           "border border-green-caribbean hover:border-green-bangladesh text-white disabled:border-gray-scale-500",
         tertiary: [
           "bg-primary-dark-green border border-primary-dark-green text-green-caribbean",
-          "focus:bg-primary-solid-black hover:bg-green-bangladesh active:text-primary-solid-black",
+          "focus:bg-primary-solid-black hover:bg-green-bangladesh active:text-primary-solid-black active:bg-green-bangladesh",
         ],
         link: "text-primary underline-offset-4 hover:underline",
         invisible: "text-white",
@@ -37,6 +39,10 @@ const buttonVariants = cva(
         className: "leading-3",
       },
       {
+        variant: ["primary", "secondary"],
+        className: "active:text-gray-scale-100",
+      },
+      {
         variant: ["primary", "tertiary"],
         className: "disabled:bg-gray-scale-600 disabled:border-transparent",
       },
@@ -48,14 +54,41 @@ const buttonVariants = cva(
   },
 )
 
+const rightIconVariants = cva(
+  [
+    "text-primary-solid-black aspect-square w-6 flex items-center justify-center bg-white rounded-full ml-2",
+    "group-active/button:text-primary-solid-black group-hover/button:text-primary-solid-black",
+    "group-disabled/button:text-gray-scale-600 group-disabled/button:bg-gray-scale-400",
+  ],
+  {
+    variants: {
+      variant: {
+        primary: "",
+        secondary: [
+          "bg-primary-dark-green text-white group-active/button:text-white group-hover/button:text-white",
+          "group-disabled/button:bg-gray-scale-600 group-disabled/button:text-gray-scale-400",
+        ],
+        tertiary: "",
+        link: "",
+        invisible: "",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+    },
+  },
+)
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  rightIcon?: boolean
+  loading?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, rightIcon, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
@@ -63,7 +96,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         aria-disabled={props.disabled}
         {...props}
-      />
+      >
+        {props.loading ? <Spinner className="w-6" /> : props.children}
+        {rightIcon && !props.loading && (
+          <div className={cn(rightIconVariants({ variant }))}>
+            <ChevronRight className="aspect-auto w-4" />
+          </div>
+        )}
+      </Comp>
     )
   },
 )
