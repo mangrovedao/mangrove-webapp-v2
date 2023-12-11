@@ -10,23 +10,20 @@ import {
 import Big from "big.js"
 import React from "react"
 
-import { IconButton } from "@/components/icon-button"
 import { TokenIcon } from "@/components/token-icon"
-import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
-import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
-import type { Order } from "./schema"
-import { Timer } from "./timer"
+import { formatDate } from "@/utils/date"
+import type { Fill } from "./schema"
 
-const columnHelper = createColumnHelper<Order>()
-const DEFAULT_DATA: Order[] = []
+const columnHelper = createColumnHelper<Fill>()
+const DEFAULT_DATA: Fill[] = []
 
 type Params = {
-  data?: Order[]
-  onRetract: (order: Order) => void
-  onEdit: (order: Order) => void
+  data?: Fill[]
+  onRetract: (fill: Fill) => void
+  onEdit: (fill: Fill) => void
 }
 
 export function useTable({ data, onRetract, onEdit }: Params) {
@@ -75,50 +72,31 @@ export function useTable({ data, onRetract, onEdit }: Params) {
         sortingFn: "datetime",
       }),
       // TODO: change when we will have amplified orders
-      columnHelper.accessor((_) => _, {
+      columnHelper.accessor("isMarketOrder", {
         header: "Type",
-        cell: () => <span>Limit</span>,
+        cell: (row) => (row.getValue() ? "Market" : "Limit"),
       }),
       columnHelper.accessor((_) => _, {
-        header: "Filled/Amount",
+        header: "Received/Sent",
         cell: ({ row }) => {
-          const { initialWants, takerGot, initialGives, isBid, takerGave } =
-            row.original
-          const baseSymbol = market?.base.symbol
-          const displayDecimals = market?.base.displayedDecimals
-          const amount = Big(isBid ? initialWants : initialGives).toFixed(
-            displayDecimals,
-          )
-          const filled = Big(isBid ? takerGot : takerGave).toFixed(
-            displayDecimals,
-          )
-          const progress = Math.min(
-            Math.round(
-              Big(filled)
-                .mul(100)
-                .div(Big(amount).eq(0) ? 1 : amount)
-                .toNumber(),
-            ),
-            100,
-          )
-          return market ? (
-            <div className={cn("flex items-center")}>
-              <span className="text-sm text-muted-foreground">
-                {filled}
-                &nbsp;/
+          const { takerGot, takerGave, isBid } = row.original
+          if (!market) return null
+          const { base, quote } = market
+          const [received, sent] = isBid ? [base, quote] : [quote, base]
+          return (
+            <div className={cn("flex flex-col")}>
+              <span className="text-sm">
+                {Big(takerGot).toFixed(received.displayedDecimals)}{" "}
+                {received.symbol}
               </span>
-              <span className="">
-                &nbsp;
-                {amount} {baseSymbol}
+              <span className="text-xs opacity-50">
+                {Big(takerGave).toFixed(sent.displayedDecimals)} {sent.symbol}
               </span>
-              <CircularProgressBar progress={progress} className="ml-3" />
             </div>
-          ) : (
-            <Skeleton className="w-32 h-6" />
           )
         },
-        enableSorting: false,
       }),
+
       columnHelper.accessor("price", {
         header: "Price",
         cell: (row) =>
@@ -135,35 +113,32 @@ export function useTable({ data, onRetract, onEdit }: Params) {
             <Skeleton className="w-20 h-6" />
           ),
       }),
-      columnHelper.accessor("expiryDate", {
-        header: "Time in force",
-        cell: (row) => {
-          const expiry = row.getValue()
-          return expiry ? <Timer expiry={expiry} /> : <div>-</div>
-        },
+      columnHelper.accessor("creationDate", {
+        header: "Date",
+        cell: (row) => <div>{formatDate(row.getValue())}</div>,
       }),
-      columnHelper.display({
-        id: "actions",
-        header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => (
-          <div className="w-full h-full flex justify-end space-x-1">
-            <IconButton
-              tooltip="Modify"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onEdit(row.original)}
-            >
-              <Pen />
-            </IconButton>
-            <IconButton
-              tooltip="Retract offer"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onRetract(row.original)}
-            >
-              <Close />
-            </IconButton>
-          </div>
-        ),
-      }),
+      // columnHelper.display({
+      //   id: "actions",
+      //   header: () => <div className="text-right">Action</div>,
+      //   cell: ({ row }) => (
+      //     <div className="w-full h-full flex justify-end space-x-1">
+      //       <IconButton
+      //         tooltip="Modify"
+      //         className="aspect-square w-6 rounded-full"
+      //         onClick={() => onEdit(row.original)}
+      //       >
+      //         <Pen />
+      //       </IconButton>
+      //       <IconButton
+      //         tooltip="Retract offer"
+      //         className="aspect-square w-6 rounded-full"
+      //         onClick={() => onRetract(row.original)}
+      //       >
+      //         <Close />
+      //       </IconButton>
+      //     </div>
+      //   ),
+      // }),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [market?.base.address, market?.quote.address, onRetract, onEdit],

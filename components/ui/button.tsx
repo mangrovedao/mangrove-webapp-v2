@@ -91,7 +91,10 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, rightIcon, ...props }, ref) => {
+  (
+    { className, variant, size, asChild = false, rightIcon, loading, ...props },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
@@ -100,8 +103,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={props.disabled}
         {...props}
       >
-        {props.loading ? <Spinner className="w-6" /> : props.children}
-        {rightIcon && !props.loading && (
+        {loading ? <Spinner className="w-6" /> : props.children}
+        {rightIcon && !loading && (
           <span className={cn(rightIconVariants({ variant }))}>
             <ChevronRight className="aspect-auto w-4" />
           </span>

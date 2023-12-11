@@ -167,7 +167,7 @@ export function Limit() {
               {(field) => {
                 return (
                   <div className="grid text-md space-y-2">
-                    <Label>Time in force</Label>
+                    <Label>Time in force {field.state.value}</Label>
                     <Select
                       name={field.name}
                       value={field.state.value}

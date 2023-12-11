@@ -60,8 +60,11 @@
     --border-width: 1px;
 
     --bar-height: 54px;
-    --history-table-height: calc(100% - var(--book-chart-height));
+    --history-table-height: calc(100vh - var(--book-chart-height));
     --book-chart-height: 31rem;
+    --history-table-content-height: calc(
+      var(--history-table-height) - 16px - var(--bar-height) * 2
+    );
 
     /* Sonner */
     --success-bg: var(hsl(--bg-gray-scale-700));

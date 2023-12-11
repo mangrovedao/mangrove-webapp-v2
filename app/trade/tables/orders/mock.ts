@@ -2,9 +2,9 @@ import type { Order } from "./schema"
 
 export const MOCKS: Order[] = [
   {
-    creationDate: "2023-12-08T16:47:11.363537",
-    latestUpdateDate: "2023-12-08T17:47:11.363537",
-    expiryDate: "2024-12-09T16:47:11.363537",
+    creationDate: new Date("2023-12-08T16:47:11.363537"),
+    latestUpdateDate: new Date("2023-12-08T17:47:11.363537"),
+    expiryDate: new Date("2024-12-09T16:47:11.363537"),
     transactionHash: "Wvjo9zlaMfnk5w8IVcZK",
     isBid: true,
     takerGot: "9209.18426939471",
@@ -17,9 +17,9 @@ export const MOCKS: Order[] = [
     offerId: "4Wa8uD34rUve",
   },
   {
-    creationDate: "2023-12-08T16:47:11.363537",
-    latestUpdateDate: "2023-12-08T17:47:11.363537",
-    expiryDate: "2022-12-10T11:47:11.363537",
+    creationDate: new Date("2023-12-08T16:47:11.363537"),
+    latestUpdateDate: new Date("2023-12-08T17:47:11.363537"),
+    expiryDate: new Date("2022-12-10T11:47:11.363537"),
     transactionHash: "Wvjo9zlaMfnk5w8IVcZK",
     isBid: false,
     takerGot: "9209.18426939471",
@@ -32,9 +32,9 @@ export const MOCKS: Order[] = [
     offerId: "4Wa8uD34rUve",
   },
   {
-    creationDate: "2023-12-08T16:47:11.363537",
-    latestUpdateDate: "2023-12-08T17:47:11.363537",
-    expiryDate: "2023-12-19T16:47:11.363537",
+    creationDate: new Date("2023-12-08T16:47:11.363537"),
+    latestUpdateDate: new Date("2023-12-08T17:47:11.363537"),
+    expiryDate: new Date("2023-12-19T16:47:11.363537"),
     transactionHash: "Wvjo9zlaMfnk5w8IVcZK",
     isBid: true,
     takerGot: "9209.18426939471",

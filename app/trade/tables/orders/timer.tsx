@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/tooltip"
 import { formatDate, formatExpiryDate, hasExpired } from "@/utils/date"
 
-export function Timer({ expiry }: { expiry: string }) {
+export function Timer({ expiry }: { expiry: Date }) {
   const [timeleft, setTimeleft] = React.useState(formatExpiryDate(expiry))
   const expired = hasExpired(expiry)
 

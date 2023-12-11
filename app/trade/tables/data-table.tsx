@@ -22,7 +22,7 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
     .filter((column) => column.getIsVisible())
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => {
@@ -49,7 +49,10 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
               className="text-gray-scale-300 hover:text-white transition-colors group/row"
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} className="px-0 py-2 group/cell">
+                <TableCell
+                  key={cell.id}
+                  className="px-0 py-2 group/cell whitespace-nowrap"
+                >
                   <div className="group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg">
                     <div className="px-2 h-6 flex items-center">
                       {flexRender(

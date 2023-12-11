@@ -1,18 +1,18 @@
 import { format, formatDistanceToNow, isPast } from "date-fns"
 
-export function hasExpired(isoDate: string) {
-  return isPast(new Date(isoDate))
+export function hasExpired(date: Date) {
+  return isPast(new Date(date))
 }
 
-export function formatExpiryDate(isoDate: string) {
-  const expiryTime = new Date(isoDate)
-  if (hasExpired(isoDate)) return "Expired"
+export function formatExpiryDate(date: Date) {
+  if (hasExpired(date)) return "Expired"
 
-  return formatDistanceToNow(expiryTime, {
+  return formatDistanceToNow(date, {
     includeSeconds: true,
   })
 }
 
-export function formatDate(isoDate: string) {
-  return format(new Date(isoDate), "MM/dd/yyyy h:mm:ss aaaa")
+export function formatDate(date: Date | string) {
+  const d = typeof date === "string" ? new Date(date) : date
+  return format(d, "MM/dd/yyyy h:mm:ss aaaa")
 }

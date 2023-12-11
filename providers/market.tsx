@@ -6,6 +6,7 @@ import React from "react"
 import { useNetwork } from "wagmi"
 
 import { marketInfoToMarketParams } from "@/utils/market"
+import { TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
@@ -35,6 +36,22 @@ const useMarketContext = () => {
     refetchOnWindowFocus: false,
   })
 
+  const olKeys = React.useMemo(() => {
+    if (!(mangrove && market)) return undefined
+    const ask: TokenAndOlkey = {
+      token: market.base,
+      olKey: mangrove.calculateOLKeyHash(market.olKeyBaseQuote),
+    }
+    const bid: TokenAndOlkey = {
+      token: market.quote,
+      olKey: mangrove.calculateOLKeyHash(market.olKeyQuoteBase),
+    }
+    return {
+      ask,
+      bid,
+    }
+  }, [mangrove, market])
+
   // create and store market instance from marketInfo
   React.useEffect(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
@@ -60,6 +77,7 @@ const useMarketContext = () => {
     requestBookQuery,
     market,
     marketInfo,
+    olKeys,
   }
 }
 
