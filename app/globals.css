@@ -15,14 +15,18 @@
     --color-primary-solid-black: 177, 72%, 6%;
     --color-black-rich: 178, 86%, 6%;
     --color-white-anti-flash: 170, 27%, 96%;
+    --color-gray-scale-100: 167, 24%, 73%;
     --color-gray-scale-200: 180, 10%, 64%;
     --color-gray-scale-300: 180, 5%, 46%;
     --color-gray-scale-400: 180, 8%, 20%;
     --color-gray-scale-500: 180, 9%, 12%;
     --color-gray-scale-600: 180, 7%, 8%;
+    --color-gray-scale-700: 180, 73%, 4%;
     --color-gray: 180, 10%, 64%;
     --color-blue-light-100: 167, 24%, 73%;
+    --color-primary-night-woods: 180, 86%, 3%;
 
+    --tw-ring-color: var(hsl(--color-primary-dark-geen));
     --background: 180 86% 3%;
     --foreground: 210 40% 98%;
 
@@ -56,8 +60,14 @@
     --border-width: 1px;
 
     --bar-height: 54px;
-    --history-table-height: calc(100% - var(--book-chart-height));
+    --history-table-height: calc(100vh - var(--book-chart-height));
     --book-chart-height: 31rem;
+    --history-table-content-height: calc(
+      var(--history-table-height) - 16px - var(--bar-height) * 2
+    );
+
+    /* Sonner */
+    --success-bg: var(hsl(--bg-gray-scale-700));
   }
 
   * {
@@ -76,4 +86,8 @@ body.mouse-down *:focus {
 html,
 body {
   height: 100%;
+}
+
+.error-shadow {
+  box-shadow: 0px 0px 0px 16px rgba(56, 18, 18, 0.25);
 }

@@ -6,7 +6,7 @@ import {
   CustomTabsContent,
   CustomTabsList,
   CustomTabsTrigger,
-} from "@/components/stateless/custom-tabs"
+} from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"

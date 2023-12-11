@@ -1,7 +1,7 @@
 import { ChevronDown, Percent } from "lucide-react"
 import React from "react"
 
-import { NumericInput } from "@/components/stateless/numeric-input"
+import { NumericInput } from "@/components/numeric-input"
 import { Button } from "@/components/ui/button"
 import {
   Collapsible,

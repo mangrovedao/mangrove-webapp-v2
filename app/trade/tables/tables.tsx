@@ -1,3 +1,4 @@
+"use client"
 import React from "react"
 
 import {
@@ -5,9 +6,12 @@ import {
   CustomTabsContent,
   CustomTabsList,
   CustomTabsTrigger,
-} from "@/components/stateless/custom-tabs"
+} from "@/components/custom-tabs"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
+import { StringParam, useQueryParam } from "use-query-params"
+import { Fills } from "./fills/fills"
 import { Orders } from "./orders/orders"
 
 export enum TradeTables {
@@ -17,17 +21,20 @@ export enum TradeTables {
 
 const TABS_CONTENT = {
   [TradeTables.ORDERS]: Orders,
-  [TradeTables.FILLS]: <div>TODO</div>,
+  [TradeTables.FILLS]: Fills,
 }
 
 export function Tables({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
+  const [tabParam, setTabParam] = useQueryParam("tab", StringParam)
+
   return (
     <CustomTabs
       {...props}
-      defaultValue={Object.values(TradeTables)[0]}
+      defaultValue={tabParam ?? Object.values(TradeTables)[0]}
+      onValueChange={setTabParam}
       className={cn(className)}
     >
       <CustomTabsList className="w-full flex justify-start border-b">
@@ -41,10 +48,18 @@ export function Tables({
           </CustomTabsTrigger>
         ))}
       </CustomTabsList>
-      <div className="h-full w-full px-2 py-4">
+      <div className="w-full py-4 px-1">
         {Object.values(TradeTables).map((table) => (
-          <CustomTabsContent key={`${table}-content`} value={table}>
-            {renderElement(TABS_CONTENT[table])}
+          <CustomTabsContent
+            key={`${table}-content`}
+            value={table}
+            style={{ height: "var(--history-table-content-height)" }}
+          >
+            <ScrollArea className="h-full" scrollHideDelay={200}>
+              <div className="px-2">{renderElement(TABS_CONTENT[table])}</div>
+              <ScrollBar orientation="vertical" className="z-50" />
+              <ScrollBar orientation="horizontal" className="z-50" />
+            </ScrollArea>
           </CustomTabsContent>
         ))}
       </div>

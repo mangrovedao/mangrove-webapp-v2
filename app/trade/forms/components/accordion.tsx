@@ -12,7 +12,12 @@ type Props = {
   className?: string
   defaultOpen?: boolean | undefined
 }
-export function Accordion({ title, children, defaultOpen, className }: Props) {
+export function Accordion({
+  title,
+  children,
+  defaultOpen = false,
+  className,
+}: Props) {
   return (
     <Collapsible
       className={cn("w-full cursor-pointer group", className)}
@@ -30,7 +35,12 @@ export function Accordion({ title, children, defaultOpen, className }: Props) {
         </button>
       </CollapsibleTrigger>
 
-      <CollapsibleContent className="space-y-2">{children}</CollapsibleContent>
+      <CollapsibleContent
+        className="space-y-2 data-[state=closed]:hidden"
+        forceMount
+      >
+        {children}
+      </CollapsibleContent>
     </Collapsible>
   )
 }

@@ -33,6 +33,7 @@ export default {
           foreground: "hsl(var(--primary-foreground))",
           "dark-green": "hsl(var(--color-primary-dark-geen))",
           "solid-black": "hsl(var(--color-primary-solid-black))",
+          "night-woods": "hsl(var(--color-primary-night-woods))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -70,11 +71,13 @@ export default {
         },
         gray: {
           DEFAULT: "hsl(var(--color-gray))",
+          "scale-100": "hsl(var(--color-gray-scale-100)) ",
           "scale-200": "hsl(var(--color-gray-scale-200)) ",
           "scale-300": "hsl(var(--color-gray-scale-300)) ",
           "scale-400": "hsl(var(--color-gray-scale-400)) ",
           "scale-500": "hsl(var(--color-gray-scale-500)) ",
           "scale-600": "hsl(var(--color-gray-scale-600)) ",
+          "scale-700": "hsl(var(--color-gray-scale-700)) ",
         },
         red: {
           100: "hsl(var(--color-red-100))",

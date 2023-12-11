@@ -29,7 +29,7 @@ const RadioGroupItem = React.forwardRef<
       className={cn(
         `pb-0.5 pt-1 px-2 text-secondary rounded-2xl border text-sm leading-[22px] font-normal
             hover:cursor-pointer border-primary-dark-green
-            ring-offset-background focus:outline-none focus-visible:ring-2 transition-colors
+            ring-offset-primary-dark-green focus:outline-none focus-visible:ring-2 transition-colors
             focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:border-gray-scale-600 disabled:text-gray-scale-400
             hover:text-green-caribbean active:text-green-bangladesh
             aria-checked:border-green-bangladesh aria-checked:hover:border-green-caribbean aria-checked:text-white aria-checked:active:text-gray`,

@@ -16,6 +16,88 @@ export function ChevronDown(props: React.ComponentProps<"svg">) {
   )
 }
 
+export function ChevronRight(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 16 16"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M6.5 11l3-3-3-3"
+      ></path>
+    </svg>
+  )
+}
+
+export function Pen(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.313"
+        d="M14.333 6.75l2.917 2.917-7.583 7.583H6.75v-2.917l7.583-7.583z"
+      ></path>
+    </svg>
+  )
+}
+
+export function Close(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M17 7L7 17M7 7l10 10"
+      ></path>
+    </svg>
+  )
+}
+
+export function ExclamationMark(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="52"
+      height="52"
+      fill="none"
+      viewBox="0 0 52 52"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="3"
+        d="M23.36 10.582L9.44 33.82a3.287 3.287 0 002.81 4.93h27.84a3.286 3.286 0 002.81-4.93L28.98 10.582a3.287 3.287 0 00-5.62 0zM26.17 19.03v6.573M26.17 32.177h.017"
+      ></path>
+    </svg>
+  )
+}
+
 export function Bell(props: React.ComponentProps<"svg">) {
   return (
     <svg

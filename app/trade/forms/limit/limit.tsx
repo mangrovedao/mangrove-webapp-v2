@@ -2,17 +2,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { Token } from "@mangrovedao/mangrove.js"
 import type { ValidationError } from "@tanstack/react-form"
-import { LucideChevronRight } from "lucide-react"
 import React from "react"
 
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
-} from "@/components/stateless/custom-radio-group"
+} from "@/components/custom-radio-group"
 import {
   NumericInput,
   type NumericInputProps,
-} from "@/components/stateless/numeric-input"
+} from "@/components/numeric-input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -168,7 +167,7 @@ export function Limit() {
               {(field) => {
                 return (
                   <div className="grid text-md space-y-2">
-                    <Label>Time in force</Label>
+                    <Label>Time in force {field.state.value}</Label>
                     <Select
                       name={field.name}
                       value={field.state.value}
@@ -282,18 +281,10 @@ export function Limit() {
                   size={"lg"}
                   type="submit"
                   disabled={!canSubmit || !market}
+                  rightIcon
+                  loading={!!isSubmitting}
                 >
-                  {isSubmitting ? "Processing..." : tradeAction}
-                  <div
-                    className={cn(
-                      "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
-                      {
-                        "opacity-10": !market,
-                      },
-                    )}
-                  >
-                    <LucideChevronRight className="h-4 text-current" />
-                  </div>
+                  {tradeAction}
                 </Button>
               )
             }}

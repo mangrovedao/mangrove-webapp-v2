@@ -24,7 +24,7 @@ CustomRadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 const customRadioGroupItemVariants = cva(
   `w-full text-secondary rounded-3xl border border-transparent  aria-checked:text-primary
   hover:cursor-pointer hover:text-primary transition-colors
-  ring-offset-background focus:outline-none focus-visible:ring-2 py-2 px-3
+  ring-offset-primary-dark-green focus:outline-none focus-visible:ring-2 py-2 px-3
   focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-sm font-medium`,
   {
     variants: {

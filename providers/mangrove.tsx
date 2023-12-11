@@ -67,12 +67,12 @@ const useMangroveContext = () => {
     if (chain?.id) close()
   }, [chain?.id, close])
 
-  // Close wrong network alert dialog after connecting to the right network
+  // Close wrong network alert dialog after connecting to the right network or if mangrove has successfully been instantiated
   React.useEffect(() => {
-    if (!chain?.unsupported) {
+    if (!chain?.unsupported || mangrove?.address) {
       networkService.closeWrongNetworkAlertDialog()
     }
-  }, [chain?.unsupported])
+  }, [chain?.unsupported, mangrove?.address])
 
   return { mangrove, marketsInfoQuery }
 }
@@ -95,7 +95,7 @@ const useMangrove = () => {
   const mangroveCtx = React.useContext(MangroveContext)
   if (!mangroveCtx) {
     throw new Error(
-      "mangroveCtx must be used within the MangroveContext.Provider",
+      "useMangrove must be used within the MangroveContext.Provider",
     )
   }
   return mangroveCtx

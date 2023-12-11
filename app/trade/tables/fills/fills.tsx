@@ -1,14 +1,14 @@
 "use client"
 
 import { DataTable } from "../data-table"
-import { useOrders } from "./use-orders"
+import { useFills } from "./use-fills"
 import { useTable } from "./use-table"
 
-export function Orders() {
-  const ordersQuery = useOrders()
+export function Fills() {
+  const fillsQuery = useFills()
 
   const table = useTable({
-    data: ordersQuery.data,
+    data: fillsQuery.data,
     onEdit: () => {
       console.log("edit")
     },

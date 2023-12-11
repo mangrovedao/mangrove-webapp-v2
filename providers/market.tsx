@@ -3,13 +3,17 @@
 import type Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { StringParam, useQueryParam } from "use-query-params"
+import { useAccount, useNetwork } from "wagmi"
 
 import { marketInfoToMarketParams } from "@/utils/market"
+import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
+  const [marketParam, setMarketParam] = useQueryParam("market", StringParam)
   const { chain } = useNetwork()
+  const { address } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
   const [marketInfo, setMarketInfo] = React.useState<Mangrove.OpenMarketInfo>()
 
@@ -35,11 +39,40 @@ const useMarketContext = () => {
     refetchOnWindowFocus: false,
   })
 
+  const olKeys = React.useMemo(() => {
+    if (!(mangrove && market)) return undefined
+    const ask: TokenAndOlkey = {
+      token: market.base,
+      olKey: mangrove.calculateOLKeyHash(market.olKeyBaseQuote),
+    }
+    const bid: TokenAndOlkey = {
+      token: market.quote,
+      olKey: mangrove.calculateOLKeyHash(market.olKeyQuoteBase),
+    }
+    return {
+      ask,
+      bid,
+    }
+  }, [mangrove, market])
+
   // create and store market instance from marketInfo
   React.useEffect(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
-    setMarketInfo(marketsInfoQuery.data[0])
-  }, [chain?.id, mangrove, marketsInfoQuery.data])
+    const [baseSymbol, quoteSymbol] = marketParam?.split(",") ?? []
+    const defaultMarketInfo =
+      marketsInfoQuery.data.find((marketInfo) => {
+        return (
+          marketInfo.base.symbol?.toLowerCase() === baseSymbol?.toLowerCase() &&
+          marketInfo.quote.symbol?.toLowerCase() === quoteSymbol?.toLowerCase()
+        )
+      }) ?? marketsInfoQuery.data[0]
+    setMarketInfo(defaultMarketInfo)
+  }, [chain?.id, mangrove, marketParam, marketsInfoQuery.data])
+
+  React.useEffect(() => {
+    if (!marketInfo) return
+    setMarketParam(`${marketInfo.base.symbol},${marketInfo.quote.symbol}`)
+  }, [marketInfo, setMarketParam])
 
   const updateOrderbook = React.useCallback(() => {
     if (!market) return
@@ -60,6 +93,7 @@ const useMarketContext = () => {
     requestBookQuery,
     market,
     marketInfo,
+    olKeys,
   }
 }
 
@@ -78,13 +112,11 @@ export function MarketProvider({ children }: React.PropsWithChildren) {
 }
 
 const useMarket = () => {
-  const mangroveCtx = React.useContext(MarketContext)
-  if (!mangroveCtx) {
-    throw new Error(
-      "mangroveCtx must be used within the MarketContext.Provider",
-    )
+  const marketCtx = React.useContext(MarketContext)
+  if (!marketCtx) {
+    throw new Error("useMarket must be used within the MarketContext.Provider")
   }
-  return mangroveCtx
+  return marketCtx
 }
 
 export default useMarket

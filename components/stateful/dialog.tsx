@@ -21,7 +21,7 @@ export function Dialog() {
             if (isClosing) {
               return (
                 <Root.DialogClose key={id} aria-label={id}>
-                  <Button {...props} variant={"outline"}>
+                  <Button {...props} variant={"tertiary"}>
                     Close
                   </Button>
                 </Root.DialogClose>
