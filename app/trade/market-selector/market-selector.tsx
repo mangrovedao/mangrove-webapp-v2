@@ -24,7 +24,7 @@ function getValue(market: Mangrove.OpenMarketInfo) {
 
 export default function MarketSelector() {
   const { marketsInfoQuery } = useMangrove()
-  const { market, setMarketInfo } = useMarket()
+  const { marketInfo, setMarketInfo } = useMarket()
   const { isConnected } = useAccount()
 
   const onValueChange = (value: string) => {
@@ -36,32 +36,34 @@ export default function MarketSelector() {
     setMarketInfo(marketInfo)
   }
 
-  const value = market ? getValue(market) : undefined
-
   return (
     <Select
-      value={value}
+      value={
+        marketInfo
+          ? `${marketInfo?.base.address}/${marketInfo?.quote.address}`
+          : undefined
+      }
       onValueChange={onValueChange}
-      disabled={marketsInfoQuery.isLoading || !market || !isConnected}
+      disabled={marketsInfoQuery.isLoading || !marketInfo || !isConnected}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
         <SelectValue
-          placeholder={!market ? "Select a market" : "No markets"}
+          placeholder={!marketInfo ? "Select a market" : "No markets"}
           suppressHydrationWarning
         />
       </SelectTrigger>
       <SelectContent>
-        {marketsInfoQuery.data?.map((market) => (
+        {marketsInfoQuery.data?.map((m) => (
           <SelectItem
-            key={`${market.base.address}/${market.quote.address}`}
-            value={getValue(market)}
+            key={`${m.base.address}/${m.quote.address}`}
+            value={getValue(m)}
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">
-                <TokenIcon symbol={market.base.symbol} />
-                <TokenIcon symbol={market.quote.symbol} />
+                <TokenIcon symbol={m.base.symbol} />
+                <TokenIcon symbol={m.quote.symbol} />
               </div>
-              <span>{getSymbol(market)}</span>
+              <span>{getSymbol(m)}</span>
             </div>
           </SelectItem>
         ))}

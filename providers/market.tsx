@@ -4,7 +4,7 @@ import type Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { StringParam, useQueryParam } from "use-query-params"
-import { useNetwork } from "wagmi"
+import { useAccount, useNetwork } from "wagmi"
 
 import { marketInfoToMarketParams } from "@/utils/market"
 import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
@@ -13,6 +13,7 @@ import useMangrove from "./mangrove"
 const useMarketContext = () => {
   const [marketParam, setMarketParam] = useQueryParam("market", StringParam)
   const { chain } = useNetwork()
+  const { address } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
   const [marketInfo, setMarketInfo] = React.useState<Mangrove.OpenMarketInfo>()
 
