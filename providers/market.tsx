@@ -3,13 +3,15 @@
 import type Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
+import { StringParam, useQueryParam } from "use-query-params"
 import { useNetwork } from "wagmi"
 
 import { marketInfoToMarketParams } from "@/utils/market"
-import { TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
+import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
+  const [marketParam, setMarketParam] = useQueryParam("market", StringParam)
   const { chain } = useNetwork()
   const { mangrove, marketsInfoQuery } = useMangrove()
   const [marketInfo, setMarketInfo] = React.useState<Mangrove.OpenMarketInfo>()
@@ -55,8 +57,21 @@ const useMarketContext = () => {
   // create and store market instance from marketInfo
   React.useEffect(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
-    setMarketInfo(marketsInfoQuery.data[0])
-  }, [chain?.id, mangrove, marketsInfoQuery.data])
+    const [baseSymbol, quoteSymbol] = marketParam?.split(",") ?? []
+    const defaultMarketInfo =
+      marketsInfoQuery.data.find((marketInfo) => {
+        return (
+          marketInfo.base.symbol?.toLowerCase() === baseSymbol?.toLowerCase() &&
+          marketInfo.quote.symbol?.toLowerCase() === quoteSymbol?.toLowerCase()
+        )
+      }) ?? marketsInfoQuery.data[0]
+    setMarketInfo(defaultMarketInfo)
+  }, [chain?.id, mangrove, marketParam, marketsInfoQuery.data])
+
+  React.useEffect(() => {
+    if (!marketInfo) return
+    setMarketParam(`${marketInfo.base.symbol},${marketInfo.quote.symbol}`)
+  }, [marketInfo, setMarketParam])
 
   const updateOrderbook = React.useCallback(() => {
     if (!market) return
