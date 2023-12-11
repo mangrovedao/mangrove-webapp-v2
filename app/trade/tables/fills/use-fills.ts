@@ -36,29 +36,14 @@ export function useFills<T = Fill[]>({
     ],
     queryFn: async () => {
       if (!(indexerSdk && address && olKeys)) return []
-      try {
-        console.log(
-          JSON.stringify({
-            ask: olKeys.ask.olKey,
-            askAddress: olKeys.ask.token.address,
-            bid: olKeys.bid.olKey,
-            bidAddress: olKeys.bid.token.address,
-            maker: address.toLowerCase(),
-          }),
-        )
-        const result = await indexerSdk.getOrdersHistory({
-          ask: olKeys.ask,
-          bid: olKeys.bid,
-          first,
-          skip,
-          maker: address.toLowerCase(),
-        })
-        console.log({ result })
-        return parseFills(result)
-      } catch (error) {
-        console.log({ error })
-        return []
-      }
+      const result = await indexerSdk.getOrdersHistory({
+        ask: olKeys.ask,
+        bid: olKeys.bid,
+        first,
+        skip,
+        maker: address.toLowerCase(),
+      })
+      return parseFills(result)
     },
     select,
     meta: {
