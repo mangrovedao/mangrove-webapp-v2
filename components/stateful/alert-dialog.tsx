@@ -2,8 +2,38 @@
 import * as Root from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { useAlertDialogStore } from "@/stores/alert-dialog.store"
-import { ExclamationMark } from "@/svgs"
+import { Check, ExclamationMark } from "@/svgs"
 import { cn } from "@/utils"
+
+function AlertDialogIcon({
+  type,
+}: {
+  type: "error" | "success" | "info" | "confirm" | undefined
+}) {
+  return (
+    <>
+      <div className="w-full flex justify-center mb-8">
+        <div
+          className={cn(
+            "w-16 aspect-square rounded-lg flex items-center justify-center",
+            {
+              "bg-red-500 text-red-100": type === "error",
+              "bg-primary-dark-green text-green-caribbean": type === "success",
+            },
+          )}
+        >
+          {type === "error" ? <ExclamationMark /> : <Check />}
+        </div>
+      </div>
+
+      <img
+        src={`/assets/illustrations/${type}-chameleon.webp`}
+        alt="red chameleon illustration"
+        className="absolute top-1 left-0 w-1/2 aspect-auto -translate-y-3/4"
+      />
+    </>
+  )
+}
 
 // TODO: handle all types "Success" "Warning" "Info"
 export function AlertDialog() {
@@ -14,24 +44,13 @@ export function AlertDialog() {
       <div className="w-full h-full relative">
         <Root.AlertDialogContent
           className={cn("p-8 max-w-md", {
-            "border-red-500 border-2 error-shadow": type === "error",
+            "border-red-500 border-2 !shadow-error": type === "error",
+            "border-primary-dark-green border-2 !shadow-success":
+              type === "success",
           })}
         >
           <Root.AlertDialogHeader>
-            {type === "error" ? (
-              <>
-                <div className="w-full flex justify-center mb-8">
-                  <div className="w-16 aspect-square bg-red-500 text-red-100 rounded-lg flex items-center justify-center">
-                    <ExclamationMark />
-                  </div>
-                </div>
-                <img
-                  src="/assets/illustrations/error-chameleon.webp"
-                  alt="red chameleon illustration"
-                  className="absolute top-1 left-0 w-1/3 aspect-auto -translate-y-3/4"
-                />
-              </>
-            ) : undefined}
+            <AlertDialogIcon type={type} />
             <Root.AlertDialogTitle className="text-center text-2xl font-medium">
               {title}
             </Root.AlertDialogTitle>

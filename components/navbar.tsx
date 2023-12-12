@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
+import { toast } from "sonner"
 import { useAccount, useDisconnect, useNetwork } from "wagmi"
 
 import { Button } from "@/components/ui/button"
@@ -171,6 +172,7 @@ function RightPart() {
             <DropdownMenuItem
               onClick={() => {
                 address && navigator.clipboard.writeText(address)
+                toast.success("Address copied to clipboard")
               }}
             >
               <Copy className="mr-2 h-4 w-4" />
