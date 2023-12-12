@@ -2,7 +2,6 @@
 
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { Chains } from "@mangrovedao/indexer-sdk/dist/src/types/types"
-import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
@@ -35,7 +34,10 @@ const useIndexerSdkContext = () => {
               throw new Error("Impossible to determine token decimals")
             return Promise.resolve(token.decimals)
           },
-          createTickHelpers: (ba, market) => new TickPriceHelper(ba, market),
+          createTickHelpers: (ba, market) => {
+            // TODO: get market from marketsInfoQuery.data
+            market.getSemibook(ba).tickPriceHelper
+          },
         },
       })
     },

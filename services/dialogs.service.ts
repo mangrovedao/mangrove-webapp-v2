@@ -7,7 +7,6 @@ function open({
   actionButtons = [
     {
       id: "cancel",
-      value: "toto",
     },
   ],
   type,

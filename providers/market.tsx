@@ -1,19 +1,17 @@
 "use client"
 
+import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import type Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { StringParam, useQueryParam } from "use-query-params"
-import { useAccount, useNetwork } from "wagmi"
+import { useNetwork } from "wagmi"
 
-import { marketInfoToMarketParams } from "@/utils/market"
-import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
   const [marketParam, setMarketParam] = useQueryParam("market", StringParam)
   const { chain } = useNetwork()
-  const { address } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
   const [marketInfo, setMarketInfo] = React.useState<Mangrove.OpenMarketInfo>()
 
@@ -22,7 +20,7 @@ const useMarketContext = () => {
     queryKey: ["market", marketInfo?.base.symbol, marketInfo?.quote.symbol],
     queryFn: () => {
       if (!marketInfo) return
-      return mangrove?.market(marketInfoToMarketParams(marketInfo))
+      return mangrove?.market(marketInfo)
     },
     enabled: !!marketInfo,
     refetchOnWindowFocus: false,
@@ -30,7 +28,7 @@ const useMarketContext = () => {
 
   const requestBookQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["orderbook", market?.base.symbol, market?.quote.symbol],
+    queryKey: ["orderbook", market?.base.id, market?.quote.id],
     queryFn: () => {
       if (!market) return null
       return market.requestBook()
@@ -58,12 +56,12 @@ const useMarketContext = () => {
   // create and store market instance from marketInfo
   React.useEffect(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
-    const [baseSymbol, quoteSymbol] = marketParam?.split(",") ?? []
+    const [baseId, quoteId] = marketParam?.split(",") ?? []
     const defaultMarketInfo =
       marketsInfoQuery.data.find((marketInfo) => {
         return (
-          marketInfo.base.symbol?.toLowerCase() === baseSymbol?.toLowerCase() &&
-          marketInfo.quote.symbol?.toLowerCase() === quoteSymbol?.toLowerCase()
+          marketInfo.base.id?.toLowerCase() === baseId?.toLowerCase() &&
+          marketInfo.quote.id?.toLowerCase() === quoteId?.toLowerCase()
         )
       }) ?? marketsInfoQuery.data[0]
     setMarketInfo(defaultMarketInfo)
@@ -71,7 +69,7 @@ const useMarketContext = () => {
 
   React.useEffect(() => {
     if (!marketInfo) return
-    setMarketParam(`${marketInfo.base.symbol},${marketInfo.quote.symbol}`)
+    setMarketParam(`${marketInfo.base.id},${marketInfo.quote.id}`)
   }, [marketInfo, setMarketParam])
 
   const updateOrderbook = React.useCallback(() => {

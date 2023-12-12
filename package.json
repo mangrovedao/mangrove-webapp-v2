@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
-    "@mangrovedao/indexer-sdk": "0.0.11-4",
+    "@mangrovedao/indexer-sdk": "0.0.11-5",
     "@mangrovedao/mangrove.js": "2.0.0-13",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-checkbox": "^1.0.4",

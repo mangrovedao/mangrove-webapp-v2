@@ -8,7 +8,7 @@ import { shortenAddress } from "@/utils/wallet"
 // open the alert dialog saying that the network is wrong
 function openTxCompletedDialog({
   title = "Transaction Completed",
-  address = "0x1234567890123456789012345678901234567890",
+  address,
 }: {
   title?: React.ReactNode
   address: string
@@ -49,6 +49,49 @@ function openTxCompletedDialog({
   })
 }
 
+function openTxFailedDialog({
+  title = "Transaction Reverted",
+  address,
+}: {
+  title?: React.ReactNode
+  address: string
+}) {
+  dialogs.open({
+    title,
+    children: (
+      <div className="space-y-4">
+        <div>Your transaction request has been reverted.</div>
+        <div className="bg-primary-dark-green rounded-lg py-3 px-4 flex items-center justify-between">
+          <span>View on block explorer</span>
+
+          <Button
+            className="flex items-center space-x-1 underline"
+            variant={"link"}
+            onClick={() => {
+              address && navigator.clipboard.writeText(address)
+              toast.success("Address copied to clipboard")
+            }}
+          >
+            <span>{shortenAddress(address ?? "")}</span>
+            <Copy className="mr-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    ),
+    actionButtons: [
+      {
+        onClick: () => alert("hello"),
+        children: "Close",
+        id: "close-tx-completed-dialog",
+        className: "w-full",
+        rightIcon: true,
+      },
+    ],
+    type: "error",
+  })
+}
+
 export const tradeService = {
   openTxCompletedDialog,
+  openTxFailedDialog,
 }
