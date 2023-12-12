@@ -14,17 +14,17 @@ const Ticks = ({
 }) => {
   return (
     <div
-      className={cn("flex gap-4 absolute left-3", {
+      className={cn("flex gap-4 absolute left-2", {
         "top-[9px]": position === "top",
         "bottom-[9px]": position === "bottom",
       })}
     >
-      {Array.from({ length: 16 }, (_, index) => (
+      {Array.from({ length: 15 }, (_, index) => (
         <span
           key={`slider-top-decoration-${index}`}
           className={cn("h-[2px] w-[2px] rounded-full bg-green-bangladesh", {
-            "bg-green-caribbean": (Number(value) / 100) * 16 > index,
-            "bg-muted": (Number(value) / 100) * 16 <= index,
+            "bg-green-caribbean": (Number(value) / 100) * 15 > index,
+            "bg-muted": (Number(value) / 100) * 15 <= index,
           })}
         />
       ))}

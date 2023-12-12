@@ -34,7 +34,6 @@ export function Market() {
     sendTokenBalance,
     handleSubmit,
     form,
-    quote,
     market,
     sendToken,
     receiveToken,
@@ -139,7 +138,7 @@ export function Market() {
           </form.Field>
           <form.Field name="sliderPercentage">
             {(field) => (
-              <div className="space-y-5 pt-2">
+              <div className="space-y-5 pt-2 px-3">
                 {/* Render the slider component */}
                 <Slider
                   name={field.name}

@@ -37,22 +37,33 @@ export function useLimit() {
       } = values
       if (!mangrove || !market) return
       try {
+        // tradeAction === TradeAction.BUY
+        // ? reactionToken.mgvToken
+        // : actionToken.mgvToken
+
         // DOUBLE Approval for limit order's explanation:
         /** limit orders first calls take() on the underlying contract which consumes the given amount of allowance,
         then if it posts an offer, then it transfers the tokens back to the wallet, and the offer then consumes up to the given amount of allowance 
         */
-        const spender = await mangrove?.orderContract.router()
+        const isBuy = tradeAction === TradeAction.BUY
+        const spender = mangrove?.address
         if (!spender) return
+
         const { baseQuoteToSendReceive } =
           TRADEMODE_AND_ACTION_PRESENTATION.limit[tradeAction]
         const [sendToken, receiveToken] = baseQuoteToSendReceive(
           market.base,
           market.quote,
         )
+
         const sendToFixed = Big(send).toFixed(sendToken.decimals)
+        const valuePlusSlippageAndSomeExtra = Big(sendToFixed)
+          .mul(100 + slippagePercentage)
+          .div(100)
+
         const receiveToFixed = Big(receive).toFixed(receiveToken.decimals)
-        await sendToken.increaseApproval(spender, sendToFixed)
-        const isBuy = tradeAction === TradeAction.BUY
+        await sendToken.approve(spender, valuePlusSlippageAndSomeExtra)
+
         let orderParams: Market.TradeParams = {
           wants: receiveToFixed,
           gives: sendToFixed,
@@ -78,20 +89,17 @@ export function useLimit() {
   })
   const tradeAction = form.useStore((state) => state.values.tradeAction)
   const send = form.useStore((state) => state.values.send)
-  const base = market?.base
-  const quote = market?.quote
+  const baseToken = market?.base
+  const quoteToken = market?.quote
+
   const { baseQuoteToSendReceive } =
-    TRADEMODE_AND_ACTION_PRESENTATION.limit[tradeAction]
-  const [sendToken, receiveToken] = baseQuoteToSendReceive(base, quote)
+    TRADEMODE_AND_ACTION_PRESENTATION.market[tradeAction]
+  const [sendToken, receiveToken] = baseQuoteToSendReceive(
+    baseToken,
+    quoteToken,
+  )
+
   const sendTokenBalance = useTokenBalance(sendToken)
-  const fee =
-    (tradeAction === TradeAction.BUY
-      ? marketInfo?.asksConfig?.fee
-      : marketInfo?.bidsConfig?.fee) ?? 0
-  const feeInPercentageAsString = new Intl.NumberFormat("en-US", {
-    style: "percent",
-    maximumFractionDigits: 2,
-  }).format(fee / 10_000)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -99,21 +107,29 @@ export function useLimit() {
     void form.handleSubmit()
   }
 
-  function computeReceiveAmount() {
-    const limitPrice = 1
+  async function computeReceiveAmount() {
     const send = form.state.values.send
-    if (send === "") return
-    const divider = Number(limitPrice) !== 0 ? Number(limitPrice) : 1
-    const receive = Big(Number(send ?? 0))
-      .div(divider)
-      .toString()
+    if (!send) return
+    // const estimatedVolume = await market?.estimateVolume({
+    //   given: Big(send),
+    //   what: "base",
+    //   to: tradeAction,
+    // })
+
+    const estimatedVolume = await market?.estimateVolumeToReceive({
+      given: Big(send),
+      what: "quote",
+    })
+
+    console.log(JSON.stringify(estimatedVolume))
+
     form.store.setState(
       (state) => {
         return {
           ...state,
           values: {
             ...state.values,
-            receive,
+            receive: estimatedVolume?.estimatedVolume.toString() || "",
           },
         }
       },
@@ -124,20 +140,28 @@ export function useLimit() {
     form.validateAllFields("submit")
   }
 
-  function computeSendAmount() {
-    const limitPrice = 1
+  async function computeSendAmount() {
     const receive = form.state.values.receive
-    if (receive === "") return
-    const send = Big(Number(limitPrice ?? 0))
-      .mul(Number(receive ?? 0))
-      .toString()
+    if (!receive) return
+    // const estimatedVolume = await market?.estimateVolume({
+    //   given: Big(receive),
+    //   what: "quote",
+    //   to: tradeAction,
+    // })
+    const estimatedVolume = await market?.estimateVolumeToSpend({
+      given: Big(receive),
+      what: "base",
+    })
+
+    console.log(JSON.stringify(estimatedVolume))
+
     form.store.setState(
       (state) => {
         return {
           ...state,
           values: {
             ...state.values,
-            send,
+            send: estimatedVolume?.estimatedVolume.toString() || "",
           },
         }
       },
@@ -158,12 +182,11 @@ export function useLimit() {
     sendTokenBalance,
     handleSubmit,
     form,
-    quote,
     market,
     sendToken,
     send,
     receiveToken,
     marketInfo,
-    feeInPercentageAsString,
+    feeInPercentageAsString: "2",
   }
 }
