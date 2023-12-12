@@ -10,11 +10,9 @@ export function filterOpenMarketsWithMarketConfig(
   if (!marketsConfig) return []
   return openMarkets.filter(({ base, quote }) => {
     return marketsConfig[chainId.toString()]?.some(
-      ([baseId, quoteId]) =>
-        (base.id.toLowerCase() === baseId?.toLowerCase() &&
-          quote.id.toLowerCase() === quoteId?.toLowerCase()) ||
-        (quote.id.toLowerCase() === baseId?.toLowerCase() &&
-          base.id.toLowerCase() === quoteId?.toLowerCase()),
+      ([tokenAId, tokenBId]) =>
+        (base.id === tokenAId && quote.id === tokenBId) ||
+        (quote.id === tokenAId && base.id === tokenBId),
     )
   })
 }

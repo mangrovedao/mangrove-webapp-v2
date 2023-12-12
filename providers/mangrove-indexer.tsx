@@ -8,7 +8,7 @@ import { useNetwork } from "wagmi"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
-  const { marketsInfoQuery } = useMangrove()
+  const { marketsInfoQuery, mangrove } = useMangrove()
   const { chain } = useNetwork()
 
   const indexerSdkQuery = useQuery({
@@ -34,9 +34,24 @@ const useIndexerSdkContext = () => {
               throw new Error("Impossible to determine token decimals")
             return Promise.resolve(token.decimals)
           },
-          createTickHelpers: (ba, market) => {
-            // TODO: get market from marketsInfoQuery.data
-            market.getSemibook(ba).tickPriceHelper
+          createTickHelpers: async (ba, m) => {
+            // TODO:
+            const marketInfo = marketsInfoQuery?.data?.find(
+              (t) =>
+                t.base.address.toLowerCase() === m.base.address.toLowerCase() &&
+                t.quote.address.toLowerCase() === m.quote.address.toLowerCase(),
+            )
+            if (!(mangrove && marketInfo)) {
+              throw new Error("Impossible to determine token decimals")
+            }
+            const market = await mangrove.market(marketInfo)
+            const tickPriceHelper = market.getSemibook(ba).tickPriceHelper
+            return {
+              priceFromTick: (tick: number) =>
+                tickPriceHelper.priceFromTick(tick),
+              inboundFromOutbound: (tick: number, outbound: Big) =>
+                tickPriceHelper.inboundFromOutbound(tick, outbound),
+            }
           },
         },
       })

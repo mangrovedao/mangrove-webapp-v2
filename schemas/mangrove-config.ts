@@ -5,7 +5,6 @@ import { getErrorMessage } from "@/utils/errors"
 import { stringToJSONSchema } from "./json"
 
 const tokenSchema = z.object({
-  decimals: z.number(),
   cashness: z.number(),
   displayedAsPriceDecimals: z.number(),
   displayedDecimals: z.number(),
