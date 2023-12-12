@@ -35,7 +35,6 @@ const useIndexerSdkContext = () => {
             return Promise.resolve(token.decimals)
           },
           createTickHelpers: async (ba, m) => {
-            // TODO:
             const marketInfo = marketsInfoQuery?.data?.find(
               (t) =>
                 t.base.address.toLowerCase() === m.base.address.toLowerCase() &&
@@ -49,7 +48,7 @@ const useIndexerSdkContext = () => {
             return {
               priceFromTick: (tick: number) =>
                 tickPriceHelper.priceFromTick(tick),
-              inboundFromOutbound: (tick: number, outbound: Big) =>
+              inboundFromOutbound: (tick: number, outbound: string) =>
                 tickPriceHelper.inboundFromOutbound(tick, outbound),
             }
           },
