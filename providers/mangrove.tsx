@@ -56,7 +56,9 @@ const useMangroveContext = () => {
     queryKey: ["whitelistedMarketsInfos", mangrove?.address, chain?.id],
     queryFn: async () => {
       if (!mangrove?.address || !chain?.id) return null
-      return getWhitelistedMarketsInfos(mangrove, chain.id)
+      const toto = await getWhitelistedMarketsInfos(mangrove, chain.id)
+      console.log(JSON.stringify({ toto }))
+      return toto
     },
     enabled: !!(mangrove?.address && chain?.id),
     refetchOnWindowFocus: false,

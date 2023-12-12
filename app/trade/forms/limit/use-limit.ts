@@ -33,7 +33,6 @@ export function useLimit() {
     onSubmit: async (values) => {
       const {
         tradeAction,
-        limitPrice,
         send,
         receive,
         timeInForce,
@@ -63,27 +62,10 @@ export function useLimit() {
           gives: sendToFixed,
         }
 
-        // let bounty = undefined
         const isGoodTilTime = timeInForce === TimeInForce.GOOD_TIL_TIME
         if (isGoodTilTime) {
-          // const onchainLP = await LiquidityProvider.connect(
-          //   mangrove.offerLogic("MangroveOrder"),
-          //   configuration.mangroveOrder.getRestingOrderGasreq(
-          //     market.mgv.network.name,
-          //   ),
-          //   market,
-          // )
-          // bounty = (
-          //   await (isBuy
-          //     ? onchainLP.computeBidProvision()
-          //     : onchainLP.computeAskProvision())
-          // ).mul(5)
           orderParams = {
             ...orderParams,
-            restingOrder: {
-              provision: "0.01",
-              // provision: bounty || "0",
-            },
             expiryDate: estimateTimestamp({
               timeToLiveUnit,
               timeToLive,

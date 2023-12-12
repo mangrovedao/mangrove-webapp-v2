@@ -13,9 +13,10 @@ import {
 
 interface DataTableProps<TData> {
   table: TableType<TData>
+  isError?: boolean
 }
 
-export function DataTable<TData>({ table }: DataTableProps<TData>) {
+export function DataTable<TData>({ table, isError }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
     .getAllLeafColumns()
@@ -71,7 +72,9 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
               colSpan={leafColumns.length}
               className="h-24 text-center text-muted-foreground"
             >
-              No results.
+              {isError
+                ? "Due to excessive demand, we are unable to return your data. Please try again later."
+                : "No results."}
             </TableCell>
           </TableRow>
         )}

@@ -6,30 +6,30 @@ import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
-import useMarket from "./market"
+import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
+  const { marketsInfoQuery } = useMangrove()
   const { chain } = useNetwork()
-  const { market } = useMarket()
 
   const indexerSdkQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [
-      "indexer-sdk",
-      chain?.network,
-      market?.base.address,
-      market?.quote.address,
-    ],
+    queryKey: ["indexer-sdk", chain?.network, marketsInfoQuery.dataUpdatedAt],
     queryFn: () => {
-      if (!(chain?.network && market)) return null
+      if (!(chain?.network && marketsInfoQuery.data)) return null
       const chainName = chain.network as Chains
       return getSdk({
         chainName,
         helpers: {
           getTokenDecimals: (address) => {
-            const tokens = [market.base, market.quote]
+            const marketInfo = marketsInfoQuery?.data?.find(
+              (t) =>
+                t.base.address.toLowerCase() === address.toLowerCase() ||
+                t.quote.address.toLowerCase() === address.toLowerCase(),
+            )
+            const tokens = [marketInfo?.base, marketInfo?.quote]
             const token = tokens.find(
-              (t) => t.address.toLowerCase() === address.toLowerCase(),
+              (t) => t?.address.toLowerCase() === address.toLowerCase(),
             )
             if (!token)
               throw new Error("Impossible to determine token decimals")
