@@ -7,7 +7,7 @@ export function baToBs(ba: Market.BA): Market.BS {
 export function bsToBa(bs: Market.BS): Market.BA {
   return bs === "buy" ? "asks" : "bids"
 }
-
+// FIXME: This function is not needed - Mangrove.OpenMarketInfo is already a Market.Key
 export function marketInfoToMarketParams(marketInfo: Mangrove.OpenMarketInfo) {
   return {
     base: marketInfo.base,

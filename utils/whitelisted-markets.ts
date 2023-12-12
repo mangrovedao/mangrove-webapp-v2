@@ -9,6 +9,7 @@ export function filterOpenMarketsWithMarketConfig(
   const marketsConfig = getJsonFromMarketsConfig()
   if (!marketsConfig) return []
   return openMarkets.filter(({ base, quote }) => {
+    // FIXME: This should be using token IDs instead of symbols
     return marketsConfig[chainId.toString()]?.some(
       ([baseSymbol, quoteSymbol]) =>
         base.symbol === baseSymbol && quote.symbol === quoteSymbol,

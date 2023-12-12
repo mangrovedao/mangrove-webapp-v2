@@ -22,6 +22,7 @@ const useMarketContext = () => {
     queryKey: ["market", marketInfo?.base.symbol, marketInfo?.quote.symbol],
     queryFn: () => {
       if (!marketInfo) return
+      // FIXME: No need to transform marketInfo here, it is already a Market.Key by definition
       return mangrove?.market(marketInfoToMarketParams(marketInfo))
     },
     enabled: !!marketInfo,
@@ -30,6 +31,7 @@ const useMarketContext = () => {
 
   const requestBookQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    // FIXME: This should probably not use token symbols but token IDs
     queryKey: ["orderbook", market?.base.symbol, market?.quote.symbol],
     queryFn: () => {
       if (!market) return null
@@ -58,6 +60,7 @@ const useMarketContext = () => {
   // create and store market instance from marketInfo
   React.useEffect(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
+    // FIXME: Why symbol and not ID here?
     const [baseSymbol, quoteSymbol] = marketParam?.split(",") ?? []
     const defaultMarketInfo =
       marketsInfoQuery.data.find((marketInfo) => {
@@ -71,6 +74,7 @@ const useMarketContext = () => {
 
   React.useEffect(() => {
     if (!marketInfo) return
+    // FIXME: Why symbol and not ID here?
     setMarketParam(`${marketInfo.base.symbol},${marketInfo.quote.symbol}`)
   }, [marketInfo, setMarketParam])
 

@@ -35,6 +35,7 @@ const useIndexerSdkContext = () => {
               throw new Error("Impossible to determine token decimals")
             return Promise.resolve(token.decimals)
           },
+          // FIXME: The web app should not create TickPriceHelpers. They are available on markets
           createTickHelpers: (ba, market) => new TickPriceHelper(ba, market),
         },
       })
