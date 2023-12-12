@@ -27,10 +27,9 @@ export function useFills<T = Fill[]>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "fills",
-      indexerSdk,
-      address,
       olKeys?.ask.token.address,
       olKeys?.bid.token.address,
+      address,
       first,
       skip,
     ],
@@ -49,6 +48,7 @@ export function useFills<T = Fill[]>({
     meta: {
       error: "Unable to retrieve fills",
     },
-    enabled: !!(isConnected && olKeys && indexerSdk),
+    enabled: !!(isConnected && indexerSdk && olKeys),
+    retry: false,
   })
 }
