@@ -54,11 +54,9 @@ const useMangroveContext = () => {
   const marketsInfoQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["whitelistedMarketsInfos", mangrove?.address, chain?.id],
-    queryFn: async () => {
+    queryFn: () => {
       if (!mangrove?.address || !chain?.id) return null
-      const toto = await getWhitelistedMarketsInfos(mangrove, chain.id)
-      console.log(JSON.stringify({ toto }))
-      return toto
+      return getWhitelistedMarketsInfos(mangrove, chain.id)
     },
     enabled: !!(mangrove?.address && chain?.id),
     refetchOnWindowFocus: false,
