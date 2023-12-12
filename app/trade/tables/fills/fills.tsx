@@ -1,10 +1,12 @@
 "use client"
 
-import { DataTable } from "../data-table"
+import useMarket from "@/providers/market"
+import { DataTable } from "../../../../components/ui/data-table/data-table"
 import { useFills } from "./use-fills"
 import { useTable } from "./use-table"
 
 export function Fills() {
+  const { market } = useMarket()
   const fillsQuery = useFills()
 
   const table = useTable({
@@ -16,5 +18,11 @@ export function Fills() {
       console.log("delete")
     },
   })
-  return <DataTable table={table} />
+  return (
+    <DataTable
+      table={table}
+      isError={!!fillsQuery.error}
+      isLoading={fillsQuery.isLoading || !market}
+    />
+  )
 }

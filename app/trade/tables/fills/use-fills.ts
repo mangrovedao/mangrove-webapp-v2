@@ -27,8 +27,8 @@ export function useFills<T = Fill[]>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "fills",
-      olKeys?.ask.token.address,
-      olKeys?.bid.token.address,
+      olKeys?.ask.token.address.toLowerCase(),
+      olKeys?.bid.token.address.toLowerCase(),
       address,
       first,
       skip,

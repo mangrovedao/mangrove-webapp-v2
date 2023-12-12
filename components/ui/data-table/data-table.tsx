@@ -10,13 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { LoadingBody } from "./loading-body"
 
 interface DataTableProps<TData> {
   table: TableType<TData>
   isError?: boolean
+  isLoading?: boolean
 }
 
-export function DataTable<TData>({ table, isError }: DataTableProps<TData>) {
+export function DataTable<TData>({
+  table,
+  isError,
+  isLoading,
+}: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
     .getAllLeafColumns()
@@ -42,7 +48,9 @@ export function DataTable<TData>({ table, isError }: DataTableProps<TData>) {
         ))}
       </TableHeader>
       <TableBody>
-        {rows?.length ? (
+        {isLoading ? (
+          <LoadingBody cells={leafColumns.length} rows={2} />
+        ) : rows?.length ? (
           rows.map((row) => (
             <TableRow
               key={row.id}

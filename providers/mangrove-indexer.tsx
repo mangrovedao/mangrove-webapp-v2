@@ -2,6 +2,7 @@
 
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { Chains } from "@mangrovedao/indexer-sdk/dist/src/types/types"
+import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
@@ -20,21 +21,13 @@ const useIndexerSdkContext = () => {
       return getSdk({
         chainName,
         helpers: {
-          getTokenDecimals: (address) => {
-            const marketInfo = marketsInfoQuery?.data?.find(
-              (t) =>
-                t.base.address.toLowerCase() === address.toLowerCase() ||
-                t.quote.address.toLowerCase() === address.toLowerCase(),
-            )
-            const tokens = [marketInfo?.base, marketInfo?.quote]
-            const token = tokens.find(
-              (t) => t?.address.toLowerCase() === address.toLowerCase(),
-            )
+          getTokenDecimals: async (address) => {
+            const token = await mangrove?.tokenFromAddress(address)
             if (!token)
               throw new Error("Impossible to determine token decimals")
-            return Promise.resolve(token.decimals)
+            return token.decimals
           },
-          createTickHelpers: async (ba, m) => {
+          createTickHelpers: (ba, m) => {
             const marketInfo = marketsInfoQuery?.data?.find(
               (t) =>
                 t.base.address.toLowerCase() === m.base.address.toLowerCase() &&
@@ -43,14 +36,7 @@ const useIndexerSdkContext = () => {
             if (!(mangrove && marketInfo)) {
               throw new Error("Impossible to determine token decimals")
             }
-            const market = await mangrove.market(marketInfo)
-            const tickPriceHelper = market.getSemibook(ba).tickPriceHelper
-            return {
-              priceFromTick: (tick: number) =>
-                tickPriceHelper.priceFromTick(tick),
-              inboundFromOutbound: (tick: number, outbound: string) =>
-                tickPriceHelper.inboundFromOutbound(tick, outbound),
-            }
+            return new TickPriceHelper(ba, marketInfo)
           },
         },
       })
