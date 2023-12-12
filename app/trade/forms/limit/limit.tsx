@@ -4,7 +4,6 @@ import type { Token } from "@mangrovedao/mangrove.js"
 import type { ValidationError } from "@tanstack/react-form"
 import React from "react"
 
-import { tradeService } from "@/app/trade/services/trade.service"
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
@@ -280,16 +279,10 @@ export function Limit() {
                 <Button
                   className="w-full flex items-center justify-center !mb-4 capitalize"
                   size={"lg"}
-                  // type="submit"
+                  type="submit"
                   disabled={!canSubmit || !market}
                   rightIcon
                   loading={!!isSubmitting}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    tradeService.openTxCompletedDialog({
-                      address: "0x1234567890123456789012345678901234567890",
-                    })
-                  }}
                 >
                   {tradeAction}
                 </Button>

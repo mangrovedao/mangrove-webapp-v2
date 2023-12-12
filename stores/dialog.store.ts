@@ -1,6 +1,7 @@
 import type React from "react"
 import { create, type StateCreator } from "zustand"
 
+import type { DialogType } from "@/components/stateful/dialogs/types"
 import type { Button } from "@/components/ui/button"
 
 export type ActionButton = React.ComponentProps<typeof Button> & {
@@ -9,11 +10,10 @@ export type ActionButton = React.ComponentProps<typeof Button> & {
 }
 
 export type DialogStore = {
-  type?: "info" | "confirm" | "error" | "success"
+  type?: DialogType
   opened: boolean
   title: React.ReactNode
   children?: React.ReactNode
-  description?: React.ReactNode
   actionButtons?: ActionButton[]
 }
 
@@ -28,7 +28,6 @@ export const dialogStateCreator: StateCreator<DialogStore & DialogActions> = (
   type: "info",
   title: "Dialog",
   children: undefined,
-  description: "This is a dialog.",
   /**
     * Example usage of actionButtons:
       actionButtons: [

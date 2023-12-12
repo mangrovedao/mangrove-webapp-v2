@@ -2,7 +2,7 @@ import { Copy } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
-import { alertDialogs } from "@/services/alert-dialogs.service"
+import { dialogs } from "@/services/dialogs.service"
 import { shortenAddress } from "@/utils/wallet"
 
 // open the alert dialog saying that the network is wrong
@@ -13,7 +13,7 @@ function openTxCompletedDialog({
   title?: React.ReactNode
   address: string
 }) {
-  alertDialogs.open({
+  dialogs.open({
     title,
     children: (
       <div className="space-y-4">
@@ -39,13 +39,13 @@ function openTxCompletedDialog({
     ),
     actionButtons: [
       {
-        onClick: alertDialogs.close,
+        onClick: dialogs.close,
         children: "Close",
         id: "close-tx-completed-dialog",
         className: "w-full",
       },
     ],
-    type: "success",
+    // type: "success",
   })
 }
 
