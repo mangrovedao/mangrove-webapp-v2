@@ -1,3 +1,4 @@
+import type { DialogType } from "@/components/stateful/dialogs/types"
 import { useDialogStore, type ActionButton } from "@/stores/dialog.store"
 
 function open({
@@ -9,17 +10,20 @@ function open({
       value: "toto",
     },
   ],
+  type,
 }: {
   children?: React.ReactNode
   title?: React.ReactNode
   description?: React.ReactNode
   actionButtons?: ActionButton[]
+  type?: DialogType
 }) {
   useDialogStore.setState({
     opened: true,
     title,
     children,
     actionButtons,
+    type,
   })
 }
 

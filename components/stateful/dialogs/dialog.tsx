@@ -9,15 +9,16 @@ import {
   titleClasses,
 } from "./styles"
 
-// TODO: handle all types "Success" "Error" "Warning" "Info"
+// TODO: handle all types "Warning" "Info"
 export function Dialog() {
-  const { opened, setOpened, title, children, actionButtons } = useDialogStore()
+  const { opened, setOpened, title, children, actionButtons, type } =
+    useDialogStore()
   return (
     <Root.Dialog open={opened} onOpenChange={setOpened}>
       <div className="w-full h-full relative">
-        <Root.DialogContent className={getContentClasses("success")}>
+        <Root.DialogContent className={getContentClasses(type)}>
           <Root.DialogHeader>
-            <Heading type={"success"} />
+            <Heading type={type} />
             <Root.DialogTitle className={titleClasses}>
               {title}
             </Root.DialogTitle>

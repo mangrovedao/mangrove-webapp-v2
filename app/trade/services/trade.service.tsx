@@ -20,7 +20,7 @@ function openTxCompletedDialog({
         <div>
           Your transaction request has been successfully and securely processed.
         </div>
-        <div className="bg-primary-dark-green rounded-lg px-3 py-4 flex items-center justify-between">
+        <div className="bg-primary-dark-green rounded-lg py-3 px-4 flex items-center justify-between">
           <span>View on block explorer</span>
 
           <Button
@@ -45,7 +45,7 @@ function openTxCompletedDialog({
         className: "w-full",
       },
     ],
-    // type: "success",
+    type: "success",
   })
 }
 
