@@ -36,7 +36,7 @@ const useIndexerSdkContext = () => {
             if (!(mangrove && marketInfo)) {
               throw new Error("Impossible to determine token decimals")
             }
-            return new TickPriceHelper(ba, marketInfo)
+            return Promise.resolve(new TickPriceHelper(ba, marketInfo))
           },
         },
       })
