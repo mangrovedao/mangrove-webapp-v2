@@ -1,4 +1,4 @@
-import type { DialogType } from "@/components/stateful/dialogs/types"
+import type { DialogType } from "@/components/dialogs/types"
 import { useDialogStore, type ActionButton } from "@/stores/dialog.store"
 
 function open({

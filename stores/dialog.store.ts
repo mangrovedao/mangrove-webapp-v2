@@ -1,7 +1,7 @@
 import type React from "react"
 import { create, type StateCreator } from "zustand"
 
-import type { DialogType } from "@/components/stateful/dialogs/types"
+import type { DialogType } from "@/components/dialogs/types"
 import type { Button } from "@/components/ui/button"
 
 export type ActionButton = React.ComponentProps<typeof Button> & {
