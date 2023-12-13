@@ -100,6 +100,7 @@ export function useLimit() {
   )
 
   const sendTokenBalance = useTokenBalance(sendToken)
+  let estimatedFeeAsString: string
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -109,18 +110,14 @@ export function useLimit() {
 
   async function computeReceiveAmount() {
     const send = form.state.values.send
-    if (!send) return
-    // const estimatedVolume = await market?.estimateVolume({
-    //   given: Big(send),
-    //   what: "base",
-    //   to: tradeAction,
-    // })
+    if (!send || !market) return
 
-    const estimatedVolume = await market?.estimateVolumeToReceive({
+    const { estimatedVolume, estimatedFee } = await market.estimateVolume({
       given: Big(send),
-      what: "quote",
+      what: "base",
+      to: tradeAction,
     })
-
+    estimatedFeeAsString = estimatedFee.toString()
     console.log(JSON.stringify(estimatedVolume))
 
     form.store.setState(
@@ -129,7 +126,7 @@ export function useLimit() {
           ...state,
           values: {
             ...state.values,
-            receive: estimatedVolume?.estimatedVolume.toString() || "",
+            receive: estimatedVolume.toString() || "",
           },
         }
       },
@@ -142,17 +139,15 @@ export function useLimit() {
 
   async function computeSendAmount() {
     const receive = form.state.values.receive
-    if (!receive) return
-    // const estimatedVolume = await market?.estimateVolume({
-    //   given: Big(receive),
-    //   what: "quote",
-    //   to: tradeAction,
-    // })
-    const estimatedVolume = await market?.estimateVolumeToSpend({
+    if (!receive || !market) return
+
+    const { estimatedVolume, estimatedFee } = await market.estimateVolume({
       given: Big(receive),
       what: "base",
+      to: tradeAction,
     })
 
+    estimatedFeeAsString = estimatedFee.toString()
     console.log(JSON.stringify(estimatedVolume))
 
     form.store.setState(
@@ -161,7 +156,7 @@ export function useLimit() {
           ...state,
           values: {
             ...state.values,
-            send: estimatedVolume?.estimatedVolume.toString() || "",
+            send: estimatedVolume.toString() || "",
           },
         }
       },

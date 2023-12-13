@@ -244,6 +244,7 @@ export function Market() {
 
           {/* TODO: unmock market details */}
           <Accordion title="Market details" className="!mb-6">
+            <MarketDetailsLine title="Estimated fee" value={"0"} />
             <MarketDetailsLine
               title="Taker fee"
               value={feeInPercentageAsString}
