@@ -24,12 +24,11 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
-import { tradeService } from "../../services/trade.service"
 import { Accordion } from "../components/accordion"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
-import { useLimit } from "./use-limit"
+import { useLimit } from "./hooks/use-limit"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
 // const sliderValues = [[25], [50], [75], [100]]
@@ -280,16 +279,9 @@ export function Limit() {
                 <Button
                   className="w-full flex items-center justify-center !mb-4 capitalize"
                   size={"lg"}
-                  // type="submit"
                   disabled={!canSubmit || !market}
                   rightIcon
                   loading={!!isSubmitting}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    tradeService.openTxFailedDialog({
-                      address: "0x1234567890123456789012345678901234567890",
-                    })
-                  }}
                 >
                   {tradeAction}
                 </Button>
@@ -384,7 +376,7 @@ const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
             {error}
           </p>
         )}
-        {!error?.length && showBalance && <TokenBalance token={token} />}
+        {showBalance && <TokenBalance token={token} />}
       </div>
     )
   },

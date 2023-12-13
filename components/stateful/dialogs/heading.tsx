@@ -4,6 +4,7 @@ import { cn } from "@/utils"
 import type { DialogType } from "./types"
 
 export function Heading({ type }: { type: DialogType }) {
+  if (!(type === "error" || type === "success")) return null
   return (
     <>
       <div className="w-full flex justify-center mb-8">

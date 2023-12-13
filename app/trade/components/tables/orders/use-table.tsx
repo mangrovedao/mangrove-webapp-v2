@@ -165,8 +165,7 @@ export function useTable({ data, onRetract, onEdit }: Params) {
         ),
       }),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [market?.base.address, market?.quote.address, onRetract, onEdit],
+    [market, onEdit, onRetract],
   )
 
   return useReactTable({

@@ -11,10 +11,10 @@ import { toast } from "sonner"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { TRADEMODE_AND_ACTION_PRESENTATION } from "../constants"
-import { TradeAction } from "../enums"
-import { TimeInForce, TimeToLiveUnit } from "./enums"
-import { estimateTimestamp, handleOrderResultToastMessages } from "./utils"
+import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
+import { TradeAction } from "../../enums"
+import { TimeInForce, TimeToLiveUnit } from "../enums"
+import { estimateTimestamp, handleOrderResultToastMessages } from "../utils"
 
 export function useLimit() {
   const { mangrove } = useMangrove()
@@ -75,9 +75,16 @@ export function useLimit() {
 
         orderParams = {
           ...orderParams,
+          restingOrder: {},
           forceRoutingToMangroveOrder: true,
           fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
         }
+
+        console.log(
+          JSON.stringify({
+            orderParams,
+          }),
+        )
 
         const order = isBuy
           ? await market.buy(orderParams)
