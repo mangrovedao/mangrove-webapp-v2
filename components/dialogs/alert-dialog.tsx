@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import * as Root from "@/components/ui/alert-dialog"
+import { cn } from "@/utils"
 import { Heading } from "./heading"
 import {
   descriptionClasses,
@@ -36,25 +37,30 @@ export default function AlertDialog({
   )
 }
 
-export function Title({ children }: { children: React.ReactNode }) {
+type Nodes = {
+  children: React.ReactNode
+  className?: string
+}
+
+export function Title({ children, className }: Nodes) {
   return (
-    <Root.AlertDialogTitle className={titleClasses}>
+    <Root.AlertDialogTitle className={cn(titleClasses, className)}>
       {children}
     </Root.AlertDialogTitle>
   )
 }
 
-export function Description({ children }: { children: React.ReactNode }) {
+export function Description({ children, className }: Nodes) {
   return (
-    <Root.AlertDialogDescription className={descriptionClasses}>
+    <Root.AlertDialogDescription className={cn(descriptionClasses, className)}>
       {children}
     </Root.AlertDialogDescription>
   )
 }
 
-export function Footer({ children }: { children: React.ReactNode }) {
+export function Footer({ children, className }: Nodes) {
   return (
-    <Root.AlertDialogFooter className={footerClasses}>
+    <Root.AlertDialogFooter className={cn(footerClasses, className)}>
       {children}
     </Root.AlertDialogFooter>
   )

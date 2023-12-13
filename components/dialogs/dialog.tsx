@@ -1,4 +1,5 @@
 import * as Root from "@/components/ui/dialog"
+import { cn } from "@/utils"
 import { Heading } from "./heading"
 import {
   descriptionClasses,
@@ -35,22 +36,31 @@ export default function Dialog({
   )
 }
 
-export function Title({ children }: { children: React.ReactNode }) {
+type Nodes = {
+  children: React.ReactNode
+  className?: string
+}
+
+export function Title({ children, className }: Nodes) {
   return (
-    <Root.DialogTitle className={titleClasses}>{children}</Root.DialogTitle>
+    <Root.DialogTitle className={cn(titleClasses, className)}>
+      {children}
+    </Root.DialogTitle>
   )
 }
 
-export function Description({ children }: { children: React.ReactNode }) {
+export function Description({ children, className }: Nodes) {
   return (
-    <Root.DialogDescription className={descriptionClasses}>
+    <Root.DialogDescription className={cn(descriptionClasses, className)}>
       {children}
     </Root.DialogDescription>
   )
 }
 
-export function Footer({ children }: { children: React.ReactNode }) {
+export function Footer({ children, className }: Nodes) {
   return (
-    <Root.DialogFooter className={footerClasses}>{children}</Root.DialogFooter>
+    <Root.DialogFooter className={cn(footerClasses, className)}>
+      {children}
+    </Root.DialogFooter>
   )
 }

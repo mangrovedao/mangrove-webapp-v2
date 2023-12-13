@@ -22,7 +22,7 @@ export function useRetractOrder() {
       }, 1000)
     },
     meta: {
-      error: "The order has not be retracted",
+      error: "Failed to retract the order",
       success: "The order has been successfully retracted",
     },
   })
