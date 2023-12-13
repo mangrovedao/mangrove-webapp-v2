@@ -1,8 +1,10 @@
 import Dialog, { Description, Footer, Title } from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
+import { Accordion } from "../../components/accordion"
 import { useApproveLimitOrder } from "../hooks/use-approve-limit-order"
 import type { Form } from "../types"
 import { Steps } from "./steps"
+import { TradeSummary } from "./trade-summary"
 
 type Props = {
   form?: Form
@@ -16,13 +18,16 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   return (
     <Dialog open={!!form} onClose={onClose}>
       <Title className="text-xl text-left">Proceed transaction</Title>
-      <Steps
-        steps={["Summary", "Approve USDC", "Approve DAI", "Send"]}
-        currentStep={1}
-      />
+      <Steps steps={["Summary", "Approve USDC", "Send"]} currentStep={1} />
       <Description>
-        By granting permission, you are allowing the following contract to
-        access your funds.
+        <div className="space-y-2">
+          <TradeSummary />
+          <div className="bg-[#041010] rounded-lg p-4 flex items-center">
+            <Accordion title="Market details" className="text-white text-base">
+              <div>TODO</div>
+            </Accordion>
+          </div>
+        </div>
       </Description>
       <Footer>
         <Button
