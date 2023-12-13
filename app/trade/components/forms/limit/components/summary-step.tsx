@@ -2,7 +2,7 @@ import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 
-export function TradeSummary() {
+export function SummaryStep() {
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">

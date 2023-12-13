@@ -5,9 +5,11 @@ import { getSvgUrl, getTokenInfos } from "@/utils/tokens"
 export function TokenIcon({
   symbol,
   className,
+  imgClasses,
 }: {
   symbol?: string
   className?: string
+  imgClasses?: string
 }) {
   if (!symbol) return null
 
@@ -18,7 +20,7 @@ export function TokenIcon({
       className={cn("w-6 h-6 rounded-full", className)}
       style={{ backgroundColor: color }}
     >
-      <img src={src} alt={`${name} token icon`} />
+      <img src={src} alt={`${name} token icon`} className={imgClasses} />
     </span>
   )
 }
