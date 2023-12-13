@@ -54,7 +54,7 @@ const useMangroveContext = () => {
   const marketsInfoQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["whitelistedMarketsInfos", mangrove?.address, chain?.id],
-    queryFn: async () => {
+    queryFn: () => {
       if (!mangrove?.address || !chain?.id) return null
       return getWhitelistedMarketsInfos(mangrove, chain.id)
     },

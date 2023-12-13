@@ -67,9 +67,8 @@ export function handleOrderResultToastMessages(
   tradeAction: TradeAction,
   market: Market,
 ) {
-  const { base, quote } = market
+  const { base } = market
   const baseDecimals = base.decimals
-  const quoteDecimals = quote.decimals
   const isBuy = tradeAction === TradeAction.BUY
   const summary = result.summary
   if (summary.partialFill && !result.restingOrder && summary.totalGot?.eq(0)) {

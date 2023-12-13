@@ -28,7 +28,7 @@ import { Accordion } from "../components/accordion"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
-import { useLimit } from "./use-limit"
+import { useLimit } from "./hooks/use-limit"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
 // const sliderValues = [[25], [50], [75], [100]]
@@ -279,7 +279,6 @@ export function Limit() {
                 <Button
                   className="w-full flex items-center justify-center !mb-4 capitalize"
                   size={"lg"}
-                  type="submit"
                   disabled={!canSubmit || !market}
                   rightIcon
                   loading={!!isSubmitting}
@@ -377,7 +376,7 @@ const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
             {error}
           </p>
         )}
-        {!error?.length && showBalance && <TokenBalance token={token} />}
+        {showBalance && <TokenBalance token={token} />}
       </div>
     )
   },

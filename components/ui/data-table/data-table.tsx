@@ -10,12 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { LoadingBody } from "./loading-body"
 
 interface DataTableProps<TData> {
   table: TableType<TData>
+  isError?: boolean
+  isLoading?: boolean
 }
 
-export function DataTable<TData>({ table }: DataTableProps<TData>) {
+export function DataTable<TData>({
+  table,
+  isError,
+  isLoading,
+}: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
     .getAllLeafColumns()
@@ -41,7 +48,9 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
         ))}
       </TableHeader>
       <TableBody>
-        {rows?.length ? (
+        {isLoading ? (
+          <LoadingBody cells={leafColumns.length} rows={2} />
+        ) : rows?.length ? (
           rows.map((row) => (
             <TableRow
               key={row.id}
@@ -71,7 +80,9 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
               colSpan={leafColumns.length}
               className="h-24 text-center text-muted-foreground"
             >
-              No results.
+              {isError
+                ? "Due to excessive demand, we are unable to return your data. Please try again later."
+                : "No results."}
             </TableCell>
           </TableRow>
         )}

@@ -27,9 +27,8 @@ export function useOrders<T = Order[]>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "orders",
-      indexerSdk,
-      olKeys?.ask.token.address,
-      olKeys?.bid.token.address,
+      olKeys?.ask.token.address.toLowerCase(),
+      olKeys?.bid.token.address.toLowerCase(),
       address,
       first,
       skip,
@@ -49,6 +48,7 @@ export function useOrders<T = Order[]>({
     meta: {
       error: "Unable to retrieve orders",
     },
-    enabled: !!(isConnected && olKeys && indexerSdk),
+    enabled: !!(isConnected && indexerSdk && olKeys),
+    retry: false,
   })
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  MutationCache,
   QueryCache,
   QueryClient,
   QueryClientProvider,
@@ -8,11 +9,29 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { toast } from "sonner"
 
+function toastError(error: unknown) {
+  if (typeof error === "string") {
+    toast.error(error)
+  } else {
+    toast.error("Something went wrong with the request.")
+  }
+}
+
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (_, query) => {
+    onError: (_error, query) => {
       if (typeof query.meta?.error === "string") {
         toast.error(query.meta.error)
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (_error, _variables, _context, mutation) => {
+      toastError(mutation.meta?.error)
+    },
+    onSuccess: (_data, _variables, _context, mutation) => {
+      if (typeof mutation.meta?.success === "string") {
+        toast.success(mutation.meta?.success)
       }
     },
   }),

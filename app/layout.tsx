@@ -1,3 +1,4 @@
+import Script from "next/script"
 import React from "react"
 import { Toaster } from "sonner"
 
@@ -18,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script src="datafeeds/udf/dist/bundle.js" async></script>
+        <Script src="datafeeds/udf/dist/bundle.js" async></Script>
       </head>
       <body className="grid grid-areas-layout">
         <RootProvider>

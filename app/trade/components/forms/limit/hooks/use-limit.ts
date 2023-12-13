@@ -11,10 +11,10 @@ import { toast } from "sonner"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { TRADEMODE_AND_ACTION_PRESENTATION } from "../constants"
-import { TradeAction } from "../enums"
-import { TimeInForce, TimeToLiveUnit } from "./enums"
-import { estimateTimestamp, handleOrderResultToastMessages } from "./utils"
+import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
+import { TradeAction } from "../../enums"
+import { TimeInForce, TimeToLiveUnit } from "../enums"
+import { estimateTimestamp, handleOrderResultToastMessages } from "../utils"
 
 export function useLimit() {
   const { mangrove } = useMangrove()
@@ -33,7 +33,6 @@ export function useLimit() {
     onSubmit: async (values) => {
       const {
         tradeAction,
-        limitPrice,
         send,
         receive,
         timeInForce,
@@ -63,27 +62,10 @@ export function useLimit() {
           gives: sendToFixed,
         }
 
-        // let bounty = undefined
         const isGoodTilTime = timeInForce === TimeInForce.GOOD_TIL_TIME
         if (isGoodTilTime) {
-          // const onchainLP = await LiquidityProvider.connect(
-          //   mangrove.offerLogic("MangroveOrder"),
-          //   configuration.mangroveOrder.getRestingOrderGasreq(
-          //     market.mgv.network.name,
-          //   ),
-          //   market,
-          // )
-          // bounty = (
-          //   await (isBuy
-          //     ? onchainLP.computeBidProvision()
-          //     : onchainLP.computeAskProvision())
-          // ).mul(5)
           orderParams = {
             ...orderParams,
-            restingOrder: {
-              provision: "0.01",
-              // provision: bounty || "0",
-            },
             expiryDate: estimateTimestamp({
               timeToLiveUnit,
               timeToLive,
@@ -93,9 +75,16 @@ export function useLimit() {
 
         orderParams = {
           ...orderParams,
+          restingOrder: {},
           forceRoutingToMangroveOrder: true,
           fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
         }
+
+        console.log(
+          JSON.stringify({
+            orderParams,
+          }),
+        )
 
         const order = isBuy
           ? await market.buy(orderParams)

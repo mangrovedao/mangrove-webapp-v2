@@ -26,7 +26,7 @@ type Params = {
   onEdit: (fill: Fill) => void
 }
 
-export function useTable({ data, onRetract, onEdit }: Params) {
+export function useTable({ data }: Params) {
   const { market } = useMarket()
   const columns = React.useMemo(
     () => [
@@ -117,31 +117,8 @@ export function useTable({ data, onRetract, onEdit }: Params) {
         header: "Date",
         cell: (row) => <div>{formatDate(row.getValue())}</div>,
       }),
-      // columnHelper.display({
-      //   id: "actions",
-      //   header: () => <div className="text-right">Action</div>,
-      //   cell: ({ row }) => (
-      //     <div className="w-full h-full flex justify-end space-x-1">
-      //       <IconButton
-      //         tooltip="Modify"
-      //         className="aspect-square w-6 rounded-full"
-      //         onClick={() => onEdit(row.original)}
-      //       >
-      //         <Pen />
-      //       </IconButton>
-      //       <IconButton
-      //         tooltip="Retract offer"
-      //         className="aspect-square w-6 rounded-full"
-      //         onClick={() => onRetract(row.original)}
-      //       >
-      //         <Close />
-      //       </IconButton>
-      //     </div>
-      //   ),
-      // }),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [market?.base.address, market?.quote.address, onRetract, onEdit],
+    [market],
   )
 
   return useReactTable({

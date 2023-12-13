@@ -6,36 +6,38 @@ import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
-import useMarket from "./market"
+import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
+  const { marketsInfoQuery, mangrove } = useMangrove()
   const { chain } = useNetwork()
-  const { market } = useMarket()
 
   const indexerSdkQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [
-      "indexer-sdk",
-      chain?.network,
-      market?.base.address,
-      market?.quote.address,
-    ],
+    queryKey: ["indexer-sdk", chain?.network, marketsInfoQuery.dataUpdatedAt],
     queryFn: () => {
-      if (!(chain?.network && market)) return null
+      if (!(chain?.network && marketsInfoQuery.data)) return null
       const chainName = chain.network as Chains
       return getSdk({
         chainName,
         helpers: {
-          getTokenDecimals: (address) => {
-            const tokens = [market.base, market.quote]
-            const token = tokens.find(
-              (t) => t.address.toLowerCase() === address.toLowerCase(),
-            )
+          getTokenDecimals: async (address) => {
+            const token = await mangrove?.tokenFromAddress(address)
             if (!token)
               throw new Error("Impossible to determine token decimals")
-            return Promise.resolve(token.decimals)
+            return token.decimals
           },
-          createTickHelpers: (ba, market) => new TickPriceHelper(ba, market),
+          createTickHelpers: (ba, m) => {
+            const marketInfo = marketsInfoQuery?.data?.find(
+              (t) =>
+                t.base.address.toLowerCase() === m.base.address.toLowerCase() &&
+                t.quote.address.toLowerCase() === m.quote.address.toLowerCase(),
+            )
+            if (!(mangrove && marketInfo)) {
+              throw new Error("Impossible to determine token decimals")
+            }
+            return Promise.resolve(new TickPriceHelper(ba, marketInfo))
+          },
         },
       })
     },

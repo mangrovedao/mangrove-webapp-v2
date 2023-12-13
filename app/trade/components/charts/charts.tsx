@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 
-import { DepthChart } from "@/app/trade/charts/depth-chart/depth-chart"
+import { DepthChart } from "@/app/trade/components/charts/depth-chart/depth-chart"
 import {
   CustomTabs,
   CustomTabsContent,

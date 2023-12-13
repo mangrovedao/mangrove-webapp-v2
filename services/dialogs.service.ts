@@ -1,31 +1,36 @@
-import { useDialogStore } from "@/stores/dialog.store"
+import type { DialogType } from "@/components/stateful/dialogs/types"
+import { useDialogStore, type ActionButton } from "@/stores/dialog.store"
 
-export function openConfirmDialog({
-  onConfirm,
+function open({
   children,
   title = "Confirm",
-  description = "Are you sure you want to do this?",
+  actionButtons = [
+    {
+      id: "cancel",
+    },
+  ],
+  type,
 }: {
-  onConfirm: () => void
   children?: React.ReactNode
   title?: React.ReactNode
   description?: React.ReactNode
+  actionButtons?: ActionButton[]
+  type?: DialogType
 }) {
   useDialogStore.setState({
     opened: true,
     title,
-    description,
     children,
-    actionButtons: [
-      {
-        isClosing: true,
-        id: "cancel",
-      },
-      {
-        onClick: onConfirm,
-        children: "Confirm",
-        id: "confirm",
-      },
-    ],
+    actionButtons,
+    type,
   })
+}
+
+function close() {
+  useDialogStore.setState({ opened: false })
+}
+
+export const dialogs = {
+  open,
+  close,
 }
