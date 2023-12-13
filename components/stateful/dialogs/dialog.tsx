@@ -1,15 +1,14 @@
-import * as Root from "@/components/ui/dialog"
-import { useDialogStore } from "@/stores/dialog.store"
-import { Button } from "@components/ui/button"
-import { Heading } from "./heading"
+import { Heading } from "@/components/dialogs/heading"
 import {
   descriptionClasses,
   footerClasses,
   getContentClasses,
   titleClasses,
-} from "./styles"
+} from "@/components/dialogs/styles"
+import * as Root from "@/components/ui/dialog"
+import { useDialogStore } from "@/stores/dialog.store"
+import { Button } from "@components/ui/button"
 
-// TODO: handle all types "Warning" "Info"
 export function Dialog() {
   const { opened, setOpened, title, children, actionButtons, type } =
     useDialogStore()

@@ -61,7 +61,6 @@ export default function MarketSelector() {
           <SelectItem
             key={`${m.base.address}/${m.quote.address}`}
             value={getValue(m)}
-            onChange={(e) => console.log("clicked", e)}
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">

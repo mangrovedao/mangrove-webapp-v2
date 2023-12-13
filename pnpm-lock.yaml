@@ -9,11 +9,11 @@ dependencies:
     specifier: ^5.7.2
     version: 5.7.2
   '@mangrovedao/indexer-sdk':
-    specifier: 0.0.11-8
-    version: 0.0.11-8(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.11)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2)
+    specifier: 0.0.11-9
+    version: 0.0.11-9(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.11)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2)
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.0-13
-    version: 2.0.0-13
+    specifier: 2.0.0-14
+    version: 2.0.0-14
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.17)(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
@@ -125,6 +125,9 @@ dependencies:
   date-fns:
     specifier: ^2.30.0
     version: 2.30.0
+  framer-motion:
+    specifier: ^10.16.16
+    version: 10.16.16(react-dom@18.2.0)(react@18.2.0)
   get-user-locale:
     specifier: ^2.3.1
     version: 2.3.1
@@ -1665,6 +1668,20 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: true
 
+  /@emotion/is-prop-valid@0.8.8:
+    resolution: {integrity: sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==}
+    requiresBuild: true
+    dependencies:
+      '@emotion/memoize': 0.7.4
+    dev: false
+    optional: true
+
+  /@emotion/memoize@0.7.4:
+    resolution: {integrity: sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==}
+    requiresBuild: true
+    dev: false
+    optional: true
+
   /@emotion/use-insertion-effect-with-fallbacks@1.0.1(react@18.2.0):
     resolution: {integrity: sha512-jT/qyKZ9rzLErtrjGgdkMBn2OP8wl0G3sQlBb3YPryvKHsjvINUhVaPFfP+fpBcOkmrVOVEEHQFJ7nbj2TH2gw==}
     peerDependencies:
@@ -2431,7 +2448,7 @@ packages:
       '@graphql-mesh/store': 0.94.6(@graphql-mesh/cross-helpers@0.4.1)(@graphql-mesh/utils@0.94.6)(@graphql-tools/utils@10.0.11)(graphql@16.8.1)(tslib@2.6.2)
       '@graphql-mesh/utils': 0.94.6(@graphql-mesh/cross-helpers@0.4.1)(@graphql-tools/utils@10.0.11)(graphql@16.8.1)(tslib@2.6.2)
       '@graphql-tools/delegate': 10.0.3(graphql@16.8.1)
-      '@graphql-tools/schema': 10.0.0(graphql@16.8.1)
+      '@graphql-tools/schema': 10.0.2(graphql@16.8.1)
       '@graphql-tools/stitch': 9.0.3(graphql@16.8.1)
       '@graphql-tools/stitching-directives': 3.0.0(graphql@16.8.1)
       '@graphql-tools/utils': 10.0.11(graphql@16.8.1)
@@ -2677,7 +2694,7 @@ packages:
       '@graphql-tools/delegate': 10.0.3(graphql@16.8.1)
       '@graphql-tools/executor': 1.2.0(graphql@16.8.1)
       '@graphql-tools/merge': 9.0.1(graphql@16.8.1)
-      '@graphql-tools/schema': 10.0.0(graphql@16.8.1)
+      '@graphql-tools/schema': 10.0.2(graphql@16.8.1)
       '@graphql-tools/utils': 10.0.11(graphql@16.8.1)
       '@graphql-tools/wrap': 10.0.1(graphql@16.8.1)
       graphql: 16.8.1
@@ -2955,8 +2972,8 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/indexer-sdk@0.0.11-8(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.11)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2):
-    resolution: {integrity: sha512-6WVNM0EBtJpV2PVeW0WkAymebnT1LZRzkSa5/XAweQBi6eI+faZ+oqNGBeJZ6/r1J9jK1eCdmogxetgdswWSjg==}
+  /@mangrovedao/indexer-sdk@0.0.11-9(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.11)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2):
+    resolution: {integrity: sha512-PGVz5Rr5zBp0aENmjX7Jt9VOwhcs/jGOuY3eahracWIipeAje4YaM70cXoUJwtkCRp2VXlvRapXsPTa1HItkvQ==}
     dependencies:
       '@ethersproject/bignumber': 5.7.0
       '@graphprotocol/client-auto-pagination': 2.0.0(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.11)(@graphql-tools/wrap@10.0.1)(graphql@16.8.1)
@@ -2998,8 +3015,8 @@ packages:
       '@mangrovedao/mangrove-core': 2.0.0-4
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.0-13:
-    resolution: {integrity: sha512-zLahoc0fJaLWmgdRegWNRI3kUj79PID3aAggsIGPCLQ2T6UyebmRqaeqQ3JzxQ/0UYeflc1xgBDu4s3mOmFNOw==}
+  /@mangrovedao/mangrove.js@2.0.0-14:
+    resolution: {integrity: sha512-KxfQOxL2qx7g9l05x7QVxaVT/dtImo53290v5MjekVz3+e9VtTn9pM8me1u7IqCXw0pr9AWVFUR/kG5+RjMHJQ==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
@@ -10588,6 +10605,24 @@ packages:
   /fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
     dev: true
+
+  /framer-motion@10.16.16(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-je6j91rd7NmUX7L1XHouwJ4v3R+SO4umso2LUcgOct3rHZ0PajZ80ETYZTajzEXEl9DlKyzjyt4AvGQ+lrebOw==}
+    peerDependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      tslib: 2.6.2
+    optionalDependencies:
+      '@emotion/is-prop-valid': 0.8.8
+    dev: false
 
   /fresh@0.5.2:
     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}

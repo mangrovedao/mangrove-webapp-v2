@@ -9,4 +9,4 @@ export const getContentClasses = (type: DialogType) =>
 
 export const titleClasses = "text-center text-2xl font-medium"
 export const descriptionClasses = "text-center text-sm font-normal !mt-4"
-export const footerClasses = "mt-8 flex space-x-2 justify-end"
+export const footerClasses = "!mt-8 flex space-x-2 justify-end"

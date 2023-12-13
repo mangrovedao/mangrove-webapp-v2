@@ -17,8 +17,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
-import type { Order } from "./schema"
-import { Timer } from "./timer"
+import { Timer } from "../components/timer"
+import type { Order } from "../schema"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -74,7 +74,6 @@ export function useTable({ data, onRetract, onEdit }: Params) {
         },
         sortingFn: "datetime",
       }),
-      // TODO: change when we will have amplified orders
       columnHelper.accessor((_) => _, {
         header: "Type",
         cell: () => <span>Limit</span>,

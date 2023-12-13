@@ -1,7 +1,7 @@
 import type { Market } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-import type { Order } from "./schema"
+import type { Order } from "../schema"
 
 export function useRetractOrder() {
   const queryClient = useQueryClient()

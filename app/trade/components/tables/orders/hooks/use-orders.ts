@@ -5,7 +5,7 @@ import { useAccount } from "wagmi"
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import useMarket from "@/providers/market"
 import { useQuery } from "@tanstack/react-query"
-import { parseOrders, type Order } from "./schema"
+import { parseOrders, type Order } from "../schema"
 
 type Params<T> = {
   filters?: {

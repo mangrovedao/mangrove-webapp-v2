@@ -1,16 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
-import * as Root from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { useAlertDialogStore } from "@/stores/alert-dialog.store"
-import { Heading } from "./heading"
+import { Heading } from "@/components/dialogs/heading"
 import {
   descriptionClasses,
   footerClasses,
   getContentClasses,
   titleClasses,
-} from "./styles"
+} from "@/components/dialogs/styles"
+import * as Root from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { useAlertDialogStore } from "@/stores/alert-dialog.store"
 
-// TODO: handle all types "Success" "Warning" "Info"
 export function AlertDialog() {
   const { opened, setOpened, title, children, actionButtons, type } =
     useAlertDialogStore()
