@@ -65,13 +65,13 @@ const useMarketContext = () => {
         )
       }) ?? marketsInfoQuery.data[0]
     setMarketInfo(defaultMarketInfo)
-  }, [chain?.id, mangrove, marketParam, marketsInfoQuery.data])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain?.id, mangrove, marketsInfoQuery.data])
 
   React.useEffect(() => {
     if (!marketInfo) return
     setMarketParam(`${marketInfo.base.id},${marketInfo.quote.id}`)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marketInfo])
+  }, [marketInfo, setMarketParam])
 
   const updateOrderbook = React.useCallback(() => {
     if (!market) return
