@@ -49,12 +49,9 @@ export function useLimit() {
         if (!spender) return
         const { baseQuoteToSendReceive } =
           TRADEMODE_AND_ACTION_PRESENTATION.limit[tradeAction]
-        const [sendToken, receiveToken] = baseQuoteToSendReceive(
-          market.base,
-          market.quote,
-        )
-        const sendToFixed = Big(send).toFixed(sendToken.decimals)
-        const receiveToFixed = Big(receive).toFixed(receiveToken.decimals)
+        const [sendToken] = baseQuoteToSendReceive(market.base, market.quote)
+        const sendToFixed = Big(send)
+        const receiveToFixed = Big(receive)
         await sendToken.increaseApproval(spender, sendToFixed)
         const isBuy = tradeAction === TradeAction.BUY
         let orderParams: Market.TradeParams = {
@@ -79,12 +76,6 @@ export function useLimit() {
           forceRoutingToMangroveOrder: true,
           fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
         }
-
-        console.log(
-          JSON.stringify({
-            orderParams,
-          }),
-        )
 
         const order = isBuy
           ? await market.buy(orderParams)
@@ -126,10 +117,8 @@ export function useLimit() {
     const limitPrice = form.state.values.limitPrice
     const send = form.state.values.send
     if (send === "") return
-    const divider = Number(limitPrice) !== 0 ? Number(limitPrice) : 1
-    const receive = Big(Number(send ?? 0))
-      .div(divider)
-      .toString()
+    const limit = Big(Number(limitPrice) ?? 0)
+    const receive = limit.mul(Big(send ?? 0)).toString()
     form.store.setState(
       (state) => {
         return {

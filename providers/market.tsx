@@ -70,7 +70,8 @@ const useMarketContext = () => {
   React.useEffect(() => {
     if (!marketInfo) return
     setMarketParam(`${marketInfo.base.id},${marketInfo.quote.id}`)
-  }, [marketInfo, setMarketParam])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketInfo])
 
   const updateOrderbook = React.useCallback(() => {
     if (!market) return

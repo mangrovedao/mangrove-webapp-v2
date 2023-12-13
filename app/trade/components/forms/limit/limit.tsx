@@ -31,9 +31,6 @@ import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./hooks/use-limit"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
-// const sliderValues = [[25], [50], [75], [100]]
-// const slippageOptions = ["0.1", "0.5", "1.0"]
-
 export function Limit() {
   const {
     computeReceiveAmount,
@@ -49,24 +46,6 @@ export function Limit() {
     feeInPercentageAsString,
     timeInForce,
   } = useLimit()
-
-  // const sliderPercentage = Math.min(
-  //   Math.trunc(
-  //     Big(Number(send))
-  //       .mul(100)
-  //       .div(sendTokenBalance.formatted ?? 0)
-  //       .toNumber(),
-  //   ),
-  //   100,
-  // )
-
-  // const { validate, setValue, pushValue, validateSync } = form.useField({
-  //   name: "send",
-  // })
-
-  // validateSync("", "submit")
-
-  // console.log(JSON.stringify({ sliderPercentage }))
 
   return (
     <form.Provider>
@@ -258,13 +237,10 @@ export function Limit() {
               title="Taker fee"
               value={feeInPercentageAsString}
             />
-            {/* TODO: <MarketDetailsLine title="Total fees" value="$0.26" /> */}
             <MarketDetailsLine
               title="Tick size"
               value={marketInfo?.tickSpacing.toString() ?? "-"}
             />
-            {/* TODO: <MarketDetailsLine title="Current spot price" value="1234" />
-            <MarketDetailsLine title="Min. order size" value="12" /> */}
           </Accordion>
 
           <form.Subscribe
@@ -306,50 +282,6 @@ function MarketDetailsLine({ title, value }: MarketDetailsLineProps) {
     </div>
   )
 }
-
-// type CSliderProps = {
-//   sliderPercentage: number
-//   form: any
-// }
-// function CSlider({ sliderPercentage, form }: CSliderProps) {
-//   const { handleChange, validateSync, setValue } = form.useField({
-//     name: "send",
-//   })
-//   console.log(handleChange)
-//   return (
-//     <div className="space-y-5 pt-2">
-//       <Slider
-//         value={[sliderPercentage]}
-//         step={5}
-//         max={100}
-//         onValueChange={([val]) => {
-//           setValue(val?.toString(), {
-//             notify: true,
-//             touch: false,
-//           })
-//           validateSync(val?.toString(), "submit")
-//           // handleChange(val?.toString())
-//           // validate()
-//         }}
-//       />
-
-//       <div className="flex space-x-3">
-//         {sliderValues.map((value, i) => (
-//           <Button
-//             key={`slider-value-${i}`}
-//             className="bg-transparent text-primary rounded-full text-xs pt-1 pb-[2px] w-16 border-[1px] border-green-bangladesh"
-//             onClick={(e) => {
-//               e.preventDefault()
-//               // setSlider(value)
-//             }}
-//           >
-//             {value}%
-//           </Button>
-//         ))}
-//       </div>
-//     </div>
-//   )
-// }
 
 type TradeInputProps = {
   token?: Token
