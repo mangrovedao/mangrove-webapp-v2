@@ -1,19 +1,31 @@
 "use client"
 
 import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
-import type Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
+import { useSearchParams } from "next/navigation"
 import React from "react"
-import { StringParam, useQueryParam } from "use-query-params"
 import { useNetwork } from "wagmi"
 
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
-  const [marketParam, setMarketParam] = useQueryParam("market", StringParam)
+  const searchParams = useSearchParams()
+  const marketParam = searchParams.get("market")
   const { chain } = useNetwork()
   const { mangrove, marketsInfoQuery } = useMangrove()
-  const [marketInfo, setMarketInfo] = React.useState<Mangrove.OpenMarketInfo>()
+
+  const marketInfo = React.useMemo(() => {
+    if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
+    const [baseId, quoteId] = marketParam?.split(",") ?? []
+    return (
+      marketsInfoQuery.data.find((marketInfo) => {
+        return (
+          marketInfo.base.id?.toLowerCase() === baseId?.toLowerCase() &&
+          marketInfo.quote.id?.toLowerCase() === quoteId?.toLowerCase()
+        )
+      }) ?? marketsInfoQuery.data[0]
+    )
+  }, [marketsInfoQuery.data, chain?.id, mangrove, marketParam])
 
   const { data: market } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -53,26 +65,6 @@ const useMarketContext = () => {
     }
   }, [mangrove, market])
 
-  // create and store market instance from marketInfo
-  React.useEffect(() => {
-    if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
-    const [baseId, quoteId] = marketParam?.split(",") ?? []
-    const defaultMarketInfo =
-      marketsInfoQuery.data.find((marketInfo) => {
-        return (
-          marketInfo.base.id?.toLowerCase() === baseId?.toLowerCase() &&
-          marketInfo.quote.id?.toLowerCase() === quoteId?.toLowerCase()
-        )
-      }) ?? marketsInfoQuery.data[0]
-    setMarketInfo(defaultMarketInfo)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chain?.id, mangrove, marketsInfoQuery.data])
-
-  // React.useEffect(() => {
-  //   if (!marketInfo) return
-  //   setMarketParam(`${marketInfo.base.id},${marketInfo.quote.id}`)
-  // }, [marketInfo, setMarketParam])
-
   const updateOrderbook = React.useCallback(() => {
     if (!market) return
     requestBookQuery.refetch()
@@ -88,7 +80,6 @@ const useMarketContext = () => {
   }, [market, updateOrderbook])
 
   return {
-    setMarketInfo,
     requestBookQuery,
     market,
     marketInfo,

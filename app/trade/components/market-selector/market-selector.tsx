@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import { useRouter } from "next/navigation"
 import { TokenIcon } from "../../../../components/token-icon"
 
 function getSymbol(market?: Mangrove.OpenMarketInfo) {
@@ -23,8 +24,9 @@ function getValue(market: Mangrove.OpenMarketInfo) {
 }
 
 export default function MarketSelector() {
+  const router = useRouter()
   const { marketsInfoQuery } = useMangrove()
-  const { marketInfo, setMarketInfo } = useMarket()
+  const { marketInfo } = useMarket()
   const { isConnected } = useAccount()
 
   const onValueChange = (value: string) => {
@@ -33,7 +35,9 @@ export default function MarketSelector() {
       ({ base, quote }) =>
         base.address === baseAddress && quote.address === quoteAddress,
     )
-    setMarketInfo(marketInfo)
+    router.push(`?market=${marketInfo?.base.id},${marketInfo?.quote.id}`, {
+      scroll: false,
+    })
   }
 
   return (
@@ -57,6 +61,7 @@ export default function MarketSelector() {
           <SelectItem
             key={`${m.base.address}/${m.quote.address}`}
             value={getValue(m)}
+            onChange={(e) => console.log("clicked", e)}
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">

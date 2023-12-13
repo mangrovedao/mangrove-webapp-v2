@@ -1,4 +1,3 @@
-"use client"
 import React from "react"
 
 import {
@@ -10,7 +9,6 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
-import { StringParam, useQueryParam } from "use-query-params"
 import { Fills } from "./fills/fills"
 import { Orders } from "./orders/orders"
 
@@ -28,13 +26,10 @@ export function Tables({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
-  const [tabParam, setTabParam] = useQueryParam("tab", StringParam)
-
   return (
     <CustomTabs
       {...props}
-      defaultValue={tabParam ?? Object.values(TradeTables)[0]}
-      onValueChange={setTabParam}
+      defaultValue={Object.values(TradeTables)[0]}
       className={cn(className)}
     >
       <CustomTabsList className="w-full flex justify-start border-b">

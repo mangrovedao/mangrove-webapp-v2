@@ -1,4 +1,3 @@
-"use client"
 import React from "react"
 
 import { DepthChart } from "@/app/trade/components/charts/depth-chart/depth-chart"
@@ -12,7 +11,6 @@ import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
 import { type ResolutionString } from "@/public/charting_library/charting_library"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
-import { StringParam, useQueryParam } from "use-query-params"
 
 export enum ChartType {
   DEPTH = "Depth chart",
@@ -30,13 +28,11 @@ export function Market({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
-  const [chartParam, setChartParam] = useQueryParam("chart", StringParam)
   return (
     <CustomTabs
       {...props}
-      defaultValue={chartParam ?? Object.values(ChartType)[0]}
+      defaultValue={Object.values(ChartType)[0]}
       className={cn(className, "h-full")}
-      onValueChange={setChartParam}
     >
       <CustomTabsList className="w-full flex justify-start border-b">
         {Object.values(ChartType).map((table) => (
