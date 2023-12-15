@@ -1,4 +1,4 @@
-type DialogType = "error" | "success" | "info" | "confirm" | undefined
+export type DialogType = "error" | "success" | "info" | "confirm" | undefined
 
 export type DialogProps = {
   open: boolean
