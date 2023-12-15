@@ -33,7 +33,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
 
   const [currentStep, helpers] = useStep(STEPS.length)
 
-  const { canGoToNextStep, goToNextStep } = helpers
+  const { goToNextStep } = helpers
 
   const stepInfos = [
     {
@@ -47,11 +47,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         />
       ),
       button: (
-        <Button
-          {...btnProps}
-          disabled={!canGoToNextStep}
-          onClick={goToNextStep}
-        >
+        <Button {...btnProps} onClick={goToNextStep}>
           Proceed the payment
         </Button>
       ),
@@ -61,7 +57,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       button: (
         <Button
           {...btnProps}
-          disabled={!canGoToNextStep || approve.isPending}
+          disabled={approve.isPending}
           loading={approve.isPending}
           onClick={() => {
             approve.mutate(
