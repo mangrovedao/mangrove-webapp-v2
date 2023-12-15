@@ -17,9 +17,6 @@ function openTxCompletedDialog({
     title,
     children: (
       <div className="space-y-4">
-        <div>
-          Your transaction request has been successfully and securely processed.
-        </div>
         <div className="bg-primary-dark-green rounded-lg py-3 px-4 flex items-center justify-between">
           <span>View on block explorer</span>
 
@@ -51,36 +48,19 @@ function openTxCompletedDialog({
 
 function openTxFailedDialog({
   title = "Transaction Reverted",
-  address,
 }: {
   title?: React.ReactNode
-  address: string
-}) {
+} = {}) {
   dialogs.open({
     title,
     children: (
       <div className="space-y-4">
-        <div>Your transaction request has been reverted.</div>
-        <div className="bg-primary-dark-green rounded-lg py-3 px-4 flex items-center justify-between">
-          <span>View on block explorer</span>
-
-          <Button
-            className="flex items-center space-x-1 underline"
-            variant={"link"}
-            onClick={() => {
-              address && navigator.clipboard.writeText(address)
-              toast.success("Address copied to clipboard")
-            }}
-          >
-            <span>{shortenAddress(address ?? "")}</span>
-            <Copy className="mr-2 h-4 w-4" />
-          </Button>
-        </div>
+        <div>Your transaction has failed.</div>
       </div>
     ),
     actionButtons: [
       {
-        onClick: () => openTxCompletedDialog({ address }),
+        onClick: () => dialogs.close,
         children: "Close",
         id: "close-tx-completed-dialog",
         className: "w-full",

@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
@@ -6,11 +6,12 @@ import type { Market } from "@mangrovedao/mangrove.js"
 import { TradeAction } from "../../enums"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
-import { estimateTimestamp, handleOrderResultToastMessages } from "../utils"
+import { estimateTimestamp } from "../utils"
 
 export function usePostLimitOrder() {
   const { mangrove } = useMangrove()
   const { market } = useMarket()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
@@ -51,10 +52,17 @@ export function usePostLimitOrder() {
         ? await market.buy(orderParams)
         : await market.sell(orderParams)
       const orderResult = await order.result
-      handleOrderResultToastMessages(orderResult, tradeAction, market)
+      // handleOrderResultToastMessages(orderResult, tradeAction, market)
+      return orderResult
     },
     meta: {
       error: "Failed to post the limit order",
+    },
+    onSuccess: () => {
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.refetchQueries({ queryKey: ["orders"] })
+      }, 1000)
     },
   })
 }

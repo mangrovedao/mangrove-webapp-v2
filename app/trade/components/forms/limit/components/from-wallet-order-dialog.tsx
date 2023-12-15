@@ -1,3 +1,4 @@
+import { tradeService } from "@/app/trade/services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { Accordion } from "../../components/accordion"
@@ -9,8 +10,6 @@ import type { Form } from "../types"
 import { ApproveStep } from "./approve-step"
 import { Steps } from "./steps"
 import { SummaryStep } from "./summary-step"
-
-const STEPS = ["Summary", "Approve USDC", "Send"]
 
 type Props = {
   form: Form
@@ -24,24 +23,20 @@ const btnProps: ButtonProps = {
 }
 
 export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
-  const [currentStep, helpers] = useStep(STEPS.length)
+  const { baseToken, quoteToken, sendToken, receiveToken } = useTradeInfos(
+    "limit",
+    form.tradeAction,
+  )
+  const STEPS = ["Summary", `Approve ${sendToken?.symbol}`, "Send"]
   const approve = useApproveLimitOrder()
   const post = usePostLimitOrder()
 
-  const {
-    baseToken,
-    quoteToken,
-    sendToken,
-    receiveToken,
-    feeInPercentageAsString,
-    sendTokenBalance,
-  } = useTradeInfos("limit", form.tradeAction)
+  const [currentStep, helpers] = useStep(STEPS.length)
 
   const { canGoToNextStep, goToNextStep } = helpers
 
   const stepInfos = [
     {
-      title: "Summary",
       body: (
         <SummaryStep
           form={form}
@@ -62,12 +57,11 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       ),
     },
     {
-      title: "Approve USDC",
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
         <Button
           {...btnProps}
-          disabled={!canGoToNextStep}
+          disabled={!canGoToNextStep || approve.isPending}
           loading={approve.isPending}
           onClick={() => {
             approve.mutate(
@@ -85,7 +79,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       ),
     },
     {
-      title: "Send",
       body: (
         <SummaryStep
           form={form}
@@ -99,13 +92,23 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         <Button
           {...btnProps}
           loading={post.isPending}
+          disabled={post.isPending}
           onClick={() => {
             post.mutate(
               {
                 form,
               },
               {
-                onSuccess: onClose,
+                onSuccess: (data) => {
+                  onClose()
+                  tradeService.openTxCompletedDialog({
+                    address: data?.txReceipt.transactionHash ?? "",
+                  })
+                },
+                onError: () => {
+                  onClose()
+                  tradeService.openTxFailedDialog()
+                },
               },
             )
           }}
@@ -114,7 +117,12 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         </Button>
       ),
     },
-  ]
+  ].map((stepInfo, i) => {
+    return {
+      ...stepInfo,
+      title: STEPS[i],
+    }
+  })
 
   return (
     <Dialog open={!!form} onClose={onClose}>
