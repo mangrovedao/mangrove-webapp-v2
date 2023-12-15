@@ -1,34 +1,80 @@
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
+import type { Token } from "@mangrovedao/mangrove.js"
+import Big from "big.js"
 
-export function SummaryStep() {
+import { TimeInForce } from "../enums"
+import type { Form } from "../types"
+
+type Props = {
+  form: Form
+  baseToken?: Token
+  quoteToken?: Token
+  sendToken?: Token
+  receiveToken?: Token
+}
+
+export function SummaryStep({
+  baseToken,
+  quoteToken,
+  sendToken,
+  receiveToken,
+  form,
+}: Props) {
+  // const {
+  //   baseToken,
+  //   quoteToken,
+  //   sendToken,
+  //   receiveToken,
+  //   feeInPercentageAsString,
+  //   sendTokenBalance,
+  // } = useTradeInfos("limit", form.tradeAction)
+  // const baseSymbol = baseToken?.symbol ?? ""
+  // const quoteSymbol = quoteToken?.symbol ?? ""
+
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
         <div className="flex -space-x-2">
-          <TokenIcon className="w-7 h-auto" symbol={"WETH"} />
-          <TokenIcon className="w-7 h-auto" symbol={"USDC"} />
+          <TokenIcon className="w-7 h-auto" symbol={baseToken?.symbol} />
+          <TokenIcon className="w-7 h-auto" symbol={quoteToken?.symbol} />
         </div>
-        <span className="text-white text-xl font-medium">WETH / USDC</span>
+        <span className="text-white text-xl font-medium">
+          {baseToken?.symbol} / {quoteToken?.symbol}
+        </span>
       </div>
       <Separator />
       <div className="space-y-4">
         <Line title="Limit Price">
-          1234.6578 <Unit>USDC</Unit>
+          {Big(form.limitPrice ?? 0).toFixed(quoteToken?.displayedDecimals)}{" "}
+          <Unit>{quoteToken?.symbol}</Unit>
         </Line>
         <Line title="Send from wallet">
-          11.6578 <Unit>USDC</Unit>
+          {Big(form.send ?? 0).toFixed(sendToken?.displayedDecimals)}{" "}
+          <Unit>{sendToken?.symbol}</Unit>
         </Line>
         <Line title="Receive to wallet">
-          1.56 <Unit>ETH</Unit>
+          {Big(form.receive ?? 0).toFixed(receiveToken?.displayedDecimals)}{" "}
+          <Unit>{receiveToken?.symbol}</Unit>
         </Line>
-        <Line title="Est. Provision">
+        {/* TODO: estimated provision */}
+        {/* <Line title="Est. Provision">
           0.2503 <Unit>MATIC</Unit>
-        </Line>
+        </Line> */}
         <Line title="Time in force">
           <div className="flex flex-col items-end">
-            Good till time <Unit>5 days</Unit>
+            {form.timeInForce}{" "}
+            {form.timeInForce === TimeInForce.GOOD_TIL_TIME && (
+              <Unit>
+                {form.timeToLive}{" "}
+                <span className="lowercase">
+                  {Number(form.timeToLive) > 1
+                    ? `${form.timeToLiveUnit}s`
+                    : form.timeToLiveUnit}
+                </span>
+              </Unit>
+            )}
           </div>
         </Line>
       </div>
@@ -36,14 +82,14 @@ export function SummaryStep() {
   )
 }
 
-type Props = {
+type LineProps = {
   title: string
 }
 function Line({
   title,
   children,
   className,
-}: Props & { children: React.ReactNode; className?: string }) {
+}: LineProps & { children: React.ReactNode; className?: string }) {
   return (
     <div className={cn("w-full flex justify-between text-base", className)}>
       <span>{title}</span>

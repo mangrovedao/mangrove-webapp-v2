@@ -7,21 +7,14 @@ import {
   getContentClasses,
   titleClasses,
 } from "./styles"
-import type { DialogType } from "./types"
-
-type Props = {
-  open: boolean
-  onClose?: () => void
-  children: React.ReactNode
-  type?: DialogType
-}
+import type { DialogProps, Nodes } from "./types"
 
 export default function Dialog({
   open,
   onClose,
   type = "confirm",
   children,
-}: Props) {
+}: DialogProps) {
   return (
     <Root.Dialog open={open} onOpenChange={onClose}>
       <div className="w-full h-full relative">
@@ -36,31 +29,29 @@ export default function Dialog({
   )
 }
 
-type Nodes = {
-  children: React.ReactNode
-  className?: string
-}
-
-export function Title({ children, className }: Nodes) {
+function Title({ children, className }: Nodes) {
   return (
     <Root.DialogTitle className={cn(titleClasses, className)}>
       {children}
     </Root.DialogTitle>
   )
 }
+Dialog.Title = Title
 
-export function Description({ children, className }: Nodes) {
+function Description({ children, className }: Nodes) {
   return (
     <Root.DialogDescription className={cn(descriptionClasses, className)}>
       {children}
     </Root.DialogDescription>
   )
 }
+Dialog.Description = Description
 
-export function Footer({ children, className }: Nodes) {
+function Footer({ children, className }: Nodes) {
   return (
     <Root.DialogFooter className={cn(footerClasses, className)}>
       {children}
     </Root.DialogFooter>
   )
 }
+Dialog.Footer = Footer

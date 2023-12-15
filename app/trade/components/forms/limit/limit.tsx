@@ -39,13 +39,14 @@ export function Limit() {
     sendTokenBalance,
     handleSubmit,
     form,
-    quote,
+    quoteToken,
     market,
     sendToken,
     receiveToken,
     tickSize,
     feeInPercentageAsString,
     timeInForce,
+    tradeAction,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
@@ -90,9 +91,11 @@ export function Limit() {
                   onBlur={field.handleBlur}
                   onChange={(e) => {
                     field.handleChange(e.target.value)
-                    computeReceiveAmount()
+                    tradeAction === TradeAction.BUY
+                      ? computeSendAmount()
+                      : computeReceiveAmount()
                   }}
-                  token={quote}
+                  token={quoteToken}
                   label="Limit price"
                   disabled={!market}
                   error={field.state.meta.errors}
@@ -150,7 +153,7 @@ export function Limit() {
                 {(field) => {
                   return (
                     <div className="grid text-md space-y-2">
-                      <Label>Time in force {field.state.value}</Label>
+                      <Label>Time in force</Label>
                       <Select
                         name={field.name}
                         value={field.state.value}
@@ -270,10 +273,12 @@ export function Limit() {
         </form>
       </form.Provider>
 
-      <FromWalletLimitOrderDialog
-        form={formData}
-        onClose={() => setFormData(undefined)}
-      />
+      {formData && (
+        <FromWalletLimitOrderDialog
+          form={formData}
+          onClose={() => setFormData(undefined)}
+        />
+      )}
     </>
   )
 }

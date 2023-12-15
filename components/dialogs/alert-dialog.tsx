@@ -8,21 +8,14 @@ import {
   getContentClasses,
   titleClasses,
 } from "./styles"
-import type { DialogType } from "./types"
-
-type Props = {
-  open: boolean
-  onClose?: () => void
-  children: React.ReactNode
-  type?: DialogType
-}
+import type { DialogProps, Nodes } from "./types"
 
 export default function AlertDialog({
   open,
   onClose,
   type = "confirm",
   children,
-}: Props) {
+}: DialogProps) {
   return (
     <Root.AlertDialog open={open} onOpenChange={onClose}>
       <div className="w-full h-full relative">
@@ -37,31 +30,29 @@ export default function AlertDialog({
   )
 }
 
-type Nodes = {
-  children: React.ReactNode
-  className?: string
-}
-
-export function Title({ children, className }: Nodes) {
+function Title({ children, className }: Nodes) {
   return (
     <Root.AlertDialogTitle className={cn(titleClasses, className)}>
       {children}
     </Root.AlertDialogTitle>
   )
 }
+AlertDialog.Title = Title
 
-export function Description({ children, className }: Nodes) {
+function Description({ children, className }: Nodes) {
   return (
     <Root.AlertDialogDescription className={cn(descriptionClasses, className)}>
       {children}
     </Root.AlertDialogDescription>
   )
 }
+AlertDialog.Description = Description
 
-export function Footer({ children, className }: Nodes) {
+function Footer({ children, className }: Nodes) {
   return (
     <Root.AlertDialogFooter className={cn(footerClasses, className)}>
       {children}
     </Root.AlertDialogFooter>
   )
 }
+AlertDialog.Footer = Footer

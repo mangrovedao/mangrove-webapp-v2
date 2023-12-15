@@ -4,11 +4,9 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
 
-import { useTokenBalance } from "@/hooks/use-token-balance"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
 import { TradeAction } from "../../enums"
+import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -17,7 +15,6 @@ type Props = {
 }
 
 export function useLimit(props: Props) {
-  const { mangrove } = useMangrove()
   const { market, marketInfo } = useMarket()
   const form = useForm({
     validator: zodValidator,
@@ -91,22 +88,16 @@ export function useLimit(props: Props) {
     },
   })
   const tradeAction = form.useStore((state) => state.values.tradeAction)
+  const {
+    quoteToken,
+    sendToken,
+    receiveToken,
+    feeInPercentageAsString,
+    sendTokenBalance,
+  } = useTradeInfos("limit", tradeAction)
+
   const send = form.useStore((state) => state.values.send)
   const timeInForce = form.useStore((state) => state.values.timeInForce)
-  const base = market?.base
-  const quote = market?.quote
-  const { baseQuoteToSendReceive } =
-    TRADEMODE_AND_ACTION_PRESENTATION.limit[tradeAction]
-  const [sendToken, receiveToken] = baseQuoteToSendReceive(base, quote)
-  const sendTokenBalance = useTokenBalance(sendToken)
-  const fee =
-    (tradeAction === TradeAction.BUY
-      ? marketInfo?.asksConfig?.fee
-      : marketInfo?.bidsConfig?.fee) ?? 0
-  const feeInPercentageAsString = new Intl.NumberFormat("en-US", {
-    style: "percent",
-    maximumFractionDigits: 2,
-  }).format(fee / 10_000)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -118,8 +109,19 @@ export function useLimit(props: Props) {
     const limitPrice = form.state.values.limitPrice
     const send = form.state.values.send
     if (send === "") return
-    const limit = Big(Number(limitPrice) ?? 0)
-    const receive = limit.mul(Big(send ?? 0)).toString()
+
+    let limit,
+      receive = ""
+    if (tradeAction === TradeAction.SELL) {
+      limit = Big(Number(limitPrice) ?? 0)
+      receive = limit.mul(Big(send ?? 0)).toString()
+    } else {
+      limit = Number(limitPrice) !== 0 ? Number(limitPrice) : 1
+      receive = Big(Number(send ?? 0))
+        .div(limit)
+        .toString()
+    }
+
     form.store.setState(
       (state) => {
         return {
@@ -141,9 +143,17 @@ export function useLimit(props: Props) {
     const limitPrice = form.state.values.limitPrice
     const receive = form.state.values.receive
     if (receive === "") return
-    const send = Big(Number(limitPrice ?? 0))
-      .mul(Number(receive ?? 0))
-      .toString()
+    let send = ""
+    if (tradeAction === TradeAction.SELL) {
+      send = Big(Number(receive ?? 0))
+        .div(Number(limitPrice ?? 1))
+        .toString()
+    } else {
+      send = Big(Number(limitPrice ?? 0))
+        .mul(Number(receive ?? 0))
+        .toString()
+    }
+
     form.store.setState(
       (state) => {
         return {
@@ -162,16 +172,25 @@ export function useLimit(props: Props) {
   }
 
   React.useEffect(() => {
+    const send = form?.getFieldValue("send")
+    const receive = form?.getFieldValue("receive")
+    form.setFieldValue("send", receive)
+    form.setFieldValue("receive", send)
+    form.validateAllFields("submit")
+  }, [form, tradeAction])
+
+  React.useEffect(() => {
     form?.reset()
   }, [form, market?.base, market?.quote])
 
   return {
+    tradeAction,
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
     handleSubmit,
     form,
-    quote,
+    quoteToken,
     market,
     sendToken,
     send,
