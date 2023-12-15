@@ -3,6 +3,7 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { Accordion } from "../../components/accordion"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { useApproveLimitOrder } from "../hooks/use-approve-limit-order"
+import { usePostLimitOrder } from "../hooks/use-post-limit-order"
 import { useStep } from "../hooks/use-step"
 import type { Form } from "../types"
 import { ApproveStep } from "./approve-step"
@@ -25,6 +26,7 @@ const btnProps: ButtonProps = {
 export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   const [currentStep, helpers] = useStep(STEPS.length)
   const approve = useApproveLimitOrder()
+  const post = usePostLimitOrder()
 
   const {
     baseToken,
@@ -96,8 +98,17 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       button: (
         <Button
           {...btnProps}
-          disabled={!canGoToNextStep}
-          onClick={goToNextStep}
+          loading={post.isPending}
+          onClick={() => {
+            post.mutate(
+              {
+                form,
+              },
+              {
+                onSuccess: onClose,
+              },
+            )
+          }}
         >
           Proceed the payment
         </Button>

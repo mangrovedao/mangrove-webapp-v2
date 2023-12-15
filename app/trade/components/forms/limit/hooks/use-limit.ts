@@ -27,65 +27,7 @@ export function useLimit(props: Props) {
       timeToLive: "1",
       timeToLiveUnit: TimeToLiveUnit.DAY,
     },
-    onSubmit: (values) => {
-      return props.onSubmit(values)
-      // const {
-      //   tradeAction,
-      //   send,
-      //   receive,
-      //   timeInForce,
-      //   timeToLive,
-      //   timeToLiveUnit,
-      // } = values
-      // if (!mangrove || !market) return
-      // try {
-      //   // DOUBLE Approval for limit order's explanation:
-      //   /** limit orders first calls take() on the underlying contract which consumes the given amount of allowance,
-      //   then if it posts an offer, then it transfers the tokens back to the wallet, and the offer then consumes up to the given amount of allowance
-      //   */
-      //   const spender = await mangrove?.orderContract.router()
-      //   if (!spender) return
-      //   const { baseQuoteToSendReceive } =
-      //     TRADEMODE_AND_ACTION_PRESENTATION.limit[tradeAction]
-      //   const [sendToken] = baseQuoteToSendReceive(market.base, market.quote)
-      //   const sendToFixed = Big(send)
-      //   const receiveToFixed = Big(receive)
-      //   await sendToken.increaseApproval(spender, sendToFixed)
-      //   const isBuy = tradeAction === TradeAction.BUY
-      //   let orderParams: Market.TradeParams = {
-      //     wants: receiveToFixed,
-      //     gives: sendToFixed,
-      //   }
-
-      //   const isGoodTilTime = timeInForce === TimeInForce.GOOD_TIL_TIME
-      //   if (isGoodTilTime) {
-      //     orderParams = {
-      //       ...orderParams,
-      //       expiryDate: estimateTimestamp({
-      //         timeToLiveUnit,
-      //         timeToLive,
-      //       }),
-      //     }
-      //   }
-
-      //   orderParams = {
-      //     ...orderParams,
-      //     restingOrder: {},
-      //     forceRoutingToMangroveOrder: true,
-      //     fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
-      //   }
-
-      //   const order = isBuy
-      //     ? await market.buy(orderParams)
-      //     : await market.sell(orderParams)
-      //   const orderResult = await order.result
-      //   handleOrderResultToastMessages(orderResult, tradeAction, market)
-      //   form.reset()
-      // } catch (e) {
-      //   console.error(e)
-      //   toast.error("An error occurred")
-      // }
-    },
+    onSubmit: (values) => props.onSubmit(values),
   })
   const tradeAction = form.useStore((state) => state.values.tradeAction)
   const {
@@ -136,6 +78,7 @@ export function useLimit(props: Props) {
         priority: "high",
       },
     )
+    if (!(limitPrice && send)) return
     form.validateAllFields("submit")
   }
 
@@ -168,12 +111,14 @@ export function useLimit(props: Props) {
         priority: "high",
       },
     )
+    if (!(limitPrice && receive)) return
     form.validateAllFields("submit")
   }
 
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
     const receive = form?.getFieldValue("receive")
+    if (!(send && receive)) return
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
     form.validateAllFields("submit")
