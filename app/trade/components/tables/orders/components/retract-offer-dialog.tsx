@@ -1,6 +1,6 @@
 import type { Market } from "@mangrovedao/mangrove.js"
 
-import Dialog, { Description, Footer, Title } from "@/components/dialogs/dialog"
+import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
 import { useRetractOrder } from "../hooks/use-retract-order"
 import type { Order } from "../schema"
@@ -17,9 +17,11 @@ export default function RetractOfferDialog({ order, market, onClose }: Props) {
 
   return (
     <Dialog open={!!order} onClose={onClose}>
-      <Title>Retract an offer</Title>
-      <Description>Are you sure to retract the offer?</Description>
-      <Footer>
+      <Dialog.Title>Retract an offer</Dialog.Title>
+      <Dialog.Description>
+        Are you sure to retract the offer?
+      </Dialog.Description>
+      <Dialog.Footer>
         <Button
           rightIcon
           className="w-full"
@@ -41,7 +43,7 @@ export default function RetractOfferDialog({ order, market, onClose }: Props) {
         >
           Retract
         </Button>
-      </Footer>
+      </Dialog.Footer>
     </Dialog>
   )
 }

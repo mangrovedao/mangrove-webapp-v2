@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import * as Root from "@/components/ui/alert-dialog"
+import { cn } from "@/utils"
 import { Heading } from "./heading"
 import {
   descriptionClasses,
@@ -7,21 +8,14 @@ import {
   getContentClasses,
   titleClasses,
 } from "./styles"
-import type { DialogType } from "./types"
-
-type Props = {
-  open: boolean
-  onClose?: () => void
-  children: React.ReactNode
-  type?: DialogType
-}
+import type { DialogProps, Nodes } from "./types"
 
 export default function AlertDialog({
   open,
   onClose,
   type = "confirm",
   children,
-}: Props) {
+}: DialogProps) {
   return (
     <Root.AlertDialog open={open} onOpenChange={onClose}>
       <div className="w-full h-full relative">
@@ -36,26 +30,29 @@ export default function AlertDialog({
   )
 }
 
-export function Title({ children }: { children: React.ReactNode }) {
+function Title({ children, className }: Nodes) {
   return (
-    <Root.AlertDialogTitle className={titleClasses}>
+    <Root.AlertDialogTitle className={cn(titleClasses, className)}>
       {children}
     </Root.AlertDialogTitle>
   )
 }
+AlertDialog.Title = Title
 
-export function Description({ children }: { children: React.ReactNode }) {
+function Description({ children, className }: Nodes) {
   return (
-    <Root.AlertDialogDescription className={descriptionClasses}>
+    <Root.AlertDialogDescription className={cn(descriptionClasses, className)}>
       {children}
     </Root.AlertDialogDescription>
   )
 }
+AlertDialog.Description = Description
 
-export function Footer({ children }: { children: React.ReactNode }) {
+function Footer({ children, className }: Nodes) {
   return (
-    <Root.AlertDialogFooter className={footerClasses}>
+    <Root.AlertDialogFooter className={cn(footerClasses, className)}>
       {children}
     </Root.AlertDialogFooter>
   )
 }
+AlertDialog.Footer = Footer

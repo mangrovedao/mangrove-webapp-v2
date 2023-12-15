@@ -24,7 +24,7 @@ export function Accordion({
       defaultOpen={defaultOpen}
     >
       <CollapsibleTrigger asChild>
-        <button className="flex items-center justify-between w-full mb-4 hover:opacity-80 transition-opacity">
+        <button className="flex items-center justify-between w-full hover:opacity-80 transition-opacity">
           <h4 className="font-semibold">{title}</h4>
           <ChevronDown
             className={
