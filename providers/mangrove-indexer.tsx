@@ -45,6 +45,7 @@ const useIndexerSdkContext = () => {
     meta: {
       error: "Error when initializing the indexer sdk",
     },
+    enabled: !!mangrove,
   })
   return {
     indexerSdkQuery,

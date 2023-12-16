@@ -14,6 +14,7 @@ import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { SemiBook } from "./semibook"
+import { OrderBookTableCell } from "./table-cell"
 import { OrderBookTableHead } from "./table-head"
 import useScrollToMiddle from "./use-scroll-to-middle"
 
@@ -83,6 +84,11 @@ function BookContent() {
         </TableHeader>
         <TableBody className="overflow-scroll" ref={bodyRef}>
           <SemiBook type="asks" ref={bestAskRef} data={requestBookQuery.data} />
+          <TableRow className="border-none">
+            <OrderBookTableCell>Prout</OrderBookTableCell>
+            <OrderBookTableCell>test</OrderBookTableCell>
+            <OrderBookTableCell></OrderBookTableCell>
+          </TableRow>
           <SemiBook type="bids" ref={bestBidRef} data={requestBookQuery.data} />
         </TableBody>
       </Table>
