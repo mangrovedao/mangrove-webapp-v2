@@ -1,4 +1,5 @@
 "use client"
+import Big from "big.js"
 import React from "react"
 
 import {
@@ -13,6 +14,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { SemiBook } from "./semibook"
 import { OrderBookTableCell } from "./table-cell"
 import { OrderBookTableHead } from "./table-head"
@@ -47,9 +49,10 @@ function BookContent() {
   const { requestBookQuery, market } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
   const { asks, bids } = requestBookQuery.data ?? {}
-  // const highestAskPrice = asks?.[asks.length - 1]?.price
+  const highestAskPrice = asks?.[asks.length - 1]?.price
   const lowestAskPrice = asks?.[0]?.price
   const highestBidPrice = bids?.[0]?.price
+  const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
   const spread = lowestAskPrice?.sub(highestBidPrice ?? 0)
   const spreadPercent =
     spread
@@ -60,6 +63,10 @@ function BookContent() {
     style: "percent",
     maximumFractionDigits: 2,
   }).format(spreadPercent / 100)
+  const priceDecimals = determinePriceDecimalsFromToken(
+    bigestPrice.toNumber(),
+    market?.quote,
+  )
 
   if (requestBookQuery.isLoading || !market) {
     return (
@@ -97,21 +104,29 @@ function BookContent() {
           </TableRow>
         </TableHeader>
         <TableBody className="overflow-scroll" ref={bodyRef}>
-          <SemiBook type="asks" data={requestBookQuery.data} />
+          <SemiBook
+            type="asks"
+            data={requestBookQuery.data}
+            priceDecimals={priceDecimals}
+          />
           {bids?.length && asks?.length ? (
             <TableRow className="border-none" ref={spreadRef}>
               <OrderBookTableCell className="text-gray">
                 Spread
               </OrderBookTableCell>
               <OrderBookTableCell>
-                {spread?.toFixed(market.quote.displayedDecimals)}
+                {spread?.toFixed(priceDecimals)}
               </OrderBookTableCell>
               <OrderBookTableCell className="text-gray">
                 {spreadPercentString}
               </OrderBookTableCell>
             </TableRow>
           ) : undefined}
-          <SemiBook type="bids" data={requestBookQuery.data} />
+          <SemiBook
+            type="bids"
+            data={requestBookQuery.data}
+            priceDecimals={priceDecimals}
+          />
         </TableBody>
       </Table>
       <ScrollBar orientation="vertical" className="z-50" />

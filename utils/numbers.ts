@@ -17,6 +17,7 @@ export function determineDecimals(
   maxDecimals = 6,
 ) {
   if (value === undefined) return maxDecimals
+
   // Convert the value to a string using the user's locale
   const valueString = value.toLocaleString()
 
@@ -48,7 +49,11 @@ export function determineDecimals(
     maxDecimals,
   )
 
-  return decimalsToShow
+  // Determine the number of decimals based on the size of the number
+  const sizeOfNumber = Math.floor(Math.log10(Math.abs(Number(value)))) + 1
+  const decimalsBasedOnSize = Math.max(0, maxDecimals - sizeOfNumber)
+
+  return Math.min(decimalsToShow, decimalsBasedOnSize)
 }
 
 export function determinePriceDecimalsFromToken(

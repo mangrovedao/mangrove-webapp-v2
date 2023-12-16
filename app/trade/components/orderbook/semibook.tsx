@@ -14,12 +14,13 @@ type SemiBookProps = {
     asks: Market.Offer[]
     bids: Market.Offer[]
   } | null
+  priceDecimals: number
 }
 
 export const SemiBook = React.forwardRef<
   React.ElementRef<typeof TableRow>,
   SemiBookProps
->(({ type, data }, ref) => {
+>(({ type, data, priceDecimals }, ref) => {
   const { dataWithCumulatedVolume, maxVolume } = calculateCumulatedVolume(data)
   const offers = dataWithCumulatedVolume?.[type].sort((a, b) =>
     Big(b.price ?? 0)
@@ -48,11 +49,11 @@ export const SemiBook = React.forwardRef<
         </OrderBookTableCell>
 
         <OrderBookTableCell className="text-right">
-          <span className="!font-roboto">{price?.toFixed(3)}</span>
+          <span className="!font-roboto">{price?.toFixed(priceDecimals)}</span>
         </OrderBookTableCell>
 
         <OrderBookTableCell className="text-gray">
-          {price?.mul(volume).toFixed(3)}
+          {price?.mul(volume).toFixed(priceDecimals)}
         </OrderBookTableCell>
         <td
           className={cn(
