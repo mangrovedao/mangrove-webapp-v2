@@ -1,3 +1,5 @@
+import { useNetwork } from "wagmi"
+
 import { tradeService } from "@/app/trade/services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
@@ -24,6 +26,7 @@ const btnProps: ButtonProps = {
 }
 
 export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
+  const { chain } = useNetwork()
   const {
     baseToken,
     quoteToken,
@@ -110,6 +113,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
                   onClose()
                   tradeService.openTxCompletedDialog({
                     address: data?.txReceipt.transactionHash ?? "",
+                    blockExplorerUrl: chain?.blockExplorers?.default.url,
                   })
                 },
                 onError: (error: Error) => {

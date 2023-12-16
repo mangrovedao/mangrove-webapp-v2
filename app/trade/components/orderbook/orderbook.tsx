@@ -10,7 +10,6 @@ import {
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
@@ -70,9 +69,7 @@ function BookContent() {
 
   if (requestBookQuery.isLoading || !market) {
     return (
-      <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean">
-        <Spinner />
-      </Skeleton>
+      <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean" />
     )
   }
 

@@ -1,4 +1,5 @@
 import { Copy } from "lucide-react"
+import Link from "next/link"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -9,16 +10,26 @@ import { shortenAddress } from "@/utils/wallet"
 function openTxCompletedDialog({
   title = "Transaction Completed",
   address,
+  blockExplorerUrl,
 }: {
   title?: React.ReactNode
   address: string
+  blockExplorerUrl?: string
 }) {
   dialogs.open({
     title,
     children: (
       <div className="space-y-4">
         <div className="bg-primary-dark-green rounded-lg py-3 px-4 flex items-center justify-between">
-          <span>View on block explorer</span>
+          {blockExplorerUrl && (
+            <Link
+              className="hover:opacity-80 transition-all"
+              target="_blank"
+              href={`${blockExplorerUrl}/tx/${address}`}
+            >
+              <span>View on block explorer</span>{" "}
+            </Link>
+          )}
 
           <Button
             className="flex items-center space-x-1 underline"
