@@ -25,35 +25,25 @@ export function usePostLimitOrder() {
         timeToLiveUnit,
       } = form
       const isBuy = tradeAction === TradeAction.BUY
-      let orderParams: Market.TradeParams = {
+      const orderParams: Market.TradeParams = {
         wants: receive,
         gives: send,
-      }
-
-      const isGoodTilTime = timeInForce === TimeInForce.GOOD_TIL_TIME
-      if (isGoodTilTime) {
-        orderParams = {
-          ...orderParams,
-          expiryDate: estimateTimestamp({
-            timeToLiveUnit,
-            timeToLive,
-          }),
-        }
-      }
-
-      orderParams = {
-        ...orderParams,
         restingOrder: {},
         forceRoutingToMangroveOrder: true,
         fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
+        expiryDate:
+          timeInForce === TimeInForce.GOOD_TIL_TIME
+            ? estimateTimestamp({
+                timeToLiveUnit,
+                timeToLive,
+              })
+            : undefined,
       }
 
       const order = isBuy
         ? await market.buy(orderParams)
         : await market.sell(orderParams)
-      const orderResult = await order.result
-      // handleOrderResultToastMessages(orderResult, tradeAction, market)
-      return orderResult
+      return await order.result
     },
     meta: {
       error: "Failed to post the limit order",

@@ -23,7 +23,7 @@ const buttonVariants = cva(
           "focus:bg-primary-solid-black hover:bg-green-bangladesh active:text-primary-solid-black active:bg-green-bangladesh",
         ],
         link: "text-primary underline-offset-4 hover:underline",
-        invisible: "text-white",
+        invisible: "text-white hover:opacity-80 transition-opacity",
       },
       size: {
         sm: "px-3 pb-1 pt-[6px] leading-[14px]",

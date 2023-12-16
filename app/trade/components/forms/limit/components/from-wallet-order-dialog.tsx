@@ -1,11 +1,12 @@
 import { tradeService } from "@/app/trade/services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
+import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { useStep } from "../../../../../../hooks/use-step"
 import { Accordion } from "../../components/accordion"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
-import { useApproveLimitOrder } from "../hooks/use-approve-limit-order"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
-import { useStep } from "../hooks/use-step"
 import type { Form } from "../types"
 import { ApproveStep } from "./approve-step"
 import { Steps } from "./steps"
@@ -23,20 +24,29 @@ const btnProps: ButtonProps = {
 }
 
 export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
-  const { baseToken, quoteToken, sendToken, receiveToken } = useTradeInfos(
-    "limit",
-    form.tradeAction,
-  )
-  const STEPS = ["Summary", `Approve ${sendToken?.symbol}`, "Send"]
-  const approve = useApproveLimitOrder()
+  const {
+    baseToken,
+    quoteToken,
+    sendToken,
+    receiveToken,
+    isInfiniteAllowance,
+    spender,
+  } = useTradeInfos("limit", form.tradeAction)
+
+  let steps = ["Send"]
+  if (!isInfiniteAllowance) {
+    steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
+  }
+
+  const approve = useInfiniteApproveToken()
   const post = usePostLimitOrder()
 
-  const [currentStep, helpers] = useStep(STEPS.length)
+  const [currentStep, helpers] = useStep(steps.length)
 
   const { goToNextStep } = helpers
 
   const stepInfos = [
-    {
+    !isInfiniteAllowance && {
       body: (
         <SummaryStep
           form={form}
@@ -52,7 +62,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         </Button>
       ),
     },
-    {
+    !isInfiniteAllowance && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
         <Button
@@ -62,7 +72,8 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
           onClick={() => {
             approve.mutate(
               {
-                form,
+                token: sendToken,
+                spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -101,9 +112,11 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
                     address: data?.txReceipt.transactionHash ?? "",
                   })
                 },
-                onError: () => {
+                onError: (error: Error) => {
                   onClose()
-                  tradeService.openTxFailedDialog()
+                  tradeService.openTxFailedDialog(
+                    getTitleDescriptionErrorMessages(error),
+                  )
                 },
               },
             )
@@ -113,19 +126,21 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         </Button>
       ),
     },
-  ].map((stepInfo, i) => {
-    return {
-      ...stepInfo,
-      title: STEPS[i],
-    }
-  })
+  ]
+    .filter(Boolean)
+    .map((stepInfo, i) => {
+      return {
+        ...stepInfo,
+        title: steps[i],
+      }
+    })
 
   return (
     <Dialog open={!!form} onClose={onClose}>
       <Dialog.Title className="text-xl text-left">
         Proceed transaction
       </Dialog.Title>
-      <Steps steps={STEPS} currentStep={currentStep} />
+      <Steps steps={steps} currentStep={currentStep} />
       <Dialog.Description>
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}

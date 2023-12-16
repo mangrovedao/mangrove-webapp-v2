@@ -48,19 +48,21 @@ function openTxCompletedDialog({
 
 function openTxFailedDialog({
   title = "Transaction Reverted",
+  description = "Your transaction has failed.",
 }: {
   title?: React.ReactNode
+  description?: React.ReactNode
 } = {}) {
   dialogs.open({
     title,
     children: (
       <div className="space-y-4">
-        <div>Your transaction has failed.</div>
+        <div>{description}</div>
       </div>
     ),
     actionButtons: [
       {
-        onClick: () => dialogs.close,
+        onClick: dialogs.close,
         children: "Close",
         id: "close-tx-completed-dialog",
         className: "w-full",
