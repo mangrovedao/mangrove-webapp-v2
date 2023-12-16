@@ -9,14 +9,14 @@ import { useNetwork } from "wagmi"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
-  const { marketsInfoQuery, mangrove } = useMangrove()
+  const { mangrove } = useMangrove()
   const { chain } = useNetwork()
 
   const indexerSdkQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["indexer-sdk", chain?.network, marketsInfoQuery.dataUpdatedAt],
+    queryKey: ["indexer-sdk", chain?.network],
     queryFn: () => {
-      if (!(chain?.network && marketsInfoQuery.data)) return null
+      if (!chain?.network) return null
       const chainName = chain.network as Chains
       return getSdk({
         chainName,
@@ -27,16 +27,17 @@ const useIndexerSdkContext = () => {
               throw new Error("Impossible to determine token decimals")
             return token.decimals
           },
-          createTickHelpers: (ba, m) => {
-            const marketInfo = marketsInfoQuery?.data?.find(
-              (t) =>
-                t.base.address.toLowerCase() === m.base.address.toLowerCase() &&
-                t.quote.address.toLowerCase() === m.quote.address.toLowerCase(),
-            )
-            if (!(mangrove && marketInfo)) {
-              throw new Error("Impossible to determine token decimals")
+          createTickHelpers: async (ba, m) => {
+            const base = await mangrove?.tokenFromAddress(m.base.address)
+            const quote = await mangrove?.tokenFromAddress(m.quote.address)
+            if (!(mangrove && base && quote)) {
+              throw new Error("Impossible to determine market tokens")
             }
-            return Promise.resolve(new TickPriceHelper(ba, marketInfo))
+            return new TickPriceHelper(ba, {
+              base,
+              quote,
+              tickSpacing: m.tickSpacing,
+            })
           },
         },
       })
