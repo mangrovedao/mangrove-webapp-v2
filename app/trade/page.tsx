@@ -7,6 +7,7 @@ import { PricesBar } from "./components/prices-bar/prices-bar"
 import { Tables } from "./components/tables/tables"
 
 export default function Page() {
+  return null
   return (
     <main>
       <section className="trade-section">
