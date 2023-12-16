@@ -45,7 +45,21 @@ export function OrderBook({
 
 function BookContent() {
   const { requestBookQuery, market } = useMarket()
-  const { bodyRef, scrollAreaRef, bestAskRef, bestBidRef } = useScrollToMiddle()
+  const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
+  const { asks, bids } = requestBookQuery.data ?? {}
+  // const highestAskPrice = asks?.[asks.length - 1]?.price
+  const lowestAskPrice = asks?.[0]?.price
+  const highestBidPrice = bids?.[0]?.price
+  const spread = lowestAskPrice?.sub(highestBidPrice ?? 0)
+  const spreadPercent =
+    spread
+      ?.mul(100)
+      .div(highestBidPrice ?? 1)
+      .toNumber() ?? 0
+  const spreadPercentString = new Intl.NumberFormat("en-US", {
+    style: "percent",
+    maximumFractionDigits: 2,
+  }).format(spreadPercent / 100)
 
   if (requestBookQuery.isLoading || !market) {
     return (
@@ -83,13 +97,21 @@ function BookContent() {
           </TableRow>
         </TableHeader>
         <TableBody className="overflow-scroll" ref={bodyRef}>
-          <SemiBook type="asks" ref={bestAskRef} data={requestBookQuery.data} />
-          <TableRow className="border-none">
-            <OrderBookTableCell>Prout</OrderBookTableCell>
-            <OrderBookTableCell>test</OrderBookTableCell>
-            <OrderBookTableCell></OrderBookTableCell>
-          </TableRow>
-          <SemiBook type="bids" ref={bestBidRef} data={requestBookQuery.data} />
+          <SemiBook type="asks" data={requestBookQuery.data} />
+          {bids?.length && asks?.length ? (
+            <TableRow className="border-none" ref={spreadRef}>
+              <OrderBookTableCell className="text-gray">
+                Spread
+              </OrderBookTableCell>
+              <OrderBookTableCell>
+                {spread?.toFixed(market.quote.displayedDecimals)}
+              </OrderBookTableCell>
+              <OrderBookTableCell className="text-gray">
+                {spreadPercentString}
+              </OrderBookTableCell>
+            </TableRow>
+          ) : undefined}
+          <SemiBook type="bids" data={requestBookQuery.data} />
         </TableBody>
       </Table>
       <ScrollBar orientation="vertical" className="z-50" />

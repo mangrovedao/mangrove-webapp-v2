@@ -3,8 +3,7 @@ import React from "react"
 export default function useScrollToMiddle() {
   const scrollAreaRef = React.useRef<HTMLDivElement>(null)
   const bodyRef = React.useRef<HTMLTableSectionElement>(null)
-  const bestBidRef = React.useRef<HTMLTableRowElement>(null)
-  const bestAskRef = React.useRef<HTMLTableRowElement>(null)
+  const spreadRef = React.useRef<HTMLTableRowElement>(null)
 
   React.useEffect(() => {
     if (!scrollAreaRef.current || !bodyRef.current) return
@@ -16,7 +15,7 @@ export default function useScrollToMiddle() {
     if (!scrollableViewport) return
     const bodyRect = scrollAreaRef.current.getBoundingClientRect()
     const middle = scrollAreaRect.height / 2
-    const targetElement = bestBidRef.current ?? bestAskRef.current
+    const targetElement = spreadRef.current
 
     if (!targetElement) return
     const targetRect = targetElement.getBoundingClientRect()
@@ -34,7 +33,6 @@ export default function useScrollToMiddle() {
   return {
     scrollAreaRef,
     bodyRef,
-    bestBidRef,
-    bestAskRef,
+    spreadRef,
   }
 }
