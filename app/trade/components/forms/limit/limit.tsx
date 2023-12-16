@@ -91,9 +91,7 @@ export function Limit() {
                   onBlur={field.handleBlur}
                   onChange={(e) => {
                     field.handleChange(e.target.value)
-                    tradeAction === TradeAction.BUY
-                      ? computeSendAmount()
-                      : computeReceiveAmount()
+                    computeReceiveAmount()
                   }}
                   token={quoteToken}
                   label="Limit price"
