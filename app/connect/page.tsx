@@ -8,7 +8,6 @@ import {
   useWeb3ModalState,
   useWeb3ModalTheme,
 } from "@web3modal/wagmi/react"
-import { useAccount } from "wagmi"
 
 export default function Page() {
   // 4. Use modal hook
@@ -16,7 +15,6 @@ export default function Page() {
   const state = useWeb3ModalState()
   const { themeMode, themeVariables, setThemeMode } = useWeb3ModalTheme()
   const events = useWeb3ModalEvents()
-  const { isConnected, connector, address, isConnecting } = useAccount()
 
   return (
     <main className="w-full items-center flex flex-col">
