@@ -9,8 +9,16 @@ import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
 
 export function Orders() {
+  const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
+    page: 1,
+    pageSize: 10,
+  })
   const { market } = useMarket()
-  const ordersQuery = useOrders()
+  const ordersQuery = useOrders({
+    filters: {
+      skip: (page - 1) * pageSize,
+    },
+  })
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<Order>()
@@ -29,6 +37,11 @@ export function Orders() {
         table={table}
         isError={!!ordersQuery.error}
         isLoading={ordersQuery.isLoading || !market}
+        pagination={{
+          onPageChange: setPageDetails,
+          page,
+          pageSize,
+        }}
       />
       <RetractOfferDialog
         order={orderToDelete}

@@ -16,6 +16,7 @@
     "crypto-icons": "node ./prepare-icons.js"
   },
   "dependencies": {
+    "@ark-ui/react": "^1.2.1",
     "@ethersproject/providers": "^5.7.2",
     "@mangrovedao/indexer-sdk": "0.0.11-9",
     "@mangrovedao/mangrove.js": "2.0.0-14",
