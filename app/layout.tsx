@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import Script from "next/script"
 import React from "react"
 import { Toaster } from "sonner"
@@ -25,6 +26,9 @@ export default function RootLayout({
         <RootProvider>
           <Navbar />
           {children}
+          {/* FIXME: This is a quick fix, I don't know why but the <w3m-modal /> is not injected into the DOM with the way I set the providers/contexts in the app */}
+          {/* @ts-ignore */}
+          <w3m-modal />
         </RootProvider>
         <Toaster
           position="bottom-center"
