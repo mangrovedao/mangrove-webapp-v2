@@ -22,7 +22,6 @@ import { Bell, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import { ClientOnly } from "./client-only"
-import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 
 const LINKS = [
@@ -112,7 +111,8 @@ function RightPart() {
 
   return (
     <div className="flex space-x-4 items-center h-8 py-1">
-      <Button
+      <w3m-network-button />
+      {/* <Button
         variant="invisible"
         className="space-x-4 flex items-center"
         size="sm"
@@ -130,7 +130,7 @@ function RightPart() {
           <span className="text-sm">{chain?.name}</span>
         </span>
         <ChevronDown className="w-3" />
-      </Button>
+      </Button> */}
 
       <Separator orientation="vertical" />
 
