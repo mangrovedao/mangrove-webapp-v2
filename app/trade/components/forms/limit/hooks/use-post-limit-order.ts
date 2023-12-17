@@ -6,7 +6,7 @@ import type { Market } from "@mangrovedao/mangrove.js"
 import { TradeAction } from "../../enums"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
-import { estimateTimestamp } from "../utils"
+import { estimateTimestamp, handleOrderResultToastMessages } from "../utils"
 
 export function usePostLimitOrder() {
   const { mangrove } = useMangrove()
@@ -43,7 +43,9 @@ export function usePostLimitOrder() {
       const order = isBuy
         ? await market.buy(orderParams)
         : await market.sell(orderParams)
-      return await order.result
+      const result = await order.result
+      handleOrderResultToastMessages(result, tradeAction, market)
+      return result
     },
     meta: {
       error: "Failed to post the limit order",
