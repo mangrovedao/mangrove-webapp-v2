@@ -1,5 +1,7 @@
 import Link from "next/link"
 
+import { Button } from "@/components/ui/button"
+
 export default function NotFound() {
   return (
     <div className="flex justify-center items-center w-full h-[calc(100vh-var(--bar-height))]">
@@ -8,14 +10,9 @@ export default function NotFound() {
         <p className="text-gray-scale-300">
           The page you requested does not exist
         </p>
-        <div className="mt-4">
-          <Link
-            href="/"
-            className="underline hover:opacity-80 transition-opacity"
-          >
-            Return Home
-          </Link>
-        </div>
+        <Button variant={"secondary"} className="mt-4" asChild>
+          <Link href="/">Return home</Link>
+        </Button>
       </div>
     </div>
   )
