@@ -10,6 +10,7 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { renderElement } from "@/utils/render"
 import { Limit } from "./limit/limit"
+import { Market } from "./market/market"
 
 enum FormType {
   LIMIT = "Limit",
@@ -18,7 +19,7 @@ enum FormType {
 
 const TABS_CONTENT = {
   [FormType.LIMIT]: Limit,
-  [FormType.MARKET]: <div>TODO</div>,
+  [FormType.MARKET]: Market,
 }
 
 export function Forms({
