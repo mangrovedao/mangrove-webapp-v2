@@ -1,6 +1,6 @@
 import { useNetwork } from "wagmi"
 
-import { tradeService } from "@/app/trade/services/trade.service"
+import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"

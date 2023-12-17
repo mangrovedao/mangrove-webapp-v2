@@ -1,10 +1,10 @@
 "use client"
-import MarketSelector from "@/app/trade/components/market-selector/market-selector"
-import { Market } from "./components/charts/charts"
-import { Forms } from "./components/forms/forms"
-import { OrderBook } from "./components/orderbook/orderbook"
-import { PricesBar } from "./components/prices-bar/prices-bar"
-import { Tables } from "./components/tables/tables"
+import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
+import { Market } from "./_components/charts/charts"
+import { Forms } from "./_components/forms/forms"
+import { OrderBook } from "./_components/orderbook/orderbook"
+import { PricesBar } from "./_components/prices-bar/prices-bar"
+import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
   return (

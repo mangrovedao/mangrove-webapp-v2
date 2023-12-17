@@ -11,7 +11,7 @@ import Big from "big.js"
 import React from "react"
 
 import { IconButton } from "@/components/icon-button"
-import { TokenIcon } from "@/components/token-icon"
+import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
@@ -37,26 +37,16 @@ export function useTable({ data, onRetract, onEdit }: Params) {
         header: "Market",
         cell: () => (
           <div className="flex items-center space-x-2">
-            <div className="flex -space-x-2">
-              {market ? (
-                <>
-                  <TokenIcon symbol={market.base.symbol} />
-                  <TokenIcon symbol={market.quote.symbol} />{" "}
-                </>
-              ) : (
-                <>
-                  <Skeleton className="w-6 h-6 rounded-full" />
-                  <Skeleton className="w-6 h-6 rounded-full" />
-                </>
-              )}
-            </div>
-            {market ? (
-              <span>
-                {market.base.symbol}/{market.quote.symbol}
-              </span>
-            ) : (
-              <Skeleton className="w-20 h-6" />
-            )}
+            <TokenPair
+              titleProps={{
+                variant: "title3",
+                className: "text-sm text-current font-normal",
+                as: "span",
+              }}
+              tokenClasses="w-4 h-4"
+              baseToken={market?.base}
+              quoteToken={market?.quote}
+            />
           </div>
         ),
       }),
