@@ -52,11 +52,24 @@ export function useMarketForm(props: Props) {
     queryFn: async () => {
       if (!market) return
 
-      const amount = estimateFrom === "receive" ? send : receive
+      if (tradeAction === TradeAction.BUY) {
+        const amount = estimateFrom === "receive" ? send : receive
+        const { estimatedVolume, estimatedFee } = await market.estimateVolume({
+          given: Big(amount),
+          what: estimateFrom === "receive" ? "quote" : "base",
+          to: estimateFrom === "receive" ? "sell" : "buy",
+        })
+        estimateFrom === "receive"
+          ? form.setFieldValue("receive", estimatedVolume.toString())
+          : form.setFieldValue("send", estimatedVolume.toString())
 
+        return { estimatedVolume, estimatedFee }
+      }
+
+      const amount = estimateFrom === "receive" ? send : receive
       const { estimatedVolume, estimatedFee } = await market.estimateVolume({
         given: Big(amount),
-        what: estimateFrom === "receive" ? "quote" : "base",
+        what: estimateFrom === "receive" ? "base" : "quote",
         to: estimateFrom === "receive" ? "sell" : "buy",
       })
       estimateFrom === "receive"
