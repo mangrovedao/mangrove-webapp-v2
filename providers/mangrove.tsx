@@ -6,8 +6,8 @@ import { useWeb3Modal } from "@web3modal/wagmi/react"
 import React from "react"
 import { useAccount, useNetwork } from "wagmi"
 
+import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import { mangroveConfig } from "@/schemas/mangrove-config"
-import { getWhitelistedMarketsInfos } from "@/services/markets.service"
 import { networkService } from "@/services/network.service"
 import { useEthersSigner } from "@/utils/adapters"
 import { getErrorMessage } from "@/utils/errors"
@@ -51,16 +51,7 @@ const useMangroveContext = () => {
     refetchOnWindowFocus: false,
   })
 
-  const marketsInfoQuery = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["whitelistedMarketsInfos", mangrove?.address, chain?.id],
-    queryFn: () => {
-      if (!mangrove?.address || !chain?.id) return null
-      return getWhitelistedMarketsInfos(mangrove, chain.id)
-    },
-    enabled: !!(mangrove?.address && chain?.id),
-    refetchOnWindowFocus: false,
-  })
+  const marketsInfoQuery = useWhitelistedMarketsInfos(mangrove)
 
   // Close web3modal after changing chain
   React.useEffect(() => {

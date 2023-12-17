@@ -28,7 +28,7 @@ const buttonVariants = cva(
       size: {
         sm: "px-3 pb-1 pt-[6px] leading-[14px]",
         md: "px-3 py-2 text-sm leading-[14px]",
-        lg: "p-3 leading-5 rounded-[32px]",
+        lg: "px-5 py-3 leading-5 rounded-[32px]",
         icon: "flex justify-center items-center aspect-square p-0 h-6",
       },
       rightIcon: {

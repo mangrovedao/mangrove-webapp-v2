@@ -74,7 +74,7 @@
     @apply border-border font-axiforma;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply overflow-x-hidden bg-background text-foreground;
   }
 }
 
