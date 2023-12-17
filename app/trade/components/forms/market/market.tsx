@@ -38,8 +38,8 @@ export function Market() {
     sendToken,
     receiveToken,
     marketInfo,
-    estimatedVolume,
     estimatedFee,
+    estimatedVolume,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
   const handlePercentageButtonClick = (percentage: number) => {
@@ -146,8 +146,8 @@ export function Market() {
                     value={[field.state.value]}
                     step={25}
                     onBlur={field.handleBlur}
-                    onChange={({ target: { value } }: any) => {
-                      field.handleChange(value)
+                    onValueChange={([value]) => {
+                      field.handleChange(Number(value ?? 0))
                     }}
                     disabled={!(market && form.state.isFormValid)}
                   />
@@ -245,7 +245,7 @@ export function Market() {
             <Accordion title="Market details" className="!mb-6">
               <MarketDetailsLine
                 title="Estimated fee"
-                value={estimatedFee || "N/A"}
+                value={estimatedFee ?? "N/A"}
               />
               <MarketDetailsLine title="Taker fee" value={"0"} />
               {/* TODO: <MarketDetailsLine title="Total fees" value="$0.26" /> */}
