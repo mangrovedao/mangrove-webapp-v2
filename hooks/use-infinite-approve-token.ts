@@ -11,7 +11,8 @@ export function useInfiniteApproveToken() {
       spender?: string | null
     }) => {
       if (!(token && spender)) return
-      await token.approve(spender)
+      const result = await token.approve(spender)
+      return result.wait()
     },
     meta: {
       error: "Failed the approval",

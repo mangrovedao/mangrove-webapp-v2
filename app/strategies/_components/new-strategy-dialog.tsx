@@ -17,20 +17,12 @@ import {
 import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import useMangrove from "@/providers/mangrove"
 import { useRouter } from "next/navigation"
+import { getSymbol, getValue } from "../_utils/markets"
 import { Badge } from "./badge"
 
 type Props = {
   open: boolean
   onClose: () => void
-}
-
-function getSymbol(market?: Mangrove.OpenMarketInfo) {
-  if (!market) return
-  return `${market?.base?.symbol}/${market?.quote?.symbol}`
-}
-
-function getValue(market: Mangrove.OpenMarketInfo) {
-  return `${market.base.id},${market.quote.id}`
 }
 
 export function NewStrategyDialog({ open, onClose }: Props) {

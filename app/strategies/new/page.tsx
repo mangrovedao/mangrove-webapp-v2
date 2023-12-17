@@ -1,3 +1,9 @@
+import { InfoBar } from "./_components/info-bar"
+
 export default function Page() {
-  return <div>New strategy</div>
+  return (
+    <div>
+      <InfoBar />
+    </div>
+  )
 }
