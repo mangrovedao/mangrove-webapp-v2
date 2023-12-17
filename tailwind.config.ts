@@ -88,6 +88,9 @@ export default {
           100: "hsl(var(--color-blue-light-100))",
         },
       },
+      maxWidth: {
+        "8xl": "90rem",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

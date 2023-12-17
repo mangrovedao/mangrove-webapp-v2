@@ -22,7 +22,7 @@ export default function RootLayout({
       <head>
         <Script src="datafeeds/udf/dist/bundle.js" async></Script>
       </head>
-      <body className="grid grid-areas-layout">
+      <body>
         <RootProvider>
           <Navbar />
           {children}
