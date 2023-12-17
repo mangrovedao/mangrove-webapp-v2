@@ -83,11 +83,6 @@ body.mouse-down *:focus {
   --tw-ring-color: transparent;
 }
 
-html,
-body {
-  height: 100%;
-}
-
 .error-shadow {
   box-shadow: 0 0 0 16px rgba(56, 18, 18, 0.25);
 }

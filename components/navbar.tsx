@@ -30,13 +30,17 @@ const LINKS = [
     name: "Trade",
     href: "/trade",
   },
+  {
+    name: "Strategies",
+    href: "/strategies",
+  },
 ]
 
 export function Navbar() {
   const currentRoute = usePathname()
   const clipPathId = React.useId()
   return (
-    <nav className="flex w-full justify-between items-center border-b px-4 text-sm grid-in-header">
+    <nav className="flex w-full justify-between items-center border-b px-4 text-sm grid-in-header min-h-[var(--bar-height)]">
       <span className="flex items-center space-x-8 h-8 py-1">
         <svg
           xmlns="http://www.w3.org/2000/svg"
