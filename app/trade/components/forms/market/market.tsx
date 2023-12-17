@@ -386,7 +386,7 @@ const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
             {error}
           </p>
         )}
-        {!error?.length && showBalance && <TokenBalance token={token} />}
+        {showBalance && <TokenBalance token={token} />}
       </div>
     )
   },
