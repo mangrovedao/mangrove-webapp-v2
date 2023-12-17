@@ -30,7 +30,7 @@ export function useTable({ data }: Params) {
   const { market } = useMarket()
   const columns = React.useMemo(
     () => [
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Market",
         cell: () => (
           <div className="flex items-center space-x-2">
@@ -66,7 +66,7 @@ export function useTable({ data }: Params) {
         header: "Type",
         cell: (row) => (row.getValue() ? "Market" : "Limit"),
       }),
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Received/Sent",
         cell: ({ row }) => {
           const { takerGot, takerGave, isBid } = row.original

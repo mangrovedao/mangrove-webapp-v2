@@ -33,7 +33,7 @@ export function useTable({ data, onRetract, onEdit }: Params) {
   const { market } = useMarket()
   const columns = React.useMemo(
     () => [
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Market",
         cell: () => (
           <div className="flex items-center space-x-2">
@@ -64,11 +64,11 @@ export function useTable({ data, onRetract, onEdit }: Params) {
         },
         sortingFn: "datetime",
       }),
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Type",
         cell: () => <span>Limit</span>,
       }),
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Filled/Amount",
         cell: ({ row }) => {
           const { initialWants, takerGot, initialGives, isBid, takerGave } =
