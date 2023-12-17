@@ -1,16 +1,14 @@
 "use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-// import configuration from "@mangrovedao/mangrove.js/dist/nodejs/configuration"
 import { useForm } from "@tanstack/react-form"
 import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
-import Big from "big.js"
 import React from "react"
 
 import useMarket from "@/providers/market"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
-import { Form } from "../types"
+import type { Form } from "../types"
 
 type Props = {
   onSubmit: (data: Form) => void
@@ -41,6 +39,7 @@ export function useMarketForm(props: Props) {
   )
 
   const { data: estimatedVolume } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "estimateVolume",
       market?.base.address,
@@ -48,30 +47,28 @@ export function useMarketForm(props: Props) {
       send,
       receive,
       tradeAction,
+      estimateFrom,
     ],
     queryFn: async () => {
       if (!market) return
 
-      if (tradeAction === TradeAction.BUY) {
-        const amount = estimateFrom === "receive" ? send : receive
-        const { estimatedVolume, estimatedFee } = await market.estimateVolume({
-          given: Big(amount),
-          what: estimateFrom === "receive" ? "quote" : "base",
-          to: estimateFrom === "receive" ? "sell" : "buy",
-        })
-        estimateFrom === "receive"
-          ? form.setFieldValue("receive", estimatedVolume.toString())
-          : form.setFieldValue("send", estimatedVolume.toString())
-
-        return { estimatedVolume, estimatedFee }
-      }
-
       const amount = estimateFrom === "receive" ? send : receive
+      const what =
+        estimateFrom === "receive"
+          ? tradeAction === TradeAction.BUY
+            ? "quote"
+            : "base"
+          : tradeAction === TradeAction.BUY
+            ? "base"
+            : "quote"
+      const to = estimateFrom === "receive" ? "sell" : "buy"
+
       const { estimatedVolume, estimatedFee } = await market.estimateVolume({
-        given: Big(amount),
-        what: estimateFrom === "receive" ? "base" : "quote",
-        to: estimateFrom === "receive" ? "sell" : "buy",
+        given: amount,
+        what: what,
+        to: to,
       })
+
       estimateFrom === "receive"
         ? form.setFieldValue("receive", estimatedVolume.toString())
         : form.setFieldValue("send", estimatedVolume.toString())
@@ -87,17 +84,17 @@ export function useMarketForm(props: Props) {
     void form.handleSubmit()
   }
 
-  async function computeReceiveAmount() {
+  const computeReceiveAmount = React.useCallback(() => {
     setEstimateFrom("receive")
     if (!send) return
     form.validateAllFields("submit")
-  }
+  }, [form, send])
 
-  async function computeSendAmount() {
+  const computeSendAmount = React.useCallback(() => {
     setEstimateFrom("send")
     if (!receive) return
     form.validateAllFields("submit")
-  }
+  }, [form, receive])
 
   React.useEffect(() => {
     form?.reset()
