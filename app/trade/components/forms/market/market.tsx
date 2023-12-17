@@ -115,11 +115,7 @@ export function Market() {
                   label="Send amount"
                   disabled={!market}
                   showBalance
-                  error={
-                    estimatedVolume === "0"
-                      ? ["error"]
-                      : field.state.meta.touchedErrors
-                  }
+                  error={field.state.meta.touchedErrors}
                 />
               )}
             </form.Field>
