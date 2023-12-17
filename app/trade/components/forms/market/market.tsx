@@ -1,4 +1,5 @@
 import { Accordion } from "@ark-ui/react"
+import { Token } from "@mangrovedao/mangrove.js"
 import { ValidationError } from "@tanstack/react-form"
 import { LucideChevronRight } from "lucide-react"
 import React from "react"
@@ -13,7 +14,6 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
-import { Token } from "@mangrovedao/mangrove.js"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
@@ -23,6 +23,7 @@ import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
 const sliderValues = [25, 50, 75, 100]
 const slippageValues = ["0.1", "0.5", "1"]
+
 export function Market() {
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
@@ -114,7 +115,11 @@ export function Market() {
                   label="Send amount"
                   disabled={!market}
                   showBalance
-                  error={field.state.meta.touchedErrors}
+                  error={
+                    estimatedVolume === "0"
+                      ? ["error"]
+                      : field.state.meta.touchedErrors
+                  }
                 />
               )}
             </form.Field>
@@ -229,7 +234,6 @@ export function Market() {
                       onBlur={field.handleBlur}
                       onChange={({ target: { value } }) => {
                         field.handleChange(value)
-                        computeSendAmount()
                       }}
                       label="Custom"
                       disabled={!(market && form.state.isFormValid)}

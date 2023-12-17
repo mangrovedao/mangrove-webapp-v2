@@ -7,11 +7,11 @@ import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
 import { Accordion } from "../../components/accordion"
+import { ApproveStep } from "../../components/approve-step"
+import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
 import type { Form } from "../types"
-import { ApproveStep } from "./approve-step"
-import { Steps } from "./steps"
 import { SummaryStep } from "./summary-step"
 
 type Props = {

@@ -1,8 +1,8 @@
+import type { Market } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import type { Market } from "@mangrovedao/mangrove.js"
 import { TradeAction } from "../../enums"
 import type { Form } from "../types"
 

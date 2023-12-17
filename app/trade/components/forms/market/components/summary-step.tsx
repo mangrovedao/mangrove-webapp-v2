@@ -1,8 +1,9 @@
+import type { Token } from "@mangrovedao/mangrove.js"
+import Big from "big.js"
+
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
-import type { Token } from "@mangrovedao/mangrove.js"
-import Big from "big.js"
 
 import type { Form } from "../types"
 
@@ -21,17 +22,6 @@ export function SummaryStep({
   receiveToken,
   form,
 }: Props) {
-  // const {
-  //   baseToken,
-  //   quoteToken,
-  //   sendToken,
-  //   receiveToken,
-  //   feeInPercentageAsString,
-  //   sendTokenBalance,
-  // } = useTradeInfos("limit", form.tradeAction)
-  // const baseSymbol = baseToken?.symbol ?? ""
-  // const quoteSymbol = quoteToken?.symbol ?? ""
-
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">

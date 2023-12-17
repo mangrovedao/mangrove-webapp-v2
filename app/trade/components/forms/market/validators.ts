@@ -2,6 +2,10 @@ import { z } from "zod"
 
 import { FIELD_ERRORS } from "@/utils/form-errors"
 
+export const isEnoughVolume = z.coerce
+  .number()
+  .gt(0, FIELD_ERRORS.insufficientVolume)
+
 export const isGreaterThanZeroValidator = z.coerce
   .number()
   .gt(0, FIELD_ERRORS.fieldRequired)

@@ -7,7 +7,6 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
 
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
@@ -18,7 +17,6 @@ type Props = {
 }
 
 export function useMarketForm(props: Props) {
-  const { mangrove } = useMangrove()
   const { market, marketInfo } = useMarket()
   const form = useForm({
     validator: zodValidator,
@@ -76,11 +74,13 @@ export function useMarketForm(props: Props) {
 
   async function computeReceiveAmount() {
     setEstimateFrom("receive")
+    if (!send) return
     form.validateAllFields("submit")
   }
 
   async function computeSendAmount() {
     setEstimateFrom("send")
+    if (!receive) return
     form.validateAllFields("submit")
   }
 
@@ -99,7 +99,7 @@ export function useMarketForm(props: Props) {
     send,
     receiveToken,
     marketInfo,
-    estimatedVolume: estimatedVolume?.estimatedVolume.toString() || "0",
-    estimatedFee: estimatedVolume?.estimatedFee.toString() || "0",
+    estimatedVolume: estimatedVolume?.estimatedVolume.toString(),
+    estimatedFee: estimatedVolume?.estimatedFee.toString(),
   }
 }
