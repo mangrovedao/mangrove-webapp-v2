@@ -124,10 +124,8 @@ export function useMarketForm(props: Props) {
     sendToken,
     send,
     receiveToken,
-    marketInfo,
-    hasEnoughVolume,
     tickSize: marketInfo?.tickSpacing.toString(),
-    estimatedVolume: estimatedVolume?.estimatedVolume?.toString(),
     estimatedFee: estimatedVolume?.estimatedFee.toString(),
+    hasEnoughVolume,
   }
 }

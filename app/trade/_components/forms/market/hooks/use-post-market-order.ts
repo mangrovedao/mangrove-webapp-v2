@@ -17,18 +17,18 @@ export function usePostMarketOrder() {
     mutationFn: async ({ form }: { form: Form }) => {
       if (!mangrove || !market) return
       const { base } = market
-      const { tradeAction, send, receive, slippage } = form
+      const { tradeAction, send: gives, receive: wants, slippage } = form
       const isBuy = tradeAction === TradeAction.BUY
 
       const orderParams: Market.TradeParams = {
-        wants: receive,
-        gives: send,
+        wants,
+        gives,
         slippage,
       }
 
       const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.market[
         tradeAction
-      ].sendReceiveToBaseQuote(send, receive)
+      ].sendReceiveToBaseQuote(gives, wants)
 
       const order = isBuy
         ? await market.buy(orderParams)

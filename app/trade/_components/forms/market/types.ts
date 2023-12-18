@@ -5,4 +5,5 @@ export type Form = {
   send: string
   receive: string
   slippage: number
+  estimatedFee?: string
 }

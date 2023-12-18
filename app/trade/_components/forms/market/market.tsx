@@ -21,7 +21,7 @@ import Big from "big.js"
 import { MarketDetails } from "../components/market-details"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
-import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
+import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
 import { useMarketForm } from "./hooks/use-market"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
@@ -282,8 +282,8 @@ export function Market() {
         </form>
       </form.Provider>
       {formData && (
-        <FromWalletLimitOrderDialog
-          form={formData}
+        <FromWalletMarketOrderDialog
+          form={{ ...formData, estimatedFee }}
           onClose={() => setFormData(undefined)}
         />
       )}
