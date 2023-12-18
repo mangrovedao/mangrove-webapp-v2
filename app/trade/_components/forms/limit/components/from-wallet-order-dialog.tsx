@@ -6,8 +6,8 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
-import { Accordion } from "../../components/accordion"
 import { ApproveStep } from "../../components/approve-step"
+import { MarketDetails } from "../../components/market-details-line"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
@@ -149,9 +149,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}
           <div className="bg-[#041010] rounded-lg p-4 flex items-center">
-            <Accordion title="Market details" className="text-white text-base">
-              <div>TODO</div>
-            </Accordion>
+            <MarketDetails takerFee={"0"} tickSize={"0"} />
           </div>
         </div>
       </Dialog.Description>

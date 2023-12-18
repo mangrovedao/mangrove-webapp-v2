@@ -52,7 +52,7 @@ export function useMarketForm(props: Props) {
     queryFn: async () => {
       if (!market) return
 
-      const amount = estimateFrom === "receive" ? send : receive
+      const given = estimateFrom === "receive" ? send : receive
       const what =
         estimateFrom === "receive"
           ? tradeAction === TradeAction.BUY
@@ -64,9 +64,9 @@ export function useMarketForm(props: Props) {
       const to = estimateFrom === "receive" ? "sell" : "buy"
 
       const { estimatedVolume, estimatedFee } = await market.estimateVolume({
-        given: amount,
-        what: what,
-        to: to,
+        given,
+        what,
+        to,
       })
 
       estimateFrom === "receive"
@@ -112,6 +112,7 @@ export function useMarketForm(props: Props) {
   return {
     computeReceiveAmount,
     computeSendAmount,
+    // computeSliderValue,
     sendTokenBalance,
     handleSubmit,
     form,
@@ -120,6 +121,7 @@ export function useMarketForm(props: Props) {
     send,
     receiveToken,
     marketInfo,
+    tickSize: marketInfo?.tickSpacing.toString(),
     estimatedVolume: estimatedVolume?.estimatedVolume.toString(),
     estimatedFee: estimatedVolume?.estimatedFee.toString(),
   }

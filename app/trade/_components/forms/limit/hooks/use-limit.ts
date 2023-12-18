@@ -140,7 +140,7 @@ export function useLimit(props: Props) {
     sendToken,
     send,
     receiveToken,
-    tickSize: marketInfo?.tickSpacing.toString() ?? "-",
+    tickSize: marketInfo?.tickSpacing.toString(),
     feeInPercentageAsString,
     timeInForce,
   }

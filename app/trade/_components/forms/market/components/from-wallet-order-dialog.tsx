@@ -1,14 +1,13 @@
 import { useNetwork } from "wagmi"
 
-import { tradeService } from "@/app/trade/services/trade.service"
+import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
-import { Accordion } from "../../components/accordion"
 import { ApproveStep } from "../../components/approve-step"
-import { MarketDetailsLine } from "../../components/market-details-line"
+import { MarketDetails } from "../../components/market-details-line"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostMarketOrder } from "../hooks/use-post-market-order"
@@ -35,6 +34,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     receiveToken,
     isInfiniteAllowance,
     spender,
+    feeInPercentageAsString,
   } = useTradeInfos("market", form.tradeAction)
 
   let steps = ["Send"]
@@ -150,11 +150,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}
           <div className="bg-[#041010] rounded-lg p-4 flex items-center">
-            <Accordion title="Market details" className="text-white text-base">
-              <MarketDetailsLine title="Taker fee" value={"0"} />
-              <MarketDetailsLine title="Tick size" value={"0"} />
-              <MarketDetailsLine title="Current spot price" value="1234" />
-            </Accordion>
+            <MarketDetails takerFee={"0"} tickSize={"0"} />
           </div>
         </div>
       </Dialog.Description>

@@ -14,10 +14,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
-import { Accordion } from "../components/accordion"
+import { MarketDetails } from "../components/market-details-line"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
@@ -25,7 +24,7 @@ import { useMarketForm } from "./hooks/use-market"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
-const sliderValues = [25, 50, 75, 100]
+// const sliderValues = [25, 50, 75, 100]
 const slippageValues = ["0.1", "0.5", "1"]
 
 export function Market() {
@@ -35,39 +34,34 @@ export function Market() {
   const {
     computeReceiveAmount,
     computeSendAmount,
+    // computeSliderValue,
     sendTokenBalance,
     handleSubmit,
     form,
     market,
     sendToken,
     receiveToken,
-    marketInfo,
+    tickSize,
     estimatedFee,
     estimatedVolume,
+    // send,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
-  const handlePercentageButtonClick = (percentage: number) => {
-    form.setFieldValue("sliderPercentage", percentage)
-    computeSendAmount()
-  }
+  // const handleSliderChange = (value: number) => {
+  //   const amount = (value * Number(sendTokenBalance.formatted)) / 100
+  //   console.log(amount, sendTokenBalance.formatted)
+  //   form.setFieldValue("send", amount.toString())
+  //   computeReceiveAmount()
+  //   form.validateAllFields("submit")
+  // }
 
-  // const sliderPercentage = Math.min(
-  //   Math.trunc(
-  //     Big(Number(send))
-  //       .mul(100)
-  //       .div(sendTokenBalance.formatted ?? 0)
-  //       .toNumber(),
-  //   ),
+  // const sliderValue = Math.min(
+  //   Big(Number(send) ?? 0)
+  //     .mul(100)
+  //     .div(sendTokenBalance.formatted ?? 1)
+  //     .toNumber(),
   //   100,
-  // )
-
-  // const { validate, setValue, pushValue, validateSync } = form.useField({
-  //   name: "send",
-  // })
-
-  // validateSync("", "submit")
-
-  // console.log(JSON.stringify({ sliderPercentage }))
+  // ).toFixed(0)
 
   return (
     <>
@@ -149,45 +143,42 @@ export function Market() {
                 />
               )}
             </form.Field>
-            <form.Field name="sliderPercentage">
-              {(field) => (
-                <div className="space-y-5 pt-2 px-3">
-                  <Slider
-                    name={field.name}
-                    defaultValue={[field.state.value]}
-                    value={[field.state.value]}
-                    step={25}
-                    onBlur={field.handleBlur}
-                    onValueChange={([value]) => {
-                      field.handleChange(Number(value ?? 0))
-                    }}
-                    disabled={!(market && form.state.isFormValid)}
-                  />
-                  <div className="flex justify-center space-x-3">
-                    {sliderValues.map((value) => (
-                      <Button
-                        key={`percentage-button-${value}`}
-                        variant={"secondary"}
-                        size={"sm"}
-                        className={cn("text-xs w-full", {
-                          "opacity-10": field.state.value !== value,
-                        })}
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handlePercentageButtonClick(value)
-                        }}
-                        disabled={!market}
-                      >
-                        {value}%
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </form.Field>
 
-            {/* TODO: set slider and synchronize it to send field */}
-            {/* <CSlider form={form} sliderPercentage={sliderPercentage} /> */}
+            {/* Slider component */}
+            {/* <div className="space-y-5 pt-2 px-3">
+              <Slider
+                name={"sliderPercentage"}
+                defaultValue={[0]}
+                value={[Number(sliderValue)]}
+                step={5}
+                min={0}
+                max={100}
+                // onBlur={field.handleBlur}
+                onValueChange={([value]) => {
+                  handleSliderChange(Number(value))
+                }}
+                disabled={!(market && form.state.isFormValid)}
+              />
+              <div className="flex justify-center space-x-3">
+                {sliderValues.map((value) => (
+                  <Button
+                    key={`percentage-button-${value}`}
+                    variant={"secondary"}
+                    size={"sm"}
+                    className={cn("text-xs w-full", {
+                      "opacity-10": Number(sliderValue) !== value,
+                    })}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleSliderChange(Number(value))
+                    }}
+                    disabled={!market}
+                  >
+                    {value}%
+                  </Button>
+                ))}
+              </div>
+            </div> */}
 
             <Separator className="!my-6" />
             <div className="flex justify-between">
@@ -254,18 +245,7 @@ export function Market() {
             </form.Field>
             <Separator className="!my-6" />
 
-            {/* TODO: unmock market details */}
-            <Accordion title="Market details" className="!mb-6">
-              <MarketDetailsLine
-                title="Taker fee"
-                value={estimatedFee ?? "N/A"}
-              />
-              <MarketDetailsLine
-                title="Tick size"
-                value={marketInfo?.tickSpacing.toString() ?? "-"}
-              />
-              <MarketDetailsLine title="Current spot price" value="1234" />
-            </Accordion>
+            <MarketDetails takerFee={estimatedFee} tickSize={tickSize} />
 
             <form.Subscribe
               selector={(state) => [
@@ -309,63 +289,6 @@ export function Market() {
     </>
   )
 }
-
-type MarketDetailsLineProps = {
-  title: string
-  value: string
-}
-function MarketDetailsLine({ title, value }: MarketDetailsLineProps) {
-  return (
-    <div className="flex justify-between items-center mt-2">
-      <span className="text-xs text-secondary float-left">{title}</span>
-      <span className="text-xs float-right">{value}</span>
-    </div>
-  )
-}
-
-// type CSliderProps = {
-//   sliderPercentage: number
-//   form: any
-// }
-// function CSlider({ sliderPercentage, form }: CSliderProps) {
-//   const { handleChange, validateSync, setValue } = form.useField({
-//     name: "send",
-//   })
-//   console.log(handleChange)
-//   return (
-//     <div className="space-y-5 pt-2">
-//       <Slider
-//         value={[sliderPercentage]}
-//         step={5}
-//         max={100}
-//         onValueChange={([val]) => {
-//           setValue(val?.toString(), {
-//             notify: true,
-//             touch: false,
-//           })
-//           validateSync(val?.toString(), "submit")
-//           // handleChange(val?.toString())
-//           // validate()
-//         }}
-//       />
-
-//       <div className="flex space-x-3">
-//         {sliderValues.map((value, i) => (
-//           <Button
-//             key={`slider-value-${i}`}
-//             className="bg-transparent text-primary rounded-full text-xs pt-1 pb-[2px] w-16 border-[1px] border-green-bangladesh"
-//             onClick={(e) => {
-//               e.preventDefault()
-//               // setSlider(value)
-//             }}
-//           >
-//             {value}%
-//           </Button>
-//         ))}
-//       </div>
-//     </div>
-//   )
-// }
 
 type TradeInputProps = {
   token?: Token
