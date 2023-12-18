@@ -4,4 +4,5 @@ export type Form = {
   tradeAction: TradeAction
   send: string
   receive: string
+  slippage: number
 }

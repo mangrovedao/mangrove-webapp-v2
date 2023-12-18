@@ -1,6 +1,5 @@
-import { Accordion } from "@ark-ui/react"
-import { Token } from "@mangrovedao/mangrove.js"
-import { ValidationError } from "@tanstack/react-form"
+import { type Token } from "@mangrovedao/mangrove.js"
+import { type ValidationError } from "@tanstack/react-form"
 import { LucideChevronRight } from "lucide-react"
 import React from "react"
 
@@ -8,17 +7,21 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
-import { NumericInput, NumericInputProps } from "@/components/numeric-input"
+import {
+  NumericInput,
+  type NumericInputProps,
+} from "@/components/numeric-input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
+import { Accordion } from "../components/accordion"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import { useMarketForm } from "./hooks/use-market"
-import { Form } from "./types"
+import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
 const sliderValues = [25, 50, 75, 100]
@@ -185,7 +188,7 @@ export function Market() {
               <span className="text-xs">$0.00</span>
             </div>
             <Separator className="!my-6" />
-            <form.Field name="slippagePercentage">
+            <form.Field name="slippage">
               {(field) => (
                 <div className="space-y-2">
                   <Label>Slippage tolerence</Label>
@@ -198,13 +201,14 @@ export function Market() {
                         size={"sm"}
                         className={cn("text-xs", {
                           "opacity-10":
-                            field.state.value !== value || showCustomInput,
+                            field.state.value !== Number(value) ||
+                            showCustomInput,
                         })}
                         onClick={(e) => {
                           e.preventDefault()
                           showCustomInput &&
                             setShowCustomInput(!showCustomInput)
-                          field.handleChange(value)
+                          field.handleChange(Number(value))
                         }}
                         disabled={!market}
                       >
@@ -229,7 +233,7 @@ export function Market() {
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={({ target: { value } }) => {
-                        field.handleChange(value)
+                        field.handleChange(Number(value))
                       }}
                       label="Custom"
                       disabled={!(market && form.state.isFormValid)}

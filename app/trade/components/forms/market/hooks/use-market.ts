@@ -21,7 +21,7 @@ export function useMarketForm(props: Props) {
     defaultValues: {
       tradeAction: TradeAction.BUY,
       sliderPercentage: 25,
-      slippagePercentage: "0.5",
+      slippage: 0.5,
       send: "",
       receive: "",
     },
@@ -95,6 +95,15 @@ export function useMarketForm(props: Props) {
     if (!receive) return
     form.validateAllFields("submit")
   }, [form, receive])
+
+  React.useEffect(() => {
+    const send = form?.getFieldValue("send")
+    const receive = form?.getFieldValue("receive")
+    if (!(send && receive)) return
+    form.setFieldValue("send", receive)
+    form.setFieldValue("receive", send)
+    form.validateAllFields("submit")
+  }, [form, tradeAction])
 
   React.useEffect(() => {
     form?.reset()

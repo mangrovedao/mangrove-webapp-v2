@@ -46,7 +46,6 @@ export function Limit() {
     tickSize,
     feeInPercentageAsString,
     timeInForce,
-    tradeAction,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })

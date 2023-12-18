@@ -14,12 +14,13 @@ export function usePostMarketOrder() {
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
       if (!mangrove || !market) return
-      const { tradeAction, send, receive } = form
+      const { tradeAction, send, receive, slippage } = form
       const isBuy = tradeAction === TradeAction.BUY
 
       const orderParams: Market.TradeParams = {
         wants: receive,
         gives: send,
+        slippage,
       }
 
       const order = isBuy
