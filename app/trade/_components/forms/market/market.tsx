@@ -216,7 +216,10 @@ export function Market() {
                       </Button>
                     ))}
                     <Button
-                      onClick={() => setShowCustomInput(!showCustomInput)}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setShowCustomInput(!showCustomInput)
+                      }}
                       variant={"secondary"}
                       size={"sm"}
                       className={cn("text-xs", {

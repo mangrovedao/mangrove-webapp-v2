@@ -39,11 +39,7 @@ function Title({ children, className }: Nodes) {
 Dialog.Title = Title
 
 function Description({ children, className }: Nodes) {
-  return (
-    <Root.DialogDescription className={cn(descriptionClasses, className)}>
-      {children}
-    </Root.DialogDescription>
-  )
+  return <div className={cn(descriptionClasses, className)}>{children}</div>
 }
 Dialog.Description = Description
 

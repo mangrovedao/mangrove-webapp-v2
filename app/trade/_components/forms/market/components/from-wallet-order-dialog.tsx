@@ -35,6 +35,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     isInfiniteAllowance,
     spender,
     feeInPercentageAsString,
+    tickSize,
   } = useTradeInfos("market", form.tradeAction)
 
   let steps = ["Send"]
@@ -150,7 +151,10 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}
           <div className="bg-[#041010] rounded-lg p-4 flex items-center">
-            <MarketDetails takerFee={"0"} tickSize={"0"} />
+            <MarketDetails
+              takerFee={feeInPercentageAsString}
+              tickSize={tickSize}
+            />
           </div>
         </div>
       </Dialog.Description>

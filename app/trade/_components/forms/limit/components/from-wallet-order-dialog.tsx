@@ -34,6 +34,8 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     receiveToken,
     isInfiniteAllowance,
     spender,
+    feeInPercentageAsString,
+    tickSize,
   } = useTradeInfos("limit", form.tradeAction)
 
   let steps = ["Send"]
@@ -149,7 +151,10 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}
           <div className="bg-[#041010] rounded-lg p-4 flex items-center">
-            <MarketDetails takerFee={"0"} tickSize={"0"} />
+            <MarketDetails
+              takerFee={feeInPercentageAsString}
+              tickSize={tickSize}
+            />
           </div>
         </div>
       </Dialog.Description>

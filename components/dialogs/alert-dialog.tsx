@@ -40,12 +40,9 @@ function Title({ children, className }: Nodes) {
 AlertDialog.Title = Title
 
 function Description({ children, className }: Nodes) {
-  return (
-    <Root.AlertDialogDescription className={cn(descriptionClasses, className)}>
-      {children}
-    </Root.AlertDialogDescription>
-  )
+  return <div className={cn(descriptionClasses, className)}>{children}</div>
 }
+
 AlertDialog.Description = Description
 
 function Footer({ children, className }: Nodes) {
