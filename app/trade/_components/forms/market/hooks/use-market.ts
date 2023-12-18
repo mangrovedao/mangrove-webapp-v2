@@ -27,6 +27,7 @@ export function useMarketForm(props: Props) {
     },
     onSubmit: (values) => props.onSubmit(values),
   })
+
   const [estimateFrom, setEstimateFrom] = React.useState<
     "send" | "receive" | undefined
   >()
@@ -82,6 +83,10 @@ export function useMarketForm(props: Props) {
     enabled: !!(send || receive),
   })
 
+  const hasEnoughVolume =
+    (Number(receive) || Number(send)) != 0 &&
+    Number(estimatedVolume?.estimatedVolume) === 0
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     e.stopPropagation()
@@ -120,6 +125,7 @@ export function useMarketForm(props: Props) {
     send,
     receiveToken,
     marketInfo,
+    hasEnoughVolume,
     tickSize: marketInfo?.tickSpacing.toString(),
     estimatedVolume: estimatedVolume?.estimatedVolume?.toString(),
     estimatedFee: estimatedVolume?.estimatedFee.toString(),

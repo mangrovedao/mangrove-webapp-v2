@@ -18,7 +18,7 @@ import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
 import Big from "big.js"
-import { MarketDetails } from "../components/market-details-line"
+import { MarketDetails } from "../components/market-details"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
@@ -44,7 +44,7 @@ export function Market() {
     receiveToken,
     tickSize,
     estimatedFee,
-    estimatedVolume,
+    hasEnoughVolume,
     send,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
@@ -113,7 +113,7 @@ export function Market() {
                   disabled={!market}
                   showBalance
                   error={
-                    field.state.value === "0" && estimatedVolume === "0"
+                    field.state.value === "0" && hasEnoughVolume
                       ? [FIELD_ERRORS.insufficientVolume]
                       : field.state.meta.touchedErrors
                   }
@@ -134,7 +134,7 @@ export function Market() {
                   label="Receive amount"
                   disabled={!(market && form.state.isFormValid)}
                   error={
-                    field.state.value === "0" && estimatedVolume === "0"
+                    field.state.value === "0" && hasEnoughVolume
                       ? [FIELD_ERRORS.insufficientVolume]
                       : field.state.meta.touchedErrors
                   }
@@ -152,7 +152,6 @@ export function Market() {
                 step={5}
                 min={0}
                 max={100}
-                // onBlur={field.handleBlur}
                 onValueChange={([value]) => {
                   handleSliderChange(Number(value))
                 }}
