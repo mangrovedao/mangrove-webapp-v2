@@ -14,8 +14,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
+import Big from "big.js"
 import { MarketDetails } from "../components/market-details-line"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
@@ -24,7 +26,7 @@ import { useMarketForm } from "./hooks/use-market"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
-// const sliderValues = [25, 50, 75, 100]
+const sliderValues = [25, 50, 75, 100]
 const slippageValues = ["0.1", "0.5", "1"]
 
 export function Market() {
@@ -34,7 +36,6 @@ export function Market() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    // computeSliderValue,
     sendTokenBalance,
     handleSubmit,
     form,
@@ -44,24 +45,22 @@ export function Market() {
     tickSize,
     estimatedFee,
     estimatedVolume,
-    // send,
+    send,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
-  // const handleSliderChange = (value: number) => {
-  //   const amount = (value * Number(sendTokenBalance.formatted)) / 100
-  //   console.log(amount, sendTokenBalance.formatted)
-  //   form.setFieldValue("send", amount.toString())
-  //   computeReceiveAmount()
-  //   form.validateAllFields("submit")
-  // }
+  const handleSliderChange = (value: number) => {
+    const amount = (value * Number(sendTokenBalance.formatted)) / 100
+    form.setFieldValue("send", amount.toString())
+    computeReceiveAmount()
+  }
 
-  // const sliderValue = Math.min(
-  //   Big(Number(send) ?? 0)
-  //     .mul(100)
-  //     .div(sendTokenBalance.formatted ?? 1)
-  //     .toNumber(),
-  //   100,
-  // ).toFixed(0)
+  const sliderValue = Math.min(
+    Big(Number(send) ?? 0)
+      .mul(100)
+      .div(sendTokenBalance.formatted ?? 1)
+      .toNumber(),
+    100,
+  ).toFixed(0)
 
   return (
     <>
@@ -145,7 +144,7 @@ export function Market() {
             </form.Field>
 
             {/* Slider component */}
-            {/* <div className="space-y-5 pt-2 px-3">
+            <div className="space-y-5 pt-2 px-3">
               <Slider
                 name={"sliderPercentage"}
                 defaultValue={[0]}
@@ -178,7 +177,7 @@ export function Market() {
                   </Button>
                 ))}
               </div>
-            </div> */}
+            </div>
 
             <Separator className="!my-6" />
             <div className="flex justify-between">

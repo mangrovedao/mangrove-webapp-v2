@@ -3,9 +3,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { TradeAction } from "../../enums"
+import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
+import { TradeAction, TradeMode } from "../../enums"
 import type { Form } from "../types"
-import { handleOrderResultToastMessages } from "../utils"
+import { successToast } from "../utils"
 
 export function usePostMarketOrder() {
   const { mangrove } = useMangrove()
@@ -15,6 +16,7 @@ export function usePostMarketOrder() {
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
       if (!mangrove || !market) return
+      const { base } = market
       const { tradeAction, send, receive, slippage } = form
       const isBuy = tradeAction === TradeAction.BUY
 
@@ -24,12 +26,24 @@ export function usePostMarketOrder() {
         slippage,
       }
 
+      const [baseValue, quoteValue] = TRADEMODE_AND_ACTION_PRESENTATION.market[
+        tradeAction
+      ].sendReceiveToBaseQuote(send, receive)
+
       const order = isBuy
         ? await market.buy(orderParams)
         : await market.sell(orderParams)
 
       const result = await order.result
-      handleOrderResultToastMessages(result, tradeAction, market)
+
+      successToast(
+        TradeMode.MARKET,
+        tradeAction,
+        base,
+        baseValue,
+        quoteValue,
+        result,
+      )
       return result
     },
     meta: {
