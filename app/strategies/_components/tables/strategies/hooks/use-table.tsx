@@ -96,17 +96,17 @@ export function useTable({ data, onCancel, onManage }: Params) {
         },
       }),
       // TODO: get from indexer
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Return (%)",
         cell: () => "5%",
       }),
       // TODO: get from indexer
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Liquidity source",
         cell: () => "Wallet",
       }),
       // TODO: get from indexer
-      columnHelper.accessor((_) => _, {
+      columnHelper.display({
         header: "Reward",
         cell: () => "3.39%",
       }),

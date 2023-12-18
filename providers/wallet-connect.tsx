@@ -28,7 +28,7 @@ export const web3modal = createWeb3Modal({
     "--w3m-z-index": 1000,
   },
   chainImages: {
-    80001: "assets/chains/80001.webp",
+    80001: "/assets/chains/80001.webp",
   },
 })
 

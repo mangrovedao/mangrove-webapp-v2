@@ -40,8 +40,8 @@ export function Navbar() {
   const currentRoute = usePathname()
   const clipPathId = React.useId()
   return (
-    <nav className="flex w-full justify-between items-center border-b px-4 text-sm grid-in-header min-h-[var(--bar-height)]">
-      <div className="flex w-full justify-between items-center max-w-8xl mx-auto">
+    <nav className="flex w-full justify-between items-center border-b text-sm grid-in-header min-h-[var(--bar-height)]">
+      <div className="flex w-full justify-between items-center max-w-8xl mx-auto px-4">
         <span className="flex items-center lg:space-x-8 h-8 py-1">
           <Link href={"/"}>
             <svg
@@ -77,7 +77,8 @@ export function Navbar() {
                   className={cn(
                     "h-[2px] w-full bg-green-caribbean inset-x-0 -bottom-3 absolute opacity-0 transition-all",
                     {
-                      "opacity-100": currentRoute === href,
+                      "opacity-100":
+                        currentRoute.split("/")[1] === href.split("/")[1],
                     },
                   )}
                 />
