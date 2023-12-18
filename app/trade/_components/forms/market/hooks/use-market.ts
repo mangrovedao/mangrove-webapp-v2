@@ -58,7 +58,7 @@ export function useMarketForm(props: Props) {
       const given = isReceive ? send : receive
 
       const what = isReceive
-        ? tradeAction === TradeAction.BUY
+        ? tradeAction === TradeAction.SELL
           ? "quote"
           : "base"
         : tradeAction === TradeAction.BUY
