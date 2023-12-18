@@ -26,7 +26,7 @@ export function usePostMarketOrder() {
         slippage,
       }
 
-      const [baseValue, quoteValue] = TRADEMODE_AND_ACTION_PRESENTATION.market[
+      const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.market[
         tradeAction
       ].sendReceiveToBaseQuote(send, receive)
 
@@ -36,14 +36,7 @@ export function usePostMarketOrder() {
 
       const result = await order.result
 
-      successToast(
-        TradeMode.MARKET,
-        tradeAction,
-        base,
-        baseValue,
-        quoteValue,
-        result,
-      )
+      successToast(TradeMode.MARKET, tradeAction, base, baseValue, result)
       return result
     },
     meta: {

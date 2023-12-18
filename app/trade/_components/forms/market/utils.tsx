@@ -13,12 +13,12 @@ export function successToast(
   tradeAction: TradeAction,
   baseToken: Token,
   baseValue: string,
-  quoteValue: string,
   result: Market.OrderResult,
 ) {
   const summary = result.summary
+  const price = result.offerWrites[0]?.offer.price.toFixed(4)
   const fillText = summary.partialFill ? "Partially filled" : "Filled"
-  const price = Number(quoteValue) / Number(baseValue)
+
   toast(
     <div className="grid gap-2 w-full">
       <div className="flex space-x-2 items-center">
