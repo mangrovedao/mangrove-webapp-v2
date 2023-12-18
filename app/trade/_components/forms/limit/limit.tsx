@@ -23,6 +23,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
+import { MarketDetails } from "../components/market-details-line"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
@@ -237,13 +238,10 @@ export function Limit() {
 
             <Separator className="!my-6" />
 
-            <Accordion title="Market details" className="!mb-6">
-              <MarketDetailsLine
-                title="Taker fee"
-                value={feeInPercentageAsString}
-              />
-              <MarketDetailsLine title="Tick size" value={tickSize} />
-            </Accordion>
+            <MarketDetails
+              takerFee={feeInPercentageAsString}
+              tickSize={tickSize}
+            />
 
             <form.Subscribe
               selector={(state) => [

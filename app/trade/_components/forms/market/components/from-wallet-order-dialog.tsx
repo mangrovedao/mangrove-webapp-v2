@@ -10,7 +10,7 @@ import { ApproveStep } from "../../components/approve-step"
 import { MarketDetails } from "../../components/market-details-line"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
-import { usePostLimitOrder } from "../hooks/use-post-limit-order"
+import { usePostMarketOrder } from "../hooks/use-post-market-order"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
@@ -25,7 +25,7 @@ const btnProps: ButtonProps = {
   size: "lg",
 }
 
-export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
+export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
   const { chain } = useNetwork()
   const {
     baseToken,
@@ -36,7 +36,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     spender,
     feeInPercentageAsString,
     tickSize,
-  } = useTradeInfos("limit", form.tradeAction)
+  } = useTradeInfos("market", form.tradeAction)
 
   let steps = ["Send"]
   if (!isInfiniteAllowance) {
@@ -44,7 +44,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   }
 
   const approve = useInfiniteApproveToken()
-  const post = usePostLimitOrder()
+  const post = usePostMarketOrder()
 
   const [currentStep, helpers] = useStep(steps.length)
 

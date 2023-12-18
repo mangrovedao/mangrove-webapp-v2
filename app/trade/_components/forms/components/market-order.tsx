@@ -90,6 +90,7 @@ export default function MarketOrder() {
             value={"custom"}
             id={"custom"}
             className="flex items-center space-x-2"
+            onClick={(e) => e.preventDefault()}
           >
             <Label htmlFor={"custom-slippage"} className="cursor-pointer">
               Custom
