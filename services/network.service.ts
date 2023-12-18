@@ -1,11 +1,12 @@
-import { web3modal } from "@/providers/wallet-connect"
+// import { web3modal } from "@/providers/wallet-connect"
 import { alertDialogs } from "@/services/alert-dialogs.service"
 
 // Open the network selection modal from wallet connect
 function changeNetwork() {
-  web3modal.open({
-    view: "Networks",
-  })
+  alert("TODO: change network")
+  // web3modal.open({
+  //   view: "Networks",
+  // })
 }
 
 // open the alert dialog saying that the network is wrong

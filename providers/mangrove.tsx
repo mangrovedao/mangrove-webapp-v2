@@ -2,7 +2,6 @@
 
 import Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
-import { useWeb3Modal } from "@web3modal/wagmi/react"
 import React from "react"
 import { useAccount, useNetwork } from "wagmi"
 
@@ -14,7 +13,6 @@ import { getErrorMessage } from "@/utils/errors"
 
 const useMangroveContext = () => {
   const signer = useEthersSigner()
-  const { close } = useWeb3Modal()
   const { chain } = useNetwork()
   const { address } = useAccount()
 
@@ -53,10 +51,10 @@ const useMangroveContext = () => {
 
   const marketsInfoQuery = useWhitelistedMarketsInfos(mangrove)
 
-  // Close web3modal after changing chain
-  React.useEffect(() => {
-    if (chain?.id) close()
-  }, [chain?.id, close])
+  // // Close web3modal after changing chain
+  // React.useEffect(() => {
+  //   if (chain?.id) close()
+  // }, [chain?.id, close])
 
   // Close wrong network alert dialog after connecting to the right network or if mangrove has successfully been instantiated
   React.useEffect(() => {
