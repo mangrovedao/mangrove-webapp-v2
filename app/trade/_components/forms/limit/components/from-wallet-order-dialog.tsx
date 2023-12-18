@@ -136,7 +136,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
                 form,
               },
               {
-                // onSuccess: (data) => ,
                 onError: (error: Error) => {
                   onClose()
                   tradeService.openTxFailedDialog(
