@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
+import { FIELD_ERRORS } from "@/utils/form-errors"
 import { Accordion } from "../components/accordion"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
@@ -118,7 +119,11 @@ export function Market() {
                   label="Send amount"
                   disabled={!market}
                   showBalance
-                  error={field.state.meta.touchedErrors}
+                  error={
+                    field.state.value === "0" && estimatedVolume === "0"
+                      ? [FIELD_ERRORS.insufficientVolume]
+                      : field.state.meta.touchedErrors
+                  }
                 />
               )}
             </form.Field>
@@ -135,7 +140,11 @@ export function Market() {
                   token={receiveToken}
                   label="Receive amount"
                   disabled={!(market && form.state.isFormValid)}
-                  error={field.state.meta.touchedErrors}
+                  error={
+                    field.state.value === "0" && estimatedVolume === "0"
+                      ? [FIELD_ERRORS.insufficientVolume]
+                      : field.state.meta.touchedErrors
+                  }
                   showBalance
                 />
               )}
@@ -248,17 +257,14 @@ export function Market() {
             {/* TODO: unmock market details */}
             <Accordion title="Market details" className="!mb-6">
               <MarketDetailsLine
-                title="Estimated fee"
+                title="Taker fee"
                 value={estimatedFee ?? "N/A"}
               />
-              <MarketDetailsLine title="Taker fee" value={"0"} />
-              {/* TODO: <MarketDetailsLine title="Total fees" value="$0.26" /> */}
               <MarketDetailsLine
                 title="Tick size"
                 value={marketInfo?.tickSpacing.toString() ?? "-"}
               />
-              {/* TODO: <MarketDetailsLine title="Current spot price" value="1234" />
-            <MarketDetailsLine title="Min. order size" value="12" /> */}
+              <MarketDetailsLine title="Current spot price" value="1234" />
             </Accordion>
 
             <form.Subscribe

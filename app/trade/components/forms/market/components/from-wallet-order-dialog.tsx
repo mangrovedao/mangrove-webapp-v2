@@ -8,6 +8,7 @@ import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
 import { Accordion } from "../../components/accordion"
 import { ApproveStep } from "../../components/approve-step"
+import { MarketDetailsLine } from "../../components/market-details-line"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostMarketOrder } from "../hooks/use-post-market-order"
@@ -150,7 +151,9 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
           {stepInfos[currentStep - 1]?.body ?? undefined}
           <div className="bg-[#041010] rounded-lg p-4 flex items-center">
             <Accordion title="Market details" className="text-white text-base">
-              <div>TODO</div>
+              <MarketDetailsLine title="Taker fee" value={"0"} />
+              <MarketDetailsLine title="Tick size" value={"0"} />
+              <MarketDetailsLine title="Current spot price" value="1234" />
             </Accordion>
           </div>
         </div>

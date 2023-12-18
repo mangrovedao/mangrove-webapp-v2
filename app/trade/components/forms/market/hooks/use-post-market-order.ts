@@ -5,6 +5,7 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { TradeAction } from "../../enums"
 import type { Form } from "../types"
+import { handleOrderResultToastMessages } from "../utils"
 
 export function usePostMarketOrder() {
   const { mangrove } = useMangrove()
@@ -26,7 +27,10 @@ export function usePostMarketOrder() {
       const order = isBuy
         ? await market.buy(orderParams)
         : await market.sell(orderParams)
-      return await order.result
+
+      const result = await order.result
+      handleOrderResultToastMessages(result, tradeAction, market)
+      return result
     },
     meta: {
       error: "Failed to post the market order",
