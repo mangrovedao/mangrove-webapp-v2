@@ -54,10 +54,12 @@ export function Market() {
     computeReceiveAmount()
   }
 
+  const sendTokenBalanceAsBig = Big(Number(sendTokenBalance.formatted) ?? 0)
+
   const sliderValue = Math.min(
     Big(Number(send) ?? 0)
       .mul(100)
-      .div(sendTokenBalance.formatted ?? 1)
+      .div(sendTokenBalanceAsBig.toNumber() ?? 1)
       .toNumber(),
     100,
   ).toFixed(0)
