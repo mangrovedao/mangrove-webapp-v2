@@ -5,6 +5,7 @@ import { X } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "utils"
+import { Title } from "../typography/title"
 
 const Drawer = DialogPrimitive.Root
 
@@ -22,10 +23,7 @@ const DrawerOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      `fixed inset-0 z-50 bg-background/80 
-      backdrop-blur-sm data-[state=open]:animate-in 
-      data-[state=closed]:animate-out data-[state=closed]:fade-out-0 
-      data-[state=open]:fade-in-0`,
+      "fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
@@ -50,62 +48,56 @@ const DrawerContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        `fixed top-0 right-0 h-full z-50 w-full max-w-lg
-        border-2 bg-background p-6 
-        shadow-lg duration-200 
-        transform translate-x-full
-        data-[state=open]:translate-x-0
-        data-[state=closed]:translate-x-full
-        data-[state=closed]:fade-out-0 
-        data-[state=open]:fade-in-0 
-        data-[state=closed]:zoom-out-95 
-        data-[state=open]:zoom-in-95 
-        data-[state=closed]:slide-out-to-left-1/2 
-        data-[state=closed]:slide-out-to-top-[48%] 
-        data-[state=open]:slide-in-from-left-1/2 
-        data-[state=open]:slide-in-from-top-[48%] 
-        sm:rounded-lg md:w-full`,
+        "fixed w-full bottom-0 p-6 right-0 h-[calc(100vh-var(--bar-height))] z-50 max-w-[362px]",
+        "border-2 border-black-rich bg-background  duration-200 transform translate-x-full",
+        "data-[state=open]:translate-x-0 data-[state=closed]:translate-x-full data-[state=closed]:fade-out-0  data-[state=open]:fade-in-0  data-[state=closed]:zoom-out-95  data-[state=open]:zoom-in-95  data-[state=closed]:slide-out-to-left-1/2  data-[state=closed]:slide-out-to-top-[48%]  data-[state=open]:slide-in-from-left-1/2  data-[state=open]:slide-in-from-top-[48%]",
         className,
       )}
       {...props}
     >
-      <div className="flex justify-end h-6">
-        <DrawerClose>
-          <X className="h-6 w-6 text-gray-scale-300" />
-          <span className="sr-only">Close</span>
-        </DrawerClose>
-      </div>
       {children}
     </DialogPrimitive.Content>
   </DrawerPortal>
 ))
 DrawerContent.displayName = DialogPrimitive.Content.displayName
 
+const DrawerBody = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn("mt-4 mb-7 space-y-7", className)} {...props} />
+)
+DrawerBody.displayName = "DrawerBody"
+
 const DrawerHeader = ({
   className,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col space-y-1.5 text-center sm:text-left",
+      "flex justify-between items-center border-b pb-4 mb-4",
       className,
     )}
     {...props}
-  />
+  >
+    <Title>{children}</Title>
+    <DrawerClose>
+      <X className="h-6 w-6 text-gray-scale-300" />
+      <span className="sr-only">Close</span>
+    </DrawerClose>
+  </div>
 )
-DrawerHeader.displayName = "DialogHeader"
+DrawerHeader.displayName = "DrawerHeader"
 
 const DrawerFooter = ({
   className,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className,
-    )}
-    {...props}
-  />
+  <div className={cn("flex justify-center gap-4", className)} {...props}>
+    {children}
+  </div>
 )
 DrawerFooter.displayName = "DialogFooter"
 
@@ -136,8 +128,11 @@ const DrawerDescription = React.forwardRef<
 ))
 DrawerDescription.displayName = DialogPrimitive.Description.displayName
 
+export default Drawer
+
 export {
   Drawer,
+  DrawerBody,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
