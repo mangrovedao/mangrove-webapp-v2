@@ -3,12 +3,16 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
+
+import Edit from "../components/Edit"
 import RetractOfferDialog from "./components/retract-offer-dialog"
 import { useOrders } from "./hooks/use-orders"
 import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
 
 export function Orders() {
+  const [edit, setEdit] = React.useState(false)
+
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
@@ -28,12 +32,14 @@ export function Orders() {
     onEdit: () => {
       // TODO: implement edit with drawer
       console.log("edit")
+      setEdit(!edit)
     },
     onRetract: setOrderToDelete,
   })
 
   return (
     <>
+      <Edit open={edit} onChange={setEdit} />
       <DataTable
         table={table}
         isError={!!ordersQuery.error}

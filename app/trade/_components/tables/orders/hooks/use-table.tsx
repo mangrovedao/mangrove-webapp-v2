@@ -141,7 +141,6 @@ export function useTable({ data, onRetract, onEdit }: Params) {
             <IconButton
               tooltip="Modify"
               className="aspect-square w-6 rounded-full"
-              disabled
               onClick={() => onEdit(row.original)}
             >
               <Pen />
