@@ -27,6 +27,7 @@ export function useMarketForm(props: Props) {
     },
     onSubmit: (values) => props.onSubmit(values),
   })
+
   const [estimateFrom, setEstimateFrom] = React.useState<
     "send" | "receive" | undefined
   >()
@@ -52,16 +53,19 @@ export function useMarketForm(props: Props) {
     queryFn: async () => {
       if (!market) return
 
-      const given = estimateFrom === "receive" ? send : receive
-      const what =
-        estimateFrom === "receive"
-          ? tradeAction === TradeAction.BUY
-            ? "quote"
-            : "base"
-          : tradeAction === TradeAction.BUY
-            ? "base"
-            : "quote"
-      const to = estimateFrom === "receive" ? "sell" : "buy"
+      const isReceive = estimateFrom === "receive"
+
+      const given = isReceive ? send : receive
+
+      const what = isReceive
+        ? tradeAction === TradeAction.BUY
+          ? "quote"
+          : "base"
+        : tradeAction === TradeAction.BUY
+          ? "base"
+          : "quote"
+
+      const to = isReceive ? "sell" : "buy"
 
       const { estimatedVolume, estimatedFee } = await market.estimateVolume({
         given,
@@ -69,14 +73,19 @@ export function useMarketForm(props: Props) {
         to,
       })
 
-      estimateFrom === "receive"
+      isReceive
         ? form.setFieldValue("receive", estimatedVolume.toString())
         : form.setFieldValue("send", estimatedVolume.toString())
 
+      form.validateAllFields("submit")
       return { estimatedVolume, estimatedFee }
     },
-    enabled: !!(send || receive),
+    enabled: !!(send || receive) && !!market,
   })
+
+  const hasEnoughVolume =
+    (Number(receive) || Number(send)) != 0 &&
+    Number(estimatedVolume?.estimatedVolume) === 0
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -86,15 +95,11 @@ export function useMarketForm(props: Props) {
 
   const computeReceiveAmount = React.useCallback(() => {
     setEstimateFrom("receive")
-    if (!send) return
-    form.validateAllFields("submit")
-  }, [form, send])
+  }, [])
 
   const computeSendAmount = React.useCallback(() => {
     setEstimateFrom("send")
-    if (!receive) return
-    form.validateAllFields("submit")
-  }, [form, receive])
+  }, [])
 
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
@@ -112,7 +117,6 @@ export function useMarketForm(props: Props) {
   return {
     computeReceiveAmount,
     computeSendAmount,
-    // computeSliderValue,
     sendTokenBalance,
     handleSubmit,
     form,
@@ -120,9 +124,8 @@ export function useMarketForm(props: Props) {
     sendToken,
     send,
     receiveToken,
-    marketInfo,
     tickSize: marketInfo?.tickSpacing.toString(),
-    estimatedVolume: estimatedVolume?.estimatedVolume.toString(),
     estimatedFee: estimatedVolume?.estimatedFee.toString(),
+    hasEnoughVolume,
   }
 }

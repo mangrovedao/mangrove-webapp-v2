@@ -14,17 +14,19 @@ import {
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
-import { MarketDetails } from "../components/market-details-line"
+import Big from "big.js"
+import { MarketDetails } from "../components/market-details"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
-import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
+import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
 import { useMarketForm } from "./hooks/use-market"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
-// const sliderValues = [25, 50, 75, 100]
+const sliderValues = [25, 50, 75, 100]
 const slippageValues = ["0.1", "0.5", "1"]
 
 export function Market() {
@@ -34,7 +36,6 @@ export function Market() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    // computeSliderValue,
     sendTokenBalance,
     handleSubmit,
     form,
@@ -43,25 +44,23 @@ export function Market() {
     receiveToken,
     tickSize,
     estimatedFee,
-    estimatedVolume,
-    // send,
+    hasEnoughVolume,
+    send,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
-  // const handleSliderChange = (value: number) => {
-  //   const amount = (value * Number(sendTokenBalance.formatted)) / 100
-  //   console.log(amount, sendTokenBalance.formatted)
-  //   form.setFieldValue("send", amount.toString())
-  //   computeReceiveAmount()
-  //   form.validateAllFields("submit")
-  // }
+  const handleSliderChange = (value: number) => {
+    const amount = (value * Number(sendTokenBalance.formatted)) / 100
+    form.setFieldValue("send", amount.toString())
+    computeReceiveAmount()
+  }
 
-  // const sliderValue = Math.min(
-  //   Big(Number(send) ?? 0)
-  //     .mul(100)
-  //     .div(sendTokenBalance.formatted ?? 1)
-  //     .toNumber(),
-  //   100,
-  // ).toFixed(0)
+  const sliderValue = Math.min(
+    Big(Number(send) ?? 0)
+      .mul(100)
+      .div(sendTokenBalance.formatted ?? 1)
+      .toNumber(),
+    100,
+  ).toFixed(0)
 
   return (
     <>
@@ -114,7 +113,7 @@ export function Market() {
                   disabled={!market}
                   showBalance
                   error={
-                    field.state.value === "0" && estimatedVolume === "0"
+                    field.state.value === "0" && hasEnoughVolume
                       ? [FIELD_ERRORS.insufficientVolume]
                       : field.state.meta.touchedErrors
                   }
@@ -135,7 +134,7 @@ export function Market() {
                   label="Receive amount"
                   disabled={!(market && form.state.isFormValid)}
                   error={
-                    field.state.value === "0" && estimatedVolume === "0"
+                    field.state.value === "0" && hasEnoughVolume
                       ? [FIELD_ERRORS.insufficientVolume]
                       : field.state.meta.touchedErrors
                   }
@@ -145,7 +144,7 @@ export function Market() {
             </form.Field>
 
             {/* Slider component */}
-            {/* <div className="space-y-5 pt-2 px-3">
+            <div className="space-y-5 pt-2 px-3">
               <Slider
                 name={"sliderPercentage"}
                 defaultValue={[0]}
@@ -153,7 +152,6 @@ export function Market() {
                 step={5}
                 min={0}
                 max={100}
-                // onBlur={field.handleBlur}
                 onValueChange={([value]) => {
                   handleSliderChange(Number(value))
                 }}
@@ -178,7 +176,7 @@ export function Market() {
                   </Button>
                 ))}
               </div>
-            </div> */}
+            </div>
 
             <Separator className="!my-6" />
             <div className="flex justify-between">
@@ -284,8 +282,8 @@ export function Market() {
         </form>
       </form.Provider>
       {formData && (
-        <FromWalletLimitOrderDialog
-          form={formData}
+        <FromWalletMarketOrderDialog
+          form={{ ...formData, estimatedFee }}
           onClose={() => setFormData(undefined)}
         />
       )}

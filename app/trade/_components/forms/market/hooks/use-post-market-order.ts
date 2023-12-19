@@ -6,9 +6,10 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import { TradeAction } from "../../enums"
+import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
+import { TradeAction, TradeMode } from "../../enums"
 import type { Form } from "../types"
-import { handleOrderResultToastMessages } from "../utils"
+import { successToast } from "../utils"
 
 type Props = {
   onResult?: (result: Market.OrderResult) => void
@@ -27,20 +28,26 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
       if (!mangrove || !market) return
-      const { tradeAction, send, receive, slippage } = form
+      const { base } = market
+      const { tradeAction, send: gives, receive: wants, slippage } = form
       const isBuy = tradeAction === TradeAction.BUY
 
       const orderParams: Market.TradeParams = {
-        wants: receive,
-        gives: send,
+        wants,
+        gives,
         slippage,
       }
+
+      const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.market[
+        tradeAction
+      ].sendReceiveToBaseQuote(gives, wants)
 
       const order = isBuy
         ? await market.buy(orderParams)
         : await market.sell(orderParams)
       const result = await order.result
-      handleOrderResultToastMessages(result, tradeAction, market)
+
+      successToast(TradeMode.MARKET, tradeAction, base, baseValue, result)
       return { order, result }
     },
     meta: {

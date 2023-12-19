@@ -23,7 +23,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
-import { MarketDetails } from "../components/market-details-line"
+import { MarketDetails } from "../components/market-details"
 import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
