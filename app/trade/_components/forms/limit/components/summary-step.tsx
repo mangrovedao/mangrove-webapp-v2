@@ -22,17 +22,6 @@ export function SummaryStep({
   receiveToken,
   form,
 }: Props) {
-  // const {
-  //   baseToken,
-  //   quoteToken,
-  //   sendToken,
-  //   receiveToken,
-  //   feeInPercentageAsString,
-  //   sendTokenBalance,
-  // } = useTradeInfos("limit", form.tradeAction)
-  // const baseSymbol = baseToken?.symbol ?? ""
-  // const quoteSymbol = quoteToken?.symbol ?? ""
-
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
@@ -47,7 +36,9 @@ export function SummaryStep({
       <Separator />
       <div className="space-y-4">
         <Line title="Limit Price">
-          {Big(form.limitPrice ?? 0).toFixed(quoteToken?.displayedDecimals)}{" "}
+          {Big(form.limitPrice ?? 0).toFixed(
+            quoteToken?.displayedAsPriceDecimals,
+          )}{" "}
           <Unit>{quoteToken?.symbol}</Unit>
         </Line>
         <Line title="Send from wallet">

@@ -31,6 +31,7 @@ export function Orders() {
     },
     onRetract: setOrderToDelete,
   })
+
   return (
     <>
       <DataTable

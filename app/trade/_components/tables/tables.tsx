@@ -7,8 +7,9 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { cn } from "@/utils"
+import { useLoadingStore } from "@/stores/loading.store"
 import { renderElement } from "@/utils/render"
+import { TRADE } from "../../_constants/loading-keys"
 import { Fills } from "./fills/fills"
 import { Orders } from "./orders/orders"
 
@@ -22,17 +23,17 @@ const TABS_CONTENT = {
   [TradeTables.FILLS]: Fills,
 }
 
-export function Tables({
-  className,
-  ...props
-}: React.ComponentProps<typeof CustomTabs>) {
+export function Tables({ ...props }: React.ComponentProps<typeof CustomTabs>) {
+  const [ordersLoading, fillsLoading] = useLoadingStore((state) =>
+    state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS]),
+  )
+
   return (
-    <CustomTabs
-      {...props}
-      defaultValue={Object.values(TradeTables)[0]}
-      className={cn(className)}
-    >
-      <CustomTabsList className="w-full flex justify-start border-b">
+    <CustomTabs {...props} defaultValue={Object.values(TradeTables)[0]}>
+      <CustomTabsList
+        className="w-full flex justify-start border-b"
+        loading={ordersLoading ?? fillsLoading}
+      >
         {Object.values(TradeTables).map((table) => (
           <CustomTabsTrigger
             key={`${table}-tab`}

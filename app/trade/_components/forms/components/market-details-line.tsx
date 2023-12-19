@@ -11,7 +11,7 @@ export function MarketDetails({
   spotPrice,
 }: MarketDetailsProps) {
   return (
-    <Accordion title="Market details" className="!mb-6">
+    <Accordion title="Market details" className="text-white text-base">
       <MarketDetailsLine title="Taker fee" value={takerFee} />
       <MarketDetailsLine title="Tick size" value={tickSize} />
       <MarketDetailsLine title="Current spot price" value={spotPrice} />
@@ -28,7 +28,7 @@ export function MarketDetailsLine({ title, value }: MarketDetailsLineProps) {
   return (
     <div className="flex justify-between items-center mt-2">
       <span className="text-xs text-secondary float-left">{title}</span>
-      <span className="text-xs float-right">{value}</span>
+      <span className="text-xs float-right text-white">{value}</span>
     </div>
   )
 }

@@ -1,5 +1,4 @@
 "use client"
-import { useWeb3Modal } from "@web3modal/wagmi/react"
 import { Copy, ExternalLink, LogOut, Network, Wallet } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -21,7 +20,13 @@ import {
 import { Bell, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
+import {
+  useAccountModal,
+  useChainModal,
+  useConnectModal,
+} from "@rainbow-me/rainbowkit"
 import { ClientOnly } from "./client-only"
+import { WrongNetworkAlertDialog } from "./stateful/dialogs/wrong-network-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 
@@ -96,23 +101,29 @@ export function Navbar() {
 }
 
 function RightPart() {
-  const { open } = useWeb3Modal()
+  const { openChainModal } = useChainModal()
+  const { openConnectModal } = useConnectModal()
+  const { openAccountModal } = useAccountModal()
   const { isConnected, connector, address, isConnecting } = useAccount()
   const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
 
+  function handleConnect() {
+    openConnectModal?.()
+  }
+
+  function handleAccount() {
+    openAccountModal?.()
+  }
+
   function handleChangeNetwork() {
-    open({ view: "Networks" })
+    openChainModal?.()
   }
 
   if (!isConnected) {
     return (
       <>
-        <Button
-          onClick={() => open({ view: "Networks" })}
-          disabled={isConnecting}
-          size="sm"
-        >
+        <Button onClick={handleConnect} disabled={isConnecting} size="sm">
           Connect to wallet
         </Button>
       </>
@@ -136,7 +147,7 @@ function RightPart() {
             key={chain?.id}
             alt={`${chain?.name}-logo`}
           />
-          <span className="text-sm">{chain?.name}</span>
+          <span className="text-sm whitespace-nowrap">{chain?.name}</span>
         </span>
         <ChevronDown className="w-3" />
       </Button>
@@ -161,14 +172,9 @@ function RightPart() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 mt-1">
           <DropdownMenuLabel>Wallet: {connector?.name}</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => {
-              disconnect()
-              open({ view: "Connect" })
-            }}
-          >
+          <DropdownMenuItem onClick={handleAccount}>
             <Wallet className="mr-2 h-4 w-4" />
-            <span>Change wallet</span>
+            <span>Account</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Chain: {chain?.name}</DropdownMenuLabel>
@@ -209,6 +215,7 @@ function RightPart() {
       <Button variant={"invisible"} size="sm" className="h-full">
         <Bell className="text-white w-4" />
       </Button>
+      <WrongNetworkAlertDialog />
     </div>
   )
 }

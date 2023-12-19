@@ -50,5 +50,6 @@ export function useFills<T = Fill[]>({
     },
     enabled: !!(isConnected && indexerSdk && olKeys),
     retry: false,
+    staleTime: 1 * 60 * 1000, // 1 minute
   })
 }
