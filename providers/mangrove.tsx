@@ -7,28 +7,17 @@ import { useAccount, useNetwork } from "wagmi"
 
 import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import { mangroveConfig } from "@/schemas/mangrove-config"
-import { networkService } from "@/services/network.service"
 import { useEthersSigner } from "@/utils/adapters"
 import { getErrorMessage } from "@/utils/errors"
 
 const useMangroveContext = () => {
   const signer = useEthersSigner()
   const { chain } = useNetwork()
-  const { address } = useAccount()
+  const { isConnected } = useAccount()
 
-  const { data: mangrove } = useQuery({
-    queryKey: [
-      "mangroveInstance",
-      signer?._address,
-      address,
-      chain?.id,
-      chain?.unsupported,
-    ],
+  const mangroveQuery = useQuery({
+    queryKey: ["mangroveInstance", signer?._address, isConnected, chain?.id],
     queryFn: async () => {
-      if (chain?.unsupported) {
-        networkService.openWrongNetworkAlertDialog()
-        return null
-      }
       try {
         const mangrove = await Mangrove.connect({ signer })
         // overwrite the mangrove's configuration thanks to the mangroveConfig env variable
@@ -36,34 +25,19 @@ const useMangroveContext = () => {
         return mangrove
       } catch (e) {
         const message = getErrorMessage(e)
-        networkService.openWrongNetworkAlertDialog({
-          title: "Error connecting to Mangrove",
-          children:
-            "Page failed to load. Please refresh page or change network",
-        })
         console.error(message)
-        return null
+        throw new Error(message)
       }
     },
-    enabled: !!signer?._address && !!address,
+    enabled: !!signer?._address && !!isConnected && !chain?.unsupported,
     refetchOnWindowFocus: false,
+    retry: false,
   })
+  const { data: mangrove } = mangroveQuery
 
   const marketsInfoQuery = useWhitelistedMarketsInfos(mangrove)
 
-  // // Close web3modal after changing chain
-  // React.useEffect(() => {
-  //   if (chain?.id) close()
-  // }, [chain?.id, close])
-
-  // Close wrong network alert dialog after connecting to the right network or if mangrove has successfully been instantiated
-  React.useEffect(() => {
-    if (!chain?.unsupported || mangrove?.address) {
-      networkService.closeWrongNetworkAlertDialog()
-    }
-  }, [chain?.unsupported, mangrove?.address])
-
-  return { mangrove, marketsInfoQuery }
+  return { mangroveQuery, mangrove, marketsInfoQuery }
 }
 
 const MangroveContext = React.createContext<

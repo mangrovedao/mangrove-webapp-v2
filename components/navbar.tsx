@@ -26,6 +26,7 @@ import {
   useConnectModal,
 } from "@rainbow-me/rainbowkit"
 import { ClientOnly } from "./client-only"
+import { WrongNetworkAlertDialog } from "./stateful/dialogs/wrong-network-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 
@@ -146,7 +147,7 @@ function RightPart() {
             key={chain?.id}
             alt={`${chain?.name}-logo`}
           />
-          <span className="text-sm">{chain?.name}</span>
+          <span className="text-sm whitespace-nowrap">{chain?.name}</span>
         </span>
         <ChevronDown className="w-3" />
       </Button>
@@ -214,6 +215,7 @@ function RightPart() {
       <Button variant={"invisible"} size="sm" className="h-full">
         <Bell className="text-white w-4" />
       </Button>
+      <WrongNetworkAlertDialog />
     </div>
   )
 }
