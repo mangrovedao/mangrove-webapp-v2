@@ -114,7 +114,9 @@ export function useTable({ data, onRetract, onEdit }: Params) {
           market ? (
             row.getValue() ? (
               <span>
-                {Big(row.getValue()).toFixed(market.quote.displayedDecimals)}{" "}
+                {Big(row.getValue()).toFixed(
+                  market.quote.displayedAsPriceDecimals,
+                )}{" "}
                 {market.quote.symbol}
               </span>
             ) : (

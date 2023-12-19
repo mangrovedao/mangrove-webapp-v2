@@ -42,7 +42,8 @@ export function successToast(
             {tradeAction.toUpperCase()}
           </span>
           <span>
-            {baseValue} {baseToken.symbol}
+            {Big(baseValue).toFixed(baseToken.displayedAsPriceDecimals)}{" "}
+            {baseToken.symbol}
           </span>
         </div>
         <div className="flex justify-between">

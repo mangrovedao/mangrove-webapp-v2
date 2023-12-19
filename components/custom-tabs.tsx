@@ -4,6 +4,7 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 import * as React from "react"
 
 import { cn } from "utils"
+import { Spinner } from "./ui/spinner"
 
 const CustomTabs = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Root>,
@@ -15,16 +16,30 @@ CustomTabs.displayName = TabsPrimitive.Root.displayName
 
 const CustomTabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & {
+    loading?: boolean
+  }
+>(({ className, children, loading, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-baseline justify-center text-primary h-[var(--bar-height)] px-4 space-x-6",
+      "flex items-baseline justify-center text-primary h-[var(--bar-height)] px-4 space-x-6 relative",
       className,
     )}
     {...props}
-  />
+  >
+    {children}
+    <div
+      className={cn(
+        "absolute right-0 h-full w-10 flex items-center transition-opacity",
+        {
+          "opacity-0": !loading,
+        },
+      )}
+    >
+      <Spinner className="h-6 w-6" />
+    </div>
+  </TabsPrimitive.List>
 ))
 CustomTabsList.displayName = TabsPrimitive.List.displayName
 

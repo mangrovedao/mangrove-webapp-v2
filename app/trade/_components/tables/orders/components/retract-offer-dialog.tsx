@@ -12,7 +12,10 @@ type Props = {
 }
 
 export default function RetractOfferDialog({ order, market, onClose }: Props) {
-  const { mutate, isPending } = useRetractOrder()
+  const retract = useRetractOrder({
+    offerId: order?.offerId,
+    onRetract: onClose,
+  })
   if (!order || !market) return null
 
   return (
@@ -26,19 +29,14 @@ export default function RetractOfferDialog({ order, market, onClose }: Props) {
           rightIcon
           className="w-full"
           size="lg"
-          disabled={isPending}
-          loading={isPending}
+          disabled={retract.isPending}
+          loading={retract.isPending}
           onClick={() => {
             if (!(order && market)) return
-            mutate(
-              {
-                order,
-                market,
-              },
-              {
-                onSuccess: onClose,
-              },
-            )
+            retract.mutate({
+              order,
+              market,
+            })
           }}
         >
           Retract

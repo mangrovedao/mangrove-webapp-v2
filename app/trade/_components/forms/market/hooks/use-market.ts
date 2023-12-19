@@ -80,7 +80,7 @@ export function useMarketForm(props: Props) {
       form.validateAllFields("submit")
       return { estimatedVolume, estimatedFee }
     },
-    enabled: !!(send || receive),
+    enabled: !!(send || receive) && !!market,
   })
 
   const hasEnoughVolume =

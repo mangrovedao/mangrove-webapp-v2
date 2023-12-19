@@ -1,3 +1,4 @@
+import React from "react"
 import { useNetwork } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
@@ -43,8 +44,32 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
   }
 
+  const isDialogOpenRef = React.useRef(false)
+  React.useEffect(() => {
+    isDialogOpenRef.current = !!form
+
+    return () => {
+      isDialogOpenRef.current = false
+    }
+  }, [form])
+
   const approve = useInfiniteApproveToken()
-  const post = usePostLimitOrder()
+  const post = usePostLimitOrder({
+    onResult: (result) => {
+      /*
+       * We use a React ref to track the dialog's open state. If the dialog is closed,
+       * we prevent further actions. This is necessary because the dialog's closure
+       * might occur before the asynchronous operations complete, potentially leading
+       * to undesired effects.
+       */
+      if (!isDialogOpenRef.current) return
+      onClose()
+      tradeService.openTxCompletedDialog({
+        address: result.txReceipt.transactionHash ?? "",
+        blockExplorerUrl: chain?.blockExplorers?.default.url,
+      })
+    },
+  })
 
   const [currentStep, helpers] = useStep(steps.length)
 
@@ -111,13 +136,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
                 form,
               },
               {
-                onSuccess: (data) => {
-                  onClose()
-                  tradeService.openTxCompletedDialog({
-                    address: data?.txReceipt.transactionHash ?? "",
-                    blockExplorerUrl: chain?.blockExplorers?.default.url,
-                  })
-                },
                 onError: (error: Error) => {
                   onClose()
                   tradeService.openTxFailedDialog(

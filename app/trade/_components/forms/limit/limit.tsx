@@ -253,7 +253,7 @@ export function Limit() {
               {([canSubmit, isSubmitting, tradeAction]) => {
                 return (
                   <Button
-                    className="w-full flex items-center justify-center !mb-4 capitalize"
+                    className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
                     disabled={!canSubmit || !market}
                     rightIcon
