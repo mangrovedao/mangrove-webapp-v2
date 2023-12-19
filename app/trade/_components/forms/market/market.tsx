@@ -51,6 +51,7 @@ export function Market() {
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(sendTokenBalance.formatted)) / 100
     form.setFieldValue("send", amount.toString())
+    form.validateAllFields("change")
     computeReceiveAmount()
   }
 
