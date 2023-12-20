@@ -3,7 +3,7 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
-import RetractOfferDialog from "./components/retract-offer-dialog"
+import CancelOfferDialog from "./components/cancel-offer-dialog"
 import { useOrders } from "./hooks/use-orders"
 import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
@@ -29,7 +29,7 @@ export function Orders() {
       // TODO: implement edit with drawer
       console.log("edit")
     },
-    onRetract: setOrderToDelete,
+    onCancel: setOrderToDelete,
   })
 
   return (
@@ -44,7 +44,7 @@ export function Orders() {
           pageSize,
         }}
       />
-      <RetractOfferDialog
+      <CancelOfferDialog
         order={orderToDelete}
         market={market}
         onClose={() => setOrderToDelete(undefined)}

@@ -8,10 +8,10 @@ import type { Order } from "../schema"
 
 type Props = {
   offerId?: string
-  onRetract?: () => void
+  onCancel?: () => void
 }
 
-export function useRetractOrder({ offerId, onRetract }: Props = {}) {
+export function useCancelOrder({ offerId, onCancel }: Props = {}) {
   const queryClient = useQueryClient()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const [startLoading] = useLoadingStore((state) => [
@@ -21,7 +21,7 @@ export function useRetractOrder({ offerId, onRetract }: Props = {}) {
 
   return useMutation({
     /*
-     * We introduce a mutationKey to the useRetractOrder hook. This allows us to
+     * We introduce a mutationKey to the useCancelOrder hook. This allows us to
      * handle multiple order retractions simultaneously, without them sharing the
      * same mutation state. This is crucial for maintaining independent states
      * for each retraction operation.
@@ -40,7 +40,7 @@ export function useRetractOrder({ offerId, onRetract }: Props = {}) {
     onSuccess: async (data) => {
       if (!data) return
       const { retract } = data
-      onRetract?.()
+      onCancel?.()
       try {
         startLoading(TRADE.TABLES.ORDERS)
         const { blockNumber } = await (await retract.response).wait()

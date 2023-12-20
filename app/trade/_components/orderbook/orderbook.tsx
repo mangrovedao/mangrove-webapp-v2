@@ -88,8 +88,8 @@ function BookContent() {
 
   return (
     <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
-      <Table className="text-sm leading-5 h-full select-none">
-        <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
+      <Table className="text-sm leading-5 h-full select-none relative">
+        <TableHeader className="sticky top-0 bg-background z-40 py-2 text-xs h-[var(--bar-height)]">
           <TableRow className="border-none">
             <OrderBookTableHead className="text-left">
               Size ({market?.base.symbol})
@@ -99,6 +99,7 @@ function BookContent() {
             </OrderBookTableHead>
             <OrderBookTableHead>Total</OrderBookTableHead>
           </TableRow>
+          <TableRow className="border-b absolute top-11 inset-x-3"></TableRow>
         </TableHeader>
         <TableBody className="overflow-scroll" ref={bodyRef}>
           <SemiBook

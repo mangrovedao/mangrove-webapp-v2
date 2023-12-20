@@ -2,9 +2,12 @@ import Big from "big.js"
 
 import { type Market } from "@mangrovedao/mangrove.js"
 
-export function calculateCumulative(offers: Market.Offer[] | undefined) {
+export function calculateCumulative(
+  offers: Market.Offer[] | undefined,
+  isAsk = false,
+) {
   let cumulativeVolume = Big(0)
-  return (
+  const calculatedOffers =
     offers?.map((offer) => {
       cumulativeVolume = cumulativeVolume.plus(offer.volume)
       return {
@@ -12,7 +15,21 @@ export function calculateCumulative(offers: Market.Offer[] | undefined) {
         volume: cumulativeVolume,
       }
     }) ?? []
-  )
+
+  // Add an extended offer to the end of the array
+  const highestOffer = calculatedOffers[calculatedOffers.length - 1]
+  const extendedPrice = Big(highestOffer?.price ?? 0).times(1.1)
+
+  if (highestOffer && isAsk) {
+    const extendedOffer = {
+      ...highestOffer,
+      price: extendedPrice,
+      volume: cumulativeVolume,
+    } // Set volume to cumulativeVolume
+    calculatedOffers.push(extendedOffer)
+  }
+
+  return calculatedOffers
 }
 
 export function getNumTicksBasedOnDecimals(

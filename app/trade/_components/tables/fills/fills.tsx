@@ -23,7 +23,7 @@ export function Fills() {
     onEdit: () => {
       console.log("edit")
     },
-    onRetract: () => {
+    onCancel: () => {
       console.log("delete")
     },
   })

@@ -46,7 +46,7 @@ export function Navbar() {
   const clipPathId = React.useId()
   return (
     <nav className="flex w-full justify-between items-center border-b text-sm grid-in-header min-h-[var(--bar-height)]">
-      <div className="flex w-full justify-between items-center max-w-8xl mx-auto px-4">
+      <div className="flex w-full justify-between items-center px-4">
         <span className="flex items-center lg:space-x-8 h-8 py-1">
           <Link href={"/"}>
             <svg

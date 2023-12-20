@@ -88,7 +88,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       ),
       button: (
         <Button {...btnProps} onClick={goToNextStep}>
-          Proceed the payment
+          Proceed
         </Button>
       ),
     },
@@ -146,7 +146,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
             )
           }}
         >
-          Proceed the payment
+          Proceed
         </Button>
       ),
     },
