@@ -18,6 +18,13 @@ function toastError(error: unknown) {
 }
 
 const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 10 * 1000,
+      refetchOnWindowFocus: false,
+      retry: false,
+    },
+  },
   queryCache: new QueryCache({
     onError: (_error, query) => {
       if (typeof query.meta?.error === "string") {
