@@ -9,14 +9,13 @@ const ellipsisClasses =
   "h-8 w-8 flex justify-center items-center cursor-default"
 
 export function Pagination(props: PaginationProps) {
+  if (!props?.count) return null
   return (
-    <div className="flex w-full justify-center">
+    <div className="flex w-full justify-center my-2">
       <Ark.Pagination.Root
-        count={100}
-        pageSize={10}
-        siblingCount={0}
+        count={props?.count ?? 0}
         {...props}
-        className="justify-between text-gray-scale-300 mb-2 bg-primary-solid-black rounded-full text-sm font-medium p-3 inline-flex gap-4"
+        className="justify-between text-gray-scale-300 bg-primary-solid-black rounded-full text-sm font-medium p-3 inline-flex gap-4"
       >
         {({ pages }) => (
           <>

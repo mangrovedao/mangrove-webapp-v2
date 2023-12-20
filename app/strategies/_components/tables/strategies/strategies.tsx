@@ -40,6 +40,7 @@ export function Strategies() {
         onPageChange: setPageDetails,
         page,
         pageSize,
+        count: 10,
       }}
     />
   )

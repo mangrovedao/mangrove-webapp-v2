@@ -42,6 +42,7 @@ export function Orders() {
           onPageChange: setPageDetails,
           page,
           pageSize,
+          count: ordersQuery.data?.length,
         }}
       />
       <CancelOfferDialog
