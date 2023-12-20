@@ -152,8 +152,6 @@ export function useDepthChart() {
         .reduce((a, b) => Math.max(a, b), 0),
     ] as const
 
-    console.log("range", range)
-
     return { domain, range }
   }, [
     asks?.length,
@@ -163,6 +161,7 @@ export function useDepthChart() {
     highestAsk?.price,
     highestBid?.price,
     lowestAsk?.price,
+    lowestBid?.price,
     midPrice,
     zoomDomain,
   ])
