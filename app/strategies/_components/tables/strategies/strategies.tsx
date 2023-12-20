@@ -21,7 +21,7 @@ export function Strategies() {
   })
 
   // selected strategy to cancel
-  const [strategyToCancel, setStrategyToCancel] = React.useState<Strategy>()
+  const [, setStrategyToCancel] = React.useState<Strategy>()
 
   const table = useTable({
     data: MOCKS,
