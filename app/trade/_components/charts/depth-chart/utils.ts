@@ -25,6 +25,7 @@ export function calculateCumulative(
       ...highestOffer,
       price: extendedPrice,
       volume: cumulativeVolume,
+      id: 0,
     } // Set volume to cumulativeVolume
     calculatedOffers.push(extendedOffer)
   }
