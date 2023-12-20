@@ -134,7 +134,7 @@ function RightPart() {
     <div className="flex space-x-4 items-center h-8 py-1">
       <Button
         variant="invisible"
-        className="space-x-4 lg:flex items-center hidden"
+        className="!space-x-4 lg:flex items-center hidden"
         size="sm"
         onClick={handleChangeNetwork}
       >
@@ -149,7 +149,9 @@ function RightPart() {
           />
           <span className="text-sm whitespace-nowrap">{chain?.name}</span>
         </span>
-        <ChevronDown className="w-3" />
+        <div className="pl-2">
+          <ChevronDown className="w-3" />
+        </div>
       </Button>
 
       <Separator orientation="vertical" />

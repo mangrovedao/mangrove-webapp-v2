@@ -19,7 +19,7 @@
     "@ark-ui/react": "^1.2.1",
     "@ethersproject/providers": "^5.7.2",
     "@mangrovedao/context-addresses": "^1.0.0",
-    "@mangrovedao/indexer-sdk": "0.0.11-11",
+    "@mangrovedao/indexer-sdk": "0.0.11-13",
     "@mangrovedao/mangrove-deployments": "^1.0.0",
     "@mangrovedao/mangrove.js": "2.0.0-17",
     "@radix-ui/react-alert-dialog": "^1.0.5",
