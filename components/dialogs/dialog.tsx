@@ -9,12 +9,7 @@ import {
 } from "./styles"
 import type { DialogProps, Nodes } from "./types"
 
-export default function Dialog({
-  open,
-  onClose,
-  type = "confirm",
-  children,
-}: DialogProps) {
+export default function Dialog({ open, onClose, type, children }: DialogProps) {
   return (
     <Root.Dialog open={open} onOpenChange={onClose}>
       <div className="w-full h-full relative">

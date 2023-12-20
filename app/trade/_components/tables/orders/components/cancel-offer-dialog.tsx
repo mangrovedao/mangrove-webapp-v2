@@ -19,7 +19,6 @@ export default function CancelOfferDialog({ order, market, onClose }: Props) {
   if (!order || !market) return null
 
   return (
-    // TODO: info
     <Dialog open={!!order} onClose={onClose} type="info">
       <Dialog.Title>Are you sure you want to cancel this order? </Dialog.Title>
       <Dialog.Description>
@@ -44,13 +43,7 @@ export default function CancelOfferDialog({ order, market, onClose }: Props) {
             Yes, cancel order
           </Button>
           <Dialog.Close>
-            <Button
-              variant={"secondary"}
-              className="w-full"
-              size="lg"
-              disabled={retract.isPending}
-              loading={retract.isPending}
-            >
+            <Button variant={"secondary"} className="w-full" size="lg">
               No, cancel
             </Button>
           </Dialog.Close>
