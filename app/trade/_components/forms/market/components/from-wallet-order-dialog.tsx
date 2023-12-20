@@ -160,8 +160,8 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     })
 
   return (
-    <Dialog open={!!form} onClose={onClose}>
-      <Dialog.Title className="text-xl text-left">
+    <Dialog open={!!form} onClose={onClose} showCloseButton={false}>
+      <Dialog.Title className="text-xl text-left" close>
         Proceed transaction
       </Dialog.Title>
       <Steps steps={steps} currentStep={currentStep} />

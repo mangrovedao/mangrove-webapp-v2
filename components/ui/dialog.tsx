@@ -40,8 +40,10 @@ DialogClose.displayName = DialogPrimitive.Close.displayName
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    showCloseButton?: boolean
+  }
+>(({ className, children, showCloseButton = true, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -52,12 +54,11 @@ const DialogContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className="flex justify-end">
-        <DialogClose className="rounded-sm opacity-70 ring-offset-primary-dark-green transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-          <X className="h-6 w-6 text-gray-scale-300" />
-          <span className="sr-only">Close</span>
-        </DialogClose>
-      </div>
+      {showCloseButton && (
+        <div className="flex justify-end">
+          <XClose />
+        </div>
+      )}
       {children}
     </DialogPrimitive.Content>
   </DialogPortal>
@@ -119,6 +120,15 @@ const DialogDescription = React.forwardRef<
 ))
 DialogDescription.displayName = DialogPrimitive.Description.displayName
 
+function XClose() {
+  return (
+    <DialogClose className="rounded-sm opacity-70 ring-offset-primary-dark-green transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground flex">
+      <X className="h-6 w-6 text-gray-scale-300" />
+      <span className="sr-only">Close</span>
+    </DialogClose>
+  )
+}
+
 export {
   Dialog,
   DialogClose,
@@ -129,4 +139,5 @@ export {
   DialogOverlay,
   DialogTitle,
   DialogTrigger,
+  XClose,
 }

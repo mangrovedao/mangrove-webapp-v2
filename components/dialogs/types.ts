@@ -5,6 +5,7 @@ export type DialogProps = {
   onClose?: () => void
   children: React.ReactNode
   type?: DialogType
+  showCloseButton?: boolean
 }
 
 export type Nodes = {
