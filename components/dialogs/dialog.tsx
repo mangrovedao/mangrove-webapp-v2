@@ -51,3 +51,4 @@ function Footer({ children, className }: Nodes) {
   )
 }
 Dialog.Footer = Footer
+Dialog.Close = Root.DialogClose

@@ -40,6 +40,7 @@ export function Market({
             key={`${table}-tab`}
             value={table}
             className="capitalize"
+            disabled={table === ChartType.PRICE}
           >
             {table}
           </CustomTabsTrigger>

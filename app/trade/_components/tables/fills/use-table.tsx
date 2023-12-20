@@ -22,7 +22,7 @@ const DEFAULT_DATA: Fill[] = []
 
 type Params = {
   data?: Fill[]
-  onRetract: (fill: Fill) => void
+  onCancel: (fill: Fill) => void
   onEdit: (fill: Fill) => void
 }
 
