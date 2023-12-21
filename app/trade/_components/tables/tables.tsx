@@ -44,7 +44,7 @@ export function Tables({ ...props }: React.ComponentProps<typeof CustomTabs>) {
           </CustomTabsTrigger>
         ))}
       </CustomTabsList>
-      <div className="w-full py-4 px-1">
+      <div className="w-full py-4 px-1 h-full">
         {Object.values(TradeTables).map((table) => (
           <CustomTabsContent
             key={`${table}-content`}
