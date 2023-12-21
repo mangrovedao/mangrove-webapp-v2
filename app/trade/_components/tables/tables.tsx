@@ -11,6 +11,8 @@ import { useLoadingStore } from "@/stores/loading.store"
 import { renderElement } from "@/utils/render"
 import { TRADE } from "../../_constants/loading-keys"
 import { Fills } from "./fills/fills"
+import { useFills } from "./fills/use-fills"
+import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
 export enum TradeTables {
@@ -28,6 +30,14 @@ export function Tables({ ...props }: React.ComponentProps<typeof CustomTabs>) {
     state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS]),
   )
 
+  // Get the total count of orders and fills
+  const { data: ordersCount } = useOrders({
+    select: (orders) => orders.length,
+  })
+  const { data: fillsCount } = useFills({
+    select: (fills) => fills.length,
+  })
+
   return (
     <CustomTabs {...props} defaultValue={Object.values(TradeTables)[0]}>
       <CustomTabsList
@@ -39,6 +49,7 @@ export function Tables({ ...props }: React.ComponentProps<typeof CustomTabs>) {
             key={`${table}-tab`}
             value={table}
             className="capitalize"
+            count={table === TradeTables.ORDERS ? ordersCount : fillsCount}
           >
             {table}
           </CustomTabsTrigger>

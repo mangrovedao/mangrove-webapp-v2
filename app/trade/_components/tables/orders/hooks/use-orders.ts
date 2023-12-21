@@ -63,8 +63,13 @@ export function useOrders<T = Order[]>({
     meta: {
       error: "Unable to retrieve orders",
     },
-    enabled: !!(isConnected && indexerSdk && olKeys),
+    enabled: !!(
+      isConnected &&
+      indexerSdk &&
+      olKeys?.bid.token.address.toLowerCase() &&
+      olKeys?.ask.token.address.toLowerCase()
+    ),
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 15 * 60 * 1000, // 5 minutes
   })
 }

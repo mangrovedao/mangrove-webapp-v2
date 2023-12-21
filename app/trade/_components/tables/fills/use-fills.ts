@@ -63,7 +63,12 @@ export function useFills<T = Fill[]>({
     meta: {
       error: "Unable to retrieve fills",
     },
-    enabled: !!(isConnected && indexerSdk && olKeys),
+    enabled: !!(
+      isConnected &&
+      indexerSdk &&
+      olKeys?.bid.token.address.toLowerCase() &&
+      olKeys?.ask.token.address.toLowerCase()
+    ),
     retry: false,
     staleTime: 1 * 60 * 1000, // 1 minute
   })

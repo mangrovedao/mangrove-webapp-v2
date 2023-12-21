@@ -87,6 +87,9 @@ export default {
         "blue-light": {
           100: "hsl(var(--color-blue-light-100))",
         },
+        cloud: {
+          100: "hsl(var(--color-cloud-100))",
+        },
       },
       maxWidth: {
         "8xl": "90rem",

@@ -45,22 +45,37 @@ CustomTabsList.displayName = TabsPrimitive.List.displayName
 
 const CustomTabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & {
+    count?: number
+  }
+>(({ className, children, count, ...props }, ref) => (
   <>
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
         "justify-center whitespace-nowrap rounded-sm text-sm leading-[22px] font-medium ring-offset-primary-dark-green transition-all",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=active]:underline data-[state=active]:underline-offset-[1.35rem]  data-[state=active]:decoration-green-caribbean data-[state=active]:decoration-2 items-center h-full",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none items-center h-full",
         "disabled:data-[state=active]:text-gray-scale-300 disabled:data-[state=active]:decoration-gray-scale-200 disabled:text-gray-scale-400",
         "text-gray-scale-300 data-[state=active]:text-white",
-        "hover:underline hover:underline-offset-[1.35rem] hover:decoration-green-caribbean hover:decoration-2",
-        "active:!text-gray-scale-200",
+        "active:!text-gray-scale-200 group space-x-2",
         className,
       )}
       {...props}
-    />
+    >
+      <span
+        className={cn(
+          "group-data-[state=active]:underline group-data-[state=active]:underline-offset-[1.35rem]  group-data-[state=active]:decoration-green-caribbean group-data-[state=active]:decoration-2",
+          "group-hover:underline group-hover:underline-offset-[1.35rem] group-hover:decoration-green-caribbean group-hover:decoration-2",
+        )}
+      >
+        {children}
+      </span>
+      {count ? (
+        <span className="bg-primary-solid-black rounded-sm pt-[6px] pb-1 px-[6px] text-sm text-cloud-100 no-underline decoration-0">
+          {count}
+        </span>
+      ) : undefined}
+    </TabsPrimitive.Trigger>
   </>
 ))
 CustomTabsTrigger.displayName = TabsPrimitive.Trigger.displayName
