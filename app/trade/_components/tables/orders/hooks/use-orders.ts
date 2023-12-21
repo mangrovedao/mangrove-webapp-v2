@@ -70,6 +70,6 @@ export function useOrders<T = Order[]>({
       olKeys?.ask.token.address.toLowerCase()
     ),
     retry: false,
-    staleTime: 15 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
