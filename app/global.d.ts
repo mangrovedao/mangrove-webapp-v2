@@ -1,6 +1,3 @@
-type Tweet = Database["public"]["Tables"]["tweets"]["Row"]
-type Profile = Database["public"]["Tables"]["profiles"]["Row"]
-
 type PageDetails = {
   page: number
   pageSize: number
@@ -8,4 +5,7 @@ type PageDetails = {
 
 declare global {
   type PageDetails = PageDetails
+  interface WindowEventMap {
+    "on-orderbook-offer-clicked": CustomEvent<{ price: string }>
+  }
 }

@@ -17,6 +17,10 @@ type SemiBookProps = {
   priceDecimals: number
 }
 
+// interface WindowEventMap {
+//   "on-orderbook-offer-clicked": CustomEvent<{ price: string }>
+// }
+
 export const SemiBook = React.forwardRef<
   React.ElementRef<typeof TableRow>,
   SemiBookProps
@@ -37,7 +41,14 @@ export const SemiBook = React.forwardRef<
       <TableRow
         ref={refIndex === i ? ref : null}
         key={`${type}-${id}`}
-        className={`relative h-6 border-none hover:opacity-80 transition-opacity cursor-default`}
+        className={`relative h-6 border-none hover:opacity-80 transition-opacity cursor-pointer`}
+        onClick={() => {
+          dispatchEvent(
+            new CustomEvent("on-orderbook-offer-clicked", {
+              detail: { price: price.toString() },
+            }),
+          )
+        }}
       >
         <OrderBookTableCell
           className={cn(
