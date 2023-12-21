@@ -19,7 +19,7 @@ type Params<T> = {
 }
 
 export function useFills<T = Fill[]>({
-  filters: { first = 10, skip = 0 } = {},
+  filters: { first = 100, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
