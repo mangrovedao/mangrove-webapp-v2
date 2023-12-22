@@ -2,6 +2,7 @@ import { type Market } from "@mangrovedao/mangrove.js"
 import { DotIcon } from "lucide-react"
 import React from "react"
 
+import { Timer } from "@/app/strategies/_components/tables/strategies/components/timer"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
@@ -69,10 +70,10 @@ export const EditOrderDrawer = ({
   if (!order || !market) return null
 
   const { base, quote } = market
-  const isBid = order.isBid
-  const formattedOrderDate = `${order.creationDate.toDateString()} ${order.creationDate.getHours()}:${order.creationDate.getMinutes()}`
-  const formattedPrice = `${Number(order.price).toFixed(4)} ${base.symbol}`
-  const isOrderExpired = order.expiryDate && order.expiryDate <= new Date()
+  const { expiryDate, price, creationDate, isBid } = order
+  const formattedOrderDate = `${creationDate.toDateString()} ${creationDate.getHours()}:${creationDate.getMinutes()}`
+  const formattedPrice = `${Number(price).toFixed(4)} ${base.symbol}`
+  const isOrderExpired = expiryDate && expiryDate <= new Date()
 
   return (
     <Drawer open={!!order} onOpenChange={onClose}>
@@ -121,7 +122,7 @@ export const EditOrderDrawer = ({
           {order.expiryDate && (
             <DrawerLine
               title="Time in force"
-              item={isOrderExpired ? "Expired" : "Good till time"}
+              item={expiryDate && <Timer expiry={expiryDate} />}
               secondaryItem="xx"
             />
           )}
