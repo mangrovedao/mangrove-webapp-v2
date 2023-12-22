@@ -1,5 +1,12 @@
 "use client"
-import { Copy, ExternalLink, LogOut, Network, Wallet } from "lucide-react"
+import {
+  Coins,
+  Copy,
+  ExternalLink,
+  LogOut,
+  Network,
+  Wallet,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
@@ -184,6 +191,14 @@ function RightPart() {
             <Network className="mr-2 h-4 w-4" />
             <span>Change network</span>
           </DropdownMenuItem>
+          {chain?.testnet && (
+            <DropdownMenuItem asChild>
+              <Link href={"/faucet"}>
+                <Coins className="mr-2 h-4 w-4" />
+                <span>Faucet</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem

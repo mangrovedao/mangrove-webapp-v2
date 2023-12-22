@@ -52,6 +52,7 @@
     "@visx/scale": "^3.5.0",
     "@visx/shape": "^3.5.0",
     "@visx/xychart": "^3.5.1",
+    "@wagmi/core": "^1.4.12",
     "big.js": "^6.2.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",

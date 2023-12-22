@@ -113,6 +113,9 @@ dependencies:
   '@visx/xychart':
     specifier: ^3.5.1
     version: 3.5.1(@react-spring/web@9.7.3)(react-dom@18.2.0)(react@18.2.0)
+  '@wagmi/core':
+    specifier: ^1.4.12
+    version: 1.4.12(@types/react@18.2.45)(react@18.2.0)(typescript@5.3.3)(viem@1.20.3)(zod@3.22.4)
   big.js:
     specifier: ^6.2.1
     version: 6.2.1
