@@ -42,16 +42,15 @@ const useIndexerSdkContext = () => {
               tickSpacing: m.tickSpacing,
             })
           },
-          async getPrice(tokenAddress) {
-            const token = await mangrove?.tokenFromAddress(tokenAddress)
-            if (!token?.symbol)
-              throw new Error(
-                `Impossible to determine token from address: ${tokenAddress}`,
-              )
+          getPrice(tokenAddress) {
             return queryClient.fetchQuery({
               queryKey: ["tokenPriceInUsd", tokenAddress],
-              queryFn: () => {
-                if (!token.symbol) return null
+              queryFn: async () => {
+                const token = await mangrove?.tokenFromAddress(tokenAddress)
+                if (!token?.symbol)
+                  throw new Error(
+                    `Impossible to determine token from address: ${tokenAddress}`,
+                  )
                 return getTokenPriceInUsd(token.symbol)
               },
               staleTime: 10 * 60 * 1000,
