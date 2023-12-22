@@ -3,14 +3,17 @@
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { Chains } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import { TickPriceHelper } from "@mangrovedao/mangrove.js"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
+
+import { getTokenPriceInUsd } from "@/services/tokens.service"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
   const { mangrove } = useMangrove()
   const { chain } = useNetwork()
+  const queryClient = useQueryClient()
 
   const indexerSdkQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -39,9 +42,20 @@ const useIndexerSdkContext = () => {
               tickSpacing: m.tickSpacing,
             })
           },
-          getPrice(tokenAddress) {
-            // TODO: unmock for kandels pages
-            return 1
+          async getPrice(tokenAddress) {
+            const token = await mangrove?.tokenFromAddress(tokenAddress)
+            if (!token?.symbol)
+              throw new Error(
+                `Impossible to determine token from address: ${tokenAddress}`,
+              )
+            return queryClient.fetchQuery({
+              queryKey: ["tokenPriceInUsd", tokenAddress],
+              queryFn: () => {
+                if (!token.symbol) return null
+                return getTokenPriceInUsd(token.symbol)
+              },
+              staleTime: 10 * 60 * 1000,
+            })
           },
         },
       })
