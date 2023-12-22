@@ -41,7 +41,7 @@ export const strategySchema = z.object({
 
 export type Strategy = z.infer<typeof strategySchema>
 
-export function parseOrders(data: unknown[]): Strategy[] {
+export function parseStrategies(data: unknown[]): Strategy[] {
   return data
     .map((item) => {
       try {

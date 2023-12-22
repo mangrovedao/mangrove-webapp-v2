@@ -6,7 +6,7 @@ import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-info
 import useMangrove from "@/providers/mangrove"
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import { useQuery } from "@tanstack/react-query"
-import { parseOrders, type Strategy } from "../schema"
+import { parseStrategies, type Strategy } from "../schema"
 
 type Params<T> = {
   filters?: {
@@ -44,7 +44,7 @@ export function useStrategies<T = Strategy[]>({
         skip,
         knownTokens,
       })
-      return parseOrders(result)
+      return parseStrategies(result)
     },
     select,
     meta: {
