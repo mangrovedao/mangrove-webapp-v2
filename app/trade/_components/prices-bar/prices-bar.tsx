@@ -86,7 +86,7 @@ export function PricesBar() {
     <ScrollArea>
       <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
         <Item
-          label={`Price (${quote?.symbol})`}
+          label={quote?.symbol ? `Price (${quote?.symbol})` : "Price"}
           value={oneMinutePriceQuery?.data?.close}
           skeleton={oneMinutePriceQuery?.isLoading}
           quote={quote}
