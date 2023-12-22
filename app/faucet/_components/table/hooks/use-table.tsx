@@ -11,20 +11,20 @@ import React from "react"
 import { useNetwork } from "wagmi"
 
 import { TokenIcon } from "@/components/token-icon"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { Actions } from "../components/actions"
+import { MintLimit } from "../components/mint-limit"
+import { TokenBalance } from "../components/token-balance"
 import type { FaucetToken } from "../schema"
-import { TokenBalance } from "../token-balance"
 
 const columnHelper = createColumnHelper<FaucetToken>()
 const DEFAULT_DATA: FaucetToken[] = []
 
 type Params = {
   data?: FaucetToken[]
-  onFaucet: (token: FaucetToken) => void
 }
 
-export function useTable({ data, onFaucet }: Params) {
+export function useTable({ data }: Params) {
   const { chain } = useNetwork()
   const blockExplorerUrl = chain?.blockExplorers?.default.url
 
@@ -62,35 +62,25 @@ export function useTable({ data, onFaucet }: Params) {
         },
       }),
       columnHelper.display({
-        id: "actions",
-        header: () => <div className="text-right">Action</div>,
+        header: "Mint limit",
         cell: ({ row }) => {
-          const isMgv = row.original.id.includes("MGV")
+          const { address, id } = row.original
+          const isMgv = id.includes("MGV")
+          if (!isMgv) return null
           return (
-            <div className="flex justify-end w-full">
-              {isMgv ? (
-                <Button size="sm" onClick={() => onFaucet(row.original)}>
-                  Faucet
-                </Button>
-              ) : (
-                <Button size="sm" asChild>
-                  <Link
-                    href={
-                      "https://staging.aave.com/faucet/?marketName=proto_mumbai_v3"
-                    }
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Go to AAVE faucet
-                  </Link>
-                </Button>
-              )}
+            <div className="flex flex-col">
+              {address && <MintLimit address={address} />}
             </div>
           )
         },
       }),
+      columnHelper.display({
+        id: "actions",
+        header: () => <div className="text-right">Action</div>,
+        cell: ({ row }) => <Actions faucetToken={row.original} />,
+      }),
     ],
-    [onFaucet],
+    [blockExplorerUrl],
   )
 
   return useReactTable({
