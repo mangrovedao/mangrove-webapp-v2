@@ -24,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import withClientOnly from "@/hocs/withClientOnly"
 import { Bell, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
@@ -32,7 +33,6 @@ import {
   useChainModal,
   useConnectModal,
 } from "@rainbow-me/rainbowkit"
-import { ClientOnly } from "./client-only"
 import { WrongNetworkAlertDialog } from "./stateful/dialogs/wrong-network-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
@@ -99,15 +99,13 @@ export function Navbar() {
           </div>
         </span>
 
-        <ClientOnly>
-          <RightPart />
-        </ClientOnly>
+        <RightPart />
       </div>
     </nav>
   )
 }
 
-function RightPart() {
+const RightPart = withClientOnly(() => {
   const { openChainModal } = useChainModal()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
@@ -235,4 +233,4 @@ function RightPart() {
       <WrongNetworkAlertDialog />
     </div>
   )
-}
+})
