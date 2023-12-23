@@ -14,6 +14,9 @@ export function Orders() {
     pageSize: 10,
   })
   const { market } = useMarket()
+  const { data: count } = useOrders({
+    select: (orders) => orders.length,
+  })
   const ordersQuery = useOrders({
     filters: {
       skip: (page - 1) * pageSize,
@@ -42,7 +45,7 @@ export function Orders() {
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count: ordersQuery.data?.length,
+          count,
         }}
       />
       <CancelOfferDialog

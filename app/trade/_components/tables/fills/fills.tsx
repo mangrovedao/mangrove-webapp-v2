@@ -12,6 +12,9 @@ export function Fills() {
     pageSize: 10,
   })
   const { market } = useMarket()
+  const { data: count } = useFills({
+    select: (fills) => fills.length,
+  })
   const fillsQuery = useFills({
     filters: {
       skip: (page - 1) * pageSize,
@@ -31,7 +34,7 @@ export function Fills() {
         onPageChange: setPageDetails,
         page,
         pageSize,
-        count: fillsQuery.data?.length,
+        count,
       }}
     />
   )

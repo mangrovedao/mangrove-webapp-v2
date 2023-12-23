@@ -3,6 +3,7 @@ import React from "react"
 import { Toaster } from "sonner"
 
 import { Navbar } from "@/components/navbar"
+import { AdminCommand } from "@/components/stateful/admin-command/admin-command"
 import { RootProvider } from "@/providers/root"
 
 import "./globals.css"
@@ -44,6 +45,7 @@ export default function RootLayout({
             },
           }}
         />
+        <AdminCommand />
       </body>
     </html>
   )
