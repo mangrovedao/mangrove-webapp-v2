@@ -63,6 +63,7 @@ const useIndexerSdkContext = () => {
       error: "Error when initializing the indexer sdk",
     },
     enabled: !!mangrove,
+    staleTime: 15 * 60 * 1000,
   })
   return {
     indexerSdkQuery,

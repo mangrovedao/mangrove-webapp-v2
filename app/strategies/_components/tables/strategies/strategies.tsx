@@ -14,7 +14,10 @@ export function Strategies() {
     pageSize: 10,
   })
   const { market } = useMarket()
-  const ordersQuery = useStrategies({
+  const { data: count } = useStrategies({
+    select: (strategies) => strategies.length,
+  })
+  const strategiesQuery = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,
     },
@@ -34,13 +37,13 @@ export function Strategies() {
   return (
     <DataTable
       table={table}
-      isError={!!ordersQuery.error}
-      isLoading={ordersQuery.isLoading || !market}
+      isError={!!strategiesQuery.error}
+      isLoading={strategiesQuery.isLoading || !market}
       pagination={{
         onPageChange: setPageDetails,
         page,
         pageSize,
-        count: 10,
+        count,
       }}
     />
   )

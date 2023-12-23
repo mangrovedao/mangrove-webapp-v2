@@ -2,7 +2,6 @@ import Script from "next/script"
 import React from "react"
 import { Toaster } from "sonner"
 
-import { Navbar } from "@/components/navbar"
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
 import { RootProvider } from "@/providers/root"
 
@@ -24,7 +23,6 @@ export default function RootLayout({
       </head>
       <body>
         <RootProvider>
-          <Navbar />
           {children}
           <AdminCommand />
         </RootProvider>

@@ -17,10 +17,10 @@ export default function Page() {
   }, [chain])
 
   return (
-    <main className="max-w-6xl mx-auto px-4 pt-8 overflow-x-hidden">
+    <>
       <InfoBanner />
       <Title className="mt-[56px]">Faucet</Title>
       <FaucetTable />
-    </main>
+    </>
   )
 }

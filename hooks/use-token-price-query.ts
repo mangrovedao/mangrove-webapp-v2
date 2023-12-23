@@ -15,6 +15,7 @@ const useTokenPriceQuery = (
     },
     enabled: !!tokenSymbol && !!priceTokenSymbol,
     refetchInterval: interval === "1m" ? 1000 * 60 : false, // every minute for 1m interval only
+    staleTime: interval === "1d" ? 1000 * 60 * 60 * 24 : 1000 * 60, // 1 day for 1d interval, 1 minute for 1m interval
   })
 }
 

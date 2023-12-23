@@ -16,7 +16,7 @@ const useMangroveContext = () => {
   const { isConnected } = useAccount()
 
   const mangroveQuery = useQuery({
-    queryKey: ["mangroveInstance", signer?._address, isConnected, chain?.id],
+    queryKey: ["mangroveInstance", signer?._address, chain?.id],
     queryFn: async () => {
       try {
         const mangrove = await Mangrove.connect({ signer })
@@ -32,6 +32,7 @@ const useMangroveContext = () => {
     enabled: !!signer?._address && !!isConnected && !chain?.unsupported,
     refetchOnWindowFocus: false,
     retry: false,
+    staleTime: 15 * 60 * 1000,
   })
   const { data: mangrove } = mangroveQuery
 

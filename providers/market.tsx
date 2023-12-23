@@ -36,6 +36,7 @@ const useMarketContext = () => {
     },
     enabled: !!marketInfo,
     refetchOnWindowFocus: false,
+    staleTime: 15 * 60 * 1000,
   })
 
   const requestBookQuery = useQuery({
