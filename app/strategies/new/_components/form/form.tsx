@@ -6,14 +6,20 @@ import { TokenInput } from "@/components/token-input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenFromId } from "@/hooks/use-token-from-id"
 import { cn } from "@/utils"
+import { useAccount, useBalance } from "wagmi"
 import { Fieldset } from "../fieldset"
 
 export function Form({ className }: { className?: string }) {
+  const { address } = useAccount()
+  const { data: nativeBalance } = useBalance({
+    address,
+  })
   const searchParams = useSearchParams()
   const market = searchParams.get("market")
   const [baseId, quoteId] = market?.split(",") ?? []
   const { data: baseToken } = useTokenFromId(baseId as Address)
   const { data: quoteToken } = useTokenFromId(quoteId as Address)
+  const walletBalanceLabel = "Wallet balance"
 
   if (!baseToken || !quoteToken)
     return <Skeleton className="w-full h-[312px]" />
@@ -33,6 +39,7 @@ export function Form({ className }: { className?: string }) {
           label={`${baseToken?.symbol} deposit`}
           // disabled={!market}
           showBalance
+          balanceLabel={walletBalanceLabel}
           // error={field.state.meta.touchedErrors}
         />
         <TokenInput
@@ -47,6 +54,7 @@ export function Form({ className }: { className?: string }) {
           label={`${quoteToken?.symbol} deposit`}
           // disabled={!market}
           showBalance
+          balanceLabel={walletBalanceLabel}
           // error={field.state.meta.touchedErrors}
         />
       </Fieldset>
@@ -55,6 +63,15 @@ export function Form({ className }: { className?: string }) {
         <TokenInput label="Number of price points" />
         <TokenInput label="Ratio" />
         <TokenInput label="Step size" />
+      </Fieldset>
+
+      <Fieldset legend="Bounty">
+        <TokenInput
+          label={`${nativeBalance?.symbol} deposit`}
+          token={nativeBalance?.symbol}
+          showBalance
+          balanceLabel={walletBalanceLabel}
+        />
       </Fieldset>
     </form>
   )

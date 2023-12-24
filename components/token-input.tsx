@@ -10,15 +10,21 @@ import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { Caption } from "./typography/caption"
 
 type TokenInputProps = {
-  token?: Token
+  token?: Token | string
   disabled?: boolean
   label?: string
   showBalance?: boolean
+  balanceLabel?: string
   error?: ValidationError[]
 } & NumericInputProps
 
 export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
-  ({ label, token, showBalance = false, error, ...inputProps }, ref) => {
+  (
+    { label, token, showBalance = false, balanceLabel, error, ...inputProps },
+    ref,
+  ) => {
+    const isNativeToken = typeof token === "string"
+    const tokenSymbol = isNativeToken ? token : token?.symbol
     return (
       <div className="flex-col flex">
         {label && (
@@ -29,8 +35,8 @@ export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
         <NumericInput
           {...inputProps}
           ref={ref}
-          icon={token?.symbol}
-          symbol={token?.symbol}
+          icon={tokenSymbol}
+          symbol={tokenSymbol}
           aria-invalid={!!error?.length}
         />
         {error?.length ? (
@@ -41,7 +47,7 @@ export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
             {error}
           </p>
         ) : undefined}
-        {showBalance && <TokenBalance token={token} />}
+        {showBalance && <TokenBalance token={token} label={balanceLabel} />}
       </div>
     )
   },
