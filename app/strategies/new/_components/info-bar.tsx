@@ -3,9 +3,7 @@ import { redirect, useSearchParams } from "next/navigation"
 import type { Address } from "viem"
 
 import { TokenPair } from "@/components/token-pair"
-import { Button } from "@/components/ui/button"
 import { useTokenFromId } from "@/hooks/use-token-from-id"
-import { Minus, Plus } from "lucide-react"
 import { Badge } from "../../_components/badge"
 
 export function InfoBar() {
@@ -19,7 +17,7 @@ export function InfoBar() {
   if (!(market && baseId && quoteId)) return redirect("/strategies")
   return (
     <div className="border-b">
-      <div className="flex justify-between items-center py-6 px-4 max-w-8xl mx-auto">
+      <div className="py-6 px-4 max-w-8xl mx-auto">
         <span className="flex items-center space-x-4">
           <TokenPair
             baseToken={baseToken}
@@ -28,7 +26,7 @@ export function InfoBar() {
           />
           <Badge>Step 2/2</Badge>
         </span>
-        <span className="flex space-x-3">
+        {/* <span className="flex space-x-3">
           <Button
             variant={"tertiary"}
             className="h-8 w-8 text-white"
@@ -43,7 +41,7 @@ export function InfoBar() {
           >
             <Plus />
           </Button>
-        </span>
+        </span> */}
       </div>
     </div>
   )

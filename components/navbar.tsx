@@ -33,7 +33,6 @@ import {
   useChainModal,
   useConnectModal,
 } from "@rainbow-me/rainbowkit"
-import { WrongNetworkAlertDialog } from "./stateful/dialogs/wrong-network-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 
@@ -245,7 +244,6 @@ const RightPart = withClientOnly(() => {
       <Button variant={"invisible"} size="sm" className="h-full">
         <Bell className="text-white w-4" />
       </Button>
-      <WrongNetworkAlertDialog />
     </div>
   )
 })

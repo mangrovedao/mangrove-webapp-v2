@@ -5,6 +5,7 @@ import { Toaster } from "sonner"
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
 import { RootProvider } from "@/providers/root"
 
+import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-network-dialog"
 import "./globals.css"
 
 const toastClasses =
@@ -25,6 +26,7 @@ export default function RootLayout({
         <RootProvider>
           {children}
           <AdminCommand />
+          <WrongNetworkAlertDialog />
         </RootProvider>
         <Toaster
           position="bottom-center"
