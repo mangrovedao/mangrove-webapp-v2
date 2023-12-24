@@ -26,6 +26,8 @@
     --color-blue-light-100: 167, 24%, 73%;
     --color-primary-night-woods: 180, 86%, 3%;
     --color-cloud-100: 167, 24%, 73%;
+    --color-cloud-300: 180, 5%, 46%;
+    --color-cherry-100: 0, 100%, 68%;
 
     --tw-ring-color: var(hsl(--color-primary-dark-geen));
     --background: 180 86% 3%;

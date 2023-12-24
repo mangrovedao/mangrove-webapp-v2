@@ -89,6 +89,10 @@ export default {
         },
         cloud: {
           100: "hsl(var(--color-cloud-100))",
+          300: "hsl(var(--color-cloud-300))",
+        },
+        cherry: {
+          100: "hsl(var(--color-cherry-100))",
         },
       },
       maxWidth: {

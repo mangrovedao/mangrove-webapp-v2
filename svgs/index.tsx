@@ -179,3 +179,23 @@ export function VariationArrow(props: React.ComponentProps<"svg">) {
     </svg>
   )
 }
+
+export function TooltipInfo(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M12 18.805a6.806 6.806 0 100-13.61 6.806 6.806 0 000 13.61zm0-4.083V12m0-2.722h.008"
+      ></path>
+    </svg>
+  )
+}
