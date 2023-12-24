@@ -1,5 +1,4 @@
-import { type Token } from "@mangrovedao/mangrove.js"
-import { type ValidationError } from "@tanstack/react-form"
+import Big from "big.js"
 import { LucideChevronRight } from "lucide-react"
 import React from "react"
 
@@ -7,19 +6,14 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
-import {
-  NumericInput,
-  type NumericInputProps,
-} from "@/components/numeric-input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
-import Big from "big.js"
+import { TokenInput } from "@components/token-input"
 import { MarketDetails } from "../components/market-details"
-import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
 import { useMarketForm } from "./hooks/use-market"
@@ -103,7 +97,7 @@ export function Market() {
               onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
             >
               {(field) => (
-                <TradeInput
+                <TokenInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -125,7 +119,7 @@ export function Market() {
             </form.Field>
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
-                <TradeInput
+                <TokenInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -232,7 +226,7 @@ export function Market() {
                   </div>
                   {/* Render the custom input component */}
                   {showCustomInput && (
-                    <TradeInput
+                    <TokenInput
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -293,36 +287,3 @@ export function Market() {
     </>
   )
 }
-
-type TradeInputProps = {
-  token?: Token
-  disabled?: boolean
-  label?: string
-  showBalance?: boolean
-  error?: ValidationError[]
-} & NumericInputProps
-
-const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
-  ({ label, token, showBalance = false, error, ...inputProps }, ref) => {
-    return (
-      <div className="flex-col flex">
-        {label && <Label>{label}</Label>}
-        <NumericInput
-          {...inputProps}
-          ref={ref}
-          icon={token?.symbol}
-          symbol={token?.symbol}
-          aria-invalid={!!error?.length}
-        />
-        {error && (
-          <p role="aria-live" className="text-red-100 text-xs leading-4 mt-1">
-            {error}
-          </p>
-        )}
-        {showBalance && <TokenBalance token={token} />}
-      </div>
-    )
-  },
-)
-
-TradeInput.displayName = "TradeInput"

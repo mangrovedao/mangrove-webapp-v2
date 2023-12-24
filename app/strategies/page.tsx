@@ -14,7 +14,7 @@ export default function Page() {
   )
 
   return (
-    <>
+    <main className="max-w-8xl mx-auto px-4 pt-8 overflow-x-hidden">
       <InfoBanner />
       <div className="mt-[56px] flex justify-between items-center">
         <Title>Strategies</Title>
@@ -32,6 +32,6 @@ export default function Page() {
         open={isNewDialogOpen}
         onClose={toggleIsNewDialogOpen}
       />
-    </>
+    </main>
   )
 }
