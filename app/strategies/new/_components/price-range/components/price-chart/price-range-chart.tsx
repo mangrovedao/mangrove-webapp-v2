@@ -13,6 +13,7 @@ import useResizeObserver from "use-resize-observer"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useKeyPress } from "@/hooks/use-key-press"
+import { cn } from "@/utils"
 import { ProvidedZoom } from "@visx/zoom/lib/types"
 
 // const [width, height] = [911, 384]
@@ -146,7 +147,10 @@ export function PriceRangeChart({
             >
               {altPressed && (
                 <rect
-                  className="absolute inset-0"
+                  className={cn("absolute inset-0 cursor", {
+                    "!cursor-grab": altPressed,
+                    "!cursor-grabbing": altPressed && zoom.isDragging,
+                  })}
                   onMouseMove={zoom.dragMove}
                   onMouseDown={zoom.dragStart}
                   onMouseUp={zoom.dragEnd}
