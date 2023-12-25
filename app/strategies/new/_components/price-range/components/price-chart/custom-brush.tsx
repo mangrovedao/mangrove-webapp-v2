@@ -34,6 +34,7 @@ function CustomBrush({
     useState<SelectionStatus>("idle")
   const [dragging, setDragging] = useState(false)
   const [dragMode, setDragMode] = useState(false)
+  const [cursorMoving, setCursorMoving] = useState(false)
 
   // Update selection when value prop changes
   useEffect(() => {
@@ -67,6 +68,7 @@ function CustomBrush({
 
   const handleMouseMove = React.useCallback(
     (event: MouseEvent) => {
+      if (cursorMoving) return
       const svg = svgRef.current
       if (svg) {
         const svgRect = svg.getBoundingClientRect()
@@ -90,10 +92,19 @@ function CustomBrush({
         }
       }
     },
-    [svgRef, xScale, dragging, dragMode, selection, selectionStatus],
+    [
+      cursorMoving,
+      svgRef,
+      xScale,
+      dragging,
+      dragMode,
+      selection,
+      selectionStatus,
+    ],
   )
 
   const handleMouseUp = React.useCallback(() => {
+    setCursorMoving(false)
     setDragging(false)
     setSelectionStatus("end")
     if (selection !== null && onBrushEnd) {
@@ -102,15 +113,14 @@ function CustomBrush({
   }, [onBrushEnd, selection])
 
   const handleCursorMove = (type: "left" | "right", newPrice: number) => {
+    setCursorMoving(true)
     if (!selection) return
     if (type === "left") {
       const newSelection: [number, number] = [newPrice, selection[1]]
-      console.log("left", newSelection)
       setSelection(newSelection)
       onBrushChange(newSelection)
     } else {
       const newSelection: [number, number] = [selection[0], newPrice]
-      console.log("right", newSelection)
       setSelection(newSelection)
       onBrushChange(newSelection)
     }

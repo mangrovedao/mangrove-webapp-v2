@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ScaleLinear } from "d3-scale"
 import React from "react"
 
@@ -38,7 +40,7 @@ export default function Cursor({
   }, [])
 
   const handleMouseMove = React.useCallback(
-    (event: MouseEvent) => {
+    (event: any) => {
       event.preventDefault()
       event.stopPropagation()
       if (isDragging) {
@@ -54,28 +56,12 @@ export default function Cursor({
     [isDragging, onMove, xScale, svgRef],
   )
 
-  // React.useEffect(() => {
-  //   if (isDragging) {
-  //     window.addEventListener("mouseup", handleMouseUp)
-  //     window.addEventListener("mousemove", handleMouseMove)
-  //   }
-
-  //   return () => {
-  //     window.removeEventListener("mouseup", handleMouseUp)
-  //     window.removeEventListener("mousemove", handleMouseMove)
-  //   }
-  // }, [isDragging, onMove, xScale])
-
   React.useEffect(() => {
     const svg = svgRef.current
-    // if (isDragging) {
-    // svg?.addEventListener("mousedown", handleMouseDown)
     svg?.addEventListener("mousemove", handleMouseMove)
     svg?.addEventListener("mouseup", handleMouseUp)
-    // }
 
     return () => {
-      // svg?.removeEventListener("mousedown", handleMouseDown)
       svg?.removeEventListener("mousemove", handleMouseMove)
       svg?.removeEventListener("mouseup", handleMouseUp)
     }
@@ -85,22 +71,18 @@ export default function Cursor({
     <g
       width="25"
       height="24"
-      // fill="none"
+      fill="none"
       transform={`translate(${xPosition}, 0)`}
-      className={cn("cursor-col-resize fill-red-200 z-50", {
+      className={cn("cursor-col-resize", {
         "text-green-caribbean": color === "green",
         "text-cherry-100": color === "red",
         "text-neutral": color === "neutral",
       })}
+      // @ts-ignore
       onMouseDown={handleMouseDown}
     >
       <line x1="0" y1="0" x2="0" y2={height} stroke="currentColor" />
-      <g
-        className={cn("-translate-x-3 translate-y-[calc(50%-24px)]", {
-          "": type === "left",
-          "": type === "right",
-        })}
-      >
+      <g className={cn("-translate-x-3 translate-y-[calc(50%-24px)]")}>
         {type === "left" ? (
           <>
             <rect
