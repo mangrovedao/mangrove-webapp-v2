@@ -39,14 +39,16 @@ function CustomBrush({
         let xPixel = event.clientX - svgRect.left
         xPixel = Math.max(0, Math.min(width, xPixel))
         const x = xScale.invert(xPixel)
-        if (selection && x >= selection[0] && x <= selection[1]) {
-          setDragging(true)
-          setDragMode(true)
-          startValueRef.current = x - selection[0] // calculate the offset
-        } else {
-          startValueRef.current = x
-          setSelection([x, x])
-          setDragMode(false)
+        if (xPixel >= 0 && xPixel <= width) {
+          if (selection && x >= selection[0] && x <= selection[1]) {
+            setDragging(true)
+            setDragMode(true)
+            startValueRef.current = x - selection[0]
+          } else if (!selection) {
+            startValueRef.current = x
+            setSelection([x, x])
+            setDragMode(false)
+          }
         }
       }
     },
