@@ -17,8 +17,15 @@ function CustomBrush({
   value,
 }: CustomBrushProps) {
   const startValueRef = useRef<number | null>(null)
-  const [selection, setSelection] = useState<[number, number] | null>(null)
+  const [selection, setSelection] = useState<[number, number] | null>(
+    value ?? null,
+  )
   const rectRef = useRef<SVGRectElement | null>(null)
+
+  // Update selection when value prop changes
+  useEffect(() => {
+    setSelection(value ?? null)
+  }, [value])
 
   const handleMouseDown = (event: MouseEvent) => {
     const rect = rectRef.current
