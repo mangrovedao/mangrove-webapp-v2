@@ -18,7 +18,6 @@ import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
 import CustomBrush from "./custom-brush"
 
-// const [width, height] = [911, 384]
 const paddingRight = 54
 const paddingBottom = 44
 const maxToTheTopRatio = 0.8
@@ -51,8 +50,6 @@ export function PriceRangeChart({
 
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
-  const lowestBid = bids?.[bids.length - 1]
-  const highestAsk = asks?.[asks.length - 1]
   const midPrice = React.useMemo(() => {
     if (!bids?.length || !asks?.length) return null // set a minimum value for midPrice
     // if (!bids?.length || !asks?.length) return 0.1 // set a minimum value for midPrice
