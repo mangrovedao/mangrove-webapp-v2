@@ -32,7 +32,6 @@ function CustomBrush({
   )
   const [selectionStatus, setSelectionStatus] =
     useState<SelectionStatus>("idle")
-  const rectRef = useRef<SVGRectElement | null>(null)
   const [dragging, setDragging] = useState(false)
   const [dragMode, setDragMode] = useState(false)
 
@@ -43,9 +42,9 @@ function CustomBrush({
 
   const handleMouseDown = React.useCallback(
     (event: MouseEvent) => {
-      const rect = rectRef.current
-      if (rect) {
-        const svgRect = rect.getBoundingClientRect()
+      const svg = svgRef.current
+      if (svg) {
+        const svgRect = svg.getBoundingClientRect()
         let xPixel = event.clientX - svgRect.left
         xPixel = Math.max(0, Math.min(width, xPixel))
         const x = xScale.invert(xPixel)
@@ -63,15 +62,14 @@ function CustomBrush({
         }
       }
     },
-    [selection, width, xScale],
+    [selection, svgRef, width, xScale],
   )
 
   const handleMouseMove = React.useCallback(
     (event: MouseEvent) => {
-      const rect = rectRef.current
-      console.log("mousemove", event.clientX, event.clientY)
-      if (rect) {
-        const svgRect = rect.getBoundingClientRect()
+      const svg = svgRef.current
+      if (svg) {
+        const svgRect = svg.getBoundingClientRect()
         const xPixel = event.clientX - svgRect.left
         const x = xScale.invert(xPixel)
         if (
@@ -92,7 +90,7 @@ function CustomBrush({
         }
       }
     },
-    [xScale, dragging, dragMode, selection, selectionStatus],
+    [svgRef, xScale, dragging, dragMode, selection, selectionStatus],
   )
 
   const handleMouseUp = React.useCallback(() => {
@@ -119,8 +117,6 @@ function CustomBrush({
     }
   }
 
-  console.log(selection, xScale.domain(), xScale.range())
-
   useEffect(() => {
     if (value) {
       setSelection(value)
@@ -128,7 +124,6 @@ function CustomBrush({
   }, [value, xScale])
 
   useEffect(() => {
-    // const rect = rectRef.current
     const svg = svgRef.current
     svg?.addEventListener("mousedown", handleMouseDown)
     svg?.addEventListener("mousemove", handleMouseMove)
@@ -153,15 +148,13 @@ function CustomBrush({
 
   return (
     <>
-      <rect ref={rectRef} width={width} height={height} fill="transparent" />
-
       {selection && (
         <rect
           x={brushX}
           y={0}
           width={brushWidth}
           height={height}
-          fill="rgba(255, 0, 0, 0.1)"
+          fill="hsla(0, 100%, 68%, 0.1)"
           className={cn({
             "cursor-grab": !dragging,
             "cursor-grabbing": dragging,
