@@ -329,24 +329,28 @@ export function PriceRangeChart({
                   />
                 )} */}
               </svg>
-              <TooltipWithBounds
-                top={height}
-                left={xScaleTransformed(selectedPriceRange?.[0] ?? 0)}
-                className="!bg-transparent"
-              >
-                <div className="!bg-green-bangladesh !text-green-caribbean -translate-x-2/3 px-2 py-1 rounded-md">
-                  Min {selectedPriceRange?.[0].toFixed(2)} 20%
-                </div>
-              </TooltipWithBounds>
-              <TooltipWithBounds
-                top={height}
-                left={xScaleTransformed(selectedPriceRange?.[1] ?? 0)}
-                className="!bg-transparent"
-              >
-                <div className="!bg-cherry-400 !text-cherry-100 -translate-x-2/3 px-2 py-1 rounded-md">
-                  Max {selectedPriceRange?.[1].toFixed(2)} 20%
-                </div>
-              </TooltipWithBounds>
+              {selectedPriceRange && (
+                <>
+                  <TooltipWithBounds
+                    top={height}
+                    left={xScaleTransformed(selectedPriceRange?.[0] ?? 0)}
+                    className="!bg-transparent"
+                  >
+                    <div className="!bg-green-bangladesh !text-green-caribbean -translate-x-2/3 px-2 py-1 rounded-md text-sm leading-[14px]">
+                      Min {selectedPriceRange?.[0].toFixed(2)} 20%
+                    </div>
+                  </TooltipWithBounds>
+                  <TooltipWithBounds
+                    top={height}
+                    left={xScaleTransformed(selectedPriceRange?.[1] ?? 0)}
+                    className="!bg-transparent"
+                  >
+                    <div className="!bg-cherry-400 !text-cherry-100 -translate-x-2/3 px-2 py-1 rounded-md text-sm leading-[14px]">
+                      Max {selectedPriceRange?.[1].toFixed(2)} 20%
+                    </div>
+                  </TooltipWithBounds>
+                </>
+              )}
             </div>
           </>
         )

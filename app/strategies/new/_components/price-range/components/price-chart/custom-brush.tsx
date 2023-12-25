@@ -2,7 +2,8 @@
 
 import { cn } from "@/utils"
 import { type ScaleLinear } from "d3-scale"
-import React, { useEffect, useRef, useState } from "react"
+import React from "react"
+
 import Cursor from "./cursor"
 
 type SelectionStatus = "idle" | "start" | "end"
@@ -28,18 +29,18 @@ function CustomBrush({
   svgRef,
   viewOnly = false,
 }: CustomBrushProps) {
-  const startValueRef = useRef<number | null>(null)
-  const [selection, setSelection] = useState<[number, number] | null>(
+  const startValueRef = React.useRef<number | null>(null)
+  const [selection, setSelection] = React.useState<[number, number] | null>(
     value ?? null,
   )
   const [selectionStatus, setSelectionStatus] =
-    useState<SelectionStatus>("idle")
-  const [dragging, setDragging] = useState(false)
-  const [dragMode, setDragMode] = useState(false)
-  const [cursorMoving, setCursorMoving] = useState(false)
+    React.useState<SelectionStatus>("idle")
+  const [dragging, setDragging] = React.useState(false)
+  const [dragMode, setDragMode] = React.useState(false)
+  const [cursorMoving, setCursorMoving] = React.useState(false)
 
   // Update selection when value prop changes
-  useEffect(() => {
+  React.useEffect(() => {
     setSelection(value ?? null)
   }, [value])
 
@@ -83,7 +84,12 @@ function CustomBrush({
           startValueRef.current !== null
         ) {
           const dx = x - startValueRef.current
-          setSelection([dx, dx + (selection[1] - selection[0])]) // apply the offset
+          const newSelection: React.SetStateAction<[number, number] | null> = [
+            dx,
+            dx + (selection[1] - selection[0]),
+          ]
+          setSelection(newSelection) // apply the offset
+          onBrushChange(newSelection)
         } else if (
           !dragMode &&
           startValueRef.current !== null &&
@@ -102,6 +108,7 @@ function CustomBrush({
       dragMode,
       selection,
       selectionStatus,
+      onBrushChange,
     ],
   )
 
@@ -128,13 +135,13 @@ function CustomBrush({
     }
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (value) {
       setSelection(value)
     }
   }, [value, xScale])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (viewOnly) return
     const svg = svgRef.current
     svg?.addEventListener("mousedown", handleMouseDown)
