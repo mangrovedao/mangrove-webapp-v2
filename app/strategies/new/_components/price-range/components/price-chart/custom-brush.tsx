@@ -42,6 +42,7 @@ function CustomBrush({
         if (selection && x >= selection[0] && x <= selection[1]) {
           setDragging(true)
           setDragMode(true)
+          startValueRef.current = x - selection[0] // calculate the offset
         } else {
           startValueRef.current = x
           setSelection([x, x])
@@ -66,8 +67,7 @@ function CustomBrush({
           startValueRef.current !== null
         ) {
           const dx = x - startValueRef.current
-          setSelection([selection[0] + dx, selection[1] + dx])
-          startValueRef.current = x
+          setSelection([dx, dx + (selection[1] - selection[0])]) // apply the offset
         } else if (
           !dragMode &&
           startValueRef.current !== null &&
