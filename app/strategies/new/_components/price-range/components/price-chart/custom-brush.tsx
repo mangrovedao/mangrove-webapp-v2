@@ -3,6 +3,7 @@
 import { cn } from "@/utils"
 import { type ScaleLinear } from "d3-scale"
 import React, { useEffect, useRef, useState } from "react"
+import Cursor from "./cursor"
 
 type SelectionStatus = "idle" | "start" | "end"
 
@@ -137,31 +138,18 @@ function CustomBrush({
       )}
       {selection && (
         <>
-          <g
-            width="25"
-            height="24"
-            fill="none"
-            transform={`translate(${leftCursorPos}, 0)`}
-            className="text-green-caribbean pointer-events-none"
-          >
-            <g className="-translate-x-3 translate-y-1/2">
-              <rect
-                width="24"
-                height="24"
-                x="24.745"
-                fill="currentColor"
-                rx="8"
-                transform="rotate(90 24.745 0)"
-              ></rect>
-              <path
-                stroke="#010D0D"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M14.745 7l-5 5 5 5"
-              ></path>
-            </g>
-          </g>
+          <Cursor
+            height={height}
+            xPosition={leftCursorPos}
+            color="green"
+            type="left"
+          />
+          <Cursor
+            height={height}
+            xPosition={rightCursorPos}
+            color="red"
+            type="right"
+          />
         </>
       )}
     </>
