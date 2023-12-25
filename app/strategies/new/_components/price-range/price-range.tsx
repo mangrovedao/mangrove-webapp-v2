@@ -1,3 +1,7 @@
+"use client"
+import React from "react"
+
+import { TokenInput } from "@/components/token-input"
 import withClientOnly from "@/hocs/withClientOnly"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
@@ -11,6 +15,8 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
+  const [minPrice, setMinPrice] = React.useState("")
+  const [maxPrice, setMaxPrice] = React.useState("")
   const { requestBookQuery } = useMarket()
   return (
     <div className={cn(className)}>
@@ -27,9 +33,34 @@ export const PriceRange = withClientOnly(function ({
         <PriceRangeChart
           bids={requestBookQuery.data?.bids}
           asks={requestBookQuery.data?.asks}
-          onPriceRangeChange={() => {
-            console.log("onPriceRangeChange")
+          onPriceRangeChange={([min, max]) => {
+            if (!min || !max) return
+            setMinPrice(min.toString())
+            setMaxPrice(max.toString())
           }}
+          initialPriceRange={
+            minPrice && maxPrice
+              ? [Number(minPrice), Number(maxPrice)]
+              : undefined
+          }
+        />
+      </div>
+      <div className="mt-4 space-x-4 flex w-full justify-center items-center">
+        <TokenInput
+          label="Min Price"
+          value={minPrice}
+          onChange={(e) => setMinPrice(e.target.value)}
+          className="w-full"
+        />
+        <div>
+          {" "}
+          <span className="h-px w-4 bg-cloud-300"></span>{" "}
+        </div>
+        <TokenInput
+          label="Min Price"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+          className="w-full"
         />
       </div>
     </div>

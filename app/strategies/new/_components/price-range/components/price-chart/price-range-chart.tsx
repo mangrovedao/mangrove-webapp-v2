@@ -35,12 +35,14 @@ type Props = {
   bids?: Market.Offer[]
   asks?: Market.Offer[]
   onPriceRangeChange?: (priceRange: number[]) => void
+  initialPriceRange?: [number, number]
 }
 
 export function PriceRangeChart({
   bids = [],
   asks = [],
   onPriceRangeChange,
+  initialPriceRange,
 }: Props) {
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const offers = [
@@ -51,8 +53,7 @@ export function PriceRangeChart({
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
   const midPrice = React.useMemo(() => {
-    if (!bids?.length || !asks?.length) return null // set a minimum value for midPrice
-    // if (!bids?.length || !asks?.length) return 0.1 // set a minimum value for midPrice
+    if (!bids?.length || !asks?.length) return null
     return Big(lowestAsk?.price ?? 0)
       .add(highestBid?.price ?? 0)
       .div(2)
@@ -109,7 +110,13 @@ export function PriceRangeChart({
    */
   const [selectedPriceRange, setSelectedPriceRange] = React.useState<
     [number, number] | null
-  >(null)
+  >(initialPriceRange ?? null)
+
+  React.useEffect(() => {
+    if (!initialPriceRange) return
+    setSelectedPriceRange(initialPriceRange)
+  }, [initialPriceRange])
+
   const svgRef = React.useRef(null)
   return (
     <Zoom
@@ -263,10 +270,19 @@ export function PriceRangeChart({
                   xScale={xScaleTransformed}
                   width={width - paddingRight}
                   height={height - paddingBottom}
-                  onBrushEnd={setSelectedPriceRange}
+                  onBrushEnd={(selectedRange) => {
+                    setSelectedPriceRange(selectedRange)
+                    if (onPriceRangeChange && selectedRange) {
+                      onPriceRangeChange(selectedRange)
+                    }
+                  }}
+                  onBrushChange={(selectedRange) => {
+                    setSelectedPriceRange(selectedRange)
+                    if (onPriceRangeChange && selectedRange) {
+                      onPriceRangeChange(selectedRange)
+                    }
+                  }}
                   value={selectedPriceRange ?? undefined}
-                  // onBrushChange={setSelectedPriceRange}
-                  onBrushChange={console.log}
                   svgRef={svgRef}
                 />
                 {/* <Brush
