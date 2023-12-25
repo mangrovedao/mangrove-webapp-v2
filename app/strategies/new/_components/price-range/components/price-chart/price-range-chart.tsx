@@ -1,10 +1,14 @@
 "use client"
 import { type Market } from "@mangrovedao/mangrove.js"
 import { AxisLeft, AxisTop } from "@visx/axis"
+import { Brush } from "@visx/brush"
+import { RectClipPath } from "@visx/clip-path"
 import { curveStep } from "@visx/curve"
+import { localPoint } from "@visx/event"
 import { scaleLinear } from "@visx/scale"
 import { AreaClosed } from "@visx/shape"
 import { Zoom } from "@visx/zoom"
+import { type ProvidedZoom } from "@visx/zoom/lib/types"
 import Big from "big.js"
 import { Minus, Plus } from "lucide-react"
 import React from "react"
@@ -14,8 +18,6 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
-import { localPoint } from "@visx/event"
-import { ProvidedZoom } from "@visx/zoom/lib/types"
 
 // const [width, height] = [911, 384]
 const paddingRight = 54
@@ -108,20 +110,20 @@ export function PriceRangeChart({
     return xScale.copy().domain(newXDomain)
   }
 
+  /**
+   * Price range selection
+   */
+  const [selectedPriceRange, setSelectedPriceRange] = React.useState<
+    [number, number] | null
+  >(null)
+
   return (
     <Zoom
       width={width}
       height={height}
       scaleXMin={0.1}
       scaleXMax={40}
-      initialTransformMatrix={{
-        scaleX: 1,
-        scaleY: 1,
-        translateX: 0,
-        translateY: 0,
-        skewX: 0,
-        skewY: 0,
-      }}
+      initialTransformMatrix={initialTransform}
     >
       {(zoom) => {
         const xScaleTransformed = rescaleXAxis(zoom)
@@ -155,7 +157,7 @@ export function PriceRangeChart({
               ref={ref}
             >
               {altPressed && (
-                <rect
+                <div
                   className={cn("absolute inset-0 cursor", {
                     "!cursor-grab": altPressed,
                     "!cursor-grabbing": altPressed && zoom.isDragging,
@@ -199,6 +201,16 @@ export function PriceRangeChart({
                 />
               )}
               <svg className="w-full h-full">
+                {/* <LinearGradient
+                  id="price-range-gradient"
+                  from={
+                    bids.length > 0 ? "green" : asks.length > 0 ? "red" : "blue"
+                  }
+                  to={
+                    bids.length > 0 ? "green" : asks.length > 0 ? "red" : "blue"
+                  }
+                /> */}
+
                 <AreaClosed
                   data={offers}
                   x={(d) => xScaleTransformed(d.price.toNumber())}
@@ -207,6 +219,8 @@ export function PriceRangeChart({
                   fill="#010D0D"
                   strokeWidth={1}
                   curve={curveStep}
+                  // fill={`url(#price-range-gradient)`}
+                  // clipPath="url(#price-range-clip)"
                 />
                 <AxisTop
                   top={height}
@@ -244,6 +258,45 @@ export function PriceRangeChart({
                     )
                   }}
                 />
+                <Brush
+                  xScale={xScale}
+                  yScale={yScale}
+                  width={width}
+                  height={height}
+                  margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
+                  brushDirection="horizontal"
+                  initialBrushPosition={
+                    selectedPriceRange
+                      ? {
+                          start: { x: selectedPriceRange[0], y: 0 },
+                          end: { x: selectedPriceRange[1], y: 0 },
+                        }
+                      : undefined
+                  }
+                  onChange={(bounds) => {
+                    if (!bounds) return
+                    const { x0, x1 } = bounds
+                    setSelectedPriceRange([x0, x1])
+                  }}
+                  onBrushEnd={(bounds) => {
+                    if (!bounds) return
+                    const { x0, x1 } = bounds
+                    onPriceRangeChange && onPriceRangeChange([x0, x1])
+                  }}
+                />
+
+                {selectedPriceRange && (
+                  <RectClipPath
+                    id="price-range-clip"
+                    x={xScale(selectedPriceRange[0])}
+                    y={0}
+                    width={
+                      xScale(selectedPriceRange[1]) -
+                      xScale(selectedPriceRange[0])
+                    }
+                    height={height}
+                  />
+                )}
               </svg>
             </div>
           </>

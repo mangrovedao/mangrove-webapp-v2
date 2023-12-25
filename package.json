@@ -45,6 +45,7 @@
     "@tanstack/react-table": "^8.11.2",
     "@visx/axis": "^3.5.0",
     "@visx/brush": "^3.6.1",
+    "@visx/clip-path": "^3.3.0",
     "@visx/curve": "^3.3.0",
     "@visx/event": "^3.3.0",
     "@visx/gradient": "^3.3.0",
