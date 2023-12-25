@@ -1,5 +1,7 @@
+"use client"
+
 import { type ScaleLinear } from "d3-scale"
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 interface CustomBrushProps {
   xScale: ScaleLinear<number, number>
@@ -21,59 +23,81 @@ function CustomBrush({
     value ?? null,
   )
   const rectRef = useRef<SVGRectElement | null>(null)
+  const [dragging, setDragging] = useState(false)
+  const [dragMode, setDragMode] = useState(false)
 
   // Update selection when value prop changes
   useEffect(() => {
     setSelection(value ?? null)
   }, [value])
 
-  const handleMouseDown = (event: MouseEvent) => {
-    const rect = rectRef.current
-    if (rect) {
-      const svgRect = rect.getBoundingClientRect()
-      let xPixel = event.clientX - svgRect.left
-      xPixel = Math.max(0, Math.min(width, xPixel))
-      const x = xScale.invert(xPixel)
-      startValueRef.current = x
-      setSelection([x, x])
-    }
-  }
+  const handleMouseDown = React.useCallback(
+    (event: MouseEvent) => {
+      const rect = rectRef.current
+      if (rect) {
+        const svgRect = rect.getBoundingClientRect()
+        let xPixel = event.clientX - svgRect.left
+        xPixel = Math.max(0, Math.min(width, xPixel))
+        const x = xScale.invert(xPixel)
+        if (selection && x >= selection[0] && x <= selection[1]) {
+          setDragging(true)
+          setDragMode(true)
+        } else {
+          startValueRef.current = x
+          setSelection([x, x])
+          setDragMode(false)
+        }
+      }
+    },
+    [selection, width, xScale],
+  )
 
-  const handleMouseMove = (event: MouseEvent) => {
-    if (startValueRef.current !== null) {
+  const handleMouseMove = React.useCallback(
+    (event: MouseEvent) => {
       const rect = rectRef.current
       if (rect) {
         const svgRect = rect.getBoundingClientRect()
         const xPixel = event.clientX - svgRect.left
         const x = xScale.invert(xPixel)
-        setSelection([startValueRef.current, x])
+        if (
+          dragging &&
+          dragMode &&
+          selection &&
+          startValueRef.current !== null
+        ) {
+          const dx = x - startValueRef.current
+          setSelection([selection[0] + dx, selection[1] + dx])
+          startValueRef.current = x
+        } else if (
+          !dragMode &&
+          startValueRef.current !== null &&
+          event.buttons !== 0
+        ) {
+          setSelection([startValueRef.current, x])
+        }
       }
-    }
-  }
+    },
+    [xScale, dragging, dragMode, selection, startValueRef],
+  )
 
-  const handleMouseUp = () => {
+  const handleMouseUp = React.useCallback(() => {
+    setDragging(false)
     if (selection !== null && onBrushEnd) {
       onBrushEnd(selection.sort((a, b) => a - b) as [number, number])
     }
-    startValueRef.current = null
-    setSelection(null)
-  }
+  }, [onBrushEnd, selection])
 
   useEffect(() => {
-    const rect = rectRef.current
-    if (rect) {
-      rect.addEventListener("mousedown", handleMouseDown)
-      document.addEventListener("mousemove", handleMouseMove)
-      document.addEventListener("mouseup", handleMouseUp)
-    }
+    window.addEventListener("mousedown", handleMouseDown)
+    window.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mouseup", handleMouseUp)
+
     return () => {
-      if (rect) {
-        rect.removeEventListener("mousedown", handleMouseDown)
-        document.removeEventListener("mousemove", handleMouseMove)
-        document.removeEventListener("mouseup", handleMouseUp)
-      }
+      window.removeEventListener("mousedown", handleMouseDown)
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseup", handleMouseUp)
     }
-  }, [selection])
+  }, [handleMouseDown, handleMouseMove, handleMouseUp])
 
   const brushWidth = selection
     ? Math.abs(xScale(selection[1]) - xScale(selection[0]))
