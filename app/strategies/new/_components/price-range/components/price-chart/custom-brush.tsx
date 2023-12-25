@@ -16,61 +16,40 @@ function CustomBrush({
   onBrushEnd,
   value,
 }: CustomBrushProps) {
-  const [start, setStart] = useState<number | null>(null)
-  const [end, setEnd] = useState<number | null>(null)
+  const startValueRef = useRef<number | null>(null)
+  const [selection, setSelection] = useState<[number, number] | null>(null)
   const rectRef = useRef<SVGRectElement | null>(null)
-  const [dragging, setDragging] = useState(false)
 
   const handleMouseDown = (event: MouseEvent) => {
     const rect = rectRef.current
     if (rect) {
       const svgRect = rect.getBoundingClientRect()
       let xPixel = event.clientX - svgRect.left
-      // Ensure xPixel is within the range of the SVG
       xPixel = Math.max(0, Math.min(width, xPixel))
       const x = xScale.invert(xPixel)
-      console.log(
-        "clientX:",
-        event.clientX,
-        "svgRect.left:",
-        svgRect.left,
-        "xPixel:",
-        xPixel,
-        "x:",
-        x,
-        "xScale(x):",
-        xScale.domain(),
-        xScale.range(),
-      )
-      setStart(x)
-      setEnd(x)
-      setDragging(true)
+      startValueRef.current = x
+      setSelection([x, x])
     }
   }
 
   const handleMouseMove = (event: MouseEvent) => {
-    if (start !== null && dragging) {
+    if (startValueRef.current !== null) {
       const rect = rectRef.current
       if (rect) {
         const svgRect = rect.getBoundingClientRect()
-        const x = xScale.invert(event.clientX - svgRect.left)
-        setEnd(x)
+        const xPixel = event.clientX - svgRect.left
+        const x = xScale.invert(xPixel)
+        setSelection([startValueRef.current, x])
       }
     }
   }
 
   const handleMouseUp = () => {
-    if (start !== null && end !== null && onBrushEnd) {
-      const lowest = Math.min(start, end)
-      const highest = Math.max(start, end)
-      onBrushEnd([lowest, highest])
+    if (selection !== null && onBrushEnd) {
+      onBrushEnd(selection.sort((a, b) => a - b) as [number, number])
     }
-    if (!value) {
-      // only reset start and end if value is not provided
-      setStart(null)
-      setEnd(null)
-    }
-    setDragging(false)
+    startValueRef.current = null
+    setSelection(null)
   }
 
   useEffect(() => {
@@ -87,23 +66,19 @@ function CustomBrush({
         document.removeEventListener("mouseup", handleMouseUp)
       }
     }
-  }, [start, end])
+  }, [selection])
 
-  const brushWidth = value
-    ? Math.abs(xScale(value[1]) - xScale(value[0]))
-    : start && end
-      ? Math.abs(xScale(end) - xScale(start))
-      : 0
-  const brushX = value
-    ? Math.min(xScale(value[0]), xScale(value[1]))
-    : start && end
-      ? Math.min(xScale(start), xScale(end))
-      : 0
+  const brushWidth = selection
+    ? Math.abs(xScale(selection[1]) - xScale(selection[0]))
+    : 0
+  const brushX = selection
+    ? Math.min(xScale(selection[0]), xScale(selection[1]))
+    : 0
 
   return (
     <>
       <rect ref={rectRef} width={width} height={height} fill="transparent" />
-      {start && end && (
+      {selection && (
         <rect
           x={brushX}
           y={0}

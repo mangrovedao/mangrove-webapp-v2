@@ -113,15 +113,6 @@ export function PriceRangeChart({
   const [selectedPriceRange, setSelectedPriceRange] = React.useState<
     [number, number] | null
   >(null)
-  const [renderBrush, setRenderBrush] = React.useState(false)
-
-  // FIX: I didn't find any other way to check if the chart has been successfully rendered
-  // this avoid a bug in customBrush during first selection
-  React.useEffect(() => {
-    setTimeout(() => {
-      setRenderBrush(true)
-    }, 1500)
-  }, [])
 
   return (
     <Zoom
@@ -133,6 +124,12 @@ export function PriceRangeChart({
     >
       {(zoom) => {
         const xScaleTransformed = rescaleXAxis(zoom)
+        const range = xScaleTransformed.range()
+        const domain = xScaleTransformed.domain()
+
+        // FIX: I didn't find any other way to check if the chart has been successfully rendered
+        // this avoid a bug in customBrush during first selection
+        const key = `${range[0]}-${range[1]}-${domain[0]}-${domain[1]}`
         return (
           <>
             <div className="flex justify-between py-6">
@@ -264,15 +261,14 @@ export function PriceRangeChart({
                     )
                   }}
                 />
-                {renderBrush && (
-                  <CustomBrush
-                    xScale={xScaleTransformed}
-                    width={width}
-                    height={height}
-                    onBrushEnd={setSelectedPriceRange}
-                    value={selectedPriceRange ?? undefined}
-                  />
-                )}
+                <CustomBrush
+                  key={key}
+                  xScale={xScaleTransformed}
+                  width={width}
+                  height={height}
+                  onBrushEnd={setSelectedPriceRange}
+                  value={selectedPriceRange ?? undefined}
+                />
                 {/* <Brush
                   xScale={xScale}
                   yScale={yScale}
