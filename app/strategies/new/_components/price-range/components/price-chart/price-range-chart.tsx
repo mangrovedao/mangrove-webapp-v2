@@ -264,8 +264,8 @@ export function PriceRangeChart({
                 <CustomBrush
                   key={key}
                   xScale={xScaleTransformed}
-                  width={width}
-                  height={height}
+                  width={width - paddingRight}
+                  height={height - paddingBottom}
                   onBrushEnd={setSelectedPriceRange}
                   value={selectedPriceRange ?? undefined}
                 />

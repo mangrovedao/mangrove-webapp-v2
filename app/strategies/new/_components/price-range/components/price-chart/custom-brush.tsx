@@ -1,7 +1,10 @@
 "use client"
 
+import { cn } from "@/utils"
 import { type ScaleLinear } from "d3-scale"
 import React, { useEffect, useRef, useState } from "react"
+
+type SelectionStatus = "idle" | "start" | "end"
 
 interface CustomBrushProps {
   xScale: ScaleLinear<number, number>
@@ -22,6 +25,7 @@ function CustomBrush({
   const [selection, setSelection] = useState<[number, number] | null>(
     value ?? null,
   )
+  const [selectionStatus, setSelectionStatus] = useState("idle")
   const rectRef = useRef<SVGRectElement | null>(null)
   const [dragging, setDragging] = useState(false)
   const [dragMode, setDragMode] = useState(false)
@@ -46,6 +50,7 @@ function CustomBrush({
             startValueRef.current = x - selection[0]
           } else if (!selection) {
             startValueRef.current = x
+            setSelectionStatus("start")
             setSelection([x, x])
             setDragMode(false)
           }
@@ -73,17 +78,19 @@ function CustomBrush({
         } else if (
           !dragMode &&
           startValueRef.current !== null &&
-          event.buttons !== 0
+          event.buttons !== 0 &&
+          selectionStatus !== "end"
         ) {
           setSelection([startValueRef.current, x])
         }
       }
     },
-    [xScale, dragging, dragMode, selection, startValueRef],
+    [xScale, dragging, dragMode, selection, selectionStatus],
   )
 
   const handleMouseUp = React.useCallback(() => {
     setDragging(false)
+    setSelectionStatus("end")
     if (selection !== null && onBrushEnd) {
       onBrushEnd(selection.sort((a, b) => a - b) as [number, number])
     }
@@ -108,9 +115,13 @@ function CustomBrush({
     ? Math.min(xScale(selection[0]), xScale(selection[1]))
     : 0
 
+  const leftCursorPos = selection ? xScale(selection[0]) : 0
+  const rightCursorPos = selection ? xScale(selection[1]) : 0
+
   return (
     <>
       <rect ref={rectRef} width={width} height={height} fill="transparent" />
+
       {selection && (
         <rect
           x={brushX}
@@ -118,7 +129,40 @@ function CustomBrush({
           width={brushWidth}
           height={height}
           fill="rgba(255, 0, 0, 0.1)"
+          className={cn({
+            "cursor-grab": !dragging,
+            "cursor-grabbing": dragging,
+          })}
         />
+      )}
+      {selection && (
+        <>
+          <g
+            width="25"
+            height="24"
+            fill="none"
+            transform={`translate(${leftCursorPos}, 0)`}
+            className="text-green-caribbean pointer-events-none"
+          >
+            <g className="-translate-x-3 translate-y-1/2">
+              <rect
+                width="24"
+                height="24"
+                x="24.745"
+                fill="currentColor"
+                rx="8"
+                transform="rotate(90 24.745 0)"
+              ></rect>
+              <path
+                stroke="#010D0D"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                d="M14.745 7l-5 5 5 5"
+              ></path>
+            </g>
+          </g>
+        </>
       )}
     </>
   )
