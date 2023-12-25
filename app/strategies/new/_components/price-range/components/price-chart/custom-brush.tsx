@@ -15,6 +15,7 @@ interface CustomBrushProps {
   value?: [number, number]
   onBrushChange: (newRange: [number, number]) => void
   svgRef: React.RefObject<SVGSVGElement>
+  viewOnly?: boolean
 }
 
 function CustomBrush({
@@ -25,6 +26,7 @@ function CustomBrush({
   value,
   onBrushChange,
   svgRef,
+  viewOnly = false,
 }: CustomBrushProps) {
   const startValueRef = useRef<number | null>(null)
   const [selection, setSelection] = useState<[number, number] | null>(
@@ -133,6 +135,7 @@ function CustomBrush({
   }, [value, xScale])
 
   useEffect(() => {
+    if (viewOnly) return
     const svg = svgRef.current
     svg?.addEventListener("mousedown", handleMouseDown)
     svg?.addEventListener("mousemove", handleMouseMove)
@@ -143,7 +146,7 @@ function CustomBrush({
       svg?.removeEventListener("mousemove", handleMouseMove)
       svg?.removeEventListener("mouseup", handleMouseUp)
     }
-  }, [handleMouseDown, handleMouseMove, handleMouseUp, svgRef])
+  }, [handleMouseDown, handleMouseMove, handleMouseUp, svgRef, viewOnly])
 
   const brushWidth = selection
     ? Math.abs(xScale(selection[1]) - xScale(selection[0]))
@@ -165,8 +168,8 @@ function CustomBrush({
           height={height}
           fill="hsla(0, 100%, 68%, 0.1)"
           className={cn({
-            "cursor-grab": !dragging,
-            "cursor-grabbing": dragging,
+            "cursor-grab": !dragging && !viewOnly,
+            "cursor-grabbing": dragging && !viewOnly,
           })}
         />
       )}
@@ -180,6 +183,7 @@ function CustomBrush({
             onMove={(newXPosition) => handleCursorMove("left", newXPosition)}
             xScale={xScale}
             svgRef={svgRef}
+            viewOnly={viewOnly}
           />
           <Cursor
             height={height}
@@ -189,6 +193,7 @@ function CustomBrush({
             onMove={(newXPosition) => handleCursorMove("right", newXPosition)}
             xScale={xScale}
             svgRef={svgRef}
+            viewOnly={viewOnly}
           />
         </>
       )}

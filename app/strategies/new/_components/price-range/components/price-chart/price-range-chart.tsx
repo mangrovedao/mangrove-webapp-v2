@@ -36,6 +36,7 @@ type Props = {
   asks?: Market.Offer[]
   onPriceRangeChange?: (priceRange: number[]) => void
   initialPriceRange?: [number, number]
+  viewOnly?: boolean
 }
 
 export function PriceRangeChart({
@@ -43,6 +44,7 @@ export function PriceRangeChart({
   asks = [],
   onPriceRangeChange,
   initialPriceRange,
+  viewOnly = false,
 }: Props) {
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const offers = [
@@ -284,6 +286,7 @@ export function PriceRangeChart({
                   }}
                   value={selectedPriceRange ?? undefined}
                   svgRef={svgRef}
+                  viewOnly={viewOnly}
                 />
                 {/* <Brush
                   xScale={xScale}

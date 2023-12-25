@@ -13,6 +13,7 @@ interface CursorProps {
   onMove: (newXPosition: number) => void
   xScale: ScaleLinear<number, number>
   svgRef: React.RefObject<SVGSVGElement>
+  viewOnly?: boolean
 }
 
 export default function Cursor({
@@ -23,11 +24,12 @@ export default function Cursor({
   onMove,
   xScale,
   svgRef,
+  viewOnly = false,
 }: CursorProps) {
   const [isDragging, setIsDragging] = React.useState(false)
 
   const handleMouseDown = React.useCallback((event: MouseEvent) => {
-    console.log("mousedown")
+    if (viewOnly) return
     event.preventDefault()
     event.stopPropagation()
     setIsDragging(true)
@@ -49,7 +51,6 @@ export default function Cursor({
         const rect = svg.getBoundingClientRect()
         const x = event.clientX - rect.left
         const newPrice = xScale.invert(x)
-        console.log(JSON.stringify(newPrice))
         onMove(newPrice)
       }
     },
@@ -57,6 +58,7 @@ export default function Cursor({
   )
 
   React.useEffect(() => {
+    if (viewOnly) return
     const svg = svgRef.current
     svg?.addEventListener("mousemove", handleMouseMove)
     svg?.addEventListener("mouseup", handleMouseUp)
@@ -65,7 +67,14 @@ export default function Cursor({
       svg?.removeEventListener("mousemove", handleMouseMove)
       svg?.removeEventListener("mouseup", handleMouseUp)
     }
-  }, [handleMouseDown, handleMouseMove, handleMouseUp, isDragging, svgRef])
+  }, [
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    isDragging,
+    svgRef,
+    viewOnly,
+  ])
 
   return (
     <g
@@ -73,7 +82,8 @@ export default function Cursor({
       height="24"
       fill="none"
       transform={`translate(${xPosition}, 0)`}
-      className={cn("cursor-col-resize", {
+      className={cn({
+        "cursor-col-resize": !viewOnly,
         "text-green-caribbean": color === "green",
         "text-cherry-100": color === "red",
         "text-neutral": color === "neutral",
@@ -82,7 +92,11 @@ export default function Cursor({
       onMouseDown={handleMouseDown}
     >
       <line x1="0" y1="0" x2="0" y2={height} stroke="currentColor" />
-      <g className={cn("-translate-x-3 translate-y-[calc(50%-24px)]")}>
+      <g
+        className={cn("-translate-x-3 translate-y-[calc(50%-24px)]", {
+          hidden: viewOnly,
+        })}
+      >
         {type === "left" ? (
           <>
             <rect
