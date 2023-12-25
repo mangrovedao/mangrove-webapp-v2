@@ -12,6 +12,7 @@ import useResizeObserver from "use-resize-observer"
 
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { useKeyPress } from "@/hooks/use-key-press"
 import { ProvidedZoom } from "@visx/zoom/lib/types"
 
 // const [width, height] = [911, 384]
@@ -66,6 +67,8 @@ export function PriceRangeChart({
   const maxVolume = Math.max(...offers.map((offer) => offer.volume.toNumber()))
 
   const [xDomain, setXDomain] = React.useState([xLowerBound, xUpperBound])
+
+  const altPressed = useKeyPress("Alt")
 
   React.useEffect(() => {
     const xLowerBound = midPrice * 0.7 // 30% lower than mid price
@@ -137,14 +140,20 @@ export function PriceRangeChart({
                 </Button>
               </span>
             </div>
-            <div className="w-full h-96 bg-[#041010] rounded-lg" ref={ref}>
-              <svg
-                className="w-full h-full"
-                onMouseMove={zoom.dragMove}
-                onMouseDown={zoom.dragStart}
-                onMouseUp={zoom.dragEnd}
-                onMouseOut={zoom.dragEnd}
-              >
+            <div
+              className="w-full h-96 bg-[#041010] rounded-lg relative"
+              ref={ref}
+            >
+              {altPressed && (
+                <rect
+                  className="absolute inset-0"
+                  onMouseMove={zoom.dragMove}
+                  onMouseDown={zoom.dragStart}
+                  onMouseUp={zoom.dragEnd}
+                  onMouseOut={zoom.dragEnd}
+                />
+              )}
+              <svg className="w-full h-full">
                 <AreaClosed
                   data={offers}
                   x={(d) => xScaleTransformed(d.price.toNumber())}
