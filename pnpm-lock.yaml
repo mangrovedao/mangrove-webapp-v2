@@ -86,6 +86,9 @@ dependencies:
   '@tanstack/react-table':
     specifier: ^8.11.2
     version: 8.11.2(react-dom@18.2.0)(react@18.2.0)
+  '@types/d3-scale':
+    specifier: ^4.0.8
+    version: 4.0.8
   '@visx/axis':
     specifier: ^3.5.0
     version: 3.5.0(react@18.2.0)
@@ -146,6 +149,9 @@ dependencies:
   d3-array:
     specifier: ^3.2.4
     version: 3.2.4
+  d3-scale:
+    specifier: ^4.0.2
+    version: 4.0.2
   date-fns:
     specifier: ^2.30.0
     version: 2.30.0
@@ -6443,6 +6449,12 @@ packages:
 
   /@types/d3-scale@4.0.2:
     resolution: {integrity: sha512-Yk4htunhPAwN0XGlIwArRomOjdoBFXC3+kCxK2Ubg7I9shQlVSJy/pG/Ht5ASN+gdMIalpk8TJ5xV74jFsetLA==}
+    dependencies:
+      '@types/d3-time': 3.0.0
+    dev: false
+
+  /@types/d3-scale@4.0.8:
+    resolution: {integrity: sha512-gkK1VVTr5iNiYJ7vWDI+yUFFlszhNMtVeneJ6lUTKPjprsvLLI9/tgEGiXJOnlINJA8FyA88gfnQsHbybVZrYQ==}
     dependencies:
       '@types/d3-time': 3.0.0
     dev: false

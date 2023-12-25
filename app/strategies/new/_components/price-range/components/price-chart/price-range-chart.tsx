@@ -1,8 +1,6 @@
 "use client"
 import { type Market } from "@mangrovedao/mangrove.js"
 import { AxisLeft, AxisTop } from "@visx/axis"
-import { Brush } from "@visx/brush"
-import { RectClipPath } from "@visx/clip-path"
 import { curveStep } from "@visx/curve"
 import { localPoint } from "@visx/event"
 import { scaleLinear } from "@visx/scale"
@@ -18,6 +16,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
+import CustomBrush from "./custom-brush"
 
 // const [width, height] = [911, 384]
 const paddingRight = 54
@@ -55,19 +54,16 @@ export function PriceRangeChart({
   const lowestBid = bids?.[bids.length - 1]
   const highestAsk = asks?.[asks.length - 1]
   const midPrice = React.useMemo(() => {
-    if (!bids?.length || !asks?.length) return 0.1 // set a minimum value for midPrice
+    if (!bids?.length || !asks?.length) return null // set a minimum value for midPrice
+    // if (!bids?.length || !asks?.length) return 0.1 // set a minimum value for midPrice
     return Big(lowestAsk?.price ?? 0)
       .add(highestBid?.price ?? 0)
       .div(2)
       .toNumber()
   }, [asks?.length, bids?.length, highestBid?.price, lowestAsk?.price])
-  const xLowerBound = midPrice * 0.7 // 30% lower than mid price
-  const xUpperBound = midPrice * 1.3 // 30% higher than mid price
+  const xLowerBound = midPrice ? midPrice * 0.7 : 0 // 30% lower than mid price
+  const xUpperBound = midPrice ? midPrice * 1.3 : 6000 // 30% higher than mid price
 
-  const min = bids.length ? lowestBid : lowestAsk
-  const max = asks.length ? highestAsk : highestBid
-  const minPrice = min?.price.toNumber() ?? 0
-  const maxPrice = max?.price.toNumber() ?? 0
   const maxVolume = Math.max(...offers.map((offer) => offer.volume.toNumber()))
 
   const [xDomain, setXDomain] = React.useState([xLowerBound, xUpperBound])
@@ -83,6 +79,7 @@ export function PriceRangeChart({
   const altPressed = useKeyPress("Alt")
 
   React.useEffect(() => {
+    if (!midPrice) return
     const xLowerBound = midPrice * 0.7 // 30% lower than mid price
     const xUpperBound = midPrice * 1.3 // 30% higher than mid price
     setXDomain([xLowerBound, xUpperBound])
@@ -116,6 +113,15 @@ export function PriceRangeChart({
   const [selectedPriceRange, setSelectedPriceRange] = React.useState<
     [number, number] | null
   >(null)
+  const [renderBrush, setRenderBrush] = React.useState(false)
+
+  // FIX: I didn't find any other way to check if the chart has been successfully rendered
+  // this avoid a bug in customBrush during first selection
+  React.useEffect(() => {
+    setTimeout(() => {
+      setRenderBrush(true)
+    }, 1500)
+  }, [])
 
   return (
     <Zoom
@@ -258,7 +264,16 @@ export function PriceRangeChart({
                     )
                   }}
                 />
-                <Brush
+                {renderBrush && (
+                  <CustomBrush
+                    xScale={xScaleTransformed}
+                    width={width}
+                    height={height}
+                    onBrushEnd={setSelectedPriceRange}
+                    value={selectedPriceRange ?? undefined}
+                  />
+                )}
+                {/* <Brush
                   xScale={xScale}
                   yScale={yScale}
                   width={width}
@@ -283,9 +298,9 @@ export function PriceRangeChart({
                     const { x0, x1 } = bounds
                     onPriceRangeChange && onPriceRangeChange([x0, x1])
                   }}
-                />
+                /> */}
 
-                {selectedPriceRange && (
+                {/* {selectedPriceRange && (
                   <RectClipPath
                     id="price-range-clip"
                     x={xScale(selectedPriceRange[0])}
@@ -296,7 +311,7 @@ export function PriceRangeChart({
                     }
                     height={height}
                   />
-                )}
+                )} */}
               </svg>
             </div>
           </>
