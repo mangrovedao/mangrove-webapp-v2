@@ -161,23 +161,32 @@ export function PriceRangeChart({
                     "!cursor-grabbing": altPressed && zoom.isDragging,
                   })}
                   onMouseMove={(e) => {
+                    // Get the minimum value of the domain
                     const [minDomain] = xScaleTransformed.domain()
-                    if (!minDomain || !dragStartPoint) return
-                    const point = localPoint(e) ?? { x: 0, y: 0 }
-                    let direction = "none"
-                    if (prevPoint) {
-                      direction = point.x < prevPoint.x ? "right" : "left"
-                    }
-                    setPrevPoint(point)
 
+                    // If there's no minimum domain value or no drag start point, exit the function
+                    if (!minDomain || !dragStartPoint) return
+
+                    // Get the current mouse position
+                    const currentPoint = localPoint(e) ?? { x: 0, y: 0 }
+
+                    // Determine the direction of the drag
+                    let dragDirection = "none"
+                    if (prevPoint) {
+                      dragDirection =
+                        currentPoint.x < prevPoint.x ? "right" : "left"
+                    }
+
+                    // Update the previous mouse position
+                    setPrevPoint(currentPoint)
+
+                    // If the minimum domain value is greater than 0, allow dragging in both directions
                     if (minDomain > 0) {
-                      // Allow dragging in both directions
                       zoom.dragMove(e)
-                    } else if (minDomain <= 0) {
-                      // Only allow dragging to the right
-                      if (direction === "right") {
-                        zoom.dragMove(e)
-                      }
+                    }
+                    // If the minimum domain value is less than or equal to 0, only allow dragging to the right
+                    else if (minDomain <= 0 && dragDirection === "right") {
+                      zoom.dragMove(e)
                     }
                   }}
                   onMouseDown={(e) => {
