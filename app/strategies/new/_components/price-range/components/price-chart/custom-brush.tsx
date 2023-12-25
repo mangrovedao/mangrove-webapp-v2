@@ -13,6 +13,8 @@ interface CustomBrushProps {
   height: number
   onBrushEnd: (range: [number, number]) => void
   value?: [number, number]
+  onBrushChange: (newRange: [number, number]) => void
+  svgRef: React.RefObject<SVGSVGElement>
 }
 
 function CustomBrush({
@@ -21,12 +23,15 @@ function CustomBrush({
   height,
   onBrushEnd,
   value,
+  onBrushChange,
+  svgRef,
 }: CustomBrushProps) {
   const startValueRef = useRef<number | null>(null)
   const [selection, setSelection] = useState<[number, number] | null>(
     value ?? null,
   )
-  const [selectionStatus, setSelectionStatus] = useState("idle")
+  const [selectionStatus, setSelectionStatus] =
+    useState<SelectionStatus>("idle")
   const rectRef = useRef<SVGRectElement | null>(null)
   const [dragging, setDragging] = useState(false)
   const [dragMode, setDragMode] = useState(false)
@@ -64,6 +69,7 @@ function CustomBrush({
   const handleMouseMove = React.useCallback(
     (event: MouseEvent) => {
       const rect = rectRef.current
+      console.log("mousemove", event.clientX, event.clientY)
       if (rect) {
         const svgRect = rect.getBoundingClientRect()
         const xPixel = event.clientX - svgRect.left
@@ -97,17 +103,43 @@ function CustomBrush({
     }
   }, [onBrushEnd, selection])
 
+  const handleCursorMove = (type: "left" | "right", newXPosition: number) => {
+    if (!selection) return
+    const newPrice = xScale.invert(newXPosition)
+    if (type === "left") {
+      const newSelection: [number, number] = [newPrice, selection[1]]
+      console.log("left", newSelection)
+      setSelection(newSelection)
+      onBrushChange(newSelection)
+    } else {
+      const newSelection: [number, number] = [selection[0], newPrice]
+      console.log("right", newSelection)
+      setSelection(newSelection)
+      onBrushChange(newSelection)
+    }
+  }
+
+  console.log(selection, xScale.domain(), xScale.range())
+
   useEffect(() => {
-    window.addEventListener("mousedown", handleMouseDown)
-    window.addEventListener("mousemove", handleMouseMove)
-    window.addEventListener("mouseup", handleMouseUp)
+    if (value) {
+      setSelection(value)
+    }
+  }, [value, xScale])
+
+  useEffect(() => {
+    // const rect = rectRef.current
+    const svg = svgRef.current
+    svg?.addEventListener("mousedown", handleMouseDown)
+    svg?.addEventListener("mousemove", handleMouseMove)
+    svg?.addEventListener("mouseup", handleMouseUp)
 
     return () => {
-      window.removeEventListener("mousedown", handleMouseDown)
-      window.removeEventListener("mousemove", handleMouseMove)
-      window.removeEventListener("mouseup", handleMouseUp)
+      svg?.removeEventListener("mousedown", handleMouseDown)
+      svg?.removeEventListener("mousemove", handleMouseMove)
+      svg?.removeEventListener("mouseup", handleMouseUp)
     }
-  }, [handleMouseDown, handleMouseMove, handleMouseUp])
+  }, [handleMouseDown, handleMouseMove, handleMouseUp, svgRef])
 
   const brushWidth = selection
     ? Math.abs(xScale(selection[1]) - xScale(selection[0]))
@@ -143,12 +175,16 @@ function CustomBrush({
             xPosition={leftCursorPos}
             color="green"
             type="left"
+            onMove={(newXPosition) => handleCursorMove("left", newXPosition)}
+            xScale={xScale}
           />
           <Cursor
             height={height}
             xPosition={rightCursorPos}
             color="red"
             type="right"
+            onMove={(newXPosition) => handleCursorMove("right", newXPosition)}
+            xScale={xScale}
           />
         </>
       )}

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ScaleLinear } from "d3-scale"
+import React from "react"
+
 import { cn } from "@/utils"
 
 interface CursorProps {
@@ -5,6 +9,8 @@ interface CursorProps {
   height: number
   color?: "red" | "neutral" | "green"
   type: "left" | "right"
+  onMove: (newXPosition: number) => void
+  xScale: ScaleLinear<number, number>
 }
 
 export default function Cursor({
@@ -12,7 +18,62 @@ export default function Cursor({
   height,
   color,
   type,
+  onMove,
+  xScale,
 }: CursorProps) {
+  const [isDragging, setIsDragging] = React.useState(false)
+
+  const handleMouseDown = React.useCallback((event: any) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDragging(true)
+  }, [])
+
+  const handleMouseUp = React.useCallback((event: any) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDragging(false)
+  }, [])
+
+  const handleMouseMove = React.useCallback(
+    (event: any) => {
+      event.preventDefault()
+      event.stopPropagation()
+      if (isDragging) {
+        const newPrice = xScale.invert(event.clientX)
+        console.log(JSON.stringify(newPrice))
+        onMove(newPrice)
+      }
+    },
+    [isDragging, onMove, xScale],
+  )
+
+  // React.useEffect(() => {
+  //   if (isDragging) {
+  //     window.addEventListener("mouseup", handleMouseUp)
+  //     window.addEventListener("mousemove", handleMouseMove)
+  //   }
+
+  //   return () => {
+  //     window.removeEventListener("mouseup", handleMouseUp)
+  //     window.removeEventListener("mousemove", handleMouseMove)
+  //   }
+  // }, [isDragging, onMove, xScale])
+
+  React.useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousedown", handleMouseDown)
+      window.addEventListener("mousemove", handleMouseMove)
+      window.addEventListener("mouseup", handleMouseUp)
+    }
+
+    return () => {
+      window.removeEventListener("mousedown", handleMouseDown)
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [handleMouseDown, handleMouseMove, handleMouseUp, isDragging])
+
   return (
     <g
       width="25"
@@ -24,6 +85,9 @@ export default function Cursor({
         "text-cherry-100": color === "red",
         "text-neutral": color === "neutral",
       })}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
     >
       <line x1="0" y1="0" x2="0" y2={height} stroke="currentColor" />
       <g

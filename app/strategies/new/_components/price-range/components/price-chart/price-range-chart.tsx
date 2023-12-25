@@ -113,7 +113,7 @@ export function PriceRangeChart({
   const [selectedPriceRange, setSelectedPriceRange] = React.useState<
     [number, number] | null
   >(null)
-
+  const svgRef = React.useRef(null)
   return (
     <Zoom
       width={width}
@@ -203,7 +203,7 @@ export function PriceRangeChart({
                   onMouseOut={zoom.dragEnd}
                 />
               )}
-              <svg className="w-full h-full">
+              <svg className="w-full h-full" ref={svgRef}>
                 {/* <LinearGradient
                   id="price-range-gradient"
                   from={
@@ -268,6 +268,9 @@ export function PriceRangeChart({
                   height={height - paddingBottom}
                   onBrushEnd={setSelectedPriceRange}
                   value={selectedPriceRange ?? undefined}
+                  // onBrushChange={setSelectedPriceRange}
+                  onBrushChange={console.log}
+                  svgRef={svgRef}
                 />
                 {/* <Brush
                   xScale={xScale}
