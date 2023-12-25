@@ -14,6 +14,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
+import { localPoint } from "@visx/event"
 import { ProvidedZoom } from "@visx/zoom/lib/types"
 
 // const [width, height] = [911, 384]
@@ -68,6 +69,10 @@ export function PriceRangeChart({
   const maxVolume = Math.max(...offers.map((offer) => offer.volume.toNumber()))
 
   const [xDomain, setXDomain] = React.useState([xLowerBound, xUpperBound])
+  const [dragStartPoint, setDragStartPoint] = React.useState<{
+    x: number
+    y: number
+  } | null>(null)
 
   const altPressed = useKeyPress("Alt")
 
@@ -151,8 +156,32 @@ export function PriceRangeChart({
                     "!cursor-grab": altPressed,
                     "!cursor-grabbing": altPressed && zoom.isDragging,
                   })}
-                  onMouseMove={zoom.dragMove}
-                  onMouseDown={zoom.dragStart}
+                  onMouseMove={(e) => {
+                    const [minDomain] = xScaleTransformed.domain()
+                    if (!minDomain || !dragStartPoint) return
+                    const point = localPoint(e) ?? { x: 0, y: 0 }
+                    const dx = point.x - dragStartPoint.x
+                    let newTranslateX = dragStartPoint.x + dx
+
+                    if (minDomain > 0) {
+                      // Allow dragging in both directions
+                      zoom.dragMove(e)
+                    } else if (minDomain <= 0) {
+                      // Only allow dragging to the right
+                      if (newTranslateX < 0) {
+                        newTranslateX = 0
+                      }
+                      zoom.setTranslate({
+                        translateX: newTranslateX,
+                        translateY: zoom.transformMatrix.translateY,
+                      })
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    const point = localPoint(e) ?? { x: 0, y: 0 }
+                    setDragStartPoint(point)
+                    zoom.dragStart(e)
+                  }}
                   onMouseUp={zoom.dragEnd}
                   onMouseOut={zoom.dragEnd}
                 />
@@ -178,10 +207,9 @@ export function PriceRangeChart({
                 <AxisLeft
                   left={width}
                   scale={yScale}
-                  numTicks={4}
+                  numTicks={3}
                   hideAxisLine
                   hideTicks
-                  hideZero
                   tickClassName="!stroke-gray-scale-300 !select-none"
                   tickComponent={({ formattedValue, ...tickProps }) => {
                     return (
