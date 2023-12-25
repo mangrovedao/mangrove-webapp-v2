@@ -26,22 +26,6 @@ export function InfoBar() {
           />
           <Badge>Step 2/2</Badge>
         </span>
-        {/* <span className="flex space-x-3">
-          <Button
-            variant={"tertiary"}
-            className="h-8 w-8 text-white"
-            size={"icon"}
-          >
-            <Minus />
-          </Button>
-          <Button
-            variant={"tertiary"}
-            className="h-8 w-8 text-white"
-            size={"icon"}
-          >
-            <Plus />
-          </Button>
-        </span> */}
       </div>
     </div>
   )
