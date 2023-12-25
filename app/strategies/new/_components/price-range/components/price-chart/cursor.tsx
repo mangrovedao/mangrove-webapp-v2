@@ -25,6 +25,7 @@ export default function Cursor({
   const [isDragging, setIsDragging] = React.useState(false)
 
   const handleMouseDown = React.useCallback((event: MouseEvent) => {
+    console.log("mousedown")
     event.preventDefault()
     event.stopPropagation()
     setIsDragging(true)
@@ -68,13 +69,13 @@ export default function Cursor({
   React.useEffect(() => {
     const svg = svgRef.current
     // if (isDragging) {
-    svg?.addEventListener("mousedown", handleMouseDown)
+    // svg?.addEventListener("mousedown", handleMouseDown)
     svg?.addEventListener("mousemove", handleMouseMove)
     svg?.addEventListener("mouseup", handleMouseUp)
     // }
 
     return () => {
-      svg?.removeEventListener("mousedown", handleMouseDown)
+      // svg?.removeEventListener("mousedown", handleMouseDown)
       svg?.removeEventListener("mousemove", handleMouseMove)
       svg?.removeEventListener("mouseup", handleMouseUp)
     }
@@ -84,13 +85,14 @@ export default function Cursor({
     <g
       width="25"
       height="24"
-      fill="none"
+      // fill="none"
       transform={`translate(${xPosition}, 0)`}
-      className={cn("", {
+      className={cn("cursor-col-resize fill-red-200 z-50", {
         "text-green-caribbean": color === "green",
         "text-cherry-100": color === "red",
         "text-neutral": color === "neutral",
       })}
+      onMouseDown={handleMouseDown}
     >
       <line x1="0" y1="0" x2="0" y2={height} stroke="currentColor" />
       <g
