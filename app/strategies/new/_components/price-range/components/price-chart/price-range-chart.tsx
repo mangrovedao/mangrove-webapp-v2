@@ -73,6 +73,10 @@ export function PriceRangeChart({
     x: number
     y: number
   } | null>(null)
+  const [prevPoint, setPrevPoint] = React.useState<{
+    x: number
+    y: number
+  } | null>(null)
 
   const altPressed = useKeyPress("Alt")
 
@@ -160,21 +164,20 @@ export function PriceRangeChart({
                     const [minDomain] = xScaleTransformed.domain()
                     if (!minDomain || !dragStartPoint) return
                     const point = localPoint(e) ?? { x: 0, y: 0 }
-                    const dx = point.x - dragStartPoint.x
-                    let newTranslateX = dragStartPoint.x + dx
+                    let direction = "none"
+                    if (prevPoint) {
+                      direction = point.x < prevPoint.x ? "right" : "left"
+                    }
+                    setPrevPoint(point)
 
                     if (minDomain > 0) {
                       // Allow dragging in both directions
                       zoom.dragMove(e)
                     } else if (minDomain <= 0) {
                       // Only allow dragging to the right
-                      if (newTranslateX < 0) {
-                        newTranslateX = 0
+                      if (direction === "right") {
+                        zoom.dragMove(e)
                       }
-                      zoom.setTranslate({
-                        translateX: newTranslateX,
-                        translateY: zoom.transformMatrix.translateY,
-                      })
                     }
                   }}
                   onMouseDown={(e) => {
