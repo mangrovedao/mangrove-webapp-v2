@@ -16,6 +16,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
+import { TooltipWithBounds } from "@visx/tooltip"
 import CustomBrush from "./custom-brush"
 
 const paddingRight = 54
@@ -328,6 +329,24 @@ export function PriceRangeChart({
                   />
                 )} */}
               </svg>
+              <TooltipWithBounds
+                top={height}
+                left={xScaleTransformed(selectedPriceRange?.[0] ?? 0)}
+                className="!bg-transparent"
+              >
+                <div className="!bg-green-bangladesh !text-green-caribbean -translate-x-2/3 px-2 py-1 rounded-md">
+                  Min {selectedPriceRange?.[0].toFixed(2)} 20%
+                </div>
+              </TooltipWithBounds>
+              <TooltipWithBounds
+                top={height}
+                left={xScaleTransformed(selectedPriceRange?.[1] ?? 0)}
+                className="!bg-transparent"
+              >
+                <div className="!bg-cherry-400 !text-cherry-100 -translate-x-2/3 px-2 py-1 rounded-md">
+                  Max {selectedPriceRange?.[1].toFixed(2)} 20%
+                </div>
+              </TooltipWithBounds>
             </div>
           </>
         )

@@ -93,6 +93,7 @@ export default {
         },
         cherry: {
           100: "hsl(var(--color-cherry-100))",
+          400: "hsl(var(--color-cherry-400))",
         },
       },
       maxWidth: {
