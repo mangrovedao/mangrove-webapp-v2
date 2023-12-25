@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ScaleLinear } from "d3-scale"
 import React from "react"
 
@@ -11,6 +10,7 @@ interface CursorProps {
   type: "left" | "right"
   onMove: (newXPosition: number) => void
   xScale: ScaleLinear<number, number>
+  svgRef: React.RefObject<SVGSVGElement>
 }
 
 export default function Cursor({
@@ -20,32 +20,37 @@ export default function Cursor({
   type,
   onMove,
   xScale,
+  svgRef,
 }: CursorProps) {
   const [isDragging, setIsDragging] = React.useState(false)
 
-  const handleMouseDown = React.useCallback((event: any) => {
+  const handleMouseDown = React.useCallback((event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
     setIsDragging(true)
   }, [])
 
-  const handleMouseUp = React.useCallback((event: any) => {
+  const handleMouseUp = React.useCallback((event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
     setIsDragging(false)
   }, [])
 
   const handleMouseMove = React.useCallback(
-    (event: any) => {
+    (event: MouseEvent) => {
       event.preventDefault()
       event.stopPropagation()
       if (isDragging) {
-        const newPrice = xScale.invert(event.clientX)
+        const svg = svgRef.current
+        if (!svg) return
+        const rect = svg.getBoundingClientRect()
+        const x = event.clientX - rect.left
+        const newPrice = xScale.invert(x)
         console.log(JSON.stringify(newPrice))
         onMove(newPrice)
       }
     },
-    [isDragging, onMove, xScale],
+    [isDragging, onMove, xScale, svgRef],
   )
 
   // React.useEffect(() => {
@@ -61,18 +66,19 @@ export default function Cursor({
   // }, [isDragging, onMove, xScale])
 
   React.useEffect(() => {
-    if (isDragging) {
-      window.addEventListener("mousedown", handleMouseDown)
-      window.addEventListener("mousemove", handleMouseMove)
-      window.addEventListener("mouseup", handleMouseUp)
-    }
+    const svg = svgRef.current
+    // if (isDragging) {
+    svg?.addEventListener("mousedown", handleMouseDown)
+    svg?.addEventListener("mousemove", handleMouseMove)
+    svg?.addEventListener("mouseup", handleMouseUp)
+    // }
 
     return () => {
-      window.removeEventListener("mousedown", handleMouseDown)
-      window.removeEventListener("mousemove", handleMouseMove)
-      window.removeEventListener("mouseup", handleMouseUp)
+      svg?.removeEventListener("mousedown", handleMouseDown)
+      svg?.removeEventListener("mousemove", handleMouseMove)
+      svg?.removeEventListener("mouseup", handleMouseUp)
     }
-  }, [handleMouseDown, handleMouseMove, handleMouseUp, isDragging])
+  }, [handleMouseDown, handleMouseMove, handleMouseUp, isDragging, svgRef])
 
   return (
     <g
@@ -85,9 +91,6 @@ export default function Cursor({
         "text-cherry-100": color === "red",
         "text-neutral": color === "neutral",
       })}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
     >
       <line x1="0" y1="0" x2="0" y2={height} stroke="currentColor" />
       <g

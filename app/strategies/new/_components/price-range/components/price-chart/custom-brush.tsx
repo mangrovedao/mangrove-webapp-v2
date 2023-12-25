@@ -101,9 +101,8 @@ function CustomBrush({
     }
   }, [onBrushEnd, selection])
 
-  const handleCursorMove = (type: "left" | "right", newXPosition: number) => {
+  const handleCursorMove = (type: "left" | "right", newPrice: number) => {
     if (!selection) return
-    const newPrice = xScale.invert(newXPosition)
     if (type === "left") {
       const newSelection: [number, number] = [newPrice, selection[1]]
       console.log("left", newSelection)
@@ -170,6 +169,7 @@ function CustomBrush({
             type="left"
             onMove={(newXPosition) => handleCursorMove("left", newXPosition)}
             xScale={xScale}
+            svgRef={svgRef}
           />
           <Cursor
             height={height}
@@ -178,6 +178,7 @@ function CustomBrush({
             type="right"
             onMove={(newXPosition) => handleCursorMove("right", newXPosition)}
             xScale={xScale}
+            svgRef={svgRef}
           />
         </>
       )}
