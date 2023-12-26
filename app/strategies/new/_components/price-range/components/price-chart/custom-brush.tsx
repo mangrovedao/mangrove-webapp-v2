@@ -17,6 +17,7 @@ interface CustomBrushProps {
   onBrushChange: (newRange: [number, number]) => void
   svgRef: React.RefObject<SVGSVGElement>
   viewOnly?: boolean
+  midPrice?: number | null
 }
 
 function CustomBrush({
@@ -28,6 +29,7 @@ function CustomBrush({
   onBrushChange,
   svgRef,
   viewOnly = false,
+  midPrice,
 }: CustomBrushProps) {
   const startValueRef = React.useRef<number | null>(null)
   const [selection, setSelection] = React.useState<[number, number] | null>(
@@ -38,6 +40,18 @@ function CustomBrush({
   const [dragging, setDragging] = React.useState(false)
   const [dragMode, setDragMode] = React.useState(false)
   const [cursorMoving, setCursorMoving] = React.useState(false)
+
+  const [min, max] = selection ?? [0, 0]
+  const leftCursorColor = !midPrice
+    ? "neutral"
+    : midPrice > min
+      ? "green"
+      : "red"
+  const rightCursorColor = !midPrice
+    ? "neutral"
+    : midPrice < max
+      ? "red"
+      : "green"
 
   // Update selection when value prop changes
   React.useEffect(() => {
@@ -186,7 +200,7 @@ function CustomBrush({
           <Cursor
             height={height}
             xPosition={leftCursorPos}
-            color="green"
+            color={leftCursorColor}
             type="left"
             onMove={(newXPosition) => handleCursorMove("left", newXPosition)}
             xScale={xScale}
@@ -197,7 +211,7 @@ function CustomBrush({
           <Cursor
             height={height}
             xPosition={rightCursorPos}
-            color="red"
+            color={rightCursorColor}
             type="right"
             onMove={(newXPosition) => handleCursorMove("right", newXPosition)}
             xScale={xScale}

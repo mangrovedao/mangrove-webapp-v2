@@ -16,9 +16,9 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
-import { Tooltip } from "@visx/tooltip"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
+import { RangeTooltips } from "./range-tooltips"
 
 const paddingRight = 54
 const paddingBottom = 44
@@ -56,7 +56,6 @@ export function PriceRangeChart({
 
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
-  const lowsestBid = bids?.[bids.length - 1]
   const midPrice = React.useMemo(() => {
     if (!bids?.length || !asks?.length) return null
     return Big(lowestAsk?.price ?? 0)
@@ -133,12 +132,6 @@ export function PriceRangeChart({
     >
       {(zoom) => {
         const xScaleTransformed = rescaleXAxis(zoom)
-        const range = xScaleTransformed.range()
-        const domain = xScaleTransformed.domain()
-
-        // FIX: I didn't find any other way to check if the chart has been successfully rendered
-        // this avoid a bug in customBrush during first selection
-        const key = `${range[0]}-${range[1]}-${domain[0]}-${domain[1]}`
         return (
           <>
             <div className="flex justify-between py-6">
@@ -266,7 +259,6 @@ export function PriceRangeChart({
                   }}
                 />
                 <CustomBrush
-                  key={key}
                   xScale={xScaleTransformed}
                   width={width - paddingRight}
                   height={height - paddingBottom}
@@ -285,68 +277,17 @@ export function PriceRangeChart({
                   value={selectedPriceRange ?? undefined}
                   svgRef={svgRef}
                   viewOnly={viewOnly}
+                  midPrice={midPrice}
                 />
-                {/* <Brush
-                  xScale={xScale}
-                  yScale={yScale}
-                  width={width}
-                  height={height}
-                  margin={{ top: 0, bottom: 0, left: 0, right: 0 }}
-                  brushDirection="horizontal"
-                  initialBrushPosition={
-                    selectedPriceRange
-                      ? {
-                          start: { x: selectedPriceRange[0], y: 0 },
-                          end: { x: selectedPriceRange[1], y: 0 },
-                        }
-                      : undefined
-                  }
-                  onChange={(bounds) => {
-                    if (!bounds) return
-                    const { x0, x1 } = bounds
-                    setSelectedPriceRange([x0, x1])
-                  }}
-                  onBrushEnd={(bounds) => {
-                    if (!bounds) return
-                    const { x0, x1 } = bounds
-                    onPriceRangeChange && onPriceRangeChange([x0, x1])
-                  }}
-                /> */}
-
-                {/* {selectedPriceRange && (
-                  <RectClipPath
-                    id="price-range-clip"
-                    x={xScale(selectedPriceRange[0])}
-                    y={0}
-                    width={
-                      xScale(selectedPriceRange[1]) -
-                      xScale(selectedPriceRange[0])
-                    }
-                    height={height}
-                  />
-                )} */}
               </svg>
               {selectedPriceRange && (
-                <>
-                  <Tooltip
-                    top={height - paddingBottom - 6}
-                    left={xScaleTransformed(selectedPriceRange?.[0] ?? 0)}
-                    className="!bg-transparent"
-                  >
-                    <div className="!bg-green-bangladesh whitespace-nowrap !text-green-caribbean -translate-x-2/3 px-2 py-1 rounded-md text-sm leading-[14px]">
-                      Min {selectedPriceRange?.[0].toFixed(2)} 20%
-                    </div>
-                  </Tooltip>
-                  <Tooltip
-                    top={height - paddingBottom - 6}
-                    left={xScaleTransformed(selectedPriceRange?.[1] ?? 0)}
-                    className="!bg-transparent"
-                  >
-                    <div className="!bg-cherry-400 whitespace-nowrap !text-cherry-100 -translate-x-2/3 px-2 py-1 rounded-md text-sm leading-[14px]">
-                      Max {selectedPriceRange?.[1].toFixed(2)} 20%
-                    </div>
-                  </Tooltip>
-                </>
+                <RangeTooltips
+                  height={height}
+                  paddingBottom={paddingBottom}
+                  xScale={xScaleTransformed}
+                  selectedPriceRange={selectedPriceRange}
+                  midPrice={midPrice}
+                />
               )}
             </div>
           </>

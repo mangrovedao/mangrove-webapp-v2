@@ -90,9 +90,8 @@ export default function Cursor({
           hidden ? "opacity-0" : "opacity-100",
           {
             "cursor-col-resize": !viewOnly,
-            "text-green-caribbean": color === "green",
+            "text-green-caribbean": color === "green" || color === "neutral",
             "text-cherry-100": color === "red",
-            "text-neutral": color === "neutral",
           },
         )}
         // @ts-ignore
