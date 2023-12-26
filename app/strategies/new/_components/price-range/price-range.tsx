@@ -89,6 +89,7 @@ export const PriceRange = withClientOnly(function ({
   const [minPrice, setMinPrice] = React.useState("")
   const [minPercentage, setMinPercentage] = React.useState("")
   const [maxPrice, setMaxPrice] = React.useState("")
+  const [maxPercentage, setMaxPercentage] = React.useState("")
 
   const geometricKandelDistribution = calculateGeometricKandelDistribution(
     minPrice,
@@ -110,6 +111,18 @@ export const PriceRange = withClientOnly(function ({
       setMinPercentage(percentageDifference.toFixed(2)) // Keep 2 decimal places
     }
   }, [minPrice, midPrice])
+
+  React.useEffect(() => {
+    if (maxPrice && midPrice) {
+      const maxPriceNumber = Number(maxPrice)
+      const midPriceNumber = Number(midPrice)
+      const percentageDifference = calculatePriceDifferencePercentage({
+        price: midPriceNumber,
+        value: maxPriceNumber,
+      })
+      setMaxPercentage(percentageDifference.toFixed(2)) // Keep 2 decimal places
+    }
+  }, [maxPrice, midPrice])
 
   const handleOnPriceRangeChange = ([min, max]: number[]) => {
     if (!min || !max) return
@@ -150,7 +163,7 @@ export const PriceRange = withClientOnly(function ({
                 className="w-full"
               />
 
-              <TokenInput label="Min %" value={minPercentage} />
+              <TokenInput label="Min %" value={minPercentage} allowNegative />
             </div>
           )}
           <span className="h-px w-4 bg-cloud-300 mt-4"></span>
@@ -163,7 +176,7 @@ export const PriceRange = withClientOnly(function ({
                 token={market.quote}
                 className="w-full"
               />
-              <TokenInput label="Max %" />
+              <TokenInput label="Max %" value={maxPercentage} allowNegative />
             </div>
           )}
         </div>
