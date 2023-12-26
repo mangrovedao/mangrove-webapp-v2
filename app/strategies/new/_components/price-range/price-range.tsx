@@ -6,7 +6,10 @@ import { TokenInput } from "@/components/token-input"
 import withClientOnly from "@/hocs/withClientOnly"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { calculatePriceDifferencePercentage } from "@/utils/numbers"
+import {
+  calculatePriceDifferencePercentage,
+  calculatePriceFromPercentage,
+} from "@/utils/numbers"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
@@ -130,6 +133,32 @@ export const PriceRange = withClientOnly(function ({
     setMaxPrice(max.toFixed(priceDecimals))
   }
 
+  const handleMinPercentageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (midPrice) {
+      const percentage = Number(e.target.value)
+      const newMinPrice = calculatePriceFromPercentage({
+        percentage,
+        basePrice: midPrice,
+      })
+      setMinPrice(newMinPrice.toFixed(priceDecimals))
+    }
+  }
+
+  const handleMaxPercentageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (midPrice) {
+      const percentage = Number(e.target.value)
+      const newMaxPrice = calculatePriceFromPercentage({
+        percentage,
+        basePrice: midPrice,
+      })
+      setMaxPrice(newMaxPrice.toFixed(priceDecimals))
+    }
+  }
+
   return (
     <div className={cn(className)}>
       <div className="border-b">
@@ -163,7 +192,12 @@ export const PriceRange = withClientOnly(function ({
                 className="w-full"
               />
 
-              <TokenInput label="Min %" value={minPercentage} allowNegative />
+              <TokenInput
+                label="Min %"
+                value={minPercentage}
+                onChange={handleMinPercentageChange}
+                allowNegative
+              />
             </div>
           )}
           <span className="h-px w-4 bg-cloud-300 mt-4"></span>
@@ -176,7 +210,12 @@ export const PriceRange = withClientOnly(function ({
                 token={market.quote}
                 className="w-full"
               />
-              <TokenInput label="Max %" value={maxPercentage} allowNegative />
+              <TokenInput
+                label="Max %"
+                value={maxPercentage}
+                onChange={handleMaxPercentageChange}
+                allowNegative
+              />
             </div>
           )}
         </div>

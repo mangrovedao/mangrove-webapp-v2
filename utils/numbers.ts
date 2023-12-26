@@ -78,3 +78,13 @@ export function calculatePriceDifferencePercentage({
 }) {
   return price ? ((value - price) / price) * 100 : 0
 }
+
+export function calculatePriceFromPercentage({
+  percentage,
+  basePrice,
+}: {
+  percentage: number
+  basePrice: number
+}) {
+  return (percentage / 100) * basePrice + basePrice
+}
