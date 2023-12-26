@@ -8,7 +8,7 @@ type Props = {
   paddingBottom: number
   xScale: ScaleLinear<number, number>
   priceRange?: [number, number] | null
-  midPrice: number | null
+  midPrice?: number | null
 }
 
 export function BackgroundRectangles({

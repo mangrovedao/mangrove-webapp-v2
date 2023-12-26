@@ -14,6 +14,7 @@ import useResizeObserver from "use-resize-observer"
 
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
 import { BackgroundRectangles } from "./background-rectangles"
@@ -34,19 +35,25 @@ const initialTransform = {
 }
 
 type Props = {
+  baseToken?: string
+  quoteToken?: string
+  initialMidPrice?: number
   bids?: Market.Offer[]
   asks?: Market.Offer[]
   onPriceRangeChange?: (priceRange: number[]) => void
   priceRange?: [number, number]
   viewOnly?: boolean
+  isLoading?: boolean
 }
 
 export function PriceRangeChart({
   bids = [],
   asks = [],
+  initialMidPrice,
   onPriceRangeChange,
   priceRange,
   viewOnly = false,
+  isLoading = false,
 }: Props) {
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const offers = [
@@ -57,12 +64,18 @@ export function PriceRangeChart({
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
   const midPrice = React.useMemo(() => {
-    if (!bids?.length || !asks?.length) return null
+    if (!bids?.length || !asks?.length) return initialMidPrice
     return Big(lowestAsk?.price ?? 0)
       .add(highestBid?.price ?? 0)
       .div(2)
       .toNumber()
-  }, [asks?.length, bids?.length, highestBid?.price, lowestAsk?.price])
+  }, [
+    asks?.length,
+    bids?.length,
+    highestBid?.price,
+    initialMidPrice,
+    lowestAsk?.price,
+  ])
   const xLowerBound = midPrice ? midPrice * 0.7 : 0 // 30% lower than mid price
   const xUpperBound = midPrice ? midPrice * 1.3 : 6000 // 30% higher than mid price
 
@@ -144,6 +157,7 @@ export function PriceRangeChart({
                   onClick={() => {
                     zoom.scale({ scaleX: 1.1 })
                   }}
+                  disabled={isLoading}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -152,6 +166,7 @@ export function PriceRangeChart({
                   size={"icon"}
                   className="w-8 h-8"
                   onClick={() => zoom.scale({ scaleX: 0.9 })}
+                  disabled={isLoading}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -205,7 +220,13 @@ export function PriceRangeChart({
                   onMouseOut={zoom.dragEnd}
                 />
               )}
-              <svg className="w-full h-full" ref={svgRef}>
+              {isLoading && <Skeleton className="h-full w-full" />}
+              <svg
+                className={cn("w-full h-full", {
+                  hidden: isLoading,
+                })}
+                ref={svgRef}
+              >
                 <BackgroundRectangles
                   height={height}
                   paddingBottom={paddingBottom}
