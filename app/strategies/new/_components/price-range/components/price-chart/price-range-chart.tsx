@@ -308,12 +308,14 @@ export function PriceRangeChart({
                   viewOnly={viewOnly}
                   midPrice={midPrice}
                 />
-                <GeometricKandelDistributionDots
-                  height={height}
-                  paddingBottom={paddingBottom}
-                  xScale={xScaleTransformed}
-                  geometricKandelDistribution={geometricKandelDistribution}
-                />
+                {priceRange?.[0] && priceRange?.[1] && (
+                  <GeometricKandelDistributionDots
+                    height={height}
+                    paddingBottom={paddingBottom}
+                    xScale={xScaleTransformed}
+                    geometricKandelDistribution={geometricKandelDistribution}
+                  />
+                )}
               </svg>
               {selectedPriceRange && (
                 <RangeTooltips

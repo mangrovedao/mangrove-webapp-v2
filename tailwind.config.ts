@@ -90,6 +90,7 @@ export default {
         cloud: {
           100: "hsl(var(--color-cloud-100))",
           300: "hsl(var(--color-cloud-300))",
+          400: "hsl(var(--color-cloud-400))",
         },
         cherry: {
           100: "hsl(var(--color-cherry-100))",

@@ -68,3 +68,13 @@ export function getSeparator() {
     .formatToParts(123.4)
     .find?.((x) => x.type === "decimal")?.value
 }
+
+export function calculatePriceDifferencePercentage({
+  price,
+  value,
+}: {
+  price?: number | null
+  value: number
+}) {
+  return price ? ((value - price) / price) * 100 : 0
+}

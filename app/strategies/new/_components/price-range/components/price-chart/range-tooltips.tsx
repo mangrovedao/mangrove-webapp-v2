@@ -1,4 +1,5 @@
 import { cn } from "@/utils"
+import { calculatePriceDifferencePercentage } from "@/utils/numbers"
 import { Tooltip } from "@visx/tooltip"
 import type { ScaleLinear } from "d3-scale"
 
@@ -67,7 +68,10 @@ function RangeTooltip({
   text,
   midPrice,
 }: RangeTooltipProps) {
-  const percentage = midPrice ? ((value - midPrice) / midPrice) * 100 : 0
+  const percentage = calculatePriceDifferencePercentage({
+    price: midPrice,
+    value,
+  })
 
   return (
     <Tooltip

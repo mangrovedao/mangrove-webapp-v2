@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation"
 import React from "react"
 import { useNetwork } from "wagmi"
 
+import { calculateMidPriceFromOrderBook } from "@/utils/market"
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
@@ -66,6 +67,12 @@ const useMarketContext = () => {
     }
   }, [mangrove, market])
 
+  const midPrice = React.useMemo(() => {
+    if (requestBookQuery.data) {
+      return calculateMidPriceFromOrderBook(requestBookQuery.data)
+    }
+  }, [requestBookQuery.data])
+
   const updateOrderbook = React.useCallback(() => {
     if (!market) return
     requestBookQuery.refetch()
@@ -85,6 +92,7 @@ const useMarketContext = () => {
     market,
     marketInfo,
     olKeys,
+    midPrice,
   }
 }
 

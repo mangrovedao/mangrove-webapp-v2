@@ -7,6 +7,7 @@ import {
   type NumericInputProps,
 } from "@/components/numeric-input"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
+import { cn } from "@/utils"
 import { Caption } from "./typography/caption"
 
 type TokenInputProps = {
@@ -20,13 +21,21 @@ type TokenInputProps = {
 
 export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
   (
-    { label, token, showBalance = false, balanceLabel, error, ...inputProps },
+    {
+      label,
+      token,
+      showBalance = false,
+      balanceLabel,
+      error,
+      className,
+      ...inputProps
+    },
     ref,
   ) => {
     const isNativeToken = typeof token === "string"
     const tokenSymbol = isNativeToken ? token : token?.symbol
     return (
-      <div className="flex-col flex">
+      <div className={cn("flex-col flex", className)}>
         {label && (
           <Caption variant={"caption1"} as={"label"} className="mb-0.5">
             {label}
