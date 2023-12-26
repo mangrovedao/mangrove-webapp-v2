@@ -173,7 +173,7 @@ function CustomBrush({
           y={0}
           width={brushWidth}
           height={height}
-          fill="hsla(0, 100%, 68%, 0.1)"
+          fill="hsla(0, 100%, 68%, 0.0)"
           className={cn({
             "cursor-grab": !dragging && !viewOnly,
             "cursor-grabbing": dragging && !viewOnly,

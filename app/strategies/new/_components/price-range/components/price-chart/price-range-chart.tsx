@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
 import { Tooltip } from "@visx/tooltip"
+import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
 
 const paddingRight = 54
@@ -55,6 +56,7 @@ export function PriceRangeChart({
 
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
+  const lowsestBid = bids?.[bids.length - 1]
   const midPrice = React.useMemo(() => {
     if (!bids?.length || !asks?.length) return null
     return Big(lowestAsk?.price ?? 0)
@@ -211,26 +213,21 @@ export function PriceRangeChart({
                 />
               )}
               <svg className="w-full h-full" ref={svgRef}>
-                {/* <LinearGradient
-                  id="price-range-gradient"
-                  from={
-                    bids.length > 0 ? "green" : asks.length > 0 ? "red" : "blue"
-                  }
-                  to={
-                    bids.length > 0 ? "green" : asks.length > 0 ? "red" : "blue"
-                  }
-                /> */}
-
+                <BackgroundRectangles
+                  height={height}
+                  paddingBottom={paddingBottom}
+                  xScale={xScaleTransformed}
+                  initialPriceRange={initialPriceRange}
+                  midPrice={midPrice}
+                />
                 <AreaClosed
                   data={offers}
                   x={(d) => xScaleTransformed(d.price.toNumber())}
                   y={(d) => yScale(d.volume.toNumber())}
                   yScale={yScale}
-                  fill="#010D0D"
                   strokeWidth={1}
                   curve={curveStep}
-                  // fill={`url(#price-range-gradient)`}
-                  // clipPath="url(#price-range-clip)"
+                  className="fill-primary-night-woods"
                 />
                 <AxisTop
                   top={height}
@@ -332,7 +329,7 @@ export function PriceRangeChart({
               {selectedPriceRange && (
                 <>
                   <Tooltip
-                    top={height - paddingBottom}
+                    top={height - paddingBottom - 6}
                     left={xScaleTransformed(selectedPriceRange?.[0] ?? 0)}
                     className="!bg-transparent"
                   >
@@ -341,7 +338,7 @@ export function PriceRangeChart({
                     </div>
                   </Tooltip>
                   <Tooltip
-                    top={height - paddingBottom}
+                    top={height - paddingBottom - 6}
                     left={xScaleTransformed(selectedPriceRange?.[1] ?? 0)}
                     className="!bg-transparent"
                   >
