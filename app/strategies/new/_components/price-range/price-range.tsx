@@ -1,15 +1,12 @@
 "use client"
-import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
 import React from "react"
 
 import { TokenInput } from "@/components/token-input"
 import withClientOnly from "@/hocs/withClientOnly"
 import useMarket from "@/providers/market"
-import { getTokenPriceInToken } from "@/services/tokens.service"
 import { cn } from "@/utils"
 import { calculatePriceDifferencePercentage } from "@/utils/numbers"
-import { useTokensFromQueryParams } from "../../_hooks/use-tokens-from-query-params"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
@@ -86,26 +83,8 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { baseToken, quoteToken } = useTokensFromQueryParams()
-  const baseSymbol = baseToken?.symbol
-  const quoteSymbol = quoteToken?.symbol
-  const priceDecimals = quoteToken?.decimals
-  const { requestBookQuery, midPrice } = useMarket()
-
-  // Get mid price only if there is no liquidity in the book
-  const midPriceQuery = useQuery({
-    queryKey: ["midPrice", baseSymbol, quoteSymbol],
-    queryFn: () => {
-      if (!baseSymbol || !quoteSymbol) return undefined
-      return getTokenPriceInToken(baseSymbol, quoteSymbol, "1m")
-    },
-    enabled:
-      requestBookQuery.status === "success" &&
-      !midPrice &&
-      !!baseSymbol &&
-      !!quoteSymbol,
-    select: (data) => data?.close,
-  })
+  const { requestBookQuery, midPrice, market } = useMarket()
+  const priceDecimals = market?.quote.decimals
 
   const [minPrice, setMinPrice] = React.useState("")
   const [minPercentage, setMinPercentage] = React.useState("")
@@ -114,23 +93,23 @@ export const PriceRange = withClientOnly(function ({
   const geometricKandelDistribution = calculateGeometricKandelDistribution(
     minPrice,
     maxPrice,
-    midPrice ?? midPriceQuery.data,
+    midPrice,
   )
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
 
   React.useEffect(() => {
-    if (minPrice && midPriceQuery.data) {
+    if (minPrice && midPrice) {
       const minPriceNumber = Number(minPrice)
-      const midPriceNumber = Number(midPriceQuery.data)
+      const midPriceNumber = Number(midPrice)
       const percentageDifference = calculatePriceDifferencePercentage({
         price: midPriceNumber,
         value: minPriceNumber,
       })
       setMinPercentage(percentageDifference.toFixed(2)) // Keep 2 decimal places
     }
-  }, [minPrice, midPriceQuery.data])
+  }, [minPrice, midPrice])
 
   const handleOnPriceRangeChange = ([min, max]: number[]) => {
     if (!min || !max) return
@@ -155,21 +134,19 @@ export const PriceRange = withClientOnly(function ({
           asks={requestBookQuery.data?.asks}
           onPriceRangeChange={handleOnPriceRangeChange}
           priceRange={priceRange}
-          initialMidPrice={midPriceQuery.data}
-          isLoading={
-            requestBookQuery.status === "pending" || midPriceQuery.isLoading
-          }
+          initialMidPrice={midPrice}
+          isLoading={requestBookQuery.status === "pending"}
           geometricKandelDistribution={geometricKandelDistribution}
         />
 
         <div className="gap-4 flex flex-col xl:flex-row w-full justify-center items-center">
-          {quoteToken && (
+          {market?.quote && (
             <div className="flex space-x-4 xl:flex-1 w-full">
               <TokenInput
                 label="Min Price"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                token={quoteToken}
+                token={market.quote}
                 className="w-full"
               />
 
@@ -177,13 +154,13 @@ export const PriceRange = withClientOnly(function ({
             </div>
           )}
           <span className="h-px w-4 bg-cloud-300 mt-4"></span>
-          {quoteToken && (
+          {market?.quote && (
             <div className="flex space-x-4 xl:flex-1 w-full">
               <TokenInput
                 label="Max Price"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                token={quoteToken}
+                token={market.quote}
                 className="w-full"
               />
               <TokenInput label="Max %" />
