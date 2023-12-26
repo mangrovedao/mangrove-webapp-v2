@@ -15,6 +15,15 @@ import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetite } from "./components/risk-appetite"
 
+type ChangingFrom =
+  | "minPrice"
+  | "maxPrice"
+  | "minPercentage"
+  | "maxPercentage"
+  | "chart"
+  | undefined
+  | null
+
 const calculateGeometricKandelDistribution = (
   minPrice: string,
   maxPrice: string,
@@ -89,6 +98,7 @@ export const PriceRange = withClientOnly(function ({
   const { requestBookQuery, midPrice, market } = useMarket()
   const priceDecimals = market?.quote.decimals
 
+  const [isChangingFrom, setIsChangingFrom] = React.useState<ChangingFrom>()
   const [minPrice, setMinPrice] = React.useState("")
   const [minPercentage, setMinPercentage] = React.useState("")
   const [maxPrice, setMaxPrice] = React.useState("")
@@ -104,7 +114,7 @@ export const PriceRange = withClientOnly(function ({
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
 
   React.useEffect(() => {
-    if (minPrice && midPrice) {
+    if (isChangingFrom !== "minPercentage" && minPrice && midPrice) {
       const minPriceNumber = Number(minPrice)
       const midPriceNumber = Number(midPrice)
       const percentageDifference = calculatePriceDifferencePercentage({
@@ -113,10 +123,10 @@ export const PriceRange = withClientOnly(function ({
       })
       setMinPercentage(percentageDifference.toFixed(2)) // Keep 2 decimal places
     }
-  }, [minPrice, midPrice])
+  }, [minPrice, midPrice, isChangingFrom])
 
   React.useEffect(() => {
-    if (maxPrice && midPrice) {
+    if (isChangingFrom !== "maxPercentage" && maxPrice && midPrice) {
       const maxPriceNumber = Number(maxPrice)
       const midPriceNumber = Number(midPrice)
       const percentageDifference = calculatePriceDifferencePercentage({
@@ -125,17 +135,37 @@ export const PriceRange = withClientOnly(function ({
       })
       setMaxPercentage(percentageDifference.toFixed(2)) // Keep 2 decimal places
     }
-  }, [maxPrice, midPrice])
+  }, [isChangingFrom, maxPrice, midPrice])
 
   const handleOnPriceRangeChange = ([min, max]: number[]) => {
     if (!min || !max) return
+    setIsChangingFrom("chart")
     setMinPrice(min.toFixed(priceDecimals))
     setMaxPrice(max.toFixed(priceDecimals))
+  }
+
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChangingFrom("minPrice")
+    const price = e.target.value
+    setMinPrice(price)
+  }
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsChangingFrom("maxPrice")
+    const price = e.target.value
+    setMaxPrice(price)
   }
 
   const handleMinPercentageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    const percentage = e.target.value
+    if (percentage === "-" || !isFinite(Number(percentage))) {
+      return
+    }
+
+    setIsChangingFrom("minPercentage")
+
     if (midPrice) {
       const percentage = Number(e.target.value)
       const newMinPrice = calculatePriceFromPercentage({
@@ -149,6 +179,13 @@ export const PriceRange = withClientOnly(function ({
   const handleMaxPercentageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    const percentage = e.target.value
+    if (percentage === "-" || !isFinite(Number(percentage))) {
+      return
+    }
+
+    setIsChangingFrom("maxPercentage")
+
     if (midPrice) {
       const percentage = Number(e.target.value)
       const newMaxPrice = calculatePriceFromPercentage({
@@ -187,7 +224,7 @@ export const PriceRange = withClientOnly(function ({
               <TokenInput
                 label="Min Price"
                 value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
+                onChange={handleMinPriceChange}
                 token={market.quote}
                 className="w-full"
               />
@@ -206,7 +243,7 @@ export const PriceRange = withClientOnly(function ({
               <TokenInput
                 label="Max Price"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                onChange={handleMaxPriceChange}
                 token={market.quote}
                 className="w-full"
               />
