@@ -38,7 +38,7 @@ export const PriceRange = withClientOnly(function ({
             setMinPrice(min.toString())
             setMaxPrice(max.toString())
           }}
-          initialPriceRange={
+          priceRange={
             minPrice && maxPrice
               ? [Number(minPrice), Number(maxPrice)]
               : undefined

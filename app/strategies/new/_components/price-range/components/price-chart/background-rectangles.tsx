@@ -7,7 +7,7 @@ type Props = {
   height: number
   paddingBottom: number
   xScale: ScaleLinear<number, number>
-  initialPriceRange?: [number, number] | null
+  priceRange?: [number, number] | null
   midPrice: number | null
 }
 
@@ -15,15 +15,15 @@ export function BackgroundRectangles({
   height,
   paddingBottom,
   xScale: xScaleTransformed,
-  initialPriceRange,
+  priceRange,
   midPrice,
 }: Props) {
   const bidsGradientId = React.useId()
   const asksGradientId = React.useId()
   const neutralGradientId = React.useId()
 
-  const minPrice = initialPriceRange ? initialPriceRange[0] : null
-  const maxPrice = initialPriceRange ? initialPriceRange[1] : null
+  const minPrice = priceRange ? priceRange[0] : null
+  const maxPrice = priceRange ? priceRange[1] : null
 
   const leftBidBound =
     minPrice && midPrice && minPrice < midPrice ? minPrice : midPrice
@@ -37,7 +37,7 @@ export function BackgroundRectangles({
 
   return (
     <>
-      {initialPriceRange && midPrice ? (
+      {priceRange && midPrice ? (
         <>
           {leftBidBound && rightBidBound && (
             <>

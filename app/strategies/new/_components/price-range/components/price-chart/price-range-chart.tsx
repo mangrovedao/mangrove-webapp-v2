@@ -37,7 +37,7 @@ type Props = {
   bids?: Market.Offer[]
   asks?: Market.Offer[]
   onPriceRangeChange?: (priceRange: number[]) => void
-  initialPriceRange?: [number, number]
+  priceRange?: [number, number]
   viewOnly?: boolean
 }
 
@@ -45,7 +45,7 @@ export function PriceRangeChart({
   bids = [],
   asks = [],
   onPriceRangeChange,
-  initialPriceRange,
+  priceRange,
   viewOnly = false,
 }: Props) {
   const { ref, width = 0, height = 0 } = useResizeObserver()
@@ -114,12 +114,12 @@ export function PriceRangeChart({
    */
   const [selectedPriceRange, setSelectedPriceRange] = React.useState<
     [number, number] | null
-  >(initialPriceRange ?? null)
+  >(priceRange ?? null)
 
   React.useEffect(() => {
-    if (!initialPriceRange) return
-    setSelectedPriceRange(initialPriceRange)
-  }, [initialPriceRange])
+    if (!priceRange) return
+    setSelectedPriceRange(priceRange)
+  }, [priceRange])
 
   const svgRef = React.useRef(null)
   return (
@@ -210,7 +210,7 @@ export function PriceRangeChart({
                   height={height}
                   paddingBottom={paddingBottom}
                   xScale={xScaleTransformed}
-                  initialPriceRange={initialPriceRange}
+                  priceRange={priceRange}
                   midPrice={midPrice}
                 />
                 <AreaClosed
