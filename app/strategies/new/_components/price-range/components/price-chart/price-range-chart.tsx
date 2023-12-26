@@ -1,5 +1,8 @@
 "use client"
-import { type Market } from "@mangrovedao/mangrove.js"
+import {
+  type GeometricKandelDistribution,
+  type Market,
+} from "@mangrovedao/mangrove.js"
 import { AxisLeft, AxisTop } from "@visx/axis"
 import { curveStep } from "@visx/curve"
 import { localPoint } from "@visx/event"
@@ -19,6 +22,7 @@ import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
+import { GeometricKandelDistributionDots } from "./geometric-distribution-dots"
 import { RangeTooltips } from "./range-tooltips"
 
 const paddingRight = 54
@@ -34,7 +38,7 @@ const initialTransform = {
   skewY: 0,
 }
 
-type Props = {
+export type PriceRangeChartProps = {
   baseToken?: string
   quoteToken?: string
   initialMidPrice?: number
@@ -44,6 +48,9 @@ type Props = {
   priceRange?: [number, number]
   viewOnly?: boolean
   isLoading?: boolean
+  geometricKandelDistribution?: ReturnType<
+    typeof GeometricKandelDistribution.prototype.getOffersWithPrices
+  >
 }
 
 export function PriceRangeChart({
@@ -54,7 +61,8 @@ export function PriceRangeChart({
   priceRange,
   viewOnly = false,
   isLoading = false,
-}: Props) {
+  geometricKandelDistribution,
+}: PriceRangeChartProps) {
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const offers = [
     ...bids.map((bid) => ({ ...bid, type: "bid" })),
@@ -299,6 +307,12 @@ export function PriceRangeChart({
                   svgRef={svgRef}
                   viewOnly={viewOnly}
                   midPrice={midPrice}
+                />
+                <GeometricKandelDistributionDots
+                  height={height}
+                  paddingBottom={paddingBottom}
+                  xScale={xScaleTransformed}
+                  geometricKandelDistribution={geometricKandelDistribution}
                 />
               </svg>
               {selectedPriceRange && (
