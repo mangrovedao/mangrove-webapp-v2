@@ -79,20 +79,19 @@ export function BackgroundRectangles({
           )}
         </>
       ) : (
-        initialPriceRange && (
+        minPrice &&
+        maxPrice && (
           <>
             <LinearGradient
               id={neutralGradientId}
               from={"rgba(3, 98, 76, 0.00)"}
               to={"rgba(11, 69, 58, 0.50)"}
+              opacity={0.05}
             />
             <rect
-              x={xScaleTransformed(initialPriceRange[1])}
+              x={xScaleTransformed(minPrice)}
               y={0}
-              width={
-                xScaleTransformed(midPrice ?? 0) -
-                xScaleTransformed(initialPriceRange[1])
-              }
+              width={xScaleTransformed(maxPrice) - xScaleTransformed(minPrice)}
               height={height - paddingBottom}
               fill={`url(#${neutralGradientId})`}
             />

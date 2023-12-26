@@ -173,8 +173,9 @@ function CustomBrush({
           y={0}
           width={brushWidth}
           height={height}
-          fill="hsla(0, 100%, 68%, 0.0)"
-          className={cn({
+          className={cn("opacity-10", {
+            "fill-green-bangladesh": selectionStatus === "start",
+            "fill-transparent": selectionStatus === "end",
             "cursor-grab": !dragging && !viewOnly,
             "cursor-grabbing": dragging && !viewOnly,
           })}
@@ -191,6 +192,7 @@ function CustomBrush({
             xScale={xScale}
             svgRef={svgRef}
             viewOnly={viewOnly}
+            hidden={selectionStatus === "start"}
           />
           <Cursor
             height={height}
@@ -201,6 +203,7 @@ function CustomBrush({
             xScale={xScale}
             svgRef={svgRef}
             viewOnly={viewOnly}
+            hidden={selectionStatus === "start"}
           />
         </>
       )}

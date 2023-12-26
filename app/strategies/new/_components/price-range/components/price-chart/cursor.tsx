@@ -14,6 +14,7 @@ interface CursorProps {
   xScale: ScaleLinear<number, number>
   svgRef: React.RefObject<SVGSVGElement>
   viewOnly?: boolean
+  hidden?: boolean
 }
 
 export default function Cursor({
@@ -25,6 +26,7 @@ export default function Cursor({
   xScale,
   svgRef,
   viewOnly = false,
+  hidden = false,
 }: CursorProps) {
   const [isDragging, setIsDragging] = React.useState(false)
 
@@ -83,12 +85,16 @@ export default function Cursor({
         height="24"
         fill="none"
         transform={`translate(${xPosition}, 0)`}
-        className={cn({
-          "cursor-col-resize": !viewOnly,
-          "text-green-caribbean": color === "green",
-          "text-cherry-100": color === "red",
-          "text-neutral": color === "neutral",
-        })}
+        className={cn(
+          "transition-opacity",
+          hidden ? "opacity-0" : "opacity-100",
+          {
+            "cursor-col-resize": !viewOnly,
+            "text-green-caribbean": color === "green",
+            "text-cherry-100": color === "red",
+            "text-neutral": color === "neutral",
+          },
+        )}
         // @ts-ignore
         onMouseDown={handleMouseDown}
       >
