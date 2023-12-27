@@ -25,6 +25,7 @@ import CustomBrush from "./custom-brush"
 import { GeometricKandelDistributionDots } from "./geometric-distribution-dots"
 import { MidPriceLine } from "./mid-price-line"
 import { RangeTooltips } from "./range-tooltips"
+import { SetRangeAnimation } from "./set-range-animation"
 
 const paddingRight = 54
 const paddingBottom = 44
@@ -182,7 +183,7 @@ export function PriceRangeChart({
               </span>
             </div>
             <div
-              className="w-full h-96 bg-[#041010] rounded-lg relative"
+              className="w-full h-96 bg-[#041010] rounded-lg relative group"
               ref={ref}
             >
               {altPressed && (
@@ -230,6 +231,13 @@ export function PriceRangeChart({
                 />
               )}
               {isLoading && <Skeleton className="h-full w-full" />}
+              {!priceRange ? (
+                <div className="absolute inset-0 flex items-center group-hover:hidden">
+                  <div className="w-full translate-x-1/4">
+                    <SetRangeAnimation />
+                  </div>
+                </div>
+              ) : undefined}
               <svg
                 className={cn("w-full h-full", {
                   hidden: isLoading,
