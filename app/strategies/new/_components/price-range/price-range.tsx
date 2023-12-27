@@ -158,34 +158,12 @@ export const PriceRange = withClientOnly(function ({
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFieldChange("minPrice")
     const price = e.target.value
-    if (Number(price) > Number(maxPrice) && maxPrice) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        minPrice: "Min price cannot be greater than max price",
-      }))
-      return
-    }
-    setErrors((prevErrors) => {
-      const { minPrice, ...rest } = prevErrors
-      return rest
-    })
     setMinPrice(price)
   }
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFieldChange("maxPrice")
     const price = e.target.value
-    if (Number(price) < Number(minPrice) && minPrice) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        maxPrice: "Max price cannot be less than min price",
-      }))
-      return
-    }
-    setErrors((prevErrors) => {
-      const { maxPrice, ...rest } = prevErrors
-      return rest
-    })
     setMaxPrice(price)
   }
 
@@ -205,20 +183,8 @@ export const PriceRange = withClientOnly(function ({
         percentage,
         basePrice: midPrice,
       })
-
-      if (percentage > Number(maxPercentage) && maxPercentage) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          minPercentage: "Min percentage cannot be greater than max percentage",
-        }))
-        return
-      }
-      setErrors((prevErrors) => {
-        const { minPercentage, ...rest } = prevErrors
-        return rest
-      })
       setMinPrice(newMinPrice.toFixed(priceDecimals))
-      setMinPercentage(e.target.value)
+      // setMinPercentage(e.target.value)
     }
   }
 
@@ -238,21 +204,43 @@ export const PriceRange = withClientOnly(function ({
         percentage,
         basePrice: midPrice,
       })
-      if (percentage < Number(minPercentage) && minPercentage) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          maxPercentage: "Max percentage cannot be less than min percentage",
-        }))
-        return
-      }
-      setErrors((prevErrors) => {
-        const { maxPercentage, ...rest } = prevErrors
-        return rest
-      })
       setMaxPrice(newMaxPrice.toFixed(priceDecimals))
-      setMaxPercentage(e.target.value)
+      // setMaxPercentage(e.target.value)
     }
   }
+
+  React.useEffect(() => {
+    const newErrors = { ...errors }
+
+    if (Number(minPrice) > Number(maxPrice) && maxPrice) {
+      newErrors.minPrice = "Min price cannot be greater than max price"
+    } else {
+      delete newErrors.minPrice
+    }
+
+    if (Number(maxPrice) < Number(minPrice) && minPrice) {
+      newErrors.maxPrice = "Max price cannot be less than min price"
+    } else {
+      delete newErrors.maxPrice
+    }
+
+    if (Number(minPercentage) > Number(maxPercentage) && maxPercentage) {
+      newErrors.minPercentage =
+        "Min percentage cannot be greater than max percentage"
+    } else {
+      delete newErrors.minPercentage
+    }
+
+    if (Number(maxPercentage) < Number(minPercentage) && minPercentage) {
+      newErrors.maxPercentage =
+        "Max percentage cannot be less than min percentage"
+    } else {
+      delete newErrors.maxPercentage
+    }
+
+    setErrors(newErrors)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [minPrice, maxPrice, minPercentage, maxPercentage])
 
   return (
     <div className={className}>
@@ -285,7 +273,9 @@ export const PriceRange = withClientOnly(function ({
                 onChange={handleMinPriceChange}
                 token={market.quote}
                 className="w-full"
-                error={errors.minPrice}
+                error={
+                  isChangingFrom === "minPrice" ? errors.minPrice : undefined
+                }
               />
 
               <TokenInput
@@ -293,7 +283,11 @@ export const PriceRange = withClientOnly(function ({
                 value={minPercentage}
                 onChange={handleMinPercentageChange}
                 allowNegative
-                error={errors.minPercentage}
+                error={
+                  isChangingFrom === "minPercentage"
+                    ? errors.minPrice
+                    : undefined
+                }
               />
             </div>
           )}
@@ -308,14 +302,20 @@ export const PriceRange = withClientOnly(function ({
                 onChange={handleMaxPriceChange}
                 token={market.quote}
                 className="w-full"
-                error={errors.maxPrice}
+                error={
+                  isChangingFrom === "maxPrice" ? errors.minPrice : undefined
+                }
               />
               <TokenInput
                 label="Max %"
                 value={maxPercentage}
                 onChange={handleMaxPercentageChange}
                 allowNegative
-                error={errors.maxPercentage}
+                error={
+                  isChangingFrom === "maxPercentage"
+                    ? errors.minPrice
+                    : undefined
+                }
               />
             </div>
           )}
