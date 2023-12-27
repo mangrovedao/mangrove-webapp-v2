@@ -55,11 +55,16 @@ function CustomBrush({
 
   // Update selection when value prop changes
   React.useEffect(() => {
-    setSelection(value ?? null)
-  }, [value])
+    if (JSON.stringify(value) !== JSON.stringify(selection)) {
+      setSelection(value ?? null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, xScale])
 
   const handleMouseDown = React.useCallback(
     (event: MouseEvent) => {
+      if (!event.buttons) return
+
       const svg = svgRef.current
       if (svg) {
         const svgRect = svg.getBoundingClientRect()
@@ -148,12 +153,6 @@ function CustomBrush({
       onBrushChange(newSelection)
     }
   }
-
-  React.useEffect(() => {
-    if (value) {
-      setSelection(value)
-    }
-  }, [value, xScale])
 
   React.useEffect(() => {
     if (viewOnly) return

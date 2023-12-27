@@ -184,7 +184,6 @@ export const PriceRange = withClientOnly(function ({
         basePrice: midPrice,
       })
       setMinPrice(newMinPrice.toFixed(priceDecimals))
-      // setMinPercentage(e.target.value)
     }
   }
 
@@ -205,7 +204,6 @@ export const PriceRange = withClientOnly(function ({
         basePrice: midPrice,
       })
       setMaxPrice(newMaxPrice.toFixed(priceDecimals))
-      // setMaxPercentage(e.target.value)
     }
   }
 

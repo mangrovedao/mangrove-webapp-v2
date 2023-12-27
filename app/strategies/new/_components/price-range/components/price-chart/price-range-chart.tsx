@@ -23,6 +23,7 @@ import { cn } from "@/utils"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
 import { GeometricKandelDistributionDots } from "./geometric-distribution-dots"
+import { MidPriceLine } from "./mid-price-line"
 import { RangeTooltips } from "./range-tooltips"
 
 const paddingRight = 54
@@ -287,6 +288,11 @@ export function PriceRangeChart({
                     )
                   }}
                 />
+                <MidPriceLine
+                  xScale={xScaleTransformed}
+                  midPrice={midPrice}
+                  height={height - paddingBottom}
+                />
                 <CustomBrush
                   xScale={xScaleTransformed}
                   width={width - paddingRight}
@@ -317,15 +323,13 @@ export function PriceRangeChart({
                   />
                 )}
               </svg>
-              {selectedPriceRange && (
-                <RangeTooltips
-                  height={height}
-                  paddingBottom={paddingBottom}
-                  xScale={xScaleTransformed}
-                  selectedPriceRange={selectedPriceRange}
-                  midPrice={midPrice}
-                />
-              )}
+              <RangeTooltips
+                height={height}
+                paddingBottom={paddingBottom}
+                xScale={xScaleTransformed}
+                selectedPriceRange={selectedPriceRange}
+                midPrice={midPrice}
+              />
             </div>
           </>
         )

@@ -23,28 +23,45 @@ export function RangeTooltips({
   const minColor = !midPrice ? "neutral" : midPrice > min ? "green" : "red"
   const maxColor = !midPrice ? "neutral" : midPrice < max ? "red" : "green"
 
-  if (!min || !max) return null
-
   return (
     <>
-      <RangeTooltip
-        color={minColor}
-        height={height}
-        paddingBottom={paddingBottom}
-        text="Min"
-        value={min}
-        xScale={xScaleTransformed}
-        midPrice={midPrice}
-      />
-      <RangeTooltip
-        color={maxColor}
-        height={height}
-        paddingBottom={paddingBottom}
-        text="Max"
-        value={max}
-        xScale={xScaleTransformed}
-        midPrice={midPrice}
-      />
+      {min && max ? (
+        <>
+          <RangeTooltip
+            color={minColor}
+            height={height}
+            paddingBottom={paddingBottom}
+            text="Min"
+            value={min}
+            xScale={xScaleTransformed}
+            midPrice={midPrice}
+          />
+          <RangeTooltip
+            color={maxColor}
+            height={height}
+            paddingBottom={paddingBottom}
+            text="Max"
+            value={max}
+            xScale={xScaleTransformed}
+            midPrice={midPrice}
+          />
+        </>
+      ) : undefined}
+      {midPrice ? (
+        <Tooltip
+          top={-40}
+          left={xScaleTransformed(midPrice)}
+          className="!bg-transparent"
+        >
+          <div
+            className={cn(
+              "whitespace-nowrap -translate-x-2/3 px-2 py-1 rounded-md text-sm leading-[14px] bg-cloud-400 text-white",
+            )}
+          >
+            Mid {midPrice.toFixed(2)}
+          </div>
+        </Tooltip>
+      ) : undefined}
     </>
   )
 }
