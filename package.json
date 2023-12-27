@@ -18,6 +18,7 @@
   "dependencies": {
     "@ark-ui/react": "^1.2.1",
     "@ethersproject/providers": "^5.7.2",
+    "@gsap/react": "^2.0.2",
     "@mangrovedao/context-addresses": "^1.0.0",
     "@mangrovedao/indexer-sdk": "0.0.11-14",
     "@mangrovedao/mangrove-deployments": "^1.0.0",
@@ -68,6 +69,7 @@
     "date-fns": "^2.30.0",
     "framer-motion": "^10.16.16",
     "get-user-locale": "^2.3.1",
+    "gsap": "^3.12.4",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.279.0",
     "next": "^14.0.4",
