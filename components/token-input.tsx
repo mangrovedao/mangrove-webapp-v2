@@ -16,7 +16,7 @@ type TokenInputProps = {
   label?: string
   showBalance?: boolean
   balanceLabel?: string
-  error?: ValidationError[]
+  error?: ValidationError[] | string
 } & NumericInputProps
 
 export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
