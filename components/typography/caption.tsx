@@ -3,7 +3,7 @@ import * as React from "react"
 
 import { cn } from "@/utils"
 
-const captionStyles = cva("font-normal", {
+const captionStyles = cva("font-normal text-xs", {
   variants: {
     variant: {
       caption1: "lg:text-xs leading-[22px]",
