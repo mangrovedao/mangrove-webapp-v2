@@ -22,7 +22,7 @@ schema.parse( 8675309 ) // 8675309
 schema.parse( { a: 'deeply', nested: [ 'JSON', 'object' ] } )
 // { a: 'deeply', nested: [ 'JSON', 'object' ] }
 */
-export const json = () => jsonSchema
+const json = () => jsonSchema
 
 export const stringToJSONSchema = z
   .string()

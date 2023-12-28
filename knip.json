@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "files": "warn",
+    "classMembers": "off",
+    "duplicates": "off"
+  },
+  "ignore": ["public/**"]
+}

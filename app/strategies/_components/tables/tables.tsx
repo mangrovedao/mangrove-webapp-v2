@@ -11,7 +11,7 @@ import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 import { Strategies } from "./strategies/strategies"
 
-export enum StrategiesTables {
+enum StrategiesTables {
   ALL_STRATEGIES = "All strategies",
   MY_STRATEGIES = "My strategies",
 }

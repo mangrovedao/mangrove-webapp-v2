@@ -1,7 +1,7 @@
 import { type TradeAction, type TradeMode } from "./enums"
 
-export type TradeModeValue = `${TradeMode}`
-export type TradeActionValue = `${TradeAction}`
+type TradeModeValue = `${TradeMode}`
+type TradeActionValue = `${TradeAction}`
 export type TradeModeAndActionPresentation = {
   [key in TradeModeValue]: {
     [key in TradeActionValue]: {

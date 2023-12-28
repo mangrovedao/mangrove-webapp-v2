@@ -2,19 +2,20 @@ import { create, type StateCreator } from "zustand"
 
 type LoadingState = "idle" | "loading"
 
-export type LoadingStore = {
+type LoadingStore = {
   states: Record<string, LoadingState>
 }
 
-export type LoadingActions = {
+type LoadingActions = {
   startLoading: (keys: string | string[]) => void
   stopLoading: (keys: string | string[]) => void
   isLoading: (keys: string | string[]) => boolean[]
 }
 
-export const loadingStateCreator: StateCreator<
-  LoadingStore & LoadingActions
-> = (set, get) => ({
+const loadingStateCreator: StateCreator<LoadingStore & LoadingActions> = (
+  set,
+  get,
+) => ({
   states: {},
 
   /**

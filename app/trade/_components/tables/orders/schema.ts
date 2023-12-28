@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const orderSchema = z.object({
+const orderSchema = z.object({
   creationDate: z.date(),
   latestUpdateDate: z.date(),
   expiryDate: z.date().optional(),

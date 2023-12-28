@@ -1,8 +1,6 @@
 import { z } from "zod"
 
-export const dependencySchema = z.record(z.string())
-
-export type Dependency = z.infer<typeof dependencySchema>
+const dependencySchema = z.record(z.string())
 
 export function parseDependencies(data: unknown) {
   try {

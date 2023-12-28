@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const fillSchema = z.object({
+const fillSchema = z.object({
   creationDate: z.date(),
   transactionHash: z.string(),
   isBid: z.boolean(),
