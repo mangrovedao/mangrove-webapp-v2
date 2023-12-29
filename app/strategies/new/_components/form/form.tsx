@@ -48,11 +48,23 @@ export function Form({ className }: { className?: string }) {
     pricePoints: debouncedPricePoints,
   })
 
-  const handleBaseDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBaseDepositChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    if (typeof e === "string") {
+      setBaseDeposit(e)
+      return
+    }
     setBaseDeposit(e.target.value)
   }
 
-  const handleQuoteDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQuoteDepositChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    if (typeof e === "string") {
+      setQuoteDeposit(e)
+      return
+    }
     setQuoteDeposit(e.target.value)
   }
 
@@ -110,7 +122,7 @@ export function Form({ className }: { className?: string }) {
             label="Wallet balance"
             token={baseToken}
             action={{
-              onClick: () => {},
+              onClick: handleBaseDepositChange,
               text: "MAX",
             }}
           />
@@ -139,7 +151,7 @@ export function Form({ className }: { className?: string }) {
             label="Wallet balance"
             token={quoteToken}
             action={{
-              onClick: () => {},
+              onClick: handleQuoteDepositChange,
               text: "MAX",
             }}
           />

@@ -1,4 +1,3 @@
-import Script from "next/script"
 import React from "react"
 import { Toaster } from "sonner"
 
@@ -19,9 +18,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <Script src="datafeeds/udf/dist/bundle.js" async></Script>
-      </head>
       <body>
         <RootProvider>
           {children}
