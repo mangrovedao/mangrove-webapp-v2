@@ -9,6 +9,7 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
 import { InitialInventoryInfo } from "./components/initial-inventory-info"
+import { useKandelRequirements } from "./hooks/use-kandel-requirements"
 
 export function Form({ className }: { className?: string }) {
   const { address } = useAccount()
@@ -17,15 +18,26 @@ export function Form({ className }: { className?: string }) {
   })
   const { market } = useMarket()
   const baseToken = market?.base
-  const quoteToken = market?.base
+  const quoteToken = market?.quote
   const walletBalanceLabel = "Wallet balance"
 
-  const [baseDeposit, setBaseDeposit] = React.useState("")
-  const [quoteDeposit, setQuoteDeposit] = React.useState("")
-  const [points, setPoints] = React.useState("")
-  const [ratio, setRatio] = React.useState("")
-  const [stepSize, setStepSize] = React.useState("")
+  const [baseDeposit, setBaseDeposit] = React.useState("1000")
+  const [quoteDeposit, setQuoteDeposit] = React.useState("2000")
+  const [pricePoints, setPricePoints] = React.useState("2")
+  const [ratio, setRatio] = React.useState("1.5")
+  const [stepSize, setStepSize] = React.useState("1")
   const [bounty, setBounty] = React.useState("")
+
+  const { data } = useKandelRequirements({
+    onAave: false,
+    minPrice: "",
+    maxPrice: "",
+    baseDeposit,
+    quoteDeposit,
+    stepSize,
+  })
+
+  console.log(data)
 
   const handleBaseDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBaseDeposit(e.target.value)
@@ -33,6 +45,22 @@ export function Form({ className }: { className?: string }) {
 
   const handleQuoteDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuoteDeposit(e.target.value)
+  }
+
+  const handlePricePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPricePoints(e.target.value)
+  }
+
+  const handleRatioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRatio(e.target.value)
+  }
+
+  const handleStepSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStepSize(e.target.value)
+  }
+
+  const handleBountyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBounty(e.target.value)
   }
 
   if (!baseToken || !quoteToken)
@@ -102,9 +130,21 @@ export function Form({ className }: { className?: string }) {
       </Fieldset>
 
       <Fieldset legend="Settings">
-        <EnhancedNumericInput label="Number of price points" />
-        <EnhancedNumericInput label="Ratio" />
-        <EnhancedNumericInput label="Step size" />
+        <EnhancedNumericInput
+          label="Number of price points"
+          value={pricePoints}
+          onChange={handlePricePointsChange}
+        />
+        <EnhancedNumericInput
+          label="Ratio"
+          value={ratio}
+          onChange={handleRatioChange}
+        />
+        <EnhancedNumericInput
+          label="Step size"
+          value={stepSize}
+          onChange={handleStepSizeChange}
+        />
       </Fieldset>
 
       <Fieldset legend="Bounty">
@@ -113,6 +153,8 @@ export function Form({ className }: { className?: string }) {
           token={nativeBalance?.symbol}
           showBalance
           balanceLabel={walletBalanceLabel}
+          value={bounty}
+          onChange={handleBountyChange}
         />
       </Fieldset>
     </form>

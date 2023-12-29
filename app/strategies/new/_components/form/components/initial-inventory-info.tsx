@@ -26,7 +26,7 @@ export function InitialInventoryInfo({
       ) : (
         <span className="text-xs space-x-1">
           <span title={value.toString()}>
-            {Big(value).toFixed(token.decimals)} {token.symbol}
+            {Big(value).toFixed(token.displayedDecimals)} {token.symbol}
           </span>
           <button className="text-xs underline" onClick={action.onClick}>
             {action.text}
