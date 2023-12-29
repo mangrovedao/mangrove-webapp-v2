@@ -21,8 +21,8 @@ export function Form({ className }: { className?: string }) {
   const quoteToken = market?.quote
   const walletBalanceLabel = "Wallet balance"
 
-  const [baseDeposit, setBaseDeposit] = React.useState("1000")
-  const [quoteDeposit, setQuoteDeposit] = React.useState("2000")
+  const [baseDeposit, setBaseDeposit] = React.useState("")
+  const [quoteDeposit, setQuoteDeposit] = React.useState("")
   const [pricePoints, setPricePoints] = React.useState("2")
   const [ratio, setRatio] = React.useState("1.5")
   const [stepSize, setStepSize] = React.useState("1")
