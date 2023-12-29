@@ -12,6 +12,7 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
+import { usePriceRangeStore } from "../../_stores/price-range.store"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
@@ -105,10 +106,16 @@ export const PriceRange = withClientOnly(function ({
     Record<string, boolean>
   >({})
   const [isChangingFrom, setIsChangingFrom] = React.useState<ChangingFrom>()
-  const [minPrice, setMinPrice] = React.useState("")
-  const [minPercentage, setMinPercentage] = React.useState("")
-  const [maxPrice, setMaxPrice] = React.useState("")
-  const [maxPercentage, setMaxPercentage] = React.useState("")
+  const {
+    minPrice,
+    maxPrice,
+    minPercentage,
+    maxPercentage,
+    setMinPrice,
+    setMaxPrice,
+    setMinPercentage,
+    setMaxPercentage,
+  } = usePriceRangeStore()
 
   const geometricKandelDistribution = calculateGeometricKandelDistribution(
     minPrice,

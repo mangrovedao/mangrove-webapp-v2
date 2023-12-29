@@ -7,6 +7,7 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import { usePriceRangeStore } from "../../_stores/price-range.store"
 import { Fieldset } from "../fieldset"
 import { InitialInventoryInfo } from "./components/initial-inventory-info"
 import { useKandelRequirements } from "./hooks/use-kandel-requirements"
@@ -28,16 +29,20 @@ export function Form({ className }: { className?: string }) {
   const [stepSize, setStepSize] = React.useState("1")
   const [bounty, setBounty] = React.useState("")
 
-  const { data } = useKandelRequirements({
+  const [minPrice, maxPrice] = usePriceRangeStore((state) => [
+    state.minPrice,
+    state.maxPrice,
+  ])
+  const fieldsDisabled = !minPrice || !maxPrice
+
+  const kandelRequirementsQuery = useKandelRequirements({
     onAave: false,
-    minPrice: "",
-    maxPrice: "",
+    minPrice,
+    maxPrice,
     baseDeposit,
     quoteDeposit,
     stepSize,
   })
-
-  console.log(data)
 
   const handleBaseDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBaseDeposit(e.target.value)
@@ -84,6 +89,7 @@ export function Form({ className }: { className?: string }) {
             label={`${baseToken?.symbol} deposit`}
             value={baseDeposit}
             onChange={handleBaseDepositChange}
+            disabled={fieldsDisabled}
           />
           <InitialInventoryInfo
             token={baseToken}
@@ -92,6 +98,9 @@ export function Form({ className }: { className?: string }) {
               onClick: () => {},
               text: "Update",
             }}
+            loading={
+              kandelRequirementsQuery.status !== "success" || fieldsDisabled
+            }
           />
           <TokenBalance
             label="Wallet balance"
@@ -108,6 +117,7 @@ export function Form({ className }: { className?: string }) {
             label={`${quoteToken?.symbol} deposit`}
             value={quoteDeposit}
             onChange={handleQuoteDepositChange}
+            disabled={fieldsDisabled}
           />
 
           <InitialInventoryInfo
@@ -117,6 +127,9 @@ export function Form({ className }: { className?: string }) {
               onClick: () => {},
               text: "Update",
             }}
+            loading={
+              kandelRequirementsQuery.status !== "success" || fieldsDisabled
+            }
           />
           <TokenBalance
             label="Wallet balance"
@@ -134,16 +147,19 @@ export function Form({ className }: { className?: string }) {
           label="Number of price points"
           value={pricePoints}
           onChange={handlePricePointsChange}
+          disabled={fieldsDisabled}
         />
         <EnhancedNumericInput
           label="Ratio"
           value={ratio}
           onChange={handleRatioChange}
+          disabled={fieldsDisabled}
         />
         <EnhancedNumericInput
           label="Step size"
           value={stepSize}
           onChange={handleStepSizeChange}
+          disabled={fieldsDisabled}
         />
       </Fieldset>
 
@@ -155,6 +171,7 @@ export function Form({ className }: { className?: string }) {
           balanceLabel={walletBalanceLabel}
           value={bounty}
           onChange={handleBountyChange}
+          disabled={fieldsDisabled}
         />
       </Fieldset>
     </form>

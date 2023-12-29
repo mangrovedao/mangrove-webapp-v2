@@ -114,7 +114,7 @@ export function useKandelRequirements({
         }
       } catch (e) {
         console.error(e)
-        return null
+        throw e
       }
     },
     enabled: !!(kandelStrategies && generator && market && midPrice),
