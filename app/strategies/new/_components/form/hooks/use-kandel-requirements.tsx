@@ -7,11 +7,12 @@ import useMarket from "@/providers/market"
 
 type Params = {
   onAave?: boolean
-  stepSize?: number | string
-  minPrice?: BigSource
-  maxPrice?: BigSource
-  baseDeposit?: string
-  quoteDeposit?: string
+  stepSize: number | string
+  minPrice: BigSource
+  maxPrice: BigSource
+  baseDeposit: string
+  quoteDeposit: string
+  pricePoints: number | string
 }
 
 export function useKandelRequirements({
@@ -21,6 +22,7 @@ export function useKandelRequirements({
   stepSize,
   baseDeposit,
   quoteDeposit,
+  pricePoints,
 }: Params) {
   const { market, midPrice } = useMarket()
   const { kandelStrategies, generator, config } = useKandel()
@@ -33,6 +35,7 @@ export function useKandelRequirements({
       quoteDeposit,
       midPrice,
       stepSize,
+      pricePoints,
       onAave,
       market?.base.id,
       market?.quote?.id,
@@ -66,20 +69,26 @@ export function useKandelRequirements({
             onAave,
           })
 
+        const param: Parameters<
+          typeof generator.calculateMinimumDistribution
+        >[number] = {
+          minimumBasePerOffer,
+          minimumQuotePerOffer,
+          distributionParams: {
+            generateFromMid: true,
+            minPrice,
+            maxPrice,
+            stepSize: Number(stepSize) || config.stepSize,
+            midPrice,
+            pricePoints: Number(pricePoints),
+          },
+        }
+
+        console.log(JSON.stringify(param, null, 2))
+
         // Calculate a candidate distribution with the recommended minimum volumes given the price range.
         const minimumDistribution =
-          await generator.calculateMinimumDistribution({
-            minimumBasePerOffer,
-            minimumQuotePerOffer,
-            distributionParams: {
-              generateFromMid: true,
-              minPrice,
-              maxPrice,
-              stepSize: Number(stepSize) || config.stepSize,
-              midPrice,
-              pricePoints: 2,
-            },
-          })
+          await generator.calculateMinimumDistribution(param)
 
         // requiredBase / quote => minimum to use in the fields
         const { requiredBase, requiredQuote } =

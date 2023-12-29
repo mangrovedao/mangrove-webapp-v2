@@ -1,31 +1,19 @@
 import { create, type StateCreator } from "zustand"
 
 type PriceRangeStore = {
-  minPrice: string
-  maxPrice: string
-  minPercentage: string
-  maxPercentage: string
+  priceRange: [string, string]
 }
 
 type PriceRangeActions = {
-  setMinPrice: (value: string) => void
-  setMaxPrice: (value: string) => void
-  setMinPercentage: (value: string) => void
-  setMaxPercentage: (value: string) => void
+  setPriceRange: (min: string, max: string) => void
 }
 
 const priceRangeStateCreator: StateCreator<
   PriceRangeStore & PriceRangeActions
 > = (set) => ({
-  minPrice: "",
-  maxPrice: "",
-  minPercentage: "",
-  maxPercentage: "",
+  priceRange: ["", ""],
 
-  setMinPrice: (value) => set({ minPrice: value }),
-  setMaxPrice: (value) => set({ maxPrice: value }),
-  setMinPercentage: (value) => set({ minPercentage: value }),
-  setMaxPercentage: (value) => set({ maxPercentage: value }),
+  setPriceRange: (min: string, max: string) => set({ priceRange: [min, max] }),
 })
 
 export const usePriceRangeStore = create(priceRangeStateCreator)

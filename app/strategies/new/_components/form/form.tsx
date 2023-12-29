@@ -7,6 +7,7 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import { useDebounce } from "usehooks-ts"
 import { usePriceRangeStore } from "../../_stores/price-range.store"
 import { Fieldset } from "../fieldset"
 import { InitialInventoryInfo } from "./components/initial-inventory-info"
@@ -29,19 +30,22 @@ export function Form({ className }: { className?: string }) {
   const [stepSize, setStepSize] = React.useState("1")
   const [bounty, setBounty] = React.useState("")
 
-  const [minPrice, maxPrice] = usePriceRangeStore((state) => [
-    state.minPrice,
-    state.maxPrice,
-  ])
+  const debouncedBaseDeposit = useDebounce(baseDeposit, 300)
+  const debouncedQuoteDeposit = useDebounce(quoteDeposit, 300)
+  const debouncedStepSize = useDebounce(stepSize, 300)
+  const debouncedPricePoints = useDebounce(pricePoints, 300)
+
+  const [minPrice, maxPrice] = usePriceRangeStore((store) => store.priceRange)
   const fieldsDisabled = !minPrice || !maxPrice
 
   const kandelRequirementsQuery = useKandelRequirements({
     onAave: false,
     minPrice,
     maxPrice,
-    baseDeposit,
-    quoteDeposit,
-    stepSize,
+    baseDeposit: debouncedBaseDeposit,
+    quoteDeposit: debouncedQuoteDeposit,
+    stepSize: debouncedStepSize,
+    pricePoints: debouncedPricePoints,
   })
 
   const handleBaseDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {

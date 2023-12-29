@@ -146,6 +146,9 @@ dependencies:
   next-ssl-redirect-middleware:
     specifier: ^0.1.5
     version: 0.1.5
+  radash:
+    specifier: ^11.0.0
+    version: 11.0.0
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -14136,6 +14139,11 @@ packages:
 
   /quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
+    dev: false
+
+  /radash@11.0.0:
+    resolution: {integrity: sha512-CRWxTFTDff0IELGJ/zz58yY4BDgyI14qSM5OLNKbCItJrff7m7dXbVF0kWYVCXQtPb3SXIVhXvAImH6eT7VLSg==}
+    engines: {node: '>=14.18.0'}
     dev: false
 
   /radix3@1.1.0:

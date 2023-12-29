@@ -2,6 +2,7 @@
 "use client"
 import Big from "big.js"
 import Link from "next/link"
+import { debounce } from "radash"
 import React from "react"
 
 import { EnhancedNumericInput } from "@/components/token-input"
@@ -106,16 +107,12 @@ export const PriceRange = withClientOnly(function ({
     Record<string, boolean>
   >({})
   const [isChangingFrom, setIsChangingFrom] = React.useState<ChangingFrom>()
-  const {
-    minPrice,
-    maxPrice,
-    minPercentage,
-    maxPercentage,
-    setMinPrice,
-    setMaxPrice,
-    setMinPercentage,
-    setMaxPercentage,
-  } = usePriceRangeStore()
+  const [minPrice, setMinPrice] = React.useState("")
+  const [minPercentage, setMinPercentage] = React.useState("")
+  const [maxPrice, setMaxPrice] = React.useState("")
+  const [maxPercentage, setMaxPercentage] = React.useState("")
+
+  const setPriceRange = usePriceRangeStore((store) => store.setPriceRange)
 
   const geometricKandelDistribution = calculateGeometricKandelDistribution(
     minPrice,
@@ -248,6 +245,21 @@ export const PriceRange = withClientOnly(function ({
     setErrors(newErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minPrice, maxPrice, minPercentage, maxPercentage])
+
+  const debouncedSetPriceRange = React.useCallback(
+    debounce(
+      {
+        delay: 300,
+      },
+      (min: string, max: string) => setPriceRange(min, max),
+    ),
+    [],
+  )
+
+  React.useEffect(() => {
+    if (!minPrice || !maxPrice) return
+    debouncedSetPriceRange(minPrice, maxPrice)
+  }, [minPrice, maxPrice])
 
   return (
     <div className={className}>
