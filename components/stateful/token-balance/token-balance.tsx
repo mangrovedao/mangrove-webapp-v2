@@ -6,6 +6,10 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 export function TokenBalance(props: {
   token?: Token | string
   label?: string
+  action?: {
+    onClick: () => void
+    text: string
+  }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
   const { formattedWithSymbol, formatted, isLoading } = useTokenBalance(token)
@@ -17,8 +21,16 @@ export function TokenBalance(props: {
       {!props.token || isLoading ? (
         <Skeleton className="w-24 h-4" />
       ) : (
-        <span className="text-xs float-right" title={formatted?.toString()}>
-          {formattedWithSymbol}
+        <span className="text-xs space-x-1">
+          <span title={formatted?.toString()}>{formattedWithSymbol}</span>
+          {props?.action && (
+            <button
+              className="text-xs underline"
+              onClick={props?.action.onClick}
+            >
+              {props?.action.text}
+            </button>
+          )}
         </span>
       )}
     </div>

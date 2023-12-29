@@ -4,7 +4,7 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
-import { TokenInput } from "@/components/token-input"
+import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -79,7 +79,7 @@ export function Limit() {
           <div className="space-y-4 !mt-6">
             <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
               {(field) => (
-                <TokenInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -100,7 +100,7 @@ export function Limit() {
               onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
             >
               {(field) => (
-                <TokenInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -118,7 +118,7 @@ export function Limit() {
             </form.Field>
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
-                <TokenInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -182,7 +182,7 @@ export function Limit() {
                   onChange={isGreaterThanZeroValidator}
                 >
                   {(field) => (
-                    <TokenInput
+                    <EnhancedNumericInput
                       placeholder="1"
                       name={field.name}
                       value={field.state.value}

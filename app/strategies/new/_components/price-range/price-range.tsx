@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import Big from "big.js"
+import Link from "next/link"
 import React from "react"
 
-import { TokenInput } from "@/components/token-input"
+import { EnhancedNumericInput } from "@/components/token-input"
+import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
 import useMarket from "@/providers/market"
 import {
@@ -262,10 +264,10 @@ export const PriceRange = withClientOnly(function ({
           geometricKandelDistribution={geometricKandelDistribution}
         />
 
-        <div className="gap-6 xl:gap-4 flex flex-col xl:flex-row w-full justify-center items-start">
+        <div className="gap-6 xl:gap-4 flex flex-col xl:flex-row w-full justify-center items-start border-b pb-6 mb-6">
           {market?.quote && (
             <div className="flex space-x-4 xl:flex-1 w-full">
-              <TokenInput
+              <EnhancedNumericInput
                 label="Min Price"
                 value={minPrice}
                 onChange={handleMinPriceChange}
@@ -276,7 +278,7 @@ export const PriceRange = withClientOnly(function ({
                 }
               />
 
-              <TokenInput
+              <EnhancedNumericInput
                 label="Min %"
                 value={minPercentage}
                 onChange={handleMinPercentageChange}
@@ -294,7 +296,7 @@ export const PriceRange = withClientOnly(function ({
           </div>
           {market?.quote && (
             <div className="flex space-x-4 xl:flex-1 w-full">
-              <TokenInput
+              <EnhancedNumericInput
                 label="Max Price"
                 value={maxPrice}
                 onChange={handleMaxPriceChange}
@@ -304,7 +306,7 @@ export const PriceRange = withClientOnly(function ({
                   isChangingFrom === "maxPrice" ? errors.minPrice : undefined
                 }
               />
-              <TokenInput
+              <EnhancedNumericInput
                 label="Max %"
                 value={maxPercentage}
                 onChange={handleMaxPercentageChange}
@@ -317,6 +319,25 @@ export const PriceRange = withClientOnly(function ({
               />
             </div>
           )}
+        </div>
+
+        <div className="flex justify-between">
+          <Button
+            asChild
+            variant={"secondary"}
+            size={"lg"}
+            className="w-full text-center max-w-32"
+          >
+            <Link href="/strategies">Back</Link>
+          </Button>
+          <Button
+            size={"lg"}
+            rightIcon
+            className="w-full max-w-72 text-center"
+            disabled
+          >
+            Summary
+          </Button>
         </div>
       </div>
     </div>

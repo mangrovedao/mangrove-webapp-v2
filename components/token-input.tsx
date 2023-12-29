@@ -10,7 +10,7 @@ import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { cn } from "@/utils"
 import { Caption } from "./typography/caption"
 
-type TokenInputProps = {
+type EnhancedNumericInputProps = {
   token?: Token | string
   disabled?: boolean
   label?: string
@@ -19,7 +19,10 @@ type TokenInputProps = {
   error?: ValidationError[] | string
 } & NumericInputProps
 
-export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
+export const EnhancedNumericInput = React.forwardRef<
+  HTMLInputElement,
+  EnhancedNumericInputProps
+>(
   (
     {
       label,
@@ -62,4 +65,4 @@ export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
   },
 )
 
-TokenInput.displayName = "TradeInput"
+EnhancedNumericInput.displayName = "EnhancedNumericInput"

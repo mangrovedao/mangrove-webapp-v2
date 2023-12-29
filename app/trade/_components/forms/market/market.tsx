@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
-import { TokenInput } from "@components/token-input"
+import { EnhancedNumericInput } from "@components/token-input"
 import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
@@ -97,7 +97,7 @@ export function Market() {
               onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
             >
               {(field) => (
-                <TokenInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -119,7 +119,7 @@ export function Market() {
             </form.Field>
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
-                <TokenInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -226,7 +226,7 @@ export function Market() {
                   </div>
                   {/* Render the custom input component */}
                   {showCustomInput && (
-                    <TokenInput
+                    <EnhancedNumericInput
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
