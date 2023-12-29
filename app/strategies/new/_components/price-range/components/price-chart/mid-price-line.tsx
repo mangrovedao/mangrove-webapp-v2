@@ -16,6 +16,7 @@ export function MidPriceLine({ xScale, midPrice, height }: Props) {
       x2={xPosition}
       y2={height}
       strokeWidth={1}
+      strokeDasharray="5, 5"
       className="stroke-cloud-300 opacity-50"
     />
   )

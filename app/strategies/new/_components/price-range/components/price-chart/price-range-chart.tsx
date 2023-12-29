@@ -157,7 +157,7 @@ export function PriceRangeChart({
         const xScaleTransformed = rescaleXAxis(zoom)
         return (
           <>
-            <div className="flex justify-between py-6">
+            <div className="flex justify-between pt-6">
               <Title variant={"title1"}>Price range</Title>
               <span className="flex space-x-3">
                 <Button
