@@ -13,11 +13,11 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { usePriceRangeStore } from "../../_stores/price-range.store"
+import { useNewStratStore } from "../../_stores/new-strat.store"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
-import { RiskAppetite } from "./components/risk-appetite"
+import { RiskAppetiteBadge } from "./components/risk-appetite"
 
 type ChangingFrom =
   | "minPrice"
@@ -99,7 +99,7 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { requestBookQuery, midPrice, market } = useMarket()
+  const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
   const priceDecimals = market?.quote.decimals
 
   const [errors, setErrors] = React.useState<Record<string, string>>({})
@@ -112,7 +112,7 @@ export const PriceRange = withClientOnly(function ({
   const [maxPrice, setMaxPrice] = React.useState("")
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
-  const setPriceRange = usePriceRangeStore((store) => store.setPriceRange)
+  const setPriceRange = useNewStratStore((store) => store.setPriceRange)
 
   const geometricKandelDistribution = calculateGeometricKandelDistribution(
     minPrice,
@@ -266,7 +266,9 @@ export const PriceRange = withClientOnly(function ({
       <div className="border-b">
         <div className="flex justify-between items-center px-6 pb-8">
           <AverageReturn percentage={1.5} />
-          <RiskAppetite value="low" />
+          <RiskAppetiteBadge
+            value={riskAppetite}
+          />
           <LiquiditySource />
         </div>
       </div>

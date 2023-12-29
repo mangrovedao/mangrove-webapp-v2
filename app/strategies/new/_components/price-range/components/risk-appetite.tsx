@@ -1,12 +1,10 @@
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
+import { RiskAppetite } from "@/utils/cashness"
 
-export function RiskAppetite({
-  value = "high",
-}: {
-  value: "high" | "medium" | "low"
-}) {
+export function RiskAppetiteBadge({ value }: { value?: RiskAppetite }) {
   return (
     <div className="flex items-end space-x-2">
       <span className="bg-black-rich rounded-lg p-1">
@@ -19,6 +17,7 @@ export function RiskAppetite({
             "text-cherry-100": value === "high",
             "text-[#FFB800]": value === "medium",
             "text-green-caribbean": value === "low",
+            "text-gray-300": !value || value === "-",
           })}
         >
           <path
@@ -37,9 +36,13 @@ export function RiskAppetite({
         >
           Risk appetite
         </Caption>
-        <Title variant={"title1"} className="capitalize">
-          {value}
-        </Title>
+        {!value ? (
+          <Skeleton className="h-7 w-20" />
+        ) : (
+          <Title variant={"title1"} className="capitalize">
+            {value}
+          </Title>
+        )}
       </span>
     </div>
   )

@@ -1,19 +1,19 @@
 import { create, type StateCreator } from "zustand"
 
-type PriceRangeStore = {
+type NewStratStore = {
   priceRange: [string, string]
 }
 
-type PriceRangeActions = {
+type NewStratActions = {
   setPriceRange: (min: string, max: string) => void
 }
 
-const priceRangeStateCreator: StateCreator<
-  PriceRangeStore & PriceRangeActions
-> = (set) => ({
+const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
+  set,
+) => ({
   priceRange: ["", ""],
 
   setPriceRange: (min: string, max: string) => set({ priceRange: [min, max] }),
 })
 
-export const usePriceRangeStore = create(priceRangeStateCreator)
+export const useNewStratStore = create(newStratStateCreator)

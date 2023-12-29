@@ -9,7 +9,7 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { useDebounce } from "usehooks-ts"
-import { usePriceRangeStore } from "../../_stores/price-range.store"
+import { useNewStratStore } from "../../_stores/new-strat.store"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeBetweenInfo } from "./components/must-be-between-info"
@@ -59,7 +59,7 @@ export function Form({ className }: { className?: string }) {
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedPricePoints = useDebounce(pricePoints, 300)
 
-  const [minPrice, maxPrice] = usePriceRangeStore((store) => store.priceRange)
+  const [minPrice, maxPrice] = useNewStratStore((store) => store.priceRange)
   const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
