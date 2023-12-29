@@ -10,7 +10,8 @@ import { cn } from "@/utils"
 import { useDebounce } from "usehooks-ts"
 import { usePriceRangeStore } from "../../_stores/price-range.store"
 import { Fieldset } from "../fieldset"
-import { InitialInventoryInfo } from "./components/initial-inventory-info"
+import { MinimumRecommended } from "./components/minimum-recommended"
+import { MustBeBetweenInfo } from "./components/must-be-between-info"
 import { useKandelRequirements } from "./hooks/use-kandel-requirements"
 
 export function Form({ className }: { className?: string }) {
@@ -21,7 +22,6 @@ export function Form({ className }: { className?: string }) {
   const { market } = useMarket()
   const baseToken = market?.base
   const quoteToken = market?.quote
-  const walletBalanceLabel = "Wallet balance"
 
   const [baseDeposit, setBaseDeposit] = React.useState("")
   const [quoteDeposit, setQuoteDeposit] = React.useState("")
@@ -36,7 +36,7 @@ export function Form({ className }: { className?: string }) {
   const debouncedPricePoints = useDebounce(pricePoints, 300)
 
   const [minPrice, maxPrice] = usePriceRangeStore((store) => store.priceRange)
-  const fieldsDisabled = !minPrice || !maxPrice
+  const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
     onAave: false,
@@ -48,40 +48,49 @@ export function Form({ className }: { className?: string }) {
     pricePoints: debouncedPricePoints,
   })
 
+  const { requiredBase, requiredQuote, requiredBounty } =
+    kandelRequirementsQuery.data || {}
+
   const handleBaseDepositChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
-    if (typeof e === "string") {
-      setBaseDeposit(e)
-      return
-    }
-    setBaseDeposit(e.target.value)
+    const value = typeof e === "string" ? e : e.target.value
+    setBaseDeposit(value)
   }
 
   const handleQuoteDepositChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
-    if (typeof e === "string") {
-      setQuoteDeposit(e)
-      return
-    }
-    setQuoteDeposit(e.target.value)
+    const value = typeof e === "string" ? e : e.target.value
+    setQuoteDeposit(value)
   }
 
-  const handlePricePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPricePoints(e.target.value)
+  const handlePricePointsChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    const value = typeof e === "string" ? e : e.target.value
+    setPricePoints(value)
   }
 
-  const handleRatioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRatio(e.target.value)
+  const handleRatioChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    const value = typeof e === "string" ? e : e.target.value
+    setRatio(value)
   }
 
-  const handleStepSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setStepSize(e.target.value)
+  const handleStepSizeChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    const value = typeof e === "string" ? e : e.target.value
+    setStepSize(value)
   }
 
-  const handleBountyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBounty(e.target.value)
+  const handleBountyDepositChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    const value = typeof e === "string" ? e : e.target.value
+    setBounty(value)
   }
 
   if (!baseToken || !quoteToken)
@@ -107,11 +116,13 @@ export function Form({ className }: { className?: string }) {
             onChange={handleBaseDepositChange}
             disabled={fieldsDisabled}
           />
-          <InitialInventoryInfo
+          <MinimumRecommended
             token={baseToken}
-            value={0.119}
+            value={requiredBase?.toFixed(baseToken.decimals)}
             action={{
-              onClick: () => {},
+              onClick: () =>
+                requiredBase &&
+                handleBaseDepositChange(requiredBase.toString()),
               text: "Update",
             }}
             loading={
@@ -136,11 +147,13 @@ export function Form({ className }: { className?: string }) {
             disabled={fieldsDisabled}
           />
 
-          <InitialInventoryInfo
+          <MinimumRecommended
             token={quoteToken}
-            value={0.119}
+            value={requiredQuote?.toFixed(quoteToken.decimals)}
             action={{
-              onClick: () => {},
+              onClick: () =>
+                requiredQuote &&
+                handleQuoteDepositChange(requiredQuote.toString()),
               text: "Update",
             }}
             loading={
@@ -159,36 +172,78 @@ export function Form({ className }: { className?: string }) {
       </Fieldset>
 
       <Fieldset legend="Settings">
-        <EnhancedNumericInput
-          label="Number of price points"
-          value={pricePoints}
-          onChange={handlePricePointsChange}
-          disabled={fieldsDisabled}
-        />
-        <EnhancedNumericInput
-          label="Ratio"
-          value={ratio}
-          onChange={handleRatioChange}
-          disabled={fieldsDisabled}
-        />
-        <EnhancedNumericInput
-          label="Step size"
-          value={stepSize}
-          onChange={handleStepSizeChange}
-          disabled={fieldsDisabled}
-        />
+        <div>
+          <EnhancedNumericInput
+            label="Number of price points"
+            value={pricePoints}
+            onChange={handlePricePointsChange}
+            disabled={fieldsDisabled}
+          />
+          <MustBeBetweenInfo
+            min={2}
+            max={255}
+            onMinClicked={handlePricePointsChange}
+          />
+        </div>
+
+        <div>
+          <EnhancedNumericInput
+            label="Ratio"
+            value={ratio}
+            onChange={handleRatioChange}
+            disabled={fieldsDisabled}
+          />
+          <MustBeBetweenInfo
+            min={1.00001}
+            max={2}
+            onMinClicked={handleRatioChange}
+          />
+        </div>
+        <div>
+          <EnhancedNumericInput
+            label="Step size"
+            value={stepSize}
+            onChange={handleStepSizeChange}
+            disabled={fieldsDisabled}
+          />
+          <MustBeBetweenInfo
+            min={1}
+            max={8}
+            onMinClicked={handleStepSizeChange}
+          />
+        </div>
       </Fieldset>
 
       <Fieldset legend="Bounty">
-        <EnhancedNumericInput
-          label={`${nativeBalance?.symbol} deposit`}
-          token={nativeBalance?.symbol}
-          showBalance
-          balanceLabel={walletBalanceLabel}
-          value={bounty}
-          onChange={handleBountyChange}
-          disabled={fieldsDisabled}
-        />
+        <div>
+          <EnhancedNumericInput
+            label={`${nativeBalance?.symbol} deposit`}
+            token={nativeBalance?.symbol}
+            value={bounty}
+            onChange={handleBountyDepositChange}
+            disabled={fieldsDisabled}
+          />
+          <MinimumRecommended
+            token={nativeBalance?.symbol}
+            value={requiredBounty}
+            action={{
+              onClick: handleBountyDepositChange,
+              text: "Update",
+            }}
+            loading={
+              kandelRequirementsQuery.status !== "success" || fieldsDisabled
+            }
+          />
+
+          <TokenBalance
+            label="Wallet balance"
+            token={nativeBalance?.symbol}
+            action={{
+              onClick: handleBountyDepositChange,
+              text: "MAX",
+            }}
+          />
+        </div>
       </Fieldset>
     </form>
   )

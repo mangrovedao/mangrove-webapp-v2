@@ -78,13 +78,11 @@ export function useKandelRequirements({
             generateFromMid: true,
             minPrice,
             maxPrice,
-            stepSize: Number(stepSize) || config.stepSize,
+            stepSize: Number(stepSize) ?? config.stepSize,
             midPrice,
             pricePoints: Number(pricePoints),
           },
         }
-
-        console.log(JSON.stringify(param, null, 2))
 
         // Calculate a candidate distribution with the recommended minimum volumes given the price range.
         const minimumDistribution =
