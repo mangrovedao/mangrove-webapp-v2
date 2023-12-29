@@ -51,7 +51,11 @@ export function NewStrategyDialog({ open, onClose }: Props) {
   return (
     <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
       <Dialog.Title className="text-xl text-left" close>
-        <Title variant={"header1"} className="space-x-3 flex items-center">
+        <Title
+          as={"div"}
+          variant={"header1"}
+          className="space-x-3 flex items-center"
+        >
           <span>Create strategy</span> <Badge>Step 1/2</Badge>
         </Title>
       </Dialog.Title>
