@@ -12,13 +12,17 @@ import type { DialogProps, Nodes } from "./types"
 export default function Dialog({
   open,
   onClose,
-  type = "confirm",
+  type,
   children,
+  showCloseButton = true,
 }: DialogProps) {
   return (
     <Root.Dialog open={open} onOpenChange={onClose}>
       <div className="w-full h-full relative">
-        <Root.DialogContent className={getContentClasses(type)}>
+        <Root.DialogContent
+          className={getContentClasses(type)}
+          showCloseButton={showCloseButton}
+        >
           <Root.DialogHeader>
             <Heading type={type} />
             {children}
@@ -29,10 +33,19 @@ export default function Dialog({
   )
 }
 
-function Title({ children, className }: Nodes) {
+function Title({
+  children,
+  className,
+  close = false,
+}: Nodes & { close?: boolean }) {
   return (
-    <Root.DialogTitle className={cn(titleClasses, className)}>
+    <Root.DialogTitle
+      className={cn(titleClasses, className, {
+        "flex justify-between items-center": close,
+      })}
+    >
       {children}
+      {close && <Root.XClose />}
     </Root.DialogTitle>
   )
 }
@@ -51,3 +64,4 @@ function Footer({ children, className }: Nodes) {
   )
 }
 Dialog.Footer = Footer
+Dialog.Close = Root.DialogClose

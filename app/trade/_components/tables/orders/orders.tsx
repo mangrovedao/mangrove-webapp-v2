@@ -3,8 +3,8 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
+import CancelOfferDialog from "./components/cancel-offer-dialog"
 import { EditOrderDrawer } from "./components/edit-order-drawer"
-import RetractOfferDialog from "./components/retract-offer-dialog"
 import { useOrders } from "./hooks/use-orders"
 import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
@@ -28,7 +28,7 @@ export function Orders() {
   const table = useTable({
     data: ordersQuery.data,
     onEdit: setOrderToEdit,
-    onRetract: setOrderToDelete,
+    onCancel: setOrderToDelete,
   })
 
   return (
@@ -41,6 +41,7 @@ export function Orders() {
           onPageChange: setPageDetails,
           page,
           pageSize,
+          count: ordersQuery.data?.length,
         }}
       />
       <EditOrderDrawer
@@ -48,7 +49,7 @@ export function Orders() {
         market={market}
         onClose={() => setOrderToEdit(undefined)}
       />
-      <RetractOfferDialog
+      <CancelOfferDialog
         order={orderToDelete}
         market={market}
         onClose={() => setOrderToDelete(undefined)}

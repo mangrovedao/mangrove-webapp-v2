@@ -21,7 +21,7 @@ export function Strategies() {
   })
 
   // selected strategy to cancel
-  const [strategyToCancel, setStrategyToCancel] = React.useState<Strategy>()
+  const [, setStrategyToCancel] = React.useState<Strategy>()
 
   const table = useTable({
     data: MOCKS,
@@ -40,6 +40,7 @@ export function Strategies() {
         onPageChange: setPageDetails,
         page,
         pageSize,
+        count: 10,
       }}
     />
   )

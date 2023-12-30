@@ -46,7 +46,7 @@ export function Navbar() {
   const clipPathId = React.useId()
   return (
     <nav className="flex w-full justify-between items-center border-b text-sm grid-in-header min-h-[var(--bar-height)]">
-      <div className="flex w-full justify-between items-center max-w-8xl mx-auto px-4">
+      <div className="flex w-full justify-between items-center px-4">
         <span className="flex items-center lg:space-x-8 h-8 py-1">
           <Link href={"/"}>
             <svg
@@ -134,7 +134,7 @@ function RightPart() {
     <div className="flex space-x-4 items-center h-8 py-1">
       <Button
         variant="invisible"
-        className="space-x-4 lg:flex items-center hidden"
+        className="!space-x-4 lg:flex items-center hidden"
         size="sm"
         onClick={handleChangeNetwork}
       >
@@ -149,7 +149,9 @@ function RightPart() {
           />
           <span className="text-sm whitespace-nowrap">{chain?.name}</span>
         </span>
-        <ChevronDown className="w-3" />
+        <div className="pl-2">
+          <ChevronDown className="w-3" />
+        </div>
       </Button>
 
       <Separator orientation="vertical" />

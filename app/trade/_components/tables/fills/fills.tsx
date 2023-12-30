@@ -20,13 +20,8 @@ export function Fills() {
 
   const table = useTable({
     data: fillsQuery.data,
-    onEdit: () => {
-      console.log("edit")
-    },
-    onRetract: () => {
-      console.log("delete")
-    },
   })
+
   return (
     <DataTable
       table={table}
@@ -36,6 +31,7 @@ export function Fills() {
         onPageChange: setPageDetails,
         page,
         pageSize,
+        count: fillsQuery.data?.length,
       }}
     />
   )

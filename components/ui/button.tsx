@@ -101,7 +101,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     const body = !asChild ? (
       <>
-        {loading ? <Spinner className="w-6" /> : props.children}
+        {loading ? <Spinner className="w-6 mx-auto" /> : props.children}
         {rightIcon && !loading && (
           <span className={cn(rightIconVariants({ variant }))}>
             <ChevronRight className="aspect-auto w-4" />

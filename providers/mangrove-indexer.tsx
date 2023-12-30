@@ -39,6 +39,10 @@ const useIndexerSdkContext = () => {
               tickSpacing: m.tickSpacing,
             })
           },
+          getPrice(tokenAddress) {
+            // TODO: unmock for kandels pages
+            return 1
+          },
         },
       })
     },

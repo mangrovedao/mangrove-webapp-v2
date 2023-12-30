@@ -49,10 +49,10 @@ export function NewStrategyDialog({ open, onClose }: Props) {
   }
 
   return (
-    <Dialog open={!!open} onClose={onClose}>
-      <Dialog.Title className="text-xl text-left">
+    <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
+      <Dialog.Title className="text-xl text-left" close>
         <Title variant={"header1"} className="space-x-3 flex items-center">
-          <span>Create new strategy</span> <Badge>Step 1/2</Badge>
+          <span>Create strategy</span> <Badge>Step 1/2</Badge>
         </Title>
       </Dialog.Title>
       <Dialog.Description className="text-left !mt-8">

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
+import { useEventListener } from "usehooks-ts"
 
 import useMarket from "@/providers/market"
 import { TradeAction } from "../../enums"
@@ -37,9 +39,21 @@ export function useLimit(props: Props) {
     feeInPercentageAsString,
     sendTokenBalance,
   } = useTradeInfos("limit", tradeAction)
+  // TODO: fix TS type for useEventListener
+  // @ts-expect-error
+  useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
   const send = form.useStore((state) => state.values.send)
   const timeInForce = form.useStore((state) => state.values.timeInForce)
+
+  function handleOnOrderbookOfferClicked(
+    event: CustomEvent<{ price: string }>,
+  ) {
+    form.setFieldValue("limitPrice", event.detail.price)
+    if (send === "") return
+    form.validateAllFields("change")
+    computeReceiveAmount()
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

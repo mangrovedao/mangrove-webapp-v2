@@ -84,33 +84,7 @@ function openTxFailedDialog({
   })
 }
 
-function openConfirmRetractOrder({
-  title = "Confirm Retract Order",
-  children = "Are you sure you want to retract this order?",
-  onConfirm,
-}: {
-  title?: React.ReactNode
-  children?: React.ReactNode
-  onConfirm: () => void
-}) {
-  dialogs.open({
-    title,
-    children,
-    actionButtons: [
-      {
-        onClick: onConfirm,
-        children: "Confirm",
-        id: "confirm-retract",
-        className: "w-full",
-        rightIcon: true,
-      },
-    ],
-    type: "confirm",
-  })
-}
-
 export const tradeService = {
   openTxCompletedDialog,
   openTxFailedDialog,
-  openConfirmRetractOrder,
 }

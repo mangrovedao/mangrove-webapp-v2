@@ -1,5 +1,6 @@
 "use client"
 
+import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -7,7 +8,6 @@ import useIndexerSdk from "@/providers/mangrove-indexer"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
-import { useQuery } from "@tanstack/react-query"
 import { parseOrders, type Order } from "../schema"
 
 type Params<T> = {
@@ -19,7 +19,7 @@ type Params<T> = {
 }
 
 export function useOrders<T = Order[]>({
-  filters: { first = 10, skip = 0 } = {},
+  filters: { first = 100, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
@@ -63,7 +63,12 @@ export function useOrders<T = Order[]>({
     meta: {
       error: "Unable to retrieve orders",
     },
-    enabled: !!(isConnected && indexerSdk && olKeys),
+    enabled: !!(
+      isConnected &&
+      indexerSdk &&
+      olKeys?.bid.token.address.toLowerCase() &&
+      olKeys?.ask.token.address.toLowerCase()
+    ),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

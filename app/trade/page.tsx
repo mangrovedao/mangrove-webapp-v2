@@ -33,7 +33,7 @@ export default function Page() {
       </section>
 
       <section className="border-x border-t tables-section z-50 bg-background">
-        <Tables />
+        <Tables className="h-full" />
       </section>
 
       <style jsx global>{`
@@ -72,6 +72,16 @@ export default function Page() {
           grid-template-columns: 20.5rem minmax(0, 1fr);
           grid-template-rows: var(--book-chart-height);
         }
+
+        @media (max-height: 800px) {
+          main {
+            grid-template-rows: 50% 50%;
+          }
+
+          .book-and-chart {
+            grid-template-rows: 100%;
+          }
+        }
       `}</style>
       <style global jsx>{`
         .market-chart-container div[role="tabpanel"] {
@@ -79,6 +89,12 @@ export default function Page() {
         }
         .book-container div[role="tabpanel"] {
           height: calc(100% - var(--bar-height));
+        }
+
+        @media (max-height: 800px) {
+          :root {
+            --history-table-content-height: calc(50vh - var(--bar-height) * 2);
+          }
         }
       `}</style>
     </main>

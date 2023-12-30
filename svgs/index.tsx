@@ -119,6 +119,32 @@ export function Check(props: React.ComponentProps<"svg">) {
   )
 }
 
+export function Info(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 36 35"
+      {...props}
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="3"
+        d="M18 31.962c7.988 0 14.463-6.475 14.463-14.462S25.988 3.038 18 3.038 3.539 9.513 3.539 17.5s6.475 14.462 14.462 14.462z"
+      ></path>
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="3.188"
+        d="M18 23.285V17.5m0-5.785h.017"
+      ></path>
+    </svg>
+  )
+}
+
 export function Bell(props: React.ComponentProps<"svg">) {
   return (
     <svg

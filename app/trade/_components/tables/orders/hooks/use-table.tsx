@@ -25,11 +25,11 @@ const DEFAULT_DATA: Order[] = []
 
 type Params = {
   data?: Order[]
-  onRetract: (order: Order) => void
+  onCancel: (order: Order) => void
   onEdit: (order: Order) => void
 }
 
-export function useTable({ data, onRetract, onEdit }: Params) {
+export function useTable({ data, onCancel, onEdit }: Params) {
   const { market } = useMarket()
   const columns = React.useMemo(
     () => [
@@ -148,7 +148,7 @@ export function useTable({ data, onRetract, onEdit }: Params) {
             <IconButton
               tooltip="Retract offer"
               className="aspect-square w-6 rounded-full"
-              onClick={() => onRetract(row.original)}
+              onClick={() => onCancel(row.original)}
             >
               <Close />
             </IconButton>
@@ -156,7 +156,7 @@ export function useTable({ data, onRetract, onEdit }: Params) {
         ),
       }),
     ],
-    [market, onEdit, onRetract],
+    [market, onEdit, onCancel],
   )
 
   return useReactTable({

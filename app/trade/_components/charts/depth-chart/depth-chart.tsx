@@ -180,7 +180,6 @@ export function DepthChart() {
             />
             {!isScrolling && (
               <Tooltip<Market.Offer>
-                unstyled
                 detectBounds={true}
                 applyPositionStyle
                 snapTooltipToDatumX
@@ -191,7 +190,6 @@ export function DepthChart() {
                 horizontalCrosshairStyle={crosshairStyle}
                 style={{
                   zIndex: 999,
-                  background: "transparent",
                 }}
                 showDatumGlyph={true}
                 renderTooltip={({ tooltipData, colorScale }) => {
@@ -203,6 +201,10 @@ export function DepthChart() {
                     )
                   )
                     return
+
+                  const id = tooltipData?.nearestDatum?.datum.id
+                  if (!id) return
+
                   const key = tooltipData.nearestDatum.key
                   const color = colorScale(key)
                   const price = accessors.xAccessor(
@@ -229,15 +231,15 @@ export function DepthChart() {
                   }
 
                   return (
-                    <div className="border bg-black p-4 rounded-md">
+                    <div className="bg-gray-scale-500 rounded-lg px-2 py-1 text-xs">
                       {price ? (
                         <div>
-                          <b>
+                          <span className="text-gray-scale-200">
                             {key !== DataKeyType.MID_PRICE.toString()
                               ? "Price"
                               : "Mid price"}
                             :
-                          </b>{" "}
+                          </span>{" "}
                           {price.toFixed(priceDecimals)} {market?.quote.symbol}
                         </div>
                       ) : undefined}

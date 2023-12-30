@@ -22,8 +22,6 @@ const DEFAULT_DATA: Fill[] = []
 
 type Params = {
   data?: Fill[]
-  onRetract: (fill: Fill) => void
-  onEdit: (fill: Fill) => void
 }
 
 export function useTable({ data }: Params) {
