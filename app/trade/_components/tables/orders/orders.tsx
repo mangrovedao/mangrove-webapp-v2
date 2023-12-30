@@ -4,7 +4,7 @@ import React from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
 import CancelOfferDialog from "./components/cancel-offer-dialog"
-import { EditOrderDrawer } from "./components/edit-order-drawer"
+import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"
 import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
@@ -44,7 +44,7 @@ export function Orders() {
           count: ordersQuery.data?.length,
         }}
       />
-      <EditOrderDrawer
+      <EditOrderSheet
         order={orderToEdit}
         market={market}
         onClose={() => setOrderToEdit(undefined)}

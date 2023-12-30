@@ -19,6 +19,7 @@ import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
+import { getOrderProgress } from "../utils/tables"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -71,32 +72,19 @@ export function useTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         header: "Filled/Amount",
         cell: ({ row }) => {
-          const { initialWants, takerGot, initialGives, isBid, takerGave } =
-            row.original
           const baseSymbol = market?.base.symbol
-          const displayDecimals = market?.base.displayedDecimals
-          const amount = Big(isBid ? initialWants : initialGives).toFixed(
-            displayDecimals,
+          const { progress, amount, filled } = getOrderProgress(
+            row.original,
+            market,
           )
-          const filled = Big(isBid ? takerGot : takerGave).toFixed(
-            displayDecimals,
-          )
-          const progress = Math.min(
-            Math.round(
-              Big(filled)
-                .mul(100)
-                .div(Big(amount).eq(0) ? 1 : amount)
-                .toNumber(),
-            ),
-            100,
-          )
+
           return market ? (
             <div className={cn("flex items-center")}>
               <span className="text-sm text-muted-foreground">
                 {filled}
                 &nbsp;/
               </span>
-              <span className="">
+              <span>
                 &nbsp;
                 {amount} {baseSymbol}
               </span>
