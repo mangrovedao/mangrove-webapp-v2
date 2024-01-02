@@ -3,7 +3,7 @@ import * as React from "react"
 import { Input } from "@/components/ui/input"
 import { escapeRegExp } from "@/utils/regexp"
 
-export type NumericInputProps = React.ComponentProps<typeof Input> & {
+type NumericInputProps = React.ComponentProps<typeof Input> & {
   onUserInput?: (nextUserInput: string) => void
 }
 

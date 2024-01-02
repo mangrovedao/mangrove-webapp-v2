@@ -66,7 +66,7 @@ export function formatNumber(n: number, isCompact: boolean = n >= 500) {
     : formattedNumber
 }
 
-export function isBig(value: unknown): value is Big {
+function isBig(value: unknown): value is Big {
   return value instanceof Big
 }
 

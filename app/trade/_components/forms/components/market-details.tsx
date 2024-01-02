@@ -23,7 +23,7 @@ type MarketDetailsLineProps = {
   title: string
   value?: string
 }
-export function MarketDetailsLine({ title, value }: MarketDetailsLineProps) {
+function MarketDetailsLine({ title, value }: MarketDetailsLineProps) {
   if (!value) return
   return (
     <div className="flex justify-between items-center mt-2">

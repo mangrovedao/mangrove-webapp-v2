@@ -12,7 +12,7 @@ import { type ResolutionString } from "@/public/charting_library/charting_librar
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 
-export enum ChartType {
+enum ChartType {
   DEPTH = "Depth chart",
   PRICE = "Price chart",
 }

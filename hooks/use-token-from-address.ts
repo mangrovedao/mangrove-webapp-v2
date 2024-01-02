@@ -13,5 +13,6 @@ export function useTokenFromAddress(address: Address) {
       return mangrove.tokenFromAddress(address)
     },
     enabled: !!(address && mangrove),
+    staleTime: 10 * 60 * 1000,
   })
 }

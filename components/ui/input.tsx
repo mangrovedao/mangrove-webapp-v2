@@ -7,7 +7,7 @@ import { NumericFormat } from "react-number-format"
 import { getSeparator } from "@/utils/numbers"
 import { cn } from "utils"
 
-export enum InputType {
+enum InputType {
   NUMBER = "number",
   PERCENT = "percent",
   TEXT = "text",

@@ -26,5 +26,6 @@ export function useWhitelistedMarketsInfos<T = Mangrove.OpenMarketInfo[]>(
     enabled: !!(mangrove && chain),
     retry: false,
     select,
+    staleTime: 15 * 60 * 1000,
   })
 }

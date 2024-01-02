@@ -2,7 +2,7 @@ import React, { useId } from "react"
 
 import { cn } from "@/utils"
 
-export type IconType =
+type IconType =
   | "lock"
   | "success"
   | "cross"

@@ -1,5 +1,12 @@
 "use client"
-import { Copy, ExternalLink, LogOut, Network, Wallet } from "lucide-react"
+import {
+  Coins,
+  Copy,
+  ExternalLink,
+  LogOut,
+  Network,
+  Wallet,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
@@ -17,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import withClientOnly from "@/hocs/withClientOnly"
 import { Bell, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
@@ -25,8 +33,6 @@ import {
   useChainModal,
   useConnectModal,
 } from "@rainbow-me/rainbowkit"
-import { ClientOnly } from "./client-only"
-import { WrongNetworkAlertDialog } from "./stateful/dialogs/wrong-network-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 
@@ -41,12 +47,27 @@ const LINKS = [
   },
 ]
 
-export function Navbar() {
+type Props = React.ComponentProps<"nav"> & {
+  innerClasses?: string
+}
+
+export function Navbar({ className, innerClasses, ...props }: Props) {
   const currentRoute = usePathname()
   const clipPathId = React.useId()
   return (
-    <nav className="flex w-full justify-between items-center border-b text-sm grid-in-header min-h-[var(--bar-height)]">
-      <div className="flex w-full justify-between items-center px-4">
+    <nav
+      className={cn(
+        "flex w-full justify-between items-center border-b text-sm grid-in-header min-h-[var(--bar-height)]",
+        className,
+      )}
+      {...props}
+    >
+      <div
+        className={cn(
+          "flex w-full justify-between items-center px-4",
+          innerClasses,
+        )}
+      >
         <span className="flex items-center lg:space-x-8 h-8 py-1">
           <Link href={"/"}>
             <svg
@@ -92,15 +113,13 @@ export function Navbar() {
           </div>
         </span>
 
-        <ClientOnly>
-          <RightPart />
-        </ClientOnly>
+        <RightPart />
       </div>
     </nav>
   )
 }
 
-function RightPart() {
+const RightPart = withClientOnly(() => {
   const { openChainModal } = useChainModal()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
@@ -184,6 +203,14 @@ function RightPart() {
             <Network className="mr-2 h-4 w-4" />
             <span>Change network</span>
           </DropdownMenuItem>
+          {chain?.testnet && (
+            <DropdownMenuItem asChild>
+              <Link href={"/faucet"}>
+                <Coins className="mr-2 h-4 w-4" />
+                <span>Faucet</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem
@@ -217,7 +244,6 @@ function RightPart() {
       <Button variant={"invisible"} size="sm" className="h-full">
         <Bell className="text-white w-4" />
       </Button>
-      <WrongNetworkAlertDialog />
     </div>
   )
-}
+})

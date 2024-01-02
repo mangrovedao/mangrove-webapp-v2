@@ -8,5 +8,3 @@ export const mangrovePriceResponseSchema = z.object({
   volume: z.number(),
   date: z.string(),
 })
-
-export type MangrovePriceResponse = z.infer<typeof mangrovePriceResponseSchema>

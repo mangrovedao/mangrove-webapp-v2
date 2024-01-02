@@ -6,7 +6,7 @@ export function useTokenBalance(token?: Token) {
   const { data, ...rest } = useBalance({
     address,
     token: token?.address as `0x`,
-    watch: false,
+    watch: true,
   })
 
   return {
@@ -15,7 +15,7 @@ export function useTokenBalance(token?: Token) {
     formattedWithSymbol:
       data &&
       `${Number(data?.formatted).toFixed(
-        token?.displayedDecimals,
+        token?.displayedDecimals ?? 2,
       )} ${data?.symbol}`,
     ...rest,
   }

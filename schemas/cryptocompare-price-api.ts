@@ -3,10 +3,6 @@ import { mangrovePriceResponseSchema } from "./mangrove-price-api"
 
 export const cryptoComparePriceResponseSchema = z.record(z.number())
 
-export type CryptoComparePriceResponse = z.infer<
-  typeof cryptoComparePriceResponseSchema
->
-
 const partialMangrovePriceResponseSchema = mangrovePriceResponseSchema.partial({
   open: true,
   high: true,

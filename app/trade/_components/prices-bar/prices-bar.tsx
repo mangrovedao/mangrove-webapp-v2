@@ -86,11 +86,10 @@ export function PricesBar() {
     <ScrollArea>
       <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
         <Item
-          label="Price"
+          label={quote?.symbol ? `Price (${quote?.symbol})` : "Price"}
           value={oneMinutePriceQuery?.data?.close}
           skeleton={oneMinutePriceQuery?.isLoading}
           quote={quote}
-          showSymbol
         />
 
         <Separator orientation="vertical" className="h-4" />
@@ -141,7 +140,7 @@ export function PricesBar() {
         <Separator orientation="vertical" className="h-4" />
 
         <Item
-          label={quote?.symbol ? `24h Volume (${quote?.symbol})` : `24h Volume`}
+          label="24h Volume"
           value={oneDayPriceQuery?.data?.volume}
           quote={quote}
           skeleton={oneDayPriceQuery?.isLoading}

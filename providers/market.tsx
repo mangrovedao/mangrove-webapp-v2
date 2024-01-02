@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation"
 import React from "react"
 import { useNetwork } from "wagmi"
 
+import { getTokenPriceInToken } from "@/services/tokens.service"
+import { calculateMidPriceFromOrderBook } from "@/utils/market"
 import useMangrove from "./mangrove"
 
 const useMarketContext = () => {
@@ -36,6 +38,7 @@ const useMarketContext = () => {
     },
     enabled: !!marketInfo,
     refetchOnWindowFocus: false,
+    staleTime: 15 * 60 * 1000,
   })
 
   const requestBookQuery = useQuery({
@@ -65,6 +68,28 @@ const useMarketContext = () => {
     }
   }, [mangrove, market])
 
+  const midPrice = React.useMemo(() => {
+    if (requestBookQuery.data) {
+      return calculateMidPriceFromOrderBook(requestBookQuery.data)
+    }
+  }, [requestBookQuery.data])
+
+  // Get mid price only if there is no liquidity in the book
+  const midPriceQuery = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ["midPrice", market?.base.symbol, market?.quote.symbol],
+    queryFn: () => {
+      if (!market?.base.symbol || !market?.quote.symbol) return undefined
+      return getTokenPriceInToken(market.base.symbol, market.quote.symbol, "1m")
+    },
+    enabled:
+      requestBookQuery.status === "success" &&
+      !midPrice &&
+      !!market?.base.symbol &&
+      !!market?.quote.symbol,
+    select: (data) => data?.close,
+  })
+
   const updateOrderbook = React.useCallback(() => {
     if (!market) return
     requestBookQuery.refetch()
@@ -84,6 +109,7 @@ const useMarketContext = () => {
     market,
     marketInfo,
     olKeys,
+    midPrice: midPrice ?? midPriceQuery.data,
   }
 }
 

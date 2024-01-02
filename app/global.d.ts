@@ -9,3 +9,5 @@ declare global {
     "on-orderbook-offer-clicked": CustomEvent<{ price: string }>
   }
 }
+
+declare module "react-object-view"

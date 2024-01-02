@@ -1,15 +1,10 @@
-import type { Token } from "@mangrovedao/mangrove.js"
-import type { ValidationError } from "@tanstack/react-form"
 import React from "react"
 
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
-import {
-  NumericInput,
-  type NumericInputProps,
-} from "@/components/numeric-input"
+import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -24,7 +19,6 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
-import { TokenBalance } from "../components/token-balance"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
@@ -85,7 +79,7 @@ export function Limit() {
           <div className="space-y-4 !mt-6">
             <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
               {(field) => (
-                <TradeInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -106,7 +100,7 @@ export function Limit() {
               onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
             >
               {(field) => (
-                <TradeInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -124,7 +118,7 @@ export function Limit() {
             </form.Field>
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
-                <TradeInput
+                <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -188,7 +182,7 @@ export function Limit() {
                   onChange={isGreaterThanZeroValidator}
                 >
                   {(field) => (
-                    <TradeInput
+                    <EnhancedNumericInput
                       placeholder="1"
                       name={field.name}
                       value={field.state.value}
@@ -277,36 +271,3 @@ export function Limit() {
     </>
   )
 }
-
-type TradeInputProps = {
-  token?: Token
-  disabled?: boolean
-  label?: string
-  showBalance?: boolean
-  error?: ValidationError[]
-} & NumericInputProps
-
-const TradeInput = React.forwardRef<HTMLInputElement, TradeInputProps>(
-  ({ label, token, showBalance = false, error, ...inputProps }, ref) => {
-    return (
-      <div className="flex-col flex">
-        {label && <Label>{label}</Label>}
-        <NumericInput
-          {...inputProps}
-          ref={ref}
-          icon={token?.symbol}
-          symbol={token?.symbol}
-          aria-invalid={!!error?.length}
-        />
-        {error && (
-          <p role="aria-live" className="text-red-100 text-xs leading-4 mt-1">
-            {error}
-          </p>
-        )}
-        {showBalance && <TokenBalance token={token} />}
-      </div>
-    )
-  },
-)
-
-TradeInput.displayName = "TradeInput"
