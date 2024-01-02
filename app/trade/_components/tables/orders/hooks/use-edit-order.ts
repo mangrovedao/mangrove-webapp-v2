@@ -4,6 +4,8 @@ import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 
+import useMangrove from "@/providers/mangrove"
+import useMarket from "@/providers/market"
 import { TradeAction } from "../../../forms/enums"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
@@ -32,6 +34,33 @@ export function useEditOrder(props: Props) {
     },
     onSubmit: (values) => props.onSubmit(values),
   })
+
+  const { mangrove } = useMangrove()
+  const { market } = useMarket()
+
+  const updateAsk = async () => {
+    if (!mangrove || !market) return
+    const directLP = mangrove?.liquidityProvider(market)
+
+    await (
+      await directLP
+    ).updateAsk(1, {
+      volume: 100.5,
+      price: 1.00345,
+    })
+  }
+
+  const updateBid = async () => {
+    if (!mangrove || !market) return
+    const directLP = mangrove?.liquidityProvider(market)
+
+    await (
+      await directLP
+    ).updateBid(1, {
+      volume: 100.5,
+      price: 1.00345,
+    })
+  }
 
   const isBid = form.useStore((state) => state.values.isBid)
   const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
