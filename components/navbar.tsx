@@ -143,7 +143,7 @@ const RightPart = withClientOnly(() => {
     return (
       <>
         <Button onClick={handleConnect} disabled={isConnecting} size="sm">
-          Connect to wallet
+          Connect wallet
         </Button>
       </>
     )
