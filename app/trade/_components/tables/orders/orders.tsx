@@ -4,6 +4,7 @@ import React from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
 import CancelOfferDialog from "./components/cancel-offer-dialog"
+import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"
 import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
@@ -25,13 +26,11 @@ export function Orders() {
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<Order>()
+  const [orderToEdit, setOrderToEdit] = React.useState<Order>()
 
   const table = useTable({
     data: ordersQuery.data,
-    onEdit: () => {
-      // TODO: implement edit with drawer
-      console.log("edit")
-    },
+    onEdit: setOrderToEdit,
     onCancel: setOrderToDelete,
   })
 
@@ -47,6 +46,11 @@ export function Orders() {
           pageSize,
           count,
         }}
+      />
+      <EditOrderSheet
+        order={orderToEdit}
+        market={market}
+        onClose={() => setOrderToEdit(undefined)}
       />
       <CancelOfferDialog
         order={orderToDelete}

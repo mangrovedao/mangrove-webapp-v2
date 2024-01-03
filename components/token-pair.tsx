@@ -39,7 +39,6 @@ export function TokenPair({
         <Skeleton className="h-7 w-32" />
       ) : (
         <Title
-          variant={"header1"}
           {...titleProps}
         >{`${baseToken.symbol}/${quoteToken.symbol}`}</Title>
       )}
