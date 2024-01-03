@@ -259,6 +259,7 @@ export function PriceRangeChart({
                   strokeWidth={1}
                   curve={curveStep}
                   className="fill-primary-night-woods"
+                  opacity={priceRange ? 0.8 : 1}
                 />
                 <AxisTop
                   top={height}
