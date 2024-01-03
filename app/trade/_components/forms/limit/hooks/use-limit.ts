@@ -50,8 +50,8 @@ export function useLimit(props: Props) {
     event: CustomEvent<{ price: string }>,
   ) {
     form.setFieldValue("limitPrice", event.detail.price)
+    form.validateAllFields("blur")
     if (send === "") return
-    form.validateAllFields("change")
     computeReceiveAmount()
   }
 
