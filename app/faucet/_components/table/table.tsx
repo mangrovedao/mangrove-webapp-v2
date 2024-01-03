@@ -18,7 +18,7 @@ export function FaucetTable() {
         },
         {
           id: quote.id,
-          symbol: base.symbol,
+          symbol: quote.symbol,
           address: quote.address?.toLowerCase(),
         },
       ])

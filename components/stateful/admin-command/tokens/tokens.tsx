@@ -27,7 +27,7 @@ export function Tokens({ onBack }: { onBack: () => void }) {
           },
           {
             id: quote.id,
-            symbol: base.symbol,
+            symbol: quote.symbol,
             address: quote.address?.toLowerCase(),
             tickSpacing,
             asksConfig,
