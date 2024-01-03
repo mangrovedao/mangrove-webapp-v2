@@ -26,7 +26,7 @@ export function useLimit(props: Props) {
       send: "",
       receive: "",
       timeInForce: TimeInForce.GOOD_TIL_TIME,
-      timeToLive: "1",
+      timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
     },
     onSubmit: (values) => props.onSubmit(values),
