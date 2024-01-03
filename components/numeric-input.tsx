@@ -14,10 +14,7 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
     return (
       <div className="w-full relative group/input">
         {icon && (
-          <div
-            className="flex items-center absolute inset-y-0 left-4"
-            onClick={() => alert("toto")}
-          >
+          <div className="flex items-center absolute inset-y-0 left-4">
             <TokenIcon symbol={icon} />
           </div>
         )}
