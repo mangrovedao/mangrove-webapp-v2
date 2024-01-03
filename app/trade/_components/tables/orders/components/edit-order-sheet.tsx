@@ -22,7 +22,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { cn } from "@/utils"
-import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
+import {
+  formatDateWithoutHours,
+  formatHoursOnly,
+  hasExpired,
+} from "@/utils/date"
 import { type Market } from "@mangrovedao/mangrove.js"
 import { DotIcon } from "lucide-react"
 import React from "react"
@@ -80,17 +84,16 @@ export default function EditOrderSheet({
   market,
   onClose,
 }: EditOrderSheetProps) {
-  const [formData, setFormData] = React.useState<Form>()
-  const { handleSubmit, form, setToggleEdit, toggleEdit, quoteToken } =
-    useEditOrder({
-      onSubmit: (formData) => setFormData({ ...formData, isBid }),
-    })
-
   if (!order || !market) return null
+  const [formData, setFormData] = React.useState<Form>()
+  const { handleSubmit, form, setToggleEdit, toggleEdit } = useEditOrder({
+    onSubmit: (formData) => setFormData({ ...formData, isBid }),
+    order,
+  })
   const { base, quote } = market
   const { expiryDate, price, isBid } = order
   const formattedPrice = `${Number(price).toFixed(4)} ${base.symbol}`
-  const isOrderExpired = expiryDate && expiryDate <= new Date()
+  const isOrderExpired = expiryDate && hasExpired(expiryDate)
 
   const { progress, amount, filled, progressInPercent } = getOrderProgress(
     order,
@@ -105,8 +108,8 @@ export default function EditOrderSheet({
         </SheetHeader>
 
         <form.Provider>
-          <form onSubmit={handleSubmit} autoComplete="off" className="flex-1">
-            <SheetBody>
+          <form onSubmit={(e) => handleSubmit(e)} autoComplete="off">
+            <SheetBody className="flex-1">
               <TokenPair
                 tokenClasses="h-7 w-7"
                 baseToken={base}
@@ -160,7 +163,7 @@ export default function EditOrderSheet({
               />
 
               <SheetLine
-                title="limitPrice"
+                title="Limit Price"
                 item={
                   !toggleEdit ? (
                     formattedPrice
@@ -215,7 +218,6 @@ export default function EditOrderSheet({
                               field.handleChange(value)
                             }}
                             disabled={!(market && form.state.isFormValid)}
-                            // error={field.state.meta.touchedErrors}
                           />
                         )}
                       </form.Field>
@@ -255,42 +257,57 @@ export default function EditOrderSheet({
                 }
               />
             </SheetBody>
+
+            <SheetFooter>
+              <SheetClose className="flex-1">
+                <Button
+                  className="w-full"
+                  variant="secondary"
+                  size="lg"
+                  onClick={
+                    toggleEdit
+                      ? (e) => {
+                          e.preventDefault()
+                          setToggleEdit(!toggleEdit)
+                        }
+                      : undefined
+                  }
+                >
+                  Cancel
+                </Button>
+              </SheetClose>
+              {!toggleEdit ? (
+                <Button
+                  className="flex-1"
+                  variant="primary"
+                  size="lg"
+                  onClick={() => setToggleEdit(!toggleEdit)}
+                >
+                  Modify
+                </Button>
+              ) : (
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                >
+                  {([canSubmit, isSubmitting]) => {
+                    return (
+                      <Button
+                        type="submit"
+                        className="flex-1"
+                        variant="primary"
+                        size="lg"
+                        disabled={!canSubmit || !market}
+                        loading={!!isSubmitting}
+                      >
+                        Save
+                      </Button>
+                    )
+                  }}
+                </form.Subscribe>
+              )}
+            </SheetFooter>
           </form>
         </form.Provider>
-
-        <SheetFooter>
-          <SheetClose className="flex-1">
-            <Button
-              className="w-full"
-              variant="secondary"
-              size="lg"
-              onClick={
-                toggleEdit
-                  ? (e) => {
-                      e.preventDefault()
-                      setToggleEdit(!toggleEdit)
-                    }
-                  : undefined
-              }
-            >
-              Cancel
-            </Button>
-          </SheetClose>
-          {!toggleEdit ? (
-            <Button
-              className="flex-1"
-              variant="primary"
-              size="lg"
-              onClick={() => setToggleEdit(!toggleEdit)}
-            >
-              Modify
-            </Button>
-          ) : (
-            <Button className="flex-1" variant="primary" size="lg">
-              Save
-            </Button>
-          )}
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   )

@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
+import { hasExpired } from "@/utils/date"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
 import { getOrderProgress } from "../utils/tables"
@@ -124,24 +125,30 @@ export function useTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => (
-          <div className="w-full h-full flex justify-end space-x-1">
-            <IconButton
-              tooltip="Modify"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onEdit(row.original)}
-            >
-              <Pen />
-            </IconButton>
-            <IconButton
-              tooltip="Retract offer"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onCancel(row.original)}
-            >
-              <Close />
-            </IconButton>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const expiryDate = row.original.expiryDate
+          const isExpired = expiryDate && hasExpired(expiryDate)
+          return (
+            <div className="w-full h-full flex justify-end space-x-1">
+              <IconButton
+                disabled={isExpired}
+                tooltip="Modify"
+                className="aspect-square w-6 rounded-full"
+                onClick={() => onEdit(row.original)}
+              >
+                <Pen />
+              </IconButton>
+              <IconButton
+                disabled={isExpired}
+                tooltip="Retract offer"
+                className="aspect-square w-6 rounded-full"
+                onClick={() => onCancel(row.original)}
+              >
+                <Close />
+              </IconButton>
+            </div>
+          )
+        },
       }),
     ],
     [market, onEdit, onCancel],

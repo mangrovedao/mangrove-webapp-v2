@@ -9,6 +9,7 @@ import useMarket from "@/providers/market"
 import { TradeAction } from "../../../forms/enums"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
+import { Order } from "../schema"
 
 export type Form = {
   limitPrice: string
@@ -20,45 +21,55 @@ export type Form = {
 
 type Props = {
   onSubmit: (data: Form) => void
+  order: Order
 }
 
 export function useEditOrder(props: Props) {
+  const { order } = props
+  const { mangrove } = useMangrove()
+  const { market } = useMarket()
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      limitPrice: "",
-      send: "",
+      limitPrice: order.price,
+      send: order.initialGives,
       timeToLive: "1",
       timeToLiveUnit: TimeToLiveUnit.DAY,
-      isBid: false,
+      isBid: order.isBid,
     },
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const { mangrove } = useMangrove()
-  const { market } = useMarket()
+  const price = form.state.values.limitPrice
 
   const updateAsk = async () => {
     if (!mangrove || !market) return
-    const directLP = mangrove?.liquidityProvider(market)
+    const directLP = await mangrove?.liquidityProvider(market)
 
-    await (
-      await directLP
-    ).updateAsk(1, {
-      volume: 100.5,
-      price: 1.00345,
+    console.log("ask", Number(order.offerId), {
+      volume: order.initialGives,
+      price,
+    })
+
+    await directLP.updateAsk(Number(order.offerId), {
+      volume: order.initialGives,
+      price,
     })
   }
 
   const updateBid = async () => {
     if (!mangrove || !market) return
-    const directLP = mangrove?.liquidityProvider(market)
+    const directLP = await mangrove?.liquidityProvider(market)
 
-    await (
-      await directLP
-    ).updateBid(1, {
-      volume: 100.5,
-      price: 1.00345,
+    console.log("bid", Number(order.offerId), {
+      volume: order.initialWants,
+      price,
+    })
+
+    await directLP.updateBid(Number(order.offerId), {
+      volume: order.initialWants,
+      price,
     })
   }
 
@@ -71,6 +82,8 @@ export function useEditOrder(props: Props) {
     e.preventDefault()
     e.stopPropagation()
     void form.handleSubmit()
+    console.log(order)
+    order.isBid ? updateBid() : updateAsk()
   }
 
   React.useEffect(() => {
