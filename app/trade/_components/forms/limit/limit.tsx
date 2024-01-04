@@ -1,3 +1,4 @@
+import Big from "big.js"
 import React from "react"
 
 import {
@@ -16,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
@@ -25,6 +27,8 @@ import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
+
+const sliderValues = [25, 50, 75, 100]
 
 export function Limit() {
   const [formData, setFormData] = React.useState<Form>()
@@ -41,9 +45,26 @@ export function Limit() {
     tickSize,
     feeInPercentageAsString,
     timeInForce,
+    send,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
+
+  const handleSliderChange = (value: number) => {
+    const amount = (value * Number(sendTokenBalance.formatted)) / 100
+    form.setFieldValue("send", amount.toString())
+    form.validateAllFields("change")
+    computeReceiveAmount()
+  }
+  const sendTokenBalanceAsBig = Big(Number(sendTokenBalance.formatted) ?? 1)
+
+  const sliderValue = Math.min(
+    Big(Number(send) ?? 0)
+      .mul(100)
+      .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
+      .toNumber(),
+    100,
+  ).toFixed(0)
 
   return (
     <>
@@ -135,8 +156,40 @@ export function Limit() {
               )}
             </form.Field>
 
-            {/* TODO: set slider and synchronize it to send field */}
-            {/* <CSlider form={form} sliderPercentage={sliderPercentage} /> */}
+            {/* Slider component */}
+            <div className="space-y-5 pt-2 px-3">
+              <Slider
+                name={"sliderPercentage"}
+                defaultValue={[0]}
+                value={[Number(sliderValue)]}
+                step={5}
+                min={0}
+                max={100}
+                onValueChange={([value]) => {
+                  handleSliderChange(Number(value))
+                }}
+                disabled={!(market && form.state.isFormValid)}
+              />
+              <div className="flex justify-center space-x-3">
+                {sliderValues.map((value) => (
+                  <Button
+                    key={`percentage-button-${value}`}
+                    variant={"secondary"}
+                    size={"sm"}
+                    className={cn("text-xs w-full", {
+                      "opacity-10": Number(sliderValue) !== value,
+                    })}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleSliderChange(Number(value))
+                    }}
+                    disabled={!market}
+                  >
+                    {value}%
+                  </Button>
+                ))}
+              </div>
+            </div>
 
             <Separator className="!my-6" />
 
