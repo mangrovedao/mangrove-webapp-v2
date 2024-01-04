@@ -29,7 +29,7 @@ export default function RootLayout({
           <WrongNetworkAlertDialog />
         </RootProvider>
         <Toaster
-          position="bottom-center"
+          position="top-right"
           toastOptions={{
             className: toastClasses,
             classNames: {

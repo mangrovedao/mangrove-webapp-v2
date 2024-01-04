@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
+// import { mangroveOrderConfiguration } from "@mangrovedao/mangrove.js/dist/nodejs/configuration"
+import { LiquidityProvider, configuration } from "@mangrovedao/mangrove.js"
+
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
@@ -20,60 +23,54 @@ export type Form = {
 }
 
 type Props = {
-  onSubmit: (data: Form) => void
   order: Order
 }
 
 export function useEditOrder(props: Props) {
-  const { order } = props
+  const {
+    offerId,
+    initialGives,
+    initialWants,
+    price: currentPrice,
+    isBid,
+  } = props.order
+
   const { mangrove } = useMangrove()
   const { market } = useMarket()
 
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      limitPrice: order.price,
-      send: order.initialGives,
+      limitPrice: currentPrice,
+      send: initialGives,
       timeToLive: "1",
       timeToLiveUnit: TimeToLiveUnit.DAY,
-      isBid: order.isBid,
+      isBid: isBid,
     },
-    onSubmit: (values) => props.onSubmit(values),
   })
 
-  const price = form.state.values.limitPrice
-
-  const updateAsk = async () => {
+  const udpdateOffer = async () => {
     if (!mangrove || !market) return
-    const directLP = await mangrove?.liquidityProvider(market)
 
-    console.log("ask", Number(order.offerId), {
-      volume: order.initialGives,
-      price,
-    })
+    const price = form.state.values.limitPrice
+    const orderLogic = mangrove.offerLogic(mangrove.orderContract.address)
+    const gasreq = configuration.mangroveOrder.getRestingOrderGasreq(
+      mangrove.network.name,
+    )
 
-    await directLP.updateAsk(Number(order.offerId), {
-      volume: order.initialGives,
-      price,
-    })
+    const orderLP = await LiquidityProvider.connect(orderLogic, gasreq, market)
+
+    // isBid
+    //   ? await orderLP.updateBid(Number(offerId), {
+    //       volume: initialWants,
+    //       price,
+    //     })
+    //   : await orderLP.updateAsk(Number(offerId), {
+    //       volume: initialGives,
+    //       price,
+    //     })
   }
 
-  const updateBid = async () => {
-    if (!mangrove || !market) return
-    const directLP = await mangrove?.liquidityProvider(market)
-
-    console.log("bid", Number(order.offerId), {
-      volume: order.initialWants,
-      price,
-    })
-
-    await directLP.updateBid(Number(order.offerId), {
-      volume: order.initialWants,
-      price,
-    })
-  }
-
-  const isBid = form.useStore((state) => state.values.isBid)
   const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
   const { quoteToken } = useTradeInfos("market", tradeAction)
   const [toggleEdit, setToggleEdit] = React.useState(false)
@@ -81,9 +78,10 @@ export function useEditOrder(props: Props) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     e.stopPropagation()
-    void form.handleSubmit()
-    console.log(order)
-    order.isBid ? updateBid() : updateAsk()
+    udpdateOffer()
+    setTimeout(() => {
+      return true
+    }, 50000)
   }
 
   React.useEffect(() => {

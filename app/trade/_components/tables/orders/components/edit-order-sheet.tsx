@@ -1,38 +1,24 @@
+import { type Market } from "@mangrovedao/mangrove.js"
+import { DotIcon } from "lucide-react"
+import React from "react"
+
+import { EnhancedNumericInput } from "@/components/token-input"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import { NumericInput } from "@/components/ui/numeric-input"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Sheet,
-  SheetBody,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+import * as SelectRoot from "@/components/ui/select"
+import * as SheetRoot from "@/components/ui/sheet"
 import { cn } from "@/utils"
 import {
   formatDateWithoutHours,
   formatHoursOnly,
   hasExpired,
 } from "@/utils/date"
-import { type Market } from "@mangrovedao/mangrove.js"
-import { DotIcon } from "lucide-react"
-import React from "react"
 import { TimeInForce, TimeToLiveUnit } from "../../../forms/limit/enums"
 import { isGreaterThanZeroValidator } from "../../../forms/limit/validators"
-import { useEditOrder, type Form } from "../hooks/use-edit-order"
+import { useEditOrder } from "../hooks/use-edit-order"
 import { type Order } from "../schema"
 import { getOrderProgress } from "../utils/tables"
 import { Timer } from "./timer"
@@ -85,11 +71,11 @@ export default function EditOrderSheet({
   onClose,
 }: EditOrderSheetProps) {
   if (!order || !market) return null
-  const [formData, setFormData] = React.useState<Form>()
+
   const { handleSubmit, form, setToggleEdit, toggleEdit } = useEditOrder({
-    onSubmit: (formData) => setFormData({ ...formData, isBid }),
     order,
   })
+
   const { base, quote } = market
   const { expiryDate, price, isBid } = order
   const formattedPrice = `${Number(price).toFixed(4)} ${base.symbol}`
@@ -101,15 +87,14 @@ export default function EditOrderSheet({
   )
 
   return (
-    <Sheet open={!!order} onOpenChange={onClose}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Order Details</SheetTitle>
-        </SheetHeader>
-
+    <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
+      <SheetRoot.SheetContent>
+        <SheetRoot.SheetHeader>
+          <SheetRoot.SheetTitle>Order Details</SheetRoot.SheetTitle>
+        </SheetRoot.SheetHeader>
         <form.Provider>
-          <form onSubmit={(e) => handleSubmit(e)} autoComplete="off">
-            <SheetBody className="flex-1">
+          <form onSubmit={handleSubmit} autoComplete="off">
+            <SheetRoot.SheetBody className="flex-1">
               <TokenPair
                 tokenClasses="h-7 w-7"
                 baseToken={base}
@@ -173,15 +158,18 @@ export default function EditOrderSheet({
                       onChange={isGreaterThanZeroValidator}
                     >
                       {(field) => (
-                        <NumericInput
+                        <EnhancedNumericInput
                           className="h-10"
+                          inputClassName="h-10"
                           name={field.name}
                           value={field.state.value}
                           placeholder={formattedPrice}
                           onBlur={field.handleBlur}
                           onChange={(e) => {
+                            console.log(e.target.value)
                             field.handleChange(e.target.value)
                           }}
+                          error={field.state.meta.touchedErrors}
                           disabled={!market}
                         />
                       )}
@@ -207,59 +195,67 @@ export default function EditOrderSheet({
                         onChange={isGreaterThanZeroValidator}
                       >
                         {(field) => (
-                          <NumericInput
+                          <EnhancedNumericInput
                             className="h-10"
+                            inputClassName="h-10"
                             placeholder="1"
                             name={field.name}
                             value={field.state.value}
                             onBlur={field.handleBlur}
                             onChange={({ target: { value } }) => {
-                              if (!value) return
                               field.handleChange(value)
                             }}
                             disabled={!(market && form.state.isFormValid)}
+                            error={field.state.meta.touchedErrors}
                           />
                         )}
                       </form.Field>
 
                       <form.Field name="timeToLiveUnit">
                         {(field) => (
-                          <Select
-                            name={field.name}
-                            value={field.state.value}
-                            onValueChange={(value: TimeToLiveUnit) => {
-                              field.handleChange(value)
-                            }}
-                            disabled={!market}
-                          >
-                            <SelectTrigger className="h-10">
-                              <SelectValue placeholder="Select time unit" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                {Object.values(TimeToLiveUnit).map(
-                                  (timeToLiveUnit) => (
-                                    <SelectItem
-                                      key={timeToLiveUnit}
-                                      value={timeToLiveUnit}
-                                    >
-                                      {timeToLiveUnit}
-                                    </SelectItem>
-                                  ),
-                                )}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
+                          <>
+                            <SelectRoot.Select
+                              name={field.name}
+                              value={field.state.value}
+                              onValueChange={(value: TimeToLiveUnit) => {
+                                field.handleChange(value)
+                              }}
+                              disabled={!market}
+                            >
+                              <SelectRoot.SelectTrigger className="h-10">
+                                <SelectRoot.SelectValue placeholder="Select time unit" />
+                              </SelectRoot.SelectTrigger>
+                              <SelectRoot.SelectContent>
+                                <SelectRoot.SelectGroup>
+                                  {Object.values(TimeToLiveUnit).map(
+                                    (timeToLiveUnit) => (
+                                      <SelectRoot.SelectItem
+                                        key={timeToLiveUnit}
+                                        value={timeToLiveUnit}
+                                      >
+                                        {timeToLiveUnit}
+                                      </SelectRoot.SelectItem>
+                                    ),
+                                  )}
+                                </SelectRoot.SelectGroup>
+                              </SelectRoot.SelectContent>
+                            </SelectRoot.Select>
+                            {field.state.meta.touchedErrors && (
+                              <span className="text-red-400">
+                                {field.state.meta.touchedErrors[0]}
+                              </span>
+                            )}
+                          </>
                         )}
                       </form.Field>
                     </div>
                   )
                 }
               />
-            </SheetBody>
+            </SheetRoot.SheetBody>
 
-            <SheetFooter>
-              <SheetClose className="flex-1">
+            <SheetRoot.SheetFooter>
+              <SheetRoot.SheetClose className="flex-1">
                 <Button
                   className="w-full"
                   variant="secondary"
@@ -275,7 +271,7 @@ export default function EditOrderSheet({
                 >
                   Cancel
                 </Button>
-              </SheetClose>
+              </SheetRoot.SheetClose>
               {!toggleEdit ? (
                 <Button
                   className="flex-1"
@@ -305,10 +301,10 @@ export default function EditOrderSheet({
                   }}
                 </form.Subscribe>
               )}
-            </SheetFooter>
+            </SheetRoot.SheetFooter>
           </form>
         </form.Provider>
-      </SheetContent>
-    </Sheet>
+      </SheetRoot.SheetContent>
+    </SheetRoot.Sheet>
   )
 }
