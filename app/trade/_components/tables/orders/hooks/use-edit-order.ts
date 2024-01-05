@@ -60,15 +60,15 @@ export function useEditOrder(props: Props) {
 
     const orderLP = await LiquidityProvider.connect(orderLogic, gasreq, market)
 
-    // isBid
-    //   ? await orderLP.updateBid(Number(offerId), {
-    //       volume: initialWants,
-    //       price,
-    //     })
-    //   : await orderLP.updateAsk(Number(offerId), {
-    //       volume: initialGives,
-    //       price,
-    //     })
+    isBid
+      ? await orderLP.updateBid(Number(offerId), {
+          volume: initialWants,
+          price,
+        })
+      : await orderLP.updateAsk(Number(offerId), {
+          volume: initialGives,
+          price,
+        })
   }
 
   const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL

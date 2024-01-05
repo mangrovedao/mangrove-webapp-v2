@@ -30,7 +30,7 @@ type SheetLineProps = {
 }
 
 const SheetLine = ({ title, item, secondaryItem }: SheetLineProps) => (
-  <div className="flex justify-between items-center">
+  <div className="flex justify-between">
     <Text className="text-muted-foreground">{title}:</Text>
     <div className="grid justify-items-end">
       <Text>{item}</Text>
@@ -134,10 +134,10 @@ export default function EditOrderSheet({
               <SheetLine title="Type" item="Wallet" />
 
               <SheetLine
-                title="Filled/Amount"
-                item={`${filled} / ${amount} ${base.symbol}`}
+                title="Filled"
+                item={`${filled} ${base.symbol}`}
                 secondaryItem={
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 align-baseline">
                     <CircularProgressBar
                       progress={progress}
                       className="h-5 w-5"
@@ -146,6 +146,7 @@ export default function EditOrderSheet({
                   </div>
                 }
               />
+              <SheetLine title="Amount" item={`${amount} ${base.symbol}`} />
 
               <SheetLine
                 title="Limit Price"
@@ -170,6 +171,7 @@ export default function EditOrderSheet({
                             field.handleChange(e.target.value)
                           }}
                           error={field.state.meta.touchedErrors}
+                          token={quote.symbol}
                           disabled={!market}
                         />
                       )}

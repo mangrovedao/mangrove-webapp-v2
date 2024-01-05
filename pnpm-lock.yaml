@@ -18,8 +18,8 @@ dependencies:
     specifier: 0.0.11-14
     version: 0.0.11-14(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2)
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.0-17
-    version: 2.0.0-17
+    specifier: 2.0.0-18
+    version: 2.0.0-18
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
@@ -3148,8 +3148,8 @@ packages:
       '@mangrovedao/mangrove-core': 2.0.2
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.0-17:
-    resolution: {integrity: sha512-OtpO+6bSwikCgOPCBC90zFTb0JnYWh8igroBLfxw5MoLizmieQAVPoLwIifkHuKiYEkXUguikdL4BdwOyhgccw==}
+  /@mangrovedao/mangrove.js@2.0.0-18:
+    resolution: {integrity: sha512-RniGSKdvHDFSdanS183G5qvWDAvOZqqxb+YWjEkRjl6xRRJed6/6izVfTsKm4CUle5ZFYF5ftp4+SoLJs+sdoQ==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
