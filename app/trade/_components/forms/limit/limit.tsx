@@ -56,7 +56,10 @@ export function Limit() {
     form.validateAllFields("change")
     computeReceiveAmount()
   }
-  const sendTokenBalanceAsBig = Big(Number(sendTokenBalance.formatted) ?? 1)
+
+  const sendTokenBalanceAsBig = sendTokenBalance.formatted
+    ? Big(Number(sendTokenBalance.formatted))
+    : Big(0)
 
   const sliderValue = Math.min(
     Big(Number(send) ?? 0)
