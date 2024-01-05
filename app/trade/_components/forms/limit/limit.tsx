@@ -54,6 +54,10 @@ export function Limit() {
     const amount = (value * Number(sendTokenBalance.formatted)) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
+    if (!form.state.values.limitPrice) {
+      form.setFieldValue("receive", "")
+      return
+    }
     computeReceiveAmount()
   }
 
