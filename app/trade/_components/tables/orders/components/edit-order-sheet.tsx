@@ -8,15 +8,10 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import * as SelectRoot from "@/components/ui/select"
 import * as SheetRoot from "@/components/ui/sheet"
 import { cn } from "@/utils"
-import {
-  formatDateWithoutHours,
-  formatHoursOnly,
-  hasExpired,
-} from "@/utils/date"
-import { TimeInForce, TimeToLiveUnit } from "../../../forms/limit/enums"
+import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
+import { TimeInForce } from "../../../forms/limit/enums"
 import { isGreaterThanZeroValidator } from "../../../forms/limit/validators"
 import { useEditOrder } from "../hooks/use-edit-order"
 import { type Order } from "../schema"
@@ -71,20 +66,27 @@ export default function EditOrderSheet({
   onClose,
 }: EditOrderSheetProps) {
   if (!order || !market) return null
+  const { expiryDate, isBid } = order
+  const {
+    handleSubmit,
+    form,
+    setToggleEdit,
+    toggleEdit,
 
-  const { handleSubmit, form, setToggleEdit, toggleEdit } = useEditOrder({
+    isOrderExpired,
+    formattedPrice,
+  } = useEditOrder({
     order,
+    onSettled: onClose,
   })
-
   const { base, quote } = market
-  const { expiryDate, price, isBid } = order
-  const formattedPrice = `${Number(price).toFixed(4)} ${base.symbol}`
-  const isOrderExpired = expiryDate && hasExpired(expiryDate)
 
-  const { progress, amount, filled, progressInPercent } = getOrderProgress(
-    order,
-    market,
-  )
+  const {
+    progress,
+    progressInPercent,
+    amount: volume,
+    filled,
+  } = getOrderProgress(order, market)
 
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
@@ -93,8 +95,12 @@ export default function EditOrderSheet({
           <SheetRoot.SheetTitle>Order Details</SheetRoot.SheetTitle>
         </SheetRoot.SheetHeader>
         <form.Provider>
-          <form onSubmit={handleSubmit} autoComplete="off">
-            <SheetRoot.SheetBody className="flex-1">
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            className="flex flex-col flex-1"
+          >
+            <SheetRoot.SheetBody>
               <TokenPair
                 tokenClasses="h-7 w-7"
                 baseToken={base}
@@ -146,7 +152,37 @@ export default function EditOrderSheet({
                   </div>
                 }
               />
-              <SheetLine title="Amount" item={`${amount} ${base.symbol}`} />
+              <SheetLine
+                title="Amount"
+                item={
+                  !toggleEdit ? (
+                    `${volume} ${base.symbol}`
+                  ) : (
+                    <form.Field
+                      name="send"
+                      onChange={isGreaterThanZeroValidator}
+                    >
+                      {(field) => (
+                        <EnhancedNumericInput
+                          className="h-10"
+                          inputClassName="h-10"
+                          name={field.name}
+                          value={field.state.value}
+                          placeholder={volume}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => {
+                            console.log(e.target.value)
+                            field.handleChange(e.target.value)
+                          }}
+                          error={field.state.meta.touchedErrors}
+                          token={base.symbol}
+                          disabled={!market}
+                        />
+                      )}
+                    </form.Field>
+                  )
+                }
+              />
 
               <SheetLine
                 title="Limit Price"
@@ -183,96 +219,34 @@ export default function EditOrderSheet({
               <SheetLine
                 title="Time in force"
                 item={TimeInForce.GOOD_TIL_TIME}
-                secondaryItem={
-                  !toggleEdit && expiryDate ? (
-                    <Timer expiry={expiryDate} />
-                  ) : (
-                    <div
-                      className={cn(
-                        "flex justify-between space-x-2 text-primary",
-                      )}
-                    >
-                      <form.Field
-                        name="timeToLive"
-                        onChange={isGreaterThanZeroValidator}
-                      >
-                        {(field) => (
-                          <EnhancedNumericInput
-                            className="h-10"
-                            inputClassName="h-10"
-                            placeholder="1"
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={({ target: { value } }) => {
-                              field.handleChange(value)
-                            }}
-                            disabled={!(market && form.state.isFormValid)}
-                            error={field.state.meta.touchedErrors}
-                          />
-                        )}
-                      </form.Field>
-
-                      <form.Field name="timeToLiveUnit">
-                        {(field) => (
-                          <>
-                            <SelectRoot.Select
-                              name={field.name}
-                              value={field.state.value}
-                              onValueChange={(value: TimeToLiveUnit) => {
-                                field.handleChange(value)
-                              }}
-                              disabled={!market}
-                            >
-                              <SelectRoot.SelectTrigger className="h-10">
-                                <SelectRoot.SelectValue placeholder="Select time unit" />
-                              </SelectRoot.SelectTrigger>
-                              <SelectRoot.SelectContent>
-                                <SelectRoot.SelectGroup>
-                                  {Object.values(TimeToLiveUnit).map(
-                                    (timeToLiveUnit) => (
-                                      <SelectRoot.SelectItem
-                                        key={timeToLiveUnit}
-                                        value={timeToLiveUnit}
-                                      >
-                                        {timeToLiveUnit}
-                                      </SelectRoot.SelectItem>
-                                    ),
-                                  )}
-                                </SelectRoot.SelectGroup>
-                              </SelectRoot.SelectContent>
-                            </SelectRoot.Select>
-                            {field.state.meta.touchedErrors && (
-                              <span className="text-red-400">
-                                {field.state.meta.touchedErrors[0]}
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </form.Field>
-                    </div>
-                  )
-                }
+                secondaryItem={expiryDate && <Timer expiry={expiryDate} />}
               />
             </SheetRoot.SheetBody>
 
             <SheetRoot.SheetFooter>
               <SheetRoot.SheetClose className="flex-1">
-                <Button
-                  className="w-full"
-                  variant="secondary"
-                  size="lg"
-                  onClick={
-                    toggleEdit
-                      ? (e) => {
-                          e.preventDefault()
-                          setToggleEdit(!toggleEdit)
+                <form.Subscribe selector={(state) => [state.isSubmitting]}>
+                  {([isSubmitting]) => {
+                    return (
+                      <Button
+                        className="w-full"
+                        variant="secondary"
+                        size="lg"
+                        onClick={
+                          toggleEdit
+                            ? (e) => {
+                                e.preventDefault()
+                                setToggleEdit(!toggleEdit)
+                              }
+                            : undefined
                         }
-                      : undefined
-                  }
-                >
-                  Cancel
-                </Button>
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </Button>
+                    )
+                  }}
+                </form.Subscribe>
               </SheetRoot.SheetClose>
               {!toggleEdit ? (
                 <Button

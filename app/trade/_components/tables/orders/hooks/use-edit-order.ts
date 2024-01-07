@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
-// import { mangroveOrderConfiguration } from "@mangrovedao/mangrove.js/dist/nodejs/configuration"
-import { LiquidityProvider, configuration } from "@mangrovedao/mangrove.js"
 
 import { useForm } from "@tanstack/react-form"
+import { useQueryClient } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
+import Big from "big.js"
 import React from "react"
+import { toast } from "sonner"
 
+import { TRADE } from "@/app/trade/_constants/loading-keys"
+import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import { useLoadingStore } from "@/stores/loading.store"
+import { hasExpired } from "@/utils/date"
 import { TradeAction } from "../../../forms/enums"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
@@ -24,64 +29,96 @@ export type Form = {
 
 type Props = {
   order: Order
+  onSettled: () => void
 }
 
-export function useEditOrder(props: Props) {
+export function useEditOrder({ order, onSettled }: Props) {
+  const { mangrove } = useMangrove()
+  const { market } = useMarket()
   const {
     offerId,
     initialGives,
     initialWants,
     price: currentPrice,
     isBid,
-  } = props.order
+    expiryDate,
+  } = order
 
-  const { mangrove } = useMangrove()
-  const { market } = useMarket()
+  const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
+  const { quoteToken } = useTradeInfos("market", tradeAction)
+  const [toggleEdit, setToggleEdit] = React.useState(false)
+
+  const displayDecimals = market?.base.displayedDecimals
+
+  const volume = Big(isBid ? initialWants : initialGives).toFixed(
+    displayDecimals,
+  )
+  const formattedPrice = `${Number(currentPrice).toFixed(
+    displayDecimals,
+  )} ${market?.base?.symbol}`
+  const isOrderExpired = expiryDate && hasExpired(expiryDate)
 
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
       limitPrice: currentPrice,
-      send: initialGives,
+      send: volume,
       timeToLive: "1",
       timeToLiveUnit: TimeToLiveUnit.DAY,
       isBid: isBid,
     },
   })
 
+  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
+  const queryClient = useQueryClient()
+  const [startLoading, stopLoading] = useLoadingStore((state) => [
+    state.startLoading,
+    state.stopLoading,
+  ])
+
   const udpdateOffer = async () => {
-    if (!mangrove || !market) return
+    try {
+      if (!mangrove || !market) return
+      const price = form.state.values.limitPrice
+      const volume = form.state.values.send
 
-    const price = form.state.values.limitPrice
-    const orderLogic = mangrove.offerLogic(mangrove.orderContract.address)
-    const gasreq = configuration.mangroveOrder.getRestingOrderGasreq(
-      mangrove.network.name,
-    )
+      form.state.isSubmitting = true
 
-    const orderLP = await LiquidityProvider.connect(orderLogic, gasreq, market)
+      const updateOrder = isBid
+        ? await market.updateRestingOrder("bids", {
+            offerId: Number(offerId),
+            volume,
+            price,
+          })
+        : await market.updateRestingOrder("asks", {
+            offerId: Number(offerId),
+            volume,
+            price,
+          })
 
-    isBid
-      ? await orderLP.updateBid(Number(offerId), {
-          volume: initialWants,
-          price,
-        })
-      : await orderLP.updateAsk(Number(offerId), {
-          volume: initialGives,
-          price,
-        })
+      // Start showing loading state indicator on parts of the UI that depend on
+      startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+      const { blockNumber } = await (await updateOrder.response).wait()
+      await resolveWhenBlockIsIndexed.mutateAsync({
+        blockNumber,
+      })
+      queryClient.invalidateQueries({ queryKey: ["orders"] })
+      queryClient.invalidateQueries({ queryKey: ["fills"] })
+
+      form.state.isSubmitting = false
+      toast.success("Order updated successfully")
+
+      onSettled()
+    } catch (error) {
+      toast.error("An error occured, please try again")
+      form.state.isSubmitting = false
+    }
   }
-
-  const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
-  const { quoteToken } = useTradeInfos("market", tradeAction)
-  const [toggleEdit, setToggleEdit] = React.useState(false)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     e.stopPropagation()
-    udpdateOffer()
-    setTimeout(() => {
-      return true
-    }, 50000)
+    void udpdateOffer()
   }
 
   React.useEffect(() => {
@@ -94,5 +131,9 @@ export function useEditOrder(props: Props) {
     setToggleEdit,
     toggleEdit,
     quoteToken,
+    displayDecimals,
+
+    formattedPrice,
+    isOrderExpired,
   }
 }
