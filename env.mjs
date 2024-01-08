@@ -24,6 +24,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PRICE_API_URL: z.string().url(),
     NEXT_PUBLIC_SENTRY_DSN: z.string().url(),
     NEXT_PUBLIC_SENTRY_PROJECT: z.string(),
+    NEXT_PUBLIC_POSTHOG_KEY: z.string(),
+    NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
   },
 
   /**
@@ -41,6 +43,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PRICE_API_URL: process.env.NEXT_PUBLIC_PRICE_API_URL,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_SENTRY_PROJECT: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

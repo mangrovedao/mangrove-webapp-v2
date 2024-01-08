@@ -9,6 +9,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import posthog from "posthog-js"
+import { useFeatureFlagEnabled } from "posthog-js/react"
 import React from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { toast } from "sonner"
@@ -54,6 +56,12 @@ type Props = React.ComponentProps<"nav"> & {
 export function Navbar({ className, innerClasses, ...props }: Props) {
   const currentRoute = usePathname()
   const clipPathId = React.useId()
+  const showStrategy = useFeatureFlagEnabled("strategies")
+  console.log({ showStrategy })
+  const links = LINKS.filter(
+    (link) => link.href !== "/strategies" || showStrategy,
+  )
+
   return (
     <nav
       className={cn(
@@ -90,7 +98,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
           <Separator orientation="vertical" className="hidden lg:block" />
 
           <div className="space-x-4 lg:space-x-10">
-            {LINKS.map(({ name, href }) => (
+            {links.map(({ name, href }) => (
               <Link
                 key={href}
                 href={href}
@@ -128,6 +136,7 @@ const RightPart = withClientOnly(() => {
   const { disconnect } = useDisconnect()
 
   function handleConnect() {
+    posthog.capture("connect-wallet:click")
     openConnectModal?.()
   }
 
