@@ -69,7 +69,7 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
           blockNumber,
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
-        // queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["fills"] })
       } catch (error) {
         console.error(error)
       }

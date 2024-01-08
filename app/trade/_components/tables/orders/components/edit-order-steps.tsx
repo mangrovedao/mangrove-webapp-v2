@@ -12,38 +12,39 @@ import { ApproveStep } from "../../../forms/components/approve-step"
 import { Steps } from "../../../forms/components/steps"
 import { TradeAction } from "../../../forms/enums"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
-
 import { useUpdateOrder } from "../hooks/use-update-order"
 import { Order } from "../schema"
 import { Form } from "../types"
 
 type Values = { price: string; volume: string }
+type decimals = { base?: number; quote?: number }
 
 type SummaryProps = {
   oldValues: Values
   newValues: Values
+  displayDecimals?: decimals
 }
 
-const Summary = ({ oldValues, newValues }: SummaryProps) => {
+const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
   return (
     <div className="grid space-y-2">
-      <div className="flex justify-between">
+      <div className="flex justify">
         <Label>Old values</Label>
         <Label>New values</Label>
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <Label>Volume</Label>
         <Text className="text-muted-foreground">
-          {Number(oldValues.volume).toFixed(8)}
+          {Number(oldValues.volume).toFixed(displayDecimals?.base)}
         </Text>
-        <Text>{Number(newValues.volume).toFixed(8)}</Text>
+        <Text>{Number(newValues.volume).toFixed(displayDecimals?.base)}</Text>
       </div>
       <div className="flex justify-between">
         <Label>Price</Label>
         <Text className="text-muted-foreground">
-          {Number(oldValues.price).toFixed(8)}
+          {Number(oldValues.price).toFixed(displayDecimals?.quote)}
         </Text>
-        <Text>{Number(newValues.price).toFixed(8)}</Text>
+        <Text>{Number(newValues.price).toFixed(displayDecimals?.quote)}</Text>
       </div>
     </div>
   )
@@ -52,6 +53,7 @@ type Props = {
   order: Order
   form: Form
   onClose: () => void
+  displayDecimals?: decimals
 }
 
 const btnProps: ButtonProps = {
@@ -60,16 +62,17 @@ const btnProps: ButtonProps = {
   size: "lg",
 }
 
-export default function EditOrderSteps({ order, form, onClose }: Props) {
+export default function EditOrderSteps({
+  order,
+  form,
+  onClose,
+  displayDecimals,
+}: Props) {
   const { chain } = useNetwork()
-  const {
-    baseToken,
-    quoteToken,
-    sendToken,
-    receiveToken,
-    isInfiniteAllowance,
-    spender,
-  } = useTradeInfos("limit", TradeAction.SELL)
+  const { sendToken, isInfiniteAllowance, spender } = useTradeInfos(
+    "limit",
+    TradeAction.SELL,
+  )
 
   let steps = ["Update order"]
   if (!isInfiniteAllowance) {
@@ -113,11 +116,12 @@ export default function EditOrderSteps({ order, form, onClose }: Props) {
     !isInfiniteAllowance && {
       body: (
         <Summary
+          displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
             volume: form.isBid ? order.initialGives : order.initialWants,
           }}
-          newValues={{ price: form.send, volume: form.send }}
+          newValues={{ price: form.limitPrice, volume: form.send }}
         />
       ),
       button: (
@@ -152,11 +156,12 @@ export default function EditOrderSteps({ order, form, onClose }: Props) {
     {
       body: (
         <Summary
+          displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
             volume: order.isBid ? order.initialWants : order.initialGives,
           }}
-          newValues={{ price: form.send, volume: form.send }}
+          newValues={{ price: form.limitPrice, volume: form.send }}
         />
       ),
       button: (
@@ -194,10 +199,10 @@ export default function EditOrderSteps({ order, form, onClose }: Props) {
     })
 
   return (
-    <div>
+    <div className="flex flex-col flex-1">
       <div className="text-xl text-left">Proceed transaction</div>
       <Steps steps={steps} currentStep={currentStep} />
-      <div className="space-y-2">
+      <div className="space-y-2 flex flex-col flex-1">
         {stepInfos[currentStep - 1]?.body ?? undefined}
         <div className="bg-[#041010] rounded-lg p-4 flex items-center"></div>
       </div>

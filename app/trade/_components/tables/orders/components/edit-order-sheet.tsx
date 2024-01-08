@@ -1,5 +1,4 @@
 import { type Market } from "@mangrovedao/mangrove.js"
-import { DotIcon } from "lucide-react"
 import React from "react"
 
 import { EnhancedNumericInput } from "@/components/token-input"
@@ -27,13 +26,11 @@ type SheetLineProps = {
 }
 
 const SheetLine = ({ title, item, secondaryItem }: SheetLineProps) => (
-  <div className="flex justify-between">
-    <Text className="text-muted-foreground">{title}:</Text>
-    <div className="grid justify-items-end">
-      <Text>{item}</Text>
-      {secondaryItem && (
-        <Text className="text-muted-foreground">{secondaryItem}</Text>
-      )}
+  <div className="flex justify-between items-center">
+    <Text className="text-muted-foreground whitespace-nowrap">{title}:</Text>
+    <div className="grid justify-items-end max-w-60">
+      {item}
+      {secondaryItem}
     </div>
   </div>
 )
@@ -47,11 +44,11 @@ const Badge = ({
 }) => (
   <div
     className={cn(
-      "flex pl-1 pr-2 justify-between text-green-caribbean bg-primary-dark-green rounded items-center",
+      "flex pl-2 pr-2 py-1 space-x-2 justify-between text-green-caribbean bg-primary-dark-green rounded items-center",
       { "text-red-100 bg-red-950": isExpired },
     )}
   >
-    <DotIcon className="h-6 w-6" />
+    <span className="bg-green-caribbean rounded-full h-[6px] w-[6px]" />
     <Title variant="title3">{title}</Title>
   </div>
 )
@@ -75,12 +72,11 @@ export default function EditOrderSheet({
     form,
     setToggleEdit,
     toggleEdit,
-
+    displayDecimals,
     isOrderExpired,
     formattedPrice,
   } = useEditOrder({
     order,
-    onSettled: onClose,
     onSubmit: (formData) => setFormData(formData),
   })
   const { base, quote } = market
@@ -91,7 +87,7 @@ export default function EditOrderSheet({
     amount: volume,
     filled,
   } = getOrderProgress(order, market)
-
+  console.log(order)
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
       <SheetRoot.SheetContent>
@@ -100,7 +96,12 @@ export default function EditOrderSheet({
         </SheetRoot.SheetHeader>
         <form.Provider>
           {formData ? (
-            <EditOrderSteps order={order} form={formData} onClose={onClose} />
+            <EditOrderSteps
+              order={order}
+              form={formData}
+              onClose={onClose}
+              displayDecimals={displayDecimals}
+            />
           ) : (
             <form
               onSubmit={handleSubmit}
@@ -128,8 +129,12 @@ export default function EditOrderSheet({
                 {expiryDate && (
                   <SheetLine
                     title="Order Date"
-                    item={formatDateWithoutHours(expiryDate)}
-                    secondaryItem={formatHoursOnly(expiryDate)}
+                    item={<Text>{formatDateWithoutHours(expiryDate)}</Text>}
+                    secondaryItem={
+                      <Text className="text-muted-foreground">
+                        {formatHoursOnly(expiryDate)}
+                      </Text>
+                    }
                   />
                 )}
 
@@ -146,11 +151,11 @@ export default function EditOrderSheet({
                   }
                 />
 
-                <SheetLine title="Type" item="Wallet" />
+                <SheetLine title="Type" item={<Text>Wallet</Text>} />
 
                 <SheetLine
                   title="Filled"
-                  item={`${filled} ${base.symbol}`}
+                  item={<Text>{`${filled} ${base.symbol}`}</Text>}
                   secondaryItem={
                     <div className="flex gap-1 align-baseline">
                       <CircularProgressBar
@@ -180,7 +185,6 @@ export default function EditOrderSheet({
                             placeholder={volume}
                             onBlur={field.handleBlur}
                             onChange={(e) => {
-                              console.log(e.target.value)
                               field.handleChange(e.target.value)
                             }}
                             error={field.state.meta.touchedErrors}
@@ -194,10 +198,10 @@ export default function EditOrderSheet({
                 />
 
                 <SheetLine
-                  title="Limit Price"
+                  title="Limit price"
                   item={
                     !toggleEdit ? (
-                      formattedPrice
+                      <Text>{formattedPrice}</Text>
                     ) : (
                       <form.Field
                         name="limitPrice"
@@ -212,7 +216,6 @@ export default function EditOrderSheet({
                             placeholder={formattedPrice}
                             onBlur={field.handleBlur}
                             onChange={(e) => {
-                              console.log(e.target.value)
                               field.handleChange(e.target.value)
                             }}
                             error={field.state.meta.touchedErrors}
@@ -227,16 +230,15 @@ export default function EditOrderSheet({
 
                 <SheetLine
                   title="Time in force"
-                  item={TimeInForce.GOOD_TIL_TIME}
-                  secondaryItem={expiryDate && <Timer expiry={expiryDate} />}
+                  item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
+                  secondaryItem={
+                    expiryDate && (
+                      <Text className="text-muted-foreground">
+                        <Timer expiry={expiryDate} />
+                      </Text>
+                    )
+                  }
                 />
-                {formData && (
-                  <EditOrderSteps
-                    order={order}
-                    form={formData}
-                    onClose={onClose}
-                  />
-                )}
               </SheetRoot.SheetBody>
 
               <SheetRoot.SheetFooter>
