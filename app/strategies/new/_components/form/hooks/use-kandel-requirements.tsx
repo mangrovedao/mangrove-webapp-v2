@@ -124,7 +124,6 @@ export function useKandelRequirements({
         throw e
       }
     },
-    enabled: false, // TODO: remove this line once the SDK has been fixed
-    // enabled: !!(kandelStrategies && generator && market && midPrice),
+    enabled: !!(kandelStrategies && generator && market && midPrice),
   })
 }

@@ -14,9 +14,15 @@ dependencies:
   '@gsap/react':
     specifier: ^2.0.2
     version: 2.0.2(react@18.2.0)
+  '@mangrovedao/context-addresses':
+    specifier: ^1.0.1
+    version: 1.0.1
   '@mangrovedao/indexer-sdk':
     specifier: 0.0.11-14
     version: 0.0.11-14(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2)
+  '@mangrovedao/mangrove-deployments':
+    specifier: ^1.0.2
+    version: 1.0.2
   '@mangrovedao/mangrove.js':
     specifier: 2.0.0-17
     version: 2.0.0-17
@@ -3102,8 +3108,8 @@ packages:
       '@lit-labs/ssr-dom-shim': 1.1.2
     dev: false
 
-  /@mangrovedao/context-addresses@1.0.0:
-    resolution: {integrity: sha512-ok4vLwx2mcWx/cYx0sXrNMU9983LmaLJeditufcMhJXs0mViwPnXsZnwYxV5utTXW0u2qAPxg04bQuUU1WOhCw==}
+  /@mangrovedao/context-addresses@1.0.1:
+    resolution: {integrity: sha512-iQOn7ChyLWk4egrqGrUhOdEXwMrbdFDuJXaudHxaZxktMktdysbbmXZXdMEN3R3QpcCiqeEQptptVSQTzEgTGg==}
     dependencies:
       semver: 7.5.4
     dev: false
@@ -3139,8 +3145,8 @@ packages:
     resolution: {integrity: sha512-qJhW/9MVAk/BddZqRMNRfTwS4BFhe6cJO1fBD60XUDeCrZ0L186yRJ8uUVJKsItOQsE2pe40WiKN0qj8+CkXNw==}
     dev: false
 
-  /@mangrovedao/mangrove-deployments@1.0.0:
-    resolution: {integrity: sha512-XsXDokgh8rhh3lk0nKh3xGcDKhujNs1tOljzmf89paqTkTB8PuvXyoZ5cR71xsrCWsB3tCVkeNl1QQ2NWvbR4Q==}
+  /@mangrovedao/mangrove-deployments@1.0.2:
+    resolution: {integrity: sha512-CvITRqgG+f1tzU9EooQjERJNniYnYxiavpkc6b6zC4H5iWyqwOxtQqwKIM+gd5Cs+mHXxYaT3a/yezO24mG/bw==}
     dependencies:
       semver: 7.5.4
     dev: false
@@ -3156,9 +3162,9 @@ packages:
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
-      '@mangrovedao/context-addresses': 1.0.0
+      '@mangrovedao/context-addresses': 1.0.1
       '@mangrovedao/mangrove-core': 2.0.2
-      '@mangrovedao/mangrove-deployments': 1.0.0
+      '@mangrovedao/mangrove-deployments': 1.0.2
       '@mangrovedao/mangrove-strats': 1.0.1
       '@mangrovedao/reliable-event-subscriber': 1.1.29
       '@types/object-inspect': 1.8.4
