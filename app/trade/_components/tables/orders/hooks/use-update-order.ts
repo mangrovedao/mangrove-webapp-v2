@@ -5,12 +5,12 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import { Form } from "./use-edit-order"
+import { Form } from "../types"
 
 type useUpdateOrderProps = {
   form: Form
   offerId?: string
-  onResult?: () => void
+  onResult?: (tx: string) => void
 }
 
 export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
@@ -40,16 +40,16 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
             price,
           })
 
-      const result = await updateOrder.result
+      await updateOrder.result
 
-      return { updateOrder, result }
+      return { updateOrder }
     },
     meta: {
       error: "Failed to update the limit order",
     },
     onSuccess: async (data) => {
       if (!data) return
-      const { updateOrder, result } = data
+      const { updateOrder } = data
       /*
        * We use a custom callback to handle the success message once it's ready.
        * This is because the onSuccess callback from the mutation will only be triggered
@@ -58,12 +58,18 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
       try {
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-        const { blockNumber } = await (await updateOrder.response).wait()
+
+        const { blockNumber, transactionHash } = await (
+          await updateOrder.response
+        ).wait()
+
+        onResult?.(transactionHash)
+
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber,
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
-        queryClient.invalidateQueries({ queryKey: ["fills"] })
+        // queryClient.invalidateQueries({ queryKey: ["fills"] })
       } catch (error) {
         console.error(error)
       }
