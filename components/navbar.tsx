@@ -57,7 +57,6 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
   const currentRoute = usePathname()
   const clipPathId = React.useId()
   const showStrategy = useFeatureFlagEnabled("strategies")
-  console.log({ showStrategy })
   const links = LINKS.filter(
     (link) => link.href !== "/strategies" || showStrategy,
   )
