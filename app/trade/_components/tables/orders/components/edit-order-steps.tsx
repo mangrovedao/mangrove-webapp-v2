@@ -28,19 +28,24 @@ type SummaryProps = {
 const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
   return (
     <div className="grid space-y-2">
-      <div className="flex justify">
-        <Label>Old values</Label>
-        <Label>New values</Label>
-      </div>
       <div className="flex justify-between items-center">
         <Label>Volume</Label>
-        <Text className="text-muted-foreground">
-          {Number(oldValues.volume).toFixed(displayDecimals?.base)}
-        </Text>
-        <Text>{Number(newValues.volume).toFixed(displayDecimals?.base)}</Text>
+        <div>
+          <Label>Old values</Label>
+          <Text className="text-muted-foreground">
+            {Number(oldValues.volume).toFixed(displayDecimals?.base)}
+          </Text>
+        </div>
+
+        <div>
+          <Label>New values</Label>
+
+          <Text>{Number(newValues.volume).toFixed(displayDecimals?.base)}</Text>
+        </div>
       </div>
       <div className="flex justify-between">
         <Label>Price</Label>
+
         <Text className="text-muted-foreground">
           {Number(oldValues.price).toFixed(displayDecimals?.quote)}
         </Text>

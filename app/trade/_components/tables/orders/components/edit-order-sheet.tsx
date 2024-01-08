@@ -87,7 +87,7 @@ export default function EditOrderSheet({
     amount: volume,
     filled,
   } = getOrderProgress(order, market)
-  console.log(order)
+
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
       <SheetRoot.SheetContent>
