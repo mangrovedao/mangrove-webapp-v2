@@ -21,7 +21,9 @@ const useMangroveContext = () => {
       try {
         const mangrove = await Mangrove.connect({ signer })
         // overwrite the mangrove's configuration thanks to the mangroveConfig env variable
-        mangrove.updateConfiguration(mangroveConfig)
+        if (mangroveConfig) {
+          mangrove.updateConfiguration(mangroveConfig)
+        }
         return mangrove
       } catch (e) {
         const message = getErrorMessage(e)
