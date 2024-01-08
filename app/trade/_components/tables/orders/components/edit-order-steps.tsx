@@ -17,7 +17,7 @@ import { Order } from "../schema"
 import { Form } from "../types"
 
 type Values = { price: string; volume: string }
-type decimals = { base?: number; quote?: number }
+type decimals = { volume?: number; price?: number }
 
 type SummaryProps = {
   oldValues: Values
@@ -33,23 +33,25 @@ const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
         <div>
           <Label>Old values</Label>
           <Text className="text-muted-foreground">
-            {Number(oldValues.volume).toFixed(displayDecimals?.base)}
+            {Number(oldValues.volume).toFixed(displayDecimals?.volume)}
           </Text>
         </div>
 
         <div>
           <Label>New values</Label>
 
-          <Text>{Number(newValues.volume).toFixed(displayDecimals?.base)}</Text>
+          <Text>
+            {Number(newValues.volume).toFixed(displayDecimals?.volume)}
+          </Text>
         </div>
       </div>
       <div className="flex justify-between">
         <Label>Price</Label>
 
         <Text className="text-muted-foreground">
-          {Number(oldValues.price).toFixed(displayDecimals?.quote)}
+          {Number(oldValues.price).toFixed(displayDecimals?.price)}
         </Text>
-        <Text>{Number(newValues.price).toFixed(displayDecimals?.quote)}</Text>
+        <Text>{Number(newValues.price).toFixed(displayDecimals?.price)}</Text>
       </div>
     </div>
   )
@@ -76,7 +78,7 @@ export default function EditOrderSteps({
   const { chain } = useNetwork()
   const { sendToken, isInfiniteAllowance, spender } = useTradeInfos(
     "limit",
-    TradeAction.SELL,
+    order.isBid ? TradeAction.BUY : TradeAction.SELL,
   )
 
   let steps = ["Update order"]

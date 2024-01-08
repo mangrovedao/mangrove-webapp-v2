@@ -71,7 +71,10 @@ export function useEditOrder({ order, onSubmit }: Props) {
     setToggleEdit,
     toggleEdit,
     quoteToken,
-    displayDecimals: { base: baseDecimals, quote: quoteDecimals },
+    displayDecimals: {
+      volume: isBid ? quoteDecimals : baseDecimals,
+      price: quoteDecimals,
+    },
     formattedPrice,
     isOrderExpired,
   }

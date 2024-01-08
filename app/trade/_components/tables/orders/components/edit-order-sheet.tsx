@@ -87,7 +87,7 @@ export default function EditOrderSheet({
     amount: volume,
     filled,
   } = getOrderProgress(order, market)
-
+  console.log(order)
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
       <SheetRoot.SheetContent>
@@ -155,7 +155,11 @@ export default function EditOrderSheet({
 
                 <SheetLine
                   title="Filled"
-                  item={<Text>{`${filled} ${base.symbol}`}</Text>}
+                  item={
+                    <Text>{`${filled} ${
+                      isBid ? base.symbol : quote.symbol
+                    }`}</Text>
+                  }
                   secondaryItem={
                     <div className="flex gap-1 align-baseline">
                       <CircularProgressBar
@@ -170,7 +174,7 @@ export default function EditOrderSheet({
                   title="Amount"
                   item={
                     !toggleEdit ? (
-                      `${volume} ${base.symbol}`
+                      `${volume} ${isBid ? quote.symbol : base.symbol}`
                     ) : (
                       <form.Field
                         name="send"
@@ -188,7 +192,7 @@ export default function EditOrderSheet({
                               field.handleChange(e.target.value)
                             }}
                             error={field.state.meta.touchedErrors}
-                            token={base.symbol}
+                            token={isBid ? quote.symbol : base.symbol}
                             disabled={!market}
                           />
                         )}
