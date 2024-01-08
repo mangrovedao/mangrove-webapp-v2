@@ -7,7 +7,7 @@ export function TokenBalance(props: {
   token?: Token | string
   label?: string
   action?: {
-    onClick: () => void
+    onClick: (value: string) => void
     text: string
   }
 }) {
@@ -26,7 +26,7 @@ export function TokenBalance(props: {
           {props?.action && (
             <button
               className="text-xs underline"
-              onClick={props?.action.onClick}
+              onClick={() => formatted && props?.action?.onClick(formatted)}
             >
               {props?.action.text}
             </button>
