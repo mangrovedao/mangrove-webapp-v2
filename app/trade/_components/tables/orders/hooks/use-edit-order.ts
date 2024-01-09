@@ -47,9 +47,9 @@ export function useEditOrder({ order, onSubmit }: Props) {
   })
 
   const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
-  const { quoteToken } = useTradeInfos("limit", tradeAction)
+  const { sendTokenBalance } = useTradeInfos("limit", tradeAction)
   const [toggleEdit, setToggleEdit] = React.useState(false)
-
+  console.log(order)
   const formattedPrice = `${Number(currentPrice).toFixed(
     quoteDecimals,
   )} ${market?.quote?.symbol}`
@@ -70,12 +70,12 @@ export function useEditOrder({ order, onSubmit }: Props) {
     form,
     setToggleEdit,
     toggleEdit,
-    quoteToken,
+    isOrderExpired,
+    formattedPrice,
+    sendTokenBalance,
     displayDecimals: {
       volume: isBid ? quoteDecimals : baseDecimals,
       price: quoteDecimals,
     },
-    formattedPrice,
-    isOrderExpired,
   }
 }

@@ -11,7 +11,10 @@ import * as SheetRoot from "@/components/ui/sheet"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { TimeInForce } from "../../../forms/limit/enums"
-import { isGreaterThanZeroValidator } from "../../../forms/limit/validators"
+import {
+  isGreaterThanZeroValidator,
+  sendValidator,
+} from "../../../forms/limit/validators"
 import { useEditOrder } from "../hooks/use-edit-order"
 import { type Order } from "../schema"
 import { Form } from "../types"
@@ -75,19 +78,18 @@ export default function EditOrderSheet({
     displayDecimals,
     isOrderExpired,
     formattedPrice,
+    sendTokenBalance,
   } = useEditOrder({
     order,
     onSubmit: (formData) => setFormData(formData),
   })
   const { base, quote } = market
 
-  const {
-    progress,
-    progressInPercent,
-    amount: volume,
-    filled,
-  } = getOrderProgress(order, market)
-  console.log(order)
+  const { progress, progressInPercent, volume, filled } = getOrderProgress(
+    order,
+    market,
+  )
+
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
       <SheetRoot.SheetContent>
@@ -174,11 +176,15 @@ export default function EditOrderSheet({
                   title="Amount"
                   item={
                     !toggleEdit ? (
-                      `${volume} ${isBid ? quote.symbol : base.symbol}`
+                      <Text>{`${volume} ${
+                        isBid ? quote.symbol : base.symbol
+                      }`}</Text>
                     ) : (
                       <form.Field
                         name="send"
-                        onChange={isGreaterThanZeroValidator}
+                        onChange={sendValidator(
+                          Number(sendTokenBalance.formatted ?? 0),
+                        )}
                       >
                         {(field) => (
                           <EnhancedNumericInput
@@ -194,6 +200,7 @@ export default function EditOrderSheet({
                             error={field.state.meta.touchedErrors}
                             token={isBid ? quote.symbol : base.symbol}
                             disabled={!market}
+                            showBalance
                           />
                         )}
                       </form.Field>
