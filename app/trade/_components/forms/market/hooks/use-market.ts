@@ -1,11 +1,15 @@
 "use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Market, Token } from "@mangrovedao/mangrove.js"
 import { useForm } from "@tanstack/react-form"
 import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
+import Big from "big.js"
 import React from "react"
 
+import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
+import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
@@ -14,8 +18,44 @@ type Props = {
   onSubmit: (data: Form) => void
 }
 
+const determinePrices = (
+  quoteToken?: Token,
+  orderBook?: {
+    asks: Market.Offer[]
+    bids: Market.Offer[]
+  } | null,
+  marketPrice?: number,
+) => {
+  const bids = orderBook?.bids
+  const asks = orderBook?.asks
+
+  const highestAskPrice = asks?.[asks.length - 1]?.price
+  const lowestAskPrice = asks?.[0]?.price
+  const highestBidPrice = bids?.[0]?.price
+
+  const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
+
+  const avgPrice =
+    lowestAskPrice && highestBidPrice
+      ? Number(lowestAskPrice) + Number(highestBidPrice) / 2
+      : marketPrice
+
+  const priceDecimals = determinePriceDecimalsFromToken(
+    bigestPrice.toNumber(),
+    quoteToken,
+  )
+
+  return {
+    avgPrice,
+    priceDecimals,
+  }
+}
+
 export function useMarketForm(props: Props) {
-  const { market, marketInfo } = useMarket()
+  const [estimateFrom, setEstimateFrom] = React.useState<
+    "send" | "receive" | undefined
+  >()
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -28,19 +68,26 @@ export function useMarketForm(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const [estimateFrom, setEstimateFrom] = React.useState<
-    "send" | "receive" | undefined
-  >()
   const tradeAction = form.useStore((state) => state.values.tradeAction)
   const send = form.useStore((state) => state.values.send)
   const receive = form.useStore((state) => state.values.receive)
-  const { sendToken, receiveToken, sendTokenBalance } = useTradeInfos(
-    "market",
-    tradeAction,
+
+  const { market, marketInfo, requestBookQuery: orderBook } = useMarket()
+  const { sendToken, quoteToken, receiveToken, sendTokenBalance } =
+    useTradeInfos("market", tradeAction)
+
+  const { data: marketPrice } = useTokenPriceQuery(
+    market?.base?.symbol,
+    market?.quote?.symbol,
+  )
+
+  const { avgPrice, priceDecimals } = determinePrices(
+    quoteToken,
+    orderBook.data,
+    marketPrice?.close,
   )
 
   const { data: estimatedVolume } = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "estimateVolume",
       market?.base.address,
@@ -121,8 +168,10 @@ export function useMarketForm(props: Props) {
     handleSubmit,
     form,
     market,
+    avgPrice: avgPrice?.toFixed(priceDecimals),
     sendToken,
     send,
+    quote: market?.quote,
     receiveToken,
     tickSize: marketInfo?.tickSpacing.toString(),
     estimatedFee: estimatedVolume?.estimatedFee.toString(),

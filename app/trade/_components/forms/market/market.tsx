@@ -40,6 +40,8 @@ export function Market() {
     estimatedFee,
     hasEnoughVolume,
     send,
+    quote,
+    avgPrice,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
   const handleSliderChange = (value: number) => {
@@ -182,7 +184,9 @@ export function Market() {
               <span className="text-muted-foreground text-xs">
                 Average market price
               </span>
-              <span className="text-xs">$0.00</span>
+              <span className="text-xs">
+                {avgPrice} {quote?.symbol}
+              </span>
             </div>
             <Separator className="!my-6" />
             <form.Field name="slippage">
