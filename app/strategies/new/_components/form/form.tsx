@@ -12,7 +12,7 @@ import { useDebounce } from "usehooks-ts"
 import { useNewStratStore } from "../../_stores/new-strat.store"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
-import { MustBeBetweenInfo } from "./components/must-be-between-info"
+import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
 import { useKandelRequirements } from "./hooks/use-kandel-requirements"
 
 type ChangingFrom =
@@ -25,9 +25,9 @@ type ChangingFrom =
   | undefined
   | null
 
-const [MIN_PRICE_POINTS, MAX_PRICE_POINTS] = [2, 255]
-const [MIN_RATIO, MAX_RATIO] = [1.00001, 2]
-const [MIN_STEP_SIZE, MAX_STEP_SIZE] = [1, 8]
+const MIN_PRICE_POINTS = 2
+const MIN_RATIO = 1.0001
+const MIN_STEP_SIZE = 1
 
 export function Form({ className }: { className?: string }) {
   const { address } = useAccount()
@@ -72,8 +72,20 @@ export function Form({ className }: { className?: string }) {
     pricePoints: debouncedPricePoints,
   })
 
-  const { requiredBase, requiredQuote, requiredBounty } =
+  const { requiredBase, requiredQuote, requiredBounty, offersWithPrices } =
     kandelRequirementsQuery.data || {}
+
+  const setOffersWithPrices = useNewStratStore(
+    (store) => store.setOffersWithPrices,
+  )
+
+  React.useEffect(() => {
+    setOffersWithPrices(offersWithPrices)
+  }, [offersWithPrices])
+
+  React.useEffect(() => {
+    setOffersWithPrices(offersWithPrices)
+  }, [offersWithPrices])
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)
@@ -147,29 +159,20 @@ export function Form({ className }: { className?: string }) {
       delete newErrors.quoteDeposit
     }
 
-    if (
-      Number(pricePoints) > Number(MAX_PRICE_POINTS) ||
-      (Number(pricePoints) < Number(MIN_PRICE_POINTS) && pricePoints)
-    ) {
+    if (Number(pricePoints) < Number(MIN_PRICE_POINTS) && pricePoints) {
       newErrors.pricePoints =
         "Price points must be between 2 and 255 (inclusive)"
     } else {
       delete newErrors.pricePoints
     }
 
-    if (
-      Number(ratio) > Number(MAX_RATIO) ||
-      (Number(ratio) < Number(MIN_RATIO) && ratio)
-    ) {
+    if (Number(ratio) < Number(MIN_RATIO) && ratio) {
       newErrors.ratio = "Ratio must be between 1.00001 and 2 (inclusive)"
     } else {
       delete newErrors.ratio
     }
 
-    if (
-      Number(stepSize) > Number(MAX_STEP_SIZE) ||
-      (Number(stepSize) < Number(MIN_STEP_SIZE) && stepSize)
-    ) {
+    if (Number(stepSize) < Number(MIN_STEP_SIZE) && stepSize) {
       newErrors.stepSize = "Step size must be between 1 and 8 (inclusive)"
     } else {
       delete newErrors.stepSize
@@ -285,9 +288,8 @@ export function Form({ className }: { className?: string }) {
               isChangingFrom === "pricePoints" ? errors.pricePoints : undefined
             }
           />
-          <MustBeBetweenInfo
+          <MustBeAtLeastInfo
             min={MIN_PRICE_POINTS}
-            max={MAX_PRICE_POINTS}
             onMinClicked={handlePricePointsChange}
           />
         </div>
@@ -300,11 +302,7 @@ export function Form({ className }: { className?: string }) {
             disabled={fieldsDisabled}
             error={isChangingFrom === "ratio" ? errors.ratio : undefined}
           />
-          <MustBeBetweenInfo
-            min={MIN_RATIO}
-            max={MAX_RATIO}
-            onMinClicked={handleRatioChange}
-          />
+          <MustBeAtLeastInfo min={MIN_RATIO} onMinClicked={handleRatioChange} />
         </div>
         <div>
           <EnhancedNumericInput
@@ -314,9 +312,8 @@ export function Form({ className }: { className?: string }) {
             disabled={fieldsDisabled}
             error={isChangingFrom === "stepSize" ? errors.stepSize : undefined}
           />
-          <MustBeBetweenInfo
+          <MustBeAtLeastInfo
             min={MIN_STEP_SIZE}
-            max={MAX_STEP_SIZE}
             onMinClicked={handleStepSizeChange}
           />
         </div>

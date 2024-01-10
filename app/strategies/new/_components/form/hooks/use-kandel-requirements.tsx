@@ -75,7 +75,7 @@ export function useKandelRequirements({
           minimumBasePerOffer,
           minimumQuotePerOffer,
           distributionParams: {
-            generateFromMid: true,
+            generateFromMid: false,
             minPrice,
             maxPrice,
             stepSize: Number(stepSize) ?? config.stepSize,
@@ -87,6 +87,8 @@ export function useKandelRequirements({
         // Calculate a candidate distribution with the recommended minimum volumes given the price range.
         const minimumDistribution =
           await generator.calculateMinimumDistribution(param)
+
+        //minimumDistribution.getPriceRatio()
 
         // requiredBase / quote => minimum to use in the fields
         const { requiredBase, requiredQuote } =
@@ -101,6 +103,12 @@ export function useKandelRequirements({
             availableBase,
             availableQuote,
           })
+
+        const offers = distribution.getOffersWithPrices()
+        const offersWithPrices = {
+          asks: offers.asks.filter((offer) => offer.gives.gt(0)),
+          bids: offers.bids.filter((offer) => offer.gives.gt(0)),
+        }
 
         // minimum allowed value for gas (or bounty)
         const requiredBounty =
@@ -118,6 +126,7 @@ export function useKandelRequirements({
           requiredQuote,
           requiredBounty,
           distribution,
+          offersWithPrices,
         }
       } catch (e) {
         console.error(e)

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
-import Big from "big.js"
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
@@ -28,72 +27,6 @@ type ChangingFrom =
   | undefined
   | null
 
-const calculateGeometricKandelDistribution = (
-  minPrice: string,
-  maxPrice: string,
-  midPrice?: number | null,
-): {
-  bids: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[]
-  asks: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[]
-} => {
-  const minPriceNumber = Number(minPrice)
-  const maxPriceNumber = Number(maxPrice)
-  const numOffers = 5
-  const priceStep = (maxPriceNumber - minPriceNumber) / (numOffers - 1)
-  const bids: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[] = []
-  const asks: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[] = []
-
-  if (!midPrice) return { bids: [], asks: [] }
-
-  if (!midPrice && bids.length > 0 && asks.length > 0) {
-    const highestBid = Math.max(...bids.map((bid) => Number(bid.price)))
-    const lowestAsk = Math.min(...asks.map((ask) => Number(ask.price)))
-    midPrice = (highestBid + lowestAsk) / 2
-  }
-
-  for (let i = 0; i < numOffers; i++) {
-    const tick = i * priceStep
-    const price = new Big(minPriceNumber + tick)
-    const offer = {
-      index: i,
-      gives: new Big(0), // replace with the correct value
-      tick: tick, // use the calculated tick value
-      price: price, // use the calculated price value
-    }
-
-    if (price.lt(midPrice)) {
-      bids.push(offer)
-    } else {
-      asks.push(offer)
-    }
-  }
-
-  return {
-    bids: bids,
-    asks: asks,
-  }
-}
-
 export const PriceRange = withClientOnly(function ({
   className,
 }: {
@@ -112,13 +45,12 @@ export const PriceRange = withClientOnly(function ({
   const [maxPrice, setMaxPrice] = React.useState("")
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
-  const setPriceRange = useNewStratStore((store) => store.setPriceRange)
-
-  const geometricKandelDistribution = calculateGeometricKandelDistribution(
-    minPrice,
-    maxPrice,
-    midPrice,
-  )
+  const [setPriceRange, offersWithPrices, setOffersWithPrices] =
+    useNewStratStore((store) => [
+      store.setPriceRange,
+      store.offersWithPrices,
+      store.setOffersWithPrices,
+    ])
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
@@ -257,6 +189,7 @@ export const PriceRange = withClientOnly(function ({
   )
 
   React.useEffect(() => {
+    if (offersWithPrices) setOffersWithPrices(undefined)
     if (!minPrice || !maxPrice) return
     debouncedSetPriceRange(minPrice, maxPrice)
   }, [minPrice, maxPrice])
@@ -266,9 +199,7 @@ export const PriceRange = withClientOnly(function ({
       <div className="border-b">
         <div className="flex justify-between items-center px-6 pb-8">
           <AverageReturn percentage={1.5} />
-          <RiskAppetiteBadge
-            value={riskAppetite}
-          />
+          <RiskAppetiteBadge value={riskAppetite} />
           <LiquiditySource />
         </div>
       </div>
@@ -282,7 +213,7 @@ export const PriceRange = withClientOnly(function ({
           priceRange={priceRange}
           initialMidPrice={midPrice}
           isLoading={requestBookQuery.status === "pending"}
-          geometricKandelDistribution={geometricKandelDistribution}
+          geometricKandelDistribution={offersWithPrices}
         />
 
         <div className="gap-6 xl:gap-4 flex flex-col xl:flex-row w-full justify-center items-start border-b pb-6 mb-6">

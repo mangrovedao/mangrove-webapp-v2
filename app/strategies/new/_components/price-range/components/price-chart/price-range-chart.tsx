@@ -66,6 +66,7 @@ export function PriceRangeChart({
   geometricKandelDistribution,
 }: PriceRangeChartProps) {
   const { ref, width = 0, height = 0 } = useResizeObserver()
+  const [isMovingRange, setIsMovingRange] = React.useState(false)
   const offers = [
     ...bids.map((bid) => ({ ...bid, type: "bid" })),
     ...asks.map((ask) => ({ ...ask, type: "ask" })),
@@ -307,12 +308,14 @@ export function PriceRangeChart({
                   width={width - paddingRight}
                   height={height - paddingBottom}
                   onBrushEnd={(selectedRange) => {
+                    setIsMovingRange(false)
                     setSelectedPriceRange(selectedRange)
                     if (onPriceRangeChange && selectedRange) {
                       onPriceRangeChange(selectedRange)
                     }
                   }}
                   onBrushChange={(selectedRange) => {
+                    setIsMovingRange(true)
                     setSelectedPriceRange(selectedRange)
                     if (onPriceRangeChange && selectedRange) {
                       onPriceRangeChange(selectedRange)
@@ -323,7 +326,7 @@ export function PriceRangeChart({
                   viewOnly={viewOnly}
                   midPrice={midPrice}
                 />
-                {priceRange?.[0] && priceRange?.[1] && (
+                {!isMovingRange && priceRange?.[0] && priceRange?.[1] && (
                   <GeometricKandelDistributionDots
                     height={height}
                     paddingBottom={paddingBottom}
