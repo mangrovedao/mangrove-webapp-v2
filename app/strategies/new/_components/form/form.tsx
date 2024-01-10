@@ -15,7 +15,7 @@ import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
 import { useKandelRequirements } from "./hooks/use-kandel-requirements"
 
-type ChangingFrom =
+export type ChangingFrom =
   | "baseDeposit"
   | "quoteDeposit"
   | "pricePoints"
@@ -26,7 +26,7 @@ type ChangingFrom =
   | null
 
 const MIN_PRICE_POINTS = 2
-const MIN_RATIO = 1.0001
+const MIN_RATIO = 1.001
 const MIN_STEP_SIZE = 1
 
 export function Form({ className }: { className?: string }) {
@@ -49,8 +49,8 @@ export function Form({ className }: { className?: string }) {
 
   const [baseDeposit, setBaseDeposit] = React.useState("")
   const [quoteDeposit, setQuoteDeposit] = React.useState("")
-  const [pricePoints, setPricePoints] = React.useState("2")
-  const [ratio, setRatio] = React.useState("1.5")
+  const [pricePoints, setPricePoints] = React.useState("10")
+  const [ratio, setRatio] = React.useState("")
   const [stepSize, setStepSize] = React.useState("1")
   const [bountyDeposit, setBountyDeposit] = React.useState("")
 
@@ -70,18 +70,38 @@ export function Form({ className }: { className?: string }) {
     quoteDeposit: debouncedQuoteDeposit,
     stepSize: debouncedStepSize,
     pricePoints: debouncedPricePoints,
+    ratio,
+    isChangingFrom,
   })
 
-  const { requiredBase, requiredQuote, requiredBounty, offersWithPrices } =
-    kandelRequirementsQuery.data || {}
+  const {
+    requiredBase,
+    requiredQuote,
+    requiredBounty,
+    offersWithPrices,
+    priceRatio,
+    pricePoints: points,
+  } = kandelRequirementsQuery.data || {}
 
   const setOffersWithPrices = useNewStratStore(
     (store) => store.setOffersWithPrices,
   )
 
+  // Update ratio field if number of price points is changing
   React.useEffect(() => {
-    setOffersWithPrices(offersWithPrices)
-  }, [offersWithPrices])
+    if (isChangingFrom === "ratio" || !priceRatio) return
+    setRatio(priceRatio.toFixed(4))
+  }, [priceRatio])
+
+  React.useEffect(() => {
+    if (
+      isChangingFrom === "pricePoints" ||
+      !points ||
+      Number(pricePoints) === points
+    )
+      return
+    setPricePoints(points.toString())
+  }, [points])
 
   React.useEffect(() => {
     setOffersWithPrices(offersWithPrices)

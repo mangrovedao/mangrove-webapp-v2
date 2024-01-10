@@ -4,6 +4,8 @@ import { BigSource } from "big.js"
 
 import useKandel from "@/providers/kandel-strategies"
 import useMarket from "@/providers/market"
+import { getErrorMessage } from "@/utils/errors"
+import { ChangingFrom } from "../form"
 
 type Params = {
   onAave?: boolean
@@ -13,6 +15,8 @@ type Params = {
   baseDeposit: string
   quoteDeposit: string
   pricePoints: number | string
+  ratio?: number | string
+  isChangingFrom?: ChangingFrom
 }
 
 export function useKandelRequirements({
@@ -23,6 +27,8 @@ export function useKandelRequirements({
   baseDeposit,
   quoteDeposit,
   pricePoints,
+  ratio,
+  isChangingFrom,
 }: Params) {
   const { market, midPrice } = useMarket()
   const { kandelStrategies, generator, config } = useKandel()
@@ -39,6 +45,7 @@ export function useKandelRequirements({
       onAave,
       market?.base.id,
       market?.quote?.id,
+      ratio,
     ],
     queryFn: async () => {
       if (
@@ -80,15 +87,15 @@ export function useKandelRequirements({
             maxPrice,
             stepSize: Number(stepSize) ?? config.stepSize,
             midPrice,
-            pricePoints: Number(pricePoints),
+            pricePoints:
+              isChangingFrom !== "ratio" ? Number(pricePoints) : undefined,
+            priceRatio: isChangingFrom === "ratio" ? Number(ratio) : undefined,
           },
         }
 
         // Calculate a candidate distribution with the recommended minimum volumes given the price range.
         const minimumDistribution =
           await generator.calculateMinimumDistribution(param)
-
-        //minimumDistribution.getPriceRatio()
 
         // requiredBase / quote => minimum to use in the fields
         const { requiredBase, requiredQuote } =
@@ -127,10 +134,15 @@ export function useKandelRequirements({
           requiredBounty,
           distribution,
           offersWithPrices,
+          priceRatio: minimumDistribution.getPriceRatio(),
+          pricePoints: minimumDistribution.pricePoints,
         }
       } catch (e) {
-        console.error(e)
-        throw e
+        const message = getErrorMessage(e)
+        if (message.includes("revert")) {
+          throw new Error("An error occured")
+        }
+        throw message
       }
     },
     enabled: !!(kandelStrategies && generator && market && midPrice),
