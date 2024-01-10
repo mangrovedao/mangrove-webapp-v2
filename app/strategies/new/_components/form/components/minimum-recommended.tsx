@@ -19,7 +19,7 @@ export function MinimumRecommended({
   action,
 }: Props) {
   const tokenSymbol = typeof token === "string" ? token : token?.symbol
-  const decimals = typeof token === "string" ? 4 : token?.displayedDecimals
+  const decimals = typeof token === "string" ? 6 : token?.displayedDecimals
 
   return (
     <div className="flex justify-between items-center mt-1">

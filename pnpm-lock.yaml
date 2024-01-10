@@ -24,8 +24,8 @@ dependencies:
     specifier: ^1.0.2
     version: 1.0.2
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.0-17
-    version: 2.0.0-17
+    specifier: 2.0.0-20
+    version: 2.0.0-20
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
@@ -3124,8 +3124,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@mangrovedao/mangrove-core@2.0.2:
-    resolution: {integrity: sha512-qJhW/9MVAk/BddZqRMNRfTwS4BFhe6cJO1fBD60XUDeCrZ0L186yRJ8uUVJKsItOQsE2pe40WiKN0qj8+CkXNw==}
+  /@mangrovedao/mangrove-core@2.0.3:
+    resolution: {integrity: sha512-3xNA6qnU2zBbHUOhgl0s98oMVF9+yCR5LRyY7cYyNUBZPxzWA2528vct9EQiGFAQEHDIaeYOWGBGkFl7UprJjw==}
     dev: false
 
   /@mangrovedao/mangrove-deployments@1.0.2:
@@ -3134,21 +3134,27 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove-strats@1.0.1:
-    resolution: {integrity: sha512-3YhLKxp71JDDV7F5Tv7VzQ7hr6K9pcL/FW10wjHW436kCOYpR4Nmp03qX3sUbX24RFwRj1Q2cUO3TK2Oxs2PYQ==}
+  /@mangrovedao/mangrove-deployments@1.0.3:
+    resolution: {integrity: sha512-kH7tdRtjct9dH2wE5ImnPkmwl2YL+/mD445rWazpS+Nb+LLvumL5pJCxnWBuqKUAvGbyIgD7kKfyBt9Yo2dOUw==}
     dependencies:
-      '@mangrovedao/mangrove-core': 2.0.2
+      semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.0-17:
-    resolution: {integrity: sha512-OtpO+6bSwikCgOPCBC90zFTb0JnYWh8igroBLfxw5MoLizmieQAVPoLwIifkHuKiYEkXUguikdL4BdwOyhgccw==}
+  /@mangrovedao/mangrove-strats@1.0.2:
+    resolution: {integrity: sha512-rG+a2/gN+ZTL/51VB0Wy/dFcXhpvrS70N1EfQxVhrcyk9pBEEtaA1FUrsJCjMR/Zw3hoMGIK2hdhfvGLPFZw2g==}
+    dependencies:
+      '@mangrovedao/mangrove-core': 2.0.3
+    dev: false
+
+  /@mangrovedao/mangrove.js@2.0.0-20:
+    resolution: {integrity: sha512-k3b3qt56eBN1iaeuL4eTiryllhgvv/GY8oGAS/gfn5KBcZ8XhZ2XShq3o/O0Ym1mQrJvS4Fg/IYhORDKLcsniA==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
       '@mangrovedao/context-addresses': 1.0.1
-      '@mangrovedao/mangrove-core': 2.0.2
-      '@mangrovedao/mangrove-deployments': 1.0.2
-      '@mangrovedao/mangrove-strats': 1.0.1
+      '@mangrovedao/mangrove-core': 2.0.3
+      '@mangrovedao/mangrove-deployments': 1.0.3
+      '@mangrovedao/mangrove-strats': 1.0.2
       '@mangrovedao/reliable-event-subscriber': 1.1.29
       '@types/object-inspect': 1.8.4
       '@types/triple-beam': 1.3.5

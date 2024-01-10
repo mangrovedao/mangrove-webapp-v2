@@ -24,7 +24,7 @@
     "@mangrovedao/context-addresses": "^1.0.1",
     "@mangrovedao/indexer-sdk": "0.0.11-14",
     "@mangrovedao/mangrove-deployments": "^1.0.2",
-    "@mangrovedao/mangrove.js": "2.0.0-17",
+    "@mangrovedao/mangrove.js": "2.0.0-20",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.5",
