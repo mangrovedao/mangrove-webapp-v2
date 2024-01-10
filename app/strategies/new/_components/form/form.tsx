@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import { getErrorMessage } from "@/utils/errors"
 import { useDebounce } from "usehooks-ts"
 import { useNewStratStore } from "../../_stores/new-strat.store"
 import { Fieldset } from "../fieldset"
@@ -60,6 +61,7 @@ export function Form({ className }: { className?: string }) {
   const debouncedPricePoints = useDebounce(pricePoints, 300)
 
   const [minPrice, maxPrice] = useNewStratStore((store) => store.priceRange)
+  const setGlobalError = useNewStratStore((store) => store.setError)
   const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
@@ -86,6 +88,15 @@ export function Form({ className }: { className?: string }) {
   const setOffersWithPrices = useNewStratStore(
     (store) => store.setOffersWithPrices,
   )
+
+  // if kandelRequirementsQuery has error
+  React.useEffect(() => {
+    if (kandelRequirementsQuery.error) {
+      setGlobalError(getErrorMessage(kandelRequirementsQuery.error))
+      return
+    }
+    setGlobalError(undefined)
+  }, [kandelRequirementsQuery.error])
 
   // Update ratio field if number of price points is changing
   React.useEffect(() => {
@@ -180,20 +191,25 @@ export function Form({ className }: { className?: string }) {
     }
 
     if (Number(pricePoints) < Number(MIN_PRICE_POINTS) && pricePoints) {
-      newErrors.pricePoints =
-        "Price points must be between 2 and 255 (inclusive)"
+      newErrors.pricePoints = "Price points must be at least 2"
     } else {
       delete newErrors.pricePoints
     }
 
     if (Number(ratio) < Number(MIN_RATIO) && ratio) {
-      newErrors.ratio = "Ratio must be between 1.00001 and 2 (inclusive)"
+      newErrors.ratio = "Ratio must be at least 1.001"
     } else {
       delete newErrors.ratio
     }
 
-    if (Number(stepSize) < Number(MIN_STEP_SIZE) && stepSize) {
-      newErrors.stepSize = "Step size must be between 1 and 8 (inclusive)"
+    debugger
+    if (
+      (Number(stepSize) < Number(MIN_STEP_SIZE) ||
+        Number(stepSize) >= Number(pricePoints)) &&
+      stepSize
+    ) {
+      newErrors.stepSize =
+        "Step size must be at least 1 and inferior to price points"
     } else {
       delete newErrors.stepSize
     }

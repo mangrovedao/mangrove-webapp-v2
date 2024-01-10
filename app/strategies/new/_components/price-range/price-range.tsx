@@ -45,11 +45,12 @@ export const PriceRange = withClientOnly(function ({
   const [maxPrice, setMaxPrice] = React.useState("")
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
-  const [setPriceRange, offersWithPrices, setOffersWithPrices] =
+  const [setPriceRange, offersWithPrices, setOffersWithPrices, globalError] =
     useNewStratStore((store) => [
       store.setPriceRange,
       store.offersWithPrices,
       store.setOffersWithPrices,
+      store.error,
     ])
 
   const priceRange: [number, number] | undefined =
@@ -272,6 +273,15 @@ export const PriceRange = withClientOnly(function ({
             </div>
           )}
         </div>
+
+        {globalError && (
+          <p
+            role="aria-live"
+            className="text-red-100 text-md leading-4 mt-1 mb-2 w-full text-center"
+          >
+            {globalError}
+          </p>
+        )}
 
         <div className="flex justify-between">
           <Button

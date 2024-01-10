@@ -140,7 +140,7 @@ export function useKandelRequirements({
       } catch (e) {
         const message = getErrorMessage(e)
         if (message.includes("revert")) {
-          throw new Error("An error occured")
+          throw new Error(`Error: one of the parameters is invalid`)
         }
         throw message
       }
