@@ -4,12 +4,12 @@ import { Market, Token } from "@mangrovedao/mangrove.js"
 import { useForm } from "@tanstack/react-form"
 import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
-import Big from "big.js"
 import React from "react"
 
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
+import Big from "big.js"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
@@ -26,19 +26,27 @@ const determinePrices = (
   } | null,
   marketPrice?: number,
 ) => {
+  if (!orderBook) {
+    return {
+      price: marketPrice,
+      decimals: 4,
+    }
+  }
+
   const bids = orderBook?.bids
   const asks = orderBook?.asks
 
+  // calculate average
+  const allPrices = asks
+    ?.map((ask) => ask.price)
+    .concat(bids.map((bid) => bid.price))
+  const totalSum = allPrices.reduce((total, price) => total + Number(price), 0)
+  const averagePrice = totalSum / allPrices.length
+
+  // get bigestPrice for decimals
   const highestAskPrice = asks?.[asks.length - 1]?.price
-  const lowestAskPrice = asks?.[0]?.price
   const highestBidPrice = bids?.[0]?.price
-
   const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
-
-  const avgPrice =
-    lowestAskPrice && highestBidPrice
-      ? Number(lowestAskPrice) + Number(highestBidPrice) / 2
-      : marketPrice
 
   const priceDecimals = determinePriceDecimalsFromToken(
     bigestPrice.toNumber(),
@@ -46,8 +54,8 @@ const determinePrices = (
   )
 
   return {
-    avgPrice,
-    priceDecimals,
+    price: averagePrice,
+    decimals: priceDecimals,
   }
 }
 
@@ -81,7 +89,7 @@ export function useMarketForm(props: Props) {
     market?.quote?.symbol,
   )
 
-  const { avgPrice, priceDecimals } = determinePrices(
+  const averagePrice = determinePrices(
     quoteToken,
     orderBook.data,
     marketPrice?.close,
@@ -168,7 +176,7 @@ export function useMarketForm(props: Props) {
     handleSubmit,
     form,
     market,
-    avgPrice: avgPrice?.toFixed(priceDecimals),
+    avgPrice: averagePrice.price?.toFixed(averagePrice.decimals),
     sendToken,
     send,
     quote: market?.quote,
