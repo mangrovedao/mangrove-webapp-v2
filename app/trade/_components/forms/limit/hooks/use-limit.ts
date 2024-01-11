@@ -31,6 +31,7 @@ export function useLimit(props: Props) {
     },
     onSubmit: (values) => props.onSubmit(values),
   })
+
   const tradeAction = form.useStore((state) => state.values.tradeAction)
   const {
     quoteToken,
@@ -38,6 +39,7 @@ export function useLimit(props: Props) {
     receiveToken,
     feeInPercentageAsString,
     sendTokenBalance,
+    tickSize,
   } = useTradeInfos("limit", tradeAction)
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
@@ -154,7 +156,7 @@ export function useLimit(props: Props) {
     sendToken,
     send,
     receiveToken,
-    tickSize: marketInfo?.tickSpacing.toString(),
+    tickSize,
     feeInPercentageAsString,
     timeInForce,
   }

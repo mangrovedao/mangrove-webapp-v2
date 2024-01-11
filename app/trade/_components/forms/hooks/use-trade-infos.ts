@@ -34,7 +34,9 @@ export function useTradeInfos(
     maximumFractionDigits: 2,
   }).format(fee / 10_000)
 
-  const tickSize = marketInfo?.tickSpacing.toString()
+  const tickSize = marketInfo?.tickSpacing
+    ? (1.0001 ^ (marketInfo?.tickSpacing - 1)) * 10000
+    : 0
 
   return {
     sendToken,
@@ -46,6 +48,6 @@ export function useTradeInfos(
     sendTokenBalance,
     isInfiniteAllowance,
     spender,
-    tickSize,
+    tickSize: tickSize.toString(),
   }
 }
