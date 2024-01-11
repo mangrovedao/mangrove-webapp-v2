@@ -9,7 +9,6 @@ import React from "react"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
-import Big from "big.js"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
@@ -25,11 +24,12 @@ const determinePrices = (
     bids: Market.Offer[]
   } | null,
   marketPrice?: number,
+  quoteDecimals?: number,
 ) => {
   if (!orderBook) {
     return {
       price: marketPrice,
-      decimals: 4,
+      decimals: determinePriceDecimalsFromToken(marketPrice, quoteToken),
     }
   }
 
@@ -43,19 +43,9 @@ const determinePrices = (
   const totalSum = allPrices.reduce((total, price) => total + Number(price), 0)
   const averagePrice = totalSum / allPrices.length
 
-  // get bigestPrice for decimals
-  const highestAskPrice = asks?.[asks.length - 1]?.price
-  const highestBidPrice = bids?.[0]?.price
-  const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
-
-  const priceDecimals = determinePriceDecimalsFromToken(
-    bigestPrice.toNumber(),
-    quoteToken,
-  )
-
   return {
     price: averagePrice,
-    decimals: priceDecimals,
+    decimals: determinePriceDecimalsFromToken(averagePrice, quoteToken),
   }
 }
 
@@ -93,6 +83,7 @@ export function useMarketForm(props: Props) {
     quoteToken,
     orderBook.data,
     marketPrice?.close,
+    quoteToken?.decimals,
   )
 
   const { data: estimatedVolume } = useQuery({
