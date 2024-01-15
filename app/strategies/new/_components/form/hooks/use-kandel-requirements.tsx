@@ -5,15 +5,13 @@ import { BigSource } from "big.js"
 import useKandel from "@/providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
-import { ChangingFrom } from "../form"
+import { ChangingFrom } from "../../../_stores/new-strat.store"
 
 type Params = {
   onAave?: boolean
   stepSize: number | string
   minPrice: BigSource
   maxPrice: BigSource
-  baseDeposit: string
-  quoteDeposit: string
   pricePoints: number | string
   ratio?: number | string
   isChangingFrom?: ChangingFrom
@@ -24,8 +22,6 @@ export function useKandelRequirements({
   minPrice,
   maxPrice,
   stepSize,
-  baseDeposit,
-  quoteDeposit,
   pricePoints,
   ratio,
   isChangingFrom,
@@ -37,8 +33,6 @@ export function useKandelRequirements({
       "kandel-requirements",
       minPrice,
       maxPrice,
-      baseDeposit,
-      quoteDeposit,
       midPrice,
       stepSize,
       pricePoints,
@@ -101,8 +95,8 @@ export function useKandelRequirements({
         const { requiredBase, requiredQuote } =
           minimumDistribution.getOfferedVolumeForDistribution()
 
-        const availableBase = baseDeposit || requiredBase
-        const availableQuote = quoteDeposit || requiredQuote
+        const availableBase = requiredBase
+        const availableQuote = requiredQuote
 
         const distribution =
           await generator.recalculateDistributionFromAvailable({

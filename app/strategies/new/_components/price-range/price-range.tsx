@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import Link from "next/link"
 import { debounce } from "radash"
@@ -12,20 +11,11 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { useNewStratStore } from "../../_stores/new-strat.store"
+import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
-
-type ChangingFrom =
-  | "minPrice"
-  | "maxPrice"
-  | "minPercentage"
-  | "maxPercentage"
-  | "chart"
-  | undefined
-  | null
 
 export const PriceRange = withClientOnly(function ({
   className,
@@ -35,23 +25,36 @@ export const PriceRange = withClientOnly(function ({
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
   const priceDecimals = market?.quote.decimals
 
-  const [errors, setErrors] = React.useState<Record<string, string>>({})
-  const [touchedFields, setTouchedFields] = React.useState<
-    Record<string, boolean>
-  >({})
-  const [isChangingFrom, setIsChangingFrom] = React.useState<ChangingFrom>()
   const [minPrice, setMinPrice] = React.useState("")
   const [minPercentage, setMinPercentage] = React.useState("")
   const [maxPrice, setMaxPrice] = React.useState("")
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
-  const [setPriceRange, offersWithPrices, setOffersWithPrices, globalError] =
-    useNewStratStore((store) => [
-      store.setPriceRange,
-      store.offersWithPrices,
-      store.setOffersWithPrices,
-      store.error,
-    ])
+  const {
+    setPriceRange,
+    offersWithPrices,
+    setOffersWithPrices,
+    globalError,
+    errors,
+    setErrors,
+    isChangingFrom,
+    setIsChangingFrom,
+    baseDeposit,
+    quoteDeposit,
+    bountyDeposit,
+    stepSize,
+    pricePoints,
+  } = useNewStratStore()
+
+  const formIsInvalid =
+    Object.keys(errors).length > 0 ||
+    !minPrice ||
+    !maxPrice ||
+    !baseDeposit ||
+    !quoteDeposit ||
+    !bountyDeposit ||
+    !stepSize ||
+    !pricePoints
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
@@ -82,9 +85,6 @@ export const PriceRange = withClientOnly(function ({
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    setTouchedFields((prevFields) => ({ ...prevFields, [field]: true }))
   }
 
   const handleOnPriceRangeChange = ([min, max]: number[]) => {
@@ -199,7 +199,7 @@ export const PriceRange = withClientOnly(function ({
     <div className={className}>
       <div className="border-b">
         <div className="flex justify-between items-center px-6 pb-8">
-          <AverageReturn percentage={1.5} />
+          <AverageReturn />
           <RiskAppetiteBadge value={riskAppetite} />
           <LiquiditySource />
         </div>
@@ -296,7 +296,7 @@ export const PriceRange = withClientOnly(function ({
             size={"lg"}
             rightIcon
             className="w-full max-w-72 text-center"
-            disabled
+            disabled={formIsInvalid}
           >
             Summary
           </Button>

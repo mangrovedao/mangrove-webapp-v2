@@ -10,21 +10,11 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getErrorMessage } from "@/utils/errors"
 import { useDebounce } from "usehooks-ts"
-import { useNewStratStore } from "../../_stores/new-strat.store"
+import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
 import { useKandelRequirements } from "./hooks/use-kandel-requirements"
-
-export type ChangingFrom =
-  | "baseDeposit"
-  | "quoteDeposit"
-  | "pricePoints"
-  | "ratio"
-  | "stepSize"
-  | "bountyDeposit"
-  | undefined
-  | null
 
 const MIN_PRICE_POINTS = 2
 const MIN_RATIO = 1.001
@@ -42,34 +32,34 @@ export function Form({ className }: { className?: string }) {
     address,
   })
 
-  const [errors, setErrors] = React.useState<Record<string, string>>({})
-  const [touchedFields, setTouchedFields] = React.useState<
-    Record<string, boolean>
-  >({})
-  const [isChangingFrom, setIsChangingFrom] = React.useState<ChangingFrom>()
-
-  const [baseDeposit, setBaseDeposit] = React.useState("")
-  const [quoteDeposit, setQuoteDeposit] = React.useState("")
-  const [pricePoints, setPricePoints] = React.useState("10")
-  const [ratio, setRatio] = React.useState("")
-  const [stepSize, setStepSize] = React.useState("1")
-  const [bountyDeposit, setBountyDeposit] = React.useState("")
-
-  const debouncedBaseDeposit = useDebounce(baseDeposit, 300)
-  const debouncedQuoteDeposit = useDebounce(quoteDeposit, 300)
+  const {
+    priceRange: [minPrice, maxPrice],
+    setGlobalError,
+    errors,
+    setErrors,
+    baseDeposit,
+    quoteDeposit,
+    pricePoints,
+    ratio,
+    stepSize,
+    bountyDeposit,
+    setBaseDeposit,
+    setQuoteDeposit,
+    setPricePoints,
+    setRatio,
+    setStepSize,
+    setBountyDeposit,
+    isChangingFrom,
+    setIsChangingFrom,
+  } = useNewStratStore()
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedPricePoints = useDebounce(pricePoints, 300)
-
-  const [minPrice, maxPrice] = useNewStratStore((store) => store.priceRange)
-  const setGlobalError = useNewStratStore((store) => store.setError)
   const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
     onAave: false,
     minPrice,
     maxPrice,
-    baseDeposit: debouncedBaseDeposit,
-    quoteDeposit: debouncedQuoteDeposit,
     stepSize: debouncedStepSize,
     pricePoints: debouncedPricePoints,
     ratio,
@@ -120,9 +110,6 @@ export function Form({ className }: { className?: string }) {
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    setTouchedFields((prevFields) => ({ ...prevFields, [field]: true }))
   }
 
   const handleBaseDepositChange = (
@@ -202,7 +189,6 @@ export function Form({ className }: { className?: string }) {
       delete newErrors.ratio
     }
 
-    debugger
     if (
       (Number(stepSize) < Number(MIN_STEP_SIZE) ||
         Number(stepSize) >= Number(pricePoints)) &&
