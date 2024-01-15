@@ -34,10 +34,14 @@ export function useMarketForm(props: Props) {
   const tradeAction = form.useStore((state) => state.values.tradeAction)
   const send = form.useStore((state) => state.values.send)
   const receive = form.useStore((state) => state.values.receive)
-  const { sendToken, receiveToken, sendTokenBalance } = useTradeInfos(
-    "market",
-    tradeAction,
-  )
+  const {
+    sendToken,
+    receiveToken,
+    sendTokenBalance,
+    tickSize,
+    feeInPercentageAsString,
+    spotPrice,
+  } = useTradeInfos("market", tradeAction)
 
   const { data: estimatedVolume } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -124,8 +128,9 @@ export function useMarketForm(props: Props) {
     sendToken,
     send,
     receiveToken,
-    tickSize: marketInfo?.tickSpacing.toString(),
-    estimatedFee: estimatedVolume?.estimatedFee.toString(),
+    tickSize,
+    feeInPercentageAsString,
     hasEnoughVolume,
+    spotPrice,
   }
 }
