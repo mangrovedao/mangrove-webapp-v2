@@ -35,6 +35,7 @@ export function Form({ className }: { className?: string }) {
   const {
     priceRange: [minPrice, maxPrice],
     setGlobalError,
+    globalError,
     errors,
     setErrors,
     baseDeposit,
@@ -235,9 +236,7 @@ export function Form({ className }: { className?: string }) {
             value={baseDeposit}
             onChange={handleBaseDepositChange}
             disabled={fieldsDisabled}
-            error={
-              isChangingFrom === "baseDeposit" ? errors.baseDeposit : undefined
-            }
+            error={errors.baseDeposit}
           />
           <MinimumRecommended
             token={baseToken}
@@ -306,9 +305,7 @@ export function Form({ className }: { className?: string }) {
             value={pricePoints}
             onChange={handlePricePointsChange}
             disabled={fieldsDisabled}
-            error={
-              isChangingFrom === "pricePoints" ? errors.pricePoints : undefined
-            }
+            error={errors.pricePoints}
           />
           <MustBeAtLeastInfo
             min={MIN_PRICE_POINTS}
@@ -349,11 +346,7 @@ export function Form({ className }: { className?: string }) {
             value={bountyDeposit}
             onChange={handleBountyDepositChange}
             disabled={fieldsDisabled}
-            error={
-              isChangingFrom === "bountyDeposit"
-                ? errors.bountyDeposit
-                : undefined
-            }
+            error={errors.bountyDeposit}
           />
           <MinimumRecommended
             token={nativeBalance?.symbol}

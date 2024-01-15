@@ -48,11 +48,9 @@ export const PriceRange = withClientOnly(function ({
 
   const formIsInvalid =
     Object.keys(errors).length > 0 ||
+    !!globalError ||
     !minPrice ||
     !maxPrice ||
-    !baseDeposit ||
-    !quoteDeposit ||
-    !bountyDeposit ||
     !stepSize ||
     !pricePoints
 
