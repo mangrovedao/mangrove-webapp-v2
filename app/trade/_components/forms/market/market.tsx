@@ -35,11 +35,12 @@ export function Market() {
     form,
     market,
     sendToken,
+    send,
     receiveToken,
+    hasEnoughVolume,
     tickSize,
     feeInPercentageAsString,
-    hasEnoughVolume,
-    send,
+    spotPrice,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
   const handleSliderChange = (value: number) => {
@@ -248,6 +249,7 @@ export function Market() {
             <MarketDetails
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
+              spotPrice={spotPrice}
             />
 
             <form.Subscribe

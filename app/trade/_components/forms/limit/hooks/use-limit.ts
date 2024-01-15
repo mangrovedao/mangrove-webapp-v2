@@ -40,6 +40,7 @@ export function useLimit(props: Props) {
     feeInPercentageAsString,
     sendTokenBalance,
     tickSize,
+    spotPrice,
   } = useTradeInfos("limit", tradeAction)
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
@@ -158,6 +159,7 @@ export function useLimit(props: Props) {
     receiveToken,
     tickSize,
     feeInPercentageAsString,
+    spotPrice,
     timeInForce,
   }
 }

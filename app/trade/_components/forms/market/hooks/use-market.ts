@@ -40,6 +40,7 @@ export function useMarketForm(props: Props) {
     sendTokenBalance,
     tickSize,
     feeInPercentageAsString,
+    spotPrice,
   } = useTradeInfos("market", tradeAction)
 
   const { data: estimatedVolume } = useQuery({
@@ -130,5 +131,6 @@ export function useMarketForm(props: Props) {
     tickSize,
     feeInPercentageAsString,
     hasEnoughVolume,
+    spotPrice,
   }
 }
