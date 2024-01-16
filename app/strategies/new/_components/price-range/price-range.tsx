@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
+import { toast } from "sonner"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
@@ -25,7 +26,9 @@ export const PriceRange = withClientOnly(function ({
 }) {
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
   const { mutate: createKandelStrategy, isPending: isCreatingKandelStrategy } =
-    useCreateKandelStrategy()
+    useCreateKandelStrategy({
+      onApproveSuccess: () => toast.success("Approvals confirmed"),
+    })
   const priceDecimals = market?.quote.decimals
 
   const [minPrice, setMinPrice] = React.useState("")
@@ -311,7 +314,7 @@ export const PriceRange = withClientOnly(function ({
             size={"lg"}
             rightIcon
             className="w-full max-w-72 text-center"
-            disabled={formIsInvalid}
+            disabled={formIsInvalid || isCreatingKandelStrategy}
             onClick={handleSubmit}
           >
             Summary

@@ -13,11 +13,11 @@ type FormValues = Pick<
   distribution: GeometricKandelDistribution
 }
 
-type Props = {
-  onResult?: (result: any) => void
+type Params = {
+  onApproveSuccess: () => void
 }
 
-export function useCreateKandelStrategy({ onResult }: Props = {}) {
+export function useCreateKandelStrategy({ onApproveSuccess }: Params) {
   const { market } = useMarket()
   const { kandelStrategies } = useKandel()
   return useMutation({
@@ -45,7 +45,7 @@ export function useCreateKandelStrategy({ onResult }: Props = {}) {
       // waiting for all approvals
       await Promise.all(approvalTxs.map((tx) => tx?.wait()))
 
-      toast.success("Approvals confirmed")
+      onApproveSuccess()
 
       const populateTxs = await kandelInstance.populateGeometricDistribution({
         distribution,
