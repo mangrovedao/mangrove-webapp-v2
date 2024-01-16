@@ -17,7 +17,7 @@ type Params = {
   onApproveSuccess: () => void
 }
 
-export function useCreateKandelStrategy({ onApproveSuccess }: Params) {
+export function useLaunchKandelStrategy({ onApproveSuccess }: Params) {
   const { market } = useMarket()
   const { kandelStrategies } = useKandel()
   return useMutation({

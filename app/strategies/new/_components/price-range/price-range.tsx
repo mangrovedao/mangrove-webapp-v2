@@ -12,7 +12,7 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { useCreateKandelStrategy } from "../../_hooks/use-create-kandel-strategy"
+import { useLaunchKandelStrategy } from "../../_hooks/use-launch-kandel-strategy"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
@@ -26,7 +26,7 @@ export const PriceRange = withClientOnly(function ({
 }) {
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
   const { mutate: createKandelStrategy, isPending: isCreatingKandelStrategy } =
-    useCreateKandelStrategy({
+    useLaunchKandelStrategy({
       onApproveSuccess: () => toast.success("Approvals confirmed"),
     })
   const priceDecimals = market?.quote.decimals
