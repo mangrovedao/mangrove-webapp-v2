@@ -1,8 +1,6 @@
 import React from "react"
 import { useNetwork } from "wagmi"
 
-import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
-
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
@@ -10,22 +8,25 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useStep } from "@/hooks/use-step"
 import { Token } from "@mangrovedao/mangrove.js"
+import { ApproveStep } from "./form/components/approve-step"
 import { Steps } from "./form/components/steps"
 import { useStrategyInfos } from "./form/hooks/use-strategy-infos"
 
+type Strategy = {
+  onAave: false
+  risk: string
+  baseDeposit: string
+  quoteDeposit: string
+  minPrice: string
+  maxPrice: string
+  pricePoints: string
+  ratio: string
+  stepSize: string
+  bountyDeposit: string
+}
+
 type Props = {
-  strategy?: {
-    onAave: false
-    risk: string
-    baseDeposit: string
-    quoteDeposit: string
-    minPrice: string
-    maxPrice: string
-    pricePoints: string
-    ratio: string
-    stepSize: string
-    bountyDeposit: string
-  }
+  strategy?: Strategy
   isOpen: boolean
   onClose: () => void
 }
@@ -35,20 +36,6 @@ const btnProps: ButtonProps = {
   className: "w-full",
   size: "lg",
 }
-const SummaryLine = ({
-  title,
-  value,
-}: {
-  title?: string
-  value?: React.ReactNode
-}) => {
-  return (
-    <div className="flex justify-between text-primary mt-4">
-      <Text className="text-muted-foreground"> {title}</Text>
-      {value}
-    </div>
-  )
-}
 
 export default function DeployStrategyDialog({
   isOpen,
@@ -56,22 +43,14 @@ export default function DeployStrategyDialog({
   strategy,
 }: Props) {
   const { chain } = useNetwork()
-  const { baseToken, quoteToken, isInfiniteAllowance } = useStrategyInfos()
+  const { baseToken, quoteToken, isInfiniteBase, isInfiniteQuote } =
+    useStrategyInfos()
 
   let steps = [
-    strategy?.onAave ? `Approve a${baseToken?.symbol}` : "",
-    strategy?.onAave ? `Approve a${quoteToken?.symbol}` : "",
+    "Summary",
+    `Approve ${baseToken?.symbol}/${quoteToken?.symbol}`,
     "Deposit",
   ]
-
-  if (!isInfiniteAllowance) {
-    steps = [
-      "Summary",
-      `Approve ${baseToken?.symbol}`,
-      `Approve ${quoteToken?.symbol}`,
-      ...steps,
-    ]
-  }
 
   const isDialogOpenRef = React.useRef(false)
   React.useEffect(() => {
@@ -106,84 +85,21 @@ export default function DeployStrategyDialog({
 
   const stepInfos = [
     {
-      body: <Summary infos={{ base: baseToken, quote: quoteToken }} />,
+      body: (
+        <Summary
+          strategy={strategy}
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+        />
+      ),
       button: (
         <Button {...btnProps} onClick={goToNextStep}>
           Proceed
         </Button>
       ),
     },
-    !isInfiniteAllowance && {
-      body: <ApproveStep tokenSymbol={baseToken?.symbol ?? ""} />,
-      button: (
-        <Button
-          {...btnProps}
-          disabled={false}
-          loading={false}
-          onClick={() => {
-            // approve.mutate(
-            //   {
-            //     token: sendToken,
-            //     spender,
-            //   },
-            //   {
-            //     onSuccess: goToNextStep,
-            //   },
-            // )
-          }}
-        >
-          Approve
-        </Button>
-      ),
-    },
-    !isInfiniteAllowance && {
-      body: <ApproveStep tokenSymbol={quoteToken?.symbol ?? ""} />,
-      button: (
-        <Button
-          {...btnProps}
-          disabled={false}
-          loading={false}
-          onClick={() => {
-            // approve.mutate(
-            //   {
-            //     token: sendToken,
-            //     spender,
-            //   },
-            //   {
-            //     onSuccess: goToNextStep,
-            //   },
-            // )
-          }}
-        >
-          Approve
-        </Button>
-      ),
-    },
-    !isInfiniteAllowance && {
-      body: <ApproveStep tokenSymbol={quoteToken?.symbol ?? ""} />,
-      button: (
-        <Button
-          {...btnProps}
-          disabled={false}
-          loading={false}
-          onClick={() => {
-            // approve.mutate(
-            //   {
-            //     token: sendToken,
-            //     spender,
-            //   },
-            //   {
-            //     onSuccess: goToNextStep,
-            //   },
-            // )
-          }}
-        >
-          Approve
-        </Button>
-      ),
-    },
-    !isInfiniteAllowance && {
-      body: <ApproveStep tokenSymbol={baseToken?.symbol ?? ""} />,
+    {
+      body: <ApproveStep baseToken={baseToken} quoteToken={quoteToken} />,
       button: (
         <Button
           {...btnProps}
@@ -206,7 +122,13 @@ export default function DeployStrategyDialog({
       ),
     },
     {
-      body: <Summary infos={{ base: baseToken, quote: quoteToken }} />,
+      body: (
+        <Summary
+          strategy={strategy}
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+        />
+      ),
       button: (
         <Button
           {...btnProps}
@@ -255,34 +177,78 @@ export default function DeployStrategyDialog({
   )
 }
 
-const Summary = ({ infos }: { infos: { base?: Token; quote?: Token } }) => {
-  const { base, quote } = infos
+const SummaryLine = ({
+  title,
+  value,
+}: {
+  title?: string
+  value?: React.ReactNode
+}) => {
+  if (!value) return
+  return (
+    <div className="flex justify-between text-primary mt-4">
+      <Text className="text-muted-foreground">{title}</Text>
+      {value}
+    </div>
+  )
+}
+
+const Summary = ({
+  strategy,
+  baseToken,
+  quoteToken,
+}: {
+  strategy?: Strategy
+  baseToken?: Token
+  quoteToken?: Token
+}) => {
+  const {
+    baseDeposit,
+    quoteDeposit,
+    ratio,
+    pricePoints,
+    stepSize,
+    bountyDeposit,
+    minPrice,
+    maxPrice,
+    risk,
+    onAave,
+  } = strategy ?? {}
+
   return (
     <div className="space-y-2">
       <div className="bg-[#041010] rounded-lg p-4">
         <TokenPair
-          baseToken={base}
-          quoteToken={quote}
+          baseToken={baseToken}
+          quoteToken={quoteToken}
           tokenClasses="w-[28px] h-[28px]"
         />
         <Separator className="mt-4" />
-        <SummaryLine title="Liquidity source" value={<Text>Aave</Text>} />
-        <SummaryLine title="Risk appetite" value={<Text>Medium</Text>} />
         <SummaryLine
-          title={`${base?.symbol} deposit`}
+          title="Liquidity source"
+          value={<Text>{onAave ? "Aave" : "Wallet"}</Text>}
+        />
+        <SummaryLine
+          title="Risk appetite"
+          value={<Text>{risk?.toUpperCase()}</Text>}
+        />
+        <SummaryLine
+          title={`${baseToken?.symbol} deposit`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>0.0004</Text>
-              <Text className="text-muted-foreground">{base?.symbol}</Text>
+              <Text>{baseDeposit}</Text>
+              <Text className="text-muted-foreground">{baseToken?.symbol}</Text>
             </div>
           }
         />
         <SummaryLine
-          title={`${quote?.symbol} deposit`}
+          title={`${quoteToken?.symbol} deposit`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>1.23</Text>
-              <Text className="text-muted-foreground">{quote?.symbol}</Text>
+              <Text>{quoteDeposit}</Text>
+              <Text className="text-muted-foreground">
+                {quoteToken?.symbol}
+              </Text>
             </div>
           }
         />
@@ -293,7 +259,7 @@ const Summary = ({ infos }: { infos: { base?: Token; quote?: Token } }) => {
           title={`Min price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>1.23</Text>
+              <Text>{minPrice}</Text>
               <Text className="text-muted-foreground">USDC</Text>
             </div>
           }
@@ -302,7 +268,7 @@ const Summary = ({ infos }: { infos: { base?: Token; quote?: Token } }) => {
           title={`Max price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>1.23</Text>
+              <Text>{maxPrice}</Text>
               <Text className="text-muted-foreground">USDC</Text>
             </div>
           }
@@ -310,16 +276,19 @@ const Summary = ({ infos }: { infos: { base?: Token; quote?: Token } }) => {
       </div>
 
       <div className="bg-[#041010] rounded-lg p-4">
-        <SummaryLine title={`No. of price points`} value={<Text>10</Text>} />
-        <SummaryLine title={`Ratio`} value={<Text>2.4</Text>} />
-        <SummaryLine title={`Step Size`} value={<Text>1</Text>} />
+        <SummaryLine
+          title={`No. of price points`}
+          value={<Text>{pricePoints}</Text>}
+        />
+        <SummaryLine title={`Ratio`} value={<Text>{ratio}</Text>} />
+        <SummaryLine title={`Step Size`} value={<Text>{stepSize}</Text>} />
       </div>
       <div className="bg-[#041010] rounded-lg p-4">
         <SummaryLine
           title={`Bounty`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>1.23</Text>
+              <Text>{bountyDeposit}</Text>
               <Text className="text-muted-foreground">USDC</Text>
             </div>
           }

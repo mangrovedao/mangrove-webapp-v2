@@ -12,7 +12,7 @@ import {
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
-import DeployStrategyDialog from "../deploy-strategy-dialog"
+import DeployStrategyDialog from "../launch-strategy-dialog"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
