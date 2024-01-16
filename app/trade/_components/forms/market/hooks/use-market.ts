@@ -71,7 +71,7 @@ export function useMarketForm(props: Props) {
   const receive = form.useStore((state) => state.values.receive)
 
   const { market, marketInfo, requestBookQuery: orderBook } = useMarket()
-  const { sendToken, quoteToken, receiveToken, sendTokenBalance } =
+  const { sendToken, quoteToken, receiveToken, sendTokenBalance, tickSize, feeInPercentageAsString, spotPrice} =
     useTradeInfos("market", tradeAction)
 
   const { data: marketPrice } = useTokenPriceQuery(
@@ -85,6 +85,7 @@ export function useMarketForm(props: Props) {
     marketPrice?.close,
     quoteToken?.decimals,
   )
+
 
   const { data: estimatedVolume } = useQuery({
     queryKey: [
@@ -172,8 +173,9 @@ export function useMarketForm(props: Props) {
     send,
     quote: market?.quote,
     receiveToken,
-    tickSize: marketInfo?.tickSpacing.toString(),
-    estimatedFee: estimatedVolume?.estimatedFee.toString(),
+    tickSize,
+    feeInPercentageAsString,
     hasEnoughVolume,
+    spotPrice,
   }
 }

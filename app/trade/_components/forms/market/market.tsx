@@ -35,13 +35,15 @@ export function Market() {
     form,
     market,
     sendToken,
+    send,
     receiveToken,
-    tickSize,
-    estimatedFee,
     hasEnoughVolume,
     send,
     quote,
     avgPrice,
+    tickSize,
+    feeInPercentageAsString,
+    spotPrice,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
   const handleSliderChange = (value: number) => {
@@ -249,7 +251,11 @@ export function Market() {
             </form.Field>
             <Separator className="!my-6" />
 
-            <MarketDetails takerFee={estimatedFee} tickSize={tickSize} />
+            <MarketDetails
+              takerFee={feeInPercentageAsString}
+              tickSize={tickSize}
+              spotPrice={spotPrice}
+            />
 
             <form.Subscribe
               selector={(state) => [
@@ -286,7 +292,7 @@ export function Market() {
       </form.Provider>
       {formData && (
         <FromWalletMarketOrderDialog
-          form={{ ...formData, estimatedFee }}
+          form={{ ...formData, estimatedFee: feeInPercentageAsString }}
           onClose={() => setFormData(undefined)}
         />
       )}
