@@ -2,7 +2,7 @@ import { cn } from "@/utils"
 import type { DialogType } from "./types"
 
 export const getContentClasses = (type: DialogType) =>
-  cn("p-8 max-w-md", {
+  cn("p-8 max-w-[600px]", {
     "border-red-500 border-2 !shadow-error": type === "error",
     "border-primary-dark-green border-2 !shadow-success": type === "success",
   })

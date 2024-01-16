@@ -20,7 +20,7 @@ export type ChangingFrom =
   | undefined
   | null
 
-type NewStratStore = {
+export type NewStratStore = {
   baseDeposit: string
   quoteDeposit: string
   pricePoints: string

@@ -12,6 +12,7 @@ import {
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
+import DeployStrategyDialog from "../deploy-strategy-dialog"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
@@ -25,6 +26,7 @@ export const PriceRange = withClientOnly(function ({
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
   const priceDecimals = market?.quote.decimals
 
+  const [summaryDialog, setSummaryDialog] = React.useState(false)
   const [minPrice, setMinPrice] = React.useState("")
   const [minPercentage, setMinPercentage] = React.useState("")
   const [maxPrice, setMaxPrice] = React.useState("")
@@ -43,6 +45,7 @@ export const PriceRange = withClientOnly(function ({
     quoteDeposit,
     bountyDeposit,
     stepSize,
+    ratio,
     pricePoints,
   } = useNewStratStore()
 
@@ -295,10 +298,27 @@ export const PriceRange = withClientOnly(function ({
             rightIcon
             className="w-full max-w-72 text-center"
             disabled={formIsInvalid}
+            onClick={() => setSummaryDialog(!summaryDialog)}
           >
             Summary
           </Button>
         </div>
+        <DeployStrategyDialog
+          strategy={{
+            onAave: false,
+            risk: "medium",
+            baseDeposit,
+            quoteDeposit,
+            minPrice,
+            maxPrice,
+            pricePoints,
+            ratio,
+            stepSize,
+            bountyDeposit,
+          }}
+          isOpen={summaryDialog}
+          onClose={() => setSummaryDialog(false)}
+        />
       </div>
     </div>
   )

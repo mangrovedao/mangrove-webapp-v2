@@ -7,7 +7,7 @@ import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom } from "../../../_stores/new-strat.store"
 
-type Params = {
+export type Params = {
   onAave?: boolean
   stepSize: number | string
   minPrice: BigSource
