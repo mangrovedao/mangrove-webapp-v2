@@ -5,7 +5,7 @@ import { BigSource } from "big.js"
 import useKandel from "@/providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
-import { ChangingFrom } from "../../../_stores/new-strat.store"
+import { ChangingFrom } from "../_stores/new-strat.store"
 
 export type Params = {
   onAave?: boolean

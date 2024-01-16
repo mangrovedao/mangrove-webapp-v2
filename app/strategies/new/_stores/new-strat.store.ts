@@ -34,6 +34,8 @@ export type NewStratStore = {
   isChangingFrom: ChangingFrom
   globalError?: string
   errors: Record<string, string>
+
+  distribution?: GeometricKandelDistribution
 }
 
 type NewStratActions = {
@@ -50,6 +52,8 @@ type NewStratActions = {
   setGlobalError: (error?: string) => void
   setErrors: (errors: Record<string, string>) => void
   setIsChangingFrom: (isChangingFrom: ChangingFrom) => void
+
+  setDistribution: (distribution?: GeometricKandelDistribution) => void
 }
 
 const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
@@ -69,6 +73,8 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   globalError: undefined,
   errors: {},
 
+  distribution: undefined,
+
   setBaseDeposit: (baseDeposit) => set({ baseDeposit }),
   setQuoteDeposit: (quoteDeposit) => set({ quoteDeposit }),
   setPricePoints: (pricePoints) => set({ pricePoints }),
@@ -82,6 +88,7 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   setGlobalError: (globalError) => set({ globalError }),
   setErrors: (errors) => set({ errors }),
   setIsChangingFrom: (isChangingFrom) => set({ isChangingFrom }),
+  setDistribution: (distribution) => set({ distribution }),
 })
 
 export const useNewStratStore = create(newStratStateCreator)

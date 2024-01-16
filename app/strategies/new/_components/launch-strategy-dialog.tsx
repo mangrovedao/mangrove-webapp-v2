@@ -1,32 +1,27 @@
+import { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useStep } from "@/hooks/use-step"
-import { Token } from "@mangrovedao/mangrove.js"
+
+import { useStrategyInfos } from "../_hooks/use-strategy-infos"
+import { NewStratStore } from "../_stores/new-strat.store"
 import { ApproveStep } from "./form/components/approve-step"
 import { Steps } from "./form/components/steps"
-import { useStrategyInfos } from "./form/hooks/use-strategy-infos"
 
-type Strategy = {
-  onAave: false
-  risk: string
-  baseDeposit: string
-  quoteDeposit: string
-  minPrice: string
-  maxPrice: string
-  pricePoints: string
-  ratio: string
-  stepSize: string
-  bountyDeposit: string
-}
+type StrategyDetails = Omit<
+  NewStratStore,
+  "isChangingFrom" | "globalError" | "errors" | "distribution" | "priceRange"
+> & { onAave?: boolean; riskAppetite?: string; priceRange?: [number, number] }
 
 type Props = {
-  strategy?: Strategy
+  strategy?: StrategyDetails
   isOpen: boolean
   onClose: () => void
 }
@@ -42,9 +37,13 @@ export default function DeployStrategyDialog({
   onClose,
   strategy,
 }: Props) {
-  const { chain } = useNetwork()
+  const { address } = useAccount()
   const { baseToken, quoteToken, isInfiniteBase, isInfiniteQuote } =
     useStrategyInfos()
+
+  const { data: nativeBalance } = useBalance({
+    address,
+  })
 
   let steps = [
     "Summary",
@@ -90,6 +89,7 @@ export default function DeployStrategyDialog({
           strategy={strategy}
           baseToken={baseToken}
           quoteToken={quoteToken}
+          nativeBalance={nativeBalance?.symbol}
         />
       ),
       button: (
@@ -127,6 +127,7 @@ export default function DeployStrategyDialog({
           strategy={strategy}
           baseToken={baseToken}
           quoteToken={quoteToken}
+          nativeBalance={nativeBalance?.symbol}
         />
       ),
       button: (
@@ -170,7 +171,11 @@ export default function DeployStrategyDialog({
       </Dialog.Title>
       <Steps steps={steps} currentStep={currentStep} />
       <Dialog.Description>
-        {stepInfos[currentStep - 1]?.body ?? undefined}
+        <ScrollArea className="h-full" scrollHideDelay={200}>
+          <ScrollBar orientation="vertical" className="z-50" />
+
+          {stepInfos[currentStep - 1]?.body ?? undefined}
+        </ScrollArea>
       </Dialog.Description>
       <Dialog.Footer>{stepInfos[currentStep - 1]?.button}</Dialog.Footer>
     </Dialog>
@@ -197,10 +202,12 @@ const Summary = ({
   strategy,
   baseToken,
   quoteToken,
+  nativeBalance,
 }: {
-  strategy?: Strategy
+  strategy?: StrategyDetails
   baseToken?: Token
   quoteToken?: Token
+  nativeBalance?: string
 }) => {
   const {
     baseDeposit,
@@ -209,11 +216,11 @@ const Summary = ({
     pricePoints,
     stepSize,
     bountyDeposit,
-    minPrice,
-    maxPrice,
-    risk,
-    onAave,
+    priceRange,
+    riskAppetite,
   } = strategy ?? {}
+
+  const [minPrice, maxPrice] = priceRange ?? []
 
   return (
     <div className="space-y-2">
@@ -226,11 +233,11 @@ const Summary = ({
         <Separator className="mt-4" />
         <SummaryLine
           title="Liquidity source"
-          value={<Text>{onAave ? "Aave" : "Wallet"}</Text>}
+          value={<Text>{false ? "Aave" : "Wallet"}</Text>}
         />
         <SummaryLine
           title="Risk appetite"
-          value={<Text>{risk?.toUpperCase()}</Text>}
+          value={<Text>{riskAppetite}</Text>}
         />
         <SummaryLine
           title={`${baseToken?.symbol} deposit`}
@@ -260,7 +267,9 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>{minPrice}</Text>
-              <Text className="text-muted-foreground">USDC</Text>
+              <Text className="text-muted-foreground">
+                {quoteToken?.symbol}
+              </Text>
             </div>
           }
         />
@@ -269,7 +278,9 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>{maxPrice}</Text>
-              <Text className="text-muted-foreground">USDC</Text>
+              <Text className="text-muted-foreground">
+                {quoteToken?.symbol}
+              </Text>
             </div>
           }
         />
@@ -289,7 +300,7 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>{bountyDeposit}</Text>
-              <Text className="text-muted-foreground">USDC</Text>
+              <Text className="text-muted-foreground">{nativeBalance}</Text>
             </div>
           }
         />
