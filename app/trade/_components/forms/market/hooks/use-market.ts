@@ -24,9 +24,8 @@ const determinePrices = (
     bids: Market.Offer[]
   } | null,
   marketPrice?: number,
-  quoteDecimals?: number,
 ) => {
-  if (!orderBook) {
+  if (!orderBook?.bids || orderBook?.asks) {
     return {
       price: marketPrice,
       decimals: determinePriceDecimalsFromToken(marketPrice, quoteToken),
@@ -71,8 +70,15 @@ export function useMarketForm(props: Props) {
   const receive = form.useStore((state) => state.values.receive)
 
   const { market, marketInfo, requestBookQuery: orderBook } = useMarket()
-  const { sendToken, quoteToken, receiveToken, sendTokenBalance, tickSize, feeInPercentageAsString, spotPrice} =
-    useTradeInfos("market", tradeAction)
+  const {
+    sendToken,
+    quoteToken,
+    receiveToken,
+    sendTokenBalance,
+    tickSize,
+    feeInPercentageAsString,
+    spotPrice,
+  } = useTradeInfos("market", tradeAction)
 
   const { data: marketPrice } = useTokenPriceQuery(
     market?.base?.symbol,
@@ -83,9 +89,7 @@ export function useMarketForm(props: Props) {
     quoteToken,
     orderBook.data,
     marketPrice?.close,
-    quoteToken?.decimals,
   )
-
 
   const { data: estimatedVolume } = useQuery({
     queryKey: [

@@ -35,7 +35,6 @@ export function Market() {
     form,
     market,
     sendToken,
-    send,
     receiveToken,
     hasEnoughVolume,
     send,
