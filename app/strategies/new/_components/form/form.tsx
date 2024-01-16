@@ -10,11 +10,11 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getErrorMessage } from "@/utils/errors"
 import { useDebounce } from "usehooks-ts"
+import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
-import { useKandelRequirements } from "./hooks/use-kandel-requirements"
 
 const MIN_PRICE_POINTS = 2
 const MIN_RATIO = 1.001
@@ -35,7 +35,6 @@ export function Form({ className }: { className?: string }) {
   const {
     priceRange: [minPrice, maxPrice],
     setGlobalError,
-    globalError,
     errors,
     setErrors,
     baseDeposit,
@@ -52,6 +51,7 @@ export function Form({ className }: { className?: string }) {
     setBountyDeposit,
     isChangingFrom,
     setIsChangingFrom,
+    setDistribution,
   } = useNewStratStore()
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedPricePoints = useDebounce(pricePoints, 300)
@@ -74,7 +74,13 @@ export function Form({ className }: { className?: string }) {
     offersWithPrices,
     priceRatio,
     pricePoints: points,
+    distribution,
   } = kandelRequirementsQuery.data || {}
+
+  // I need the distribution to be set in the store to share it with the price range component
+  React.useEffect(() => {
+    setDistribution(distribution)
+  }, [distribution])
 
   const setOffersWithPrices = useNewStratStore(
     (store) => store.setOffersWithPrices,

@@ -11,6 +11,7 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
+import { useCreateKandelStrategy } from "../../_hooks/use-create-kandel-strategy"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
@@ -23,6 +24,8 @@ export const PriceRange = withClientOnly(function ({
   className?: string
 }) {
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
+  const { mutate: createKandelStrategy, isPending: isCreatingKandelStrategy } =
+    useCreateKandelStrategy()
   const priceDecimals = market?.quote.decimals
 
   const [minPrice, setMinPrice] = React.useState("")
@@ -44,6 +47,7 @@ export const PriceRange = withClientOnly(function ({
     bountyDeposit,
     stepSize,
     pricePoints,
+    distribution,
   } = useNewStratStore()
 
   const formIsInvalid =
@@ -52,10 +56,23 @@ export const PriceRange = withClientOnly(function ({
     !minPrice ||
     !maxPrice ||
     !stepSize ||
-    !pricePoints
+    !pricePoints ||
+    !distribution
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
+
+  function handleSubmit() {
+    if (formIsInvalid) return
+    createKandelStrategy({
+      baseDeposit,
+      quoteDeposit,
+      bountyDeposit,
+      pricePoints,
+      stepSize,
+      distribution,
+    })
+  }
 
   React.useEffect(() => {
     if (isChangingFrom !== "minPercentage" && minPrice && midPrice) {
@@ -295,6 +312,7 @@ export const PriceRange = withClientOnly(function ({
             rightIcon
             className="w-full max-w-72 text-center"
             disabled={formIsInvalid}
+            onClick={handleSubmit}
           >
             Summary
           </Button>
