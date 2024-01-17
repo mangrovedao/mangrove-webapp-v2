@@ -12,6 +12,7 @@ type FormValues = Pick<
   "baseDeposit" | "quoteDeposit" | "pricePoints" | "stepSize" | "bountyDeposit"
 > & {
   distribution: GeometricKandelDistribution | undefined
+  kandelAddress: string
 }
 
 export function useLaunchKandelStrategy() {
@@ -25,16 +26,15 @@ export function useLaunchKandelStrategy() {
       bountyDeposit,
       stepSize,
       pricePoints,
+      kandelAddress,
     }: FormValues) => {
       try {
         if (!(market && kandelStrategies && distribution)) return
 
-        const { result } = await kandelStrategies.seeder.sow({
+        const kandelInstance = await kandelStrategies.instance({
+          address: kandelAddress,
           market,
-          onAave: false,
-          liquiditySharing: false,
         })
-        const kandelInstance = await result
 
         const populateTxs = await kandelInstance.populateGeometricDistribution({
           distribution,
@@ -46,6 +46,8 @@ export function useLaunchKandelStrategy() {
             stepSize: Number(stepSize),
           },
         })
+
+        await Promise.all(populateTxs.map((x) => x.wait()))
         toast.success("Kandel strategy successfully launched")
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)

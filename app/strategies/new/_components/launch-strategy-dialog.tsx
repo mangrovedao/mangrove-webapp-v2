@@ -62,17 +62,21 @@ export default function DeployStrategyDialog({
     }
   }, [isOpen])
 
+  const [kandelAddress, setKandelAddress] = React.useState("")
+
   const {
     mutate: approveKandelStrategy,
     isPending: isApprovingKandelStrategy,
-  } = useApproveKandelStrategy()
+  } = useApproveKandelStrategy({
+    setKandelAddress: (address) => setKandelAddress(address),
+  })
 
   const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
     useLaunchKandelStrategy()
 
   const [currentStep, helpers] = useStep(steps.length)
 
-  const { goToNextStep } = helpers
+  const { goToNextStep, reset } = helpers
 
   const stepInfos = [
     {
@@ -91,7 +95,14 @@ export default function DeployStrategyDialog({
       ),
     },
     {
-      body: <ApproveStep baseToken={baseToken} quoteToken={quoteToken} />,
+      body: (
+        <ApproveStep
+          baseToken={baseToken}
+          baseDeposit={strategy?.baseDeposit}
+          quoteToken={quoteToken}
+          quoteDeposit={strategy?.quoteDeposit}
+        />
+      ),
       button: (
         <Button
           {...btnProps}
@@ -141,14 +152,22 @@ export default function DeployStrategyDialog({
               pricePoints,
             } = strategy
 
-            launchKandelStrategy({
-              baseDeposit,
-              quoteDeposit,
-              distribution,
-              bountyDeposit,
-              stepSize,
-              pricePoints,
-            })
+            launchKandelStrategy(
+              {
+                kandelAddress,
+                baseDeposit,
+                quoteDeposit,
+                distribution,
+                bountyDeposit,
+                stepSize,
+                pricePoints,
+              },
+              {
+                onSuccess: () => {
+                  onClose()
+                },
+              },
+            )
           }}
         >
           Proceed
@@ -165,7 +184,14 @@ export default function DeployStrategyDialog({
     })
 
   return (
-    <Dialog open={!!isOpen} onClose={onClose} showCloseButton={false}>
+    <Dialog
+      open={!!isOpen}
+      onClose={() => {
+        reset()
+        onClose()
+      }}
+      showCloseButton={false}
+    >
       <Dialog.Title className="text-xl text-left" close>
         Launch Strategy
       </Dialog.Title>

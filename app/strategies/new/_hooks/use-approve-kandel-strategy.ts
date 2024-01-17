@@ -9,7 +9,11 @@ import { NewStratStore } from "../_stores/new-strat.store"
 
 type FormValues = Pick<NewStratStore, "baseDeposit" | "quoteDeposit">
 
-export function useApproveKandelStrategy() {
+export function useApproveKandelStrategy({
+  setKandelAddress,
+}: {
+  setKandelAddress: (address: string) => void
+}) {
   const { market } = useMarket()
   const { kandelStrategies } = useKandel()
   return useMutation({
@@ -22,15 +26,18 @@ export function useApproveKandelStrategy() {
           onAave: false,
           liquiditySharing: false,
         })
+
         const kandelInstance = await result
 
         const approvalTxs = await kandelInstance.approveIfHigher(
-          baseDeposit,
-          quoteDeposit,
+          Number(baseDeposit),
+          Number(quoteDeposit),
         )
 
         // waiting for all approvals
         await Promise.all(approvalTxs.map((tx) => tx?.wait()))
+
+        setKandelAddress(kandelInstance.address)
 
         toast.success("Kandel strategy successfully approved")
       } catch (error) {
