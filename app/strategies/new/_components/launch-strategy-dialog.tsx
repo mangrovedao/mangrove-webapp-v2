@@ -10,6 +10,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useStep } from "@/hooks/use-step"
 
+import { useApproveKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
+import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
 import { useStrategyInfos } from "../_hooks/use-strategy-infos"
 import { NewStratStore } from "../_stores/new-strat.store"
 import { ApproveStep } from "./form/components/approve-step"
@@ -17,7 +19,7 @@ import { Steps } from "./form/components/steps"
 
 type StrategyDetails = Omit<
   NewStratStore,
-  "isChangingFrom" | "globalError" | "errors" | "distribution" | "priceRange"
+  "isChangingFrom" | "globalError" | "errors" | "priceRange"
 > & { onAave?: boolean; riskAppetite?: string; priceRange?: [number, number] }
 
 type Props = {
@@ -60,23 +62,13 @@ export default function DeployStrategyDialog({
     }
   }, [isOpen])
 
-  //   const approve = useInfiniteApproveToken()
-  //   const post = usePostLimitOrder({
-  //     onResult: (result) => {
-  //       /*
-  //        * We use a React ref to track the dialog's open state. If the dialog is closed,
-  //        * we prevent further actions. This is necessary because the dialog's closure
-  //        * might occur before the asynchronous operations complete, potentially leading
-  //        * to undesired effects.
-  //        */
-  //       if (!isDialogOpenRef.current) return
-  //       onClose()
-  //       tradeService.openTxCompletedDialog({
-  //         address: result.txReceipt.transactionHash ?? "",
-  //         blockExplorerUrl: chain?.blockExplorers?.default.url,
-  //       })
-  //     },
-  //   })
+  const {
+    mutate: approveKandelStrategy,
+    isPending: isApprovingKandelStrategy,
+  } = useApproveKandelStrategy()
+
+  const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
+    useLaunchKandelStrategy()
 
   const [currentStep, helpers] = useStep(steps.length)
 
@@ -103,18 +95,20 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={false}
-          loading={false}
+          disabled={isApprovingKandelStrategy}
+          loading={isApprovingKandelStrategy}
           onClick={() => {
-            // approve.mutate(
-            //   {
-            //     token: sendToken,
-            //     spender,
-            //   },
-            //   {
-            //     onSuccess: goToNextStep,
-            //   },
-            // )
+            if (!strategy) return
+            const { baseDeposit, quoteDeposit } = strategy
+            approveKandelStrategy(
+              {
+                baseDeposit,
+                quoteDeposit,
+              },
+              {
+                onSuccess: goToNextStep,
+              },
+            )
           }}
         >
           Approve
@@ -133,22 +127,28 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          loading={false}
-          disabled={false}
+          loading={isLaunchingKandelStrategy}
+          disabled={isLaunchingKandelStrategy}
           onClick={() => {
-            // post.mutate(
-            //   {
-            //     form,
-            //   },
-            //   {
-            //     onError: (error: Error) => {
-            //       onClose()
-            //       tradeService.openTxFailedDialog(
-            //         getTitleDescriptionErrorMessages(error),
-            //       )
-            //     },
-            //   },
-            // )
+            if (!strategy) return
+
+            const {
+              baseDeposit,
+              quoteDeposit,
+              distribution,
+              bountyDeposit,
+              stepSize,
+              pricePoints,
+            } = strategy
+
+            launchKandelStrategy({
+              baseDeposit,
+              quoteDeposit,
+              distribution,
+              bountyDeposit,
+              stepSize,
+              pricePoints,
+            })
           }}
         >
           Proceed

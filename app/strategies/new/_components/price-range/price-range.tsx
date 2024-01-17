@@ -2,7 +2,6 @@
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
-import { toast } from "sonner"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
@@ -12,7 +11,6 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { useLaunchKandelStrategy } from "../../_hooks/use-launch-kandel-strategy"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import DeployStrategyDialog from "../launch-strategy-dialog"
 import { AverageReturn } from "./components/average-return"
@@ -26,10 +24,7 @@ export const PriceRange = withClientOnly(function ({
   className?: string
 }) {
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
-  const { mutate: createKandelStrategy, isPending: isCreatingKandelStrategy } =
-    useLaunchKandelStrategy({
-      onApproveSuccess: () => toast.success("Approvals confirmed"),
-    })
+
   const priceDecimals = market?.quote.decimals
 
   const [summaryDialog, setSummaryDialog] = React.useState(false)
@@ -67,18 +62,6 @@ export const PriceRange = withClientOnly(function ({
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
-
-  function handleSubmit() {
-    if (formIsInvalid) return
-    createKandelStrategy({
-      baseDeposit,
-      quoteDeposit,
-      bountyDeposit,
-      pricePoints,
-      stepSize,
-      distribution,
-    })
-  }
 
   React.useEffect(() => {
     if (isChangingFrom !== "minPercentage" && minPrice && midPrice) {
@@ -317,7 +300,7 @@ export const PriceRange = withClientOnly(function ({
             size={"lg"}
             rightIcon
             className="w-full max-w-72 text-center"
-            disabled={formIsInvalid || isCreatingKandelStrategy}
+            disabled={formIsInvalid}
             onClick={() => setSummaryDialog(!summaryDialog)}
           >
             Summary
@@ -326,6 +309,7 @@ export const PriceRange = withClientOnly(function ({
         <DeployStrategyDialog
           strategy={{
             riskAppetite,
+            distribution,
             baseDeposit,
             quoteDeposit,
             priceRange,
