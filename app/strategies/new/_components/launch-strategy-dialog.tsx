@@ -215,7 +215,6 @@ const SummaryLine = ({
   title?: string
   value?: React.ReactNode
 }) => {
-  if (!value) return
   return (
     <div className="flex justify-between text-primary mt-4">
       <Text className="text-muted-foreground">{title}</Text>
@@ -265,26 +264,32 @@ const Summary = ({
           title="Risk appetite"
           value={<Text>{riskAppetite}</Text>}
         />
-        <SummaryLine
-          title={`${baseToken?.symbol} deposit`}
-          value={
-            <div className="flex space-x-1 items-center">
-              <Text>{baseDeposit}</Text>
-              <Text className="text-muted-foreground">{baseToken?.symbol}</Text>
-            </div>
-          }
-        />
-        <SummaryLine
-          title={`${quoteToken?.symbol} deposit`}
-          value={
-            <div className="flex space-x-1 items-center">
-              <Text>{quoteDeposit}</Text>
-              <Text className="text-muted-foreground">
-                {quoteToken?.symbol}
-              </Text>
-            </div>
-          }
-        />
+        {baseDeposit && (
+          <SummaryLine
+            title={`${baseToken?.symbol} deposit`}
+            value={
+              <div className="flex space-x-1 items-center">
+                <Text>{baseDeposit}</Text>
+                <Text className="text-muted-foreground">
+                  {baseToken?.symbol}
+                </Text>
+              </div>
+            }
+          />
+        )}
+        {quoteDeposit && (
+          <SummaryLine
+            title={`${quoteToken?.symbol} deposit`}
+            value={
+              <div className="flex space-x-1 items-center">
+                <Text>{quoteDeposit}</Text>
+                <Text className="text-muted-foreground">
+                  {quoteToken?.symbol}
+                </Text>
+              </div>
+            }
+          />
+        )}
       </div>
 
       <div className="bg-[#041010] rounded-lg p-4">
