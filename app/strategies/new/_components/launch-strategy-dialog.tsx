@@ -264,32 +264,28 @@ const Summary = ({
           title="Risk appetite"
           value={<Text>{riskAppetite}</Text>}
         />
-        {baseDeposit && (
-          <SummaryLine
-            title={`${baseToken?.symbol} deposit`}
-            value={
-              <div className="flex space-x-1 items-center">
-                <Text>{baseDeposit}</Text>
-                <Text className="text-muted-foreground">
-                  {baseToken?.symbol}
-                </Text>
-              </div>
-            }
-          />
-        )}
-        {quoteDeposit && (
-          <SummaryLine
-            title={`${quoteToken?.symbol} deposit`}
-            value={
-              <div className="flex space-x-1 items-center">
-                <Text>{quoteDeposit}</Text>
-                <Text className="text-muted-foreground">
-                  {quoteToken?.symbol}
-                </Text>
-              </div>
-            }
-          />
-        )}
+
+        <SummaryLine
+          title={`${baseToken?.symbol} deposit`}
+          value={
+            <div className="flex space-x-1 items-center">
+              <Text>{baseDeposit || 0}</Text>
+              <Text className="text-muted-foreground">{baseToken?.symbol}</Text>
+            </div>
+          }
+        />
+
+        <SummaryLine
+          title={`${quoteToken?.symbol} deposit`}
+          value={
+            <div className="flex space-x-1 items-center">
+              <Text>{quoteDeposit || 0}</Text>
+              <Text className="text-muted-foreground">
+                {quoteToken?.symbol}
+              </Text>
+            </div>
+          }
+        />
       </div>
 
       <div className="bg-[#041010] rounded-lg p-4">
