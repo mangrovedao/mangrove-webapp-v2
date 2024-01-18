@@ -9,10 +9,9 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useStep } from "@/hooks/use-step"
-
+import useMarket from "@/providers/market"
 import { useApproveKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
-import { useStrategyInfos } from "../_hooks/use-strategy-infos"
 import { NewStratStore } from "../_stores/new-strat.store"
 import { ApproveStep } from "./form/components/approve-step"
 import { Steps } from "./form/components/steps"
@@ -40,27 +39,12 @@ export default function DeployStrategyDialog({
   strategy,
 }: Props) {
   const { address } = useAccount()
-  const { baseToken, quoteToken, isInfiniteBase, isInfiniteQuote } =
-    useStrategyInfos()
+  const { market } = useMarket()
+  const { base: baseToken, quote: quoteToken } = market ?? {}
 
   const { data: nativeBalance } = useBalance({
     address,
   })
-
-  let steps = [
-    "Summary",
-    `Approve ${baseToken?.symbol}/${quoteToken?.symbol}`,
-    "Deposit",
-  ]
-
-  const isDialogOpenRef = React.useRef(false)
-  React.useEffect(() => {
-    isDialogOpenRef.current = !!isOpen
-
-    return () => {
-      isDialogOpenRef.current = false
-    }
-  }, [isOpen])
 
   const [kandelAddress, setKandelAddress] = React.useState("")
 
@@ -74,10 +58,13 @@ export default function DeployStrategyDialog({
   const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
     useLaunchKandelStrategy()
 
+  let steps = [
+    "Summary",
+    `Approve ${baseToken?.symbol}/${quoteToken?.symbol}`,
+    "Deposit",
+  ]
   const [currentStep, helpers] = useStep(steps.length)
-
   const { goToNextStep, reset } = helpers
-
   const stepInfos = [
     {
       body: (
@@ -183,6 +170,15 @@ export default function DeployStrategyDialog({
       }
     })
 
+  const isDialogOpenRef = React.useRef(false)
+  React.useEffect(() => {
+    isDialogOpenRef.current = !!isOpen
+
+    return () => {
+      isDialogOpenRef.current = false
+    }
+  }, [isOpen])
+
   return (
     <Dialog
       open={!!isOpen}
@@ -249,27 +245,32 @@ const Summary = ({
 
   return (
     <div className="space-y-2">
-      <div className="bg-[#041010] rounded-lg p-4">
+      <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <TokenPair
           baseToken={baseToken}
           quoteToken={quoteToken}
           tokenClasses="w-[28px] h-[28px]"
         />
+
         <Separator className="mt-4" />
+
         <SummaryLine
           title="Liquidity source"
           value={<Text>{false ? "Aave" : "Wallet"}</Text>}
         />
+
         <SummaryLine
           title="Risk appetite"
-          value={<Text>{riskAppetite}</Text>}
+          value={<Text>{riskAppetite?.toUpperCase()}</Text>}
         />
 
         <SummaryLine
           title={`${baseToken?.symbol} deposit`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{baseDeposit || 0}</Text>
+              <Text>
+                {Number(baseDeposit).toFixed(baseToken?.decimals) || 0}
+              </Text>
               <Text className="text-muted-foreground">{baseToken?.symbol}</Text>
             </div>
           }
@@ -279,7 +280,9 @@ const Summary = ({
           title={`${quoteToken?.symbol} deposit`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{quoteDeposit || 0}</Text>
+              <Text>
+                {Number(quoteDeposit).toFixed(quoteToken?.decimals) || 0}
+              </Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
               </Text>
@@ -288,7 +291,7 @@ const Summary = ({
         />
       </div>
 
-      <div className="bg-[#041010] rounded-lg p-4">
+      <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <SummaryLine
           title={`Min price`}
           value={
@@ -300,6 +303,7 @@ const Summary = ({
             </div>
           }
         />
+
         <SummaryLine
           title={`Max price`}
           value={
@@ -313,7 +317,7 @@ const Summary = ({
         />
       </div>
 
-      <div className="bg-[#041010] rounded-lg p-4">
+      <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <SummaryLine
           title={`No. of price points`}
           value={<Text>{pricePoints}</Text>}
@@ -321,7 +325,8 @@ const Summary = ({
         <SummaryLine title={`Ratio`} value={<Text>{ratio}</Text>} />
         <SummaryLine title={`Step Size`} value={<Text>{stepSize}</Text>} />
       </div>
-      <div className="bg-[#041010] rounded-lg p-4">
+
+      <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <SummaryLine
           title={`Bounty`}
           value={
