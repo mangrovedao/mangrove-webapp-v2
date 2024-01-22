@@ -8,11 +8,13 @@ import {
 } from "@/components/ui/tooltip"
 import { TooltipInfo } from "@/svgs"
 
-export function AverageReturn({ percentage }: { percentage: number }) {
-  const formattedPercentage = new Intl.NumberFormat("en-US", {
-    style: "percent",
-    minimumFractionDigits: 2,
-  }).format(percentage / 100)
+export function AverageReturn({ percentage }: { percentage?: number }) {
+  const formattedValue = percentage
+    ? new Intl.NumberFormat("en-US", {
+        style: "percent",
+        minimumFractionDigits: 2,
+      }).format(percentage / 100)
+    : "N/A"
   return (
     <div className="flex items-end space-x-2">
       <span className="bg-black-rich rounded-lg p-1">
@@ -46,7 +48,7 @@ export function AverageReturn({ percentage }: { percentage: number }) {
             </Tooltip>
           </TooltipProvider>
         </Caption>
-        <Title variant={"title1"}>{formattedPercentage}</Title>
+        <Title variant={"title1"}>{formattedValue}</Title>
       </span>
     </div>
   )
