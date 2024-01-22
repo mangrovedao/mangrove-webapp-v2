@@ -37,7 +37,7 @@ export function useAmplified(props: Props) {
     receiveToken,
     feeInPercentageAsString,
     sendTokenBalance,
-  } = useTradeInfos("limit", tradeAction)
+  } = useTradeInfos("amplified", tradeAction)
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)

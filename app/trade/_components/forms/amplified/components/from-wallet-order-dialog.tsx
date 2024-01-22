@@ -26,7 +26,10 @@ const btnProps: ButtonProps = {
   size: "lg",
 }
 
-export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
+export default function FromWalletAmplifiedOrderDialog({
+  form,
+  onClose,
+}: Props) {
   const { chain } = useNetwork()
   const {
     baseToken,
@@ -37,7 +40,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     spender,
     feeInPercentageAsString,
     tickSize,
-  } = useTradeInfos("limit", form.tradeAction)
+  } = useTradeInfos("amplified", form.tradeAction)
 
   let steps = ["Send"]
   if (!isInfiniteAllowance) {

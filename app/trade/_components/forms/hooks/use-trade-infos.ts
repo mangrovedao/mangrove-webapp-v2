@@ -6,7 +6,7 @@ import { TradeAction } from "../enums"
 import { useSpenderAddress } from "./use-spender-address"
 
 export function useTradeInfos(
-  type: "limit" | "market",
+  type: "limit" | "market" | "amplified",
   tradeAction: TradeAction,
 ) {
   const { market, marketInfo } = useMarket()
