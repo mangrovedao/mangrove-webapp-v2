@@ -16,9 +16,23 @@ const useMarketContext = () => {
   const marketParam = searchParams.get("market")
   const { chain } = useNetwork()
   const { mangrove, marketsInfoQuery } = useMangrove()
+  const [currentMarket, setCurrentMarket] = React.useState<string>()
 
   const marketInfo = React.useMemo(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
+
+    // Use currentMarket if no marketParam is provided
+    if (!marketParam && currentMarket) {
+      const [baseId, quoteId] = currentMarket.split(",")
+      return marketsInfoQuery.data.find((marketInfo) => {
+        return (
+          marketInfo.base.id?.toLowerCase() === baseId?.toLowerCase() &&
+          marketInfo.quote.id?.toLowerCase() === quoteId?.toLowerCase()
+        )
+      })
+    }
+
+    // Use marketParam to fetch market data
     const [baseId, quoteId] = marketParam?.split(",") ?? []
     return (
       marketsInfoQuery.data.find((marketInfo) => {
@@ -117,6 +131,7 @@ const useMarketContext = () => {
     olKeys,
     midPrice: midPrice ?? midPriceQuery.data,
     riskAppetite,
+    setCurrentMarket,
   }
 }
 

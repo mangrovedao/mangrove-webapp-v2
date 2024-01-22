@@ -15,9 +15,9 @@ import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
 import Big from "big.js"
+import type { Strategy } from "../../../../_schemas/kandels"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
-import type { Strategy } from "../schema"
 
 const columnHelper = createColumnHelper<Strategy>()
 const DEFAULT_DATA: Strategy[] = []

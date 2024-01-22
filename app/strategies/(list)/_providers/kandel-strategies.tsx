@@ -2,8 +2,8 @@
 import { KandelStrategies } from "@mangrovedao/mangrove.js"
 import React from "react"
 
-import useMangrove from "./mangrove"
-import useMarket from "./market"
+import useMangrove from "../../../../providers/mangrove"
+import useMarket from "../../../../providers/market"
 
 const useKandelStrategiesContext = () => {
   const { mangrove } = useMangrove()

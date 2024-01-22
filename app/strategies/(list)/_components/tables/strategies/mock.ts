@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
 
-import { strategySchema, type Strategy } from "./schema"
+import { strategySchema, type Strategy } from "../../../_schemas/kandels"
 
 const markets = [
   [

@@ -3,10 +3,10 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
+import type { Strategy } from "../../../_schemas/kandels"
 import { useStrategies } from "./hooks/use-strategies"
 import { useTable } from "./hooks/use-table"
 import { MOCKS } from "./mock"
-import type { Strategy } from "./schema"
 
 export function Strategies() {
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({

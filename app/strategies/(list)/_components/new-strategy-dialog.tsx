@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/select"
 import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import useMangrove from "@/providers/mangrove"
+import { getSymbol, getValue } from "@/utils/market"
 import { useRouter } from "next/navigation"
-import { getSymbol, getValue } from "../_utils/markets"
 import { Badge } from "./badge"
 
 type Props = {

@@ -6,7 +6,7 @@ import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-info
 import useMangrove from "@/providers/mangrove"
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import { useQuery } from "@tanstack/react-query"
-import { parseStrategies, type Strategy } from "../schema"
+import { parseStrategies, type Strategy } from "../../../../_schemas/kandels"
 
 type Params<T> = {
   filters?: {

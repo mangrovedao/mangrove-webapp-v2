@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { BigSource } from "big.js"
 
-import useKandel from "@/providers/kandel-strategies"
+import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom } from "../_stores/new-strat.store"

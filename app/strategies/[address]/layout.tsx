@@ -1,7 +1,7 @@
 import React from "react"
 
+import { KandelStrategyProvider } from "@/app/strategies/[address]/_providers/kandel-strategy"
 import { Navbar } from "@/components/navbar"
-import { KandelStrategiesProvider } from "@/providers/kandel-strategies"
 import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
 import { MarketProvider } from "@/providers/market"
 
@@ -9,10 +9,10 @@ export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <MarketProvider>
       <IndexerSdkProvider>
-        <KandelStrategiesProvider>
+        <KandelStrategyProvider>
           <Navbar innerClasses="max-w-8xl mx-auto" />
-          {children}
-        </KandelStrategiesProvider>
+          <main className="w-full">{children}</main>
+        </KandelStrategyProvider>
       </IndexerSdkProvider>
     </MarketProvider>
   )

@@ -1,20 +1,20 @@
 import { z } from "zod"
 
-const parameterSchema = z.object({
+export const parameterSchema = z.object({
   gasprice: z.string().optional(),
   gasreq: z.string().optional(),
   stepSize: z.string().optional(),
   length: z.string().optional(),
 })
 
-const bidsOrAsksSchema = z.union([z.literal("bids"), z.literal("asks")])
+export const bidsOrAsksSchema = z.union([z.literal("bids"), z.literal("asks")])
 
-const kandelTypeStringSchema = z.union([
+export const kandelTypeStringSchema = z.union([
   z.literal("Kandel"),
   z.literal("KandelAAVE"),
 ])
 
-const offerWithPricesSchema = z.object({
+export const offerWithPricesSchema = z.object({
   offerType: bidsOrAsksSchema,
   gives: z.string(),
   gasprice: z.string(),
