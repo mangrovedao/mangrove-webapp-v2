@@ -35,9 +35,11 @@ export function Market() {
     form,
     market,
     sendToken,
-    send,
     receiveToken,
     hasEnoughVolume,
+    send,
+    quote,
+    avgPrice,
     tickSize,
     feeInPercentageAsString,
     spotPrice,
@@ -183,7 +185,9 @@ export function Market() {
               <span className="text-muted-foreground text-xs">
                 Average market price
               </span>
-              <span className="text-xs">$0.00</span>
+              <span className="text-xs">
+                {avgPrice} {quote?.symbol}
+              </span>
             </div>
             <Separator className="!my-6" />
             <form.Field name="slippage">

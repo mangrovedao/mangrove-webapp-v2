@@ -48,22 +48,26 @@ export function useTradeInfos(
     lowestAskPrice?.toNumber(),
     market?.quote,
   )
-  const spread = lowestAskPrice
-    ?.sub(highestBidPrice ?? 0)
-    .toFixed(priceDecimals)
 
-  const spotPrice =
-    spread && Number(spread) <= 0
-      ? Math.max(
+  // const spread = lowestAskPrice
+  //   ?.sub(highestBidPrice ?? 0)
+  //   .toFixed(priceDecimals)
+
+  // const spotPrice =
+  //   spread && Number(spread) <= 0
+  //     ? Math.max(
+  //         lowestAskPrice?.toNumber() || 0,
+  //         highestBidPrice?.toNumber() || 0,
+  //       ).toFixed(priceDecimals)
+  //     : spread
+
+  const tempSpotPrice =
+    !lowestAskPrice || !highestBidPrice
+      ? undefined
+      : Math.max(
           lowestAskPrice?.toNumber() || 0,
           highestBidPrice?.toNumber() || 0,
         ).toFixed(priceDecimals)
-      : spread
-
-  const tempSpotPrice = Math.max(
-    lowestAskPrice?.toNumber() || 0,
-    highestBidPrice?.toNumber() || 0,
-  ).toFixed(priceDecimals)
 
   return {
     sendToken,
