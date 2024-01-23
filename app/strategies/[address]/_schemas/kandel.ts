@@ -1,6 +1,7 @@
 import { z } from "zod"
 import {
   kandelTypeStringSchema,
+  numberOrNaN,
   offerWithPricesSchema,
   parameterSchema,
 } from "../../(list)/_schemas/kandels"
@@ -17,7 +18,7 @@ export const strategySchema = z.object({
   max: z.string(),
   depositedBase: z.string(),
   depositedQuote: z.string(),
-  return: z.number(),
+  return: numberOrNaN,
   currentParameter: parameterSchema,
   offers: z.array(offerWithPricesSchema),
 })
@@ -25,5 +26,10 @@ export const strategySchema = z.object({
 export type Strategy = z.infer<typeof strategySchema>
 
 export function parseStrategy(data: unknown): Strategy {
-  return strategySchema.parse(data)
+  try {
+    return strategySchema.parse(data)
+  } catch (error) {
+    console.error("Failed to parse strategy", error, data)
+    throw error
+  }
 }

@@ -124,6 +124,19 @@ const useMarketContext = () => {
     }
   }, [market, updateOrderbook])
 
+  function getMarketFromAddresses(base: string, quote: string) {
+    if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
+
+    const marketInfo = marketsInfoQuery.data.find((marketInfo) => {
+      return (
+        marketInfo.base.address?.toLowerCase() === base?.toLowerCase() &&
+        marketInfo.quote.address?.toLowerCase() === quote?.toLowerCase()
+      )
+    })
+    if (!marketInfo) return
+    return mangrove.market(marketInfo)
+  }
+
   return {
     requestBookQuery,
     market,
@@ -132,6 +145,7 @@ const useMarketContext = () => {
     midPrice: midPrice ?? midPriceQuery.data,
     riskAppetite,
     setCurrentMarket,
+    getMarketFromAddresses,
   }
 }
 

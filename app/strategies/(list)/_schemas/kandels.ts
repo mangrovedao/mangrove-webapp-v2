@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const numberOrNaN = z.custom(
+export const numberOrNaN = z.custom(
   (value) => typeof value === "number" || Number.isNaN(value),
   { message: "Expected number or NaN" },
 )
@@ -28,6 +28,7 @@ export const offerWithPricesSchema = z.object({
   price: z.union([z.string(), z.undefined()]),
   index: z.number(),
   offerId: z.number(),
+  tick: z.string(),
   live: z.boolean(),
 })
 

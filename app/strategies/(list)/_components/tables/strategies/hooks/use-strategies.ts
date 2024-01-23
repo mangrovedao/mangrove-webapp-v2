@@ -43,6 +43,7 @@ export function useStrategies<T = Strategy[]>({
         skip,
         knownTokens,
       })
+      console.log(result)
       return parseStrategies(result)
     },
     select,

@@ -2,30 +2,24 @@
 
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import { useQuery } from "@tanstack/react-query"
+import { parseStrategy } from "../_schemas/kandel"
 
-type Strategy = any
-
-type Params<T> = {
+type Params = {
   strategyAddress: string
-  select?: (data: Strategy) => T
 }
 
-export function useStrategy<T = Strategy>({
-  strategyAddress,
-  select,
-}: Params<T>) {
+export function useStrategy({ strategyAddress }: Params) {
   const { indexerSdk } = useIndexerSdk()
-
   return useQuery({
     queryKey: ["strategy", strategyAddress],
     queryFn: async () => {
-      if (!(indexerSdk && strategyAddress)) return []
+      if (!(indexerSdk && strategyAddress)) return null
       const result = await indexerSdk.getKandel({
         address: strategyAddress,
       })
-      return result
+      console.log("result", result)
+      return parseStrategy(result)
     },
-    select,
     meta: {
       error: "Unable to fetch strategy",
     },

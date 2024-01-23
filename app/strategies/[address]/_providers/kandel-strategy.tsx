@@ -1,6 +1,9 @@
 "use client"
 import { useParams } from "next/navigation"
 import React from "react"
+import { Address } from "viem"
+
+import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { useStrategy } from "../_hooks/use-strategy"
 
 const useKandelStrategyContext = () => {
@@ -8,10 +11,18 @@ const useKandelStrategyContext = () => {
   const strategyQuery = useStrategy({
     strategyAddress: params.address,
   })
+  const { data: baseToken } = useTokenFromAddress(
+    strategyQuery.data?.base as Address,
+  )
+  const { data: quoteToken } = useTokenFromAddress(
+    strategyQuery.data?.quote as Address,
+  )
 
   return {
     strategyQuery,
     strategyAddress: params.address,
+    baseToken,
+    quoteToken,
   }
 }
 
