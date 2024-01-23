@@ -7,6 +7,8 @@ import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import useMarket from "@/providers/market"
 import { calculateMidPriceFromOrderBook } from "@/utils/market"
 
+export type Status = "active" | "inactive" | "closed" | "unknown"
+
 export default function useStrategyStatus(strategy: Strategy) {
   const { kandelStrategies } = useKandel()
   const { getMarketFromAddresses } = useMarket()
@@ -18,7 +20,7 @@ export default function useStrategyStatus(strategy: Strategy) {
           strategy.base,
           strategy.quote,
         )
-        if (!(kandelStrategies && market)) return []
+        if (!(kandelStrategies && market)) return null
         const book = await market.requestBook()
         const midPrice = Big(calculateMidPriceFromOrderBook(book) ?? 0)
         const stratInstance = await kandelStrategies.instance({
@@ -33,7 +35,7 @@ export default function useStrategyStatus(strategy: Strategy) {
         let isOutOfRange = false
         let unexpectedDeadOffers = false
         let offerStatuses: Statuses | null = null
-        let status = "unknown"
+        let status: Status = "unknown"
         if (!anyLiveOffers) {
           status = hasBalance ? "inactive" : "closed"
         } else {
@@ -41,19 +43,19 @@ export default function useStrategyStatus(strategy: Strategy) {
             offers: {
               bids: strategy.offers
                 .filter((x) => x.offerType === "bids")
-                .map(({ offerId, index, live }) => ({
+                .map(({ offerId, index, live, tick }) => ({
                   id: offerId,
                   index,
                   live,
-                  tick: 0, // TODO: I don't have the info
+                  tick: Number(tick),
                 })),
               asks: strategy.offers
                 .filter((x) => x.offerType === "asks")
-                .map(({ offerId, index, live }) => ({
+                .map(({ offerId, index, live, tick }) => ({
                   id: offerId,
                   index,
                   live,
-                  tick: 0, // TODO: I don't have the info
+                  tick: Number(tick),
                 })),
             },
             midPrice,

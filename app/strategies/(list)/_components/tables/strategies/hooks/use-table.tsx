@@ -103,8 +103,7 @@ export function useTable({ data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Status",
         cell: ({ row }) => {
-          const { offers } = row.original
-          return <Status status={offers?.length === 0 ? "closed" : "active"} />
+          return <Status strategy={row.original} />
         },
       }),
       columnHelper.display({
