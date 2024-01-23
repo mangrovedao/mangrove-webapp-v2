@@ -2,11 +2,13 @@
 import { useParams } from "next/navigation"
 import React from "react"
 import { Address } from "viem"
+import { useNetwork } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { useStrategy } from "../_hooks/use-strategy"
 
 const useKandelStrategyContext = () => {
+  const { chain } = useNetwork()
   const params = useParams<{ address: string }>()
   const strategyQuery = useStrategy({
     strategyAddress: params.address,
@@ -23,6 +25,7 @@ const useKandelStrategyContext = () => {
     strategyAddress: params.address,
     baseToken,
     quoteToken,
+    blockExplorerUrl: chain?.blockExplorers?.default.url,
   }
 }
 

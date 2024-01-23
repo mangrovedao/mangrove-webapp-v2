@@ -3,14 +3,17 @@ import { Title } from "@/components/typography/title"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Check, Close, Closed } from "@/svgs"
 import { cn } from "@/utils"
-import useStrategyStatus from "../hooks/use-strategy-status"
+import useStrategyStatus from "../_hooks/use-strategy-status"
 
-type Props = {
-  strategy: Strategy
-}
+type Props = Pick<Strategy, "address" | "base" | "quote" | "offers">
 
-export default function Status({ strategy }: Props) {
-  const { data } = useStrategyStatus(strategy)
+export default function Status({ address, base, quote, offers }: Props) {
+  const { data } = useStrategyStatus({
+    address,
+    base,
+    quote,
+    offers,
+  })
   const status = data?.status
 
   if (!status) return <Skeleton className="w-20 h-5" />

@@ -9,29 +9,33 @@ import { calculateMidPriceFromOrderBook } from "@/utils/market"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
 
-export default function useStrategyStatus(strategy: Strategy) {
+type Params = Pick<Strategy, "address" | "base" | "quote" | "offers">
+
+export default function useStrategyStatus({
+  address,
+  base,
+  quote,
+  offers,
+}: Params) {
   const { kandelStrategies } = useKandel()
   const { getMarketFromAddresses } = useMarket()
   return useQuery({
-    queryKey: ["stategy-status", strategy.address],
+    queryKey: ["stategy-status", address],
     queryFn: async () => {
       try {
-        const market = await getMarketFromAddresses(
-          strategy.base,
-          strategy.quote,
-        )
+        const market = await getMarketFromAddresses(base, quote)
         if (!(kandelStrategies && market)) return null
         const book = await market.requestBook()
         const midPrice = Big(calculateMidPriceFromOrderBook(book) ?? 0)
         const stratInstance = await kandelStrategies.instance({
-          address: strategy.address,
+          address: address,
           market,
         })
 
         const asksBalance = await stratInstance.getBalance("asks") // base
         const bidsBalance = await stratInstance.getBalance("bids") // quote
         const hasBalance = asksBalance.gt(0) && bidsBalance.gt(0)
-        const anyLiveOffers = strategy.offers.some((x) => x?.live === true)
+        const anyLiveOffers = offers.some((x) => x?.live === true)
         let isOutOfRange = false
         let unexpectedDeadOffers = false
         let offerStatuses: Statuses | null = null
@@ -41,7 +45,7 @@ export default function useStrategyStatus(strategy: Strategy) {
         } else {
           offerStatuses = await stratInstance.getOfferStatusFromOffers({
             offers: {
-              bids: strategy.offers
+              bids: offers
                 .filter((x) => x.offerType === "bids")
                 .map(({ offerId, index, live, tick }) => ({
                   id: offerId,
@@ -49,7 +53,7 @@ export default function useStrategyStatus(strategy: Strategy) {
                   live,
                   tick: Number(tick),
                 })),
-              asks: strategy.offers
+              asks: offers
                 .filter((x) => x.offerType === "asks")
                 .map(({ offerId, index, live, tick }) => ({
                   id: offerId,
@@ -80,6 +84,6 @@ export default function useStrategyStatus(strategy: Strategy) {
         }
       } catch (error) {}
     },
-    enabled: !!strategy.address,
+    enabled: !!address,
   })
 }

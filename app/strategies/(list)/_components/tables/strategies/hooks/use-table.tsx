@@ -14,10 +14,10 @@ import { useNetwork } from "wagmi"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
+import Status from "../../../../../(shared)/_components/status"
 import type { Strategy } from "../../../../_schemas/kandels"
 import { Market } from "../components/market"
 import { MinMax } from "../components/min-max"
-import Status from "../components/status"
 import { Value } from "../components/value"
 
 const columnHelper = createColumnHelper<Strategy>()
@@ -103,7 +103,15 @@ export function useTable({ data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Status",
         cell: ({ row }) => {
-          return <Status strategy={row.original} />
+          const { base, quote, address, offers } = row.original
+          return (
+            <Status
+              base={base}
+              quote={quote}
+              address={address}
+              offers={offers}
+            />
+          )
         },
       }),
       columnHelper.display({
