@@ -5,14 +5,14 @@ import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import Big from "big.js"
 
 type Props = {
-  base: string
-  baseValue: string
+  min: string
+  max: string
   quote: string
-  quoteValue: string
 }
-export function Value({ base, baseValue, quote, quoteValue }: Props) {
-  const { data: baseToken } = useTokenFromAddress(base as Address)
+export function MinMax({ min, max, quote }: Props) {
   const { data: quoteToken } = useTokenFromAddress(quote as Address)
+  const displayedDecimals = quoteToken?.displayedDecimals ?? 2
+  const symbol = quoteToken?.symbol
 
   if (!quoteToken) {
     return <Skeleton className="h-6 w-full" />
@@ -21,12 +21,10 @@ export function Value({ base, baseValue, quote, quoteValue }: Props) {
   return (
     <div>
       <div>
-        {Big(baseValue).toFixed(baseToken?.displayedDecimals)}{" "}
-        {baseToken?.symbol}
+        {Big(min).toFixed(displayedDecimals)} {symbol}
       </div>
       <div>
-        {Big(quoteValue).toFixed(quoteToken?.displayedDecimals)}{" "}
-        {quoteToken?.symbol}
+        {Big(max).toFixed(displayedDecimals)} {symbol}
       </div>
     </div>
   )

@@ -34,7 +34,6 @@ export function useStrategies<T = Strategy[]>({
   })
 
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["strategies", address, first, skip],
     queryFn: async () => {
       if (!(indexerSdk && address && knownTokens)) return []

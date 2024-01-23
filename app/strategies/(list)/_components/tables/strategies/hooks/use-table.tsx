@@ -14,9 +14,10 @@ import { useNetwork } from "wagmi"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
-import Big from "big.js"
 import type { Strategy } from "../../../../_schemas/kandels"
 import { Market } from "../components/market"
+import { MinMax } from "../components/min-max"
+import Status from "../components/status"
 import { Value } from "../components/value"
 
 const columnHelper = createColumnHelper<Strategy>()
@@ -41,27 +42,30 @@ export function useTable({ data, onCancel, onManage }: Params) {
           </div>
         ),
         cell: ({ row }) => {
-          const { address, transactionHash } = row.original
+          const { address, owner } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
           return (
             <div className="flex flex-col underline">
               <Link
                 className="hover:opacity-80 transition-opacity"
-                href={`${blockExplorerUrl}/tx/${address}`}
+                href={`${blockExplorerUrl}/address/${address}`}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 {shortenAddress(address)}
               </Link>
               <Link
                 className="hover:opacity-80 transition-opacity"
-                href={`${blockExplorerUrl}/address/${transactionHash}`}
+                href={`${blockExplorerUrl}/address/${owner}`}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {shortenAddress(transactionHash)}
+                {shortenAddress(owner)}
               </Link>
             </div>
           )
         },
       }),
-      // TODO: get min max from indexer
       columnHelper.display({
         id: "min-max",
         header: () => (
@@ -71,13 +75,8 @@ export function useTable({ data, onCancel, onManage }: Params) {
           </div>
         ),
         cell: ({ row }) => {
-          const { depositedBase, depositedQuote } = row.original
-          return (
-            <div className="flex flex-col">
-              <div>{Big(depositedBase).toFixed(2)}</div>
-              <div>{Big(depositedQuote).toFixed(2)}</div>
-            </div>
-          )
+          const { min, max, quote } = row.original
+          return <MinMax min={min} max={max} quote={quote} />
         },
       }),
       columnHelper.display({
@@ -87,28 +86,42 @@ export function useTable({ data, onCancel, onManage }: Params) {
           return <Market base={base} quote={quote} />
         },
       }),
-      // TODO: get from indexer
       columnHelper.display({
         header: "Value",
         cell: ({ row }) => {
-          const { quote } = row.original
-          return <Value quote={quote} value={"123.484"} />
+          const { base, quote, depositedBase, depositedQuote } = row.original
+          return (
+            <Value
+              base={base}
+              baseValue={depositedBase}
+              quote={quote}
+              quoteValue={depositedQuote}
+            />
+          )
         },
       }),
-      // TODO: get from indexer
+      columnHelper.display({
+        header: "Status",
+        cell: ({ row }) => {
+          const { offers } = row.original
+          return <Status status={offers?.length === 0 ? "closed" : "active"} />
+        },
+      }),
       columnHelper.display({
         header: "Return (%)",
-        cell: () => "5%",
+        cell: ({ row }) => {
+          const { return: ret } = row.original
+          return (
+            <div className="flex flex-col">
+              <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+            </div>
+          )
+        },
       }),
       // TODO: get from indexer
       columnHelper.display({
         header: "Liquidity source",
         cell: () => "Wallet",
-      }),
-      // TODO: get from indexer
-      columnHelper.display({
-        header: "Reward",
-        cell: () => "3.39%",
       }),
       columnHelper.display({
         id: "actions",
@@ -118,7 +131,6 @@ export function useTable({ data, onCancel, onManage }: Params) {
             <IconButton
               tooltip="Manage"
               className="aspect-square w-6 rounded-full"
-              disabled
               onClick={() => onManage(row.original)}
             >
               <Pen />

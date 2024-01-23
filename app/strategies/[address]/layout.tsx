@@ -11,7 +11,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
       <IndexerSdkProvider>
         <KandelStrategyProvider>
           <Navbar innerClasses="max-w-8xl mx-auto" />
-          <main className="w-full">{children}</main>
+          <main className="w-full mt-5">{children}</main>
         </KandelStrategyProvider>
       </IndexerSdkProvider>
     </MarketProvider>

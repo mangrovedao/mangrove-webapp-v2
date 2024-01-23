@@ -1,10 +1,15 @@
 import { z } from "zod"
 
+const numberOrNaN = z.custom(
+  (value) => typeof value === "number" || Number.isNaN(value),
+  { message: "Expected number or NaN" },
+)
+
 export const parameterSchema = z.object({
-  gasprice: z.string().optional(),
+  gasprice: z.string().nullable().optional(),
   gasreq: z.string().optional(),
-  stepSize: z.string().optional(),
-  length: z.string().optional(),
+  stepSize: z.string().nullable().optional(),
+  length: z.string().nullable().optional(),
 })
 
 export const bidsOrAsksSchema = z.union([z.literal("bids"), z.literal("asks")])
@@ -37,6 +42,10 @@ export const strategySchema = z.object({
   depositedQuote: z.string(),
   currentParameter: parameterSchema,
   offers: z.array(offerWithPricesSchema),
+  owner: z.string(),
+  min: z.string(),
+  max: z.string(),
+  return: numberOrNaN,
 })
 
 export type Strategy = z.infer<typeof strategySchema>

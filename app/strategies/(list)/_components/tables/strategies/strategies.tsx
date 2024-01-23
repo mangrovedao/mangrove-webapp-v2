@@ -1,4 +1,5 @@
 "use client"
+import { useRouter } from "next/navigation"
 import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
@@ -6,14 +7,15 @@ import useMarket from "@/providers/market"
 import type { Strategy } from "../../../_schemas/kandels"
 import { useStrategies } from "./hooks/use-strategies"
 import { useTable } from "./hooks/use-table"
-import { MOCKS } from "./mock"
 
 export function Strategies() {
+  const { push } = useRouter()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
   })
   const { market } = useMarket()
+  const { data } = useStrategies()
   const { data: count } = useStrategies({
     select: (strategies) => strategies.length,
   })
@@ -27,12 +29,11 @@ export function Strategies() {
   const [, setStrategyToCancel] = React.useState<Strategy>()
 
   const table = useTable({
-    data: MOCKS,
-    onManage: () => {
-      // TODO: implement
-      console.log("manage")
+    data,
+    onManage: (strategy: Strategy) => {
+      push(`/strategies/${strategy.address}`)
     },
-    onCancel: setStrategyToCancel,
+    onCancel: setStrategyToCancel, // TODO: implement cancel dialog
   })
   return (
     <DataTable
