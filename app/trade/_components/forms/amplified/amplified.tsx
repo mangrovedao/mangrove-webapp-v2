@@ -5,6 +5,7 @@ import {
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
+import { TokenIcon } from "@/components/token-icon"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Accordion } from "../components/accordion"
-import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import { useAmplified } from "./hooks/use-amplified"
@@ -33,6 +33,7 @@ export function Amplified() {
   const [formData, setFormData] = React.useState<Form>()
   const {
     sendTokenBalance,
+    assets,
     handleSubmit,
     form,
     quoteToken,
@@ -52,6 +53,7 @@ export function Amplified() {
         Amplified order is a lorem ipsum dolor sit amet consectetur adipiscing
         elit.
       </Text>
+
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
           <form.Field name="tradeAction">
@@ -80,35 +82,42 @@ export function Amplified() {
               </CustomRadioGroup>
             )}
           </form.Field>
+
           <div className="space-y-4 !mt-6">
             <Title variant={"title2"}> Liquidity sourcing</Title>
 
             <form.Field name="sendSource">
               {(field) => (
-                <Select
-                  name={field.name}
-                  value={field.state.value}
-                  onValueChange={(value: string) => {
-                    field.handleChange(value)
-                  }}
-                  disabled={!market}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Send from" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {["wallet1", "wallet2"].map((source) => (
-                        <SelectItem key={source} value={source}>
-                          {source}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-col">
+                  <Caption variant={"caption1"} as={"label"}>
+                    Send from
+                  </Caption>
+                  <Select
+                    name={field.name}
+                    value={field.state.value}
+                    onValueChange={(value: string) => {
+                      field.handleChange(value)
+                    }}
+                    disabled={!market}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {["wallet1", "wallet2"].map((source) => (
+                          <SelectItem key={source} value={source}>
+                            {source}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
             </form.Field>
-            <div className="flex space-x-2">
+
+            <div className="flex flex-col">
               <form.Field
                 name="sendBalance"
                 onChange={isGreaterThanZeroValidator}
@@ -121,7 +130,6 @@ export function Amplified() {
                     onChange={(e) => {
                       field.handleChange(e.target.value)
                     }}
-                    // label="Send"
                     disabled={!market}
                     error={field.state.meta.errors}
                   />
@@ -129,60 +137,6 @@ export function Amplified() {
               </form.Field>
 
               <form.Field name="sendBalance">
-                {(field) => (
-                  <Select
-                    name={field.name}
-                    value={field.state.value}
-                    onValueChange={(value: string) => {
-                      field.handleChange(value)
-                    }}
-                    disabled={!market}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Send from" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {["wallet1", "wallet2"].map((source) => (
-                          <SelectItem key={source} value={source}>
-                            {source}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
-              </form.Field>
-            </div>
-
-            <div />
-            <Caption variant={"caption1"} as={"label"}>
-              Buy (Asset 1)
-            </Caption>
-            <div className="flex justify-between space-x-1">
-              <form.Field
-                name="buyAmount"
-                onChange={isGreaterThanZeroValidator}
-              >
-                {(field) => (
-                  <EnhancedNumericInput
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={({ target: { value } }) => {
-                      field.handleChange(value)
-                    }}
-                    token={receiveToken}
-                    disabled={!(market && form.state.isFormValid)}
-                    error={field.state.meta.touchedErrors}
-                  />
-                )}
-              </form.Field>
-
-              <form.Field
-                name="buyToken"
-                // onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
-              >
                 {(field) => (
                   <Select
                     name={field.name}
@@ -207,57 +161,16 @@ export function Amplified() {
                   </Select>
                 )}
               </form.Field>
+              <TokenBalance token={receiveToken} label={"Balance"} />
             </div>
-            <TokenBalance token={receiveToken} label={"Balance"} />
 
-            <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
-              {(field) => (
-                <EnhancedNumericInput
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={({ target: { value } }) => {
-                    field.handleChange(value)
-                  }}
-                  token={receiveToken}
-                  label="Limit price"
-                  disabled={!(market && form.state.isFormValid)}
-                  error={field.state.meta.touchedErrors}
-                  showBalance
-                />
-              )}
-            </form.Field>
-
-            <form.Field name="receiveTo">
-              {(field) => (
-                <Select
-                  name={field.name}
-                  value={field.state.value}
-                  onValueChange={(value: string) => {
-                    field.handleChange(value)
-                  }}
-                  disabled={!market}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {["wallet1", "wallet2"].map((source) => (
-                        <SelectItem key={source} value={source}>
-                          {source}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-            </form.Field>
+            <div />
 
             <Caption variant={"caption1"} as={"label"}>
-              Buy
+              Buy (Asset 1)
             </Caption>
-            <div className="flex justify-between space-x-2">
+
+            <div className="flex justify-between space-x-1">
               <form.Field
                 name="buyAmount"
                 onChange={isGreaterThanZeroValidator}
@@ -270,7 +183,6 @@ export function Amplified() {
                     onChange={({ target: { value } }) => {
                       field.handleChange(value)
                     }}
-                    token={quoteToken}
                     disabled={!(market && form.state.isFormValid)}
                     error={field.state.meta.touchedErrors}
                   />
@@ -292,9 +204,120 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
+                        {assets.map((asset) => (
+                          <SelectItem
+                            key={asset?.symbol}
+                            value={asset?.symbol || ""} //TODO: fix undefined assets
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={asset?.symbol} />
+                              <Text>{asset?.symbol}</Text>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              </form.Field>
+            </div>
+
+            <TokenBalance token={receiveToken} label={"Balance"} />
+
+            <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
+              {(field) => (
+                <EnhancedNumericInput
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={({ target: { value } }) => {
+                    field.handleChange(value)
+                  }}
+                  token={receiveToken}
+                  label="Limit price"
+                  disabled={!(market && form.state.isFormValid)}
+                  error={field.state.meta.touchedErrors}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="receiveTo">
+              {(field) => (
+                <div className="flex-col flex">
+                  <Caption variant={"caption1"} as={"label"}>
+                    Receive to
+                  </Caption>
+                  <Select
+                    name={field.name}
+                    value={field.state.value}
+                    onValueChange={(value: string) => {
+                      field.handleChange(value)
+                    }}
+                    disabled={!market}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
                         {["wallet1", "wallet2"].map((source) => (
                           <SelectItem key={source} value={source}>
                             {source}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </form.Field>
+
+            <Caption variant={"caption1"} as={"label"}>
+              Buy (Asset 2)
+            </Caption>
+            <div className="flex justify-between space-x-2">
+              <form.Field
+                name="buyAmount"
+                onChange={isGreaterThanZeroValidator}
+              >
+                {(field) => (
+                  <EnhancedNumericInput
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={({ target: { value } }) => {
+                      field.handleChange(value)
+                    }}
+                    disabled={!(market && form.state.isFormValid)}
+                    error={field.state.meta.touchedErrors}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="buyToken">
+                {(field) => (
+                  <Select
+                    name={field.name}
+                    value={field.state.value}
+                    onValueChange={(value: string) => {
+                      field.handleChange(value)
+                    }}
+                    disabled={!market}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {assets.map((asset) => (
+                          <SelectItem
+                            key={asset?.symbol}
+                            value={asset?.symbol || ""} // TODO: fix undefined assets
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={asset?.symbol} />
+                              <Text>{asset?.symbol}</Text>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -318,49 +341,48 @@ export function Amplified() {
                   label="Limit price"
                   disabled={!(market && form.state.isFormValid)}
                   error={field.state.meta.touchedErrors}
-                  showBalance
                 />
               )}
             </form.Field>
 
             <form.Field name="receiveTo">
               {(field) => (
-                <Select
-                  name={field.name}
-                  value={field.state.value}
-                  onValueChange={(value: string) => {
-                    field.handleChange(value)
-                  }}
-                  disabled={!market}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {["wallet1", "wallet2"].map((source) => (
-                        <SelectItem key={source} value={source}>
-                          {source}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <div className="flex-col flex">
+                  <Caption variant={"caption1"} as={"label"}>
+                    Receive to
+                  </Caption>
+                  <Select
+                    name={field.name}
+                    value={field.state.value}
+                    onValueChange={(value: string) => {
+                      field.handleChange(value)
+                    }}
+                    disabled={!market}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {["wallet1", "wallet2"].map((source) => (
+                          <SelectItem key={source} value={source}>
+                            {source}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
             </form.Field>
 
             <Separator className="!my-6" />
-
+            <Button> Add Market</Button>
             <Accordion title="Advanced">
               <p></p>
             </Accordion>
 
             <Separator className="!my-6" />
-
-            <MarketDetails
-              takerFee={feeInPercentageAsString}
-              tickSize={tickSize}
-            />
 
             <form.Subscribe
               selector={(state) => [

@@ -33,6 +33,7 @@ export function useAmplified(props: Props) {
   const tradeAction = form.useStore((state) => state.values.tradeAction)
   const {
     quoteToken,
+    baseToken,
     sendToken,
     receiveToken,
     feeInPercentageAsString,
@@ -76,6 +77,7 @@ export function useAmplified(props: Props) {
     sendToken,
     send,
     receiveToken,
+    assets: [quoteToken, baseToken],
     tickSize: marketInfo?.tickSpacing.toString(),
     feeInPercentageAsString,
   }
