@@ -74,13 +74,14 @@ export function useTable({ data, onCancel, onEdit }: Params) {
           const { initialWants, takerGot, initialGives, isBid, takerGave } =
             row.original
           const baseSymbol = market?.base.symbol
-          const displayDecimals = market?.base.displayedDecimals
-          const amount = Big(isBid ? initialWants : initialGives).toFixed(
-            displayDecimals,
-          )
-          const filled = Big(isBid ? takerGot : takerGave).toFixed(
-            displayDecimals,
-          )
+          const quoteSymbol = market?.quote.symbol
+          const symbol = isBid ? baseSymbol : quoteSymbol
+          const displayDecimals = isBid
+            ? market?.base.displayedDecimals
+            : market?.quote.displayedDecimals
+
+          const amount = Big(initialWants).toFixed(displayDecimals)
+          const filled = Big(takerGot).toFixed(displayDecimals)
           const progress = Math.min(
             Math.round(
               Big(filled)
@@ -98,7 +99,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
               </span>
               <span className="">
                 &nbsp;
-                {amount} {baseSymbol}
+                {amount} {symbol}
               </span>
               <CircularProgressBar progress={progress} className="ml-3" />
             </div>
