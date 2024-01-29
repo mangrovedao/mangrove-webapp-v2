@@ -9,7 +9,7 @@ export const useSpenderAddress = (type: "limit" | "market") => {
     queryFn: async () => {
       if (!mangrove) return null
       if (type === "limit") {
-        return await mangrove.orderContract.router()
+        return await mangrove.getRestingOrderRouterAddress()
       }
       return mangrove.address
     },
