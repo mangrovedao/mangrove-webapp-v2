@@ -14,7 +14,8 @@
     "build-storybook": "storybook build",
     "prepare": "pnpm run crypto-icons",
     "crypto-icons": "node ./prepare-icons.js",
-    "knip": "knip"
+    "knip": "knip",
+    "heroku-cleanup": "rm -rf .next/cache"
   },
   "dependencies": {
     "@ark-ui/react": "^1.2.1",
@@ -36,6 +37,7 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@rainbow-me/rainbowkit": "^1.3.2",
+    "@sentry/nextjs": "^7.92.0",
     "@storybook/preview-api": "^7.6.6",
     "@t3-oss/env-nextjs": "^0.6.1",
     "@tanstack/react-form": "0.10.3",
@@ -64,6 +66,8 @@
     "lucide-react": "^0.279.0",
     "next": "^14.0.4",
     "next-ssl-redirect-middleware": "^0.1.5",
+    "posthog-js": "^1.96.1",
+    "radash": "^11.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-jazzicon": "^1.0.4",

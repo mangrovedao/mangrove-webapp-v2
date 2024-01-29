@@ -1,3 +1,4 @@
+import Script from "next/script"
 import React from "react"
 
 import { Navbar } from "@/components/navbar"
@@ -8,8 +9,9 @@ export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <MarketProvider>
       <IndexerSdkProvider>
+        {/* TODO: remove once we got our datafeed */}
+        <Script src="/datafeeds/udf/dist/bundle.js" async />
         <Navbar />
-
         {children}
       </IndexerSdkProvider>
     </MarketProvider>

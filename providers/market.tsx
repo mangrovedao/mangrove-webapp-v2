@@ -7,6 +7,7 @@ import React from "react"
 import { useNetwork } from "wagmi"
 
 import { getTokenPriceInToken } from "@/services/tokens.service"
+import { getRiskAppetite } from "@/utils/cashness"
 import { calculateMidPriceFromOrderBook } from "@/utils/market"
 import useMangrove from "./mangrove"
 
@@ -74,6 +75,11 @@ const useMarketContext = () => {
     }
   }, [requestBookQuery.data])
 
+  const riskAppetite = React.useMemo(() => {
+    if (!marketInfo) return
+    return getRiskAppetite(marketInfo.base.id, marketInfo.quote.id)
+  }, [marketInfo])
+
   // Get mid price only if there is no liquidity in the book
   const midPriceQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -110,6 +116,7 @@ const useMarketContext = () => {
     marketInfo,
     olKeys,
     midPrice: midPrice ?? midPriceQuery.data,
+    riskAppetite,
   }
 }
 

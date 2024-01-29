@@ -49,7 +49,7 @@ export function RangeTooltips({
       ) : undefined}
       {midPrice ? (
         <Tooltip
-          top={-40}
+          top={0}
           left={xScaleTransformed(midPrice)}
           className="!bg-transparent"
         >

@@ -14,7 +14,9 @@ const mangroveConfigSchema = z.object({
   tokens: z.record(z.string(), tokenSchema),
 })
 
-function getMangroveConfigFromEnvVariable() {
+type MangroveConfig = z.infer<typeof mangroveConfigSchema>
+
+function getMangroveConfigFromEnvVariable(): MangroveConfig | undefined {
   try {
     const mangroveConfig = stringToJSONSchema.parse(
       env.NEXT_PUBLIC_MANGROVE_CONFIG,
@@ -22,7 +24,6 @@ function getMangroveConfigFromEnvVariable() {
     return mangroveConfigSchema.parse(mangroveConfig)
   } catch (e) {
     console.error(getErrorMessage(e))
-    return {}
   }
 }
 
