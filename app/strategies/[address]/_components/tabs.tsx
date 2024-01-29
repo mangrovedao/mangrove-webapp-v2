@@ -4,8 +4,8 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { renderElement } from "@/utils/render"
+import Overview from "./overview/overview"
 
 export enum ManageTabs {
   OVERVIEW = "overview",
@@ -13,7 +13,7 @@ export enum ManageTabs {
 }
 
 const TABS_CONTENT = {
-  [ManageTabs.OVERVIEW]: <div>Overview</div>,
+  [ManageTabs.OVERVIEW]: <Overview />,
   [ManageTabs.PARAMETERS]: <div>Parameters</div>,
 }
 
@@ -42,11 +42,7 @@ export default function Tabs(
             value={table}
             style={{ height: "var(--history-table-content-height)" }}
           >
-            <ScrollArea className="h-full" scrollHideDelay={200}>
-              <div className="">{renderElement(TABS_CONTENT[table])}</div>
-              <ScrollBar orientation="vertical" className="z-50" />
-              <ScrollBar orientation="horizontal" className="z-50" />
-            </ScrollArea>
+            <div className="">{renderElement(TABS_CONTENT[table])}</div>
           </CustomTabsContent>
         ))}
       </div>

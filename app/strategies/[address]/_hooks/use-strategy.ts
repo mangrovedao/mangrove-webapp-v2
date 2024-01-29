@@ -17,7 +17,6 @@ export function useStrategy({ strategyAddress }: Params) {
       const result = await indexerSdk.getKandel({
         address: strategyAddress,
       })
-      console.log("result", result)
       return parseStrategy(result)
     },
     meta: {

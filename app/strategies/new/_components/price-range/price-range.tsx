@@ -11,9 +11,9 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
+import { AverageReturn } from "../../../(shared)/_components/average-return"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import DeployStrategyDialog from "../launch-strategy-dialog"
-import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"

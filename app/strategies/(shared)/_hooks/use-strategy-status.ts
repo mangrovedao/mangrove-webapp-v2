@@ -9,7 +9,7 @@ import { calculateMidPriceFromOrderBook } from "@/utils/market"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
 
-type Params = Pick<Strategy, "address" | "base" | "quote" | "offers">
+type Params = Partial<Pick<Strategy, "address" | "base" | "quote" | "offers">>
 
 export default function useStrategyStatus({
   address,
@@ -23,6 +23,7 @@ export default function useStrategyStatus({
     queryKey: ["stategy-status", address],
     queryFn: async () => {
       try {
+        if (!address || !base || !quote || !offers) return null
         const market = await getMarketFromAddresses(base, quote)
         if (!(kandelStrategies && market)) return null
         const book = await market.requestBook()
@@ -43,24 +44,26 @@ export default function useStrategyStatus({
         if (!anyLiveOffers) {
           status = hasBalance ? "inactive" : "closed"
         } else {
+          const bids = offers.filter((x) => x.offerType === "bids")
+          const asks = offers.filter((x) => x.offerType === "asks")
           offerStatuses = await stratInstance.getOfferStatusFromOffers({
             offers: {
-              bids: offers
-                .filter((x) => x.offerType === "bids")
-                .map(({ offerId, index, live, tick }) => ({
-                  id: offerId,
-                  index,
-                  live,
-                  tick: Number(tick),
-                })),
-              asks: offers
-                .filter((x) => x.offerType === "asks")
-                .map(({ offerId, index, live, tick }) => ({
-                  id: offerId,
-                  index,
-                  live,
-                  tick: Number(tick),
-                })),
+              bids: bids.length
+                ? bids.map(({ offerId, index, live, tick }) => ({
+                    id: offerId,
+                    index,
+                    live,
+                    tick: Number(tick),
+                  }))
+                : [],
+              asks: asks.length
+                ? asks.map(({ offerId, index, live, tick }) => ({
+                    id: offerId,
+                    index,
+                    live,
+                    tick: Number(tick),
+                  }))
+                : [],
             },
             midPrice,
           })
@@ -81,9 +84,14 @@ export default function useStrategyStatus({
         }
         return {
           status,
+          asksBalance,
+          bidsBalance,
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error(error)
+        throw new Error("failed to determine strategy status")
+      }
     },
-    enabled: !!address,
+    enabled: !!address && !!base && !!quote && !!offers,
   })
 }

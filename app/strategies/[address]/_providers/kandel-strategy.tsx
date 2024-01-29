@@ -5,6 +5,7 @@ import { Address } from "viem"
 import { useNetwork } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
 
 const useKandelStrategyContext = () => {
@@ -20,12 +21,20 @@ const useKandelStrategyContext = () => {
     strategyQuery.data?.quote as Address,
   )
 
+  const strategyStatusQuery = useStrategyStatus({
+    address: params.address,
+    base: strategyQuery.data?.base,
+    quote: strategyQuery.data?.quote,
+    offers: strategyQuery.data?.offers,
+  })
+
   return {
     strategyQuery,
     strategyAddress: params.address,
     baseToken,
     quoteToken,
     blockExplorerUrl: chain?.blockExplorers?.default.url,
+    strategyStatusQuery,
   }
 }
 
