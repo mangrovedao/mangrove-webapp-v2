@@ -18,14 +18,14 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   '@mangrovedao/indexer-sdk':
-    specifier: 0.0.11-14
-    version: 0.0.11-14(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2)
+    specifier: 0.0.11-18
+    version: 0.0.11-18(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
     specifier: ^1.0.2
     version: 1.0.2
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.0-17
-    version: 2.0.0-17
+    specifier: 2.0.5-3
+    version: 2.0.5-3
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.45)(react-dom@18.2.0)(react@18.2.0)
@@ -2566,7 +2566,7 @@ packages:
       '@graphql-mesh/store': 0.94.6(@graphql-mesh/cross-helpers@0.4.1)(@graphql-mesh/utils@0.94.6)(@graphql-tools/utils@10.0.12)(graphql@16.8.1)(tslib@2.6.2)
       '@graphql-mesh/utils': 0.94.6(@graphql-mesh/cross-helpers@0.4.1)(@graphql-tools/utils@10.0.12)(graphql@16.8.1)(tslib@2.6.2)
       '@graphql-tools/delegate': 10.0.3(graphql@16.8.1)
-      '@graphql-tools/schema': 10.0.0(graphql@16.8.1)
+      '@graphql-tools/schema': 10.0.2(graphql@16.8.1)
       '@graphql-tools/stitch': 9.0.3(graphql@16.8.1)
       '@graphql-tools/stitching-directives': 3.0.0(graphql@16.8.1)
       '@graphql-tools/utils': 10.0.12(graphql@16.8.1)
@@ -2812,7 +2812,7 @@ packages:
       '@graphql-tools/delegate': 10.0.3(graphql@16.8.1)
       '@graphql-tools/executor': 1.2.0(graphql@16.8.1)
       '@graphql-tools/merge': 9.0.1(graphql@16.8.1)
-      '@graphql-tools/schema': 10.0.0(graphql@16.8.1)
+      '@graphql-tools/schema': 10.0.2(graphql@16.8.1)
       '@graphql-tools/utils': 10.0.12(graphql@16.8.1)
       '@graphql-tools/wrap': 10.0.1(graphql@16.8.1)
       graphql: 16.8.1
@@ -3097,8 +3097,8 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/indexer-sdk@0.0.11-14(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2):
-    resolution: {integrity: sha512-CK9wnNRZt5yGorvCNvy7+6nbQhPlUXI+/+l5DEkK7y17E44WDzbeEpgIslLKu8uLNcuoQ4xkXVpHKefKLT7vIQ==}
+  /@mangrovedao/indexer-sdk@0.0.11-18(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.3)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-XA4k+tJmNaxhnd8U5WTStGRYBFbWa+zY9/GfMDwa1SF+Mrje5dP4WVh1TqcztNsrmk8vxbkh+YUTWIRAnBWG9A==}
     dependencies:
       '@ethersproject/bignumber': 5.7.0
       '@graphprotocol/client-auto-pagination': 2.0.0(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(graphql@16.8.1)
@@ -3112,6 +3112,7 @@ packages:
       '@graphql-mesh/utils': 0.94.6(@graphql-mesh/cross-helpers@0.4.1)(@graphql-tools/utils@10.0.12)(graphql@16.8.1)(tslib@2.6.2)
       big.js: 6.2.1
       graphql: 16.8.1
+      viem: 2.5.0(typescript@5.3.3)(zod@3.22.4)
     transitivePeerDependencies:
       - '@graphql-mesh/types'
       - '@graphql-tools/delegate'
@@ -3121,11 +3122,13 @@ packages:
       - bufferutil
       - encoding
       - tslib
+      - typescript
       - utf-8-validate
+      - zod
     dev: false
 
-  /@mangrovedao/mangrove-core@2.0.2:
-    resolution: {integrity: sha512-qJhW/9MVAk/BddZqRMNRfTwS4BFhe6cJO1fBD60XUDeCrZ0L186yRJ8uUVJKsItOQsE2pe40WiKN0qj8+CkXNw==}
+  /@mangrovedao/mangrove-core@2.0.3:
+    resolution: {integrity: sha512-3xNA6qnU2zBbHUOhgl0s98oMVF9+yCR5LRyY7cYyNUBZPxzWA2528vct9EQiGFAQEHDIaeYOWGBGkFl7UprJjw==}
     dev: false
 
   /@mangrovedao/mangrove-deployments@1.0.2:
@@ -3134,21 +3137,27 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove-strats@1.0.1:
-    resolution: {integrity: sha512-3YhLKxp71JDDV7F5Tv7VzQ7hr6K9pcL/FW10wjHW436kCOYpR4Nmp03qX3sUbX24RFwRj1Q2cUO3TK2Oxs2PYQ==}
+  /@mangrovedao/mangrove-deployments@2.0.1-3:
+    resolution: {integrity: sha512-pA/8jNenW0NcrjvXvlSHqFLxCfVPSXt3WE52aVQaRLtzs/FlS32H4wDokV0zrNLEWhQLnkV00Oo8B947xkderA==}
     dependencies:
-      '@mangrovedao/mangrove-core': 2.0.2
+      semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.0-17:
-    resolution: {integrity: sha512-OtpO+6bSwikCgOPCBC90zFTb0JnYWh8igroBLfxw5MoLizmieQAVPoLwIifkHuKiYEkXUguikdL4BdwOyhgccw==}
+  /@mangrovedao/mangrove-strats@2.0.0-b1.3:
+    resolution: {integrity: sha512-RYtbTjfIrRKSsJ4ue+qVtLdzcnvSRNn4v9RVqJszVZ2WwOp2nU2nhu96qaXIf62Cnva54aYw5EKqGFz1T/tj7w==}
+    dependencies:
+      '@mangrovedao/mangrove-core': 2.0.3
+    dev: false
+
+  /@mangrovedao/mangrove.js@2.0.5-3:
+    resolution: {integrity: sha512-9fZbOQ81YTUh8M/B17WJRPTpAUPcEdmaH0rmJT7S/Yopp+Q8yvVJ2oX549M4H2XwQaniss13cfLioMxjSM/VrQ==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
       '@mangrovedao/context-addresses': 1.0.1
-      '@mangrovedao/mangrove-core': 2.0.2
-      '@mangrovedao/mangrove-deployments': 1.0.2
-      '@mangrovedao/mangrove-strats': 1.0.1
+      '@mangrovedao/mangrove-core': 2.0.3
+      '@mangrovedao/mangrove-deployments': 2.0.1-3
+      '@mangrovedao/mangrove-strats': 2.0.0-b1.3
       '@mangrovedao/reliable-event-subscriber': 1.1.29
       '@types/object-inspect': 1.8.4
       '@types/triple-beam': 1.3.5
@@ -8836,6 +8845,21 @@ packages:
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3 >=3.19.1
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      typescript: 5.3.3
+      zod: 3.22.4
+    dev: false
+
+  /abitype@1.0.0(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-NMeMah//6bJ56H5XRj8QCV4AwuW6hB6zqz2LnhhLdcWVQOsXki6/Pn3APeqxCma62nXIcmZWdu1DlHWS74umVQ==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3 >=3.22.0
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -16301,6 +16325,29 @@ packages:
       '@scure/bip32': 1.3.2
       '@scure/bip39': 1.2.1
       abitype: 0.9.8(typescript@5.3.3)(zod@3.22.4)
+      isows: 1.0.3(ws@8.13.0)
+      typescript: 5.3.3
+      ws: 8.13.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - zod
+    dev: false
+
+  /viem@2.5.0(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-ytHXIWtlgPs4mcsGxXjJrQ25v+N4dE2hBzgCU8CVv4iXNh3PRFRgyYa7igZlmxiMVzkfSHHADOtivS980JhilA==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@adraffy/ens-normalize': 1.10.0
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
+      '@scure/bip32': 1.3.2
+      '@scure/bip39': 1.2.1
+      abitype: 1.0.0(typescript@5.3.3)(zod@3.22.4)
       isows: 1.0.3(ws@8.13.0)
       typescript: 5.3.3
       ws: 8.13.0
