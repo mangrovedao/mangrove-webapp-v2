@@ -8,6 +8,7 @@ import { useEventListener } from "usehooks-ts"
 import useMarket from "@/providers/market"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
+import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
@@ -21,12 +22,23 @@ export function useAmplified(props: Props) {
     defaultValues: {
       tradeAction: TradeAction.BUY,
       sendSource: "",
-      sendBalance: "",
+      sendAmount: "",
       sendToken: "",
-      buyAmount: "",
-      buyToken: "",
-      limitPrice: "",
-      receiveTo: "",
+      firstAsset: {
+        amount: "",
+        token: "",
+        limitPrice: "",
+        receiveTo: "wallet",
+      },
+      secondAsset: {
+        amount: "",
+        token: "",
+        limitPrice: "",
+        receiveTo: "wallet",
+      },
+      timeInForce: TimeInForce.GOOD_TIL_TIME,
+      timeToLive: "28",
+      timeToLiveUnit: TimeToLiveUnit.DAY,
     },
     onSubmit: (values) => props.onSubmit(values),
   })
@@ -43,12 +55,13 @@ export function useAmplified(props: Props) {
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
-  const send = form.useStore((state) => state.values.sendBalance)
+  const send = form.useStore((state) => state.values.sendAmount)
+  const timeInForce = form.useStore((state) => state.values.timeInForce)
 
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
   ) {
-    form.setFieldValue("limitPrice", event.detail.price)
+    // form.setFieldValue("limitPrice", event.detail.price)
     form.validateAllFields("blur")
     if (send === "") return
   }
@@ -80,5 +93,6 @@ export function useAmplified(props: Props) {
     assets: [quoteToken, baseToken],
     tickSize: marketInfo?.tickSpacing.toString(),
     feeInPercentageAsString,
+    timeInForce,
   }
 }

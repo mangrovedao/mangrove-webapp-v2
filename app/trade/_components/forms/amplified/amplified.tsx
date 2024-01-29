@@ -11,6 +11,7 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -20,29 +21,25 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { cn } from "@/utils"
+import { Plus, WalletIcon } from "lucide-react"
 import { Accordion } from "../components/accordion"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
+import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
-import { isGreaterThanZeroValidator } from "./validators"
-
-const sliderValues = [25, 50, 75, 100]
 
 export function Amplified() {
   const [formData, setFormData] = React.useState<Form>()
   const {
-    sendTokenBalance,
     assets,
     handleSubmit,
     form,
     quoteToken,
     market,
-    sendToken,
     receiveToken,
-    tickSize,
-    feeInPercentageAsString,
-    send,
+    timeInForce,
   } = useAmplified({
     onSubmit: (formData) => setFormData(formData),
   })
@@ -105,9 +102,12 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {["wallet1", "wallet2"].map((source) => (
+                        {["wallet"].map((source) => (
                           <SelectItem key={source} value={source}>
-                            {source}
+                            <div className="flex space-x-3">
+                              <WalletIcon />
+                              <Text className="capitalize"> {source}</Text>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -117,11 +117,8 @@ export function Amplified() {
               )}
             </form.Field>
 
-            <div className="flex flex-col">
-              <form.Field
-                name="sendBalance"
-                onChange={isGreaterThanZeroValidator}
-              >
+            <div className="flex gap-2">
+              <form.Field name="sendAmount">
                 {(field) => (
                   <EnhancedNumericInput
                     name={field.name}
@@ -136,7 +133,7 @@ export function Amplified() {
                 )}
               </form.Field>
 
-              <form.Field name="sendBalance">
+              <form.Field name="sendToken">
                 {(field) => (
                   <Select
                     name={field.name}
@@ -151,9 +148,15 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {["wallet1", "wallet2"].map((source) => (
-                          <SelectItem key={source} value={source}>
-                            {source}
+                        {assets.map((asset) => (
+                          <SelectItem
+                            key={asset?.symbol}
+                            value={asset?.symbol || ""} //TODO: fix undefined assets
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={asset?.symbol} />
+                              <Text>{asset?.symbol}</Text>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -161,20 +164,17 @@ export function Amplified() {
                   </Select>
                 )}
               </form.Field>
-              <TokenBalance token={receiveToken} label={"Balance"} />
             </div>
+            <TokenBalance token={receiveToken} label={"Balance"} />
 
             <div />
 
             <Caption variant={"caption1"} as={"label"}>
-              Buy (Asset 1)
+              Buy Asset #1
             </Caption>
 
             <div className="flex justify-between space-x-1">
-              <form.Field
-                name="buyAmount"
-                onChange={isGreaterThanZeroValidator}
-              >
+              <form.Field name="firstAsset.amount">
                 {(field) => (
                   <EnhancedNumericInput
                     name={field.name}
@@ -189,7 +189,7 @@ export function Amplified() {
                 )}
               </form.Field>
 
-              <form.Field name="buyToken">
+              <form.Field name="firstAsset.token">
                 {(field) => (
                   <Select
                     name={field.name}
@@ -224,7 +224,7 @@ export function Amplified() {
 
             <TokenBalance token={receiveToken} label={"Balance"} />
 
-            <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
+            <form.Field name="firstAsset.limitPrice">
               {(field) => (
                 <EnhancedNumericInput
                   name={field.name}
@@ -241,7 +241,7 @@ export function Amplified() {
               )}
             </form.Field>
 
-            <form.Field name="receiveTo">
+            <form.Field name="firstAsset.receiveTo">
               {(field) => (
                 <div className="flex-col flex">
                   <Caption variant={"caption1"} as={"label"}>
@@ -260,9 +260,12 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {["wallet1", "wallet2"].map((source) => (
+                        {["wallet"].map((source) => (
                           <SelectItem key={source} value={source}>
-                            {source}
+                            <div className="flex space-x-3">
+                              <WalletIcon />
+                              <Text className="capitalize"> {source}</Text>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -273,13 +276,10 @@ export function Amplified() {
             </form.Field>
 
             <Caption variant={"caption1"} as={"label"}>
-              Buy (Asset 2)
+              Buy Asset #2
             </Caption>
             <div className="flex justify-between space-x-2">
-              <form.Field
-                name="buyAmount"
-                onChange={isGreaterThanZeroValidator}
-              >
+              <form.Field name="secondAsset.amount">
                 {(field) => (
                   <EnhancedNumericInput
                     name={field.name}
@@ -294,7 +294,7 @@ export function Amplified() {
                 )}
               </form.Field>
 
-              <form.Field name="buyToken">
+              <form.Field name="secondAsset.token">
                 {(field) => (
                   <Select
                     name={field.name}
@@ -328,7 +328,7 @@ export function Amplified() {
             </div>
             <TokenBalance token={quoteToken} label={"Balance"} />
 
-            <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
+            <form.Field name="secondAsset.limitPrice">
               {(field) => (
                 <EnhancedNumericInput
                   name={field.name}
@@ -345,7 +345,7 @@ export function Amplified() {
               )}
             </form.Field>
 
-            <form.Field name="receiveTo">
+            <form.Field name="secondAsset.receiveTo">
               {(field) => (
                 <div className="flex-col flex">
                   <Caption variant={"caption1"} as={"label"}>
@@ -364,9 +364,12 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {["wallet1", "wallet2"].map((source) => (
+                        {["wallet"].map((source) => (
                           <SelectItem key={source} value={source}>
-                            {source}
+                            <div className="flex space-x-3">
+                              <WalletIcon />
+                              <Text className="capitalize"> {source}</Text>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -376,10 +379,100 @@ export function Amplified() {
               )}
             </form.Field>
 
+            <Button
+              disabled
+              variant={"secondary"}
+              className="flex justify-center items-center w-full"
+            >
+              <Plus className="h-4 w-4" /> Add Market
+            </Button>
             <Separator className="!my-6" />
-            <Button> Add Market</Button>
+
             <Accordion title="Advanced">
-              <p></p>
+              <form.Field name="timeInForce">
+                {(field) => {
+                  return (
+                    <div className="grid text-md space-y-2">
+                      <Label>Time in force</Label>
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: TimeInForce) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!market}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select time in force" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {Object.values(TimeInForce).map((timeInForce) => (
+                              <SelectItem key={timeInForce} value={timeInForce}>
+                                {timeInForce}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )
+                }}
+              </form.Field>
+
+              <div
+                className={cn("flex justify-between space-x-2", {
+                  hidden: timeInForce !== TimeInForce.GOOD_TIL_TIME,
+                })}
+              >
+                <form.Field name="timeToLive">
+                  {(field) => (
+                    <EnhancedNumericInput
+                      placeholder="1"
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={({ target: { value } }) => {
+                        if (!value) return
+                        field.handleChange(value)
+                      }}
+                      disabled={!(market && form.state.isFormValid)}
+                      error={field.state.meta.touchedErrors}
+                    />
+                  )}
+                </form.Field>
+
+                <form.Field name="timeToLiveUnit">
+                  {(field) => (
+                    <Select
+                      name={field.name}
+                      value={field.state.value}
+                      onValueChange={(value: TimeToLiveUnit) => {
+                        field.handleChange(value)
+                      }}
+                      disabled={!market}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select time unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {Object.values(TimeToLiveUnit).map(
+                            (timeToLiveUnit) => (
+                              <SelectItem
+                                key={timeToLiveUnit}
+                                value={timeToLiveUnit}
+                              >
+                                {timeToLiveUnit}
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </form.Field>
+              </div>
             </Accordion>
 
             <Separator className="!my-6" />
