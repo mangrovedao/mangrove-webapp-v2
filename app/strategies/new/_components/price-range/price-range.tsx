@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
-import Big from "big.js"
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
@@ -13,86 +11,12 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { useNewStratStore } from "../../_stores/new-strat.store"
+import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
+import DeployStrategyDialog from "../launch-strategy-dialog"
 import { AverageReturn } from "./components/average-return"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
-
-type ChangingFrom =
-  | "minPrice"
-  | "maxPrice"
-  | "minPercentage"
-  | "maxPercentage"
-  | "chart"
-  | undefined
-  | null
-
-const calculateGeometricKandelDistribution = (
-  minPrice: string,
-  maxPrice: string,
-  midPrice?: number | null,
-): {
-  bids: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[]
-  asks: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[]
-} => {
-  const minPriceNumber = Number(minPrice)
-  const maxPriceNumber = Number(maxPrice)
-  const numOffers = 5
-  const priceStep = (maxPriceNumber - minPriceNumber) / (numOffers - 1)
-  const bids: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[] = []
-  const asks: {
-    price: Big
-    index: number
-    gives: Big
-    tick: number
-  }[] = []
-
-  if (!midPrice) return { bids: [], asks: [] }
-
-  if (!midPrice && bids.length > 0 && asks.length > 0) {
-    const highestBid = Math.max(...bids.map((bid) => Number(bid.price)))
-    const lowestAsk = Math.min(...asks.map((ask) => Number(ask.price)))
-    midPrice = (highestBid + lowestAsk) / 2
-  }
-
-  for (let i = 0; i < numOffers; i++) {
-    const tick = i * priceStep
-    const price = new Big(minPriceNumber + tick)
-    const offer = {
-      index: i,
-      gives: new Big(0), // replace with the correct value
-      tick: tick, // use the calculated tick value
-      price: price, // use the calculated price value
-    }
-
-    if (price.lt(midPrice)) {
-      bids.push(offer)
-    } else {
-      asks.push(offer)
-    }
-  }
-
-  return {
-    bids: bids,
-    asks: asks,
-  }
-}
 
 export const PriceRange = withClientOnly(function ({
   className,
@@ -100,25 +24,41 @@ export const PriceRange = withClientOnly(function ({
   className?: string
 }) {
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
+
   const priceDecimals = market?.quote.decimals
 
-  const [errors, setErrors] = React.useState<Record<string, string>>({})
-  const [touchedFields, setTouchedFields] = React.useState<
-    Record<string, boolean>
-  >({})
-  const [isChangingFrom, setIsChangingFrom] = React.useState<ChangingFrom>()
+  const [summaryDialog, setSummaryDialog] = React.useState(false)
   const [minPrice, setMinPrice] = React.useState("")
   const [minPercentage, setMinPercentage] = React.useState("")
   const [maxPrice, setMaxPrice] = React.useState("")
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
-  const setPriceRange = useNewStratStore((store) => store.setPriceRange)
+  const {
+    setPriceRange,
+    offersWithPrices,
+    setOffersWithPrices,
+    globalError,
+    errors,
+    setErrors,
+    isChangingFrom,
+    setIsChangingFrom,
+    baseDeposit,
+    quoteDeposit,
+    bountyDeposit,
+    stepSize,
+    ratio,
+    pricePoints,
+    distribution,
+  } = useNewStratStore()
 
-  const geometricKandelDistribution = calculateGeometricKandelDistribution(
-    minPrice,
-    maxPrice,
-    midPrice,
-  )
+  const formIsInvalid =
+    Object.keys(errors).length > 0 ||
+    !!globalError ||
+    !minPrice ||
+    !maxPrice ||
+    !stepSize ||
+    !pricePoints ||
+    !distribution
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
@@ -149,9 +89,6 @@ export const PriceRange = withClientOnly(function ({
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    setTouchedFields((prevFields) => ({ ...prevFields, [field]: true }))
   }
 
   const handleOnPriceRangeChange = ([min, max]: number[]) => {
@@ -257,6 +194,7 @@ export const PriceRange = withClientOnly(function ({
   )
 
   React.useEffect(() => {
+    if (offersWithPrices) setOffersWithPrices(undefined)
     if (!minPrice || !maxPrice) return
     debouncedSetPriceRange(minPrice, maxPrice)
   }, [minPrice, maxPrice])
@@ -265,10 +203,8 @@ export const PriceRange = withClientOnly(function ({
     <div className={className}>
       <div className="border-b">
         <div className="flex justify-between items-center px-6 pb-8">
-          <AverageReturn percentage={1.5} />
-          <RiskAppetiteBadge
-            value={riskAppetite}
-          />
+          <AverageReturn />
+          <RiskAppetiteBadge value={riskAppetite} />
           <LiquiditySource />
         </div>
       </div>
@@ -282,7 +218,7 @@ export const PriceRange = withClientOnly(function ({
           priceRange={priceRange}
           initialMidPrice={midPrice}
           isLoading={requestBookQuery.status === "pending"}
-          geometricKandelDistribution={geometricKandelDistribution}
+          geometricKandelDistribution={offersWithPrices}
         />
 
         <div className="gap-6 xl:gap-4 flex flex-col xl:flex-row w-full justify-center items-start border-b pb-6 mb-6">
@@ -342,6 +278,15 @@ export const PriceRange = withClientOnly(function ({
           )}
         </div>
 
+        {globalError && (
+          <p
+            role="aria-live"
+            className="text-red-100 text-md leading-4 mt-1 mb-2 w-full text-center"
+          >
+            {globalError}
+          </p>
+        )}
+
         <div className="flex justify-between">
           <Button
             asChild
@@ -355,11 +300,27 @@ export const PriceRange = withClientOnly(function ({
             size={"lg"}
             rightIcon
             className="w-full max-w-72 text-center"
-            disabled
+            disabled={formIsInvalid}
+            onClick={() => setSummaryDialog(!summaryDialog)}
           >
             Summary
           </Button>
         </div>
+        <DeployStrategyDialog
+          strategy={{
+            riskAppetite,
+            distribution,
+            baseDeposit,
+            quoteDeposit,
+            priceRange,
+            pricePoints,
+            ratio,
+            stepSize,
+            bountyDeposit,
+          }}
+          isOpen={summaryDialog}
+          onClose={() => setSummaryDialog(false)}
+        />
       </div>
     </div>
   )
