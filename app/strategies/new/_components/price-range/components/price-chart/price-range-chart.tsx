@@ -1,5 +1,6 @@
 "use client"
 import {
+  Token,
   type GeometricKandelDistribution,
   type Market,
 } from "@mangrovedao/mangrove.js"
@@ -22,8 +23,12 @@ import { useKeyPress } from "@/hooks/use-key-press"
 import { cn } from "@/utils"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
-import { GeometricKandelDistributionDots } from "./geometric-distribution-dots"
+import {
+  GeometricKandelDistributionDots,
+  GeometricOffer,
+} from "./geometric-distribution-dots"
 import { MidPriceLine } from "./mid-price-line"
+import OfferTooltip from "./offer-tooltip"
 import { RangeTooltips } from "./range-tooltips"
 import { SetRangeAnimation } from "./set-range-animation"
 
@@ -41,8 +46,8 @@ const initialTransform = {
 }
 
 export type PriceRangeChartProps = {
-  baseToken?: string
-  quoteToken?: string
+  baseToken?: Token | null
+  quoteToken?: Token | null
   initialMidPrice?: number
   bids?: Market.Offer[]
   asks?: Market.Offer[]
@@ -64,7 +69,11 @@ export function PriceRangeChart({
   viewOnly = false,
   isLoading = false,
   geometricKandelDistribution,
+  baseToken,
+  quoteToken,
 }: PriceRangeChartProps) {
+  const [hoveredGeometricOffer, setHoveredGeometricOffer] =
+    React.useState<GeometricOffer>()
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const [isMovingRange, setIsMovingRange] = React.useState(false)
   const offers = [
@@ -341,6 +350,8 @@ export function PriceRangeChart({
                     paddingBottom={paddingBottom}
                     xScale={xScaleTransformed}
                     geometricKandelDistribution={geometricKandelDistribution}
+                    onHover={setHoveredGeometricOffer}
+                    onHoverOut={() => setHoveredGeometricOffer(undefined)}
                   />
                 )}
               </svg>
@@ -351,6 +362,17 @@ export function PriceRangeChart({
                 selectedPriceRange={selectedPriceRange}
                 midPrice={midPrice}
               />
+
+              {hoveredGeometricOffer && baseToken && quoteToken && (
+                <OfferTooltip
+                  height={height}
+                  paddingBottom={paddingBottom}
+                  xScale={xScaleTransformed}
+                  hoveredGeometricOffer={hoveredGeometricOffer}
+                  baseToken={baseToken}
+                  quoteToken={quoteToken}
+                />
+              )}
             </div>
           </>
         )

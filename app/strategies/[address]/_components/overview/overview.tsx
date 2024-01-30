@@ -24,6 +24,9 @@ export default function Overview() {
   const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
   const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
+  const chartIsLoading =
+    (strategyStatusQuery.isLoading && strategyQuery.isLoading) ||
+    !(baseToken && quoteToken && strategyStatusQuery.data?.midPrice)
   const liveOffers = strategyQuery.data?.offers.filter(
     (offer) => Big(offer.gives).gt(0) && offer.live,
   )
@@ -73,12 +76,15 @@ export default function Overview() {
         <div className="border-b absolute left-0 right-0" />
 
         <PriceRangeChart
+          isLoading={chartIsLoading}
           bids={bids}
           asks={asks}
           initialMidPrice={strategyStatusQuery.data?.midPrice?.toNumber()}
           priceRange={priceRange}
           viewOnly
           geometricKandelDistribution={geometricKandelDistribution}
+          baseToken={baseToken}
+          quoteToken={quoteToken}
         />
       </div>
     </div>

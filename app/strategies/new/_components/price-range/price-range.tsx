@@ -6,11 +6,13 @@ import React from "react"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
+import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import useMarket from "@/providers/market"
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
+import { Address } from "viem"
 import { AverageReturn } from "../../../(shared)/_components/average-return"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import DeployStrategyDialog from "../launch-strategy-dialog"
@@ -24,6 +26,13 @@ export const PriceRange = withClientOnly(function ({
   className?: string
 }) {
   const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
+
+  const { data: baseToken } = useTokenFromAddress(
+    market?.base.address as Address,
+  )
+  const { data: quoteToken } = useTokenFromAddress(
+    market?.quote.address as Address,
+  )
 
   const priceDecimals = market?.quote.decimals
 
@@ -219,6 +228,8 @@ export const PriceRange = withClientOnly(function ({
           initialMidPrice={midPrice}
           isLoading={requestBookQuery.status === "pending"}
           geometricKandelDistribution={offersWithPrices}
+          baseToken={baseToken}
+          quoteToken={quoteToken}
         />
 
         <div className="gap-6 xl:gap-4 flex flex-col xl:flex-row w-full justify-center items-start border-b pb-6 mb-6">

@@ -29,7 +29,7 @@ export default function useStrategyStatus({
         if (!(kandelStrategies && market)) return null
         const book = await market.requestBook()
         const mid = calculateMidPriceFromOrderBook(book)
-        let midPrice = Big(1)
+        let midPrice = Big(mid ?? 1)
         if (!mid && market.base.symbol && market.quote.symbol) {
           const { close } = await getTokenPriceInToken(
             market.base.symbol,
