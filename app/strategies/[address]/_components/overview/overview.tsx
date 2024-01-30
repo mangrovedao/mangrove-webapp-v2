@@ -1,6 +1,7 @@
 import Big from "big.js"
 
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
+import { cn } from "@/utils"
 import { AverageReturn } from "../../../(shared)/_components/average-return"
 import useKandel from "../../_providers/kandel-strategy"
 import TotalInventory from "./total-inventory"
@@ -86,7 +87,34 @@ export default function Overview() {
           baseToken={baseToken}
           quoteToken={quoteToken}
         />
+        <div className="pt-4 flex gap-4">
+          <LegendItem type="bids" />
+          <LegendItem type="asks" />
+          <LegendItem type="empty" />
+        </div>
       </div>
     </div>
+  )
+}
+
+function LegendItem({ type }: { type: "bids" | "asks" | "empty" }) {
+  return (
+    <span className="flex items-center text-sm">
+      <span
+        className={cn(
+          "w-[6px] h-[6px] bg-green-caribbean rounded-full mx-[5px]",
+          {
+            "bg-[#BCBCBC]": type === "empty",
+            "bg-green-caribbean": type === "bids",
+            "bg-cherry-100": type === "asks",
+          },
+        )}
+      ></span>
+      {type === "asks"
+        ? "Live asks"
+        : type === "bids"
+          ? "Live bids"
+          : "Empty offers"}
+    </span>
   )
 }
