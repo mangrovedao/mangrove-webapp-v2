@@ -489,7 +489,8 @@ export function Amplified() {
                   <Button
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
-                    disabled={!canSubmit || !market}
+                    // disabled={!canSubmit || !market}
+                    disabled
                     rightIcon
                     loading={!!isSubmitting}
                   >
