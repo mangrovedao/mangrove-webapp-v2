@@ -5,6 +5,7 @@ import Big from "big.js"
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import useMarket from "@/providers/market"
+import { getTokenPriceInToken } from "@/services/tokens.service"
 import { calculateMidPriceFromOrderBook } from "@/utils/market"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
@@ -20,14 +21,24 @@ export default function useStrategyStatus({
   const { kandelStrategies } = useKandel()
   const { getMarketFromAddresses } = useMarket()
   return useQuery({
-    queryKey: ["stategy-status", address],
+    queryKey: ["strategy-status", address],
     queryFn: async () => {
       try {
         if (!address || !base || !quote || !offers) return null
         const market = await getMarketFromAddresses(base, quote)
         if (!(kandelStrategies && market)) return null
         const book = await market.requestBook()
-        const midPrice = Big(calculateMidPriceFromOrderBook(book) ?? 0)
+        const mid = calculateMidPriceFromOrderBook(book)
+        let midPrice = Big(1)
+        if (!mid && market.base.symbol && market.quote.symbol) {
+          const { close } = await getTokenPriceInToken(
+            market.base.symbol,
+            market.quote.symbol,
+            "1d",
+          )
+          midPrice = Big(close)
+        }
+
         const stratInstance = await kandelStrategies.instance({
           address: address,
           market,
@@ -86,6 +97,9 @@ export default function useStrategyStatus({
           status,
           asksBalance,
           bidsBalance,
+          midPrice,
+          market,
+          book,
         }
       } catch (error) {
         console.error(error)

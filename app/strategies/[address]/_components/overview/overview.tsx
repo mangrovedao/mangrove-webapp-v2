@@ -1,35 +1,85 @@
+import Big from "big.js"
+
+import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
 import { AverageReturn } from "../../../(shared)/_components/average-return"
 import useKandel from "../../_providers/kandel-strategy"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function Overview() {
-  const { strategyStatusQuery, baseToken, quoteToken } = useKandel()
+  const { strategyQuery, strategyStatusQuery, baseToken, quoteToken } =
+    useKandel()
   const { bidsBalance, asksBalance } = strategyStatusQuery.data ?? {}
 
+  const bids = strategyStatusQuery.data?.book?.bids ?? []
+  const asks = strategyStatusQuery.data?.book?.asks ?? []
+
+  const avgReturnPercentage = strategyQuery.data?.return as number | undefined
+  const priceRange = !strategyQuery.isLoading
+    ? ([Number(strategyQuery.data?.min), Number(strategyQuery.data?.max)] as [
+        number,
+        number,
+      ])
+    : undefined
   const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
   const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
+  const liveOffers = strategyQuery.data?.offers.filter(
+    (offer) => Big(offer.gives).gt(0) && offer.live,
+  )
+  const geometricKandelDistribution = {
+    bids: liveOffers?.length
+      ? liveOffers
+          .filter((offer) => offer.offerType === "bids")
+          .map((offer) => ({
+            price: Big(offer.price ?? 0),
+            gives: Big(offer.gives),
+            index: offer.index,
+            tick: Number(offer.tick),
+          }))
+      : [],
+    asks: liveOffers?.length
+      ? liveOffers
+          .filter((offer) => offer.offerType === "asks")
+          .map((offer) => ({
+            price: Big(offer.price ?? 0),
+            gives: Big(offer.gives),
+            index: offer.index,
+            tick: Number(offer.tick),
+          }))
+      : [],
+  }
 
   return (
     <div>
       <div className="relative">
-        <div className="flex justify-between items-center px-6 pb-8">
-          <AverageReturn />
+        <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 justify-between items-center px-6 pb-8 my-3">
+          <AverageReturn percentage={avgReturnPercentage} />
           <UnrealizedPnl />
           <TotalInventory
             value={baseValue}
             symbol={baseToken?.symbol}
             loading={isLoading}
+            label="Total base inventory"
           />
           <TotalInventory
             value={quoteValue}
             symbol={quoteToken?.symbol}
             loading={isLoading}
+            label="Total quote inventory"
           />
         </div>
 
-        <div className="border-b absolute -left-full -right-full -mt-4" />
+        <div className="border-b absolute left-0 right-0" />
+
+        <PriceRangeChart
+          bids={bids}
+          asks={asks}
+          initialMidPrice={strategyStatusQuery.data?.midPrice?.toNumber()}
+          priceRange={priceRange}
+          viewOnly
+          geometricKandelDistribution={geometricKandelDistribution}
+        />
       </div>
     </div>
   )

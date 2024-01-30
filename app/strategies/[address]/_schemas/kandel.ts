@@ -18,7 +18,7 @@ export const strategySchema = z.object({
   max: z.string(),
   depositedBase: z.string(),
   depositedQuote: z.string(),
-  return: numberOrNaN,
+  return: numberOrNaN.optional(),
   currentParameter: parameterSchema,
   offers: z.array(offerWithPricesSchema),
 })

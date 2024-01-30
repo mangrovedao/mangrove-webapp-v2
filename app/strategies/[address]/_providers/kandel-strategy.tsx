@@ -5,10 +5,12 @@ import { Address } from "viem"
 import { useNetwork } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import useMarket from "@/providers/market"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
 
 const useKandelStrategyContext = () => {
+  const { getMarketFromAddresses } = useMarket()
   const { chain } = useNetwork()
   const params = useParams<{ address: string }>()
   const strategyQuery = useStrategy({

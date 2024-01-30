@@ -7,9 +7,15 @@ type Props = {
   symbol?: string
   value?: string
   loading?: boolean
+  label: string
 }
 
-export default function TotalInventory({ symbol, value, loading }: Props) {
+export default function TotalInventory({
+  symbol,
+  value,
+  loading,
+  label,
+}: Props) {
   return (
     <div className="flex items-end space-x-2">
       {!loading ? (
@@ -22,7 +28,7 @@ export default function TotalInventory({ symbol, value, loading }: Props) {
           variant={"caption1"}
           className="text-cloud-300 flex items-center"
         >
-          Unrealized PnL
+          {label}
         </Caption>
         {!loading ? (
           <Title variant={"title1"}>{value}</Title>

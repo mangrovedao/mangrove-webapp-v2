@@ -104,8 +104,17 @@ export function PriceRangeChart({
 
   const altPressed = useKeyPress("Alt")
 
+  // if viewOnly, set the xDomain to the priceRange
   React.useEffect(() => {
-    if (!midPrice) return
+    if (!viewOnly || !priceRange) return
+    const [min, max] = priceRange
+    const xLowerBound = min * 0.8
+    const xUpperBound = max * 1.1
+    setXDomain([xLowerBound, xUpperBound])
+  }, [viewOnly, priceRange])
+
+  React.useEffect(() => {
+    if (!midPrice || viewOnly) return
     const xLowerBound = midPrice * 0.7 // 30% lower than mid price
     const xUpperBound = midPrice * 1.3 // 30% higher than mid price
     setXDomain([xLowerBound, xUpperBound])
@@ -184,7 +193,7 @@ export function PriceRangeChart({
               </span>
             </div>
             <div
-              className="w-full h-96 bg-[#041010] rounded-lg relative group"
+              className="w-full h-96 bg-[#041010] rounded-lg relative group mt-5 overflow-hidden"
               ref={ref}
             >
               {altPressed && (
@@ -232,7 +241,7 @@ export function PriceRangeChart({
                 />
               )}
               {isLoading && <Skeleton className="h-full w-full" />}
-              {!priceRange ? (
+              {!priceRange && !viewOnly ? (
                 <div className="absolute inset-0 flex items-center group-hover:hidden">
                   <div className="w-full translate-x-1/4">
                     <SetRangeAnimation />

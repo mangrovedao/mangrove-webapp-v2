@@ -96,7 +96,6 @@ const useMarketContext = () => {
 
   // Get mid price only if there is no liquidity in the book
   const midPriceQuery = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["midPrice", market?.base.symbol, market?.quote.symbol],
     queryFn: () => {
       if (!market?.base.symbol || !market?.quote.symbol) return undefined
