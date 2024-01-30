@@ -1,20 +1,17 @@
 import type { KandelStrategies, Market } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { redirect } from "next/navigation"
 import { toast } from "sonner"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
-import useMangrove from "@/providers/mangrove"
 import { useLoadingStore } from "@/stores/loading.store"
 
 type Props = {
   strategyAddress?: string
-  onResult?: (result: Market.OrderResult) => void
 }
 
-export function useCloseStrategy({ onResult, strategyAddress }: Props) {
-  const { mangrove } = useMangrove()
-
+export function useCloseStrategy({ strategyAddress }: Props) {
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -58,7 +55,6 @@ export function useCloseStrategy({ onResult, strategyAddress }: Props) {
     onSuccess: async (data) => {
       if (!data) return
       const { result } = data
-
       /*
        * We use a custom callback to handle the success message once it's ready.
        * This is because the onSuccess callback from the mutation will only be triggered
@@ -70,9 +66,13 @@ export function useCloseStrategy({ onResult, strategyAddress }: Props) {
       } catch (error) {
         console.error(error)
       }
+
+      return setTimeout(() => {
+        redirect("/strategies")
+      }, 5000)
     },
     onError(error, variables, context) {
-      console.log(error)
+      console.error(error)
     },
     onSettled: () => {
       stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])

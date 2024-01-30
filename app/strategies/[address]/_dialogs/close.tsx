@@ -47,12 +47,15 @@ export default function CloseDialog({ isOpen, onClose }: Props) {
         <Button
           className="w-full"
           onClick={() => {
-            closeStrategy.mutate({
-              getMarketFromAddresses,
-              kandelStrategies,
-              base,
-              quote,
-            })
+            closeStrategy.mutate(
+              {
+                getMarketFromAddresses,
+                kandelStrategies,
+                base,
+                quote,
+              },
+              { onSuccess: () => onClose },
+            )
           }}
           disabled={closeStrategy.isPending}
           loading={closeStrategy.isPending}
