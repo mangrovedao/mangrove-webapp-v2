@@ -34,18 +34,17 @@ export function SummaryStep({
       </div>
       <Separator />
       <div className="space-y-4">
-        <Line title="Limit Price">
-          {Big(form.limitPrice ?? 0).toFixed(
+        <Line title="Source">
+          {Big(form.sendSource ?? 0).toFixed(
             quoteToken?.displayedAsPriceDecimals,
           )}{" "}
-          <Unit>{quoteToken?.symbol}</Unit>
         </Line>
         <Line title="Send from wallet">
-          {Big(form.sendBalance ?? 0).toFixed(sendToken?.displayedDecimals)}{" "}
+          {Big(form.sendAmount ?? 0).toFixed(sendToken?.displayedDecimals)}{" "}
           <Unit>{sendToken?.symbol}</Unit>
         </Line>
         <Line title="Receive to wallet">
-          {Big(form.receiveTo ?? 0).toFixed(receiveToken?.displayedDecimals)}{" "}
+          {Big(form.sendToken ?? 0).toFixed(receiveToken?.displayedDecimals)}{" "}
           <Unit>{receiveToken?.symbol}</Unit>
         </Line>
         {/* TODO: estimated provision */}
