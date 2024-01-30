@@ -52,7 +52,7 @@ export function KandelStrategyProvider({ children }: React.PropsWithChildren) {
   )
 }
 
-const useKandel = () => {
+export const useKandelContext = () => {
   const kandelStrategyCtx = React.useContext(KandelStrategyContext)
   if (!kandelStrategyCtx) {
     throw new Error(
@@ -62,4 +62,4 @@ const useKandel = () => {
   return kandelStrategyCtx
 }
 
-export default useKandel
+export default useKandelContext

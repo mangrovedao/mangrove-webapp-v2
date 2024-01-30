@@ -83,6 +83,7 @@ export default function useStrategyStatus({
           }
         }
         return {
+          stratInstance,
           status,
           asksBalance,
           bidsBalance,

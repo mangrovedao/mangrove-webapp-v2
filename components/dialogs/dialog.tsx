@@ -56,9 +56,17 @@ function Description({ children, className }: Nodes) {
 }
 Dialog.Description = Description
 
-function Footer({ children, className }: Nodes) {
+function Footer({
+  children,
+  className,
+  center = false,
+}: Nodes & { center?: boolean }) {
   return (
-    <Root.DialogFooter className={cn(footerClasses, className)}>
+    <Root.DialogFooter
+      className={cn(footerClasses, className, {
+        "flex flex-col gap-4 justify-center sm:space-x-0 sm:flex-col": center,
+      })}
+    >
       {children}
     </Root.DialogFooter>
   )

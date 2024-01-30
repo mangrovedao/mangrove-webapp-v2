@@ -1,14 +1,19 @@
 "use client"
 
+import React from "react"
+
 import { TokenPair } from "@/components/token-pair"
 import { Button } from "@/components/ui/button"
 import Status from "../(shared)/_components/status"
 import BackButton from "./_components/back-button"
 import BlockExplorer from "./_components/block-explorer"
 import Tabs from "./_components/tabs"
+import CloseDialog from "./_dialogs/close"
 import useKandel from "./_providers/kandel-strategy"
 
 export default function Page() {
+  const [closeStrategy, setCloseStragy] = React.useState(false)
+
   const {
     strategyQuery,
     strategyAddress,
@@ -16,8 +21,10 @@ export default function Page() {
     quoteToken,
     blockExplorerUrl,
   } = useKandel()
+
   const { base, quote, address, offers } = strategyQuery.data ?? {}
   const showStatus = base && quote && address && offers
+
   return (
     <div className="max-w-5xl mx-auto px-4 xl:px-0">
       <BackButton href={"/strategies"}>Back to Strategies</BackButton>
@@ -38,7 +45,11 @@ export default function Page() {
             />
           ) : undefined}
         </div>
-        <Button size={"lg"} rightIcon>
+        <Button
+          size={"lg"}
+          onClick={() => setCloseStragy(!closeStrategy)}
+          rightIcon
+        >
           Close strategy
         </Button>
       </div>
@@ -49,6 +60,11 @@ export default function Page() {
       />
 
       <Tabs />
+
+      <CloseDialog
+        isOpen={closeStrategy}
+        onClose={() => setCloseStragy(false)}
+      />
     </div>
   )
 }
