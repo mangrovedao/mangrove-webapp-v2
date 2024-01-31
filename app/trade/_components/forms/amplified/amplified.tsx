@@ -235,7 +235,28 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {assets.map((asset) => (
+                        {tradeAction === TradeAction.BUY ? (
+                          <SelectItem
+                            key={baseToken?.symbol || "..."}
+                            value={baseToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={baseToken?.symbol || "..."} />
+                              <Text>{baseToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        ) : (
+                          <SelectItem
+                            key={quoteToken?.symbol || "..."}
+                            value={quoteToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
+                              <Text>{quoteToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        )}
+                        {/* {assets.map((asset) => (
                           <SelectItem
                             key={asset?.symbol}
                             value={asset?.symbol || "..."}
@@ -245,7 +266,7 @@ export function Amplified() {
                               <Text>{asset?.symbol}</Text>
                             </div>
                           </SelectItem>
-                        ))}
+                        ))} */}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
