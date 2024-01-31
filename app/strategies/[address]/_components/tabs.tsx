@@ -6,6 +6,7 @@ import {
 } from "@/components/custom-tabs"
 import { renderElement } from "@/utils/render"
 import Overview from "./overview/overview"
+import Parameters from "./parameters/parameters"
 
 export enum ManageTabs {
   OVERVIEW = "overview",
@@ -14,7 +15,7 @@ export enum ManageTabs {
 
 const TABS_CONTENT = {
   [ManageTabs.OVERVIEW]: <Overview />,
-  [ManageTabs.PARAMETERS]: <div>Parameters</div>,
+  [ManageTabs.PARAMETERS]: <Parameters />,
 }
 
 export default function Tabs(

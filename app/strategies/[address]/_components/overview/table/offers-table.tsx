@@ -1,3 +1,3 @@
 export default function OffersTable() {
-  return <div>OffersTable</div>
+  return <div className="mt-10">TODO: OffersTable</div>
 }

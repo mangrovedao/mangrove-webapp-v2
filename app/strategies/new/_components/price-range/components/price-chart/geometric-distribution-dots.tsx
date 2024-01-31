@@ -44,9 +44,9 @@ export function GeometricKandelDistributionDots({
       className="group/circle cursor-pointer"
       onMouseOver={() => onHover?.(geometricOffer)}
       onMouseOut={onHoverOut}
+      key={`${geometricOffer.type}-${geometricOffer.index}`}
     >
       <circle
-        key={`${geometricOffer.type}-${geometricOffer.index}`}
         cx={xScale(geometricOffer.price.toNumber())}
         cy={height - paddingBottom}
         r={8}
@@ -60,7 +60,6 @@ export function GeometricKandelDistributionDots({
       />
 
       <circle
-        key={`${geometricOffer.type}-${geometricOffer.index}`}
         cx={xScale(geometricOffer.price.toNumber())}
         cy={height - paddingBottom}
         r={3}

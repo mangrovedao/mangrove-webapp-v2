@@ -7,6 +7,8 @@ import { useNetwork } from "wagmi"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
+import { getMergedOffers } from "../_utils/inventory"
+import Big from "big.js"
 
 const useKandelStrategyContext = () => {
   const { chain } = useNetwork()
@@ -28,6 +30,39 @@ const useKandelStrategyContext = () => {
     offers: strategyQuery.data?.offers,
   })
 
+  const geometricKandelDistribution = React.useMemo(() => {
+    const indexerOffers = strategyQuery.data?.offers
+    const sdkOffers = strategyStatusQuery.data?.offerStatuses
+    const market = strategyStatusQuery.data?.market
+    if (!(sdkOffers && indexerOffers && market)) return
+    //@ts-expect-error TODO: it's an error type from the indexer SDK
+    const mergedOffers = getMergedOffers(sdkOffers, indexerOffers, market)
+    if (!mergedOffers) return
+    return {
+      bids: mergedOffers?.length
+        ? mergedOffers
+            .filter((offer) => offer.offerType === "bids")
+            .map((offer) => ({
+              price: Big(offer.price ?? 0),
+              gives: Big(offer.gives ?? 0),
+              index: offer.index,
+              tick: Number(offer.tick),
+            }))
+        : [],
+      asks: mergedOffers?.length
+        ? mergedOffers
+            .filter((offer) => offer.offerType === "asks")
+            .map((offer) => ({
+              price: Big(offer.price ?? 0),
+              gives: Big(offer.gives ?? 0),
+              index: offer.index,
+              tick: Number(offer.tick),
+            }))
+        : [],
+    }
+  }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses, strategyStatusQuery.data?.market])
+
+
   return {
     strategyQuery,
     strategyAddress: params.address,
@@ -35,6 +70,7 @@ const useKandelStrategyContext = () => {
     quoteToken,
     blockExplorerUrl: chain?.blockExplorers?.default.url,
     strategyStatusQuery,
+    geometricKandelDistribution,
   }
 }
 

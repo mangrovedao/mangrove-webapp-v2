@@ -4,14 +4,7 @@ import Big from "big.js"
 
 import { Statuses } from "@mangrovedao/mangrove.js/dist/nodejs/kandel/geometricKandel/geometricKandelStatus"
 
-export type MergedOffers = {
-  offerType: string
-  base: Big
-  quote: Big
-  live?: boolean
-  offerId?: number
-  price?: Big
-}[]
+export type MergedOffers = ReturnType<typeof getMergedOffers>;
 
 function getPublished(
   mergedOffers: MergedOffers | undefined,
@@ -58,6 +51,7 @@ export function getMergedOffers(
   const asksPriceHelper = new TickPriceHelper("asks", market)
   const bidsPriceHelper = new TickPriceHelper("bids", market)
 
+  // FIXME: Found some weird cases, verify and improve that code
   return sdkOffers?.statuses
     .map((sdkOffer) => {
       const offerType = sdkOffer?.expectedLiveAsk ? "asks" : "bids"
@@ -73,17 +67,15 @@ export function getMergedOffers(
       const base = Big(isBid ? wants || 0 : indexedOffer?.gives || 0)
       const quote = Big(isBid ? indexedOffer?.gives || 0 : wants || 0)
       return {
-        live: indexedOffer?.live,
-        offerId: indexedOffer?.offerId,
-        price: Big(indexedOffer?.price ?? 0),
-        offerType,
+        ...indexedOffer,
+        index: indexedOffer?.index ?? 0,
         base,
-        quote,
+        quote
       }
     })
     .filter((x) => x.offerId)
     .sort((a, b) =>
-      a.offerType === b.offerType ? 0 : a.offerType < b.offerType ? 1 : -1,
+      a.offerType === b.offerType || !(a.offerType && b.offerType) ? 0 : a.offerType < b.offerType ? 1 : -1,
     )
 }
 

@@ -94,8 +94,6 @@ export default function useStrategyStatus({
           }
         }
 
-        // const mergedOffers = getMergedOffers()
-
         return {
           status,
           asksBalance,
