@@ -275,6 +275,12 @@ export function Amplified() {
               )}
             </form.Field>
 
+            <div className="flex items-center gap-2 justify-center">
+              <Separator className="bg-green-bangladesh max-w-[135px]" />
+              <Caption>or</Caption>
+              <Separator className="bg-green-bangladesh max-w-[135px]" />
+            </div>
+
             <Caption variant={"caption1"} as={"label"}>
               Buy Asset #2
             </Caption>
@@ -386,6 +392,7 @@ export function Amplified() {
             >
               <Plus className="h-4 w-4" /> Add Market
             </Button>
+
             <Separator className="!my-6" />
 
             <Accordion title="Advanced">
