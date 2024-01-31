@@ -8,18 +8,22 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { ChevronDown } from "@/svgs"
 import { renderElement } from "@/utils/render"
+import { Amplified } from "./amplified/amplified"
 import { Limit } from "./limit/limit"
 import { Market } from "./market/market"
 
 enum FormType {
   LIMIT = "Limit",
   MARKET = "Market",
+  AMPLIFIED = "Amplified",
 }
 
 const TABS_CONTENT = {
   [FormType.LIMIT]: Limit,
   [FormType.MARKET]: Market,
+  [FormType.AMPLIFIED]: Amplified,
 }
 
 export function Forms({
@@ -42,6 +46,16 @@ export function Forms({
             {form}
           </CustomTabsTrigger>
         ))}
+        <CustomTabsTrigger
+          key={`stop-tab`}
+          value="stop"
+          className="capitalize"
+          disabled
+        >
+          <div className="flex items-center gap-1">
+            Stop <ChevronDown className="h-2 w-2" />
+          </div>
+        </CustomTabsTrigger>
       </CustomTabsList>
       <ScrollArea className="h-[calc(100vh-(var(--bar-height)*3))] overflow-hidden">
         <div className="px-4 space-y-4 mt-[24px]">
