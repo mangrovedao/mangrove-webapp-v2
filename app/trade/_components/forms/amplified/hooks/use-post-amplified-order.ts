@@ -26,11 +26,11 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
       if (!mangrove || !market) return
-      const { tradeAction, sendBalance, receiveTo } = form
+      const { tradeAction } = form
       const isBuy = tradeAction === TradeAction.BUY
       const orderParams: Market.TradeParams = {
-        wants: receiveTo,
-        gives: sendBalance,
+        wants: "",
+        gives: "",
         restingOrder: {},
         forceRoutingToMangroveOrder: true,
         expiryDate: undefined,

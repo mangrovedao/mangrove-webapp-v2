@@ -46,7 +46,7 @@ export function Amplified() {
     onSubmit: (formData) => setFormData(formData),
   })
 
-  const [markets, setMarkets] = React.useState(2)
+  const [markets, setMarkets] = React.useState(0)
 
   const addMarket = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
@@ -196,8 +196,10 @@ export function Amplified() {
                 )}
               </form.Field>
             </div>
-            <TokenBalance token={receiveToken} label={"Balance"} />
-
+            <TokenBalance
+              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
+              label={"Balance"}
+            />
             <div />
 
             <Caption variant={"caption1"} as={"label"}>
@@ -274,7 +276,10 @@ export function Amplified() {
               </form.Field>
             </div>
 
-            <TokenBalance token={receiveToken} label={"Balance"} />
+            <TokenBalance
+              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
+              label={"Balance"}
+            />
 
             <form.Field name="firstAsset.limitPrice">
               {(field) => (
@@ -388,24 +393,17 @@ export function Amplified() {
                             </div>
                           </SelectItem>
                         )}
-                        {/* {assets.map((asset) => (
-                          <SelectItem
-                            key={asset?.symbol}
-                            value={asset?.symbol || "..."} // TODO: fix undefined assets
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={asset?.symbol} />
-                              <Text>{asset?.symbol}</Text>
-                            </div>
-                          </SelectItem>
-                        ))} */}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 )}
               </form.Field>
             </div>
-            <TokenBalance token={quoteToken} label={"Balance"} />
+
+            <TokenBalance
+              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
+              label={"Balance"}
+            />
 
             <form.Field name="secondAsset.limitPrice">
               {(field) => (
@@ -458,7 +456,7 @@ export function Amplified() {
               )}
             </form.Field>
 
-            {Array.from(Array(markets - 2).keys()).map((item, i) => (
+            {Array.from(Array(markets).keys()).map((item, i) => (
               <>
                 <div className="flex items-center gap-2 justify-center">
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
@@ -466,122 +464,80 @@ export function Amplified() {
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
                 </div>
                 <Caption variant={"caption1"} as={"label"}>
-                  Buy Asset
+                  Buy Asset #{item + 3}
                 </Caption>
                 <div className="flex justify-between space-x-2">
-                  <form.Field name="secondAsset.amount">
-                    {(field) => (
-                      <EnhancedNumericInput
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={({ target: { value } }) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!(market && form.state.isFormValid)}
-                        error={field.state.meta.touchedErrors}
-                      />
-                    )}
-                  </form.Field>
+                  <EnhancedNumericInput name="" value={""} disabled={!market} />
 
-                  <form.Field name="secondAsset.token">
-                    {(field) => (
-                      <Select
-                        name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: string) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!market}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {tradeAction === TradeAction.BUY ? (
-                              <SelectItem
-                                key={baseToken?.symbol || "..."}
-                                value={baseToken?.symbol || "..."}
-                              >
-                                <div className="flex space-x-3">
-                                  <TokenIcon
-                                    symbol={baseToken?.symbol || "..."}
-                                  />
-                                  <Text>{baseToken?.symbol || "..."}</Text>
-                                </div>
-                              </SelectItem>
-                            ) : (
-                              <SelectItem
-                                key={quoteToken?.symbol || "..."}
-                                value={quoteToken?.symbol || "..."}
-                              >
-                                <div className="flex space-x-3">
-                                  <TokenIcon
-                                    symbol={quoteToken?.symbol || "..."}
-                                  />
-                                  <Text>{quoteToken?.symbol || "..."}</Text>
-                                </div>
-                              </SelectItem>
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </form.Field>
+                  <Select name={""} value={""} disabled={!market}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {tradeAction === TradeAction.BUY ? (
+                          <SelectItem
+                            key={baseToken?.symbol || "..."}
+                            value={baseToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={baseToken?.symbol || "..."} />
+                              <Text>{baseToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        ) : (
+                          <SelectItem
+                            key={quoteToken?.symbol || "..."}
+                            value={quoteToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
+                              <Text>{quoteToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        )}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <TokenBalance token={quoteToken} label={"Balance"} />
 
-                <form.Field name="secondAsset.limitPrice">
-                  {(field) => (
-                    <EnhancedNumericInput
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={({ target: { value } }) => {
-                        field.handleChange(value)
-                      }}
-                      token={quoteToken}
-                      label="Limit price"
-                      disabled={!(market && form.state.isFormValid)}
-                      error={field.state.meta.touchedErrors}
-                    />
-                  )}
-                </form.Field>
+                <TokenBalance
+                  token={
+                    tradeAction === TradeAction.BUY ? baseToken : quoteToken
+                  }
+                  label={"Balance"}
+                />
 
-                <form.Field name="secondAsset.receiveTo">
-                  {(field) => (
-                    <div className="flex-col flex">
-                      <Caption variant={"caption1"} as={"label"}>
-                        Receive to
-                      </Caption>
-                      <Select
-                        name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: string) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!market}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {["wallet"].map((source) => (
-                              <SelectItem key={source} value={source}>
-                                <div className="flex space-x-3">
-                                  <WalletIcon />
-                                  <Text className="capitalize"> {source}</Text>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </form.Field>
+                <EnhancedNumericInput
+                  name={""}
+                  value={""}
+                  token={quoteToken}
+                  label="Limit price"
+                  disabled={!market}
+                />
+
+                <div className="flex-col flex">
+                  <Caption variant={"caption1"} as={"label"}>
+                    Receive to
+                  </Caption>
+                  <Select name={""} value={""} disabled={!market}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {["wallet"].map((source) => (
+                          <SelectItem key={source} value={source}>
+                            <div className="flex space-x-3">
+                              <WalletIcon />
+                              <Text className="capitalize"> {source}</Text>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
               </>
             ))}
 
