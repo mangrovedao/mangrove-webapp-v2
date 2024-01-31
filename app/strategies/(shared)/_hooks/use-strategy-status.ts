@@ -93,6 +93,9 @@ export default function useStrategyStatus({
             status = "inactive"
           }
         }
+
+        // const mergedOffers = getMergedOffers()
+
         return {
           status,
           asksBalance,
@@ -100,6 +103,9 @@ export default function useStrategyStatus({
           midPrice,
           market,
           book,
+          offerStatuses,
+          unexpectedDeadOffers, // TODO: will help us to show UI message to the user with an explanation
+          isOutOfRange, // TODO: will help us to show UI message to the user with an explanation
         }
       } catch (error) {
         console.error(error)

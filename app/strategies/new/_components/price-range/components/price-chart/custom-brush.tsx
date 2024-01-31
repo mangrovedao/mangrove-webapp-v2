@@ -182,7 +182,7 @@ function CustomBrush({
     <>
       {selection && (
         <rect
-          x={brushX}
+          x={isNaN(brushX) ? 0 : brushX}
           y={0}
           width={brushWidth}
           height={height}

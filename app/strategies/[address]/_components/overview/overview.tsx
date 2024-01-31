@@ -1,9 +1,10 @@
 import Big from "big.js"
 
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
-import { cn } from "@/utils"
 import { AverageReturn } from "../../../(shared)/_components/average-return"
 import useKandel from "../../_providers/kandel-strategy"
+import { LegendItem } from "./legend-item"
+import OffersTable from "./table/offers-table"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
@@ -93,28 +94,7 @@ export default function Overview() {
           <LegendItem type="empty" />
         </div>
       </div>
+      <OffersTable />
     </div>
-  )
-}
-
-function LegendItem({ type }: { type: "bids" | "asks" | "empty" }) {
-  return (
-    <span className="flex items-center text-sm">
-      <span
-        className={cn(
-          "w-[6px] h-[6px] bg-green-caribbean rounded-full mx-[5px]",
-          {
-            "bg-[#BCBCBC]": type === "empty",
-            "bg-green-caribbean": type === "bids",
-            "bg-cherry-100": type === "asks",
-          },
-        )}
-      ></span>
-      {type === "asks"
-        ? "Live asks"
-        : type === "bids"
-          ? "Live bids"
-          : "Empty offers"}
-    </span>
   )
 }
