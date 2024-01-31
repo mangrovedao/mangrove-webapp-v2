@@ -33,16 +33,25 @@ import type { Form } from "./types"
 export function Amplified() {
   const [formData, setFormData] = React.useState<Form>()
   const {
+    tradeAction,
     assets,
     handleSubmit,
     form,
     quoteToken,
+    baseToken,
     market,
     receiveToken,
     timeInForce,
   } = useAmplified({
     onSubmit: (formData) => setFormData(formData),
   })
+
+  const [markets, setMarkets] = React.useState(2)
+
+  const addMarket = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault()
+    setMarkets(markets + 1)
+  }
 
   return (
     <div className="grid space-y-2">
@@ -148,17 +157,39 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {assets.map((asset) => (
+                        {tradeAction === TradeAction.BUY ? (
+                          <SelectItem
+                            key={baseToken?.symbol || "..."}
+                            value={baseToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={baseToken?.symbol || "..."} />
+                              <Text>{baseToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        ) : (
+                          <SelectItem
+                            key={quoteToken?.symbol || "..."}
+                            value={quoteToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
+                              <Text>{quoteToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        )}
+
+                        {/* {assets.map((asset) => (
                           <SelectItem
                             key={asset?.symbol}
-                            value={asset?.symbol || ""} //TODO: fix undefined assets
+                            value={asset?.symbol || "..."} 
                           >
                             <div className="flex space-x-3">
                               <TokenIcon symbol={asset?.symbol} />
                               <Text>{asset?.symbol}</Text>
                             </div>
                           </SelectItem>
-                        ))}
+                        ))} */}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -207,7 +238,7 @@ export function Amplified() {
                         {assets.map((asset) => (
                           <SelectItem
                             key={asset?.symbol}
-                            value={asset?.symbol || ""} //TODO: fix undefined assets
+                            value={asset?.symbol || "..."}
                           >
                             <div className="flex space-x-3">
                               <TokenIcon symbol={asset?.symbol} />
@@ -315,17 +346,38 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {assets.map((asset) => (
+                        {tradeAction === TradeAction.BUY ? (
+                          <SelectItem
+                            key={baseToken?.symbol || "..."}
+                            value={baseToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={baseToken?.symbol || "..."} />
+                              <Text>{baseToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        ) : (
+                          <SelectItem
+                            key={quoteToken?.symbol || "..."}
+                            value={quoteToken?.symbol || "..."}
+                          >
+                            <div className="flex space-x-3">
+                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
+                              <Text>{quoteToken?.symbol || "..."}</Text>
+                            </div>
+                          </SelectItem>
+                        )}
+                        {/* {assets.map((asset) => (
                           <SelectItem
                             key={asset?.symbol}
-                            value={asset?.symbol || ""} // TODO: fix undefined assets
+                            value={asset?.symbol || "..."} // TODO: fix undefined assets
                           >
                             <div className="flex space-x-3">
                               <TokenIcon symbol={asset?.symbol} />
                               <Text>{asset?.symbol}</Text>
                             </div>
                           </SelectItem>
-                        ))}
+                        ))} */}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -385,8 +437,135 @@ export function Amplified() {
               )}
             </form.Field>
 
+            {Array.from(Array(markets - 2).keys()).map((item, i) => (
+              <>
+                <div className="flex items-center gap-2 justify-center">
+                  <Separator className="bg-green-bangladesh max-w-[135px]" />
+                  <Caption>or</Caption>
+                  <Separator className="bg-green-bangladesh max-w-[135px]" />
+                </div>
+                <Caption variant={"caption1"} as={"label"}>
+                  Buy Asset
+                </Caption>
+                <div className="flex justify-between space-x-2">
+                  <form.Field name="secondAsset.amount">
+                    {(field) => (
+                      <EnhancedNumericInput
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={({ target: { value } }) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!(market && form.state.isFormValid)}
+                        error={field.state.meta.touchedErrors}
+                      />
+                    )}
+                  </form.Field>
+
+                  <form.Field name="secondAsset.token">
+                    {(field) => (
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!market}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {tradeAction === TradeAction.BUY ? (
+                              <SelectItem
+                                key={baseToken?.symbol || "..."}
+                                value={baseToken?.symbol || "..."}
+                              >
+                                <div className="flex space-x-3">
+                                  <TokenIcon
+                                    symbol={baseToken?.symbol || "..."}
+                                  />
+                                  <Text>{baseToken?.symbol || "..."}</Text>
+                                </div>
+                              </SelectItem>
+                            ) : (
+                              <SelectItem
+                                key={quoteToken?.symbol || "..."}
+                                value={quoteToken?.symbol || "..."}
+                              >
+                                <div className="flex space-x-3">
+                                  <TokenIcon
+                                    symbol={quoteToken?.symbol || "..."}
+                                  />
+                                  <Text>{quoteToken?.symbol || "..."}</Text>
+                                </div>
+                              </SelectItem>
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </form.Field>
+                </div>
+                <TokenBalance token={quoteToken} label={"Balance"} />
+
+                <form.Field name="secondAsset.limitPrice">
+                  {(field) => (
+                    <EnhancedNumericInput
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={({ target: { value } }) => {
+                        field.handleChange(value)
+                      }}
+                      token={quoteToken}
+                      label="Limit price"
+                      disabled={!(market && form.state.isFormValid)}
+                      error={field.state.meta.touchedErrors}
+                    />
+                  )}
+                </form.Field>
+
+                <form.Field name="secondAsset.receiveTo">
+                  {(field) => (
+                    <div className="flex-col flex">
+                      <Caption variant={"caption1"} as={"label"}>
+                        Receive to
+                      </Caption>
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!market}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {["wallet"].map((source) => (
+                              <SelectItem key={source} value={source}>
+                                <div className="flex space-x-3">
+                                  <WalletIcon />
+                                  <Text className="capitalize"> {source}</Text>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </form.Field>
+              </>
+            ))}
+
             <Button
-              disabled
+              onClick={(e) => addMarket(e)}
               variant={"secondary"}
               className="flex justify-center items-center w-full"
             >
