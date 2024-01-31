@@ -106,7 +106,8 @@ function RangeTooltip({
           },
         )}
       >
-        {text} {value.toFixed(2)} {midPrice ? `${percentage.toFixed(2)}%` : ""}
+        {text} {value.toFixed(2)}{" "}
+        {midPrice ? `${percentage.toFixed(2)}% filled` : ""}
       </div>
     </Tooltip>
   )
