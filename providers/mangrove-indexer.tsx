@@ -2,12 +2,12 @@
 
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { Chains } from "@mangrovedao/indexer-sdk/dist/src/types/types"
-import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
 
 import { getTokenPriceInUsd } from "@/services/tokens.service"
+import Big from "big.js"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
@@ -36,11 +36,29 @@ const useIndexerSdkContext = () => {
             if (!(mangrove && base && quote)) {
               throw new Error("Impossible to determine market tokens")
             }
-            return new TickPriceHelper(ba, {
-              base,
-              quote,
-              tickSpacing: m.tickSpacing,
-            })
+
+            return {
+              priceFromTick: () => Big(0),
+              outboundFromInbound: () => Big(0),
+              inboundFromOutbound: () => Big(0),
+            }
+            // return {
+            //   priceFromTick:  new TickPriceHelper(ba, {
+            //     base,
+            //     quote,
+            //     tickSpacing: m.tickSpacing,
+            //   }).priceFromTick,
+            //   outboundFromInbound: new TickPriceHelper(ba, {
+            //     base,
+            //     quote,
+            //     tickSpacing: m.tickSpacing,
+            //   }).outboundFromInbound,
+            //   inboundFromOutbound: new TickPriceHelper(ba, {
+            //     base,
+            //     quote,
+            //     tickSpacing: m.tickSpacing,
+            //   }).inboundFromOutbound,
+            // }
           },
           getPrice(tokenAddress) {
             return queryClient.fetchQuery({
