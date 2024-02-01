@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
-import { Plus, WalletIcon } from "lucide-react"
+import { Plus, WalletIcon, XIcon } from "lucide-react"
 import { Accordion } from "../components/accordion"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
@@ -463,9 +463,17 @@ export function Amplified() {
                   <Caption>or</Caption>
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
                 </div>
-                <Caption variant={"caption1"} as={"label"}>
-                  Buy Asset #{item + 3}
-                </Caption>
+                <div className="flex justify-between items-center">
+                  <Caption variant={"caption1"} as={"label"}>
+                    Buy Asset #{item + 3}
+                  </Caption>
+                  <span
+                    className="text-white cursor-pointer"
+                    onClick={() => setMarkets(markets - 1)}
+                  >
+                    <XIcon className="w-4 h-4 hover:text-green-caribbean" />
+                  </span>
+                </div>
                 <div className="flex justify-between space-x-2">
                   <EnhancedNumericInput name="" value={""} disabled={!market} />
 

@@ -8,7 +8,10 @@ import { useTable } from "./hooks/use-table"
 import { MOCKS } from "./mock"
 import type { Strategy } from "./schema"
 
-export function Strategies() {
+type Props = {
+  type: "user" | "all"
+}
+export function Strategies({ type }: Props) {
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
@@ -27,6 +30,7 @@ export function Strategies() {
   const [, setStrategyToCancel] = React.useState<Strategy>()
 
   const table = useTable({
+    type,
     data: MOCKS,
     onManage: () => {
       // TODO: implement
@@ -34,6 +38,7 @@ export function Strategies() {
     },
     onCancel: setStrategyToCancel,
   })
+
   return (
     <DataTable
       table={table}

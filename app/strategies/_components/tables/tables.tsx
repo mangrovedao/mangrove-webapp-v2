@@ -17,8 +17,8 @@ enum StrategiesTables {
 }
 
 const TABS_CONTENT = {
-  [StrategiesTables.ALL_STRATEGIES]: <Strategies />,
-  [StrategiesTables.MY_STRATEGIES]: <Strategies />,
+  [StrategiesTables.ALL_STRATEGIES]: <Strategies type="all" />,
+  [StrategiesTables.MY_STRATEGIES]: <Strategies type="user" />,
 }
 
 export function Tables({

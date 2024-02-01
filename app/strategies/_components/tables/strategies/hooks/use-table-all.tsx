@@ -11,6 +11,8 @@ import Link from "next/link"
 import React from "react"
 import { useNetwork } from "wagmi"
 
+import { IconButton } from "@/components/icon-button"
+import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
 import Big from "big.js"
 import { Market } from "../components/market"
@@ -108,6 +110,31 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Reward",
         cell: () => "3.39%",
+      }),
+
+      columnHelper.display({
+        id: "actions",
+        enableHiding: true,
+        header: () => <div className="text-right">Action</div>,
+        cell: ({ row }) => (
+          <div className="w-full h-full flex justify-end space-x-1">
+            <IconButton
+              tooltip="Manage"
+              className="aspect-square w-6 rounded-full"
+              disabled
+              onClick={() => onManage(row.original)}
+            >
+              <Pen />
+            </IconButton>
+            <IconButton
+              tooltip="Cancel strategy"
+              className="aspect-square w-6 rounded-full"
+              onClick={() => onCancel(row.original)}
+            >
+              <Close />
+            </IconButton>
+          </div>
+        ),
       }),
     ],
     [onManage, onCancel],
