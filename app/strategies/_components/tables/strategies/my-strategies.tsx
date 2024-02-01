@@ -4,11 +4,11 @@ import React from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
 import { useStrategies } from "./hooks/use-strategies"
-import { useTable } from "./hooks/use-table"
+import { useTable } from "./hooks/use-table-all"
 import { MOCKS } from "./mock"
 import type { Strategy } from "./schema"
 
-export function Strategies() {
+export function MyStrategies() {
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
@@ -27,7 +27,7 @@ export function Strategies() {
   const [, setStrategyToCancel] = React.useState<Strategy>()
 
   const table = useTable({
-    type: "all",
+    type: "user",
     data: MOCKS,
     onManage: () => {
       // TODO: implement

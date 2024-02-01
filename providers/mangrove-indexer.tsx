@@ -9,7 +9,6 @@ import { useNetwork } from "wagmi"
 
 import { getTokenPriceInUsd } from "@/services/tokens.service"
 import useMangrove from "./mangrove"
-import Big from "big.js"
 
 const useIndexerSdkContext = () => {
   const { mangrove } = useMangrove()
@@ -31,22 +30,37 @@ const useIndexerSdkContext = () => {
               throw new Error("Impossible to determine token decimals")
             return token.decimals
           },
-          // FIXME: this is a temporary fix to avoid the error
           createTickHelpers: async (ba, m) => {
-            // const base = await mangrove?.tokenFromAddress(m.base.address)
-            // const quote = await mangrove?.tokenFromAddress(m.quote.address)
-            // if (!(mangrove && base && quote)) {
-            //   throw new Error("Impossible to determine market tokens")
-            // }
-            // return new TickPriceHelper(ba, {
-            //   base,
-            //   quote,
-            //   tickSpacing: m.tickSpacing,
-            // })
+            const base = await mangrove?.tokenFromAddress(m.base.address)
+            const quote = await mangrove?.tokenFromAddress(m.quote.address)
+            if (!(mangrove && base && quote)) {
+              throw new Error("Impossible to determine market tokens")
+            }
+
+            const tickPriceHelper = new TickPriceHelper(ba, {
+              base,
+              quote,
+              tickSpacing: m.tickSpacing,
+            })
+
             return {
-              priceFromTick: () => Big(0),
-              inboundFromOutbound: () => Big(0),
-              outboundFromInbound: () => Big(0),
+              priceFromTick(tick) {
+                return tickPriceHelper.priceFromTick(tick, "roundUp")
+              },
+              inboundFromOutbound(tick, outboundAmount, roundUp) {
+                return tickPriceHelper.inboundFromOutbound(
+                  tick,
+                  outboundAmount,
+                  roundUp ? "roundUp" : "nearest",
+                )
+              },
+              outboundFromInbound(tick, inboundAmount, roundUp) {
+                return tickPriceHelper.outboundFromInbound(
+                  tick,
+                  inboundAmount,
+                  roundUp ? "roundUp" : "nearest",
+                )
+              },
             }
           },
           getPrice(tokenAddress) {

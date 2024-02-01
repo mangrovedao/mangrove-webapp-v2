@@ -9,6 +9,7 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
+import { MyStrategies } from "./strategies/my-strategies"
 import { Strategies } from "./strategies/strategies"
 
 enum StrategiesTables {
@@ -18,7 +19,7 @@ enum StrategiesTables {
 
 const TABS_CONTENT = {
   [StrategiesTables.ALL_STRATEGIES]: <Strategies />,
-  [StrategiesTables.MY_STRATEGIES]: <Strategies />,
+  [StrategiesTables.MY_STRATEGIES]: <MyStrategies />,
 }
 
 export function Tables({
