@@ -4,7 +4,7 @@ import Big from "big.js"
 
 import { Statuses } from "@mangrovedao/mangrove.js/dist/nodejs/kandel/geometricKandel/geometricKandelStatus"
 
-export type MergedOffers = ReturnType<typeof getMergedOffers>;
+export type MergedOffers = ReturnType<typeof getMergedOffers>
 
 function getPublished(
   mergedOffers: MergedOffers | undefined,
@@ -63,19 +63,27 @@ export function getMergedOffers(
       const isBid = offerType === "bids"
       const wants = (
         isBid ? bidsPriceHelper : asksPriceHelper
-      ).inboundFromOutbound(indexedOffer?.tick ?? 0, indexedOffer?.gives ?? 0)
+      ).inboundFromOutbound(
+        indexedOffer?.tick ?? 0,
+        indexedOffer?.gives ?? 0,
+        "nearest",
+      )
       const base = Big(isBid ? wants || 0 : indexedOffer?.gives || 0)
       const quote = Big(isBid ? indexedOffer?.gives || 0 : wants || 0)
       return {
         ...indexedOffer,
         index: indexedOffer?.index ?? 0,
         base,
-        quote
+        quote,
       }
     })
     .filter((x) => x.offerId)
     .sort((a, b) =>
-      a.offerType === b.offerType || !(a.offerType && b.offerType) ? 0 : a.offerType < b.offerType ? 1 : -1,
+      a.offerType === b.offerType || !(a.offerType && b.offerType)
+        ? 0
+        : a.offerType < b.offerType
+          ? 1
+          : -1,
     )
 }
 
