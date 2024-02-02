@@ -17,6 +17,30 @@ type Props = {
   quoteToken: Token
 }
 
+export function StatusBadge({ isLive }: { isLive: boolean }) {
+  return (
+    <div
+      className={cn(
+        "rounded py-0.5 pl-1 pr-2 inline-flex space-x-0.5 items-center",
+        {
+          "bg-primary-dark-green text-green-caribbean": isLive,
+          "bg-cloud-500 text-cloud-00": !isLive,
+        },
+      )}
+    >
+      <span
+        className={cn("w-1 h-1 rounded-full mx-1", {
+          "bg-green-caribbean": isLive,
+          "bg-cloud-00": !isLive,
+        })}
+      />
+      <Title variant={"title3"} className="text-inherit capitalize">
+        {isLive ? "Live" : "Empty"}
+      </Title>
+    </div>
+  )
+}
+
 export default function OfferTooltip({
   height,
   paddingBottom,
@@ -37,16 +61,7 @@ export default function OfferTooltip({
           "border-green-bangladesh": hoveredGeometricOffer.type === "bid",
         })}
       >
-        <div
-          className={cn(
-            "rounded py-0.5 pl-1 pr-2 inline-flex space-x-0.5 bg-primary-dark-green text-green-caribbean items-center",
-          )}
-        >
-          <span className="w-1 h-1 rounded-full bg-green-caribbean mx-1"></span>
-          <Title variant={"title3"} className="text-inherit capitalize">
-            Live
-          </Title>
-        </div>
+        <StatusBadge isLive />
         <div className="text-white">
           <span className="text-cloud-300">Price:</span>{" "}
           {hoveredGeometricOffer.price.toFixed(quoteToken?.displayedDecimals)}{" "}

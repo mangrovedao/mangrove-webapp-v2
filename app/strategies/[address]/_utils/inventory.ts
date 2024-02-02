@@ -4,7 +4,12 @@ import Big from "big.js"
 
 import { Statuses } from "@mangrovedao/mangrove.js/dist/nodejs/kandel/geometricKandel/geometricKandelStatus"
 
-export type MergedOffers = ReturnType<typeof getMergedOffers>
+export type MergedOffer = OfferWithPrices & {
+  index: number
+  base: Big
+  quote: Big
+}
+export type MergedOffers = MergedOffer[]
 
 function getPublished(
   mergedOffers: MergedOffers | undefined,

@@ -5,10 +5,10 @@ import { Address } from "viem"
 import { useNetwork } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import Big from "big.js"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
 import { getMergedOffers } from "../_utils/inventory"
-import Big from "big.js"
 
 const useKandelStrategyContext = () => {
   const { chain } = useNetwork()
@@ -30,13 +30,20 @@ const useKandelStrategyContext = () => {
     offers: strategyQuery.data?.offers,
   })
 
-  const geometricKandelDistribution = React.useMemo(() => {
+  const mergedOffers = React.useMemo(() => {
     const indexerOffers = strategyQuery.data?.offers
     const sdkOffers = strategyStatusQuery.data?.offerStatuses
     const market = strategyStatusQuery.data?.market
     if (!(sdkOffers && indexerOffers && market)) return
     //@ts-expect-error TODO: it's an error type from the indexer SDK
-    const mergedOffers = getMergedOffers(sdkOffers, indexerOffers, market)
+    return getMergedOffers(sdkOffers, indexerOffers, market)
+  }, [
+    strategyQuery.data?.offers,
+    strategyStatusQuery.data?.offerStatuses,
+    strategyStatusQuery.data?.market,
+  ])
+
+  const geometricKandelDistribution = React.useMemo(() => {
     if (!mergedOffers) return
     return {
       bids: mergedOffers?.length
@@ -60,8 +67,7 @@ const useKandelStrategyContext = () => {
             }))
         : [],
     }
-  }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses, strategyStatusQuery.data?.market])
-
+  }, [mergedOffers])
 
   return {
     strategyQuery,
@@ -71,6 +77,7 @@ const useKandelStrategyContext = () => {
     blockExplorerUrl: chain?.blockExplorers?.default.url,
     strategyStatusQuery,
     geometricKandelDistribution,
+    mergedOffers,
   }
 }
 

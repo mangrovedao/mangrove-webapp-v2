@@ -1,11 +1,13 @@
-import OffersTable from "./table/offers-table"
 import PriceRangeInfos from "../shared/price-range-infos"
+import OffersTable from "./table/offers-table"
 
 export default function Overview() {
   return (
     <div>
       <PriceRangeInfos />
-      <OffersTable />
+      <div className="py-10">
+        <OffersTable />
+      </div>
     </div>
   )
 }
