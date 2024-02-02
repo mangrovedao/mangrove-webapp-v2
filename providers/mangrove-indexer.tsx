@@ -7,7 +7,7 @@ import React from "react"
 import { useNetwork } from "wagmi"
 
 import { getTokenPriceInUsd } from "@/services/tokens.service"
-import Big from "big.js"
+import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
@@ -30,12 +30,37 @@ const useIndexerSdkContext = () => {
               throw new Error("Impossible to determine token decimals")
             return token.decimals
           },
-          createTickHelpers: async () => {
-            // FIXME: find a workaround for this
+          createTickHelpers: async (ba, m) => {
+            const base = await mangrove?.tokenFromAddress(m.base.address)
+            const quote = await mangrove?.tokenFromAddress(m.quote.address)
+            if (!(mangrove && base && quote)) {
+              throw new Error("Impossible to determine market tokens")
+            }
+
+            const tickPriceHelper = new TickPriceHelper(ba, {
+              base,
+              quote,
+              tickSpacing: m.tickSpacing,
+            })
+
             return {
-              inboundFromOutbound: () => Big(1),
-              outboundFromInbound: () => Big(1),
-              priceFromTick: () => Big(1),
+              priceFromTick(tick) {
+                return tickPriceHelper.priceFromTick(tick, "roundUp")
+              },
+              inboundFromOutbound(tick, outboundAmount, roundUp) {
+                return tickPriceHelper.inboundFromOutbound(
+                  tick,
+                  outboundAmount,
+                  roundUp ? "roundUp" : "nearest",
+                )
+              },
+              outboundFromInbound(tick, inboundAmount, roundUp) {
+                return tickPriceHelper.outboundFromInbound(
+                  tick,
+                  inboundAmount,
+                  roundUp ? "roundUp" : "nearest",
+                )
+              },
             }
           },
           getPrice(tokenAddress) {
