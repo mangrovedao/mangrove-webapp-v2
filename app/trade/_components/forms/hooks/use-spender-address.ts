@@ -1,7 +1,7 @@
 import useMangrove from "@/providers/mangrove"
 import { useQuery } from "@tanstack/react-query"
 
-export const useSpenderAddress = (type: "limit" | "market") => {
+export const useSpenderAddress = (type: "limit" | "market" | "amplified") => {
   const { mangrove } = useMangrove()
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps

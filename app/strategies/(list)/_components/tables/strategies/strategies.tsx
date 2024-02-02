@@ -8,7 +8,10 @@ import type { Strategy } from "../../../_schemas/kandels"
 import { useStrategies } from "./hooks/use-strategies"
 import { useTable } from "./hooks/use-table"
 
-export function Strategies() {
+type Props = {
+  type: "user" | "all"
+}
+export function Strategies({ type }: Props) {
   const { push } = useRouter()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
@@ -29,12 +32,14 @@ export function Strategies() {
   const [, setStrategyToCancel] = React.useState<Strategy>()
 
   const table = useTable({
+    type,
     data,
     onManage: (strategy: Strategy) => {
       push(`/strategies/${strategy.address}`)
     },
     onCancel: setStrategyToCancel, // TODO: implement cancel dialog
   })
+
   return (
     <DataTable
       table={table}
