@@ -2,6 +2,7 @@ import { Token } from "@mangrovedao/mangrove.js"
 import { TooltipWithBounds } from "@visx/tooltip"
 import { ScaleLinear } from "d3-scale"
 
+import { MergedOffer } from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
 import { GeometricOffer } from "./geometric-distribution-dots"
@@ -12,7 +13,7 @@ type Props = {
   xScale: ScaleLinear<number, number>
   onHover?: (offer: GeometricOffer) => void
   onHoverOut?: () => void
-  hoveredGeometricOffer: GeometricOffer
+  mergedOffer: MergedOffer
   baseToken: Token
   quoteToken: Token
 }
@@ -41,35 +42,36 @@ export function StatusBadge({ isLive }: { isLive: boolean }) {
   )
 }
 
-export default function OfferTooltip({
+export function MergedOfferTooltip({
   height,
   paddingBottom,
   xScale: xScaleTransformed,
-  hoveredGeometricOffer,
+  mergedOffer,
   baseToken,
   quoteToken,
 }: Props) {
+  const isLive = mergedOffer.live
   return (
     <TooltipWithBounds
       top={height - paddingBottom}
-      left={xScaleTransformed(hoveredGeometricOffer.price.toNumber())}
+      left={xScaleTransformed(Number(mergedOffer.price))}
       className="!bg-transparent"
     >
       <div
         className={cn("p-4 rounded-lg bg-[#0F1212] space-y-2 border", {
-          "border-cherry-400": hoveredGeometricOffer.type === "ask",
-          "border-green-bangladesh": hoveredGeometricOffer.type === "bid",
+          "border-cherry-400": mergedOffer.offerType === "asks",
+          "border-green-bangladesh": mergedOffer.offerType === "bids",
         })}
       >
-        <StatusBadge isLive />
+        <StatusBadge isLive={isLive} />
         <div className="text-white">
           <span className="text-cloud-300">Price:</span>{" "}
-          {hoveredGeometricOffer.price.toFixed(quoteToken?.displayedDecimals)}{" "}
+          {Number(mergedOffer.price).toFixed(quoteToken?.displayedDecimals)}{" "}
           {quoteToken?.symbol}
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {hoveredGeometricOffer.gives.toFixed(baseToken?.displayedDecimals)}{" "}
+          {Number(mergedOffer.gives).toFixed(baseToken?.displayedDecimals)}{" "}
           {baseToken?.symbol}
         </div>
       </div>

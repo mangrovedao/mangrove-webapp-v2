@@ -16,6 +16,10 @@ import { Minus, Plus } from "lucide-react"
 import React from "react"
 import useResizeObserver from "use-resize-observer"
 
+import {
+  MergedOffer,
+  MergedOffers,
+} from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -27,8 +31,10 @@ import {
   GeometricKandelDistributionDots,
   GeometricOffer,
 } from "./geometric-distribution-dots"
+import { GeometricOfferTooltip } from "./geometric-offer-tooltip"
+import { MergedOfferTooltip } from "./merged-offer-tooltip"
+import { MergedOffersDots } from "./merged-offers-dots"
 import { MidPriceLine } from "./mid-price-line"
-import OfferTooltip from "./offer-tooltip"
 import { RangeTooltips } from "./range-tooltips"
 import { SetRangeAnimation } from "./set-range-animation"
 
@@ -58,6 +64,7 @@ export type PriceRangeChartProps = {
   geometricKandelDistribution?: ReturnType<
     typeof GeometricKandelDistribution.prototype.getOffersWithPrices
   >
+  mergedOffers?: MergedOffers
 }
 
 export function PriceRangeChart({
@@ -69,11 +76,14 @@ export function PriceRangeChart({
   viewOnly = false,
   isLoading = false,
   geometricKandelDistribution,
+  mergedOffers,
   baseToken,
   quoteToken,
 }: PriceRangeChartProps) {
   const [hoveredGeometricOffer, setHoveredGeometricOffer] =
     React.useState<GeometricOffer>()
+  const [hoveredMergedOffer, setHoveredMergedOffer] =
+    React.useState<MergedOffer>()
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const [isMovingRange, setIsMovingRange] = React.useState(false)
   const offers = [
@@ -354,6 +364,18 @@ export function PriceRangeChart({
                     onHoverOut={() => setHoveredGeometricOffer(undefined)}
                   />
                 )}
+                {mergedOffers && (
+                  <MergedOffersDots
+                    height={height}
+                    paddingBottom={paddingBottom}
+                    xScale={xScaleTransformed}
+                    mergedOffers={mergedOffers}
+                    onHover={(offer) => {
+                      setHoveredMergedOffer(offer)
+                    }}
+                    onHoverOut={() => setHoveredMergedOffer(undefined)}
+                  />
+                )}
               </svg>
               <RangeTooltips
                 height={height}
@@ -364,11 +386,21 @@ export function PriceRangeChart({
               />
 
               {hoveredGeometricOffer && baseToken && quoteToken && (
-                <OfferTooltip
+                <GeometricOfferTooltip
                   height={height}
                   paddingBottom={paddingBottom}
                   xScale={xScaleTransformed}
                   hoveredGeometricOffer={hoveredGeometricOffer}
+                  baseToken={baseToken}
+                  quoteToken={quoteToken}
+                />
+              )}
+              {hoveredMergedOffer && baseToken && quoteToken && (
+                <MergedOfferTooltip
+                  height={height}
+                  paddingBottom={paddingBottom}
+                  xScale={xScaleTransformed}
+                  mergedOffer={hoveredMergedOffer}
                   baseToken={baseToken}
                   quoteToken={quoteToken}
                 />

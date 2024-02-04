@@ -1,15 +1,19 @@
-import Big from "big.js"
-
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
 import { AverageReturn } from "../../../(shared)/_components/average-return"
 import useKandel from "../../_providers/kandel-strategy"
+import { MergedOffers } from "../../_utils/inventory"
 import { LegendItem } from "./legend-item"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function PriceRangeInfos() {
-  const { strategyQuery, strategyStatusQuery, baseToken, quoteToken, geometricKandelDistribution } =
-    useKandel()
+  const {
+    strategyQuery,
+    strategyStatusQuery,
+    baseToken,
+    quoteToken,
+    mergedOffers,
+  } = useKandel()
   const { bidsBalance, asksBalance } = strategyStatusQuery.data ?? {}
 
   const bids = strategyStatusQuery.data?.book?.bids ?? []
@@ -58,7 +62,7 @@ export default function PriceRangeInfos() {
           initialMidPrice={strategyStatusQuery.data?.midPrice?.toNumber()}
           priceRange={priceRange}
           viewOnly
-          geometricKandelDistribution={geometricKandelDistribution}
+          mergedOffers={mergedOffers as MergedOffers}
           baseToken={baseToken}
           quoteToken={quoteToken}
         />
