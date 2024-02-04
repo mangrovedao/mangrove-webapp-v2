@@ -56,22 +56,39 @@ export function getMergedOffers(
   const asksPriceHelper = new TickPriceHelper("asks", market)
   const bidsPriceHelper = new TickPriceHelper("bids", market)
 
-  // FIXME: Found some weird cases, verify and improve that code
   return sdkOffers?.statuses
     .map((sdkOffer) => {
-      const offerType = sdkOffer?.expectedLiveAsk ? "asks" : "bids"
-      const indexedOffer = indexedOffers?.find(
-        (indexedOffer) =>
-          indexedOffer?.offerId === sdkOffer[offerType]?.id &&
-          indexedOffer.offerType === offerType,
-      )
+      const indexedOffer = indexedOffers?.find((indexedOffer) => {
+        const isExpectedLiveAsk = sdkOffer.expectedLiveAsk
+        const isExpectedLiveBid = sdkOffer.expectedLiveBid
+
+        // we do not have ask/bid type information, so we retreive the corresponding offer by comparing the price
+        if (!isExpectedLiveAsk && !isExpectedLiveBid) {
+          return (
+            (indexedOffer?.offerId === sdkOffer.asks?.id &&
+              sdkOffer.asks?.price?.toString() ===
+                indexedOffer.price?.toString()) ||
+            (indexedOffer?.offerId === sdkOffer.bids?.id &&
+              sdkOffer.bids?.price?.toString() ===
+                indexedOffer.price?.toString())
+          )
+        }
+
+        const offerType = sdkOffer?.expectedLiveAsk ? "asks" : "bids"
+
+        return (
+          indexedOffer?.offerId === sdkOffer?.[offerType]?.id &&
+          indexedOffer.offerType === offerType
+        )
+      })
+      const offerType = indexedOffer?.offerType
       const isBid = offerType === "bids"
       const wants = (
         isBid ? bidsPriceHelper : asksPriceHelper
       ).inboundFromOutbound(
         indexedOffer?.tick ?? 0,
         indexedOffer?.gives ?? 0,
-        "nearest",
+        "roundUp",
       )
       const base = Big(isBid ? wants || 0 : indexedOffer?.gives || 0)
       const quote = Big(isBid ? indexedOffer?.gives || 0 : wants || 0)
