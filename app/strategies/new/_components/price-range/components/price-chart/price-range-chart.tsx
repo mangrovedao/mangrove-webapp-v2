@@ -16,14 +16,12 @@ import { Minus, Plus } from "lucide-react"
 import React from "react"
 import useResizeObserver from "use-resize-observer"
 
-import {
-  MergedOffer,
-  MergedOffers,
-} from "@/app/strategies/[address]/_utils/inventory"
+import { MergedOffers } from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
+import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import { cn } from "@/utils"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
@@ -82,8 +80,7 @@ export function PriceRangeChart({
 }: PriceRangeChartProps) {
   const [hoveredGeometricOffer, setHoveredGeometricOffer] =
     React.useState<GeometricOffer>()
-  const [hoveredMergedOffer, setHoveredMergedOffer] =
-    React.useState<MergedOffer>()
+  const { hoveredOffer, setHoveredOffer } = useHoveredOfferStore()
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const [isMovingRange, setIsMovingRange] = React.useState(false)
   const offers = [
@@ -371,9 +368,9 @@ export function PriceRangeChart({
                     xScale={xScaleTransformed}
                     mergedOffers={mergedOffers}
                     onHover={(offer) => {
-                      setHoveredMergedOffer(offer)
+                      setHoveredOffer(offer)
                     }}
-                    onHoverOut={() => setHoveredMergedOffer(undefined)}
+                    onHoverOut={() => setHoveredOffer(undefined)}
                   />
                 )}
               </svg>
@@ -395,12 +392,12 @@ export function PriceRangeChart({
                   quoteToken={quoteToken}
                 />
               )}
-              {hoveredMergedOffer && baseToken && quoteToken && (
+              {hoveredOffer && baseToken && quoteToken && (
                 <MergedOfferTooltip
                   height={height}
                   paddingBottom={paddingBottom}
                   xScale={xScaleTransformed}
-                  mergedOffer={hoveredMergedOffer}
+                  mergedOffer={hoveredOffer}
                   baseToken={baseToken}
                   quoteToken={quoteToken}
                 />

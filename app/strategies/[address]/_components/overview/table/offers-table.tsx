@@ -1,10 +1,12 @@
 import { DataTable } from "@/components/ui/data-table/data-table"
+import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import useKandel from "../../../_providers/kandel-strategy"
-import { type MergedOffers } from "../../../_utils/inventory"
+import { MergedOffer, type MergedOffers } from "../../../_utils/inventory"
 import { useOffersTable } from "./use-offers-table"
 
 export default function OffersTable() {
   const { mergedOffers, strategyQuery, strategyStatusQuery } = useKandel()
+  const { hoveredOffer, setHoveredOffer } = useHoveredOfferStore()
 
   const table = useOffersTable({
     data: mergedOffers as MergedOffers,
@@ -13,5 +15,13 @@ export default function OffersTable() {
   const isLoading = strategyQuery.isLoading || strategyStatusQuery.isLoading
   const isError = strategyQuery.isError || strategyStatusQuery.isError
 
-  return <DataTable table={table} isLoading={isLoading} isError={isError} />
+  return (
+    <DataTable
+      table={table}
+      isLoading={isLoading}
+      isError={isError}
+      isRowHighlighted={(offer) => offer.offerId === hoveredOffer?.offerId}
+      onRowHover={(offer) => setHoveredOffer(offer as MergedOffer)}
+    />
+  )
 }

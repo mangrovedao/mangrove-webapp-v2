@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/utils"
 import { LoadingBody } from "./loading-body"
 import { Pagination, type PaginationProps } from "./pagination"
 
@@ -18,6 +19,8 @@ interface DataTableProps<TData> {
   isError?: boolean
   isLoading?: boolean
   pagination?: PaginationProps
+  isRowHighlighted?: (row: TData) => boolean
+  onRowHover?: (row: TData | null) => void
 }
 
 export function DataTable<TData>({
@@ -25,6 +28,8 @@ export function DataTable<TData>({
   isError,
   isLoading,
   pagination,
+  isRowHighlighted = () => false,
+  onRowHover = () => {},
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
@@ -59,14 +64,28 @@ export function DataTable<TData>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="text-gray-scale-300 hover:text-white transition-colors group/row"
+                className={cn(
+                  "text-gray-scale-300 hover:text-white transition-colors group/row",
+                  {
+                    "text-white": isRowHighlighted(row.original),
+                  },
+                )}
+                onMouseEnter={() => onRowHover(row.original)}
+                onMouseLeave={() => onRowHover(null)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}
                     className="px-0 py-2 group/cell whitespace-nowrap"
                   >
-                    <div className="group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg">
+                    <div
+                      className={cn(
+                        "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
+                        {
+                          "bg-gray-scale-700": isRowHighlighted(row.original),
+                        },
+                      )}
+                    >
                       <div className="px-2 h-6 flex items-center">
                         {flexRender(
                           cell.column.columnDef.cell,
