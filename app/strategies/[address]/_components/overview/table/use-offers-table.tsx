@@ -10,8 +10,8 @@ import {
 import React from "react"
 
 import { StatusBadge } from "@/app/strategies/new/_components/price-range/components/price-chart/merged-offer-tooltip"
-import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffer, MergedOffers } from "../../../_utils/inventory"
 
 const columnHelper = createColumnHelper<MergedOffer>()
@@ -22,7 +22,8 @@ type Params = {
 }
 
 export function useOffersTable({ data }: Params) {
-  const { market } = useMarket()
+  const { strategyStatusQuery } = useKandel()
+  const market = strategyStatusQuery.data?.market
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("offerType", {

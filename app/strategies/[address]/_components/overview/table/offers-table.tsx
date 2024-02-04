@@ -2,6 +2,7 @@ import { DataTable } from "@/components/ui/data-table/data-table"
 import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffer, type MergedOffers } from "../../../_utils/inventory"
+import RefillRow from "./refill-row"
 import { useOffersTable } from "./use-offers-table"
 
 export default function OffersTable() {
@@ -25,6 +26,10 @@ export default function OffersTable() {
         offer.offerType === hoveredOffer?.offerType
       }
       onRowHover={(offer) => setHoveredOffer(offer as MergedOffer)}
+      renderExtraRow={(row) => {
+        if (row.original.live) return null
+        return <RefillRow row={row} />
+      }}
     />
   )
 }
