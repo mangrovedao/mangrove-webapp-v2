@@ -7,11 +7,15 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell } from "@/components/ui/table"
 import { cn } from "@/utils"
+import { useRefillRequirements } from "../../../_hooks/use-refill-requirements"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffer } from "../../../_utils/inventory"
 
 export default function RefillRow({ row }: { row: Row<MergedOffer> }) {
   const { strategyStatusQuery } = useKandel()
+  const { data } = useRefillRequirements({
+    offer: row.original,
+  })
   const { base, quote } = strategyStatusQuery.data?.market ?? {}
 
   return (
@@ -30,9 +34,13 @@ export default function RefillRow({ row }: { row: Row<MergedOffer> }) {
             <Info className={"text-mango-100"} />
           </div>
           {/* TODO: unmock values for amount / volume and Min quote */}
-          <LabelValueItem label="Amount" value="1774.2240" token={quote} />
-          <LabelValueItem label="Volume" value="1774.2240" token={base} />
-          <LabelValueItem label="Min quote" value="1774.2240" token={quote} />
+          {/* <LabelValueItem label="Amount" value={Big(0)} token={quote} /> */}
+          <LabelValueItem
+            label="Minimum Volume"
+            value={data?.minimumVolume}
+            token={row.original.offerType === "asks" ? base : quote}
+          />
+          {/* <LabelValueItem label="Min quote" value={Big(0)} token={quote} /> */}
         </div>
         {/* TODO: implement re-fill */}
         <Button size={"sm"} className="px-5">
@@ -49,7 +57,7 @@ function LabelValueItem({
   token,
 }: {
   label: string
-  value: string
+  value?: Big
   token?: Token
 }) {
   return (
@@ -57,7 +65,7 @@ function LabelValueItem({
       <span className="text-cloud-300">{label}:</span>
       {value && token ? (
         <span className="ml-1 text-white">
-          {Big(value).toFixed(token.displayedDecimals)} {token?.symbol}
+          {value.toFixed(token.displayedDecimals)} {token?.symbol}
         </span>
       ) : (
         <Skeleton className="w-10 h-4" />

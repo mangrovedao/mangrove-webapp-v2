@@ -104,6 +104,7 @@ export default function useStrategyStatus({
           offerStatuses,
           unexpectedDeadOffers,
           isOutOfRange,
+          stratInstance,
         }
       } catch (error) {
         console.error(error)
