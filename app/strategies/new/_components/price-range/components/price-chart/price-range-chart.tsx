@@ -15,6 +15,7 @@ import Big from "big.js"
 import { Minus, Plus } from "lucide-react"
 import React from "react"
 import useResizeObserver from "use-resize-observer"
+import { useAccount } from "wagmi"
 
 import { MergedOffers } from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
@@ -81,6 +82,7 @@ export function PriceRangeChart({
   const [hoveredGeometricOffer, setHoveredGeometricOffer] =
     React.useState<GeometricOffer>()
   const { hoveredOffer, setHoveredOffer } = useHoveredOfferStore()
+  const { isConnected } = useAccount()
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const [isMovingRange, setIsMovingRange] = React.useState(false)
   const offers = [
@@ -256,7 +258,9 @@ export function PriceRangeChart({
                   onMouseOut={zoom.dragEnd}
                 />
               )}
-              {isLoading && <Skeleton className="h-full w-full" />}
+              {(isLoading || !isConnected) && (
+                <Skeleton className="h-full w-full" />
+              )}
               {!priceRange && !viewOnly ? (
                 <div className="absolute inset-0 flex items-center group-hover:hidden">
                   <div className="w-full translate-x-1/4">
@@ -328,29 +332,33 @@ export function PriceRangeChart({
                   midPrice={midPrice}
                   height={height - paddingBottom}
                 />
-                <CustomBrush
-                  xScale={xScaleTransformed}
-                  width={width - paddingRight}
-                  height={height - paddingBottom}
-                  onBrushEnd={(selectedRange) => {
-                    setIsMovingRange(false)
-                    setSelectedPriceRange(selectedRange)
-                    if (onPriceRangeChange && selectedRange) {
-                      onPriceRangeChange(selectedRange)
-                    }
-                  }}
-                  onBrushChange={(selectedRange) => {
-                    setIsMovingRange(true)
-                    setSelectedPriceRange(selectedRange)
-                    if (onPriceRangeChange && selectedRange) {
-                      onPriceRangeChange(selectedRange)
-                    }
-                  }}
-                  value={selectedPriceRange ?? undefined}
-                  svgRef={svgRef}
-                  viewOnly={viewOnly}
-                  midPrice={midPrice}
-                />
+                {viewOnly &&
+                !priceRange?.[0] &&
+                !priceRange?.[1] ? undefined : (
+                  <CustomBrush
+                    xScale={xScaleTransformed}
+                    width={width - paddingRight}
+                    height={height - paddingBottom}
+                    onBrushEnd={(selectedRange) => {
+                      setIsMovingRange(false)
+                      setSelectedPriceRange(selectedRange)
+                      if (onPriceRangeChange && selectedRange) {
+                        onPriceRangeChange(selectedRange)
+                      }
+                    }}
+                    onBrushChange={(selectedRange) => {
+                      setIsMovingRange(true)
+                      setSelectedPriceRange(selectedRange)
+                      if (onPriceRangeChange && selectedRange) {
+                        onPriceRangeChange(selectedRange)
+                      }
+                    }}
+                    value={selectedPriceRange ?? undefined}
+                    svgRef={svgRef}
+                    viewOnly={viewOnly}
+                    midPrice={midPrice}
+                  />
+                )}
                 {!isMovingRange && priceRange?.[0] && priceRange?.[1] && (
                   <GeometricKandelDistributionDots
                     height={height}
@@ -371,6 +379,7 @@ export function PriceRangeChart({
                       setHoveredOffer(offer)
                     }}
                     onHoverOut={() => setHoveredOffer(undefined)}
+                    hoveredOffer={hoveredOffer}
                   />
                 )}
               </svg>

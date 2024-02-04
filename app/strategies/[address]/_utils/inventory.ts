@@ -82,6 +82,13 @@ export function getMergedOffers(
         )
       })
       const offerType = indexedOffer?.offerType
+      const expectedLive =
+        offerType === "bids"
+          ? sdkOffer.expectedLiveBid
+          : sdkOffer.expectedLiveAsk
+      const live =
+        expectedLive &&
+        (offerType === "bids" ? sdkOffer.bids?.live : sdkOffer.asks?.live)
       const isBid = offerType === "bids"
       const wants = (
         isBid ? bidsPriceHelper : asksPriceHelper
@@ -97,6 +104,7 @@ export function getMergedOffers(
         index: indexedOffer?.index ?? 0,
         base,
         quote,
+        live,
       }
     })
     .filter((x) => x.offerId)

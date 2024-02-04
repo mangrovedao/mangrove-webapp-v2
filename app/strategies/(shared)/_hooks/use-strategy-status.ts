@@ -102,8 +102,8 @@ export default function useStrategyStatus({
           market,
           book,
           offerStatuses,
-          unexpectedDeadOffers, // TODO: will help us to show UI message to the user with an explanation
-          isOutOfRange, // TODO: will help us to show UI message to the user with an explanation
+          unexpectedDeadOffers,
+          isOutOfRange,
         }
       } catch (error) {
         console.error(error)

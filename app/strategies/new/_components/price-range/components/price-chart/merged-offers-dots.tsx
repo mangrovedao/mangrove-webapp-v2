@@ -10,6 +10,7 @@ type Props = {
   xScale: ScaleLinear<number, number>
   onHover?: (offer: MergedOffer) => void
   onHoverOut?: () => void
+  hoveredOffer?: MergedOffer
 } & Pick<PriceRangeChartProps, "mergedOffers">
 
 export function MergedOffersDots({
@@ -19,6 +20,7 @@ export function MergedOffersDots({
   paddingBottom,
   onHover,
   onHoverOut,
+  hoveredOffer,
 }: Props) {
   if (!mergedOffers) return null
 
@@ -39,6 +41,9 @@ export function MergedOffersDots({
             "fill-green-bangladesh": mergedOffer.offerType === "bids",
             "fill-cherry-400": mergedOffer.offerType === "asks",
             "fill-cloud-300": !mergedOffer.live,
+            "opacity-100":
+              hoveredOffer?.offerId === mergedOffer.offerId &&
+              hoveredOffer?.offerType === mergedOffer.offerType,
           },
         )}
       />

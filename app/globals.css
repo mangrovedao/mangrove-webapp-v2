@@ -32,6 +32,9 @@
     --color-cloud-500: 180, 9%, 12%;
     --color-cherry-100: 0, 100%, 68%;
     --color-cherry-400: 0, 51%, 15%;
+    --color-mango-100: 43, 100%, 50%;
+    --color-mango-200: 45, 74%, 20%;
+    --color-mango-300: 50, 42%, 11%;
 
     --tw-ring-color: var(hsl(--color-primary-dark-geen));
     --background: 180 86% 3%;

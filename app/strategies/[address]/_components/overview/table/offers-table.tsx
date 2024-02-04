@@ -20,7 +20,10 @@ export default function OffersTable() {
       table={table}
       isLoading={isLoading}
       isError={isError}
-      isRowHighlighted={(offer) => offer.offerId === hoveredOffer?.offerId}
+      isRowHighlighted={(offer) =>
+        offer.offerId === hoveredOffer?.offerId &&
+        offer.offerType === hoveredOffer?.offerType
+      }
       onRowHover={(offer) => setHoveredOffer(offer as MergedOffer)}
     />
   )

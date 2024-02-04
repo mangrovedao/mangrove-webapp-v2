@@ -98,6 +98,11 @@ export default {
           100: "hsl(var(--color-cherry-100))",
           400: "hsl(var(--color-cherry-400))",
         },
+        mango: {
+          100: "hsl(var(--color-mango-100))",
+          200: "hsl(var(--color-mango-200))",
+          300: "hsl(var(--color-mango-300))",
+        },
       },
       maxWidth: {
         "8xl": "90rem",

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Status from "../(shared)/_components/status"
 import BackButton from "./_components/back-button"
 import BlockExplorer from "./_components/block-explorer"
+import InformationBanner from "./_components/shared/information-banner"
 import Tabs from "./_components/tabs"
 import useKandel from "./_providers/kandel-strategy"
 
@@ -21,6 +22,8 @@ export default function Page() {
   return (
     <div className="max-w-5xl mx-auto px-4 xl:px-0">
       <BackButton href={"/strategies"}>Back to Strategies</BackButton>
+
+      <InformationBanner />
 
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4 mb-4 mt-8">
