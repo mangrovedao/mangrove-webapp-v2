@@ -57,6 +57,7 @@ export function useUnPublish({
       } catch (err) {
         console.error(err)
         toast.error("Failed to publish")
+        throw new Error("Failed to publish")
       }
     },
     meta: {

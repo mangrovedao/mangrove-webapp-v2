@@ -54,10 +54,6 @@ export function Bounty({ open, onClose }: Props) {
       body: (
         <div className="grid gap-4">
           <EnhancedNumericInput
-            balanceAction={{
-              onClick: () => setBounty(nativeBalance?.value.toString() || ""),
-              text: "MAX",
-            }}
             label={`${nativeBalance?.symbol} amount`}
             showBalance
             token={nativeBalance?.symbol}

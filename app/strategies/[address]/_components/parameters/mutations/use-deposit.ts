@@ -43,6 +43,7 @@ export function useDeposit({
       } catch (err) {
         console.error(err)
         toast.error("Could not deposit")
+        throw new Error("Could not deposit")
       }
     },
     meta: {

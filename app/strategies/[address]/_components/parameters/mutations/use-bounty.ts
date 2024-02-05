@@ -31,6 +31,7 @@ export function useBounty({
       } catch (err) {
         console.error(err)
         toast.error("Could not add bounty")
+        throw new Error("Could not add bounty")
       }
     },
     meta: {

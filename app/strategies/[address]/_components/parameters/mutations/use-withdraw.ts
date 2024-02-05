@@ -33,6 +33,7 @@ export function useWithDraw({
       } catch (err) {
         console.error(err)
         toast.error("Failed to withdraw")
+        throw new Error("Failed to withdraw")
       }
     },
     meta: {

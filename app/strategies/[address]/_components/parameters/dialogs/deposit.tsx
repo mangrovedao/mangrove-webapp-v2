@@ -14,7 +14,7 @@ import { LucideChevronRight } from "lucide-react"
 import React from "react"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useDeposit } from "../mutations/use-deposit"
-import { DepositCompleted } from "./deposit-completed"
+import { DialogCompleted } from "./dialog-completed"
 
 type Props = {
   open: boolean
@@ -55,7 +55,11 @@ export function Deposit({ open, onClose }: Props) {
       body: (
         <div className="grid gap-4">
           <EnhancedNumericInput
-            label={"WETH amount"}
+            balanceAction={{
+              onClick: () => setBaseAmount(baseBalance?.toString() || ""),
+              text: "MAX",
+            }}
+            label={`${market?.base.symbol} amount`}
             showBalance
             token={market?.base}
             onChange={(e) => setBaseAmount(e.target.value)}
@@ -65,7 +69,11 @@ export function Deposit({ open, onClose }: Props) {
           />
 
           <EnhancedNumericInput
-            label={"USDC amount"}
+            balanceAction={{
+              onClick: () => setQuoteAmount(quoteBalance?.toString() || ""),
+              text: "MAX",
+            }}
+            label={`${market?.quote.symbol} amount`}
             showBalance
             token={market?.quote}
             onChange={(e) => setQuoteAmount(e.target.value)}
@@ -125,10 +133,13 @@ export function Deposit({ open, onClose }: Props) {
           loading={deposit.isPending}
           onClick={() =>
             deposit.mutate(undefined, {
-              onSuccess() {
-                toggleDepositCompleted(!depositCompleted)
-                onClose()
-                reset()
+              onSettled(data, error, variables, context) {
+                if (!error) {
+                  console.log(data, error)
+                  toggleDepositCompleted(!depositCompleted)
+                  onClose()
+                  reset()
+                }
               },
             })
           }
@@ -159,7 +170,13 @@ export function Deposit({ open, onClose }: Props) {
 
   return (
     <>
-      <DepositCompleted
+      <DialogCompleted
+        title="Deposit completed"
+        actionButton={
+          <Button className="w-full" size={"lg"}>
+            Publish now
+          </Button>
+        }
         open={depositCompleted}
         onClose={() => toggleDepositCompleted(false)}
       />

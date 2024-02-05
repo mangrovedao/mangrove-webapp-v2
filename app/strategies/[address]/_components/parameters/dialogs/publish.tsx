@@ -88,7 +88,7 @@ export function Publish({ open, onClose }: Props) {
               text: "MAX",
             }}
             value={baseAmount}
-            label={"WETH amount"}
+            label={`${market?.base.symbol} amount`}
             customBalance={upublishedBase}
             showBalance
             balanceLabel="Unpublished inventory"
@@ -107,7 +107,7 @@ export function Publish({ open, onClose }: Props) {
               text: "MAX",
             }}
             value={quoteAmount}
-            label={"USDC amount"}
+            label={`${market?.quote.symbol} amount`}
             customBalance={upublishedQuote}
             showBalance
             balanceLabel="Unpublished inventory"
