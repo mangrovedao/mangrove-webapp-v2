@@ -70,11 +70,11 @@ export function DataTable<TData>({
                   className={cn(
                     "text-gray-scale-300 hover:text-white transition-colors group/row",
                     {
-                      "text-white": isRowHighlighted(row.original),
+                      "text-white": isRowHighlighted?.(row.original),
                     },
                   )}
-                  onMouseEnter={() => onRowHover(row.original)}
-                  onMouseLeave={() => onRowHover(null)}
+                  onMouseEnter={() => onRowHover?.(row.original)}
+                  onMouseLeave={() => onRowHover?.(null)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -85,7 +85,9 @@ export function DataTable<TData>({
                         className={cn(
                           "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
                           {
-                            "bg-gray-scale-700": isRowHighlighted(row.original),
+                            "bg-gray-scale-700": isRowHighlighted?.(
+                              row.original,
+                            ),
                           },
                         )}
                       >
@@ -99,7 +101,7 @@ export function DataTable<TData>({
                     </TableCell>
                   ))}
                 </TableRow>
-                {renderExtraRow(row)}
+                {renderExtraRow?.(row)}
               </>
             ))
           ) : (

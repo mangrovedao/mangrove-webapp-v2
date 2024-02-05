@@ -7,6 +7,7 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { DataTable } from "@/components/ui/data-table/data-table"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
 import { Deposit } from "./dialogs/deposit"
@@ -154,7 +155,7 @@ const BountyInventory = () => {
         </div>
       </div>
       {/* Table */}
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
+      <DataTable table={table} isLoading={false} isError={false} />
 
       {/* Dialogs */}
       <Bounty open={bounty} onClose={() => toggleBounty(false)} />
