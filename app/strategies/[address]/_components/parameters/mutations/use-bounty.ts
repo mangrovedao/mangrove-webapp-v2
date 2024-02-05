@@ -1,6 +1,6 @@
 import useMangrove from "@/providers/mangrove"
 import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 export function useBounty({
@@ -11,6 +11,8 @@ export function useBounty({
   bounty: string
 }) {
   const { mangrove } = useMangrove()
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async () => {
       try {
@@ -33,6 +35,13 @@ export function useBounty({
     },
     meta: {
       error: "Failed to add bounty",
+    },
+    onSuccess() {
+      try {
+        queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+      } catch (error) {
+        console.error(error)
+      }
     },
   })
 }

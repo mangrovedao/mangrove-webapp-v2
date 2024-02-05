@@ -45,15 +45,15 @@ export function useDeposit({
         toast.error("Could not deposit")
       }
     },
+    meta: {
+      error: "Failed to deposit",
+    },
     onSuccess() {
       try {
         queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
       } catch (error) {
         console.error(error)
       }
-    },
-    meta: {
-      error: "Failed to deposit",
     },
   })
 }

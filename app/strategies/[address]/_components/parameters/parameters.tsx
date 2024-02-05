@@ -215,6 +215,7 @@ const BountyInventory = () => {
         </tbody>
         <Separator />
       </table>
+      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
       <Bounty open={bounty} onClose={() => toggleBounty(false)} />
