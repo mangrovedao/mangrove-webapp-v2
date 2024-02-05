@@ -12,12 +12,12 @@ import { renderElement } from "@/utils/render"
 import { Strategies } from "./strategies/strategies"
 
 enum StrategiesTables {
-  ALL_STRATEGIES = "All strategies",
+  // ALL_STRATEGIES = "All strategies",
   MY_STRATEGIES = "My strategies",
 }
 
 const TABS_CONTENT = {
-  [StrategiesTables.ALL_STRATEGIES]: <Strategies type="all" />,
+  // [StrategiesTables.ALL_STRATEGIES]: <Strategies type="all" />,
   [StrategiesTables.MY_STRATEGIES]: <Strategies type="user" />,
 }
 
