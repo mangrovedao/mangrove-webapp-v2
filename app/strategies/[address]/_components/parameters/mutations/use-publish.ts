@@ -1,5 +1,5 @@
 import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { MergedOffers } from "../../../_utils/inventory"
 
@@ -12,6 +12,8 @@ export function usePublish({
   mergedOffers: MergedOffers
   volumes: { baseAmount: string; quoteAmount: string }
 }) {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async () => {
       try {
@@ -60,6 +62,13 @@ export function usePublish({
     },
     meta: {
       error: "Failed to publish",
+    },
+    onSuccess() {
+      try {
+        queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+      } catch (error) {
+        console.error(error)
+      }
     },
   })
 }

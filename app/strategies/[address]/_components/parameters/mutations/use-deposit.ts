@@ -1,5 +1,5 @@
 import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 export function useDeposit({
@@ -9,6 +9,8 @@ export function useDeposit({
   stratInstance?: GeometricKandelInstance
   volumes: { baseAmount: string; quoteAmount: string }
 }) {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async () => {
       try {
@@ -41,6 +43,13 @@ export function useDeposit({
       } catch (err) {
         console.error(err)
         toast.error("Could not deposit")
+      }
+    },
+    onSuccess() {
+      try {
+        queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+      } catch (error) {
+        console.error(error)
       }
     },
     meta: {
