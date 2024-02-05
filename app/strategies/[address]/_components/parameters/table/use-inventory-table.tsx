@@ -23,28 +23,28 @@ export function useInventoryTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.display({
-        header: "Asset",
+        id: "Asset",
+        header: () => <div className="text-start">Asset</div>,
         cell: ({ row }) => {
           const { asset } = row.original
-
           return (
-            asset && (
+            <div className="w-full h-full flex justify-start">
               <Text className="text-primary"> {asset.toUpperCase()}</Text>
-            )
+            </div>
           )
         },
       }),
       columnHelper.display({
-        header: "Amount",
+        id: "Amount",
+        header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount, asset } = row.original
           return (
-            amount &&
-            asset && (
+            <div className="w-full h-full flex justify-end">
               <Text className="text-primary">
                 {amount.toUpperCase()} {asset.toUpperCase()}
               </Text>
-            )
+            </div>
           )
         },
       }),

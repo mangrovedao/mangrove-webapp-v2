@@ -7,10 +7,11 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/ui/data-table/data-table"
 import PriceRangeInfos from "../shared/price-range-infos"
+import { Bounty } from "./dialogs/bounty"
 import { Deposit } from "./dialogs/deposit"
 import { Publish } from "./dialogs/publish"
+import { UnPublish } from "./dialogs/unpublish"
 import { Withdraw } from "./dialogs/withdraw"
 import { useInventoryTable } from "./table/use-inventory-table"
 
@@ -55,7 +56,6 @@ const InfoBar = () => {
 
 const UnallocatedInventory = () => {
   const [deposit, toggleDeposit] = React.useState(false)
-
   const [publish, togglePublish] = React.useState(false)
   const [withdraw, toggleWithdraw] = React.useState(false)
 
@@ -68,8 +68,8 @@ const UnallocatedInventory = () => {
 
   return (
     <div>
+      {/* Header */}
       <div className="flex justify-between">
-        {/* Header */}
         <div className="flex gap-2 items-center">
           <Title>Unallocated inventory</Title>
           <Info className="h-4 w-4 hover:text-green-caribbean" />
@@ -101,6 +101,9 @@ const UnallocatedInventory = () => {
 }
 
 const PublishInventory = () => {
+  const [unPublish, toggleUnpublish] = React.useState(false)
+  const [close, toggleClose] = React.useState(false)
+
   const table = useInventoryTable({
     data: [
       { amount: "0.00000", asset: "WETH" },
@@ -110,6 +113,7 @@ const PublishInventory = () => {
 
   return (
     <div>
+      {/* Header */}
       <div className="flex justify-between">
         <div className="flex gap-2 items-center">
           <Title>Publish inventory</Title>
@@ -120,28 +124,40 @@ const PublishInventory = () => {
           <Button variant={"secondary"}>Close Strategy</Button>
         </div>
       </div>
-      <DataTable table={table} isLoading={false} isError={false} />
+
+      {/* Table */}
+      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
+
+      {/* Dialogs */}
+      <UnPublish open={unPublish} onClose={() => toggleUnpublish(false)} />
     </div>
   )
 }
 
-const Bounty = () => {
+const BountyInventory = () => {
+  const [bounty, toggleBounty] = React.useState(false)
+
   const table = useInventoryTable({
     data: [{ amount: "0.0000", asset: "USDC" }],
   })
 
   return (
     <div>
+      {/* Header */}
       <div className="flex justify-between">
         <div className="flex gap-2 items-center">
           <Title>Bounty</Title>
           <Info className="h-4 w-4 hover:text-green-caribbean" />
         </div>
         <div className="flex gap-2">
-          <Button>Add Bounty</Button>
+          <Button onClick={() => toggleBounty(!bounty)}>Add Bounty</Button>
         </div>
       </div>
-      <DataTable table={table} isLoading={false} isError={false} />
+      {/* Table */}
+      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
+
+      {/* Dialogs */}
+      <Bounty open={bounty} onClose={() => toggleBounty(false)} />
     </div>
   )
 }
@@ -159,7 +175,7 @@ export default function Parameters() {
       <div className="pt-10 space-y-4">
         <UnallocatedInventory />
         <PublishInventory />
-        <Bounty />
+        <BountyInventory />
       </div>
     </div>
   )
