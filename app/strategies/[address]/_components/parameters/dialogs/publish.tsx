@@ -16,6 +16,7 @@ import { useStep } from "@/hooks/use-step"
 import { cn } from "@/utils"
 import Link from "next/link"
 import useKandel from "../../../_providers/kandel-strategy"
+import { MergedOffers } from "../../../_utils/inventory"
 import { usePublish } from "../mutations/use-publish"
 import { DialogCompleted } from "./dialog-completed"
 
@@ -73,7 +74,7 @@ export function Publish({ open, onClose }: Props) {
 
   const publish = usePublish({
     stratInstance: strategy?.stratInstance,
-    mergedOffers,
+    mergedOffers: mergedOffers as MergedOffers,
     volumes: { baseAmount, quoteAmount },
   })
 
