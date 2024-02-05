@@ -18,11 +18,11 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   '@mangrovedao/indexer-sdk':
-    specifier: 0.0.11-21-old-contracts-1
-    version: 0.0.11-21-old-contracts-1(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.7)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
+    specifier: 0.0.11-25
+    version: 0.0.11-25(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
-    specifier: ^1.0.2
-    version: 1.0.2
+    specifier: ^1.0.3
+    version: 1.0.3
   '@mangrovedao/mangrove.js':
     specifier: 2.0.5-3
     version: 2.0.5-3
@@ -3097,8 +3097,8 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/indexer-sdk@0.0.11-21-old-contracts-1(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.7)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
-    resolution: {integrity: sha512-nJdqPeaukwpc3wwKdUJjR93ZNfxNL9SL/qzu32spqxwhZw5LUJvZTagB6oHT9v6Cjkcy1jaTe2THLNHSKunn9g==}
+  /@mangrovedao/indexer-sdk@0.0.11-25(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-XrHFdnfXdNweM/L5f1Q8/fS6jy43Nx/BBivBr/n1gpf0bjDXfTTAz09H6qQw1ohko7IYlyCozzpy5nFn6HYBCA==}
     dependencies:
       '@ethersproject/bignumber': 5.7.0
       '@graphprotocol/client-auto-pagination': 2.0.0(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(graphql@16.8.1)
@@ -3131,8 +3131,8 @@ packages:
     resolution: {integrity: sha512-3xNA6qnU2zBbHUOhgl0s98oMVF9+yCR5LRyY7cYyNUBZPxzWA2528vct9EQiGFAQEHDIaeYOWGBGkFl7UprJjw==}
     dev: false
 
-  /@mangrovedao/mangrove-deployments@1.0.2:
-    resolution: {integrity: sha512-CvITRqgG+f1tzU9EooQjERJNniYnYxiavpkc6b6zC4H5iWyqwOxtQqwKIM+gd5Cs+mHXxYaT3a/yezO24mG/bw==}
+  /@mangrovedao/mangrove-deployments@1.0.3:
+    resolution: {integrity: sha512-kH7tdRtjct9dH2wE5ImnPkmwl2YL+/mD445rWazpS+Nb+LLvumL5pJCxnWBuqKUAvGbyIgD7kKfyBt9Yo2dOUw==}
     dependencies:
       semver: 7.5.4
     dev: false
