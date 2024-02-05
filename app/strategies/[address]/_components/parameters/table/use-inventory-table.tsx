@@ -1,5 +1,7 @@
 "use client"
 
+import React from "react"
+
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -7,10 +9,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import React from "react"
 
 import { Text } from "@/components/typography/text"
-import useMarket from "@/providers/market"
 
 const columnHelper = createColumnHelper<{ asset: string; amount: string }>()
 const DEFAULT_DATA: { asset: string; amount: string }[] = []
@@ -20,14 +20,18 @@ type Params = {
 }
 
 export function useInventoryTable({ data }: Params) {
-  const { market } = useMarket()
   const columns = React.useMemo(
     () => [
       columnHelper.display({
         header: "Asset",
         cell: ({ row }) => {
           const { asset } = row.original
-          return <Text className="text-primary"> {asset.toUpperCase()}</Text>
+
+          return (
+            asset && (
+              <Text className="text-primary"> {asset.toUpperCase()}</Text>
+            )
+          )
         },
       }),
       columnHelper.display({
@@ -35,14 +39,17 @@ export function useInventoryTable({ data }: Params) {
         cell: ({ row }) => {
           const { amount, asset } = row.original
           return (
-            <Text className="text-primary">
-              {amount.toUpperCase()} {asset.toUpperCase()}
-            </Text>
+            amount &&
+            asset && (
+              <Text className="text-primary">
+                {amount.toUpperCase()} {asset.toUpperCase()}
+              </Text>
+            )
           )
         },
       }),
     ],
-    [market],
+    [],
   )
 
   return useReactTable({

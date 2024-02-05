@@ -1,3 +1,5 @@
+"use client"
+
 import { Info } from "lucide-react"
 import React from "react"
 
@@ -8,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Deposit } from "./dialogs/deposit"
+import { Publish } from "./dialogs/publish"
+import { Withdraw } from "./dialogs/withdraw"
 import { useInventoryTable } from "./table/use-inventory-table"
 
 const InfoBar = () => {
@@ -50,7 +54,10 @@ const InfoBar = () => {
 }
 
 const UnallocatedInventory = () => {
-  const [deposit, toggleDeposit] = React.useReducer((isOpen) => !isOpen, false)
+  const [deposit, toggleDeposit] = React.useState(false)
+
+  const [publish, togglePublish] = React.useState(false)
+  const [withdraw, toggleWithdraw] = React.useState(false)
 
   const table = useInventoryTable({
     data: [
@@ -62,19 +69,33 @@ const UnallocatedInventory = () => {
   return (
     <div>
       <div className="flex justify-between">
+        {/* Header */}
         <div className="flex gap-2 items-center">
           <Title>Unallocated inventory</Title>
           <Info className="h-4 w-4 hover:text-green-caribbean" />
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleDeposit}>Deposit</Button>
-          <Button variant={"secondary"}>Publish</Button>
-          <Button variant={"secondary"}>Withdraw</Button>
+          <Button onClick={() => toggleDeposit(!deposit)}>Deposit</Button>
+          <Button onClick={() => togglePublish(!publish)} variant={"secondary"}>
+            Publish
+          </Button>
+          <Button
+            onClick={() => toggleWithdraw(!withdraw)}
+            variant={"secondary"}
+          >
+            Withdraw
+          </Button>
         </div>
       </div>
-      <DataTable table={table} isLoading={false} isError={false} />
 
-      <Deposit open={deposit} onClose={toggleDeposit} />
+      {/* Table */}
+      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
+
+      {/* Dialogs */}
+
+      <Deposit open={deposit} onClose={() => toggleDeposit(false)} />
+      <Publish open={publish} onClose={() => togglePublish(false)} />
+      <Withdraw open={withdraw} onClose={() => toggleWithdraw(false)} />
     </div>
   )
 }
@@ -128,14 +149,18 @@ const Bounty = () => {
 export default function Parameters() {
   return (
     <div className="space-y-4">
+      {/* Price range */}
       <PriceRangeInfos />
+
+      {/* Info */}
       <InfoBar />
+
+      {/* Tables */}
       <div className="pt-10 space-y-4">
         <UnallocatedInventory />
         <PublishInventory />
         <Bounty />
       </div>
-      {/* TODO: All informations regarding inventory / dialogs to Retract / Withdraw etc... */}
     </div>
   )
 }

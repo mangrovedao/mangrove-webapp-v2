@@ -83,12 +83,14 @@ export default function DeployStrategyDialog({
     },
     {
       body: (
-        <ApproveStep
-          baseToken={baseToken}
-          baseDeposit={strategy?.baseDeposit}
-          quoteToken={quoteToken}
-          quoteDeposit={strategy?.quoteDeposit}
-        />
+        <div className="text-center">
+          <ApproveStep
+            baseToken={baseToken}
+            baseDeposit={strategy?.baseDeposit}
+            quoteToken={quoteToken}
+            quoteDeposit={strategy?.quoteDeposit}
+          />
+        </div>
       ),
       button: (
         <Button
