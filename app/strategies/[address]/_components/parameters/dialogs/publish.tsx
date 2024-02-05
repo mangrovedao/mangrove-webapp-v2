@@ -1,6 +1,7 @@
 "use client"
 
 import { InfoIcon, LucideChevronRight } from "lucide-react"
+import Link from "next/link"
 import React from "react"
 
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
@@ -14,11 +15,10 @@ import { Button } from "@/components/ui/button"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
 import { cn } from "@/utils"
-import Link from "next/link"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
 import { usePublish } from "../mutations/use-publish"
-import { DialogCompleted } from "./dialog-completed"
+import { SuccessDialog } from "./succes-dialog"
 
 type Props = {
   open: boolean
@@ -223,7 +223,7 @@ export function Publish({ open, onClose }: Props) {
 
   return (
     <>
-      <DialogCompleted
+      <SuccessDialog
         title={"Funds published"}
         open={publishCompleted}
         onClose={() => togglePublishCompleted(false)}

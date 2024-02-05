@@ -14,7 +14,7 @@ type Props = {
   actionButton?: React.ReactNode
 }
 
-export function DialogCompleted({ title, actionButton, open, onClose }: Props) {
+export function SuccessDialog({ title, actionButton, open, onClose }: Props) {
   const { chain } = useNetwork()
   const { strategyAddress } = useKandel()
   const blockExplorerUrl = chain?.blockExplorers?.default.url
@@ -44,7 +44,12 @@ export function DialogCompleted({ title, actionButton, open, onClose }: Props) {
       <Dialog.Footer className="flex !flex-col gap-2 items-baseline">
         {actionButton}
 
-        <Button className="w-full" size={"lg"} onClick={onClose}>
+        <Button
+          className="w-full"
+          size={"lg"}
+          variant={actionButton ? "secondary" : "primary"}
+          onClick={onClose}
+        >
           Close
         </Button>
       </Dialog.Footer>
