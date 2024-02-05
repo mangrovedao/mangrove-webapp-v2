@@ -17,7 +17,7 @@ import { cn } from "@/utils"
 import Link from "next/link"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
-import { usePublish } from "../mutations/use-publish"
+import { useUnPublish } from "../mutations/use-unpublish"
 import { DialogCompleted } from "./dialog-completed"
 
 type Props = {
@@ -26,7 +26,7 @@ type Props = {
 }
 
 export function UnPublish({ open, onClose }: Props) {
-  const [publishCompleted, togglePublishCompleted] = React.useState(false)
+  const [unpublishCompleted, toggleUnPublishCompleted] = React.useState(false)
 
   const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
     useKandel()
@@ -37,6 +37,7 @@ export function UnPublish({ open, onClose }: Props) {
     quote: market?.quote.symbol,
     offers: strategyQuery.data?.offers,
   })
+
   const getUnpublishedBalances = async () => {
     const asks =
       await strategyStatusQuery.data?.stratInstance.getUnpublished("asks")
@@ -46,7 +47,7 @@ export function UnPublish({ open, onClose }: Props) {
     return { asks, bids }
   }
 
-  let steps = ["Set", "Publish"]
+  let steps = ["Set", "UnPublish"]
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
 
@@ -72,7 +73,7 @@ export function UnPublish({ open, onClose }: Props) {
     fetchUnpublishedBalances()
   }, [strategyStatusQuery.data])
 
-  const publish = usePublish({
+  const publish = useUnPublish({
     stratInstance: strategy?.stratInstance,
     mergedOffers: mergedOffers as MergedOffers,
     volumes: { baseAmount, quoteAmount },
@@ -190,7 +191,7 @@ export function UnPublish({ open, onClose }: Props) {
           onClick={() =>
             publish.mutate(undefined, {
               onSuccess() {
-                togglePublishCompleted(!publishCompleted)
+                toggleUnPublishCompleted(!unpublishCompleted)
                 onClose()
                 reset()
               },
@@ -198,7 +199,7 @@ export function UnPublish({ open, onClose }: Props) {
           }
           className="w-full flex items-center justify-center !mt-6"
         >
-          Publish
+          UnPublish
           <div
             className={cn(
               "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
@@ -225,8 +226,8 @@ export function UnPublish({ open, onClose }: Props) {
     <>
       <DialogCompleted
         title={"Funds published"}
-        open={publishCompleted}
-        onClose={() => togglePublishCompleted(false)}
+        open={unpublishCompleted}
+        onClose={() => toggleUnPublishCompleted(false)}
       />
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>

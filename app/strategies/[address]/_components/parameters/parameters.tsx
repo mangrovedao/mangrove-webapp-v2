@@ -7,7 +7,7 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/ui/data-table/data-table"
+import { Separator } from "@/components/ui/separator"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
 import { Deposit } from "./dialogs/deposit"
@@ -90,10 +90,30 @@ const UnallocatedInventory = () => {
       </div>
 
       {/* Table */}
+      <table className="w-full flex flex-col gap-2 mt-5">
+        <thead>
+          <tr className="flex justify-between">
+            <Caption className="text-muted-foreground">Asset</Caption>
+            <Caption className="text-muted-foreground">Amount</Caption>
+          </tr>
+        </thead>
+        <Separator />
+        <tbody className="w-full flex flex-col gap-4">
+          <tr className="flex justify-between ">
+            <Text>USDC</Text>
+            <Text>2 USDC</Text>
+          </tr>
+          <Separator />
+          <tr className="flex justify-between">
+            <Text>USDT</Text>
+            <Text>2 USDT</Text>
+          </tr>
+        </tbody>
+        <Separator />
+      </table>
       {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
-
       <Deposit open={deposit} onClose={() => toggleDeposit(false)} />
       <Publish open={publish} onClose={() => togglePublish(false)} />
       <Withdraw open={withdraw} onClose={() => toggleWithdraw(false)} />
@@ -121,12 +141,35 @@ const PublishInventory = () => {
           <Info className="h-4 w-4 hover:text-green-caribbean" />
         </div>
         <div className="flex gap-2">
-          <Button>Un-publish</Button>
+          <Button onClick={() => toggleUnpublish(!unPublish)}>
+            Un-publish
+          </Button>
           <Button variant={"secondary"}>Close Strategy</Button>
         </div>
       </div>
 
       {/* Table */}
+      <table className="w-full flex flex-col gap-2 mt-5">
+        <thead>
+          <tr className="flex justify-between">
+            <Caption className="text-muted-foreground">Asset</Caption>
+            <Caption className="text-muted-foreground">Amount</Caption>
+          </tr>
+        </thead>
+        <Separator />
+        <tbody className="w-full flex flex-col gap-4">
+          <tr className="flex justify-between ">
+            <Text>USDC</Text>
+            <Text>2 USDC</Text>
+          </tr>
+          <Separator />
+          <tr className="flex justify-between">
+            <Text>USDT</Text>
+            <Text>2 USDT</Text>
+          </tr>
+        </tbody>
+        <Separator />
+      </table>
       {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
@@ -154,8 +197,24 @@ const BountyInventory = () => {
           <Button onClick={() => toggleBounty(!bounty)}>Add Bounty</Button>
         </div>
       </div>
+
       {/* Table */}
-      <DataTable table={table} isLoading={false} isError={false} />
+      <table className="w-full flex flex-col gap-2 mt-5">
+        <thead>
+          <tr className="flex justify-between">
+            <Caption className="text-muted-foreground">Asset</Caption>
+            <Caption className="text-muted-foreground">Amount</Caption>
+          </tr>
+        </thead>
+        <Separator />
+        <tbody className="w-full flex flex-col gap-4">
+          <tr className="flex justify-between ">
+            <Text>MATIC</Text>
+            <Text>0.00000 MATIC</Text>
+          </tr>
+        </tbody>
+        <Separator />
+      </table>
 
       {/* Dialogs */}
       <Bounty open={bounty} onClose={() => toggleBounty(false)} />
@@ -173,7 +232,7 @@ export default function Parameters() {
       <InfoBar />
 
       {/* Tables */}
-      <div className="pt-10 space-y-4">
+      <div className="pb-5 pt-10 space-y-4">
         <UnallocatedInventory />
         <PublishInventory />
         <BountyInventory />
