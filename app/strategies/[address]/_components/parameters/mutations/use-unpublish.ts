@@ -67,6 +67,7 @@ export function useUnPublish({
     onSuccess() {
       try {
         queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+        queryClient.invalidateQueries({ queryKey: ["strategy"] })
       } catch (error) {
         console.error(error)
       }

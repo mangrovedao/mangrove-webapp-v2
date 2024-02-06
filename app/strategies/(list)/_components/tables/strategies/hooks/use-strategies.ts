@@ -1,11 +1,11 @@
 "use client"
 
+import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import useMangrove from "@/providers/mangrove"
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import { useQuery } from "@tanstack/react-query"
 import { parseStrategies, type Strategy } from "../../../../_schemas/kandels"
 
 type Params<T> = {
@@ -36,14 +36,20 @@ export function useStrategies<T = Strategy[]>({
   return useQuery({
     queryKey: ["strategies", address, first, skip],
     queryFn: async () => {
-      if (!(indexerSdk && address && knownTokens)) return []
-      const result = await indexerSdk.getKandels({
-        owner: address.toLowerCase(),
-        first,
-        skip,
-        knownTokens,
-      })
-      return parseStrategies(result)
+      try {
+        if (!(indexerSdk && address && knownTokens)) return []
+        const result = await indexerSdk.getKandels({
+          owner: address.toLowerCase(),
+          first,
+          skip,
+          knownTokens,
+        })
+
+        return parseStrategies(result)
+      } catch (error) {
+        console.error(error)
+        return []
+      }
     },
     select,
     meta: {
