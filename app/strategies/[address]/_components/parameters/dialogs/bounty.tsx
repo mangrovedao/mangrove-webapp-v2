@@ -1,5 +1,9 @@
 "use client"
 
+import { LucideChevronRight } from "lucide-react"
+import React from "react"
+import { useAccount, useBalance } from "wagmi"
+
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { Steps } from "@/app/strategies/new/_components/form/components/steps"
 import Dialog from "@/components/dialogs/dialog"
@@ -9,12 +13,9 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useStep } from "@/hooks/use-step"
 import { cn } from "@/utils"
-import { LucideChevronRight } from "lucide-react"
-import React from "react"
-import { useAccount, useBalance } from "wagmi"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useBounty } from "../mutations/use-bounty"
-import { DialogCompleted } from "./dialog-completed"
+import { SuccessDialog } from "./succes-dialog"
 
 type Props = {
   open: boolean
@@ -54,10 +55,6 @@ export function Bounty({ open, onClose }: Props) {
       body: (
         <div className="grid gap-4">
           <EnhancedNumericInput
-            balanceAction={{
-              onClick: () => setBounty(nativeBalance?.value.toString() || ""),
-              text: "MAX",
-            }}
             label={`${nativeBalance?.symbol} amount`}
             showBalance
             token={nativeBalance?.symbol}
@@ -143,7 +140,7 @@ export function Bounty({ open, onClose }: Props) {
 
   return (
     <>
-      <DialogCompleted
+      <SuccessDialog
         title="Bounty Added"
         open={bountyCompleted}
         onClose={() => toggleBountyCompleted(false)}

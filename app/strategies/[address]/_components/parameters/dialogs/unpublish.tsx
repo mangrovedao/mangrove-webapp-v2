@@ -1,6 +1,7 @@
 "use client"
 
 import { InfoIcon, LucideChevronRight } from "lucide-react"
+import Link from "next/link"
 import React from "react"
 
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
@@ -14,11 +15,10 @@ import { Button } from "@/components/ui/button"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
 import { cn } from "@/utils"
-import Link from "next/link"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
-import { usePublish } from "../mutations/use-publish"
-import { DialogCompleted } from "./dialog-completed"
+import { useUnPublish } from "../mutations/use-unpublish"
+import { SuccessDialog } from "./succes-dialog"
 
 type Props = {
   open: boolean
@@ -26,7 +26,7 @@ type Props = {
 }
 
 export function UnPublish({ open, onClose }: Props) {
-  const [publishCompleted, togglePublishCompleted] = React.useState(false)
+  const [unpublishCompleted, toggleUnPublishCompleted] = React.useState(false)
 
   const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
     useKandel()
@@ -46,7 +46,7 @@ export function UnPublish({ open, onClose }: Props) {
     return { asks, bids }
   }
 
-  let steps = ["Set", "Publish"]
+  let steps = ["Set", "UnPublish"]
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
 
@@ -72,7 +72,7 @@ export function UnPublish({ open, onClose }: Props) {
     fetchUnpublishedBalances()
   }, [strategyStatusQuery.data])
 
-  const publish = usePublish({
+  const publish = useUnPublish({
     stratInstance: strategy?.stratInstance,
     mergedOffers: mergedOffers as MergedOffers,
     volumes: { baseAmount, quoteAmount },
@@ -88,7 +88,7 @@ export function UnPublish({ open, onClose }: Props) {
               text: "MAX",
             }}
             value={baseAmount}
-            label={"WETH amount"}
+            label={`${market?.base.symbol} amount`}
             customBalance={upublishedBase}
             showBalance
             balanceLabel="Unpublished inventory"
@@ -107,7 +107,7 @@ export function UnPublish({ open, onClose }: Props) {
               text: "MAX",
             }}
             value={quoteAmount}
-            label={"USDC amount"}
+            label={`${market?.quote.symbol} amount`}
             customBalance={upublishedQuote}
             showBalance
             balanceLabel="Unpublished inventory"
@@ -190,7 +190,7 @@ export function UnPublish({ open, onClose }: Props) {
           onClick={() =>
             publish.mutate(undefined, {
               onSuccess() {
-                togglePublishCompleted(!publishCompleted)
+                toggleUnPublishCompleted(!unpublishCompleted)
                 onClose()
                 reset()
               },
@@ -198,7 +198,7 @@ export function UnPublish({ open, onClose }: Props) {
           }
           className="w-full flex items-center justify-center !mt-6"
         >
-          Publish
+          UnPublish
           <div
             className={cn(
               "ml-2 bg-white h-6 w-6 rounded-full text-secondary flex items-center justify-center transition-opacity",
@@ -223,10 +223,10 @@ export function UnPublish({ open, onClose }: Props) {
 
   return (
     <>
-      <DialogCompleted
-        title={"Funds published"}
-        open={publishCompleted}
-        onClose={() => togglePublishCompleted(false)}
+      <SuccessDialog
+        title={"Funds UnPublished"}
+        open={unpublishCompleted}
+        onClose={() => toggleUnPublishCompleted(false)}
       />
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
@@ -237,7 +237,7 @@ export function UnPublish({ open, onClose }: Props) {
               variant={"header1"}
               className="space-x-3 flex items-center"
             >
-              Publish
+              UnPublish
             </Title>
             <InfoIcon className="h-4 w-4 text-muted-foreground" />
           </div>

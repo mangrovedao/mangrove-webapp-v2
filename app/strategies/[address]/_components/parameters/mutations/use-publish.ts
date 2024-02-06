@@ -1,7 +1,8 @@
 import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { MergedOffers } from "../../../_utils/inventory"
+
+import { MergedOffer, MergedOffers } from "../../../_utils/inventory"
 
 export function usePublish({
   stratInstance,
@@ -24,7 +25,7 @@ export function usePublish({
         const { baseAmount, quoteAmount } = volumes
 
         const bids = mergedOffers
-          .filter((x: any) => x.offerType === "bids")
+          .filter((x: MergedOffer) => x.offerType === "bids")
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,
@@ -32,7 +33,7 @@ export function usePublish({
           }))
 
         const asks = mergedOffers
-          .filter((x: any) => x.offerType === "asks")
+          .filter((x: MergedOffer) => x.offerType === "asks")
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,
@@ -58,6 +59,7 @@ export function usePublish({
       } catch (err) {
         console.error(err)
         toast.error("Failed to publish")
+        throw new Error("Failed to publish")
       }
     },
     meta: {
@@ -66,6 +68,7 @@ export function usePublish({
     onSuccess() {
       try {
         queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+        queryClient.invalidateQueries({ queryKey: ["strategy"] })
       } catch (error) {
         console.error(error)
       }

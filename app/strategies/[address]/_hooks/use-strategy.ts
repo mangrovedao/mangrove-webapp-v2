@@ -13,11 +13,18 @@ export function useStrategy({ strategyAddress }: Params) {
   return useQuery({
     queryKey: ["strategy", strategyAddress],
     queryFn: async () => {
-      if (!(indexerSdk && strategyAddress)) return null
-      const result = await indexerSdk.getKandel({
-        address: strategyAddress,
-      })
-      return parseStrategy(result)
+      try {
+        if (!(indexerSdk && strategyAddress)) {
+          throw new Error("Unable to fetch strategy")
+        }
+        const result = await indexerSdk.getKandel({
+          address: strategyAddress,
+        })
+        return parseStrategy(result)
+      } catch (error) {
+        console.log("error", error)
+        throw new Error("Unable to fetch strategy")
+      }
     },
     meta: {
       error: "Unable to fetch strategy",

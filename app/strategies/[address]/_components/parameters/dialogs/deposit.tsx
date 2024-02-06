@@ -1,5 +1,8 @@
 "use client"
 
+import { LucideChevronRight } from "lucide-react"
+import React from "react"
+
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { Steps } from "@/app/strategies/new/_components/form/components/steps"
 import Dialog from "@/components/dialogs/dialog"
@@ -10,11 +13,9 @@ import { Button } from "@/components/ui/button"
 import { useStep } from "@/hooks/use-step"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
-import { LucideChevronRight } from "lucide-react"
-import React from "react"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useDeposit } from "../mutations/use-deposit"
-import { DepositCompleted } from "./deposit-completed"
+import { SuccessDialog } from "./succes-dialog"
 
 type Props = {
   open: boolean
@@ -55,7 +56,11 @@ export function Deposit({ open, onClose }: Props) {
       body: (
         <div className="grid gap-4">
           <EnhancedNumericInput
-            label={"WETH amount"}
+            balanceAction={{
+              onClick: () => setBaseAmount(baseBalance?.toString() || ""),
+              text: "MAX",
+            }}
+            label={`${market?.base.symbol} amount`}
             showBalance
             token={market?.base}
             onChange={(e) => setBaseAmount(e.target.value)}
@@ -65,7 +70,11 @@ export function Deposit({ open, onClose }: Props) {
           />
 
           <EnhancedNumericInput
-            label={"USDC amount"}
+            balanceAction={{
+              onClick: () => setQuoteAmount(quoteBalance?.toString() || ""),
+              text: "MAX",
+            }}
+            label={`${market?.quote.symbol} amount`}
             showBalance
             token={market?.quote}
             onChange={(e) => setQuoteAmount(e.target.value)}
@@ -125,10 +134,13 @@ export function Deposit({ open, onClose }: Props) {
           loading={deposit.isPending}
           onClick={() =>
             deposit.mutate(undefined, {
-              onSuccess() {
-                toggleDepositCompleted(!depositCompleted)
-                onClose()
-                reset()
+              onSettled(data, error, variables, context) {
+                if (!error) {
+                  console.log(data, error)
+                  toggleDepositCompleted(!depositCompleted)
+                  onClose()
+                  reset()
+                }
               },
             })
           }
@@ -159,7 +171,13 @@ export function Deposit({ open, onClose }: Props) {
 
   return (
     <>
-      <DepositCompleted
+      <SuccessDialog
+        title="Deposit completed"
+        actionButton={
+          <Button className="w-full" size={"lg"}>
+            Publish now
+          </Button>
+        }
         open={depositCompleted}
         onClose={() => toggleDepositCompleted(false)}
       />

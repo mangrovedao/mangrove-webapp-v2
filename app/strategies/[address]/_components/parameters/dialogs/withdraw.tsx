@@ -2,9 +2,12 @@
 
 import { InfoIcon, LucideChevronRight } from "lucide-react"
 import React from "react"
+import { useAccount } from "wagmi"
 
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
+import { ApproveStep } from "@/app/strategies/new/_components/form/components/approve-step"
 import { Steps } from "@/app/strategies/new/_components/form/components/steps"
+import { useApproveKandelStrategy } from "@/app/strategies/new/_hooks/use-approve-kandel-strategy"
 import Dialog from "@/components/dialogs/dialog"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Text } from "@/components/typography/text"
@@ -12,14 +15,10 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useStep } from "@/hooks/use-step"
 import { cn } from "@/utils"
-import useKandel from "../../../_providers/kandel-strategy"
-
-import { ApproveStep } from "@/app/strategies/new/_components/form/components/approve-step"
-import { useApproveKandelStrategy } from "@/app/strategies/new/_hooks/use-approve-kandel-strategy"
 import { shortenAddress } from "@/utils/wallet"
-import { useAccount } from "wagmi"
+import useKandel from "../../../_providers/kandel-strategy"
 import { useWithDraw } from "../mutations/use-withdraw"
-import { DialogCompleted } from "./dialog-completed"
+import { SuccessDialog } from "./succes-dialog"
 
 type Props = {
   open: boolean
@@ -100,7 +99,7 @@ export function Withdraw({ open, onClose }: Props) {
               text: "MAX",
             }}
             value={baseAmount}
-            label={"WETH amount"}
+            label={`${market?.base.symbol} amount`}
             customBalance={upublishedBase}
             showBalance
             balanceLabel="Unpublished inventory"
@@ -119,11 +118,8 @@ export function Withdraw({ open, onClose }: Props) {
               text: "MAX",
             }}
             value={quoteAmount}
-            label={"USDC amount"}
-            customBalance={upublishedQuote}
-            showBalance
+            label={`${market?.quote.symbol} amount`}
             balanceLabel="Unpublished inventory"
-            token={market?.quote}
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
               Number(quoteAmount) > Number(upublishedQuote)
@@ -256,7 +252,7 @@ export function Withdraw({ open, onClose }: Props) {
 
   return (
     <>
-      <DialogCompleted
+      <SuccessDialog
         title={"Withdraw completed"}
         open={withdrawCompleted}
         onClose={() => toggleWithdrawCompleted(false)}

@@ -1,5 +1,5 @@
 import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 export function useWithDraw({
@@ -10,6 +10,8 @@ export function useWithDraw({
   stratInstance?: GeometricKandelInstance
   volumes: { baseAmount: string; quoteAmount: string }
 }) {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async () => {
       try {
@@ -31,10 +33,19 @@ export function useWithDraw({
       } catch (err) {
         console.error(err)
         toast.error("Failed to withdraw")
+        throw new Error("Failed to withdraw")
       }
     },
     meta: {
       error: "Failed to withdraw",
+    },
+    onSuccess() {
+      try {
+        queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+        queryClient.invalidateQueries({ queryKey: ["strategy"] })
+      } catch (error) {
+        console.error(error)
+      }
     },
   })
 }
