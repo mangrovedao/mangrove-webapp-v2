@@ -2,7 +2,7 @@ import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
-import { MergedOffers } from "../../../_utils/inventory"
+import { MergedOffer, MergedOffers } from "../../../_utils/inventory"
 
 export function useUnPublish({
   stratInstance,
@@ -25,14 +25,15 @@ export function useUnPublish({
         const { baseAmount, quoteAmount } = volumes
 
         const bids = mergedOffers
-          .filter((x: any) => x.offerType === "bids" && x.live === true)
+          .filter((x: MergedOffer) => x.offerType === "bids")
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,
             gives: offer.gives,
           }))
+
         const asks = mergedOffers
-          .filter((x: any) => x.offerType === "asks" && x.live === true)
+          .filter((x: MergedOffer) => x.offerType === "asks")
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,
@@ -57,12 +58,12 @@ export function useUnPublish({
         toast.success("Published successfully")
       } catch (err) {
         console.error(err)
-        toast.error("Failed to publish")
-        throw new Error("Failed to publish")
+        toast.error("Failed to unpublish")
+        throw new Error("Failed to unppublish")
       }
     },
     meta: {
-      error: "Failed to publish",
+      error: "Failed to unpublish",
     },
     onSuccess() {
       try {

@@ -22,7 +22,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@gsap/react": "^2.0.2",
     "@mangrovedao/context-addresses": "^1.0.1",
-    "@mangrovedao/indexer-sdk": "0.0.11-25",
+    "@mangrovedao/indexer-sdk": "0.0.11-26",
     "@mangrovedao/mangrove-deployments": "^1.0.3",
     "@mangrovedao/mangrove.js": "2.0.5-5",
     "@radix-ui/react-alert-dialog": "^1.0.5",
