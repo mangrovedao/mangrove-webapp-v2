@@ -225,7 +225,7 @@ export function UnPublish({ open, onClose }: Props) {
   return (
     <>
       <SuccessDialog
-        title={"Funds published"}
+        title={"Funds UnPublished"}
         open={unpublishCompleted}
         onClose={() => toggleUnPublishCompleted(false)}
       />
@@ -238,7 +238,7 @@ export function UnPublish({ open, onClose }: Props) {
               variant={"header1"}
               className="space-x-3 flex items-center"
             >
-              Publish
+              UnPublish
             </Title>
             <InfoIcon className="h-4 w-4 text-muted-foreground" />
           </div>

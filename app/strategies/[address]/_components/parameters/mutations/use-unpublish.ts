@@ -55,7 +55,7 @@ export function useUnPublish({
 
         const res = txs && (await Promise.all(txs.map((tx) => tx.wait())))
 
-        toast.success("Published successfully")
+        toast.success("UnPublished successfully")
       } catch (err) {
         console.error(err)
         toast.error("Failed to unpublish")

@@ -82,10 +82,9 @@ export const useParameters = () => {
   }, [strategyStatusQuery.data, strategyQuery.data])
 
   return {
-    maxPrice,
-    minPrice,
-    priceRatio,
-    currentParameter,
+    quote: market?.quote,
+    base: market?.base,
+    currentParameter: { ...currentParameter, maxPrice, minPrice, priceRatio },
     unallocatedBase,
     unallocatedQuote,
     unPublishedBase,

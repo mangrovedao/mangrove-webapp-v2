@@ -14,58 +14,60 @@ import { Deposit } from "./dialogs/deposit"
 import { Publish } from "./dialogs/publish"
 import { UnPublish } from "./dialogs/unpublish"
 import { Withdraw } from "./dialogs/withdraw"
+import { useParameters } from "./hook/use-parameters"
 import { useInventoryTable } from "./table/use-inventory-table"
 
 const InfoBar = () => {
+  const { currentParameter, quote } = useParameters()
+
   return (
     <div className="flex justify-between bg-blend-darken rounded-lg">
       <div>
         <Caption className="text-muted-foreground"> Ratio</Caption>
-        <Text variant={"text2"}> 1.29432</Text>
+        <Text variant={"text2"}> - </Text>
       </div>
 
       {/* <Separator orientation="vertical" /> */}
 
       <div>
         <Caption className="text-muted-foreground">No. of price points</Caption>
-        <Text variant={"text2"}> 4</Text>
+        <Text variant={"text2"}> {currentParameter?.length}</Text>
       </div>
 
       {/* <Separator orientation="vertical" /> */}
 
       <div>
         <Caption className="text-muted-foreground"> Step size</Caption>
-        <Text variant={"text2"}> 1</Text>
+        <Text variant={"text2"}> {currentParameter?.stepSize}</Text>
       </div>
 
       {/* <Separator orientation="vertical" /> */}
 
       <div>
         <Caption className="text-muted-foreground"> Min price</Caption>
-        <Text variant={"text2"}> 1500.00 USDC</Text>
+        <Text variant={"text2"}>
+          {currentParameter?.minPrice?.toFixed(quote?.decimals)} {quote?.symbol}
+        </Text>
       </div>
 
       {/* <Separator orientation="vertical" /> */}
 
       <div>
         <Caption className="text-muted-foreground"> Max price</Caption>
-        <Text variant={"text2"}> 2100.00 USDC</Text>
+        <Text variant={"text2"}>
+          {" "}
+          {currentParameter?.minPrice?.toFixed(quote?.decimals)} {quote?.symbol}
+        </Text>
       </div>
     </div>
   )
 }
 
 const UnallocatedInventory = () => {
+  const { unallocatedBase, unallocatedQuote, quote, base } = useParameters()
   const [deposit, toggleDeposit] = React.useState(false)
   const [publish, togglePublish] = React.useState(false)
   const [withdraw, toggleWithdraw] = React.useState(false)
-
-  const table = useInventoryTable({
-    data: [
-      { amount: "0.00000", asset: "WETH" },
-      { amount: "0.0000", asset: "USDC" },
-    ],
-  })
 
   return (
     <div>
@@ -100,18 +102,17 @@ const UnallocatedInventory = () => {
         <Separator />
         <tbody className="w-full flex flex-col gap-4">
           <tr className="flex justify-between ">
-            <Text>USDC</Text>
-            <Text>2 USDC</Text>
+            <Text>{base?.symbol}</Text>
+            <Text> - {base?.symbol}</Text>
           </tr>
           <Separator />
           <tr className="flex justify-between">
-            <Text>USDT</Text>
-            <Text>2 USDT</Text>
+            <Text>{quote?.symbol}</Text>
+            <Text>- {quote?.symbol}</Text>
           </tr>
         </tbody>
         <Separator />
       </table>
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
       <Deposit open={deposit} onClose={() => toggleDeposit(false)} />
@@ -122,6 +123,8 @@ const UnallocatedInventory = () => {
 }
 
 const PublishInventory = () => {
+  const { quote, base } = useParameters()
+
   const [unPublish, toggleUnpublish] = React.useState(false)
   const [close, toggleClose] = React.useState(false)
 
@@ -159,13 +162,13 @@ const PublishInventory = () => {
         <Separator />
         <tbody className="w-full flex flex-col gap-4">
           <tr className="flex justify-between ">
-            <Text>USDC</Text>
-            <Text>2 USDC</Text>
+            <Text>{base?.symbol}</Text>
+            <Text> - {base?.symbol}</Text>
           </tr>
           <Separator />
           <tr className="flex justify-between">
-            <Text>USDT</Text>
-            <Text>2 USDT</Text>
+            <Text>{quote?.symbol}</Text>
+            <Text>- {quote?.symbol}</Text>
           </tr>
         </tbody>
         <Separator />
@@ -210,7 +213,7 @@ const BountyInventory = () => {
         <tbody className="w-full flex flex-col gap-4">
           <tr className="flex justify-between ">
             <Text>MATIC</Text>
-            <Text>0.00000 MATIC</Text>
+            <Text>- MATIC</Text>
           </tr>
         </tbody>
         <Separator />
