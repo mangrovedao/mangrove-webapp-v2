@@ -7,7 +7,7 @@ export default function HistoryTable() {
   const { strategyQuery, strategyStatusQuery } = useKandel()
 
   const { currentParameter, depositedBase } = useParameters()
-  const { creationDate, length, priceRatio } = currentParameter
+  const { creationDate, length, priceRatio, address } = currentParameter
 
   const table = useParametersTables({
     data: [
@@ -17,6 +17,7 @@ export default function HistoryTable() {
         pricePoints: length,
         amount: depositedBase,
         ratio: priceRatio?.toFixed(4),
+        txHash: address,
       },
     ] as Parameters[],
   })

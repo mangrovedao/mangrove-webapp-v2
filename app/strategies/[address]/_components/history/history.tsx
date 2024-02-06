@@ -8,6 +8,8 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { renderElement } from "@/utils/render"
+import HistoryTable from "./table/history-table"
+import ParametersTable from "./table/parameters-table"
 
 export enum ManageTabs {
   DEPOSIT_WITHDRAW = "Deposit / Withdraw",
@@ -15,8 +17,8 @@ export enum ManageTabs {
 }
 
 const TABS_CONTENT = {
-  [ManageTabs.DEPOSIT_WITHDRAW]: <div>Deposit / Withdraw</div>,
-  [ManageTabs.PARAMETERS]: <div>Parameters</div>,
+  [ManageTabs.DEPOSIT_WITHDRAW]: <HistoryTable />,
+  [ManageTabs.PARAMETERS]: <ParametersTable />,
 }
 
 function Tabs(props: React.ComponentPropsWithoutRef<typeof CustomTabs>) {
