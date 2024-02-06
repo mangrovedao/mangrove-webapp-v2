@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
+import CloseDialog from "./dialogs/close"
 import { Deposit } from "./dialogs/deposit"
 import { Publish } from "./dialogs/publish"
 import { UnPublish } from "./dialogs/unpublish"
@@ -147,7 +148,9 @@ const PublishInventory = () => {
           <Button onClick={() => toggleUnpublish(!unPublish)}>
             Un-publish
           </Button>
-          <Button variant={"secondary"}>Close Strategy</Button>
+          <Button onClick={() => toggleClose(!close)} variant={"secondary"}>
+            Close Strategy
+          </Button>
         </div>
       </div>
 
@@ -176,6 +179,7 @@ const PublishInventory = () => {
       {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
+      <CloseDialog isOpen={close} onClose={() => toggleClose(false)} />
       <UnPublish open={unPublish} onClose={() => toggleUnpublish(false)} />
     </div>
   )
