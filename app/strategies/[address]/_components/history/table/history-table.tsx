@@ -1,25 +1,15 @@
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useParameters } from "../../parameters/hook/use-parameters"
-import { Parameters, useParametersTables } from "./use-parameters-table"
+import { useHistoryParams } from "./use-history-table"
 
 export default function HistoryTable() {
   const { strategyQuery, strategyStatusQuery } = useKandel()
 
-  const { currentParameter, depositedBase } = useParameters()
-  const { creationDate, length, priceRatio, address } = currentParameter
+  const { depositAndWithdraw } = useParameters()
 
-  const table = useParametersTables({
-    data: [
-      {
-        date: creationDate,
-        spread: "-",
-        pricePoints: length,
-        amount: depositedBase,
-        ratio: priceRatio?.toFixed(4),
-        txHash: address,
-      },
-    ] as Parameters[],
+  const table = useHistoryParams({
+    data: depositAndWithdraw,
   })
 
   const isLoading = strategyQuery.isLoading || strategyStatusQuery.isLoading

@@ -22,6 +22,7 @@ export const useParameters = () => {
     currentParameter,
     creationDate,
     address,
+    depositAndWithdraw,
   } = strategyQuery.data ?? {}
 
   const { maxPrice, minPrice, priceRatio } = offerStatuses ?? {}
@@ -87,6 +88,7 @@ export const useParameters = () => {
   }, [strategyStatusQuery.data, strategyQuery.data])
 
   return {
+    depositAndWithdraw,
     quote: market?.quote,
     base: market?.base,
     currentParameter: {
