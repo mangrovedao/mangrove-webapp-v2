@@ -6,16 +6,19 @@ import {
   NumericInput,
   type NumericInputProps,
 } from "@/components/numeric-input"
+import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { cn } from "@/utils"
 import { Caption } from "./typography/caption"
 
 type EnhancedNumericInputProps = {
   token?: Token | string
+  customBalance?: string
   disabled?: boolean
   label?: string
   showBalance?: boolean
   balanceLabel?: string
+  balanceAction?: { onClick: (value: string) => void; text: string }
   error?: ValidationError[] | string
 } & NumericInputProps
 
@@ -29,6 +32,8 @@ export const EnhancedNumericInput = React.forwardRef<
       token,
       showBalance = false,
       balanceLabel,
+      customBalance,
+      balanceAction,
       error,
       className,
       ...inputProps
@@ -59,7 +64,21 @@ export const EnhancedNumericInput = React.forwardRef<
             {error}
           </p>
         ) : undefined}
-        {showBalance && <TokenBalance token={token} label={balanceLabel} />}
+        {!customBalance && showBalance && (
+          <TokenBalance
+            action={balanceAction}
+            token={token}
+            label={balanceLabel}
+          />
+        )}
+        {customBalance && showBalance && (
+          <CustomBalance
+            action={balanceAction}
+            token={token}
+            balance={customBalance}
+            label={balanceLabel}
+          />
+        )}
       </div>
     )
   },

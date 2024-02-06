@@ -77,6 +77,32 @@ export function Close(props: React.ComponentProps<"svg">) {
   )
 }
 
+export function Closed(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 20 20"
+      {...props}
+    >
+      <g
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.25"
+        clipPath="url(#aaas)"
+      >
+        <path d="M10 15.556a5.556 5.556 0 100-11.111 5.556 5.556 0 000 11.11zM6.072 6.072l7.856 7.856"></path>
+      </g>
+      <defs>
+        <clipPath id="aaas">
+          <path fill="#fff" d="M3.333 3.333h13.333v13.333H3.333z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+  )
+}
+
 export function ExclamationMark(props: React.ComponentProps<"svg">) {
   return (
     <svg

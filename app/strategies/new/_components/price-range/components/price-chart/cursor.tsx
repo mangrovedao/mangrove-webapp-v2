@@ -84,7 +84,7 @@ export default function Cursor({
         width="25"
         height="24"
         fill="none"
-        transform={`translate(${xPosition}, 0)`}
+        transform={`translate(${xPosition ?? 0}, 0)`}
         className={cn(
           "transition-opacity",
           hidden ? "opacity-0" : "opacity-100",

@@ -83,12 +83,14 @@ export default function DeployStrategyDialog({
     },
     {
       body: (
-        <ApproveStep
-          baseToken={baseToken}
-          baseDeposit={strategy?.baseDeposit}
-          quoteToken={quoteToken}
-          quoteDeposit={strategy?.quoteDeposit}
-        />
+        <div className="text-center">
+          <ApproveStep
+            baseToken={baseToken}
+            baseDeposit={strategy?.baseDeposit}
+            quoteToken={quoteToken}
+            quoteDeposit={strategy?.quoteDeposit}
+          />
+        </div>
       ),
       button: (
         <Button
@@ -319,7 +321,7 @@ const Summary = ({
 
       <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <SummaryLine
-          title={`No. of price points`}
+          title={`Nb. of price points`}
           value={<Text>{pricePoints}</Text>}
         />
         <SummaryLine title={`Ratio`} value={<Text>{ratio}</Text>} />

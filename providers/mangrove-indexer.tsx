@@ -2,12 +2,12 @@
 
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { Chains } from "@mangrovedao/indexer-sdk/dist/src/types/types"
-import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React from "react"
 import { useNetwork } from "wagmi"
 
 import { getTokenPriceInUsd } from "@/services/tokens.service"
+import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {

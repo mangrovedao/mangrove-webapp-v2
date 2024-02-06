@@ -18,11 +18,11 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   '@mangrovedao/indexer-sdk':
-    specifier: 0.0.11-25
-    version: 0.0.11-25(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
+    specifier: 0.0.11-27
+    version: 0.0.11-27(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
-    specifier: ^1.0.2
-    version: 1.0.2
+    specifier: ^1.0.3
+    version: 1.0.3
   '@mangrovedao/mangrove.js':
     specifier: 2.0.5-6
     version: 2.0.5-6
@@ -3097,8 +3097,8 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/indexer-sdk@0.0.11-25(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
-    resolution: {integrity: sha512-XrHFdnfXdNweM/L5f1Q8/fS6jy43Nx/BBivBr/n1gpf0bjDXfTTAz09H6qQw1ohko7IYlyCozzpy5nFn6HYBCA==}
+  /@mangrovedao/indexer-sdk@0.0.11-27(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-9I2oKWaedVbxrPwreT8y2BbS8af4roGrhb3k5pMbfohmosuM4qucTtzJmb40CcK9fDDAKewTTlhiIRj6L3AnbA==}
     dependencies:
       '@ethersproject/bignumber': 5.7.0
       '@graphprotocol/client-auto-pagination': 2.0.0(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(graphql@16.8.1)
@@ -3131,8 +3131,8 @@ packages:
     resolution: {integrity: sha512-3xNA6qnU2zBbHUOhgl0s98oMVF9+yCR5LRyY7cYyNUBZPxzWA2528vct9EQiGFAQEHDIaeYOWGBGkFl7UprJjw==}
     dev: false
 
-  /@mangrovedao/mangrove-deployments@1.0.2:
-    resolution: {integrity: sha512-CvITRqgG+f1tzU9EooQjERJNniYnYxiavpkc6b6zC4H5iWyqwOxtQqwKIM+gd5Cs+mHXxYaT3a/yezO24mG/bw==}
+  /@mangrovedao/mangrove-deployments@1.0.3:
+    resolution: {integrity: sha512-kH7tdRtjct9dH2wE5ImnPkmwl2YL+/mD445rWazpS+Nb+LLvumL5pJCxnWBuqKUAvGbyIgD7kKfyBt9Yo2dOUw==}
     dependencies:
       semver: 7.5.4
     dev: false
@@ -9638,6 +9638,9 @@ packages:
   /caniuse-lite@1.0.30001572:
     resolution: {integrity: sha512-1Pbh5FLmn5y4+QhNyJE9j3/7dK44dGB83/ZMjv/qJk86TvDbjk0LosiZo0i0WB0Vx607qMX9jYrn1VLHCkN4rw==}
 
+  /caniuse-lite@1.0.30001583:
+    resolution: {integrity: sha512-acWTYaha8xfhA/Du/z4sNZjHUWjkiuoAi2LM+T/aL+kemKQgPT1xBb/YKjlQ0Qo8gvbHsGNplrEJ+9G3gL7i4Q==}
+
   /case-sensitive-paths-webpack-plugin@2.4.0:
     resolution: {integrity: sha512-roIFONhcxog0JSSWbvVAh3OocukmSgpqOH6YpMkCvav/ySIV3JKg4Dc8vYtQjYi/UxpNE36r/9v+VqTQqgkYmw==}
     engines: {node: '>=4'}
@@ -13239,7 +13242,7 @@ packages:
       '@next/env': 14.0.4
       '@swc/helpers': 0.5.2
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001572
+      caniuse-lite: 1.0.30001583
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.2.0

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query"
 
-import useKandel from "@/providers/kandel-strategies"
+import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMarket from "@/providers/market"
 
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
