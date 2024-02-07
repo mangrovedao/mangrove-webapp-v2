@@ -8,9 +8,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
+import { useNetwork } from "wagmi"
 
 import { formatDate } from "@/utils/date"
-import { useNetwork } from "wagmi"
 import useKandel from "../../../_providers/kandel-strategy"
 import BlockExplorer from "../../block-explorer"
 
