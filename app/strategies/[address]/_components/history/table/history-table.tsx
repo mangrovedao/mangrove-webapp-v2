@@ -6,10 +6,10 @@ import { useHistoryParams } from "./use-history-table"
 export default function HistoryTable() {
   const { strategyQuery, strategyStatusQuery } = useKandel()
 
-  const { depositAndWithdraw } = useParameters()
+  const { depositsAndWithdraws } = useParameters()
 
   const table = useHistoryParams({
-    data: depositAndWithdraw,
+    data: depositsAndWithdraws,
   })
 
   const isLoading = strategyQuery.isLoading || strategyStatusQuery.isLoading

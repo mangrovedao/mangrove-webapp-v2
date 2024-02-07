@@ -1,6 +1,6 @@
 import { z } from "zod"
 import {
-  depositAndWithdraw,
+  depositsAndWithdraws,
   kandelTypeStringSchema,
   numberOrNaN,
   offerWithPricesSchema,
@@ -22,7 +22,7 @@ export const strategySchema = z.object({
   return: numberOrNaN.optional(),
   currentParameter: parameterSchema,
   offers: z.array(offerWithPricesSchema),
-  depositAndWithdraw: depositAndWithdraw.optional(),
+  depositsAndWithdraws: z.array(depositsAndWithdraws).optional(),
 })
 
 export type Strategy = z.infer<typeof strategySchema>
