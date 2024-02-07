@@ -6,7 +6,6 @@ export const useIsTokenInfiniteAllowance = (
   spender?: string | null,
 ) => {
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["isTokenInfiniteAllowance", token?.id, spender],
     queryFn: () => {
       if (!(token && spender)) return null
