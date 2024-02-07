@@ -26,7 +26,10 @@ type Props = {
 }
 
 export function UnPublish({ open, onClose }: Props) {
-  const [unpublishCompleted, toggleUnPublishCompleted] = React.useState(false)
+  const [unpublishCompleted, toggleUnPublishCompleted] = React.useReducer(
+    (isOpen) => !isOpen,
+    false,
+  )
 
   const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
     useKandel()
@@ -190,7 +193,7 @@ export function UnPublish({ open, onClose }: Props) {
           onClick={() =>
             publish.mutate(undefined, {
               onSuccess() {
-                toggleUnPublishCompleted(!unpublishCompleted)
+                toggleUnPublishCompleted()
                 onClose()
                 reset()
               },
@@ -226,7 +229,7 @@ export function UnPublish({ open, onClose }: Props) {
       <SuccessDialog
         title={"Funds UnPublished"}
         open={unpublishCompleted}
-        onClose={() => toggleUnPublishCompleted(false)}
+        onClose={toggleUnPublishCompleted}
       />
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>

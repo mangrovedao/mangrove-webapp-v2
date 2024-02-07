@@ -26,7 +26,10 @@ type Props = {
 }
 
 export function Withdraw({ open, onClose }: Props) {
-  const [withdrawCompleted, toggleWithdrawCompleted] = React.useState(false)
+  const [withdrawCompleted, toggleWithdrawCompleted] = React.useReducer(
+    (isOpen) => !isOpen,
+    false,
+  )
 
   const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
 
@@ -126,6 +129,8 @@ export function Withdraw({ open, onClose }: Props) {
                 ? "Invalid amount"
                 : ""
             }
+            token={market?.quote}
+            showBalance
           />
         </div>
       ),
@@ -219,7 +224,7 @@ export function Withdraw({ open, onClose }: Props) {
           onClick={() =>
             withdraw.mutate(undefined, {
               onSuccess() {
-                toggleWithdrawCompleted(!withdrawCompleted)
+                toggleWithdrawCompleted()
                 onClose()
                 reset()
               },
@@ -255,7 +260,7 @@ export function Withdraw({ open, onClose }: Props) {
       <SuccessDialog
         title={"Withdraw completed"}
         open={withdrawCompleted}
-        onClose={() => toggleWithdrawCompleted(false)}
+        onClose={toggleWithdrawCompleted}
       />
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
@@ -268,6 +273,19 @@ export function Withdraw({ open, onClose }: Props) {
             >
               Withdraw
             </Title>
+            {/* <IconToolTip
+              tooltip={
+                <Text variant={"text2"}>
+                  Only unpublished funds are available to withdraw.
+                  <Link href={KANDEL_DOC_URL} target="_blank">
+                    <Caption className="text-primary underline">
+                      Learn more
+                    </Caption>
+                  </Link>
+                </Text>
+              }
+            >
+            </IconToolTip> */}
             <InfoIcon className="h-4 w-4 text-muted-foreground" />
           </div>
         </Dialog.Title>

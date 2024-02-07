@@ -23,7 +23,10 @@ type Props = {
 }
 
 export function Bounty({ open, onClose }: Props) {
-  const [bountyCompleted, toggleBountyCompleted] = React.useState(false)
+  const [bountyCompleted, toggleBountyCompleted] = React.useReducer(
+    (isOpen) => !isOpen,
+    false,
+  )
 
   const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
   const { market } = strategyStatusQuery.data ?? {}
@@ -107,7 +110,7 @@ export function Bounty({ open, onClose }: Props) {
           onClick={() =>
             addBounty.mutate(undefined, {
               onSuccess() {
-                toggleBountyCompleted(!bountyCompleted)
+                toggleBountyCompleted()
                 onClose()
                 reset()
               },
@@ -143,7 +146,7 @@ export function Bounty({ open, onClose }: Props) {
       <SuccessDialog
         title="Bounty Added"
         open={bountyCompleted}
-        onClose={() => toggleBountyCompleted(false)}
+        onClose={toggleBountyCompleted}
       />
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>

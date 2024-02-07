@@ -73,7 +73,7 @@ export function useParametersTables({ data }: Params) {
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount } = row.original
-          return <div className="w-full h-full flex justify-end">{amount}</div>
+          return <div className="w-full h-full flex justify-end">{amount} </div>
         },
       }),
       columnHelper.accessor("txHash", {
