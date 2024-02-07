@@ -11,6 +11,9 @@ import React from "react"
 
 import { formatDate } from "@/utils/date"
 import { DepositAndWithdraw } from "@mangrovedao/indexer-sdk/dist/src/kandel/types"
+import { useNetwork } from "wagmi"
+import useKandel from "../../../_providers/kandel-strategy"
+import BlockExplorer from "../../block-explorer"
 
 const columnHelper = createColumnHelper<DepositAndWithdraw>()
 const DEFAULT_DATA: DepositAndWithdraw[] = []
@@ -20,6 +23,9 @@ type Params = {
 }
 
 export function useHistoryParams({ data }: Params) {
+  const { chain } = useNetwork()
+  const { baseToken } = useKandel()
+
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("date", {
@@ -48,7 +54,11 @@ export function useHistoryParams({ data }: Params) {
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount } = row.original
-          return <div className="w-full h-full flex justify-end">{amount}</div>
+          return (
+            <div className="w-full h-full flex justify-end">
+              {amount} {baseToken?.symbol}
+            </div>
+          )
         },
       }),
 
@@ -57,9 +67,14 @@ export function useHistoryParams({ data }: Params) {
         header: () => <div className="text-right">Transaction Hash</div>,
         cell: ({ row }) => {
           const { transactionHash } = row.original
+          const blockExplorerUrl = chain?.blockExplorers?.default.url
           return (
             <div className="w-full h-full flex justify-end">
-              {transactionHash}
+              <BlockExplorer
+                address={transactionHash}
+                blockExplorerUrl={blockExplorerUrl}
+                description={false}
+              />
             </div>
           )
         },

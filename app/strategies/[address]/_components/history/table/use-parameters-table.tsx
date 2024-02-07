@@ -10,6 +10,8 @@ import {
 import React from "react"
 
 import { formatDate } from "@/utils/date"
+import { useNetwork } from "wagmi"
+import useKandel from "../../../_providers/kandel-strategy"
 import BlockExplorer from "../../block-explorer"
 
 const columnHelper = createColumnHelper<Parameters>()
@@ -29,6 +31,9 @@ type Params = {
 }
 
 export function useParametersTables({ data }: Params) {
+  const { chain } = useNetwork()
+  const { baseToken } = useKandel()
+
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("date", {
@@ -73,7 +78,11 @@ export function useParametersTables({ data }: Params) {
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount } = row.original
-          return <div className="w-full h-full flex justify-end">{amount} </div>
+          return (
+            <div className="w-full h-full flex justify-end">
+              {amount} {baseToken?.symbol}
+            </div>
+          )
         },
       }),
       columnHelper.accessor("txHash", {
@@ -81,9 +90,14 @@ export function useParametersTables({ data }: Params) {
         header: () => <div className="text-right">Transaction Hash</div>,
         cell: ({ row }) => {
           const { txHash } = row.original
+          const blockExplorerUrl = chain?.blockExplorers?.default.url
           return (
             <div className="w-full h-full flex justify-end">
-              <BlockExplorer address={txHash} description={false} />
+              <BlockExplorer
+                address={txHash}
+                blockExplorerUrl={blockExplorerUrl}
+                description={false}
+              />
             </div>
           )
         },
