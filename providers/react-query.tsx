@@ -34,6 +34,7 @@ const queryClient = new QueryClient({
   }),
   mutationCache: new MutationCache({
     onError: (_error, _variables, _context, mutation) => {
+      if (mutation.meta?.disableGenericError === true) return
       toastError(mutation.meta?.error)
     },
     onSuccess: (_data, _variables, _context, mutation) => {

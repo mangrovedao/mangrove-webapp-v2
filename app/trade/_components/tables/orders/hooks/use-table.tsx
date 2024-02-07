@@ -17,10 +17,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
-import { hasExpired } from "@/utils/date"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
-import { getOrderProgress } from "../utils/tables"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -73,21 +71,35 @@ export function useTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         header: "Filled/Amount",
         cell: ({ row }) => {
+          const { initialWants, takerGot, initialGives, isBid, takerGave } =
+            row.original
           const baseSymbol = market?.base.symbol
-          const { progress, amount, filled } = getOrderProgress(
-            row.original,
-            market,
-          )
+          const quoteSymbol = market?.quote.symbol
+          const symbol = isBid ? baseSymbol : quoteSymbol
+          const displayDecimals = isBid
+            ? market?.base.displayedDecimals
+            : market?.quote.displayedDecimals
 
+          const amount = Big(initialWants).toFixed(displayDecimals)
+          const filled = Big(takerGot).toFixed(displayDecimals)
+          const progress = Math.min(
+            Math.round(
+              Big(filled)
+                .mul(100)
+                .div(Big(amount).eq(0) ? 1 : amount)
+                .toNumber(),
+            ),
+            100,
+          )
           return market ? (
             <div className={cn("flex items-center")}>
               <span className="text-sm text-muted-foreground">
                 {filled}
                 &nbsp;/
               </span>
-              <span>
+              <span className="">
                 &nbsp;
-                {amount} {baseSymbol}
+                {amount} {symbol}
               </span>
               <CircularProgressBar progress={progress} className="ml-3" />
             </div>
@@ -125,30 +137,25 @@ export function useTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => {
-          const expiryDate = row.original.expiryDate
-          const isExpired = expiryDate && hasExpired(expiryDate)
-          return (
-            <div className="w-full h-full flex justify-end space-x-1">
-              <IconButton
-                disabled={isExpired}
-                tooltip="Modify"
-                className="aspect-square w-6 rounded-full"
-                onClick={() => onEdit(row.original)}
-              >
-                <Pen />
-              </IconButton>
-              <IconButton
-                disabled={isExpired}
-                tooltip="Retract offer"
-                className="aspect-square w-6 rounded-full"
-                onClick={() => onCancel(row.original)}
-              >
-                <Close />
-              </IconButton>
-            </div>
-          )
-        },
+        cell: ({ row }) => (
+          <div className="w-full h-full flex justify-end space-x-1">
+            <IconButton
+              tooltip="Modify"
+              className="aspect-square w-6 rounded-full"
+              disabled
+              onClick={() => onEdit(row.original)}
+            >
+              <Pen />
+            </IconButton>
+            <IconButton
+              tooltip="Retract offer"
+              className="aspect-square w-6 rounded-full"
+              onClick={() => onCancel(row.original)}
+            >
+              <Close />
+            </IconButton>
+          </div>
+        ),
       }),
     ],
     [market, onEdit, onCancel],

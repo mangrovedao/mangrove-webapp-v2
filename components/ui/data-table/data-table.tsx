@@ -1,6 +1,6 @@
 "use client"
 
-import { flexRender, type Table as TableType } from "@tanstack/react-table"
+import { flexRender, Row, type Table as TableType } from "@tanstack/react-table"
 
 import {
   Table,
@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/utils"
 import { LoadingBody } from "./loading-body"
 import { Pagination, type PaginationProps } from "./pagination"
 
@@ -18,6 +19,9 @@ interface DataTableProps<TData> {
   isError?: boolean
   isLoading?: boolean
   pagination?: PaginationProps
+  isRowHighlighted?: (row: TData) => boolean
+  onRowHover?: (row: TData | null) => void
+  renderExtraRow?: (row: Row<TData>) => React.ReactNode
 }
 
 export function DataTable<TData>({
@@ -25,6 +29,9 @@ export function DataTable<TData>({
   isError,
   isLoading,
   pagination,
+  isRowHighlighted = () => false,
+  onRowHover = () => {},
+  renderExtraRow = () => null,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
@@ -56,27 +63,46 @@ export function DataTable<TData>({
             <LoadingBody cells={leafColumns.length} rows={2} />
           ) : rows?.length ? (
             rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="text-gray-scale-300 hover:text-white transition-colors group/row"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className="px-0 py-2 group/cell whitespace-nowrap"
-                  >
-                    <div className="group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg">
-                      <div className="px-2 h-6 flex items-center">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
+              <>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={cn(
+                    "text-gray-scale-300 hover:text-white transition-colors group/row",
+                    {
+                      "text-white": isRowHighlighted?.(row.original),
+                    },
+                  )}
+                  onMouseEnter={() => onRowHover?.(row.original)}
+                  onMouseLeave={() => onRowHover?.(null)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="px-0 py-2 group/cell whitespace-nowrap"
+                    >
+                      <div
+                        className={cn(
+                          "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
+                          {
+                            "bg-gray-scale-700": isRowHighlighted?.(
+                              row.original,
+                            ),
+                          },
                         )}
+                      >
+                        <div className="px-2 h-6 flex items-center">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                ))}
-              </TableRow>
+                    </TableCell>
+                  ))}
+                </TableRow>
+                {renderExtraRow?.(row)}
+              </>
             ))
           ) : (
             <TableRow>

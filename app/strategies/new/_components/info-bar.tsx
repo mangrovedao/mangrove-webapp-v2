@@ -1,7 +1,7 @@
 "use client"
 
 import { TokenPair } from "@/components/token-pair"
-import { Badge } from "../../_components/badge"
+import { Badge } from "../../(list)/_components/badge"
 import { useTokensFromQueryParams } from "../_hooks/use-tokens-from-query-params"
 
 export function InfoBar() {
