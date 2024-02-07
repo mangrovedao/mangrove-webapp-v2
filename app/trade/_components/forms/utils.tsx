@@ -4,8 +4,7 @@ import { toast } from "sonner"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
-import type { TradeMode } from "../enums"
-import { TradeAction } from "../enums"
+import { TradeAction, TradeMode } from "./enums"
 
 export function successToast(
   tradeMode: TradeMode,

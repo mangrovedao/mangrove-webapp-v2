@@ -14,7 +14,7 @@ export function ApproveStep({ tokenSymbol }: Props) {
           symbol={tokenSymbol}
         />
       </div>
-      <h1 className="text-2xl text-white">
+      <h1 className="text-2xl text-white text-center">
         Allow Mangrove to access your {tokenSymbol}?
       </h1>
       <p className="text-base text-gray-scale-300">

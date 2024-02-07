@@ -20,6 +20,7 @@ type EnhancedNumericInputProps = {
   balanceLabel?: string
   balanceAction?: { onClick: (value: string) => void; text: string }
   error?: ValidationError[] | string
+  inputClassName?: string
 } & NumericInputProps
 
 export const EnhancedNumericInput = React.forwardRef<
@@ -36,6 +37,7 @@ export const EnhancedNumericInput = React.forwardRef<
       balanceAction,
       error,
       className,
+      inputClassName,
       ...inputProps
     },
     ref,
@@ -51,6 +53,7 @@ export const EnhancedNumericInput = React.forwardRef<
         )}
         <NumericInput
           {...inputProps}
+          className={inputClassName}
           ref={ref}
           icon={tokenSymbol}
           symbol={tokenSymbol}
