@@ -1,15 +1,20 @@
 "use client"
 
+import React from "react"
+
 import { TokenPair } from "@/components/token-pair"
 import { Button } from "@/components/ui/button"
 import Status from "../(shared)/_components/status"
 import BackButton from "./_components/back-button"
 import BlockExplorer from "./_components/block-explorer"
+import CloseDialog from "./_components/parameters/dialogs/close"
 import InformationBanner from "./_components/shared/information-banner"
 import Tabs from "./_components/tabs"
 import useKandel from "./_providers/kandel-strategy"
 
 export default function Page() {
+  const [closeStrategy, toggleCloseStrategy] = React.useState(false)
+
   const {
     strategyQuery,
     strategyAddress,
@@ -41,7 +46,11 @@ export default function Page() {
             />
           ) : undefined}
         </div>
-        <Button size={"lg"} rightIcon>
+        <Button
+          onClick={() => toggleCloseStrategy(!closeStrategy)}
+          size={"lg"}
+          rightIcon
+        >
           Close strategy
         </Button>
       </div>
@@ -52,6 +61,11 @@ export default function Page() {
       />
 
       <Tabs />
+
+      <CloseDialog
+        isOpen={closeStrategy}
+        onClose={() => toggleCloseStrategy(false)}
+      />
     </div>
   )
 }
