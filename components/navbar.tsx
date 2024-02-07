@@ -47,6 +47,10 @@ const LINKS = [
     name: "Strategies",
     href: "/strategies",
   },
+  {
+    name: "Points",
+    href: "/points",
+  },
 ]
 
 type Props = React.ComponentProps<"nav"> & {

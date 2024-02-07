@@ -31,7 +31,8 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          "dark-green": "hsl(var(--color-primary-dark-geen))",
+          "dark-green": "hsl(var(--color-primary-dark-green))",
+          "bush-green": "hsl(var(--color-primary-bush-green))",
           "solid-black": "hsl(var(--color-primary-solid-black))",
           "night-woods": "hsl(var(--color-primary-night-woods))",
         },
@@ -90,6 +91,7 @@ export default {
         cloud: {
           "00": "hsl(var(--color-cloud-00))",
           100: "hsl(var(--color-cloud-100))",
+          200: "hsl(var(--color-cloud-200))",
           300: "hsl(var(--color-cloud-300))",
           400: "hsl(var(--color-cloud-400))",
           500: "hsl(var(--color-cloud-500))",
