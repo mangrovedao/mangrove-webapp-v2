@@ -182,10 +182,10 @@ function CustomBrush({
     <>
       {selection && (
         <rect
-          x={isNaN(brushX) ? 0 : brushX}
+          x={brushX}
           y={0}
-          width={isNaN(brushWidth) ? 0 : brushWidth}
-          height={isNaN(height) ? 0 : height}
+          width={brushWidth}
+          height={height}
           className={cn("opacity-10", {
             "fill-green-bangladesh": selectionStatus === "start",
             "fill-transparent": selectionStatus === "end",

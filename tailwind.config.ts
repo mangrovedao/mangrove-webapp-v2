@@ -88,20 +88,13 @@ export default {
           100: "hsl(var(--color-blue-light-100))",
         },
         cloud: {
-          "00": "hsl(var(--color-cloud-00))",
           100: "hsl(var(--color-cloud-100))",
           300: "hsl(var(--color-cloud-300))",
           400: "hsl(var(--color-cloud-400))",
-          500: "hsl(var(--color-cloud-500))",
         },
         cherry: {
           100: "hsl(var(--color-cherry-100))",
           400: "hsl(var(--color-cherry-400))",
-        },
-        mango: {
-          100: "hsl(var(--color-mango-100))",
-          200: "hsl(var(--color-mango-200))",
-          300: "hsl(var(--color-mango-300))",
         },
       },
       maxWidth: {

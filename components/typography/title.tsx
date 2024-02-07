@@ -3,7 +3,7 @@ import * as React from "react"
 
 import { cn } from "@/utils"
 
-const titleStyles = cva("text-current font-medium", {
+const titleStyles = cva("text-white font-medium", {
   variants: {
     variant: {
       header1: "text-xl lg:text-2xl",

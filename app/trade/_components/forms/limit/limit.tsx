@@ -46,7 +46,6 @@ export function Limit() {
     feeInPercentageAsString,
     timeInForce,
     send,
-    spotPrice,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
@@ -296,7 +295,6 @@ export function Limit() {
             <MarketDetails
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
-              spotPrice={spotPrice}
             />
 
             <form.Subscribe

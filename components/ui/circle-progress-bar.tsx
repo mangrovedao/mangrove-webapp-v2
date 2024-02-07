@@ -56,7 +56,7 @@ export const CircularProgressBar = ({
             />
           </svg>
         </TooltipTrigger>
-        <TooltipContent>{progress}% filled</TooltipContent>
+        <TooltipContent>{progress}%</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )

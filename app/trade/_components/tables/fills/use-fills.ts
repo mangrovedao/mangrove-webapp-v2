@@ -63,7 +63,6 @@ export function useFills<T = Fill[]>({
     meta: {
       error: "Unable to retrieve fills",
     },
-
     enabled: !!(
       isConnected &&
       indexerSdk &&
