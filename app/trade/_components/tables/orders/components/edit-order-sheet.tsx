@@ -198,7 +198,7 @@ export default function EditOrderSheet({
                               field.handleChange(e.target.value)
                             }}
                             error={field.state.meta.touchedErrors}
-                            token={isBid ? quote.symbol : base.symbol}
+                            token={isBid ? quote : base}
                             disabled={!market}
                             showBalance
                           />
@@ -230,7 +230,7 @@ export default function EditOrderSheet({
                               field.handleChange(e.target.value)
                             }}
                             error={field.state.meta.touchedErrors}
-                            token={quote.symbol}
+                            token={quote}
                             disabled={!market}
                           />
                         )}

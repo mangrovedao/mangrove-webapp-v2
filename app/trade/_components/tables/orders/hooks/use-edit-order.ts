@@ -30,9 +30,11 @@ export function useEditOrder({ order, onSubmit }: Props) {
   } = order
 
   const baseDecimals = market?.base.displayedDecimals
-  const quoteDecimals = market?.base.displayedDecimals
+  const quoteDecimals = market?.quote.displayedDecimals
 
-  const volume = Big(isBid ? initialWants : initialGives).toFixed(baseDecimals)
+  const displayDecimals = isBid ? baseDecimals : quoteDecimals
+
+  const volume = Big(initialGives).toFixed(displayDecimals)
 
   const form = useForm({
     validator: zodValidator,
@@ -49,10 +51,13 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
   const { sendTokenBalance } = useTradeInfos("limit", tradeAction)
   const [toggleEdit, setToggleEdit] = React.useState(false)
+
   console.log(order)
+
   const formattedPrice = `${Number(currentPrice).toFixed(
     quoteDecimals,
   )} ${market?.quote?.symbol}`
+
   const isOrderExpired = expiryDate && hasExpired(expiryDate)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
