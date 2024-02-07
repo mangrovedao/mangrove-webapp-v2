@@ -79,7 +79,7 @@ export default function Page() {
           }
 
           .book-and-chart {
-            grid-template-rows: calc(50vh - var(--bar-height) + 38px);
+            grid-template-rows: 100%;
           }
         }
       `}</style>

@@ -74,14 +74,13 @@ export function useTable({ data, onCancel, onEdit }: Params) {
           const { initialWants, takerGot, initialGives, isBid, takerGave } =
             row.original
           const baseSymbol = market?.base.symbol
-          const quoteSymbol = market?.quote.symbol
-          const symbol = isBid ? baseSymbol : quoteSymbol
-          const displayDecimals = isBid
-            ? market?.base.displayedDecimals
-            : market?.quote.displayedDecimals
-
-          const amount = Big(initialWants).toFixed(displayDecimals)
-          const filled = Big(takerGot).toFixed(displayDecimals)
+          const displayDecimals = market?.base.displayedDecimals
+          const amount = Big(isBid ? initialWants : initialGives).toFixed(
+            displayDecimals,
+          )
+          const filled = Big(isBid ? takerGot : takerGave).toFixed(
+            displayDecimals,
+          )
           const progress = Math.min(
             Math.round(
               Big(filled)
@@ -99,7 +98,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
               </span>
               <span className="">
                 &nbsp;
-                {amount} {symbol}
+                {amount} {baseSymbol}
               </span>
               <CircularProgressBar progress={progress} className="ml-3" />
             </div>
@@ -137,32 +136,25 @@ export function useTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => {
-          const { expiryDate } = row.original
-          const isExpired = expiryDate
-            ? new Date(expiryDate) < new Date()
-            : true
-
-          return (
-            <div className="w-full h-full flex justify-end space-x-1">
-              <IconButton
-                tooltip="Modify"
-                className="aspect-square w-6 rounded-full"
-                disabled={isExpired}
-                onClick={() => onEdit(row.original)}
-              >
-                <Pen />
-              </IconButton>
-              <IconButton
-                tooltip="Retract offer"
-                className="aspect-square w-6 rounded-full"
-                onClick={() => onCancel(row.original)}
-              >
-                <Close />
-              </IconButton>
-            </div>
-          )
-        },
+        cell: ({ row }) => (
+          <div className="w-full h-full flex justify-end space-x-1">
+            <IconButton
+              tooltip="Modify"
+              className="aspect-square w-6 rounded-full"
+              disabled
+              onClick={() => onEdit(row.original)}
+            >
+              <Pen />
+            </IconButton>
+            <IconButton
+              tooltip="Retract offer"
+              className="aspect-square w-6 rounded-full"
+              onClick={() => onCancel(row.original)}
+            >
+              <Close />
+            </IconButton>
+          </div>
+        ),
       }),
     ],
     [market, onEdit, onCancel],

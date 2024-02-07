@@ -1,4 +1,4 @@
-import type { Mangrove, Market } from "@mangrovedao/mangrove.js"
+import type { Market } from "@mangrovedao/mangrove.js"
 
 export function baToBs(ba: Market.BA): Market.BS {
   return ba === "asks" ? "buy" : "sell"
@@ -23,13 +23,4 @@ export function calculateMidPriceFromOrderBook({
   const lowestAsk = Math.min(...asks.map((ask) => Number(ask.price)))
 
   return (highestBid + lowestAsk) / 2
-}
-
-export function getSymbol(market?: Mangrove.OpenMarketInfo) {
-  if (!market) return
-  return `${market?.base?.symbol}/${market?.quote?.symbol}`
-}
-
-export function getValue(market: Mangrove.OpenMarketInfo) {
-  return `${market.base.id},${market.quote.id}`
 }

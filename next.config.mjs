@@ -25,6 +25,15 @@ const config = {
   images: {
     domains: ["explorer-api.walletconnect.com"],
   },
+  async redirects() {
+    return Promise.resolve([
+      {
+        source: "/",
+        destination: "/trade",
+        permanent: true,
+      },
+    ])
+  },
 }
 
 export default withSentryConfig(

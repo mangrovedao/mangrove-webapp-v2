@@ -1,6 +1,5 @@
 "use client"
 import {
-  Token,
   type GeometricKandelDistribution,
   type Market,
 } from "@mangrovedao/mangrove.js"
@@ -15,24 +14,15 @@ import Big from "big.js"
 import { Minus, Plus } from "lucide-react"
 import React from "react"
 import useResizeObserver from "use-resize-observer"
-import { useAccount } from "wagmi"
 
-import { MergedOffers } from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
-import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import { cn } from "@/utils"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
-import {
-  GeometricKandelDistributionDots,
-  GeometricOffer,
-} from "./geometric-distribution-dots"
-import { GeometricOfferTooltip } from "./geometric-offer-tooltip"
-import { MergedOfferTooltip } from "./merged-offer-tooltip"
-import { MergedOffersDots } from "./merged-offers-dots"
+import { GeometricKandelDistributionDots } from "./geometric-distribution-dots"
 import { MidPriceLine } from "./mid-price-line"
 import { RangeTooltips } from "./range-tooltips"
 import { SetRangeAnimation } from "./set-range-animation"
@@ -51,8 +41,8 @@ const initialTransform = {
 }
 
 export type PriceRangeChartProps = {
-  baseToken?: Token | null
-  quoteToken?: Token | null
+  baseToken?: string
+  quoteToken?: string
   initialMidPrice?: number
   bids?: Market.Offer[]
   asks?: Market.Offer[]
@@ -63,7 +53,6 @@ export type PriceRangeChartProps = {
   geometricKandelDistribution?: ReturnType<
     typeof GeometricKandelDistribution.prototype.getOffersWithPrices
   >
-  mergedOffers?: MergedOffers
 }
 
 export function PriceRangeChart({
@@ -75,16 +64,8 @@ export function PriceRangeChart({
   viewOnly = false,
   isLoading = false,
   geometricKandelDistribution,
-  mergedOffers,
-  baseToken,
-  quoteToken,
 }: PriceRangeChartProps) {
-  const [hoveredGeometricOffer, setHoveredGeometricOffer] =
-    React.useState<GeometricOffer>()
-  const { hoveredOffer, setHoveredOffer } = useHoveredOfferStore()
-  const { isConnected } = useAccount()
   const { ref, width = 0, height = 0 } = useResizeObserver()
-  const [isMovingRange, setIsMovingRange] = React.useState(false)
   const offers = [
     ...bids.map((bid) => ({ ...bid, type: "bid" })),
     ...asks.map((ask) => ({ ...ask, type: "ask" })),
@@ -122,17 +103,8 @@ export function PriceRangeChart({
 
   const altPressed = useKeyPress("Alt")
 
-  // if viewOnly, set the xDomain to the priceRange
   React.useEffect(() => {
-    if (!viewOnly || !priceRange) return
-    const [min, max] = priceRange
-    const xLowerBound = min * 0.8
-    const xUpperBound = max * 1.1
-    setXDomain([xLowerBound, xUpperBound])
-  }, [viewOnly, priceRange])
-
-  React.useEffect(() => {
-    if (!midPrice || viewOnly) return
+    if (!midPrice) return
     const xLowerBound = midPrice * 0.7 // 30% lower than mid price
     const xUpperBound = midPrice * 1.3 // 30% higher than mid price
     setXDomain([xLowerBound, xUpperBound])
@@ -211,7 +183,7 @@ export function PriceRangeChart({
               </span>
             </div>
             <div
-              className="w-full h-96 bg-[#041010] rounded-lg relative group mt-5 overflow-hidden"
+              className="w-full h-96 bg-[#041010] rounded-lg relative group"
               ref={ref}
             >
               {altPressed && (
@@ -258,10 +230,8 @@ export function PriceRangeChart({
                   onMouseOut={zoom.dragEnd}
                 />
               )}
-              {(isLoading || !isConnected) && (
-                <Skeleton className="h-full w-full" />
-              )}
-              {!priceRange && !viewOnly ? (
+              {isLoading && <Skeleton className="h-full w-full" />}
+              {!priceRange ? (
                 <div className="absolute inset-0 flex items-center group-hover:hidden">
                   <div className="w-full translate-x-1/4">
                     <SetRangeAnimation />
@@ -332,54 +302,33 @@ export function PriceRangeChart({
                   midPrice={midPrice}
                   height={height - paddingBottom}
                 />
-                {viewOnly &&
-                !priceRange?.[0] &&
-                !priceRange?.[1] ? undefined : (
-                  <CustomBrush
-                    xScale={xScaleTransformed}
-                    width={width - paddingRight}
-                    height={height - paddingBottom}
-                    onBrushEnd={(selectedRange) => {
-                      setIsMovingRange(false)
-                      setSelectedPriceRange(selectedRange)
-                      if (onPriceRangeChange && selectedRange) {
-                        onPriceRangeChange(selectedRange)
-                      }
-                    }}
-                    onBrushChange={(selectedRange) => {
-                      setIsMovingRange(true)
-                      setSelectedPriceRange(selectedRange)
-                      if (onPriceRangeChange && selectedRange) {
-                        onPriceRangeChange(selectedRange)
-                      }
-                    }}
-                    value={selectedPriceRange ?? undefined}
-                    svgRef={svgRef}
-                    viewOnly={viewOnly}
-                    midPrice={midPrice}
-                  />
-                )}
-                {!isMovingRange && priceRange?.[0] && priceRange?.[1] && (
+                <CustomBrush
+                  xScale={xScaleTransformed}
+                  width={width - paddingRight}
+                  height={height - paddingBottom}
+                  onBrushEnd={(selectedRange) => {
+                    setSelectedPriceRange(selectedRange)
+                    if (onPriceRangeChange && selectedRange) {
+                      onPriceRangeChange(selectedRange)
+                    }
+                  }}
+                  onBrushChange={(selectedRange) => {
+                    setSelectedPriceRange(selectedRange)
+                    if (onPriceRangeChange && selectedRange) {
+                      onPriceRangeChange(selectedRange)
+                    }
+                  }}
+                  value={selectedPriceRange ?? undefined}
+                  svgRef={svgRef}
+                  viewOnly={viewOnly}
+                  midPrice={midPrice}
+                />
+                {priceRange?.[0] && priceRange?.[1] && (
                   <GeometricKandelDistributionDots
                     height={height}
                     paddingBottom={paddingBottom}
                     xScale={xScaleTransformed}
                     geometricKandelDistribution={geometricKandelDistribution}
-                    onHover={setHoveredGeometricOffer}
-                    onHoverOut={() => setHoveredGeometricOffer(undefined)}
-                  />
-                )}
-                {mergedOffers && (
-                  <MergedOffersDots
-                    height={height}
-                    paddingBottom={paddingBottom}
-                    xScale={xScaleTransformed}
-                    mergedOffers={mergedOffers}
-                    onHover={(offer) => {
-                      setHoveredOffer(offer)
-                    }}
-                    onHoverOut={() => setHoveredOffer(undefined)}
-                    hoveredOffer={hoveredOffer}
                   />
                 )}
               </svg>
@@ -390,27 +339,6 @@ export function PriceRangeChart({
                 selectedPriceRange={selectedPriceRange}
                 midPrice={midPrice}
               />
-
-              {hoveredGeometricOffer && baseToken && quoteToken && (
-                <GeometricOfferTooltip
-                  height={height}
-                  paddingBottom={paddingBottom}
-                  xScale={xScaleTransformed}
-                  hoveredGeometricOffer={hoveredGeometricOffer}
-                  baseToken={baseToken}
-                  quoteToken={quoteToken}
-                />
-              )}
-              {hoveredOffer && baseToken && quoteToken && (
-                <MergedOfferTooltip
-                  height={height}
-                  paddingBottom={paddingBottom}
-                  xScale={xScaleTransformed}
-                  mergedOffer={hoveredOffer}
-                  baseToken={baseToken}
-                  quoteToken={quoteToken}
-                />
-              )}
             </div>
           </>
         )
