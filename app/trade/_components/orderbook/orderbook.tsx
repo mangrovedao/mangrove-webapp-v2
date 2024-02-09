@@ -116,7 +116,7 @@ function BookContent() {
                 {spread?.toFixed(priceDecimals)}
               </OrderBookTableCell>
               <OrderBookTableCell className="text-gray">
-                {spreadPercentString}
+                {/* {spreadPercentString} */}
               </OrderBookTableCell>
             </TableRow>
           ) : undefined}
