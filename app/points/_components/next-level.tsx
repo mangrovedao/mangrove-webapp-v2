@@ -114,6 +114,7 @@ export default function NextLevel({ className }: Props) {
               <span
                 className={cn("absolute -right-1 -top-8 text-xs", {
                   "bg-green-bangladesh px-2 aspect-square rounded-full text-white flex items-center justify-center -right-3 w-5 h-5":
+                    //@ts-ignore
                     currentLevel === 4,
                 })}
               >
