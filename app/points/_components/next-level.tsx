@@ -2,6 +2,7 @@ import InfoTooltip from "@/components/info-tooltip"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
+import Animals from "./animals"
 import BoxContainer from "./box-container"
 
 type Props = {
@@ -32,7 +33,7 @@ const LEVELS = [
 ]
 
 export default function NextLevel({ className }: Props) {
-  const currentLevel = 0
+  const currentLevel = 1
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex justify-between">
@@ -80,8 +81,18 @@ export default function NextLevel({ className }: Props) {
             className={cn(
               "col-span-1 h-full z-10 first-of-type:border-l-none",
               "relative group",
+              {
+                "bg-level-chart": i === currentLevel,
+              },
             )}
           >
+            <Animals
+              className={cn("z-30 absolute", {
+                visible: i === currentLevel,
+                hidden: i !== currentLevel,
+              })}
+              level={currentLevel}
+            />
             <div
               className={cn(
                 "w-2 h-full bg-primary-bush-green right-0 absolute group-last-of-type:opacity-0",
@@ -89,14 +100,23 @@ export default function NextLevel({ className }: Props) {
               )}
             ></div>
             <span
-              className={
-                "absolute -top-8 group-first-of-type:-left-1 -left-3 text-xs"
-              }
+              className={cn(
+                "absolute -top-8 group-first-of-type:-left-1 -left-3 text-xs",
+                {
+                  "bg-green-bangladesh px-2 aspect-square rounded-full text-white flex items-center -left-4 -translate-y-1":
+                    i === currentLevel + 1,
+                },
+              )}
             >
               {i}
             </span>
             {i === 4 ? (
-              <span className={"absolute -right-1 -top-8 text-xs"}>
+              <span
+                className={cn("absolute -right-1 -top-8 text-xs", {
+                  "bg-green-bangladesh px-2 aspect-square rounded-full text-white flex items-center justify-center -right-3 w-5 h-5":
+                    currentLevel === 4,
+                })}
+              >
                 {i + 1}
               </span>
             ) : undefined}
@@ -161,7 +181,6 @@ export default function NextLevel({ className }: Props) {
           </div>
         ))}
       </div>
-      <style>{/* #03624C00, #03624C */}</style>
     </BoxContainer>
   )
 }

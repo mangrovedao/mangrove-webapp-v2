@@ -132,6 +132,10 @@ export default {
         error: "0px 0px 0px 16px rgba(56, 18, 18, 0.25)",
         success: "0 0 0 16px rgba(3, 34, 33, 0.25)",
       },
+      backgroundImage: {
+        "level-chart":
+          "linear-gradient(180deg, rgba(3, 98, 76, 0.00) 57.96%, rgba(3, 98, 76, 0.30) 99.5%)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
