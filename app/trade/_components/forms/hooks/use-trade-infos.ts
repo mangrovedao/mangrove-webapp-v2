@@ -41,7 +41,7 @@ export function useTradeInfos(
   }).format(fee / 10_000)
 
   const tickSize = marketInfo?.tickSpacing
-    ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)} %`
+    ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
     : ""
 
   const priceDecimals = determinePriceDecimalsFromToken(
