@@ -1,10 +1,5 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { MangroveLogo, TooltipInfo } from "@/svgs"
+import InfoTooltip from "@/components/info-tooltip"
+import { MangroveLogo } from "@/svgs"
 
 export default function Points() {
   return (
@@ -16,16 +11,9 @@ export default function Points() {
       </div>
       <div className="text-xs text-cloud-200 flex items-center pt-11">
         update in 22h 10m{" "}
-        <TooltipProvider>
-          <Tooltip delayDuration={200}>
-            <TooltipTrigger className="hover:opacity-80 transition-opacity ml-0.5">
-              <TooltipInfo />
-            </TooltipTrigger>
-            <TooltipContent>
-              Your total points, recalculated every 24 hours.
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <InfoTooltip>
+          Your total points, recalculated every 24 hours.
+        </InfoTooltip>
       </div>
     </div>
   )
