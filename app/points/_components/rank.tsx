@@ -3,9 +3,15 @@ import BoxContainer from "./box-container"
 
 type Props = {
   className?: string
+  rank?: number
+  totalTraders?: number
 }
 
-export default function Rank({ className }: Props) {
+export default function Rank({
+  className,
+  rank = 103,
+  totalTraders = 39059,
+}: Props) {
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
@@ -27,10 +33,16 @@ export default function Rank({ className }: Props) {
         <div>
           <div className="text-sm text-cloud-200">Rank</div>
           <div className="flex items-center">
-            <span className="font-medium text-[32px]">103</span>
+            <span
+              className={cn("font-medium text-[32px]", {
+                "text-cloud-00": !rank,
+              })}
+            >
+              {rank}
+            </span>
           </div>
           <div className="text-xs text-cloud-200 flex items-center pt-7">
-            of 39059 traders
+            of {totalTraders} traders
           </div>
         </div>
       </div>

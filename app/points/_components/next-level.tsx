@@ -5,10 +5,6 @@ import { cn } from "@/utils"
 import Animals from "./animals"
 import BoxContainer from "./box-container"
 
-type Props = {
-  className?: string
-}
-
 const LEVELS = [
   {
     amount: "$1,000",
@@ -32,10 +28,25 @@ const LEVELS = [
   },
 ]
 
-export default function NextLevel({ className }: Props) {
-  const currentLevel = 1
+type Props = {
+  className?: string
+  currentLevel?: number
+  volume?: number
+}
+
+export default function NextLevel({
+  className,
+  currentLevel = 0,
+  volume = 100,
+}: Props) {
+  const disabled = !volume
+
   return (
-    <BoxContainer className={cn(className)}>
+    <BoxContainer
+      className={cn(className, {
+        "text-cloud-00": !volume,
+      })}
+    >
       <div className="flex justify-between">
         <Title className="flex items-center">
           Next level{" "}
@@ -49,7 +60,12 @@ export default function NextLevel({ className }: Props) {
           <InfoTooltip>Time until your level is updated.</InfoTooltip>
         </div>
       </div>
-      <div className="w-full aspect-[5.266] relative mt-20 grid grid-cols-5 border-x border-green-bangladesh">
+      <div
+        className={cn(
+          "w-full aspect-[5.266] relative mt-20 grid grid-cols-5 border-x",
+          disabled ? "border-cloud-300" : "border-green-bangladesh",
+        )}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -69,9 +85,12 @@ export default function NextLevel({ className }: Props) {
               y2="0"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="#00DF81"></stop>
-              <stop offset="0.515" stopColor="#03624C"></stop>
-              <stop offset="1" stopColor="#031F1E"></stop>
+              <stop stopColor={disabled ? "#2E3737" : "#00DF81"}></stop>
+              {!disabled && <stop offset="0.515" stopColor="#03624C"></stop>}
+              <stop
+                offset="1"
+                stopColor={disabled ? "#1C2222" : "#031F1E"}
+              ></stop>
             </linearGradient>
           </defs>
         </svg>
@@ -82,21 +101,22 @@ export default function NextLevel({ className }: Props) {
               "col-span-1 h-full z-10 first-of-type:border-l-none",
               "relative group",
               {
-                "bg-level-chart": i === currentLevel,
+                "bg-level-chart": i === currentLevel && volume,
               },
             )}
           >
             <Animals
               className={cn("z-30 absolute", {
                 visible: i === currentLevel,
-                hidden: i !== currentLevel,
+                hidden: i !== currentLevel || !volume,
               })}
               level={currentLevel}
             />
             <div
               className={cn(
                 "w-2 h-full bg-primary-bush-green right-0 absolute group-last-of-type:opacity-0",
-                "border-l border-green-bangladesh",
+                "border-l",
+                disabled ? "border-cloud-300" : "border-green-bangladesh",
               )}
             ></div>
             <span
@@ -104,7 +124,7 @@ export default function NextLevel({ className }: Props) {
                 "absolute -top-8 group-first-of-type:-left-1 -left-3 text-xs",
                 {
                   "bg-green-bangladesh px-2 aspect-square rounded-full text-white flex items-center -left-4 -translate-y-1":
-                    i === currentLevel + 1,
+                    i === currentLevel + 1 && !disabled,
                 },
               )}
             >
@@ -174,7 +194,7 @@ export default function NextLevel({ className }: Props) {
             )}
             <span
               className={cn({
-                "text-green-caribbean": i === currentLevel,
+                "text-green-caribbean": i === currentLevel && volume,
               })}
             >
               {level.nextBoost}

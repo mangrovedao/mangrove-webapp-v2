@@ -1,22 +1,24 @@
+import { cn } from "@/utils"
+
 const POINTS = [
   {
     id: "Trader points",
-    points: 2920,
+    points: 100,
     color: "bg-green-caribbean",
   },
   {
     id: "Liquidity providing points",
-    points: 540,
+    points: 20,
     color: "bg-[#8F5AE8]",
   },
   {
     id: "Community points",
-    points: 25,
+    points: 20,
     color: "bg-white",
   },
   {
     id: "Referral points",
-    points: 400,
+    points: 15,
     color: "bg-green-bangladesh",
   },
 ]
@@ -33,30 +35,44 @@ export default function TotalPoints() {
         </div>
       </div>
       <div className="h-1 w-full rounded-lg overflow-hidden flex mt-2">
-        {POINTS.map((item) => (
-          <span
-            key={item.id}
-            style={{ width: `${(item.points / totalPoints) * 100}%` }}
-            className={`${item.color} h-full`}
-          ></span>
-        ))}
+        {totalPoints ? (
+          POINTS.map((item) => (
+            <span
+              key={item.id}
+              style={{ width: `${(item.points / totalPoints) * 100}%` }}
+              className={`${item.color} h-full`}
+            ></span>
+          ))
+        ) : (
+          <span className="bg-cloud-300 w-full" />
+        )}
       </div>
       <table className="mt-4 w-full text-white text-xs">
         <tbody>
-          {POINTS.map((item) => (
-            <tr key={item.id}>
-              <td className="flex items-center py-1">
-                <span
-                  className={`inline-block w-1 h-1 rounded-full mr-2 ${item.color}`}
-                ></span>
-                {item.id}
-              </td>
-              <td className="text-right py-1">{item.points}</td>
-              <td className="text-right text-cloud-200 py-1">
-                ({((item.points / totalPoints) * 100).toFixed(0)}%)
-              </td>
-            </tr>
-          ))}
+          {POINTS.map((item) => {
+            const points = item.points ?? 1
+            const circleColor = !points ? "bg-cloud-300" : item.color
+            const percentage = points ? (item.points / totalPoints) * 100 : 0
+            return (
+              <tr
+                key={item.id}
+                className={cn({
+                  "text-cloud-00": !points,
+                })}
+              >
+                <td className="flex items-center py-1">
+                  <span
+                    className={`inline-block w-1 h-1 rounded-full mr-2 ${circleColor}`}
+                  ></span>
+                  {item.id}
+                </td>
+                <td className="text-right py-1">{item.points}</td>
+                <td className="text-right text-cloud-200 py-1">
+                  ({percentage.toFixed(0)}%)
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
