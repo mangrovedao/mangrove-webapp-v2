@@ -1,6 +1,6 @@
 import { GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
 import { useMutation } from "@tanstack/react-query"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
@@ -19,6 +19,8 @@ type FormValues = Pick<
 export function useLaunchKandelStrategy() {
   const { market } = useMarket()
   const { kandelStrategies } = useKandel()
+  const router = useRouter()
+
   return useMutation({
     mutationFn: async ({
       baseDeposit,
@@ -52,7 +54,7 @@ export function useLaunchKandelStrategy() {
         toast.success("Kandel strategy successfully launched")
 
         return setTimeout(() => {
-          redirect("strategies")
+          router.push("/strategies")
         }, 5000)
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)

@@ -1,6 +1,6 @@
 import type { KandelStrategies, Market } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -12,6 +12,7 @@ type Props = {
 }
 
 export function useCloseStrategy({ strategyAddress }: Props) {
+  const router = useRouter()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -68,7 +69,7 @@ export function useCloseStrategy({ strategyAddress }: Props) {
       }
 
       return setTimeout(() => {
-        redirect("/strategies")
+        router.push("/strategies")
       }, 5000)
     },
     onError(error, variables, context) {
