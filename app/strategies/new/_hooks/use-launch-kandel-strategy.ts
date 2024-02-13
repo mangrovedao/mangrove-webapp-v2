@@ -56,7 +56,6 @@ export function useLaunchKandelStrategy() {
           redirect("strategies")
         }, 5000)
       } catch (error) {
-        console.log("error", error)
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
         console.error(error)
