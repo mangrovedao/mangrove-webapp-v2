@@ -52,10 +52,7 @@ export function useLaunchKandelStrategy() {
 
         await Promise.all(populateTxs.map((x) => x.wait()))
         toast.success("Kandel strategy successfully launched")
-
-        return setTimeout(() => {
-          router.push("/strategies")
-        }, 5000)
+        router.push("/strategies")
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
