@@ -1,11 +1,11 @@
 import { GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
 import { useMutation } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { redirect } from "next/navigation"
-import { toast } from "sonner"
 import { NewStratStore } from "../_stores/new-strat.store"
 
 type FormValues = Pick<
@@ -19,6 +19,8 @@ type FormValues = Pick<
 export function useLaunchKandelStrategy() {
   const { market } = useMarket()
   const { kandelStrategies } = useKandel()
+  const router = useRouter()
+
   return useMutation({
     mutationFn: async ({
       baseDeposit,
@@ -50,7 +52,7 @@ export function useLaunchKandelStrategy() {
 
         await Promise.all(populateTxs.map((x) => x.wait()))
         toast.success("Kandel strategy successfully launched")
-        redirect("/strategies")
+        router.push("/strategies")
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
