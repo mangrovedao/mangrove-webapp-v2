@@ -6,6 +6,7 @@ import Big from "big.js"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
 
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
@@ -17,6 +18,7 @@ type Props = {
 }
 
 export function useLimit(props: Props) {
+  const { mangrove } = useMangrove()
   const { market, marketInfo } = useMarket()
   const form = useForm({
     validator: zodValidator,
@@ -24,7 +26,9 @@ export function useLimit(props: Props) {
       tradeAction: TradeAction.BUY,
       limitPrice: "",
       send: "",
+      sendFrom: "simple",
       receive: "",
+      receiveTo: "simple",
       timeInForce: TimeInForce.GOOD_TIL_TIME,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
@@ -48,6 +52,8 @@ export function useLimit(props: Props) {
 
   const send = form.useStore((state) => state.values.send)
   const timeInForce = form.useStore((state) => state.values.timeInForce)
+
+  const logics = mangrove ? Object.values(mangrove.logics) : []
 
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
@@ -161,5 +167,6 @@ export function useLimit(props: Props) {
     feeInPercentageAsString,
     spotPrice,
     timeInForce,
+    logics,
   }
 }

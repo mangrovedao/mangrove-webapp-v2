@@ -6,6 +6,7 @@ import {
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Text } from "@/components/typography/text"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -18,11 +19,19 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
+import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
@@ -47,6 +56,7 @@ export function Limit() {
     timeInForce,
     send,
     spotPrice,
+    logics,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
@@ -286,6 +296,120 @@ export function Limit() {
                         </SelectGroup>
                       </SelectContent>
                     </Select>
+                  )}
+                </form.Field>
+              </div>
+            </Accordion>
+
+            <Separator className="!my-6" />
+
+            <Accordion title="Liquidity Sourcing">
+              <div className="flex justify-between space-x-2 pt-2">
+                <form.Field name="sendFrom">
+                  {(field) => (
+                    <div className="flex flex-col w-full">
+                      <Label className="flex items-center">
+                        Send from
+                        <TooltipProvider>
+                          <Tooltip delayDuration={200} defaultOpen={false}>
+                            <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                              <TooltipInfo />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <Text>Select the origin of the assets.</Text>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </Label>
+
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!market}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {logics.map((source) => (
+                              <SelectItem key={source.id} value={source.id}>
+                                <div className="flex gap-2 w-full">
+                                  <SourceIcon sourceId={source.id} />
+                                  <Text className="capitalize">
+                                    {source.id.includes("simple")
+                                      ? "Wallet"
+                                      : source.id.toUpperCase()}
+                                  </Text>
+                                  {/* {<Caption> {source.description}</Caption>} */}
+                                </div>
+                              </SelectItem>
+                            ))}
+                            <SelectItem value="disabled" disabled>
+                              <Text>More sources coming soon...</Text>
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="receiveTo">
+                  {(field) => (
+                    <div className="flex flex-col w-full">
+                      <Label className="flex items-center">
+                        Receive to
+                        <TooltipProvider>
+                          <Tooltip delayDuration={200} defaultOpen={false}>
+                            <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                              <TooltipInfo />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <Text>
+                                Select the destination of the assets (after the
+                                trade is executed)
+                              </Text>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </Label>
+
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!market}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {logics.map((source) => (
+                              <SelectItem key={source.id} value={source.id}>
+                                <div className="flex gap-2 w-full">
+                                  <SourceIcon sourceId={source.id} />
+                                  <Text className="capitalize">
+                                    {source.id.includes("simple")
+                                      ? "Wallet"
+                                      : source.id.toUpperCase()}
+                                  </Text>
+                                </div>
+                              </SelectItem>
+                            ))}
+                            <SelectItem value="disabled" disabled>
+                              <Text>More sources coming soon...</Text>
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   )}
                 </form.Field>
               </div>
