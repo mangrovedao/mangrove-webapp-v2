@@ -52,8 +52,6 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const { sendTokenBalance } = useTradeInfos("limit", tradeAction)
   const [toggleEdit, setToggleEdit] = React.useState(false)
 
-  console.log(order)
-
   const formattedPrice = `${Number(currentPrice).toFixed(
     quoteDecimals,
   )} ${market?.quote?.symbol}`

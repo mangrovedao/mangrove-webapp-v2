@@ -140,11 +140,10 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
             deposit.mutate(undefined, {
               onSettled(data, error, variables, context) {
                 if (!error) {
-                  console.log(data, error)
                   toggleDepositCompleted()
-                  onClose()
-                  reset()
                 }
+                onClose()
+                reset()
               },
             })
           }

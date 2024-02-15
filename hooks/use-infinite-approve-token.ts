@@ -20,7 +20,7 @@ export function useInfiniteApproveToken() {
 
         if (logic) {
           const tokenToApprove = await logic.overlying(token)
-          console.log(tokenToApprove)
+
           const result = await tokenToApprove?.approve(spender)
           return result?.wait()
         } else {
@@ -28,7 +28,7 @@ export function useInfiniteApproveToken() {
           return result.wait()
         }
       } catch (error) {
-        console.log(error)
+        console.error(error)
         throw new Error("Failed the approval")
       }
     },

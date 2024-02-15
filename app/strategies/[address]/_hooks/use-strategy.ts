@@ -20,10 +20,10 @@ export function useStrategy({ strategyAddress }: Params) {
         const result = await indexerSdk.getKandel({
           address: strategyAddress,
         })
-        console.log(result)
+
         return parseStrategy(result)
       } catch (error) {
-        console.log("error", error)
+        console.error(error)
         throw new Error("Unable to fetch strategy")
       }
     },
