@@ -148,6 +148,7 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   token={sendToken}
+                  customBalance={sendTokenBalance.formatted}
                   label="Send amount"
                   disabled={!market}
                   showBalance

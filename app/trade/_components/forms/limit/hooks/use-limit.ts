@@ -8,6 +8,9 @@ import { useEventListener } from "usehooks-ts"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import { Token } from "@mangrovedao/mangrove.js"
+import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
+import { useAccount } from "wagmi"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
@@ -36,7 +39,18 @@ export function useLimit(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
+  const [balanceLogic, setBalanceLogic] = React.useState<{
+    formatted: string
+    balance: number
+  }>()
+
   const tradeAction = form.useStore((state) => state.values.tradeAction)
+  const send = form.useStore((state) => state.values.send)
+  const sendFrom = form.state.values.sendFrom
+  const timeInForce = form.useStore((state) => state.values.timeInForce)
+  const logics = mangrove ? Object.values(mangrove.logics) : []
+
+  const { address } = useAccount()
   const {
     quoteToken,
     sendToken,
@@ -46,14 +60,42 @@ export function useLimit(props: Props) {
     tickSize,
     spotPrice,
   } = useTradeInfos("limit", tradeAction)
+
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
-  const send = form.useStore((state) => state.values.send)
-  const timeInForce = form.useStore((state) => state.values.timeInForce)
+  const getPossibleLogics = async (token: Token) => {
+    const logics = mangrove ? Object.values(mangrove.logics) : []
+    const usableLogics = logics.map(async (logic) => {
+      const canUseLogic = await logic.canUseLogicFor(token)
+      if (canUseLogic) {
+        return logic
+      }
+    })
 
-  const logics = mangrove ? Object.values(mangrove.logics) : []
+    return usableLogics
+  }
+
+  const getLogicBalance = async (token: Token, fundOwner: string) => {
+    if (sendFrom === "simple") return
+
+    const selectedLogic = logics.find(
+      (logic) => logic.id === sendFrom,
+    ) as SimpleAaveLogic
+
+    const logicToken = await selectedLogic.overlying(token)
+
+    const logicBalance = await selectedLogic.logic.balanceLogic(
+      logicToken.address,
+      fundOwner,
+    )
+
+    setBalanceLogic({
+      formatted: logicBalance.toNumber().toFixed(4),
+      balance: logicBalance.toNumber(),
+    })
+  }
 
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
@@ -138,6 +180,11 @@ export function useLimit(props: Props) {
     form.validateAllFields("submit")
   }
 
+  // React.useEffect(() => {
+  //   if (!sendToken || !address) return
+  //   getLogicBalance(sendToken, address)
+  // }, [sendToken, sendFrom])
+
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
     const receive = form?.getFieldValue("receive")
@@ -155,18 +202,21 @@ export function useLimit(props: Props) {
     tradeAction,
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendTokenBalance:
+      sendFrom != "simple" ? { ...balanceLogic } : sendTokenBalance,
     handleSubmit,
     form,
     quoteToken,
     market,
     sendToken,
     send,
+    sendFrom,
     receiveToken,
     tickSize,
     feeInPercentageAsString,
     spotPrice,
     timeInForce,
+    balanceLogic,
     logics,
   }
 }
