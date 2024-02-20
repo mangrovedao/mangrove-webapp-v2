@@ -27,12 +27,14 @@ import {
 } from "@/components/ui/tooltip"
 import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
+import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
+import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
@@ -55,14 +57,27 @@ export function Limit() {
     feeInPercentageAsString,
     timeInForce,
     send,
+    sendFrom,
     spotPrice,
     logics,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
 
+  const { address } = useAccount()
+
+  const { balanceLogic, availableLogics } = liquiditySourcing({
+    sendToken,
+    sendFrom,
+    fundOwner: address,
+    logics,
+  })
+
+  const currentBalance =
+    balanceLogic && sendFrom !== "simple" ? balanceLogic : sendTokenBalance
+
   const handleSliderChange = (value: number) => {
-    const amount = (value * Number(sendTokenBalance.formatted)) / 100
+    const amount = (value * Number(currentBalance.formatted)) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
     if (!form.state.values.limitPrice) {
@@ -72,8 +87,8 @@ export function Limit() {
     computeReceiveAmount()
   }
 
-  const sendTokenBalanceAsBig = sendTokenBalance.formatted
-    ? Big(Number(sendTokenBalance.formatted))
+  const sendTokenBalanceAsBig = currentBalance.formatted
+    ? Big(Number(currentBalance.formatted))
     : Big(0)
 
   const sliderValue = Math.min(
@@ -136,7 +151,7 @@ export function Limit() {
 
             <form.Field
               name="send"
-              onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
+              onChange={sendValidator(Number(currentBalance.formatted ?? 0))}
             >
               {(field) => (
                 <EnhancedNumericInput
@@ -148,7 +163,7 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   token={sendToken}
-                  customBalance={sendTokenBalance.formatted}
+                  customBalance={currentBalance.formatted}
                   label="Send amount"
                   disabled={!market}
                   showBalance
