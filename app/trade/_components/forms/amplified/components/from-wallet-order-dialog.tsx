@@ -1,5 +1,5 @@
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
@@ -30,7 +30,7 @@ export default function FromWalletAmplifiedOrderDialog({
   form,
   onClose,
 }: Props) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const {
     baseToken,
     quoteToken,

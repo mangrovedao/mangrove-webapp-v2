@@ -1,5 +1,5 @@
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
 import { Text } from "@/components/typography/text"
@@ -75,7 +75,7 @@ export default function EditOrderSteps({
   onClose,
   displayDecimals,
 }: Props) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const { sendToken, isInfiniteAllowance, spender } = useTradeInfos(
     "limit",
     order.isBid ? TradeAction.BUY : TradeAction.SELL,

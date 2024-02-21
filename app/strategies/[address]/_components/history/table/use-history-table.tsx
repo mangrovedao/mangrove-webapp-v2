@@ -8,7 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { formatDate } from "@/utils/date"
 import { DepositAndWithdraw } from "@mangrovedao/indexer-sdk/dist/src/kandel/types"
@@ -23,7 +23,7 @@ type Params = {
 }
 
 export function useHistoryParams({ data }: Params) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const { baseToken } = useKandel()
 
   const columns = React.useMemo(
