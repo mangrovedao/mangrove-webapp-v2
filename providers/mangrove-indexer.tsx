@@ -9,6 +9,7 @@ import { useAccount } from "wagmi"
 import { getTokenPriceInUsd } from "@/services/tokens.service"
 import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import useMangrove from "./mangrove"
+import { de } from "date-fns/locale"
 
 const useIndexerSdkContext = () => {
   const { mangrove } = useMangrove()
@@ -20,7 +21,18 @@ const useIndexerSdkContext = () => {
     queryKey: ["indexer-sdk", chain],
     queryFn: () => {
       if (!chain) return null
-      const chainName = chain.name as Chains
+
+      let chainName: Chains;
+      // const chainName = chain.name as Chains
+      switch (chain.id) {
+        case 80001:
+          chainName = "maticmum"
+          break
+        default:
+          chainName = chain.name as Chains
+      }
+
+      console.log("Initializing indexer sdk for chain", chainName)
       return getSdk({
         chainName,
         helpers: {
