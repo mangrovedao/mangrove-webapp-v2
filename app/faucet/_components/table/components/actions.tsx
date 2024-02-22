@@ -22,7 +22,7 @@ export function Actions({ faucetToken }: Props) {
   const isMgv = faucetToken.id.includes("MGV")
   const tokenQuery = useTokenFromAddress(faucetToken.address as Address)
   const mintLimit = useMintLimit(faucetToken.address as Address, !!isMgv)
-  const prepareMint = useSimulateContract({
+  const { data: prepareMint } = useSimulateContract({
     address: tokenQuery?.data?.address as Address,
     abi: TestTokenAbi,
     functionName: "mint",
@@ -32,6 +32,7 @@ export function Actions({ faucetToken }: Props) {
         tokenQuery.data?.decimals ?? 0,
       ),
     ],
+
     // enabled: !!(
     //   tokenQuery.data?.decimals &&
     //   mintLimit.data &&
@@ -40,10 +41,9 @@ export function Actions({ faucetToken }: Props) {
   })
 
   const { writeContract } = useWriteContract()
-  const mint = writeContract(prepareMint.data!.request)
 
   const waitForMint = useWaitForTransactionReceipt({
-    hash: mint as unknown as `0x${string}`,
+    hash: prepareMint?.result as unknown as `0x${string}`,
     onReplaced(response) {
       if (response.transactionReceipt) {
         toast.success("Minted successfully")
@@ -62,9 +62,7 @@ export function Actions({ faucetToken }: Props) {
           disabled={
             mintLimit.isLoading || tokenQuery.isLoading || waitForMint.isLoading
           }
-          onClick={() => {
-            writeContract(prepareMint.data!.request)
-          }}
+          onClick={() => writeContract(prepareMint!.request)}
         >
           Faucet
         </Button>
