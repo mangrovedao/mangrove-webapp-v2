@@ -1,9 +1,9 @@
 import Link from "next/link"
 import { parseUnits, type Address } from "viem"
 import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi"
 
 import { Button } from "@/components/ui/button"
@@ -22,25 +22,29 @@ export function Actions({ faucetToken }: Props) {
   const isMgv = faucetToken.id.includes("MGV")
   const tokenQuery = useTokenFromAddress(faucetToken.address as Address)
   const mintLimit = useMintLimit(faucetToken.address as Address, !!isMgv)
-  const prepareMint = usePrepareContractWrite({
+  const prepareMint = useSimulateContract({
     address: tokenQuery?.data?.address as Address,
     abi: TestTokenAbi,
     functionName: "mint",
-    args: [parseUnits(mintLimit.data ?? "", tokenQuery.data?.decimals ?? 0)],
-    enabled: !!(
-      tokenQuery.data?.decimals &&
-      mintLimit.data &&
-      faucetToken.id.includes("MGV")
-    ),
+    args: [
+      parseUnits(
+        mintLimit.data?.toString() ?? "",
+        tokenQuery.data?.decimals ?? 0,
+      ),
+    ],
   })
-  const mint = useContractWrite(prepareMint.config)
-  const waitForMint = useWaitForTransaction({
-    hash: mint.data?.hash,
-    onSuccess: () => {
-      toast.success("Minted successfully")
-    },
-    onError: () => {
-      toast.error("Error while minting")
+
+  const { writeContract } = useWriteContract()
+  const mint = writeContract(prepareMint.data!.request)
+
+  const waitForMint = useWaitForTransactionReceipt({
+    hash: mint as unknown as `0x${string}`,
+    onReplaced(response) {
+      if (response.transactionReceipt) {
+        toast.success("Minted successfully")
+      } else {
+        toast.error("Error while minting")
+      }
     },
   })
 
@@ -51,13 +55,10 @@ export function Actions({ faucetToken }: Props) {
           size="sm"
           loading={waitForMint.isLoading}
           disabled={
-            mintLimit.isLoading ||
-            mint.isLoading ||
-            tokenQuery.isLoading ||
-            waitForMint.isLoading
+            mintLimit.isLoading || tokenQuery.isLoading || waitForMint.isLoading
           }
           onClick={() => {
-            mint?.write?.()
+            writeContract(prepareMint.data!.request)
           }}
         >
           Faucet
