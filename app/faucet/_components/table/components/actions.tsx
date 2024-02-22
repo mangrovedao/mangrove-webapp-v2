@@ -32,12 +32,13 @@ export function Actions({ faucetToken }: Props) {
         tokenQuery.data?.decimals ?? 0,
       ),
     ],
-
-    // enabled: !!(
-    //   tokenQuery.data?.decimals &&
-    //   mintLimit.data &&
-    //   faucetToken.id.includes("MGV")
-    // ),
+    query: {
+      enabled: !!(
+        tokenQuery.data?.decimals &&
+        mintLimit.data &&
+        faucetToken.id.includes("MGV")
+      ),
+    },
   })
 
   const { writeContract } = useWriteContract()
