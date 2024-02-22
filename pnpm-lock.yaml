@@ -15,17 +15,17 @@ dependencies:
     specifier: ^2.0.2
     version: 2.0.2(react@18.2.0)
   '@mangrovedao/context-addresses':
-    specifier: ^1.0.1
-    version: 1.0.1
+    specifier: ^1.1.3
+    version: 1.1.3
   '@mangrovedao/indexer-sdk':
     specifier: 0.0.11-27
     version: 0.0.11-27(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
-    specifier: ^2.0.3-2
-    version: 2.0.3-2
+    specifier: ^2.0.3-4
+    version: 2.0.3-4
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.5-8
-    version: 2.0.5-8
+    specifier: 2.0.5-9
+    version: 2.0.5-9
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -3302,14 +3302,8 @@ packages:
       '@lit-labs/ssr-dom-shim': 1.1.2
     dev: false
 
-  /@mangrovedao/context-addresses@1.0.1:
-    resolution: {integrity: sha512-iQOn7ChyLWk4egrqGrUhOdEXwMrbdFDuJXaudHxaZxktMktdysbbmXZXdMEN3R3QpcCiqeEQptptVSQTzEgTGg==}
-    dependencies:
-      semver: 7.5.4
-    dev: false
-
-  /@mangrovedao/context-addresses@1.1.2:
-    resolution: {integrity: sha512-BzF60QpMZz6hagtXGLXz6cMrfhIvfDx326HLYEx8KCQmztTX4wtHwZU8qvCMWReXTjBIIlpO2IeiX9lkrGSpRA==}
+  /@mangrovedao/context-addresses@1.1.3:
+    resolution: {integrity: sha512-RF265lc+vQAkhJinsAFZhRfQtv3+WTOVvXpkiqMNtg6BHOmdjrKWLh9VYF8MYwvBhWBLwVy3o3KVGSPcoQ4+5A==}
     dependencies:
       semver: 7.5.4
     dev: false
@@ -3344,39 +3338,32 @@ packages:
       - zod
     dev: false
 
-  /@mangrovedao/mangrove-core@2.0.3:
-    resolution: {integrity: sha512-3xNA6qnU2zBbHUOhgl0s98oMVF9+yCR5LRyY7cYyNUBZPxzWA2528vct9EQiGFAQEHDIaeYOWGBGkFl7UprJjw==}
+  /@mangrovedao/mangrove-core@2.1.0-0:
+    resolution: {integrity: sha512-oiNN/MsyzbmCU/Q6Ku7VJDkKd4nS4sGozTyeqVNklqltI9eD0a+9rzY7Y0UrExr6JYf/HM5homia9oSVtuW5oQ==}
     dev: false
 
-  /@mangrovedao/mangrove-deployments@2.0.2:
-    resolution: {integrity: sha512-iCjWsEEeNLWHfa9zlfroDu4qdAGmRBVOJuksTGc/PEEg5IzUbPnXb5rmjrqFS+Wt8szTbX5fUl+JIgc4EFFqvA==}
+  /@mangrovedao/mangrove-deployments@2.0.3-4:
+    resolution: {integrity: sha512-vdmZvenqXzHioxFma9IEA64KEJq1Epc3MdaRlWzmxrxxvkSsqLptNXfOludbGlvjsSClSth4+4KtbF0XU+O5TA==}
     dependencies:
-      '@mangrovedao/context-addresses': 1.1.2
+      '@mangrovedao/context-addresses': 1.1.3
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove-deployments@2.0.3-2:
-    resolution: {integrity: sha512-mg0lTnNO91i/LyHqjX7menOhLpNKXkw77H7euk2s6SonD1fWUHk68/5OvYb54rVtHpsF7rSFzZSANKJv5QGu6Q==}
+  /@mangrovedao/mangrove-strats@2.1.0-0:
+    resolution: {integrity: sha512-NH/1mRTRK/4PeGdWTh44xkiHZxoTLSJaiDVJCM653QFlOcpTtWEff820QhKmenP168nOwlW52iAf1mTun+B1Rw==}
     dependencies:
-      '@mangrovedao/context-addresses': 1.1.2
-      semver: 7.5.4
+      '@mangrovedao/mangrove-core': 2.1.0-0
     dev: false
 
-  /@mangrovedao/mangrove-strats@2.0.1:
-    resolution: {integrity: sha512-8MDa/H/DpP+qThCzKf26PxxFpXUC8PQJvsvBzO48RVVp9yYhjpo5ifvyHcpnuciznhEVIKZlFsTi9CEeUFqDkw==}
-    dependencies:
-      '@mangrovedao/mangrove-core': 2.0.3
-    dev: false
-
-  /@mangrovedao/mangrove.js@2.0.5-8:
-    resolution: {integrity: sha512-5QFsrP8mnC0k8fCsWfle9AxJqbWchUuZiIWIZeq5vP/M0xNUe2K+Yec0qvqx2+cnWnhOUszgmv7fYKquaVjcrw==}
+  /@mangrovedao/mangrove.js@2.0.5-9:
+    resolution: {integrity: sha512-5mz2icQ1lmdqFTTF29R3xh9vwdaLVjvxDZ9Z+pJpEOZ6EofiI5LOA9adLXs0l6N7UvaAldzsa10+TPHOMDMTqg==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
-      '@mangrovedao/context-addresses': 1.1.2
-      '@mangrovedao/mangrove-core': 2.0.3
-      '@mangrovedao/mangrove-deployments': 2.0.2
-      '@mangrovedao/mangrove-strats': 2.0.1
+      '@mangrovedao/context-addresses': 1.1.3
+      '@mangrovedao/mangrove-core': 2.1.0-0
+      '@mangrovedao/mangrove-deployments': 2.0.3-4
+      '@mangrovedao/mangrove-strats': 2.1.0-0
       '@mangrovedao/reliable-event-subscriber': 1.1.29
       '@types/object-inspect': 1.8.4
       '@types/triple-beam': 1.3.5
