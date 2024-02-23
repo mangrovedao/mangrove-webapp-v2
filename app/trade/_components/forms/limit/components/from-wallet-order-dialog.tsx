@@ -5,6 +5,7 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import useMangrove from "@/providers/mangrove"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
@@ -17,6 +18,7 @@ import { SummaryStep } from "./summary-step"
 
 type Props = {
   form: Form
+
   onClose: () => void
 }
 
@@ -73,6 +75,10 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
 
   const [currentStep, helpers] = useStep(steps.length)
 
+  const { mangrove } = useMangrove()
+  const logics = mangrove ? Object.values(mangrove.logics) : []
+  const logic = logics.find((logic) => logic.id === form.sendFrom)
+
   const { goToNextStep } = helpers
 
   const stepInfos = [
@@ -103,6 +109,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
             approve.mutate(
               {
                 token: sendToken,
+                logic,
                 spender,
               },
               {

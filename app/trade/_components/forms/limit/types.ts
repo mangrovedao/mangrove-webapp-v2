@@ -9,4 +9,6 @@ export type Form = {
   timeInForce: TimeInForce
   timeToLive: string
   timeToLiveUnit: TimeToLiveUnit
+  sendFrom: string
+  receiveTo: string
 }

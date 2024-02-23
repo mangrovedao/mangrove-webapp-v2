@@ -56,8 +56,9 @@ export function Amplified() {
   return (
     <div className="grid space-y-2">
       <Text className="text-muted-foreground text-xs" variant={"text2"}>
-        Amplified order is a lorem ipsum dolor sit amet consectetur adipiscing
-        elit.
+        Place multiple limit orders using the same liquidity. The execution of
+        one order will automatically update the others if partially filled or
+        cancel the others if fully filled.
       </Text>
 
       <form.Provider>
