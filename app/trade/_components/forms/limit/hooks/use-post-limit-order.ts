@@ -49,8 +49,8 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
         restingOrder: {},
         forceRoutingToMangroveOrder: true,
         fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
-        takerGivesLogic: logics.find((logic) => logic.id === form.sendFrom),
-        takerWantsLogic: logics.find((logic) => logic.id === form.receiveTo),
+        takerGivesLogic: logics.find((logic) => logic?.id === form.sendFrom),
+        takerWantsLogic: logics.find((logic) => logic?.id === form.receiveTo),
         expiryDate:
           timeInForce === TimeInForce.GOOD_TIL_TIME
             ? estimateTimestamp({

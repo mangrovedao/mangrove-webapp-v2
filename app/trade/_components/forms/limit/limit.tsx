@@ -70,6 +70,7 @@ export function Limit() {
     sendToken,
     sendFrom,
     fundOwner: address,
+    //@ts-ignore
     logics,
   })
 
@@ -351,19 +352,29 @@ export function Limit() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {logics.map((source) => (
-                              <SelectItem key={source.id} value={source.id}>
-                                <div className="flex gap-2 w-full">
-                                  <SourceIcon sourceId={source.id} />
-                                  <Text className="capitalize">
-                                    {source.id.includes("simple")
-                                      ? "Wallet"
-                                      : source.id.toUpperCase()}
-                                  </Text>
-                                  {/* {<Caption> {source.description}</Caption>} */}
-                                </div>
-                              </SelectItem>
-                            ))}
+                            {logics.map((source) =>
+                              !source ? (
+                                <SelectItem
+                                  key={"disabled"}
+                                  value="disabled"
+                                  disabled
+                                >
+                                  <Text> No source available</Text>
+                                </SelectItem>
+                              ) : (
+                                <SelectItem key={source.id} value={source.id}>
+                                  <div className="flex gap-2 w-full">
+                                    <SourceIcon sourceId={source.id} />
+                                    <Text className="capitalize">
+                                      {source.id.includes("simple")
+                                        ? "Wallet"
+                                        : source.id.toUpperCase()}
+                                    </Text>
+                                    {/* {<Caption> {source.description}</Caption>} */}
+                                  </div>
+                                </SelectItem>
+                              ),
+                            )}
                             <SelectItem value="disabled" disabled>
                               <Text>More sources coming soon...</Text>
                             </SelectItem>
@@ -407,18 +418,29 @@ export function Limit() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {logics.map((source) => (
-                              <SelectItem key={source.id} value={source.id}>
-                                <div className="flex gap-2 w-full">
-                                  <SourceIcon sourceId={source.id} />
-                                  <Text className="capitalize">
-                                    {source.id.includes("simple")
-                                      ? "Wallet"
-                                      : source.id.toUpperCase()}
-                                  </Text>
-                                </div>
-                              </SelectItem>
-                            ))}
+                            {logics.map((source) =>
+                              !source ? (
+                                <SelectItem
+                                  key={"disabled"}
+                                  value="disabled"
+                                  disabled
+                                >
+                                  <Text> No source available</Text>
+                                </SelectItem>
+                              ) : (
+                                <SelectItem key={source.id} value={source.id}>
+                                  <div className="flex gap-2 w-full">
+                                    <SourceIcon sourceId={source.id} />
+                                    <Text className="capitalize">
+                                      {source.id.includes("simple")
+                                        ? "Wallet"
+                                        : source.id.toUpperCase()}
+                                    </Text>
+                                  </div>
+                                </SelectItem>
+                              ),
+                            )}
+
                             <SelectItem value="disabled" disabled>
                               <Text>More sources coming soon...</Text>
                             </SelectItem>

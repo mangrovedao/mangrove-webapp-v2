@@ -77,7 +77,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
 
   const { mangrove } = useMangrove()
   const logics = mangrove ? Object.values(mangrove.logics) : []
-  const logic = logics.find((logic) => logic.id === form.sendFrom)
+  const logic = logics.find((logic) => logic?.id === form.sendFrom)
 
   const { goToNextStep } = helpers
 
@@ -109,6 +109,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
             approve.mutate(
               {
                 token: sendToken,
+                //@ts-ignore
                 logic,
                 spender,
               },
