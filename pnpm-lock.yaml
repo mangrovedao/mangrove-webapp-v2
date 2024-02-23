@@ -18,8 +18,8 @@ dependencies:
     specifier: ^1.1.3
     version: 1.1.3
   '@mangrovedao/indexer-sdk':
-    specifier: 0.0.11-27
-    version: 0.0.11-27(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
+    specifier: 0.0.11-28
+    version: 0.0.11-28(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
     specifier: ^2.0.3-4
     version: 2.0.3-4
@@ -3314,8 +3314,8 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/indexer-sdk@0.0.11-27(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
-    resolution: {integrity: sha512-9I2oKWaedVbxrPwreT8y2BbS8af4roGrhb3k5pMbfohmosuM4qucTtzJmb40CcK9fDDAKewTTlhiIRj6L3AnbA==}
+  /@mangrovedao/indexer-sdk@0.0.11-28(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-06m8CdbWTAU/WDs4kchlI8S+e2WowbZ+CcJulrHYjZzyYC6kdishMiE6AWJKaSwFqMyq5D9h6/wkrTwjgt3X4g==}
     dependencies:
       '@ethersproject/bignumber': 5.7.0
       '@graphprotocol/client-auto-pagination': 2.0.0(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(graphql@16.8.1)

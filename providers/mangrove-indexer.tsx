@@ -9,7 +9,6 @@ import { useAccount } from "wagmi"
 import { getTokenPriceInUsd } from "@/services/tokens.service"
 import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import useMangrove from "./mangrove"
-import { de } from "date-fns/locale"
 
 const useIndexerSdkContext = () => {
   const { mangrove } = useMangrove()
@@ -22,9 +21,12 @@ const useIndexerSdkContext = () => {
     queryFn: () => {
       if (!chain) return null
 
-      let chainName: Chains;
+      let chainName: Chains
       // const chainName = chain.name as Chains
       switch (chain.id) {
+        case 168587773:
+          chainName = "blast-sepolia" as Chains
+          break
         case 80001:
           chainName = "maticmum"
           break
