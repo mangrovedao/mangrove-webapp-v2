@@ -1,6 +1,6 @@
 "use client"
 
-import { InfoIcon, LucideChevronRight } from "lucide-react"
+import { LucideChevronRight } from "lucide-react"
 import React from "react"
 import { useAccount } from "wagmi"
 
@@ -10,12 +10,22 @@ import { Steps } from "@/app/strategies/new/_components/form/components/steps"
 import { useApproveKandelStrategy } from "@/app/strategies/new/_hooks/use-approve-kandel-strategy"
 import Dialog from "@/components/dialogs/dialog"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
+import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
+import Link from "next/link"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useWithDraw } from "../mutations/use-withdraw"
 import { SuccessDialog } from "./succes-dialog"
@@ -273,20 +283,21 @@ export function Withdraw({ open, onClose }: Props) {
             >
               Withdraw
             </Title>
-            {/* <IconToolTip
-              tooltip={
-                <Text variant={"text2"}>
-                  Only unpublished funds are available to withdraw.
+            <TooltipProvider>
+              <Tooltip delayDuration={200} defaultOpen={false}>
+                <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                  <TooltipInfo />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <Text>Only unpublished funds are available to withdraw.</Text>
                   <Link href={KANDEL_DOC_URL} target="_blank">
                     <Caption className="text-primary underline">
                       Learn more
                     </Caption>
                   </Link>
-                </Text>
-              }
-            >
-            </IconToolTip> */}
-            <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </Dialog.Title>
         <Steps steps={steps} currentStep={currentStep} />

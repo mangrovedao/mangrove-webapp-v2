@@ -1,5 +1,12 @@
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { TooltipInfo } from "@/svgs"
 
 export default function UnrealizedPnl() {
   return (
@@ -26,6 +33,16 @@ export default function UnrealizedPnl() {
           className="text-cloud-300 flex items-center"
         >
           Unrealized PnL
+          <TooltipProvider>
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                <TooltipInfo />
+              </TooltipTrigger>
+              <TooltipContent>
+                Current profit or loss of the strategy.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </Caption>
         <Title variant={"title1"}>{"-"}</Title>
       </span>

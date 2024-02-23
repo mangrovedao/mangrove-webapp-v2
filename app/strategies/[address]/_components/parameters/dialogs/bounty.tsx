@@ -11,7 +11,14 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useStep } from "@/hooks/use-step"
+import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useBounty } from "../mutations/use-bounty"
@@ -151,13 +158,34 @@ export function Bounty({ open, onClose }: Props) {
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
         <Dialog.Title className="text-xl text-left" close>
-          <Title
-            as={"div"}
-            variant={"header1"}
-            className="space-x-3 flex items-center"
-          >
-            Deposit
-          </Title>
+          <div className="flex space-x-2 items-center">
+            <Title
+              as={"div"}
+              variant={"header1"}
+              className="space-x-3 flex items-center "
+            >
+              Bounty
+            </Title>
+
+            <TooltipProvider>
+              <Tooltip delayDuration={200} defaultOpen={false}>
+                <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                  <TooltipInfo />
+                </TooltipTrigger>
+
+                <TooltipContent>
+                  <Text className="text-wrap">
+                    Native token used to compensate the taker in case your order
+                    fails.
+                  </Text>
+                  <Text>
+                    Order might fail in case the liquidity is not on the origin
+                    source anymore.
+                  </Text>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </Dialog.Title>
         <Steps steps={steps} currentStep={currentStep} />
         <Dialog.Description className="text-left !mt-8">
