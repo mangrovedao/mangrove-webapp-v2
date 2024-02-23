@@ -6,7 +6,7 @@ type Props = {
   points?: number
 }
 
-export default function Points({ points = 12450 }: Props) {
+export default function Rewards({ points = 12450 }: Props) {
   return (
     <div className="space-y-1">
       <div className="text-sm text-cloud-200">Total points</div>

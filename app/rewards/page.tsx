@@ -1,16 +1,18 @@
 "use client"
 
 import CurrentBoost from "./_components/current-boost"
+import { JoinProgramBanner } from "./_components/join-program-banner"
 import NextLevel from "./_components/next-level"
-import Points from "./_components/points"
 import Rank from "./_components/rank"
+import Rewards from "./_components/rewards"
 import TotalPoints from "./_components/total-points"
 
 export default function Page() {
   return (
     <div>
+      <JoinProgramBanner />
       <div className="flex flex-col items-center md:flex-row md:items-start md:justify-between">
-        <Points />
+        <Rewards />
         <TotalPoints />
       </div>
 
