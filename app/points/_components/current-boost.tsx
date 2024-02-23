@@ -1,18 +1,19 @@
 import { cn } from "@/utils"
+import { formatNumber } from "../utils"
 import BoxContainer from "./box-container"
 
 type Props = {
   className?: string
   level?: number
   percentage?: number
-  previousVolume?: string
+  previousVolume?: number
 }
 
 export default function CurrentBoost({
   className,
   level = 2,
   percentage = 5,
-  previousVolume = "$15,400",
+  previousVolume = 15_400,
 }: Props) {
   return (
     <BoxContainer className={cn(className)}>
@@ -60,7 +61,7 @@ export default function CurrentBoost({
             </span>
           </div>
           <div className="text-xs text-cloud-200 flex items-center pt-7">
-            previous volume {previousVolume}
+            previous volume {formatNumber(previousVolume)}
           </div>
         </div>
       </div>

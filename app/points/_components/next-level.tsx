@@ -2,44 +2,31 @@ import InfoTooltip from "@/components/info-tooltip"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
+import { LEVELS } from "../constants"
+import { formatNumber, getFormattedTimeFromNowTo } from "../utils"
 import Animals from "./animals"
 import BoxContainer from "./box-container"
 
-const LEVELS = [
-  {
-    amount: "$1,000",
-    nextBoost: "2%",
-  },
-  {
-    amount: "$10,000",
-    nextBoost: "15%",
-  },
-  {
-    amount: "$50,000",
-    nextBoost: "7%",
-  },
-  {
-    amount: "$100,000",
-    nextBoost: "10%",
-  },
-  {
-    amount: "$500,000",
-    nextBoost: "15%",
-  },
-]
-
 type Props = {
   className?: string
-  currentLevel?: number
   volume?: number
+  nextRankingDate?: Date
 }
 
 export default function NextLevel({
   className,
-  currentLevel = 0,
-  volume = 100,
+  volume = 1_500,
+  nextRankingDate = new Date("2024-03-04T23:59:59.999Z"),
 }: Props) {
   const disabled = !volume
+
+  // if returns -1 it means that the volume is higher to the max level
+  const currentIndex = LEVELS.findIndex((l) => l.amount > volume)
+  const currentLevel = currentIndex < 0 ? LEVELS.length - 1 : currentIndex
+
+  const nextLevel = LEVELS[currentLevel]
+  const amountToReachNextLevel = (nextLevel?.amount ?? 0) - volume
+  const hasReachedMaxLevel = currentIndex === -1
 
   return (
     <BoxContainer
@@ -55,8 +42,11 @@ export default function NextLevel({
             based on <br /> your weekly trading volume.
           </InfoTooltip>
         </Title>
-        <div className="text-base text-cloud-200 flex items-center">
-          4d 12h 36m 15s{" "}
+        <div
+          className="text-base text-cloud-200 flex items-center"
+          suppressHydrationWarning
+        >
+          {getFormattedTimeFromNowTo(nextRankingDate)}{" "}
           <InfoTooltip>Time until your level is updated.</InfoTooltip>
         </div>
       </div>
@@ -167,7 +157,7 @@ export default function NextLevel({
                 </InfoTooltip>
               </Text>
             )}
-            <span>{level.amount}</span>
+            <span>{formatNumber(level.amount)}</span>
           </div>
         ))}
         {LEVELS.map((level, i) => (
@@ -202,6 +192,32 @@ export default function NextLevel({
           </div>
         ))}
       </div>
+      {volume && !hasReachedMaxLevel ? (
+        <div className="px-4 pt-4 pb-3 border border-green-bangladesh rounded-lg mt-8">
+          <Title variant={"title2"}>Fantastic progress!</Title>
+          <p className="text-cloud-100 text-sm mt-[10px]">
+            Unlock the {nextLevel?.rankString} level and enjoy a{" "}
+            <span className="text-green-caribbean">
+              {nextLevel?.nextBoost} boost
+            </span>{" "}
+            in the upcoming week by elevating your volume by an additional{" "}
+            <span className="text-green-caribbean">
+              {formatNumber(amountToReachNextLevel)}
+            </span>
+          </p>
+        </div>
+      ) : undefined}
+      {hasReachedMaxLevel ? (
+        <div className="px-4 pt-4 pb-3 border border-green-bangladesh rounded-lg mt-8">
+          <Title variant={"title2"}>Fantastic progress!</Title>
+          <p className="text-cloud-100 text-sm mt-[10px]">
+            You did it! You're at the very top next week enjoying a{" "}
+            <span className="text-green-caribbean">
+              {nextLevel?.nextBoost} boost!
+            </span>
+          </p>
+        </div>
+      ) : undefined}
     </BoxContainer>
   )
 }
