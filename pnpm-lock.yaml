@@ -24,8 +24,8 @@ dependencies:
     specifier: ^2.0.3-4
     version: 2.0.3-4
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.5-10
-    version: 2.0.5-10
+    specifier: 2.0.5-12
+    version: 2.0.5-12
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -3308,6 +3308,12 @@ packages:
       semver: 7.5.4
     dev: false
 
+  /@mangrovedao/context-addresses@1.1.4:
+    resolution: {integrity: sha512-e2Jl9J8UwaxcI58iuMhD+05/eU5IAJ1gdkLg2OuEi7L3ALMQFqHKxiNLDpYdVGcesdpUbQ+FlS7avX/zX0Mwbw==}
+    dependencies:
+      semver: 7.5.4
+    dev: false
+
   /@mangrovedao/indexer-sdk@0.0.11-27(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
     resolution: {integrity: sha512-9I2oKWaedVbxrPwreT8y2BbS8af4roGrhb3k5pMbfohmosuM4qucTtzJmb40CcK9fDDAKewTTlhiIRj6L3AnbA==}
     dependencies:
@@ -3355,12 +3361,12 @@ packages:
       '@mangrovedao/mangrove-core': 2.1.0-0
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.5-10:
-    resolution: {integrity: sha512-0XdtCHI3FnQEgIixNasq+4PIlXElaMlbrLvD1ATqVRNw+x0zC03+Wjn+T2iGTLzOQCiCa4L4SW7ZGKyZ56db9g==}
+  /@mangrovedao/mangrove.js@2.0.5-12:
+    resolution: {integrity: sha512-MsgTeZFqa3KCM8HIo9pvlr/cLxJtuqMvcXbj/ZpI9tyaOgq9OGrfDjOGrnfC4j+5u/QdLDIK/QgC5e2tY72rnA==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
-      '@mangrovedao/context-addresses': 1.1.3
+      '@mangrovedao/context-addresses': 1.1.4
       '@mangrovedao/mangrove-core': 2.1.0-0
       '@mangrovedao/mangrove-deployments': 2.0.3-4
       '@mangrovedao/mangrove-strats': 2.1.0-0

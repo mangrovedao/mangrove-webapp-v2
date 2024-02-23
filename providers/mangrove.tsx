@@ -40,7 +40,7 @@ const useMangroveContext = () => {
   const { data: mangrove } = mangroveQuery
 
   const marketsInfoQuery = useWhitelistedMarketsInfos(mangrove)
-
+  console.log(marketsInfoQuery.data)
   return { mangroveQuery, mangrove, marketsInfoQuery }
 }
 
