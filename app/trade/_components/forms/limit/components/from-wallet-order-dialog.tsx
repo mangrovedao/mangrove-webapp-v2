@@ -1,5 +1,5 @@
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
@@ -29,7 +29,7 @@ const btnProps: ButtonProps = {
 }
 
 export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const {
     baseToken,
     quoteToken,
@@ -77,7 +77,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
 
   const { mangrove } = useMangrove()
   const logics = mangrove ? Object.values(mangrove.logics) : []
-  const logic = logics.find((logic) => logic.id === form.sendFrom)
+  const logic = logics.find((logic) => logic?.id === form.sendFrom)
 
   const { goToNextStep } = helpers
 
@@ -109,6 +109,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
             approve.mutate(
               {
                 token: sendToken,
+                //@ts-ignore
                 logic,
                 spender,
               },

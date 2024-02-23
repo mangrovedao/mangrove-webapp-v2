@@ -1,12 +1,14 @@
 import { Web3Provider } from "@ethersproject/providers"
-import { useWalletClient, type WalletClient } from "wagmi"
+import { WalletClient } from "viem"
+import { useWalletClient } from "wagmi"
 
 function walletClientToSigner(walletClient: WalletClient) {
-  const { account, chain, transport } = walletClient
+  const { account, chain, transport } = walletClient ?? {}
+  if (!account || !chain || !transport) return undefined
   const network = {
     chainId: chain.id,
     name: chain.name,
-    ensAddress: chain.contracts?.ensRegistry?.address,
+    ensAddress: chain?.contracts?.ensRegistry?.address,
   }
   const provider = new Web3Provider(transport, network)
   return provider.getSigner(account.address)

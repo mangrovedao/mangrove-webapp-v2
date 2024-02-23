@@ -28,6 +28,8 @@ export default function liquiditySourcing({
 
   const getPossibleLogics = async (token: Token) => {
     const usableLogics = logics.map(async (logic) => {
+      if (!logic) return
+      //@ts-ignore
       const canUseLogic = await logic.canUseLogicFor(token)
       if (canUseLogic) {
         return logic
@@ -45,6 +47,7 @@ export default function liquiditySourcing({
       const selectedLogic = logics.find(
         (logic) => logic.id === sendFrom,
       ) as SimpleAaveLogic
+      //@ts-ignore
       const logicToken = await selectedLogic.overlying(token)
       const logicBalance = await selectedLogic.logic.balanceLogic(
         logicToken.address,

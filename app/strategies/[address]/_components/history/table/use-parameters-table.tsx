@@ -8,7 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { formatDate } from "@/utils/date"
 import useKandel from "../../../_providers/kandel-strategy"
@@ -31,7 +31,7 @@ type Params = {
 }
 
 export function useParametersTables({ data }: Params) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const { baseToken } = useKandel()
 
   const columns = React.useMemo(

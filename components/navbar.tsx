@@ -14,7 +14,7 @@ import { useFeatureFlagEnabled } from "posthog-js/react"
 import React from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { toast } from "sonner"
-import { useAccount, useDisconnect, useNetwork } from "wagmi"
+import { useAccount, useDisconnect } from "wagmi"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -131,7 +131,7 @@ const RightPart = withClientOnly(() => {
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
   const { isConnected, connector, address, isConnecting } = useAccount()
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const { disconnect } = useDisconnect()
 
   function handleConnect() {

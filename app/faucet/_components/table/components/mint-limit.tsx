@@ -13,7 +13,7 @@ export function MintLimit({ address }: { address?: string }) {
         <Skeleton className="w-24 h-4" />
       ) : (
         <span className="text-base float-right">
-          {mintLimitQuery.data} {token.symbol}
+          {mintLimitQuery.data?.toString()} {token.symbol}
         </span>
       )}
     </div>

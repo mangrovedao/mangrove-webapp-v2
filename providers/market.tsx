@@ -4,7 +4,7 @@ import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/type
 import { useQuery } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { getTokenPriceInToken } from "@/services/tokens.service"
 import { getRiskAppetite } from "@/utils/cashness"
@@ -14,7 +14,7 @@ import useMangrove from "./mangrove"
 const useMarketContext = () => {
   const searchParams = useSearchParams()
   const marketParam = searchParams.get("market")
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
   const [currentMarket, setCurrentMarket] = React.useState<string>()
 

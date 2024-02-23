@@ -1,31 +1,35 @@
-import { formatUnits } from "viem"
-import { useContractRead, type Address } from "wagmi"
+import { Address, formatUnits } from "viem"
+import { useReadContract } from "wagmi"
 
 import TestTokenAbi from "../../../_abis/test-token.json"
 
 export function useMintLimit(tokenAddress: Address, mintable?: boolean) {
-  const { data: decimals } = useContractRead<
+  const { data: decimals } = useReadContract<
     typeof TestTokenAbi,
     "decimals",
-    number | undefined
+    readonly unknown[]
   >({
     address: tokenAddress,
     abi: TestTokenAbi,
     functionName: "decimals",
-    cacheTime: 43200000, // 12 hours
-    enabled: !!tokenAddress && !!mintable,
+    query: {
+      staleTime: 43200000,
+      enabled: !!tokenAddress && !!mintable,
+    },
   })
 
-  return useContractRead<typeof TestTokenAbi, "mintLimit", string | undefined>({
+  return useReadContract<typeof TestTokenAbi, "mintLimit", readonly unknown[]>({
     address: tokenAddress,
     abi: TestTokenAbi,
     functionName: "mintLimit",
-    cacheTime: 43200000, // 12 hours
-    enabled: !!tokenAddress && !!decimals && mintable,
-    select: (mintLimit) => {
-      if (!mintLimit || typeof mintLimit !== "bigint" || !decimals)
-        return undefined
-      return formatUnits(mintLimit, decimals ?? 0)
+    query: {
+      select(mintLimit) {
+        if (!mintLimit || typeof mintLimit !== "bigint" || !decimals)
+          return undefined
+        return formatUnits(mintLimit, (decimals as number) ?? 0)
+      },
+      staleTime: 43200000,
+      enabled: !!tokenAddress && !!decimals && mintable,
     },
   })
 }

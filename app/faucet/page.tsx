@@ -3,12 +3,12 @@ import { redirect } from "next/navigation"
 import React from "react"
 
 import { Title } from "@/components/typography/title"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 import { InfoBanner } from "./_components/info-banner"
 import { FaucetTable } from "./_components/table/table"
 
 export default function Page() {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
 
   React.useEffect(() => {
     if (chain?.id) {

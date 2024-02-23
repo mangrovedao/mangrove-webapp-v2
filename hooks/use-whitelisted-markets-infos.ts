@@ -1,6 +1,6 @@
 import type Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { getWhitelistedMarketsInfos } from "@/services/markets.service"
 
@@ -12,7 +12,7 @@ export function useWhitelistedMarketsInfos<T = Mangrove.OpenMarketInfo[]>(
   mangrove: Mangrove | null | undefined,
   { select }: Params<T> = {},
 ) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["whitelistedMarketsInfos", mangrove?.address, chain?.id],
