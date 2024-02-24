@@ -1,33 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
+import { useConnectModal } from "@rainbow-me/rainbowkit"
+
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 
-const BULLETS = [
-  "hold $100 equivalent in trading or liquidity provision",
-  "participation in testnet (hold a Mangrove NFT) or beta mainnet",
-]
-
-export function JoinProgramBanner() {
+export function ConnectWalletBanner() {
+  const { openConnectModal } = useConnectModal()
   return (
     <>
       <div className="w-full max-w-[1252px] bg-white text-primary-dark-green rounded-lg mx-auto flex">
         <div className="space-y-6 p-8 flex-1 flex flex-col justify-center">
-          <Title variant={"header1"}>Join MS1 Points Program!</Title>
-          <Title className="text-green-bangladesh" variant={"title3"}>
-            Become eligible through one of:
+          <Title variant={"header1"}>
+            Connect wallet to access MS1 Points Program!
           </Title>
-          <ul className="list-disc !ml-4 !m-0">
-            {BULLETS.map((bullet) => (
-              <Text variant={"text2"} as={"li"} key={bullet}>
-                {bullet}
-              </Text>
-            ))}
-          </ul>
           <span>
-            <Button variant={"tertiary"} size={"md"} className="px-5" asChild>
-              <Link href={"/trade"}>Trade now</Link>
+            <Button
+              variant={"tertiary"}
+              size={"lg"}
+              className="px-5"
+              onClick={openConnectModal}
+            >
+              Connect wallet
             </Button>
           </span>
         </div>
@@ -35,7 +29,7 @@ export function JoinProgramBanner() {
           <img
             src="/assets/rewards/join-program.webp"
             alt="Illustrations with mangrove animals sitting on a bench"
-            className="max-h-[300px] top-5 absolute right-10"
+            className="max-h-[250px] top-5 absolute right-10"
           />
         </div>
       </div>

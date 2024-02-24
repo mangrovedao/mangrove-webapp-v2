@@ -1,5 +1,7 @@
 "use client"
 
+import { useAccount } from "wagmi"
+import { ConnectWalletBanner } from "./_components/connect-wallet-banner"
 import CurrentBoost from "./_components/current-boost"
 import { JoinProgramBanner } from "./_components/join-program-banner"
 import NextLevel from "./_components/next-level"
@@ -8,7 +10,8 @@ import Rewards from "./_components/rewards"
 import TotalPoints from "./_components/total-points"
 
 export default function Page() {
-  return (
+  const { isConnected } = useAccount()
+  return isConnected ? (
     <div>
       <JoinProgramBanner />
       <div className="flex flex-col items-center md:flex-row md:items-start md:justify-between">
@@ -21,6 +24,10 @@ export default function Page() {
         <Rank className="col-span-full md:col-span-1" />
         <NextLevel className="col-span-full" />
       </div>
+    </div>
+  ) : (
+    <div>
+      <ConnectWalletBanner />
     </div>
   )
 }

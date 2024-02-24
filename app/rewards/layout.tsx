@@ -6,7 +6,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <>
       <Navbar innerClasses="max-w-8xl mx-auto" />
-      <main className="max-w-5xl mx-auto px-4 pt-8 overflow-x-hidden">
+      <main className="max-w-5xl mx-auto px-4 pt-8 overflow-x-hidden mb-10">
         {children}
       </main>
     </>
