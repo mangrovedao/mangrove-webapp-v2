@@ -8,7 +8,14 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { CoinsIcon, MeterIcon, PersonIcon, TelegramIcon, XIcon } from "@/svgs"
+import {
+  CoinsIcon,
+  MeterIcon,
+  PersonIcon,
+  TelegramIcon,
+  Toucan,
+  XIcon,
+} from "@/svgs"
 import BoxContainer from "./box-container"
 import ConnectBanner from "./connect-banner"
 
@@ -22,7 +29,8 @@ export default function ReferAndEarn() {
 
   return (
     <div className="space-y-4">
-      <BoxContainer>
+      <BoxContainer className="relative">
+        <Toucan className="w-[91px] h-auto absolute right-10 -top-20" />
         <Title variant={"title1"} className="mb-4">
           Refer and Earn
         </Title>
