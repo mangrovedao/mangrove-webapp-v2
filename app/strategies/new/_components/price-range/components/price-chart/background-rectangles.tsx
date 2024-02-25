@@ -35,6 +35,8 @@ export function BackgroundRectangles({
   const rightAskBound =
     maxPrice && midPrice && maxPrice > midPrice ? maxPrice : midPrice
 
+  const rectHeight = height - paddingBottom
+
   return (
     <>
       {priceRange && midPrice ? (
@@ -53,7 +55,7 @@ export function BackgroundRectangles({
                   xScaleTransformed(rightBidBound) -
                   xScaleTransformed(leftBidBound)
                 }
-                height={height - paddingBottom}
+                height={rectHeight}
                 fill={`url(#${bidsGradientId})`}
               />
             </>
@@ -72,7 +74,7 @@ export function BackgroundRectangles({
                   xScaleTransformed(rightAskBound) -
                   xScaleTransformed(leftAskBound)
                 }
-                height={height - paddingBottom}
+                height={rectHeight}
                 fill={`url(#${asksGradientId})`}
               />
             </>

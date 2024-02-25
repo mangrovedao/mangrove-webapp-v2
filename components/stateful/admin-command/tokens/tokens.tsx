@@ -1,5 +1,5 @@
 "use client"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { TokenIcon } from "@/components/token-icon"
 import { CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
@@ -11,7 +11,7 @@ import { Footer } from "../footer"
 
 export function Tokens({ onBack }: { onBack: () => void }) {
   const { mangrove } = useMangrove()
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const blockExplorerUrl = chain?.blockExplorers?.default.url
   const tokensQuery = useWhitelistedMarketsInfos(mangrove, {
     select: (whitelistedMarkets) => {

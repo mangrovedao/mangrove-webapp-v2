@@ -4,7 +4,7 @@ import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/type
 import { useQuery } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { getTokenPriceInToken } from "@/services/tokens.service"
 import { getRiskAppetite } from "@/utils/cashness"
@@ -14,11 +14,25 @@ import useMangrove from "./mangrove"
 const useMarketContext = () => {
   const searchParams = useSearchParams()
   const marketParam = searchParams.get("market")
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
+  const [currentMarket, setCurrentMarket] = React.useState<string>()
 
   const marketInfo = React.useMemo(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
+
+    // Use currentMarket if no marketParam is provided
+    if (!marketParam && currentMarket) {
+      const [baseId, quoteId] = currentMarket.split(",")
+      return marketsInfoQuery.data.find((marketInfo) => {
+        return (
+          marketInfo.base.id?.toLowerCase() === baseId?.toLowerCase() &&
+          marketInfo.quote.id?.toLowerCase() === quoteId?.toLowerCase()
+        )
+      })
+    }
+
+    // Use marketParam to fetch market data
     const [baseId, quoteId] = marketParam?.split(",") ?? []
     return (
       marketsInfoQuery.data.find((marketInfo) => {
@@ -82,7 +96,6 @@ const useMarketContext = () => {
 
   // Get mid price only if there is no liquidity in the book
   const midPriceQuery = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["midPrice", market?.base.symbol, market?.quote.symbol],
     queryFn: () => {
       if (!market?.base.symbol || !market?.quote.symbol) return undefined
@@ -110,6 +123,19 @@ const useMarketContext = () => {
     }
   }, [market, updateOrderbook])
 
+  function getMarketFromAddresses(base: string, quote: string) {
+    if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
+
+    const marketInfo = marketsInfoQuery.data.find((marketInfo) => {
+      return (
+        marketInfo.base.address?.toLowerCase() === base?.toLowerCase() &&
+        marketInfo.quote.address?.toLowerCase() === quote?.toLowerCase()
+      )
+    })
+    if (!marketInfo) return
+    return mangrove.market(marketInfo)
+  }
+
   return {
     requestBookQuery,
     market,
@@ -117,6 +143,8 @@ const useMarketContext = () => {
     olKeys,
     midPrice: midPrice ?? midPriceQuery.data,
     riskAppetite,
+    setCurrentMarket,
+    getMarketFromAddresses,
   }
 }
 

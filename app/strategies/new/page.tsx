@@ -1,5 +1,5 @@
 "use client"
-import { redirect, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Form } from "./_components/form/form"
@@ -7,11 +7,11 @@ import { InfoBar } from "./_components/info-bar"
 import { PriceRange } from "./_components/price-range/price-range"
 
 export default function Page() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const market = searchParams.get("market")
-
   if (!market) {
-    redirect("/strategies")
+    router.push("/strategies")
   }
 
   return (

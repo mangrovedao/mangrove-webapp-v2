@@ -8,8 +8,8 @@ import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
 import { TradeAction, TradeMode } from "../../enums"
+import { successToast } from "../../utils"
 import type { Form } from "../types"
-import { successToast } from "../utils"
 
 type Props = {
   onResult?: (result: Market.OrderResult) => void

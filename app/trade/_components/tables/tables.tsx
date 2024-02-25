@@ -25,7 +25,7 @@ const TABS_CONTENT = {
   [TradeTables.FILLS]: Fills,
 }
 
-export function Tables({ ...props }: React.ComponentProps<typeof CustomTabs>) {
+export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const [ordersLoading, fillsLoading] = useLoadingStore((state) =>
     state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS]),
   )

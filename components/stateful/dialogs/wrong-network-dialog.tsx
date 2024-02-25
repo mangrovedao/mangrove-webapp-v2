@@ -1,7 +1,7 @@
 "use client"
 import { useChainModal } from "@rainbow-me/rainbowkit"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount, useConfig } from "wagmi"
 
 import Dialog from "@/components/dialogs/alert-dialog"
 import { Button } from "@/components/ui/button"
@@ -11,29 +11,32 @@ import { cn } from "@/utils"
 export function WrongNetworkAlertDialog() {
   const { mangroveQuery } = useMangrove()
   const { openChainModal, chainModalOpen } = useChainModal()
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
+  const { chains } = useConfig()
+  const isNetworkSupported = chains.find((c) => c.id === chain?.id)
+
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
     if (
       !chainModalOpen &&
-      (chain?.unsupported === true || !!mangroveQuery.error === true)
+      (!isNetworkSupported || !!mangroveQuery.error === true)
     ) {
       setOpen(true)
     } else {
       setOpen(false)
     }
-  }, [chain?.unsupported, chainModalOpen, mangroveQuery.error])
+  }, [chain, isNetworkSupported, chainModalOpen, mangroveQuery.error])
 
   function handleChangeNetwork() {
     setOpen(false)
     openChainModal?.()
   }
 
-  const title = chain?.unsupported
+  const title = !isNetworkSupported
     ? "Unsupported network"
     : "Error connecting to Mangrove"
-  const description = chain?.unsupported ? (
+  const description = !isNetworkSupported ? (
     "Mangrove does not support this network yet."
   ) : (
     <div>
@@ -49,10 +52,10 @@ export function WrongNetworkAlertDialog() {
       <Dialog.Footer className="!justify-center">
         <div
           className={cn("flex space-x-2 justify-center", {
-            "w-full": chain?.unsupported,
+            "w-full": !isNetworkSupported,
           })}
         >
-          {!chain?.unsupported && (
+          {isNetworkSupported && (
             <Button
               size={"lg"}
               variant={"tertiary"}

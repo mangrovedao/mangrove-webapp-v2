@@ -16,3 +16,13 @@ export function formatDate(date: Date | string) {
   const d = typeof date === "string" ? new Date(date) : date
   return format(d, "MM/dd/yyyy h:mm:ss aaaa")
 }
+
+export function formatDateWithoutHours(date: Date | string) {
+  const d = typeof date === "string" ? new Date(date) : date
+  return format(d, "dd MMM yyyy")
+}
+
+export function formatHoursOnly(date: Date | string) {
+  const d = typeof date === "string" ? new Date(date) : date
+  return format(d, "h:mm")
+}

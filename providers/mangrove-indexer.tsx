@@ -2,25 +2,39 @@
 
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { Chains } from "@mangrovedao/indexer-sdk/dist/src/types/types"
-import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { getTokenPriceInUsd } from "@/services/tokens.service"
+import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
   const { mangrove } = useMangrove()
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const queryClient = useQueryClient()
 
   const indexerSdkQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["indexer-sdk", chain?.network],
+    queryKey: ["indexer-sdk", chain],
     queryFn: () => {
-      if (!chain?.network) return null
-      const chainName = chain.network as Chains
+      if (!chain) return null
+
+      let chainName: Chains
+      // const chainName = chain.name as Chains
+      switch (chain.id) {
+        case 168587773:
+          chainName = "blast-sepolia" as Chains
+          break
+        case 80001:
+          chainName = "maticmum"
+          break
+        default:
+          chainName = chain.name as Chains
+      }
+
+      console.log("Initializing indexer sdk for chain", chainName)
       return getSdk({
         chainName,
         helpers: {
@@ -36,11 +50,32 @@ const useIndexerSdkContext = () => {
             if (!(mangrove && base && quote)) {
               throw new Error("Impossible to determine market tokens")
             }
-            return new TickPriceHelper(ba, {
+
+            const tickPriceHelper = new TickPriceHelper(ba, {
               base,
               quote,
               tickSpacing: m.tickSpacing,
             })
+
+            return {
+              priceFromTick(tick) {
+                return tickPriceHelper.priceFromTick(tick, "roundUp")
+              },
+              inboundFromOutbound(tick, outboundAmount, roundUp) {
+                return tickPriceHelper.inboundFromOutbound(
+                  tick,
+                  outboundAmount,
+                  roundUp ? "roundUp" : "nearest",
+                )
+              },
+              outboundFromInbound(tick, inboundAmount, roundUp) {
+                return tickPriceHelper.outboundFromInbound(
+                  tick,
+                  inboundAmount,
+                  roundUp ? "roundUp" : "nearest",
+                )
+              },
+            }
           },
           getPrice(tokenAddress) {
             return queryClient.fetchQuery({

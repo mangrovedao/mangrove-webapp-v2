@@ -5,37 +5,35 @@ import "@rainbow-me/rainbowkit/styles.css"
 import {
   RainbowKitProvider,
   darkTheme,
-  getDefaultWallets,
+  getDefaultConfig,
 } from "@rainbow-me/rainbowkit"
-import { WagmiConfig, configureChains, createConfig } from "wagmi"
-import { publicProvider } from "wagmi/providers/public"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { WagmiProvider, http } from "wagmi"
+import { arbitrum, blastSepolia, polygon, polygonMumbai } from "wagmi/chains"
 
 import { env } from "@/env.mjs"
-import { getWhitelistedChainObjects } from "@/utils/chains"
 
+const queryClient = new QueryClient()
 const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
-const { chains, publicClient } = configureChains(getWhitelistedChainObjects(), [
-  publicProvider(),
-])
 
-const { connectors } = getDefaultWallets({
-  appName: "Mangrove DEX",
+const config = getDefaultConfig({
+  appName: "Mangrove dApp",
   projectId,
-  chains,
-})
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
+  chains: [blastSepolia, polygon, polygonMumbai, arbitrum],
+  transports: {
+    [polygon.id]: http(),
+    [polygonMumbai.id]: http(),
+    [blastSepolia.id]: http(),
+    [arbitrum.id]: http(),
+  },
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider theme={darkTheme()} chains={chains}>
-        {children}
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={darkTheme()}>{children}</RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   )
 }
