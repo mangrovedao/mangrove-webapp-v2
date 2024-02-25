@@ -11,7 +11,7 @@ import { cn } from "@/utils"
 export function WrongNetworkAlertDialog() {
   const { mangroveQuery } = useMangrove()
   const { openChainModal, chainModalOpen } = useChainModal()
-  const { chain } = useAccount()
+  const { chain, isConnected } = useAccount()
   const { chains } = useConfig()
   const isNetworkSupported = chains.find((c) => c.id === chain?.id)
 
@@ -20,6 +20,7 @@ export function WrongNetworkAlertDialog() {
   React.useEffect(() => {
     if (
       !chainModalOpen &&
+      isConnected &&
       (!isNetworkSupported || !!mangroveQuery.error === true)
     ) {
       setOpen(true)
