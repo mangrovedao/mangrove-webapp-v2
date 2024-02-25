@@ -1,6 +1,7 @@
-import React from "react"
-
 import Big from "big.js"
+import React from "react"
+import { useAccount, useBalance } from "wagmi"
+
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
 
@@ -9,17 +10,59 @@ export const useParameters = () => {
   const [unPublishedQuote, setUnPublishedQuote] = React.useState("")
   const [unallocatedBase, setUnallocatedBase] = React.useState("")
   const [unallocatedQuote, setUnallocatedQuote] = React.useState("")
-  const [bounty, setBounty] = React.useState("")
 
   const { strategyStatusQuery, strategyQuery, mergedOffers } = useKandel()
 
-  const { market, asksBalance, bidsBalance, offerStatuses } =
-    strategyStatusQuery.data ?? {}
+  const { address } = useAccount()
+  const { data: nativeBalance } = useBalance({
+    address,
+  })
 
-  const { depositedBase, depositedQuote, currentParameter } =
-    strategyQuery.data ?? {}
+  const {
+    book,
+    market,
+    asksBalance,
+    bidsBalance,
+    offerStatuses,
+    stratInstance,
+  } = strategyStatusQuery.data ?? {}
+
+  const {
+    depositedBase,
+    offers,
+    depositedQuote,
+    currentParameter,
+    creationDate,
+    address: strategyAddress,
+    depositsAndWithdraws,
+  } = strategyQuery.data ?? {}
 
   const { maxPrice, minPrice, priceRatio } = offerStatuses ?? {}
+
+  const asks =
+    offers
+      ?.filter((item) => item.offerType === "asks")
+      .map(({ gasbase, gasreq, gasprice }) => ({
+        gasbase: Number(gasbase || 0),
+        gasreq: Number(gasreq || 0),
+        gasprice: Number(gasprice || 0),
+      })) || []
+
+  const bids =
+    offers
+      ?.filter((item) => item.offerType === "bids")
+      .map(({ gasbase, gasreq, gasprice }) => ({
+        gasbase: Number(gasbase || 0),
+        gasreq: Number(gasreq || 0),
+        gasprice: Number(gasprice || 0),
+      })) || []
+
+  const lockedBounty = stratInstance
+    ?.getLockedProvisionFromOffers({
+      asks,
+      bids,
+    })
+    .toFixed(nativeBalance?.decimals ?? 4)
 
   const publishedBase = getPublished(mergedOffers as MergedOffers, "asks")
   const publishedQuote = getPublished(mergedOffers as MergedOffers, "bids")
@@ -53,10 +96,8 @@ export const useParameters = () => {
   }
 
   const getUnpublishedBalances = async () => {
-    const asks =
-      await strategyStatusQuery.data?.stratInstance.getUnpublished("asks")
-    const bids =
-      await strategyStatusQuery.data?.stratInstance.getUnpublished("bids")
+    const asks = await stratInstance?.getUnpublished("asks")
+    const bids = await stratInstance?.getUnpublished("bids")
 
     return [asks, bids]
   }
@@ -64,6 +105,7 @@ export const useParameters = () => {
   React.useEffect(() => {
     const fetchUnpublishedBalancesAndBounty = async () => {
       const [base, quote] = await getUnpublishedBalances()
+
       if (!base || !quote || !asksBalance || !bidsBalance) return
 
       const { unallocatedBase, unallocatedQuote } = getUnallocatedInventory(
@@ -75,22 +117,29 @@ export const useParameters = () => {
       setUnPublishedQuote(quote.toFixed(market?.base?.decimals))
       setUnallocatedBase(unallocatedBase.toFixed(market?.base?.decimals))
       setUnallocatedQuote(unallocatedQuote.toFixed(market?.quote?.decimals))
-      //   setBounty(bountyAmount)
     }
 
     fetchUnpublishedBalancesAndBounty()
-  }, [strategyStatusQuery.data, strategyQuery.data])
+  }, [strategyStatusQuery.data])
 
   return {
+    depositsAndWithdraws,
     quote: market?.quote,
     base: market?.base,
-    currentParameter: { ...currentParameter, maxPrice, minPrice, priceRatio },
+    currentParameter: {
+      ...currentParameter,
+      lockedBounty,
+      maxPrice,
+      minPrice,
+      priceRatio,
+      creationDate,
+      strategyAddress,
+    },
     unallocatedBase,
     unallocatedQuote,
     unPublishedBase,
     unPublishedQuote,
     depositedBase,
     depositedQuote,
-    bounty,
   }
 }

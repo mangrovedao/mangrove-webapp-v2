@@ -3,7 +3,7 @@
 import Dialog from "@/components/dialogs/alert-dialog"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 import useKandel from "../../../_providers/kandel-strategy"
 import BlockExplorer from "../../block-explorer"
 
@@ -15,7 +15,7 @@ type Props = {
 }
 
 export function SuccessDialog({ title, actionButton, open, onClose }: Props) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const { strategyAddress } = useKandel()
   const blockExplorerUrl = chain?.blockExplorers?.default.url
 

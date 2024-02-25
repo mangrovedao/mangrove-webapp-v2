@@ -20,10 +20,14 @@ import { SuccessDialog } from "./succes-dialog"
 type Props = {
   open: boolean
   onClose: () => void
+  togglePublish: () => void
 }
 
-export function Deposit({ open, onClose }: Props) {
-  const [depositCompleted, toggleDepositCompleted] = React.useState(false)
+export function Deposit({ togglePublish, open, onClose }: Props) {
+  const [depositCompleted, toggleDepositCompleted] = React.useReducer(
+    (isOpen) => !isOpen,
+    false,
+  )
 
   const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
   const { market } = strategyStatusQuery.data ?? {}
@@ -136,11 +140,10 @@ export function Deposit({ open, onClose }: Props) {
             deposit.mutate(undefined, {
               onSettled(data, error, variables, context) {
                 if (!error) {
-                  console.log(data, error)
-                  toggleDepositCompleted(!depositCompleted)
-                  onClose()
-                  reset()
+                  toggleDepositCompleted()
                 }
+                onClose()
+                reset()
               },
             })
           }
@@ -174,12 +177,19 @@ export function Deposit({ open, onClose }: Props) {
       <SuccessDialog
         title="Deposit completed"
         actionButton={
-          <Button className="w-full" size={"lg"}>
+          <Button
+            className="w-full"
+            size={"lg"}
+            onClick={() => {
+              toggleDepositCompleted()
+              togglePublish()
+            }}
+          >
             Publish now
           </Button>
         }
         open={depositCompleted}
-        onClose={() => toggleDepositCompleted(false)}
+        onClose={toggleDepositCompleted}
       />
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>

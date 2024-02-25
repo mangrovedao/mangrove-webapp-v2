@@ -12,8 +12,15 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
+import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
@@ -27,7 +34,10 @@ type Props = {
 }
 
 export function Publish({ open, onClose }: Props) {
-  const [publishCompleted, togglePublishCompleted] = React.useState(false)
+  const [publishCompleted, togglePublishCompleted] = React.useReducer(
+    (isOpen) => !isOpen,
+    false,
+  )
 
   const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
     useKandel()
@@ -167,7 +177,7 @@ export function Publish({ open, onClose }: Props) {
           onClick={() =>
             publish.mutate(undefined, {
               onSuccess() {
-                togglePublishCompleted(!publishCompleted)
+                togglePublishCompleted()
                 onClose()
                 reset()
               },
@@ -203,7 +213,7 @@ export function Publish({ open, onClose }: Props) {
       <SuccessDialog
         title={"Funds published"}
         open={publishCompleted}
-        onClose={() => togglePublishCompleted(false)}
+        onClose={togglePublishCompleted}
       />
 
       <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
@@ -215,8 +225,24 @@ export function Publish({ open, onClose }: Props) {
               className="space-x-3 flex items-center"
             >
               Publish
+              <TooltipProvider>
+                <Tooltip delayDuration={200} defaultOpen={false}>
+                  <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                    <TooltipInfo />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <Text>
+                      Funds are evenly distributed across the active strategy.
+                    </Text>
+                    <Link href={KANDEL_DOC_URL} target="_blank">
+                      <Caption className="text-primary underline">
+                        Learn more
+                      </Caption>
+                    </Link>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </Title>
-            <InfoIcon className="h-4 w-4 text-muted-foreground" />
           </div>
         </Dialog.Title>
         <Steps steps={steps} currentStep={currentStep} />

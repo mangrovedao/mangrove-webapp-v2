@@ -5,17 +5,20 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { renderElement } from "@/utils/render"
+import History from "./history/history"
 import Overview from "./overview/overview"
 import Parameters from "./parameters/parameters"
 
 export enum ManageTabs {
   OVERVIEW = "overview",
   PARAMETERS = "parameters",
+  HISTORY = "history",
 }
 
 const TABS_CONTENT = {
   [ManageTabs.OVERVIEW]: <Overview />,
   [ManageTabs.PARAMETERS]: <Parameters />,
+  [ManageTabs.HISTORY]: <History />,
 }
 
 export default function Tabs(

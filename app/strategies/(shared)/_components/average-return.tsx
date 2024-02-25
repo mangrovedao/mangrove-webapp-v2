@@ -44,7 +44,9 @@ export function AverageReturn({ percentage }: { percentage?: number }) {
               <TooltipTrigger className="hover:opacity-80 transition-opacity">
                 <TooltipInfo />
               </TooltipTrigger>
-              <TooltipContent>Average return per market</TooltipContent>
+              <TooltipContent>
+                Average return of the strategy over 30 days.
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </Caption>

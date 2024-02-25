@@ -8,12 +8,15 @@ import Link from "next/link"
 type Props = {
   address: string
   blockExplorerUrl?: string
+  description?: boolean
 }
 
-function BlockExplorer({ address, blockExplorerUrl }: Props) {
+function BlockExplorer({ description, address, blockExplorerUrl }: Props) {
   return (
     <div className="flex items-center text-sm font-normal">
-      <span className="text-cloud-300">View on block explorer:</span>
+      {description ? (
+        <span className="text-cloud-300">View on block explorer:</span>
+      ) : undefined}
 
       {blockExplorerUrl ? (
         <Button

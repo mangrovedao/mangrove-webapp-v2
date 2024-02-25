@@ -38,14 +38,19 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
         timeToLive,
         timeToLiveUnit,
       } = form
+
+      const logics = Object.values(mangrove.logics)
       const isBuy = tradeAction === TradeAction.BUY
       const { base } = market
+
       const orderParams: Market.TradeParams = {
         wants,
         gives,
         restingOrder: {},
         forceRoutingToMangroveOrder: true,
         fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
+        takerGivesLogic: logics.find((logic) => logic?.id === form.sendFrom),
+        takerWantsLogic: logics.find((logic) => logic?.id === form.receiveTo),
         expiryDate:
           timeInForce === TimeInForce.GOOD_TIL_TIME
             ? estimateTimestamp({

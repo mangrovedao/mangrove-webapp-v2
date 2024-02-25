@@ -8,7 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { TokenIcon } from "@/components/token-icon"
 import Link from "next/link"
@@ -25,7 +25,7 @@ type Params = {
 }
 
 export function useTable({ data }: Params) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const blockExplorerUrl = chain?.blockExplorers?.default.url
 
   const columns = React.useMemo(

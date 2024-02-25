@@ -32,6 +32,14 @@ export const offerWithPricesSchema = z.object({
   live: z.boolean(),
 })
 
+export const depositsAndWithdraws = z.object({
+  transactionHash: z.string(),
+  date: z.date(),
+  token: z.string(),
+  amount: z.string(),
+  isDeposit: z.boolean(),
+})
+
 export const strategySchema = z.object({
   transactionHash: z.string(),
   creationDate: z.date(),

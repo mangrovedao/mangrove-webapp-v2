@@ -3,7 +3,7 @@
 import Mangrove from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
-import { useAccount, useNetwork } from "wagmi"
+import { useAccount, useConfig } from "wagmi"
 
 import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import { mangroveConfig } from "@/schemas/mangrove-config"
@@ -12,8 +12,9 @@ import { getErrorMessage } from "@/utils/errors"
 
 const useMangroveContext = () => {
   const signer = useEthersSigner()
-  const { chain } = useNetwork()
-  const { isConnected } = useAccount()
+  const { isConnected, chain } = useAccount()
+  const { chains } = useConfig()
+  const isNetworkSupported = chains.find((c) => c.id === chain?.id)
 
   const mangroveQuery = useQuery({
     queryKey: ["mangroveInstance", signer?._address, chain?.id],
@@ -31,7 +32,7 @@ const useMangroveContext = () => {
         throw new Error(message)
       }
     },
-    enabled: !!signer?._address && !!isConnected && !chain?.unsupported,
+    enabled: !!signer?._address && !!isConnected && !!isNetworkSupported,
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 15 * 60 * 1000,

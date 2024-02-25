@@ -1,21 +1,22 @@
 "use client"
+import Big from "big.js"
 import { useParams } from "next/navigation"
 import React from "react"
 import { Address } from "viem"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import Big from "big.js"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
 import { getMergedOffers } from "../_utils/inventory"
 
 const useKandelStrategyContext = () => {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const params = useParams<{ address: string }>()
   const strategyQuery = useStrategy({
     strategyAddress: params.address,
   })
+
   const { data: baseToken } = useTokenFromAddress(
     strategyQuery.data?.base as Address,
   )

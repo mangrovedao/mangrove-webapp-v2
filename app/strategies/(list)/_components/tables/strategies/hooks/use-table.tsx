@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table"
 import Link from "next/link"
 import React from "react"
-import { useNetwork } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
@@ -31,7 +31,7 @@ type Params = {
 }
 
 export function useTable({ type, data, onCancel, onManage }: Params) {
-  const { chain } = useNetwork()
+  const { chain } = useAccount()
   const columns = React.useMemo(
     () => [
       columnHelper.display({

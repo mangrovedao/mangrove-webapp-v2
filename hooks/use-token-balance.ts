@@ -6,7 +6,6 @@ export function useTokenBalance(token?: Token) {
   const { data, ...rest } = useBalance({
     address,
     token: token?.address as `0x`,
-    watch: true,
   })
 
   return {
