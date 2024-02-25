@@ -1,5 +1,5 @@
-import ConnectBanner from "./_components/connect-banner"
 import HowItWorks from "./_components/how-it-works"
+import ReferAndEarn from "./_components/refer-and-earn"
 import ReferralGivesInformation from "./_components/referral-gives-information"
 
 export default function Page() {
@@ -24,7 +24,7 @@ export default function Page() {
       </div>
 
       <div className="space-y-12">
-        <ConnectBanner />
+        <ReferAndEarn />
         <hr />
         <ReferralGivesInformation />
         <hr />

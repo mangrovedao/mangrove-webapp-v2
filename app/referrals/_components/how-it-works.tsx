@@ -37,7 +37,11 @@ export default function HowItWorks() {
       </Title>
       <div className="grid grid-cols-3 gap-4 mt-4">
         {ITEMS.map((item) => (
-          <Item {...item} className="col-span-full sm:col-span-1" />
+          <Item
+            {...item}
+            key={item.title}
+            className="col-span-full sm:col-span-1"
+          />
         ))}
       </div>
     </div>
