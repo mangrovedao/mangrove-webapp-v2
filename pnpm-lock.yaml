@@ -176,6 +176,9 @@ dependencies:
   react-object-view:
     specifier: ^0.3.4
     version: 0.3.4(react-dom@18.2.0)(react-native@0.73.4)(react@18.2.0)
+  react-share:
+    specifier: ^5.1.0
+    version: 5.1.0(react@18.2.0)
   sonner:
     specifier: ^1.3.1
     version: 1.3.1(react-dom@18.2.0)(react@18.2.0)
@@ -13429,6 +13432,14 @@ packages:
     optionalDependencies:
       graceful-fs: 4.2.11
 
+  /jsonp@0.2.1:
+    resolution: {integrity: sha512-pfog5gdDxPdV4eP7Kg87M8/bHgshlZ5pybl+yKxAnCZ5O7lCIn7Ixydj03wOlnDQesky2BPyA91SQ+5Y/mNwzw==}
+    dependencies:
+      debug: 2.6.9
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /just-clone@6.2.0:
     resolution: {integrity: sha512-1IynUYEc/HAwxhi3WDpIpxJbZpMCvvrrmZVqvj9EhpvbH8lls7HhdhiByjL7DkAaWlLIzpC0Xc/VPvy/UxLNjA==}
     dev: false
@@ -15994,6 +16005,18 @@ packages:
       object-assign: 4.1.1
       react: 18.2.0
       react-is: 18.1.0
+    dev: false
+
+  /react-share@5.1.0(react@18.2.0):
+    resolution: {integrity: sha512-OvyfMtj/0UzH1wi90OdHhZVJ6WUC/+IeWvBwppeZozwIGyAjQgyR0QXlHOrxVHVECqnGvcpBaFTXVrqouTieaw==}
+    peerDependencies:
+      react: ^17 || ^18
+    dependencies:
+      classnames: 2.4.0
+      jsonp: 0.2.1
+      react: 18.2.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /react-style-singleton@2.2.1(@types/react@18.2.48)(react@18.2.0):
