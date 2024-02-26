@@ -77,6 +77,8 @@ export function Limit() {
   const currentBalance =
     balanceLogic && sendFrom !== "simple" ? balanceLogic : sendTokenBalance
 
+  console.log("currentBalance", currentBalance)
+
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(currentBalance.formatted)) / 100
     form.setFieldValue("send", amount.toString())
