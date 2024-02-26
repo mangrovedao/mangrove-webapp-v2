@@ -1,3 +1,6 @@
+import { Token } from "@mangrovedao/mangrove.js"
+import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
+import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
 import { useAccount } from "wagmi"
 
@@ -11,13 +14,17 @@ import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
 import { Steps } from "../../components/steps"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
-import { useAmplified } from "../hooks/use-amplified"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { Form } from "../types"
-import { SummaryStep } from "./summary-step"
 
 type Props = {
-  form: Form
+  form: Form & {
+    selectedToken?: Token
+    firstAssetToken?: Token
+    secondAssetToken?: Token
+    selectedSource?: SimpleLogic | SimpleAaveLogic
+    sendAmount: string
+  }
   onClose: () => void
 }
 
@@ -32,25 +39,18 @@ export default function FromWalletAmplifiedOrderDialog({
   onClose,
 }: Props) {
   const { chain } = useAccount()
-  const {
-    selectedToken,
-    firstAssetToken,
-    secondAssetToken,
-    selectedSource,
-    tickSize,
-  } = useAmplified({})
 
   const { data: spender } = useSpenderAddress("amplified")
   const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance({
     // @ts-ignore
-    selectedToken,
+    selectedToken: form.selectedToken,
     spender,
-    selectedSource,
+    selectedSource: form.selectedSource,
   })
 
   let steps = ["Send"]
   if (!isInfiniteAllowance) {
-    steps = ["Summary", `Approve ${selectedToken?.symbol}`, ...steps]
+    steps = ["Summary", `Approve ${form.selectedToken?.symbol}`, ...steps]
   }
 
   const isDialogOpenRef = React.useRef(false)
@@ -87,11 +87,12 @@ export default function FromWalletAmplifiedOrderDialog({
   const stepInfos = [
     !isInfiniteAllowance && {
       body: (
-        <SummaryStep
-          form={form}
-          sendToken={selectedToken}
-          receiveToken={firstAssetToken}
-        />
+        <div>Summary</div>
+        // <SummaryStep
+        //   form={form}
+        //   sendToken={selectedToken}
+        //   receiveToken={firstAssetToken}
+        // />
       ),
       button: (
         <Button {...btnProps} onClick={goToNextStep}>
@@ -100,7 +101,7 @@ export default function FromWalletAmplifiedOrderDialog({
       ),
     },
     !isInfiniteAllowance && {
-      body: <ApproveStep tokenSymbol={selectedToken?.symbol ?? ""} />,
+      body: <ApproveStep tokenSymbol={form.selectedToken?.symbol ?? ""} />,
       button: (
         <Button
           {...btnProps}
@@ -109,7 +110,7 @@ export default function FromWalletAmplifiedOrderDialog({
           onClick={() => {
             approve.mutate(
               {
-                token: selectedToken,
+                token: form.selectedToken,
                 spender,
               },
               {

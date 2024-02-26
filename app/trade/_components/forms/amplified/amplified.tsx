@@ -37,9 +37,11 @@ export function Amplified() {
     timeInForce,
     sendSource,
     sendToken,
+    sendAmount,
+    selectedToken,
+    selectedSource,
     firstAssetToken,
     secondAssetToken,
-    selectedToken,
     logics,
     availableTokens,
     currentTokens,
@@ -145,7 +147,7 @@ export function Amplified() {
                     onChange={(e) => {
                       field.handleChange(e.target.value)
                     }}
-                    disabled={!market}
+                    disabled={!market || !sendToken}
                     error={field.state.meta.errors}
                   />
                 )}
@@ -210,7 +212,9 @@ export function Amplified() {
                     onChange={({ target: { value } }) => {
                       field.handleChange(value)
                     }}
-                    disabled={!(market && form.state.isFormValid)}
+                    disabled={
+                      !(market && form.state.isFormValid) || !firstAssetToken
+                    }
                     error={field.state.meta.touchedErrors}
                   />
                 )}
@@ -334,7 +338,9 @@ export function Amplified() {
                     onChange={({ target: { value } }) => {
                       field.handleChange(value)
                     }}
-                    disabled={!(market && form.state.isFormValid)}
+                    disabled={
+                      !(market && form.state.isFormValid) || !secondAssetToken
+                    }
                     error={field.state.meta.touchedErrors}
                   />
                 )}
@@ -649,7 +655,14 @@ export function Amplified() {
 
       {formData && (
         <FromWalletAmplifiedOrderDialog
-          form={formData}
+          form={{
+            ...formData,
+            selectedToken,
+            selectedSource,
+            sendAmount,
+            firstAssetToken,
+            secondAssetToken,
+          }}
           onClose={() => setFormData(undefined)}
         />
       )}

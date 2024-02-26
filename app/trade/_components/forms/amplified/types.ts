@@ -1,3 +1,5 @@
+import { TimeInForce, TimeToLiveUnit } from "./enums"
+
 type Asset = {
   amount: string
   token: string
@@ -11,4 +13,7 @@ export type Form = {
   sendToken: string
   firstAsset: Asset
   secondAsset: Asset
+  timeInForce: TimeInForce
+  timeToLive: string
+  timeToLiveUnit: TimeToLiveUnit
 }

@@ -124,7 +124,7 @@ export function useAmplified({ onSubmit }: Props) {
 
   React.useEffect(() => {
     form?.reset()
-  }, [form, market?.base, market?.quote])
+  }, [form])
 
   return {
     handleSubmit,
