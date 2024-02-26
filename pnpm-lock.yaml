@@ -15,14 +15,14 @@ dependencies:
     specifier: ^2.0.2
     version: 2.0.2(react@18.2.0)
   '@mangrovedao/context-addresses':
-    specifier: ^1.1.3
-    version: 1.1.3
+    specifier: '^1.2.1 '
+    version: 1.2.1
   '@mangrovedao/indexer-sdk':
     specifier: 0.0.11-28
     version: 0.0.11-28(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
-    specifier: ^2.0.3-4
-    version: 2.0.3-4
+    specifier: ^2.1.1
+    version: 2.1.1
   '@mangrovedao/mangrove.js':
     specifier: 2.0.5-16
     version: 2.0.5-16
@@ -3302,14 +3302,8 @@ packages:
       '@lit-labs/ssr-dom-shim': 1.1.2
     dev: false
 
-  /@mangrovedao/context-addresses@1.1.3:
-    resolution: {integrity: sha512-RF265lc+vQAkhJinsAFZhRfQtv3+WTOVvXpkiqMNtg6BHOmdjrKWLh9VYF8MYwvBhWBLwVy3o3KVGSPcoQ4+5A==}
-    dependencies:
-      semver: 7.5.4
-    dev: false
-
-  /@mangrovedao/context-addresses@1.2.0:
-    resolution: {integrity: sha512-FwmJn0U0ynUPXrm57JegamcPUiv9X1vyRfQIfQUJtnT6JnnTICThQmf1/EE2azws5cFqPzTxD5x2Snpo8yGUYQ==}
+  /@mangrovedao/context-addresses@1.2.1:
+    resolution: {integrity: sha512-kWhE0EBJTVSjOcIV1DQMmHDVQaYmZlNED6HQRZnGzkbuVhjLBme/pR1Zypvg7NZdl5X59GWMNLrfFvtHcKsNTg==}
     dependencies:
       semver: 7.5.4
     dev: false
@@ -3348,17 +3342,10 @@ packages:
     resolution: {integrity: sha512-oiNN/MsyzbmCU/Q6Ku7VJDkKd4nS4sGozTyeqVNklqltI9eD0a+9rzY7Y0UrExr6JYf/HM5homia9oSVtuW5oQ==}
     dev: false
 
-  /@mangrovedao/mangrove-deployments@2.0.3-4:
-    resolution: {integrity: sha512-vdmZvenqXzHioxFma9IEA64KEJq1Epc3MdaRlWzmxrxxvkSsqLptNXfOludbGlvjsSClSth4+4KtbF0XU+O5TA==}
-    dependencies:
-      '@mangrovedao/context-addresses': 1.1.3
-      semver: 7.5.4
-    dev: false
-
   /@mangrovedao/mangrove-deployments@2.1.1:
     resolution: {integrity: sha512-7hunKqot8VKc2lblI18w0FzrdbvT6NqG00PZi1c2wMs/ubgWiNlqj06AV3jE6MmAygyAT26KKi2ts436oXhJEQ==}
     dependencies:
-      '@mangrovedao/context-addresses': 1.2.0
+      '@mangrovedao/context-addresses': 1.2.1
       semver: 7.5.4
     dev: false
 
@@ -3373,7 +3360,7 @@ packages:
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
-      '@mangrovedao/context-addresses': 1.2.0
+      '@mangrovedao/context-addresses': 1.2.1
       '@mangrovedao/mangrove-core': 2.1.0-0
       '@mangrovedao/mangrove-deployments': 2.1.1
       '@mangrovedao/mangrove-strats': 2.1.0-0
