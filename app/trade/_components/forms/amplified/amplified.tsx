@@ -1,10 +1,6 @@
 import React from "react"
 
-import {
-  CustomRadioGroup,
-  CustomRadioGroupItem,
-} from "@/components/custom-radio-group"
-import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
+import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenIcon } from "@/components/token-icon"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
@@ -23,10 +19,12 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { Plus, WalletIcon, XIcon } from "lucide-react"
+import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
+import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
 
@@ -34,7 +32,6 @@ export function Amplified() {
   const [formData, setFormData] = React.useState<Form>()
   const {
     tradeAction,
-    assets,
     handleSubmit,
     form,
     quoteToken,
@@ -42,8 +39,25 @@ export function Amplified() {
     market,
     receiveToken,
     timeInForce,
+
+    selectedToken,
+    logics,
+    sendSource,
+    sources,
+    availableTokens,
+    currentTokens,
   } = useAmplified({
     onSubmit: (formData) => setFormData(formData),
+  })
+
+  const { address } = useAccount()
+
+  const { balanceLogic } = liquiditySourcing({
+    sendToken: selectedToken,
+    sendFrom: sendSource,
+    fundOwner: address,
+    //@ts-ignore
+    logics,
   })
 
   const [markets, setMarkets] = React.useState(0)
@@ -63,9 +77,10 @@ export function Amplified() {
 
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <form.Field name="tradeAction">
+          {/* <form.Field name="tradeAction">
             {(field) => (
               <CustomRadioGroup
+                disabled
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
@@ -88,7 +103,7 @@ export function Amplified() {
                 ))}
               </CustomRadioGroup>
             )}
-          </form.Field>
+          </form.Field> */}
 
           <div className="space-y-4 !mt-6">
             <Title variant={"title2"}> Liquidity sourcing</Title>
@@ -112,11 +127,11 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {["wallet"].map((source) => (
-                          <SelectItem key={source} value={source}>
+                        {sources?.map((source) => (
+                          <SelectItem key={source.id} value={source.id}>
                             <div className="flex space-x-3">
                               <WalletIcon />
-                              <Text className="capitalize"> {source}</Text>
+                              <Text className="capitalize">{source.title}</Text>
                             </div>
                           </SelectItem>
                         ))}
@@ -151,56 +166,36 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market}
+                    disabled={!market || !sendSource}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {tradeAction === TradeAction.BUY ? (
-                          <SelectItem
-                            key={baseToken?.symbol || "..."}
-                            value={baseToken?.symbol || "..."}
-                          >
+                        {availableTokens.map((token) => (
+                          <SelectItem key={token.id} value={token.id}>
                             <div className="flex space-x-3">
-                              <TokenIcon symbol={baseToken?.symbol || "..."} />
-                              <Text>{baseToken?.symbol || "..."}</Text>
+                              <TokenIcon symbol={token.symbol} />
+                              <Text>{token.symbol}</Text>
                             </div>
                           </SelectItem>
-                        ) : (
-                          <SelectItem
-                            key={quoteToken?.symbol || "..."}
-                            value={quoteToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
-                              <Text>{quoteToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
-                        )}
-
-                        {/* {assets.map((asset) => (
-                          <SelectItem
-                            key={asset?.symbol}
-                            value={asset?.symbol || "..."} 
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={asset?.symbol} />
-                              <Text>{asset?.symbol}</Text>
-                            </div>
-                          </SelectItem>
-                        ))} */}
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 )}
               </form.Field>
             </div>
-            <TokenBalance
-              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
-              label={"Balance"}
-            />
+
+            {selectedToken && (
+              <CustomBalance
+                token={selectedToken}
+                balance={balanceLogic?.formatted}
+                label={"Balance"}
+              />
+            )}
+
             <div />
 
             <Caption variant={"caption1"} as={"label"}>
@@ -238,38 +233,14 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {tradeAction === TradeAction.BUY ? (
-                          <SelectItem
-                            key={baseToken?.symbol || "..."}
-                            value={baseToken?.symbol || "..."}
-                          >
+                        {currentTokens.map((token) => (
+                          <SelectItem key={token.id} value={token.id}>
                             <div className="flex space-x-3">
-                              <TokenIcon symbol={baseToken?.symbol || "..."} />
-                              <Text>{baseToken?.symbol || "..."}</Text>
+                              <TokenIcon symbol={token.symbol} />
+                              <Text>{token.id}</Text>
                             </div>
                           </SelectItem>
-                        ) : (
-                          <SelectItem
-                            key={quoteToken?.symbol || "..."}
-                            value={quoteToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
-                              <Text>{quoteToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
-                        )}
-                        {/* {assets.map((asset) => (
-                          <SelectItem
-                            key={asset?.symbol}
-                            value={asset?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={asset?.symbol} />
-                              <Text>{asset?.symbol}</Text>
-                            </div>
-                          </SelectItem>
-                        ))} */}
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -277,8 +248,9 @@ export function Amplified() {
               </form.Field>
             </div>
 
-            <TokenBalance
-              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
+            <CustomBalance
+              token={selectedToken}
+              balance={balanceLogic?.formatted}
               label={"Balance"}
             />
 
@@ -401,8 +373,9 @@ export function Amplified() {
               </form.Field>
             </div>
 
-            <TokenBalance
-              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
+            <CustomBalance
+              token={selectedToken}
+              balance={balanceLogic?.formatted}
               label={"Balance"}
             />
 
@@ -510,10 +483,9 @@ export function Amplified() {
                   </Select>
                 </div>
 
-                <TokenBalance
-                  token={
-                    tradeAction === TradeAction.BUY ? baseToken : quoteToken
-                  }
+                <CustomBalance
+                  token={selectedToken}
+                  balance={balanceLogic?.formatted}
                   label={"Balance"}
                 />
 
