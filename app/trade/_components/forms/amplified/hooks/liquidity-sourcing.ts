@@ -36,14 +36,14 @@ export default function liquiditySourcing({
 
       const logicToken = await selectedLogic.overlying(token)
 
-      if (selectedLogic instanceof SimpleLogic) {
-        const simpleBalance = await logicToken.balanceOf(fundOwner)
+      if (selectedLogic.id === "simple") {
+        const simpleBalance = await token.balanceOf(fundOwner)
         setBalanceLogic({
-          formatted: simpleBalance.toNumber().toFixed(logicToken.decimals),
+          formatted: simpleBalance.toFixed(token.decimals),
           balance: simpleBalance.toNumber(),
         })
       } else {
-        const logicBalance = await selectedLogic?.logic.balanceLogic(
+        const logicBalance = await selectedLogic.logic.balanceLogic(
           logicToken.address,
           fundOwner,
         )

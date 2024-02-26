@@ -6,9 +6,7 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { useEthersSigner } from "@/utils/adapters"
-import type { Market } from "@mangrovedao/mangrove.js"
-import { Signer } from "@mangrovedao/mangrove.js/dist/nodejs/types"
-import { MangroveAmplifier__factory as MangroveAmplifier } from "@mangrovedao/mangrove.js/dist/nodejs/types/typechain"
+import { MangroveAmplifier, type Market } from "@mangrovedao/mangrove.js"
 import type { Form } from "../types"
 
 type Props = {
@@ -30,25 +28,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
     mutationFn: async ({ form }: { form: Form }) => {
       if (!mangrove || !market) return
 
-      mangrove.openMarkets()
-      const liquidityProvider = await mangrove.liquidityProvider(market)
-      const mangroveAmplifier = MangroveAmplifier.connect("", signer as Signer)
-
-      // const { tradeAction } = form
-      // const isBuy = tradeAction === TradeAction.BUY
-      // const orderParams: Market.TradeParams = {
-      //   wants: "",
-      //   gives: "",
-      //   restingOrder: {},
-      //   forceRoutingToMangroveOrder: true,
-      //   expiryDate: undefined,
-      // }
-
-      // const order = isBuy
-      //   ? await market.buy(orderParams)
-      //   : await market.sell(orderParams)
-      // const result = await order.result
-      // return { order, result }
+      const amp = new MangroveAmplifier({ mgv: mangrove })
     },
     meta: {
       error: "Failed to post the limit order",

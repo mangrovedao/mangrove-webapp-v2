@@ -1,5 +1,3 @@
-import type { TradeAction } from "../enums"
-
 type Asset = {
   amount: string
   token: string
@@ -8,7 +6,6 @@ type Asset = {
 }
 
 export type Form = {
-  tradeAction: TradeAction
   sendSource: string
   sendAmount: string
   sendToken: string
