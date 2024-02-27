@@ -16,6 +16,7 @@ import { Steps } from "../../components/steps"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { Form } from "../types"
+import { SummaryStep } from "./summary-step"
 
 type Props = {
   form: Form & {
@@ -95,12 +96,26 @@ export default function FromWalletAmplifiedOrderDialog({
   const stepInfos = [
     !isInfiniteAllowance && {
       body: (
-        <div>Summary</div>
-        // <SummaryStep
-        //   form={form}
-        //   sendToken={selectedToken}
-        //   receiveToken={firstAssetToken}
-        // />
+        <SummaryStep
+          form={form}
+          receiveTokens={[
+            {
+              receiveTo: form.firstAsset.receiveTo,
+              amount: form.firstAsset.amount,
+              token: firstAssetToken!,
+              limitPrice: form.firstAsset.limitPrice,
+            },
+            {
+              receiveTo: form.secondAsset.receiveTo,
+              amount: form.secondAsset.amount,
+              token: secondAssetToken!,
+              limitPrice: form.secondAsset.limitPrice,
+            },
+          ]}
+          tokenToAmplify={selectedToken}
+          sendAmount={sendAmount}
+          source={selectedSource!}
+        />
       ),
       button: (
         <Button {...btnProps} onClick={goToNextStep}>
@@ -133,14 +148,26 @@ export default function FromWalletAmplifiedOrderDialog({
     },
     {
       body: (
-        <div>Summary</div>
-        // <SummaryStep
-        //   form={form}
-        //   baseToken={baseToken}
-        //   quoteToken={quoteToken}
-        //   sendToken={sendToken}
-        //   receiveToken={receiveToken}
-        // />
+        <SummaryStep
+          form={form}
+          receiveTokens={[
+            {
+              receiveTo: form.firstAsset.receiveTo,
+              amount: form.firstAsset.amount,
+              token: firstAssetToken!,
+              limitPrice: form.firstAsset.limitPrice,
+            },
+            {
+              receiveTo: form.secondAsset.receiveTo,
+              amount: form.secondAsset.amount,
+              token: secondAssetToken!,
+              limitPrice: form.secondAsset.limitPrice,
+            },
+          ]}
+          tokenToAmplify={selectedToken}
+          sendAmount={sendAmount}
+          source={selectedSource!}
+        />
       ),
       button: (
         <Button

@@ -6,7 +6,7 @@ import { toast } from "sonner"
 
 type Props = {
   sendFrom: string
-  logics: (SimpleAaveLogic | SimpleLogic)[]
+  logics: (SimpleAaveLogic | SimpleLogic | undefined)[]
   fundOwner?: string
   sendToken?: Token
 }
@@ -30,7 +30,7 @@ export default function liquiditySourcing({
 
       const selectedLogic = logics
         .filter((logic) => logic != undefined)
-        .find((logic) => logic.id === sendFrom)
+        .find((logic) => logic?.id === sendFrom)
 
       if (!selectedLogic) return
 

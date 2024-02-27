@@ -93,7 +93,7 @@ export function useAmplified({ onSubmit }: Props) {
   )
 
   const currentTokens = availableTokens?.filter((token) => {
-    if (!selectedToken || selectedToken.id === token.id) return false
+    if (selectedToken?.id === token.id) return false
 
     return compatibleMarkets?.some(
       (market) => market.base.id == token.id || market.quote.id == token.id,
@@ -143,7 +143,7 @@ export function useAmplified({ onSubmit }: Props) {
     firstAssetToken,
     secondAssetToken,
     logics,
-    currentTokens,
+    currentTokens: currentTokens.length > 1 ? currentTokens : [],
     availableTokens,
     openMarkets,
   }
