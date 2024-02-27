@@ -22,10 +22,9 @@ const useIndexerSdkContext = () => {
       if (!chain) return null
 
       let chainName: Chains
-      // const chainName = chain.name as Chains
       switch (chain.id) {
         case 168587773:
-          chainName = "blast-sepolia" as Chains
+          chainName = "blast-sepolia"
           break
         case 80001:
           chainName = "maticmum"

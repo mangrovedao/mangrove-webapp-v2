@@ -48,7 +48,8 @@ export function SummaryStep({
 
         {receiveTokens?.map(
           (receiveToken) =>
-            receiveToken.token && (
+            receiveToken.token &&
+            receiveToken.receiveTo && (
               <>
                 <div className="flex items-center space-x-2">
                   <TokenIcon

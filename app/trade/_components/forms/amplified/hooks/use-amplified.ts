@@ -107,9 +107,9 @@ export function useAmplified({ onSubmit }: Props) {
     const limitPrice = form.getFieldValue(`${key}.limitPrice`)
     const keyValue = form.getFieldValue(`${key}`)
 
-    if (!limitPrice) return
+    if (Number(limitPrice) <= 0) return
     const amount = Big(Number(sendAmount ?? 0))
-      .div(limitPrice)
+      .div(Number(limitPrice) ?? 1)
       .toString()
 
     form.store.setState(
@@ -146,7 +146,7 @@ export function useAmplified({ onSubmit }: Props) {
   }
 
   React.useEffect(() => {
-    form.validateAllFields("submit")
+    form.validateAllFields("change")
   }, [form])
 
   React.useEffect(() => {

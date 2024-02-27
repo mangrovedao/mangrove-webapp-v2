@@ -31,7 +31,11 @@ import { TimeInForce, TimeToLiveUnit } from "./enums"
 import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
-import { isGreaterThanZeroValidator, sendValidator } from "./validators"
+import {
+  isGreaterThanZeroValidator,
+  isSelected,
+  sendValidator,
+} from "./validators"
 
 const sliderValues = [25, 50, 75, 100]
 
@@ -78,12 +82,15 @@ export function Amplified() {
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(balanceLogic_temporary)) / 100
     form.setFieldValue("sendAmount", amount.toString())
+
     if (
       !form.state.values["firstAsset"].limitPrice ||
       !form.state.values["secondAsset"].limitPrice
     ) {
       return
     }
+
+    form.validateAllFields("change")
     computeReceiveAmount("firstAsset")
     computeReceiveAmount("secondAsset")
   }
@@ -243,7 +250,7 @@ export function Amplified() {
                 onValueChange={([value]) => {
                   handleSliderChange(Number(value))
                 }}
-                disabled={!(market && form.state.isFormValid)}
+                disabled={!(market && form.state.isFormValid) || !sendToken}
               />
               <div className="flex justify-center space-x-3">
                 {sliderValues.map((value) => (
@@ -258,7 +265,7 @@ export function Amplified() {
                       e.preventDefault()
                       handleSliderChange(Number(value))
                     }}
-                    disabled={!market}
+                    disabled={!market || !sendToken}
                   >
                     {value}%
                   </Button>
@@ -456,12 +463,13 @@ export function Amplified() {
                   )}
                 </form.Field>
 
-                <form.Field name="secondAsset.receiveTo">
+                <form.Field name="secondAsset.receiveTo" onChange={isSelected}>
                   {(field) => (
                     <div className="flex-col flex">
                       <Caption variant={"caption1"} as={"label"}>
                         Receive to
                       </Caption>
+
                       <Select
                         name={field.name}
                         value={field.state.value}
@@ -493,6 +501,13 @@ export function Amplified() {
                           </SelectGroup>
                         </SelectContent>
                       </Select>
+                      {field.state.meta.touchedErrors && (
+                        <div>
+                          <Caption className="text-red-600 text-xs">
+                            Please select a valid option
+                          </Caption>
+                        </div>
+                      )}
                     </div>
                   )}
                 </form.Field>
@@ -615,13 +630,9 @@ export function Amplified() {
             <Separator className="!my-6" />
 
             <form.Subscribe
-              selector={(state) => [
-                state.canSubmit,
-                state.isSubmitting,
-                state.values.sendSource,
-              ]}
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
             >
-              {([canSubmit, isSubmitting, tradeAction]) => {
+              {([canSubmit, isSubmitting]) => {
                 return (
                   <Button
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
@@ -630,7 +641,7 @@ export function Amplified() {
                     rightIcon
                     loading={!!isSubmitting}
                   >
-                    {tradeAction}
+                    Buy
                   </Button>
                 )
               }}
