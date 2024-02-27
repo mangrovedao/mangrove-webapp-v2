@@ -82,15 +82,21 @@ export function Amplified() {
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(balanceLogic_temporary)) / 100
     form.setFieldValue("sendAmount", amount.toString())
+    form.validateAllFields("change")
 
-    if (
-      !form.state.values["firstAsset"].limitPrice ||
-      !form.state.values["secondAsset"].limitPrice
-    ) {
-      return
+    if (currentTokens.length > 1) {
+      if (
+        !form.state.values["firstAsset"].limitPrice ||
+        !form.state.values["secondAsset"].limitPrice
+      ) {
+        return
+      }
+    } else {
+      if (!form.state.values["firstAsset"].limitPrice) {
+        return
+      }
     }
 
-    form.validateAllFields("change")
     computeReceiveAmount("firstAsset")
     computeReceiveAmount("secondAsset")
   }
