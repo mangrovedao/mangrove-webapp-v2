@@ -2,7 +2,6 @@
 import React from "react"
 
 import { Title } from "@/components/typography/title"
-import { DataTable } from "@/components/ui/data-table/data-table"
 import { useLeaderboard, useUserRank } from "./use-leaderboard"
 import { useTable } from "./use-table"
 
@@ -35,7 +34,7 @@ export function Leaderboard() {
       <Title variant={"title1"} className="mb-10">
         Leaderboard
       </Title>
-      <DataTable
+      {/* <DataTable
         table={table}
         isError={!!leaderboardQuery.error}
         isLoading={leaderboardQuery.isLoading}
@@ -45,8 +44,8 @@ export function Leaderboard() {
           pageSize,
           count: 1,
         }}
-        // tableRowClasses="text-white"
-      />
+        tableRowClasses="text-white"
+      /> */}
     </div>
   )
 }

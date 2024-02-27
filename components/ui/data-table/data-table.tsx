@@ -35,7 +35,6 @@ export function DataTable<TData>({
   renderExtraRow = () => null,
   tableRowClasses,
 }: DataTableProps<TData>) {
-  console.log("totototo")
   const rows = table.getRowModel().rows
   const leafColumns = table
     .getAllLeafColumns()
