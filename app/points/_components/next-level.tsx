@@ -3,7 +3,7 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
 import { LEVELS } from "../constants"
-import { formatNumber, getFormattedTimeFromNowTo } from "../utils"
+import { formatNumber } from "../utils"
 import Animals from "./animals"
 import BoxContainer from "./box-container"
 
@@ -16,7 +16,7 @@ type Props = {
 export default function NextLevel({
   className,
   volume = 1_500,
-  nextRankingDate = new Date("2024-03-04T23:59:59.999Z"),
+  // nextRankingDate = new Date("2024-03-04T23:59:59.999Z"),
 }: Props) {
   const disabled = !volume
 
@@ -42,13 +42,13 @@ export default function NextLevel({
             based on <br /> your weekly trading volume.
           </InfoTooltip>
         </Title>
-        <div
+        {/* <div
           className="text-base text-cloud-200 flex items-center"
           suppressHydrationWarning
         >
           {getFormattedTimeFromNowTo(nextRankingDate)}{" "}
           <InfoTooltip>Time until your level is updated.</InfoTooltip>
-        </div>
+        </div> */}
       </div>
       <div
         className={cn(

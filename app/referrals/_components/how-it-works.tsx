@@ -1,4 +1,4 @@
-import BoxContainer from "@/app/rewards/_components/box-container"
+import BoxContainer from "@/app/points/_components/box-container"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"

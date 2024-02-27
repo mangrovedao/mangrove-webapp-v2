@@ -48,8 +48,8 @@ const LINKS = [
     href: "/strategies",
   },
   {
-    name: "Rewards",
-    href: "/rewards",
+    name: "Points",
+    href: "/points",
   },
   {
     name: "Referrals",
