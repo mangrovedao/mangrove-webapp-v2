@@ -26,7 +26,7 @@ import { TimeInForce, TimeToLiveUnit } from "./enums"
 import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
-import { sendValidator } from "./validators"
+import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
 export function Amplified() {
   const [formData, setFormData] = React.useState<Form>()
@@ -199,12 +199,7 @@ export function Amplified() {
             </Caption>
 
             <div className="flex justify-between space-x-1">
-              <form.Field
-                name="firstAsset.amount"
-                onChange={sendValidator(
-                  Number(firstAssetBalance?.formatted ?? 0),
-                )}
-              >
+              <form.Field name="firstAsset.amount">
                 {(field) => (
                   <EnhancedNumericInput
                     name={field.name}
@@ -229,7 +224,7 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market || !sendToken || currentTokens.length < 1}
+                    disabled={!market || !sendToken}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
@@ -263,7 +258,10 @@ export function Amplified() {
               />
             )}
 
-            <form.Field name="firstAsset.limitPrice">
+            <form.Field
+              name="firstAsset.limitPrice"
+              onChange={isGreaterThanZeroValidator}
+            >
               {(field) => (
                 <EnhancedNumericInput
                   name={field.name}
@@ -331,12 +329,7 @@ export function Amplified() {
               Buy Asset #2
             </Caption>
             <div className="flex justify-between space-x-2">
-              <form.Field
-                name="secondAsset.amount"
-                onChange={sendValidator(
-                  Number(secondAssetBalance?.formatted ?? 0),
-                )}
-              >
+              <form.Field name="secondAsset.amount">
                 {(field) => (
                   <EnhancedNumericInput
                     name={field.name}
@@ -361,7 +354,7 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market || !sendToken || currentTokens.length < 1}
+                    disabled={!market || !sendToken}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
@@ -395,7 +388,10 @@ export function Amplified() {
               />
             )}
 
-            <form.Field name="secondAsset.limitPrice">
+            <form.Field
+              name="secondAsset.limitPrice"
+              onChange={isGreaterThanZeroValidator}
+            >
               {(field) => (
                 <EnhancedNumericInput
                   name={field.name}
@@ -565,7 +561,7 @@ export function Amplified() {
                   <Button
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
-                    disabled={!canSubmit || !market || currentTokens.length < 1}
+                    disabled={!canSubmit || !market}
                     rightIcon
                     loading={!!isSubmitting}
                   >

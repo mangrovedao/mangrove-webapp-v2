@@ -143,7 +143,7 @@ export function useAmplified({ onSubmit }: Props) {
     firstAssetToken,
     secondAssetToken,
     logics,
-    currentTokens: currentTokens.length > 1 ? currentTokens : [],
+    currentTokens,
     availableTokens,
     openMarkets,
   }
