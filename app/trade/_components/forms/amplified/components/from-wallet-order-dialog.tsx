@@ -1,4 +1,4 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mangrove.js"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
@@ -38,19 +38,27 @@ export default function FromWalletAmplifiedOrderDialog({
   form,
   onClose,
 }: Props) {
-  const { chain } = useAccount()
+  const {
+    selectedToken,
+    firstAssetToken,
+    secondAssetToken,
+    selectedSource,
+    sendAmount,
+  } = form
 
+  const { chain } = useAccount()
   const { data: spender } = useSpenderAddress("amplified")
-  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance({
-    // @ts-ignore
-    selectedToken: form.selectedToken,
+  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
+    selectedToken,
     spender,
-    selectedSource: form.selectedSource,
-  })
+    selectedSource,
+  )
+
+  console.log(isInfiniteAllowance, "isInfiniteAllowance")
 
   let steps = ["Send"]
   if (!isInfiniteAllowance) {
-    steps = ["Summary", `Approve ${form.selectedToken?.symbol}`, ...steps]
+    steps = ["Summary", `Approve ${selectedToken?.symbol}`, ...steps]
   }
 
   const isDialogOpenRef = React.useRef(false)
@@ -101,7 +109,7 @@ export default function FromWalletAmplifiedOrderDialog({
       ),
     },
     !isInfiniteAllowance && {
-      body: <ApproveStep tokenSymbol={form.selectedToken?.symbol ?? ""} />,
+      body: <ApproveStep tokenSymbol={selectedToken?.symbol ?? ""} />,
       button: (
         <Button
           {...btnProps}
@@ -110,7 +118,7 @@ export default function FromWalletAmplifiedOrderDialog({
           onClick={() => {
             approve.mutate(
               {
-                token: form.selectedToken,
+                token: selectedToken,
                 spender,
               },
               {
