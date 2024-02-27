@@ -131,14 +131,11 @@ export function useAmplified({ onSubmit }: Props) {
     form,
     market,
     tickSize: marketInfo?.tickSpacing.toString(),
-
     sendAmount,
     sendSource,
     sendToken,
-
     selectedToken,
     selectedSource,
-
     timeInForce,
     firstAssetToken,
     secondAssetToken,

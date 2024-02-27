@@ -46,34 +46,37 @@ export function SummaryStep({
           <Unit>{tokenToAmplify?.symbol}</Unit>
         </Line>
 
-        {receiveTokens?.map((receiveToken) => (
-          <>
-            <div className="flex items-center space-x-2">
-              <TokenIcon
-                className="w-7 h-auto"
-                symbol={receiveToken.token.symbol}
-              />
-              <span className="text-white text-xl font-medium">
-                {receiveToken.token.symbol}
-              </span>
-            </div>
+        {receiveTokens?.map(
+          (receiveToken) =>
+            receiveToken.token && (
+              <>
+                <div className="flex items-center space-x-2">
+                  <TokenIcon
+                    className="w-7 h-auto"
+                    symbol={receiveToken.token.symbol}
+                  />
+                  <span className="text-white text-xl font-medium">
+                    {receiveToken.token.symbol}
+                  </span>
+                </div>
 
-            <Line title="Limit Price">
-              {Big(receiveToken.limitPrice ?? 0).toFixed(
-                receiveToken.token.displayedAsPriceDecimals,
-              )}{" "}
-              <Unit>{receiveToken.token.symbol}</Unit>
-            </Line>
-            <Line
-              title={`Receive to ${receiveToken.receiveTo.includes("simple") ? "Wallet" : receiveToken.receiveTo.toUpperCase()}`}
-            >
-              {Big(receiveToken.amount ?? 0).toFixed(
-                receiveToken.token.displayedDecimals,
-              )}{" "}
-              <Unit>{receiveToken.token.symbol}</Unit>
-            </Line>
-          </>
-        ))}
+                <Line title="Limit Price">
+                  {Big(receiveToken.limitPrice ?? 0).toFixed(
+                    receiveToken.token.displayedAsPriceDecimals,
+                  )}{" "}
+                  <Unit>{receiveToken.token.symbol}</Unit>
+                </Line>
+                <Line
+                  title={`Receive to ${receiveToken.receiveTo.includes("simple") ? "Wallet" : receiveToken.receiveTo.toUpperCase()}`}
+                >
+                  {Big(receiveToken.amount ?? 0).toFixed(
+                    receiveToken.token.displayedDecimals,
+                  )}{" "}
+                  <Unit>{receiveToken.token.symbol}</Unit>
+                </Line>
+              </>
+            ),
+        )}
       </div>
     </div>
   )
