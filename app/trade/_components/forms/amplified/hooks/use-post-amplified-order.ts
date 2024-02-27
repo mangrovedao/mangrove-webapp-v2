@@ -51,30 +51,39 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           !market ||
           !form.selectedToken ||
           !form.selectedSource ||
-          !form.firstAssetToken ||
-          !form.secondAssetToken
+          !form.firstAssetToken
         )
           return
         const { data: openMarkets } = marketsInfoQuery
 
         const amp = new MangroveAmplifier({ mgv: mangrove })
 
-        const assets = [
-          {
-            inboundTokenAddress: form.firstAssetToken.address,
-            inboundTokenId: form.firstAssetToken.id,
-            inboundLogic: form.selectedSource,
-            tickspacing: market.tickSpacing,
-            limitPrice: form.firstAsset.limitPrice,
-          },
-          {
-            inboundTokenAddress: form.secondAssetToken.address,
-            inboundTokenId: form.secondAssetToken.id,
-            inboundLogic: form.selectedSource,
-            tickspacing: market.tickSpacing,
-            limitPrice: form.secondAsset.limitPrice,
-          },
-        ]
+        const assets = form.secondAssetToken
+          ? [
+              {
+                inboundTokenAddress: form.firstAssetToken.address,
+                inboundTokenId: form.firstAssetToken.id,
+                inboundLogic: form.selectedSource,
+                tickspacing: market.tickSpacing,
+                limitPrice: form.firstAsset.limitPrice,
+              },
+              {
+                inboundTokenAddress: form.secondAssetToken.address,
+                inboundTokenId: form.secondAssetToken.id,
+                inboundLogic: form.selectedSource,
+                tickspacing: market.tickSpacing,
+                limitPrice: form.secondAsset.limitPrice,
+              },
+            ]
+          : [
+              {
+                inboundTokenAddress: form.firstAssetToken.address,
+                inboundTokenId: form.firstAssetToken.id,
+                inboundLogic: form.selectedSource,
+                tickspacing: market.tickSpacing,
+                limitPrice: form.firstAsset.limitPrice,
+              },
+            ]
 
         const inboundTokens = assets.map((token) => {
           const market = openMarkets?.find((market) => {
@@ -117,7 +126,8 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           inboundTokens,
         })
 
-        return { data: order }
+        //TODO: check why we don't have tx hash
+        return order
       } catch (error) {
         console.error(error)
       }
@@ -126,26 +136,24 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
       error: "Failed to post the limit order",
     },
     onSuccess: async (data) => {
-      // if (!data) return
-      // const { order, result } = data
-      // /*
-      //  * We use a custom callback to handle the success message once it's ready.
-      //  * This is because the onSuccess callback from the mutation will only be triggered
-      //  * after all the preceding logic has been executed.
-      //  */
-      // onResult?.(result)
-      // try {
-      //   // Start showing loading state indicator on parts of the UI that depend on
-      //   startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-      //   const { blockNumber } = await (await order.response).wait()
-      //   await resolveWhenBlockIsIndexed.mutateAsync({
-      //     blockNumber,
-      //   })
-      //   queryClient.invalidateQueries({ queryKey: ["orders"] })
-      //   queryClient.invalidateQueries({ queryKey: ["fills"] })
-      // } catch (error) {
-      //   console.error(error)
-      // }
+      /*
+       * We use a custom callback to handle the success message once it's ready.
+       * This is because the onSuccess callback from the mutation will only be triggered
+       * after all the preceding logic has been executed.
+       */
+      // onResult?.(data)
+      try {
+        // Start showing loading state indicator on parts of the UI that depend on
+        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+        // const { blockNumber } = await (await order.response).wait()
+        // await resolveWhenBlockIsIndexed.mutateAsync({
+        //   blockNumber,
+        // })
+        queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["fills"] })
+      } catch (error) {
+        console.error(error)
+      }
     },
     onSettled: () => {
       stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])

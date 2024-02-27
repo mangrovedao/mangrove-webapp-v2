@@ -1,3 +1,5 @@
+import useMangrove from "@/providers/mangrove"
+import useMarket from "@/providers/market"
 import { Token } from "@mangrovedao/mangrove.js"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
@@ -22,7 +24,22 @@ export default function liquiditySourcing({
   logics,
   fundOwner,
 }: Props) {
+  const { market } = useMarket()
+  const { mangrove } = useMangrove()
   const [balanceLogic, setBalanceLogic] = React.useState<BalanceLogic>()
+
+  // const getMinVolume = async () => {
+  //   if (!market || !mangrove || !sendToken) return
+
+  //   const ba = market.base.id === sendToken.id ? "bids" : "asks"
+  //   const offerGasreq = 30000
+  //   const minVolume = await mangrove.readerContract.minVolume(
+  //     market.getOLKey(ba),
+  //     offerGasreq,
+  //   )
+
+  //   console.log(minVolume.toString(), ba)
+  // }
 
   const getLogicBalance = async (token: Token, fundOwner: string) => {
     try {
@@ -37,7 +54,8 @@ export default function liquiditySourcing({
       const logicToken = await selectedLogic.overlying(token)
 
       if (selectedLogic.id === "simple") {
-        const simpleBalance = await token.balanceOf(fundOwner)
+        const simpleBalance = await logicToken.balanceOf(fundOwner)
+
         setBalanceLogic({
           formatted: simpleBalance.toFixed(token.decimals),
           balance: simpleBalance.toNumber(),
@@ -47,20 +65,24 @@ export default function liquiditySourcing({
           logicToken.address,
           fundOwner,
         )
+
         setBalanceLogic({
-          formatted: logicBalance.toNumber().toFixed(logicToken.decimals),
+          formatted: logicBalance
+            .toNumber()
+            .toFixed(logicToken.displayedDecimals),
           balance: logicBalance.toNumber(),
         })
       }
     } catch (error) {
       console.error(error)
-      toast.error("Liquidity source not available for this market.")
+      toast.error("Could not fetch token balance.")
     }
   }
 
   React.useEffect(() => {
     if (!sendToken || !fundOwner) return
     getLogicBalance(sendToken, fundOwner)
+    // getMinVolume()
   }, [sendFrom, sendToken, fundOwner])
 
   return {

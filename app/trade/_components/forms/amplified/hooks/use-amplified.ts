@@ -8,7 +8,7 @@ import { useEventListener } from "usehooks-ts"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { Token } from "@mangrovedao/mangrove.js"
-import { useAccount } from "wagmi"
+import Big from "big.js"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -19,7 +19,6 @@ type Props = {
 export function useAmplified({ onSubmit }: Props) {
   const { mangrove, marketsInfoQuery } = useMangrove()
   const { market, marketInfo } = useMarket()
-  const { address: owner } = useAccount()
 
   const form = useForm({
     validator: zodValidator,
@@ -104,6 +103,34 @@ export function useAmplified({ onSubmit }: Props) {
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
+  const computeReceiveAmount = (key: "firstAsset" | "secondAsset") => {
+    const limitPrice = form.getFieldValue(`${key}.limitPrice`)
+    const keyValue = form.getFieldValue(`${key}`)
+    if (!limitPrice) return
+
+    const amount = Big(Number(sendAmount ?? 0))
+      .div(Number(limitPrice) ?? 1)
+      .toString()
+
+    form.store.setState(
+      (state) => {
+        return {
+          ...state,
+          values: {
+            ...state.values,
+            [key]: {
+              ...keyValue,
+              amount,
+            },
+          },
+        }
+      },
+      {
+        priority: "high",
+      },
+    )
+  }
+
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
   ) {
@@ -119,7 +146,7 @@ export function useAmplified({ onSubmit }: Props) {
   }
 
   React.useEffect(() => {
-    form.validateAllFields("submit")
+    form.validateAllFields("change")
   }, [form])
 
   React.useEffect(() => {
@@ -128,6 +155,7 @@ export function useAmplified({ onSubmit }: Props) {
 
   return {
     handleSubmit,
+    computeReceiveAmount,
     form,
     market,
     tickSize: marketInfo?.tickSpacing.toString(),
@@ -137,6 +165,9 @@ export function useAmplified({ onSubmit }: Props) {
     selectedToken,
     selectedSource,
     timeInForce,
+
+    firstAsset,
+    secondAsset,
     firstAssetToken,
     secondAssetToken,
     logics,
