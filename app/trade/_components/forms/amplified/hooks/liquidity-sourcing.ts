@@ -37,7 +37,8 @@ export default function liquiditySourcing({
       const logicToken = await selectedLogic.overlying(token)
 
       if (selectedLogic.id === "simple") {
-        const simpleBalance = await token.balanceOf(fundOwner)
+        const simpleBalance = await logicToken.balanceOf(fundOwner)
+
         setBalanceLogic({
           formatted: simpleBalance.toFixed(token.decimals),
           balance: simpleBalance.toNumber(),
@@ -47,14 +48,17 @@ export default function liquiditySourcing({
           logicToken.address,
           fundOwner,
         )
+
         setBalanceLogic({
-          formatted: logicBalance.toNumber().toFixed(logicToken.decimals),
+          formatted: logicBalance
+            .toNumber()
+            .toFixed(logicToken.displayedDecimals),
           balance: logicBalance.toNumber(),
         })
       }
     } catch (error) {
       console.error(error)
-      toast.error("Liquidity source not available for this market.")
+      toast.error("Could not fetch token balance.")
     }
   }
 

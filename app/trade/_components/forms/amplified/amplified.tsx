@@ -18,7 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
+import Big from "big.js"
 import { Plus, WalletIcon } from "lucide-react"
 import Link from "next/link"
 import { useAccount } from "wagmi"
@@ -30,10 +33,13 @@ import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
+const sliderValues = [25, 50, 75, 100]
+
 export function Amplified() {
   const [formData, setFormData] = React.useState<Form>()
   const {
     handleSubmit,
+    computeReceiveAmount,
     form,
     market,
     timeInForce,
@@ -42,6 +48,8 @@ export function Amplified() {
     sendAmount,
     selectedToken,
     selectedSource,
+    firstAsset,
+    secondAsset,
     firstAssetToken,
     secondAssetToken,
     logics,
@@ -59,29 +67,38 @@ export function Amplified() {
     fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
     logics,
   })
+  const { formatted } = useTokenBalance(selectedToken)
 
-  const { balanceLogic: firstAssetBalance } = liquiditySourcing({
-    sendToken: firstAssetToken,
-    sendFrom: sendSource,
-    fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
-    logics,
-  })
-
-  const { balanceLogic: secondAssetBalance } = liquiditySourcing({
-    sendToken: secondAssetToken,
-    sendFrom: sendSource,
-    fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
-    logics,
-  })
-
-  const [markets, setMarkets] = React.useState(0)
-
-  const addMarket = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault()
-    setMarkets(markets + 1)
-  }
+  const balanceLogic_temporary = selectedToken?.id.includes("WBTC")
+    ? formatted
+    : balanceLogic?.formatted
 
   const selectedTokens = [firstAssetToken, secondAssetToken]
+
+  const handleSliderChange = (value: number) => {
+    const amount = (value * Number(balanceLogic_temporary)) / 100
+    form.setFieldValue("sendAmount", amount.toString())
+    if (
+      !form.state.values["firstAsset"].limitPrice ||
+      !form.state.values["secondAsset"].limitPrice
+    ) {
+      return
+    }
+    computeReceiveAmount("firstAsset")
+    computeReceiveAmount("secondAsset")
+  }
+
+  const sendTokenBalanceAsBig = balanceLogic_temporary
+    ? Big(Number(balanceLogic_temporary))
+    : Big(0)
+
+  const sliderValue = Math.min(
+    Big(Number(sendAmount) ?? 0)
+      .mul(100)
+      .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
+      .toNumber(),
+    100,
+  ).toFixed(0)
 
   return (
     <div className="grid space-y-2">
@@ -112,9 +129,8 @@ export function Amplified() {
 
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <div className="space-y-4 !mt-6">
+          <div className="space-y-2 !mt-6">
             <Title variant={"title2"}> Liquidity sourcing</Title>
-
             <form.Field name="sendSource">
               {(field) => (
                 <div className="flex flex-col">
@@ -159,7 +175,7 @@ export function Amplified() {
             <div className="flex gap-2">
               <form.Field
                 name="sendAmount"
-                onChange={sendValidator(Number(balanceLogic?.formatted ?? 0))}
+                onChange={sendValidator(Number(balanceLogic_temporary))}
               >
                 {(field) => (
                   <EnhancedNumericInput
@@ -168,6 +184,8 @@ export function Amplified() {
                     onBlur={field.handleBlur}
                     onChange={(e) => {
                       field.handleChange(e.target.value)
+                      computeReceiveAmount("firstAsset")
+                      computeReceiveAmount("secondAsset")
                     }}
                     disabled={!market || !sendToken}
                     error={field.state.meta.errors}
@@ -208,10 +226,45 @@ export function Amplified() {
             {selectedToken && (
               <CustomBalance
                 token={selectedToken}
-                balance={balanceLogic?.formatted}
+                balance={balanceLogic_temporary}
                 label={"Balance"}
               />
             )}
+
+            {/* Slider component */}
+            <div className="space-y-5 pt-2 px-3">
+              <Slider
+                name={"sliderPercentage"}
+                defaultValue={[0]}
+                value={[Number(sliderValue)]}
+                step={5}
+                min={0}
+                max={100}
+                onValueChange={([value]) => {
+                  handleSliderChange(Number(value))
+                }}
+                disabled={!(market && form.state.isFormValid)}
+              />
+              <div className="flex justify-center space-x-3">
+                {sliderValues.map((value) => (
+                  <Button
+                    key={`percentage-button-${value}`}
+                    variant={"secondary"}
+                    size={"sm"}
+                    className={cn("text-xs w-full", {
+                      "opacity-10": Number(sliderValue) !== value,
+                    })}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleSliderChange(Number(value))
+                    }}
+                    disabled={!market}
+                  >
+                    {value}%
+                  </Button>
+                ))}
+              </div>
+            </div>
 
             <div />
 
@@ -220,23 +273,6 @@ export function Amplified() {
             </Caption>
 
             <div className="flex justify-between space-x-1">
-              <form.Field name="firstAsset.amount">
-                {(field) => (
-                  <EnhancedNumericInput
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={({ target: { value } }) => {
-                      field.handleChange(value)
-                    }}
-                    disabled={
-                      !(market && form.state.isFormValid) || !firstAssetToken
-                    }
-                    error={field.state.meta.touchedErrors}
-                  />
-                )}
-              </form.Field>
-
               <form.Field name="firstAsset.token">
                 {(field) => (
                   <Select
@@ -271,14 +307,6 @@ export function Amplified() {
               </form.Field>
             </div>
 
-            {firstAssetBalance && (
-              <CustomBalance
-                token={firstAssetToken}
-                balance={firstAssetBalance?.formatted}
-                label={"Balance"}
-              />
-            )}
-
             <form.Field
               name="firstAsset.limitPrice"
               onChange={isGreaterThanZeroValidator}
@@ -290,10 +318,13 @@ export function Amplified() {
                   onBlur={field.handleBlur}
                   onChange={({ target: { value } }) => {
                     field.handleChange(value)
+                    computeReceiveAmount("firstAsset")
                   }}
                   token={firstAssetToken}
                   label="Limit price"
-                  disabled={!(market && form.state.isFormValid)}
+                  disabled={
+                    !(market && form.state.isFormValid) || !firstAsset.token
+                  }
                   error={field.state.meta.touchedErrors}
                 />
               )}
@@ -339,6 +370,21 @@ export function Amplified() {
                 </div>
               )}
             </form.Field>
+            <div className="flex justify-between !my-6">
+              <span className="text-muted-foreground text-xs">
+                Receiving amount
+              </span>
+              {firstAsset.amount ? (
+                <span className="text-xs">
+                  {Number(firstAsset.amount).toFixed(
+                    firstAssetToken?.displayedDecimals,
+                  )}{" "}
+                  {firstAssetToken?.symbol}
+                </span>
+              ) : (
+                "-"
+              )}
+            </div>
 
             {currentTokens.length > 1 && (
               <>
@@ -352,24 +398,6 @@ export function Amplified() {
                   Buy Asset #2
                 </Caption>
                 <div className="flex justify-between space-x-2">
-                  <form.Field name="secondAsset.amount">
-                    {(field) => (
-                      <EnhancedNumericInput
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={({ target: { value } }) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={
-                          !(market && form.state.isFormValid) ||
-                          !secondAssetToken
-                        }
-                        error={field.state.meta.touchedErrors}
-                      />
-                    )}
-                  </form.Field>
-
                   <form.Field name="secondAsset.token">
                     {(field) => (
                       <Select
@@ -404,14 +432,6 @@ export function Amplified() {
                   </form.Field>
                 </div>
 
-                {secondAssetBalance && (
-                  <CustomBalance
-                    token={secondAssetToken}
-                    balance={secondAssetBalance?.formatted}
-                    label={"Balance"}
-                  />
-                )}
-
                 <form.Field
                   name="secondAsset.limitPrice"
                   onChange={isGreaterThanZeroValidator}
@@ -423,10 +443,14 @@ export function Amplified() {
                       onBlur={field.handleBlur}
                       onChange={({ target: { value } }) => {
                         field.handleChange(value)
+                        computeReceiveAmount("secondAsset")
                       }}
                       token={secondAssetToken}
                       label="Limit price"
-                      disabled={!(market && form.state.isFormValid)}
+                      disabled={
+                        !(market && form.state.isFormValid) ||
+                        !secondAsset.token
+                      }
                       error={field.state.meta.touchedErrors}
                     />
                   )}
@@ -472,12 +496,27 @@ export function Amplified() {
                     </div>
                   )}
                 </form.Field>
+
+                <div className="flex justify-between !my-6">
+                  <span className="text-muted-foreground text-xs">
+                    Receiving amount
+                  </span>
+                  {secondAsset.amount ? (
+                    <span className="text-xs">
+                      {Number(secondAsset.amount).toFixed(
+                        secondAssetToken?.displayedDecimals,
+                      )}{" "}
+                      {secondAssetToken?.symbol}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </div>
               </>
             )}
 
             <Button
               disabled
-              onClick={(e) => addMarket(e)}
               variant={"secondary"}
               className="flex justify-center items-center w-full"
             >
