@@ -180,6 +180,7 @@ export default function FromWalletAmplifiedOrderDialog({
                 form,
               },
               {
+                onSettled: onClose,
                 onError: (error: Error) => {
                   onClose()
                   tradeService.openTxFailedDialog(
