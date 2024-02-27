@@ -55,8 +55,6 @@ export default function FromWalletAmplifiedOrderDialog({
     selectedSource,
   )
 
-  console.log(isInfiniteAllowance, "isInfiniteAllowance")
-
   let steps = ["Send"]
   if (!isInfiniteAllowance) {
     steps = ["Summary", `Approve ${selectedToken?.symbol}`, ...steps]
