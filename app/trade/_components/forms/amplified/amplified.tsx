@@ -374,6 +374,13 @@ export function Amplified() {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
+                  {field.state.meta.touchedErrors.length ? (
+                    <div>
+                      <Caption className="text-red-600 text-xs">
+                        Please select a valid option
+                      </Caption>
+                    </div>
+                  ) : undefined}
                 </div>
               )}
             </form.Field>
@@ -501,13 +508,13 @@ export function Amplified() {
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      {field.state.meta.touchedErrors && (
+                      {field.state.meta.touchedErrors.length ? (
                         <div>
                           <Caption className="text-red-600 text-xs">
                             Please select a valid option
                           </Caption>
                         </div>
-                      )}
+                      ) : undefined}
                     </div>
                   )}
                 </form.Field>

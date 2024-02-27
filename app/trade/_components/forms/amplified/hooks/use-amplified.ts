@@ -106,8 +106,8 @@ export function useAmplified({ onSubmit }: Props) {
   const computeReceiveAmount = (key: "firstAsset" | "secondAsset") => {
     const limitPrice = form.getFieldValue(`${key}.limitPrice`)
     const keyValue = form.getFieldValue(`${key}`)
+    if (!limitPrice) return
 
-    if (Number(limitPrice) <= 0) return
     const amount = Big(Number(sendAmount ?? 0))
       .div(Number(limitPrice) ?? 1)
       .toString()

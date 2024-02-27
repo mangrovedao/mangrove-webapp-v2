@@ -125,7 +125,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
               : 0,
           inboundTokens,
         })
-        console.log(1)
+
         //TODO: check why we don't have tx hash
         return order
       } catch (error) {
