@@ -1,10 +1,10 @@
 import { Copy } from "lucide-react"
-import Link from "next/link"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { dialogs } from "@/services/dialogs.service"
 import { shortenAddress } from "@/utils/wallet"
+import Link from "next/link"
 
 // open the alert dialog saying that the network is wrong
 function openTxCompletedDialog({

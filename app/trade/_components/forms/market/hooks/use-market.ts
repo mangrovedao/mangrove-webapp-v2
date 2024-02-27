@@ -18,6 +18,7 @@ type Props = {
 }
 
 const determinePrices = (
+  tradeAction: TradeAction,
   quoteToken?: Token,
   orderBook?: {
     asks: Market.Offer[]
@@ -25,7 +26,7 @@ const determinePrices = (
   } | null,
   marketPrice?: number,
 ) => {
-  if (!orderBook?.bids || orderBook?.asks) {
+  if (!orderBook?.bids || !orderBook?.asks) {
     return {
       price: marketPrice,
       decimals: determinePriceDecimalsFromToken(marketPrice, quoteToken),
@@ -35,16 +36,15 @@ const determinePrices = (
   const bids = orderBook?.bids
   const asks = orderBook?.asks
 
-  // calculate average
-  const allPrices = asks
-    ?.map((ask) => ask.price)
-    .concat(bids.map((bid) => bid.price))
-  const totalSum = allPrices.reduce((total, price) => total + Number(price), 0)
-  const averagePrice = totalSum / allPrices.length
+  const lowestAsk = asks?.[0]
+  const highestBid = bids?.[0]
+
+  const averagePrice =
+    tradeAction === TradeAction.BUY ? lowestAsk?.price : highestBid?.price
 
   return {
     price: averagePrice,
-    decimals: determinePriceDecimalsFromToken(averagePrice, quoteToken),
+    decimals: determinePriceDecimalsFromToken(Number(averagePrice), quoteToken),
   }
 }
 
@@ -86,6 +86,7 @@ export function useMarketForm(props: Props) {
   )
 
   const averagePrice = determinePrices(
+    tradeAction,
     quoteToken,
     orderBook.data,
     marketPrice?.close,

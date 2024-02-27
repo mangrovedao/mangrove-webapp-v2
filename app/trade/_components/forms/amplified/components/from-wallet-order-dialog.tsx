@@ -211,12 +211,6 @@ export default function FromWalletAmplifiedOrderDialog({
       <Dialog.Description>
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}
-          <div className="bg-[#041010] rounded-lg p-4 flex items-center">
-            {/* <MarketDetails
-              takerFee={feeInPercentageAsString}
-              tickSize={tickSize}
-            /> */}
-          </div>
         </div>
       </Dialog.Description>
       <Dialog.Footer>{stepInfos[currentStep - 1]?.button}</Dialog.Footer>

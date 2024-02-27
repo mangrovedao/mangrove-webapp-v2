@@ -19,79 +19,83 @@ const useIndexerSdkContext = () => {
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["indexer-sdk", chain],
     queryFn: () => {
-      if (!chain) return null
+      try {
+        if (!chain) return null
 
-      let chainName: Chains
-      switch (chain.id) {
-        case 168587773:
-          chainName = "blast-sepolia"
-          break
-        case 80001:
-          chainName = "maticmum"
-          break
-        default:
-          chainName = chain.name as Chains
-      }
+        let chainName: Chains
+        switch (chain.id) {
+          case 168587773:
+            chainName = "blast-sepolia"
+            break
+          case 80001:
+            chainName = "maticmum"
+            break
+          default:
+            chainName = chain.name as Chains
+        }
 
-      console.log("Initializing indexer sdk for chain", chainName)
-      return getSdk({
-        chainName,
-        helpers: {
-          getTokenDecimals: async (address) => {
-            const token = await mangrove?.tokenFromAddress(address)
-            if (!token)
-              throw new Error("Impossible to determine token decimals")
-            return token.decimals
-          },
-          createTickHelpers: async (ba, m) => {
-            const base = await mangrove?.tokenFromAddress(m.base.address)
-            const quote = await mangrove?.tokenFromAddress(m.quote.address)
-            if (!(mangrove && base && quote)) {
-              throw new Error("Impossible to determine market tokens")
-            }
+        console.log("Initializing indexer sdk for chain", chainName)
+        return getSdk({
+          chainName,
+          helpers: {
+            getTokenDecimals: async (address) => {
+              const token = await mangrove?.tokenFromAddress(address)
+              if (!token)
+                throw new Error("Impossible to determine token decimals")
+              return token.decimals
+            },
+            createTickHelpers: async (ba, m) => {
+              const base = await mangrove?.tokenFromAddress(m.base.address)
+              const quote = await mangrove?.tokenFromAddress(m.quote.address)
+              if (!(mangrove && base && quote)) {
+                throw new Error("Impossible to determine market tokens")
+              }
 
-            const tickPriceHelper = new TickPriceHelper(ba, {
-              base,
-              quote,
-              tickSpacing: m.tickSpacing,
-            })
+              const tickPriceHelper = new TickPriceHelper(ba, {
+                base,
+                quote,
+                tickSpacing: m.tickSpacing,
+              })
 
-            return {
-              priceFromTick(tick) {
-                return tickPriceHelper.priceFromTick(tick, "roundUp")
-              },
-              inboundFromOutbound(tick, outboundAmount, roundUp) {
-                return tickPriceHelper.inboundFromOutbound(
-                  tick,
-                  outboundAmount,
-                  roundUp ? "roundUp" : "nearest",
-                )
-              },
-              outboundFromInbound(tick, inboundAmount, roundUp) {
-                return tickPriceHelper.outboundFromInbound(
-                  tick,
-                  inboundAmount,
-                  roundUp ? "roundUp" : "nearest",
-                )
-              },
-            }
-          },
-          getPrice(tokenAddress) {
-            return queryClient.fetchQuery({
-              queryKey: ["tokenPriceInUsd", tokenAddress],
-              queryFn: async () => {
-                const token = await mangrove?.tokenFromAddress(tokenAddress)
-                if (!token?.symbol)
-                  throw new Error(
-                    `Impossible to determine token from address: ${tokenAddress}`,
+              return {
+                priceFromTick(tick) {
+                  return tickPriceHelper.priceFromTick(tick, "roundUp")
+                },
+                inboundFromOutbound(tick, outboundAmount, roundUp) {
+                  return tickPriceHelper.inboundFromOutbound(
+                    tick,
+                    outboundAmount,
+                    roundUp ? "roundUp" : "nearest",
                   )
-                return getTokenPriceInUsd(token.symbol)
-              },
-              staleTime: 10 * 60 * 1000,
-            })
+                },
+                outboundFromInbound(tick, inboundAmount, roundUp) {
+                  return tickPriceHelper.outboundFromInbound(
+                    tick,
+                    inboundAmount,
+                    roundUp ? "roundUp" : "nearest",
+                  )
+                },
+              }
+            },
+            getPrice(tokenAddress) {
+              return queryClient.fetchQuery({
+                queryKey: ["tokenPriceInUsd", tokenAddress],
+                queryFn: async () => {
+                  const token = await mangrove?.tokenFromAddress(tokenAddress)
+                  if (!token?.symbol)
+                    throw new Error(
+                      `Impossible to determine token from address: ${tokenAddress}`,
+                    )
+                  return getTokenPriceInUsd(token.symbol)
+                },
+                staleTime: 10 * 60 * 1000,
+              })
+            },
           },
-        },
-      })
+        })
+      } catch (error) {
+        console.error("Error when initializing the indexer sdk", error)
+      }
     },
     meta: {
       error: "Error when initializing the indexer sdk",

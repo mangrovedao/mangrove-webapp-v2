@@ -156,9 +156,9 @@ export default function EditOrderSheet({
                 <SheetLine title="Type" item={<Text>Wallet</Text>} />
 
                 <SheetLine
-                  title="Filled"
+                  title="Filled/Amount"
                   item={
-                    <Text>{`${filled} ${
+                    <Text>{`${filled} / ${volume} ${
                       isBid ? base.symbol : quote.symbol
                     }`}</Text>
                   }
@@ -173,7 +173,7 @@ export default function EditOrderSheet({
                   }
                 />
                 <SheetLine
-                  title="Amount"
+                  title="Send Amount"
                   item={
                     !toggleEdit ? (
                       <Text>{`${volume} ${

@@ -40,6 +40,7 @@ export function Orders() {
         table={table}
         isError={!!ordersQuery.error}
         isLoading={ordersQuery.isLoading || !market}
+        onRowClick={(order) => setOrderToEdit(order as Order)}
         pagination={{
           onPageChange: setPageDetails,
           page,

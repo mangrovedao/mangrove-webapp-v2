@@ -15,7 +15,12 @@ export function successToast(
 ) {
   const summary = result.summary
   const price = result.offerWrites[0]?.offer.price.toFixed(4)
-  const fillText = summary.partialFill ? "Partially filled" : "Filled"
+  const fillText =
+    summary.fillVolume.toNumber() > 0
+      ? "Market order not filled, please increase the slippage."
+      : summary.partialFill
+        ? "Partially filled"
+        : "Filled"
 
   toast(
     <div className="grid gap-2 w-full">
