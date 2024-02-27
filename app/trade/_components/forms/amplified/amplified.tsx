@@ -1,5 +1,6 @@
 import React from "react"
 
+import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenIcon } from "@/components/token-icon"
 import { EnhancedNumericInput } from "@/components/token-input"
@@ -19,6 +20,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { Plus, WalletIcon } from "lucide-react"
+import Link from "next/link"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
@@ -83,11 +85,30 @@ export function Amplified() {
 
   return (
     <div className="grid space-y-2">
-      <Text className="text-muted-foreground text-xs" variant={"text2"}>
-        Place multiple limit orders using the same liquidity. The execution of
-        one order will automatically update the others if partially filled or
-        cancel the others if fully filled.
-      </Text>
+      <div className="flex items-center">
+        <Text className="text-muted-foreground text-xs" variant={"text2"}>
+          Place multiple limit orders using the same liquidity.
+        </Text>
+        <InfoTooltip>
+          <Caption>
+            The execution of one order will automatically update the others
+          </Caption>
+          <Caption>
+            if partially filled or cancel the others if fully filled.{" "}
+          </Caption>
+
+          <Link
+            className="text-primary underline"
+            href={
+              "https://docs.mangrove.exchange/general/web-app/trade/how-to-amplify-order"
+            }
+            target="_blank"
+            rel="noreferrer"
+          >
+            Learn more
+          </Link>
+        </InfoTooltip>
+      </div>
 
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
