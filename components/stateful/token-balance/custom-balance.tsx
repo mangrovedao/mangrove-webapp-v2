@@ -23,7 +23,7 @@ export function CustomBalance(props: {
         <Skeleton className="w-24 h-4" />
       ) : (
         <span className="text-xs space-x-1">
-          <span>{props.balance}</span>
+          <span>{formattedWithSymbol}</span>
           {props?.action && (
             <button
               className="text-xs underline"

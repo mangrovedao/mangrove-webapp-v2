@@ -31,7 +31,8 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          "dark-green": "hsl(var(--color-primary-dark-geen))",
+          "dark-green": "hsl(var(--color-primary-dark-green))",
+          "bush-green": "hsl(var(--color-primary-bush-green))",
           "solid-black": "hsl(var(--color-primary-solid-black))",
           "night-woods": "hsl(var(--color-primary-night-woods))",
         },
@@ -90,6 +91,7 @@ export default {
         cloud: {
           "00": "hsl(var(--color-cloud-00))",
           100: "hsl(var(--color-cloud-100))",
+          200: "hsl(var(--color-cloud-200))",
           300: "hsl(var(--color-cloud-300))",
           400: "hsl(var(--color-cloud-400))",
           500: "hsl(var(--color-cloud-500))",
@@ -129,6 +131,10 @@ export default {
       boxShadow: {
         error: "0px 0px 0px 16px rgba(56, 18, 18, 0.25)",
         success: "0 0 0 16px rgba(3, 34, 33, 0.25)",
+      },
+      backgroundImage: {
+        "level-chart":
+          "linear-gradient(180deg, rgba(3, 98, 76, 0.00) 57.96%, rgba(3, 98, 76, 0.30) 99.5%)",
       },
     },
   },

@@ -11,7 +11,8 @@
     --color-red-500: 0, 53%, 10%;
     --color-green-caribbean: 155, 100%, 44%;
     --color-green-bangladesh: 166, 94%, 20%;
-    --color-primary-dark-geen: 178 84% 7%;
+    --color-primary-dark-green: 178 84% 7%;
+    --color-primary-bush-green: 180, 73%, 4%;
     --color-primary-solid-black: 177, 72%, 6%;
     --color-black-rich: 178, 86%, 6%;
     --color-white-anti-flash: 170, 27%, 96%;
@@ -27,6 +28,7 @@
     --color-primary-night-woods: 180, 86%, 3%;
     --color-cloud-00: 0, 0%, 74%;
     --color-cloud-100: 167, 24%, 73%;
+    --color-cloud-200: 180, 10%, 64%;
     --color-cloud-300: 180, 5%, 46%;
     --color-cloud-400: 180, 8%, 20%;
     --color-cloud-500: 180, 9%, 12%;
@@ -36,7 +38,7 @@
     --color-mango-200: 45, 74%, 20%;
     --color-mango-300: 50, 42%, 11%;
 
-    --tw-ring-color: var(hsl(--color-primary-dark-geen));
+    --tw-ring-color: var(hsl(--color-primary-dark-green));
     --background: 180 86% 3%;
     --foreground: 210 40% 98%;
 
