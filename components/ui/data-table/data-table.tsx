@@ -22,6 +22,7 @@ interface DataTableProps<TData> {
   isRowHighlighted?: (row: TData) => boolean
   onRowHover?: (row: TData | null) => void
   renderExtraRow?: (row: Row<TData>) => React.ReactNode
+  tableRowClasses?: string
 }
 
 export function DataTable<TData>({
@@ -32,6 +33,7 @@ export function DataTable<TData>({
   isRowHighlighted = () => false,
   onRowHover = () => {},
   renderExtraRow = () => null,
+  tableRowClasses,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
@@ -72,6 +74,7 @@ export function DataTable<TData>({
                     {
                       "text-white": isRowHighlighted?.(row.original),
                     },
+                    tableRowClasses,
                   )}
                   onMouseEnter={() => onRowHover?.(row.original)}
                   onMouseLeave={() => onRowHover?.(null)}

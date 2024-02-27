@@ -430,3 +430,95 @@ export function MeterIcon(props: React.ComponentProps<"svg">) {
     </svg>
   )
 }
+
+export function Rank1Icon(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 28 29"
+      {...props}
+    >
+      <rect width="28" height="28" y="0.166" fill="#946E00" rx="14"></rect>
+      <rect
+        width="26"
+        height="26"
+        x="1"
+        y="1.166"
+        stroke="#FFDA7B"
+        strokeOpacity="0.25"
+        strokeWidth="2"
+        rx="13"
+      ></rect>
+      <path
+        stroke="#FFDA7B"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.102"
+        d="M16.002 13.043l2.692-6.098m-6.271 6.234L9.306 6.945m5.605 5.812l-2.835-5.812m3.99 0l-.752 1.806m-5.286 8.304a4.333 4.333 0 108.666 0 4.333 4.333 0 00-8.666 0z"
+      ></path>
+    </svg>
+  )
+}
+
+export function Rank2Icon(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 28 29"
+      {...props}
+    >
+      <rect width="28" height="28" y="0.166" fill="#2E3737" rx="14"></rect>
+      <rect
+        width="26"
+        height="26"
+        x="1"
+        y="1.166"
+        stroke="#BCBCBC"
+        strokeOpacity="0.25"
+        strokeWidth="2"
+        rx="13"
+      ></rect>
+      <path
+        stroke="#BCBCBC"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.102"
+        d="M16.002 13.043l2.692-6.098m-6.271 6.234L9.306 6.945m5.605 5.812l-2.835-5.812m3.99 0l-.752 1.806m-5.286 8.304a4.333 4.333 0 108.666 0 4.333 4.333 0 00-8.666 0z"
+      ></path>
+    </svg>
+  )
+}
+
+export function Rank3Icon(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="28"
+      height="29"
+      fill="none"
+      viewBox="0 0 28 29"
+      {...props}
+    >
+      <rect width="28" height="28" y="0.166" fill="#5E3900" rx="14"></rect>
+      <rect
+        width="26"
+        height="26"
+        x="1"
+        y="1.166"
+        stroke="#D7A250"
+        strokeOpacity="0.25"
+        strokeWidth="2"
+        rx="13"
+      ></rect>
+      <path
+        stroke="#D7A250"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.102"
+        d="M16.002 13.043l2.692-6.098m-6.271 6.234L9.306 6.945m5.605 5.812l-2.835-5.812m3.99 0l-.752 1.806m-5.286 8.304a4.333 4.333 0 108.666 0 4.333 4.333 0 00-8.666 0z"
+      ></path>
+    </svg>
+  )
+}

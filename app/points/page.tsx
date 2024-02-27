@@ -4,6 +4,7 @@ import { useAccount } from "wagmi"
 import { ConnectWalletBanner } from "./_components/connect-wallet-banner"
 import CurrentBoost from "./_components/current-boost"
 import { JoinProgramBanner } from "./_components/join-program-banner"
+import { Leaderboard } from "./_components/leaderboard/table"
 import NextLevel from "./_components/next-level"
 import Rank from "./_components/rank"
 import Rewards from "./_components/rewards"
@@ -24,6 +25,7 @@ export default function Page() {
         <Rank className="col-span-full md:col-span-1" />
         <NextLevel className="col-span-full" />
       </div>
+      <Leaderboard />
     </div>
   ) : (
     <div>
