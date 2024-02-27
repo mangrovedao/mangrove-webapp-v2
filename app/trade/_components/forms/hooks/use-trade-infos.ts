@@ -7,7 +7,7 @@ import { TradeAction } from "../enums"
 import { useSpenderAddress } from "./use-spender-address"
 
 export function useTradeInfos(
-  type: "limit" | "market" | "amplified",
+  type: "limit" | "market",
   tradeAction: TradeAction,
 ) {
   const { market, marketInfo, requestBookQuery } = useMarket()
@@ -19,6 +19,7 @@ export function useTradeInfos(
     baseToken,
     quoteToken,
   )
+
   const sendTokenBalance = useTokenBalance(sendToken)
   const { data: spender } = useSpenderAddress(type)
   const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(

@@ -8,10 +8,10 @@ export const useSpenderAddress = (type: "limit" | "market" | "amplified") => {
     queryKey: ["spenderAddress", type, mangrove?.address],
     queryFn: async () => {
       if (!mangrove) return null
-      if (type === "limit") {
-        return await mangrove.getRestingOrderRouterAddress()
+      if (type === "market") {
+        return mangrove.address
       }
-      return mangrove.address
+      return await mangrove.getRestingOrderRouterAddress()
     },
     enabled: !!mangrove,
   })

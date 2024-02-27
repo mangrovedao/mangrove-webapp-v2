@@ -19,7 +19,7 @@ export function CustomBalance(props: {
       <span className="text-xs text-secondary float-left">
         {props.label ?? "Balance"}
       </span>
-      {!props.token || isLoading ? (
+      {!props.balance || !props.token || isLoading ? (
         <Skeleton className="w-24 h-4" />
       ) : (
         <span className="text-xs space-x-1">

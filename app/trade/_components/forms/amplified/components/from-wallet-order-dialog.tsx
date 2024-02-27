@@ -1,3 +1,6 @@
+import type { Token } from "@mangrovedao/mangrove.js"
+import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
+import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
 import { useAccount } from "wagmi"
 
@@ -5,18 +8,24 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
-import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
-import { useTradeInfos } from "../../hooks/use-trade-infos"
+import { useSpenderAddress } from "../../hooks/use-spender-address"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
 type Props = {
-  form: Form
+  form: Form & {
+    selectedToken?: Token
+    firstAssetToken?: Token
+    secondAssetToken?: Token
+    selectedSource?: SimpleLogic | SimpleAaveLogic
+    sendAmount: string
+  }
   onClose: () => void
 }
 
@@ -30,21 +39,25 @@ export default function FromWalletAmplifiedOrderDialog({
   form,
   onClose,
 }: Props) {
-  const { chain } = useAccount()
   const {
-    baseToken,
-    quoteToken,
-    sendToken,
-    receiveToken,
-    isInfiniteAllowance,
+    selectedToken,
+    firstAssetToken,
+    secondAssetToken,
+    selectedSource,
+    sendAmount,
+  } = form
+
+  const { chain } = useAccount()
+  const { data: spender } = useSpenderAddress("amplified")
+  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
+    selectedToken,
     spender,
-    feeInPercentageAsString,
-    tickSize,
-  } = useTradeInfos("amplified", form.tradeAction)
+    selectedSource,
+  )
 
   let steps = ["Send"]
   if (!isInfiniteAllowance) {
-    steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
+    steps = ["Summary", `Approve ${selectedToken?.symbol}`, ...steps]
   }
 
   const isDialogOpenRef = React.useRef(false)
@@ -83,10 +96,23 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          baseToken={baseToken}
-          quoteToken={quoteToken}
-          sendToken={sendToken}
-          receiveToken={receiveToken}
+          receiveTokens={[
+            {
+              receiveTo: form.firstAsset.receiveTo,
+              amount: form.firstAsset.amount,
+              token: firstAssetToken!,
+              limitPrice: form.firstAsset.limitPrice,
+            },
+            {
+              receiveTo: form.secondAsset.receiveTo,
+              amount: form.secondAsset.amount,
+              token: secondAssetToken!,
+              limitPrice: form.secondAsset.limitPrice,
+            },
+          ]}
+          tokenToAmplify={selectedToken}
+          sendAmount={sendAmount}
+          source={selectedSource!}
         />
       ),
       button: (
@@ -96,7 +122,7 @@ export default function FromWalletAmplifiedOrderDialog({
       ),
     },
     !isInfiniteAllowance && {
-      body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
+      body: <ApproveStep tokenSymbol={selectedToken?.symbol ?? ""} />,
       button: (
         <Button
           {...btnProps}
@@ -105,7 +131,7 @@ export default function FromWalletAmplifiedOrderDialog({
           onClick={() => {
             approve.mutate(
               {
-                token: sendToken,
+                token: selectedToken,
                 spender,
               },
               {
@@ -122,10 +148,23 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          baseToken={baseToken}
-          quoteToken={quoteToken}
-          sendToken={sendToken}
-          receiveToken={receiveToken}
+          receiveTokens={[
+            {
+              receiveTo: form.firstAsset.receiveTo,
+              amount: form.firstAsset.amount,
+              token: firstAssetToken!,
+              limitPrice: form.firstAsset.limitPrice,
+            },
+            {
+              receiveTo: form.secondAsset.receiveTo,
+              amount: form.secondAsset.amount,
+              token: secondAssetToken!,
+              limitPrice: form.secondAsset.limitPrice,
+            },
+          ]}
+          tokenToAmplify={selectedToken}
+          sendAmount={sendAmount}
+          source={selectedSource!}
         />
       ),
       button: (
@@ -139,6 +178,7 @@ export default function FromWalletAmplifiedOrderDialog({
                 form,
               },
               {
+                onSettled: onClose,
                 onError: (error: Error) => {
                   onClose()
                   tradeService.openTxFailedDialog(
@@ -172,10 +212,10 @@ export default function FromWalletAmplifiedOrderDialog({
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}
           <div className="bg-[#041010] rounded-lg p-4 flex items-center">
-            <MarketDetails
+            {/* <MarketDetails
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
-            />
+            /> */}
           </div>
         </div>
       </Dialog.Description>
