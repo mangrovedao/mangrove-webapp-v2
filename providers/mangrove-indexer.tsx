@@ -1,7 +1,7 @@
 "use client"
 
 import { getSdk } from "@mangrovedao/indexer-sdk"
-import type { Chains } from "@mangrovedao/indexer-sdk/dist/src/types/types"
+import type { ChainsIds } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import React from "react"
 import { useAccount } from "wagmi"
@@ -22,21 +22,9 @@ const useIndexerSdkContext = () => {
       try {
         if (!chain) return null
 
-        let chainName: Chains
-        switch (chain.id) {
-          case 168587773:
-            chainName = "blast-sepolia"
-            break
-          case 80001:
-            chainName = "maticmum"
-            break
-          default:
-            chainName = chain.name as Chains
-        }
-
-        console.log("Initializing indexer sdk for chain", chainName)
+        console.log("Initializing indexer sdk for chain", chain.name)
         return getSdk({
-          chainName,
+          chainId: chain.id as ChainsIds,
           helpers: {
             getTokenDecimals: async (address) => {
               const token = await mangrove?.tokenFromAddress(address)

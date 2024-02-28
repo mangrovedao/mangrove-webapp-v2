@@ -151,6 +151,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
                 disabled={isExpired}
                 onClick={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
                   onEdit(row.original)
                 }}
               >
@@ -161,6 +162,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
                 className="aspect-square w-6 rounded-full"
                 onClick={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
                   onCancel(row.original)
                 }}
               >

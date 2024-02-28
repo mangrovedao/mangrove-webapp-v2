@@ -57,7 +57,7 @@ export function Market() {
     : Big(0)
 
   const sliderValue = Math.min(
-    Big(Number(send) ?? 0)
+    Big(!isNaN(Number(send)) ? Number(send) : 0)
       .mul(100)
       .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
       .toNumber(),

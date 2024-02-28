@@ -76,7 +76,10 @@ export function DataTable<TData>({
                       "text-white": isRowHighlighted?.(row.original),
                     },
                   )}
-                  onClick={() => onRowClick?.(row.original)}
+                  onClick={(e) => {
+                    console.log(e)
+                    onRowClick?.(row.original)
+                  }}
                   onMouseEnter={() => onRowHover?.(row.original)}
                   onMouseLeave={() => onRowHover?.(null)}
                 >
