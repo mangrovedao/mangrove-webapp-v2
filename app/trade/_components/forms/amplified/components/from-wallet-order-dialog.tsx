@@ -22,13 +22,14 @@ import { useSpenderAddress } from "../../hooks/use-spender-address"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 
 type Props = {
   form: Form & {
     selectedToken?: Token
     firstAssetToken?: Token
     secondAssetToken?: Token
-    selectedSource?: SimpleLogic | SimpleAaveLogic
+    selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
     sendAmount: string
   }
   onClose: () => void
