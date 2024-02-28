@@ -1,7 +1,6 @@
 import type { Token } from "@mangrovedao/mangrove.js"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
-
 import { useMutation } from "@tanstack/react-query"
 
 export function useInfiniteApproveToken() {

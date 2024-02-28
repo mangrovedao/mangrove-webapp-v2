@@ -149,14 +149,22 @@ export function useTable({ data, onCancel, onEdit }: Params) {
                 tooltip="Modify"
                 className="aspect-square w-6 rounded-full"
                 disabled={isExpired}
-                onClick={() => onEdit(row.original)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onEdit(row.original)
+                }}
               >
                 <Pen />
               </IconButton>
               <IconButton
                 tooltip="Retract offer"
                 className="aspect-square w-6 rounded-full"
-                onClick={() => onCancel(row.original)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onCancel(row.original)
+                }}
               >
                 <Close />
               </IconButton>

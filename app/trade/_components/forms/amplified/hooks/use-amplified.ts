@@ -5,22 +5,24 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
 
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { TradeAction } from "../../enums"
-import { useTradeInfos } from "../../hooks/use-trade-infos"
+import { Token } from "@mangrovedao/mangrove.js"
+import Big from "big.js"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
-  onSubmit: (data: Form) => void
+  onSubmit?: (data: Form) => void
 }
 
-export function useAmplified(props: Props) {
+export function useAmplified({ onSubmit }: Props) {
+  const { mangrove, marketsInfoQuery } = useMangrove()
   const { market, marketInfo } = useMarket()
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      tradeAction: TradeAction.BUY,
       sendSource: "",
       sendAmount: "",
       sendToken: "",
@@ -28,42 +30,124 @@ export function useAmplified(props: Props) {
         amount: "",
         token: "",
         limitPrice: "",
-        receiveTo: "wallet",
+        receiveTo: "simple",
       },
       secondAsset: {
         amount: "",
         token: "",
         limitPrice: "",
-        receiveTo: "wallet",
+        receiveTo: "simple",
       },
       timeInForce: TimeInForce.GOOD_TIL_TIME,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
     },
-    onSubmit: (values) => props.onSubmit(values),
+    onSubmit: (values) => onSubmit?.(values),
   })
-  const tradeAction = form.useStore((state) => state.values.tradeAction)
-  const {
-    quoteToken,
-    baseToken,
-    sendToken,
-    receiveToken,
-    feeInPercentageAsString,
-    sendTokenBalance,
-  } = useTradeInfos("amplified", tradeAction)
+
+  const sendAmount = form.useStore((state) => state.values.sendAmount)
+  const sendToken = form.useStore((state) => state.values.sendToken)
+  const sendSource = form.useStore((state) => state.values.sendSource)
+  const timeInForce = form.useStore((state) => state.values.timeInForce)
+  const selectedTokenId = form.useStore((state) => state.values.sendToken)
+
+  const { data: openMarkets } = marketsInfoQuery
+
+  const availableTokens =
+    openMarkets?.reduce((acc, current) => {
+      if (!acc.includes(current.base)) {
+        acc.push(current.base)
+      }
+      if (!acc.includes(current.quote)) {
+        acc.push(current.quote)
+      }
+
+      return acc
+    }, [] as Token[]) ?? []
+
+  /// GET liquidity sourcing logics ///
+  const logics = mangrove ? Object.values(mangrove.logics) : []
+
+  /// GET first asset infos ///
+  const firstAsset = form.useStore((state) => state.values.firstAsset)
+  const firstAssetToken = availableTokens.find(
+    (token) => token.id === firstAsset.token,
+  )
+
+  /// GET second asset infos ///
+  const secondAsset = form.useStore((state) => state.values.secondAsset)
+  const secondAssetToken = availableTokens.find(
+    (token) => token.id === secondAsset.token,
+  )
+
+  const selectedToken = availableTokens.find(
+    (token) => token.id === selectedTokenId,
+  )
+  const selectedSource = logics.find((logic) => logic?.id === sendSource)
+
+  const compatibleMarkets = openMarkets?.filter(
+    (market) =>
+      market.base.id === selectedToken?.id ||
+      market.quote.id === selectedToken?.id,
+  )
+
+  const currentTokens = availableTokens?.filter((token) => {
+    if (selectedToken?.id === token.id) return false
+
+    return compatibleMarkets?.some(
+      (market) => market.base.id == token.id || market.quote.id == token.id,
+    )
+  })
+
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
-  const send = form.useStore((state) => state.values.sendAmount)
-  const timeInForce = form.useStore((state) => state.values.timeInForce)
+  const computeReceiveAmount = (key: "firstAsset" | "secondAsset") => {
+    const limitPrice = form.getFieldValue(`${key}.limitPrice`)
+    const keyValue = form.getFieldValue(`${key}`)
+    if (!limitPrice) return
+
+    const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
+      .div(
+        Big(
+          !isNaN(Number(limitPrice)) && Number(limitPrice) > 0
+            ? Number(limitPrice)
+            : 1,
+        ),
+      )
+      .toString()
+
+    form.store.setState(
+      (state) => {
+        return {
+          ...state,
+          values: {
+            ...state.values,
+            [key]: {
+              ...keyValue,
+              amount,
+            },
+          },
+        }
+      },
+      {
+        priority: "high",
+      },
+    )
+  }
 
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
   ) {
-    // form.setFieldValue("limitPrice", event.detail.price)
+    if (firstAsset?.token === market?.quote.id) {
+      form.setFieldValue("firstAsset.limitPrice", event.detail.price)
+    }
+    if (secondAsset?.token === market?.quote.id) {
+      form.setFieldValue("secondAsset.limitPrice", event.detail.price)
+    }
     form.validateAllFields("blur")
-    if (send === "") return
+    if (sendAmount === "") return
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -73,27 +157,33 @@ export function useAmplified(props: Props) {
   }
 
   React.useEffect(() => {
-    form.validateAllFields("submit")
-  }, [form, tradeAction])
+    form.validateAllFields("change")
+  }, [form])
 
   React.useEffect(() => {
     form?.reset()
-  }, [form, market?.base, market?.quote])
+  }, [form])
 
   return {
-    tradeAction,
-    sendTokenBalance,
     handleSubmit,
+    computeReceiveAmount,
     form,
-    quoteToken,
-    baseToken,
     market,
-    sendToken,
-    send,
-    receiveToken,
-    assets: quoteToken && baseToken ? [quoteToken, baseToken] : [],
     tickSize: marketInfo?.tickSpacing.toString(),
-    feeInPercentageAsString,
+    sendAmount,
+    sendSource,
+    sendToken,
+    selectedToken,
+    selectedSource,
     timeInForce,
+
+    firstAsset,
+    secondAsset,
+    firstAssetToken,
+    secondAssetToken,
+    logics,
+    currentTokens,
+    availableTokens,
+    openMarkets,
   }
 }

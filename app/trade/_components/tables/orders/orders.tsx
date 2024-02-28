@@ -26,11 +26,14 @@ export function Orders() {
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<Order>()
-  const [orderToEdit, setOrderToEdit] = React.useState<Order>()
+  const [orderToEdit, setOrderToEdit] = React.useState<{
+    order: Order
+    mode: "view" | "edit"
+  }>()
 
   const table = useTable({
     data: ordersQuery.data,
-    onEdit: setOrderToEdit,
+    onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
     onCancel: setOrderToDelete,
   })
 
@@ -40,6 +43,9 @@ export function Orders() {
         table={table}
         isError={!!ordersQuery.error}
         isLoading={ordersQuery.isLoading || !market}
+        onRowClick={(order) =>
+          setOrderToEdit({ order: order as Order, mode: "view" })
+        }
         pagination={{
           onPageChange: setPageDetails,
           page,
@@ -48,7 +54,7 @@ export function Orders() {
         }}
       />
       <EditOrderSheet
-        order={orderToEdit}
+        orderInfos={orderToEdit}
         market={market}
         onClose={() => setOrderToEdit(undefined)}
       />

@@ -1,10 +1,7 @@
 import React from "react"
 
-import {
-  CustomRadioGroup,
-  CustomRadioGroupItem,
-} from "@/components/custom-radio-group"
-import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
+import InfoTooltip from "@/components/info-tooltip"
+import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenIcon } from "@/components/token-icon"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
@@ -21,78 +18,132 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
-import { Plus, WalletIcon, XIcon } from "lucide-react"
+import Big from "big.js"
+import { Plus, WalletIcon } from "lucide-react"
+import Link from "next/link"
+import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
-import { TradeAction } from "../enums"
-import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
+import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
+import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
+import {
+  isGreaterThanZeroValidator,
+  isSelected,
+  sendValidator,
+} from "./validators"
+
+const sliderValues = [25, 50, 75, 100]
 
 export function Amplified() {
   const [formData, setFormData] = React.useState<Form>()
   const {
-    tradeAction,
-    assets,
     handleSubmit,
+    computeReceiveAmount,
     form,
-    quoteToken,
-    baseToken,
     market,
-    receiveToken,
     timeInForce,
+    sendSource,
+    sendToken,
+    sendAmount,
+    selectedToken,
+    selectedSource,
+    firstAsset,
+    secondAsset,
+    firstAssetToken,
+    secondAssetToken,
+    logics,
+    availableTokens,
+    currentTokens,
   } = useAmplified({
     onSubmit: (formData) => setFormData(formData),
   })
 
-  const [markets, setMarkets] = React.useState(0)
+  const { address } = useAccount()
 
-  const addMarket = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault()
-    setMarkets(markets + 1)
+  const { balanceLogic } = liquiditySourcing({
+    sendToken: selectedToken,
+    sendFrom: sendSource,
+    fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
+    logics,
+  })
+  const { formatted } = useTokenBalance(selectedToken)
+
+  const balanceLogic_temporary = selectedToken?.id.includes("WBTC")
+    ? formatted
+    : balanceLogic?.formatted
+
+  const selectedTokens = [firstAssetToken, secondAssetToken]
+
+  const handleSliderChange = (value: number) => {
+    const amount = (value * Number(balanceLogic_temporary)) / 100
+    form.setFieldValue("sendAmount", amount.toString())
+    form.validateAllFields("change")
+
+    if (currentTokens.length > 1) {
+      if (
+        !form.state.values["firstAsset"].limitPrice ||
+        !form.state.values["secondAsset"].limitPrice
+      ) {
+        return
+      }
+    } else {
+      if (!form.state.values["firstAsset"].limitPrice) {
+        return
+      }
+    }
+
+    computeReceiveAmount("firstAsset")
+    computeReceiveAmount("secondAsset")
   }
+
+  const sendTokenBalanceAsBig = balanceLogic_temporary
+    ? Big(Number(balanceLogic_temporary))
+    : Big(0)
+
+  const sliderValue = Math.min(
+    Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
+      .mul(100)
+      .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
+      .toNumber(),
+    100,
+  ).toFixed(0)
 
   return (
     <div className="grid space-y-2">
-      <Text className="text-muted-foreground text-xs" variant={"text2"}>
-        Place multiple limit orders using the same liquidity. The execution of
-        one order will automatically update the others if partially filled or
-        cancel the others if fully filled.
-      </Text>
+      <div className="flex items-center">
+        <Text className="text-muted-foreground text-xs" variant={"text2"}>
+          Place multiple limit orders using the same liquidity.
+        </Text>
+        <InfoTooltip>
+          <Caption>
+            The execution of one order will automatically update others
+          </Caption>
+          <Caption>
+            if partially filled or cancel others if fully filled.{" "}
+          </Caption>
+
+          <Link
+            className="text-primary underline"
+            href={
+              "https://docs.mangrove.exchange/general/web-app/trade/how-to-amplify-order"
+            }
+            target="_blank"
+            rel="noreferrer"
+          >
+            Learn more
+          </Link>
+        </InfoTooltip>
+      </div>
 
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <form.Field name="tradeAction">
-            {(field) => (
-              <CustomRadioGroup
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onValueChange={(e: TradeAction) => {
-                  field.handleChange(e)
-                }}
-              >
-                {Object.values(TradeAction).map((action) => (
-                  <CustomRadioGroupItem
-                    key={action}
-                    value={action}
-                    id={action}
-                    variant={
-                      action === TradeAction.SELL ? "secondary" : "primary"
-                    }
-                    className="capitalize"
-                  >
-                    {action}
-                  </CustomRadioGroupItem>
-                ))}
-              </CustomRadioGroup>
-            )}
-          </form.Field>
-
-          <div className="space-y-4 !mt-6">
+          <div className="space-y-2 !mt-6">
             <Title variant={"title2"}> Liquidity sourcing</Title>
-
             <form.Field name="sendSource">
               {(field) => (
                 <div className="flex flex-col">
@@ -112,14 +163,21 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {["wallet"].map((source) => (
-                          <SelectItem key={source} value={source}>
-                            <div className="flex space-x-3">
-                              <WalletIcon />
-                              <Text className="capitalize"> {source}</Text>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        {logics.map(
+                          (logic) =>
+                            logic && (
+                              <SelectItem key={logic.id} value={logic.id}>
+                                <div className="flex space-x-3">
+                                  <WalletIcon />
+                                  <Text className="capitalize">
+                                    {logic.id.includes("simple")
+                                      ? "Wallet"
+                                      : logic.id.toUpperCase()}
+                                  </Text>
+                                </div>
+                              </SelectItem>
+                            ),
+                        )}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -128,7 +186,10 @@ export function Amplified() {
             </form.Field>
 
             <div className="flex gap-2">
-              <form.Field name="sendAmount">
+              <form.Field
+                name="sendAmount"
+                onChange={sendValidator(Number(balanceLogic_temporary))}
+              >
                 {(field) => (
                   <EnhancedNumericInput
                     name={field.name}
@@ -136,8 +197,10 @@ export function Amplified() {
                     onBlur={field.handleBlur}
                     onChange={(e) => {
                       field.handleChange(e.target.value)
+                      computeReceiveAmount("firstAsset")
+                      computeReceiveAmount("secondAsset")
                     }}
-                    disabled={!market}
+                    disabled={!market || !sendToken}
                     error={field.state.meta.errors}
                   />
                 )}
@@ -151,56 +214,72 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market}
+                    disabled={!market || !sendSource}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {tradeAction === TradeAction.BUY ? (
-                          <SelectItem
-                            key={baseToken?.symbol || "..."}
-                            value={baseToken?.symbol || "..."}
-                          >
+                        {availableTokens.map((token) => (
+                          <SelectItem key={token.id} value={token.id}>
                             <div className="flex space-x-3">
-                              <TokenIcon symbol={baseToken?.symbol || "..."} />
-                              <Text>{baseToken?.symbol || "..."}</Text>
+                              <TokenIcon symbol={token.symbol} />
+                              <Text>{token.symbol}</Text>
                             </div>
                           </SelectItem>
-                        ) : (
-                          <SelectItem
-                            key={quoteToken?.symbol || "..."}
-                            value={quoteToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
-                              <Text>{quoteToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
-                        )}
-
-                        {/* {assets.map((asset) => (
-                          <SelectItem
-                            key={asset?.symbol}
-                            value={asset?.symbol || "..."} 
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={asset?.symbol} />
-                              <Text>{asset?.symbol}</Text>
-                            </div>
-                          </SelectItem>
-                        ))} */}
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 )}
               </form.Field>
             </div>
-            <TokenBalance
-              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
-              label={"Balance"}
-            />
+
+            {selectedToken && (
+              <CustomBalance
+                token={selectedToken}
+                balance={balanceLogic_temporary}
+                label={"Balance"}
+              />
+            )}
+
+            {/* Slider component */}
+            <div className="space-y-5 pt-2 px-3">
+              <Slider
+                name={"sliderPercentage"}
+                defaultValue={[0]}
+                value={[Number(sliderValue)]}
+                step={5}
+                min={0}
+                max={100}
+                onValueChange={([value]) => {
+                  handleSliderChange(Number(value))
+                }}
+                disabled={!(market && form.state.isFormValid) || !sendToken}
+              />
+              <div className="flex justify-center space-x-3">
+                {sliderValues.map((value) => (
+                  <Button
+                    key={`percentage-button-${value}`}
+                    variant={"secondary"}
+                    size={"sm"}
+                    className={cn("text-xs w-full", {
+                      "opacity-10": Number(sliderValue) !== value,
+                    })}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (!sendToken) return
+                      handleSliderChange(Number(value))
+                    }}
+                    disabled={!market}
+                  >
+                    {value}%
+                  </Button>
+                ))}
+              </div>
+            </div>
+
             <div />
 
             <Caption variant={"caption1"} as={"label"}>
@@ -208,21 +287,6 @@ export function Amplified() {
             </Caption>
 
             <div className="flex justify-between space-x-1">
-              <form.Field name="firstAsset.amount">
-                {(field) => (
-                  <EnhancedNumericInput
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={({ target: { value } }) => {
-                      field.handleChange(value)
-                    }}
-                    disabled={!(market && form.state.isFormValid)}
-                    error={field.state.meta.touchedErrors}
-                  />
-                )}
-              </form.Field>
-
               <form.Field name="firstAsset.token">
                 {(field) => (
                   <Select
@@ -231,45 +295,25 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market}
+                    disabled={!market || !sendToken}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {tradeAction === TradeAction.BUY ? (
+                        {currentTokens.map((token) => (
                           <SelectItem
-                            key={baseToken?.symbol || "..."}
-                            value={baseToken?.symbol || "..."}
+                            key={token.id}
+                            value={token.id}
+                            disabled={selectedTokens.includes(token)}
                           >
                             <div className="flex space-x-3">
-                              <TokenIcon symbol={baseToken?.symbol || "..."} />
-                              <Text>{baseToken?.symbol || "..."}</Text>
+                              <TokenIcon symbol={token.symbol} />
+                              <Text>{token.id}</Text>
                             </div>
                           </SelectItem>
-                        ) : (
-                          <SelectItem
-                            key={quoteToken?.symbol || "..."}
-                            value={quoteToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
-                              <Text>{quoteToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
-                        )}
-                        {/* {assets.map((asset) => (
-                          <SelectItem
-                            key={asset?.symbol}
-                            value={asset?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={asset?.symbol} />
-                              <Text>{asset?.symbol}</Text>
-                            </div>
-                          </SelectItem>
-                        ))} */}
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -277,12 +321,10 @@ export function Amplified() {
               </form.Field>
             </div>
 
-            <TokenBalance
-              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
-              label={"Balance"}
-            />
-
-            <form.Field name="firstAsset.limitPrice">
+            <form.Field
+              name="firstAsset.limitPrice"
+              onChange={isGreaterThanZeroValidator}
+            >
               {(field) => (
                 <EnhancedNumericInput
                   name={field.name}
@@ -290,10 +332,13 @@ export function Amplified() {
                   onBlur={field.handleBlur}
                   onChange={({ target: { value } }) => {
                     field.handleChange(value)
+                    computeReceiveAmount("firstAsset")
                   }}
-                  token={receiveToken}
+                  token={firstAssetToken}
                   label="Limit price"
-                  disabled={!(market && form.state.isFormValid)}
+                  disabled={
+                    !(market && form.state.isFormValid) || !firstAsset.token
+                  }
                   error={field.state.meta.touchedErrors}
                 />
               )}
@@ -318,240 +363,189 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {["wallet"].map((source) => (
-                          <SelectItem key={source} value={source}>
-                            <div className="flex space-x-3">
-                              <WalletIcon />
-                              <Text className="capitalize"> {source}</Text>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </form.Field>
-
-            <div className="flex items-center gap-2 justify-center">
-              <Separator className="bg-green-bangladesh max-w-[135px]" />
-              <Caption>or</Caption>
-              <Separator className="bg-green-bangladesh max-w-[135px]" />
-            </div>
-
-            <Caption variant={"caption1"} as={"label"}>
-              Buy Asset #2
-            </Caption>
-            <div className="flex justify-between space-x-2">
-              <form.Field name="secondAsset.amount">
-                {(field) => (
-                  <EnhancedNumericInput
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={({ target: { value } }) => {
-                      field.handleChange(value)
-                    }}
-                    disabled={!(market && form.state.isFormValid)}
-                    error={field.state.meta.touchedErrors}
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="secondAsset.token">
-                {(field) => (
-                  <Select
-                    name={field.name}
-                    value={field.state.value}
-                    onValueChange={(value: string) => {
-                      field.handleChange(value)
-                    }}
-                    disabled={!market}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {tradeAction === TradeAction.BUY ? (
-                          <SelectItem
-                            key={baseToken?.symbol || "..."}
-                            value={baseToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={baseToken?.symbol || "..."} />
-                              <Text>{baseToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
-                        ) : (
-                          <SelectItem
-                            key={quoteToken?.symbol || "..."}
-                            value={quoteToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
-                              <Text>{quoteToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
+                        {logics.map(
+                          (logic) =>
+                            logic && (
+                              <SelectItem key={logic.id} value={logic.id}>
+                                <div className="flex space-x-3">
+                                  <WalletIcon />
+                                  <Text className="capitalize">
+                                    {logic.id.includes("simple")
+                                      ? "Wallet"
+                                      : logic.id.toUpperCase()}
+                                  </Text>
+                                </div>
+                              </SelectItem>
+                            ),
                         )}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                )}
-              </form.Field>
-            </div>
-
-            <TokenBalance
-              token={tradeAction === TradeAction.BUY ? baseToken : quoteToken}
-              label={"Balance"}
-            />
-
-            <form.Field name="secondAsset.limitPrice">
-              {(field) => (
-                <EnhancedNumericInput
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={({ target: { value } }) => {
-                    field.handleChange(value)
-                  }}
-                  token={quoteToken}
-                  label="Limit price"
-                  disabled={!(market && form.state.isFormValid)}
-                  error={field.state.meta.touchedErrors}
-                />
-              )}
-            </form.Field>
-
-            <form.Field name="secondAsset.receiveTo">
-              {(field) => (
-                <div className="flex-col flex">
-                  <Caption variant={"caption1"} as={"label"}>
-                    Receive to
-                  </Caption>
-                  <Select
-                    name={field.name}
-                    value={field.state.value}
-                    onValueChange={(value: string) => {
-                      field.handleChange(value)
-                    }}
-                    disabled={!market}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {["wallet"].map((source) => (
-                          <SelectItem key={source} value={source}>
-                            <div className="flex space-x-3">
-                              <WalletIcon />
-                              <Text className="capitalize"> {source}</Text>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  {field.state.meta.touchedErrors.length ? (
+                    <div>
+                      <Caption className="text-red-600 text-xs">
+                        Please select a valid option
+                      </Caption>
+                    </div>
+                  ) : undefined}
                 </div>
               )}
             </form.Field>
+            <div className="flex justify-between !my-6">
+              <span className="text-muted-foreground text-xs">
+                Receiving amount
+              </span>
+              {firstAsset.amount ? (
+                <span className="text-xs">
+                  {Number(firstAsset.amount).toFixed(
+                    firstAssetToken?.displayedDecimals,
+                  )}{" "}
+                  {firstAssetToken?.symbol}
+                </span>
+              ) : (
+                "-"
+              )}
+            </div>
 
-            {Array.from(Array(markets).keys()).map((item, i) => (
+            {currentTokens.length > 1 && (
               <>
                 <div className="flex items-center gap-2 justify-center">
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
                   <Caption>or</Caption>
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
                 </div>
-                <div className="flex justify-between items-center">
-                  <Caption variant={"caption1"} as={"label"}>
-                    Buy Asset #{item + 3}
-                  </Caption>
-                  <span
-                    className="text-white cursor-pointer"
-                    onClick={() => setMarkets(markets - 1)}
-                  >
-                    <XIcon className="w-4 h-4 hover:text-green-caribbean" />
-                  </span>
-                </div>
+
+                <Caption variant={"caption1"} as={"label"}>
+                  Buy Asset #2
+                </Caption>
                 <div className="flex justify-between space-x-2">
-                  <EnhancedNumericInput name="" value={""} disabled={!market} />
-
-                  <Select name={""} value={""} disabled={!market}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {tradeAction === TradeAction.BUY ? (
-                          <SelectItem
-                            key={baseToken?.symbol || "..."}
-                            value={baseToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={baseToken?.symbol || "..."} />
-                              <Text>{baseToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
-                        ) : (
-                          <SelectItem
-                            key={quoteToken?.symbol || "..."}
-                            value={quoteToken?.symbol || "..."}
-                          >
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={quoteToken?.symbol || "..."} />
-                              <Text>{quoteToken?.symbol || "..."}</Text>
-                            </div>
-                          </SelectItem>
-                        )}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  <form.Field name="secondAsset.token">
+                    {(field) => (
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!market || !sendToken}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {currentTokens.map((token) => (
+                              <SelectItem
+                                key={token.id}
+                                value={token.id}
+                                disabled={selectedTokens.includes(token)}
+                              >
+                                <div className="flex space-x-3">
+                                  <TokenIcon symbol={token.symbol} />
+                                  <Text>{token.id}</Text>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </form.Field>
                 </div>
 
-                <TokenBalance
-                  token={
-                    tradeAction === TradeAction.BUY ? baseToken : quoteToken
-                  }
-                  label={"Balance"}
-                />
+                <form.Field
+                  name="secondAsset.limitPrice"
+                  onChange={isGreaterThanZeroValidator}
+                >
+                  {(field) => (
+                    <EnhancedNumericInput
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={({ target: { value } }) => {
+                        field.handleChange(value)
+                        computeReceiveAmount("secondAsset")
+                      }}
+                      token={secondAssetToken}
+                      label="Limit price"
+                      disabled={
+                        !(market && form.state.isFormValid) ||
+                        !secondAsset.token
+                      }
+                      error={field.state.meta.touchedErrors}
+                    />
+                  )}
+                </form.Field>
 
-                <EnhancedNumericInput
-                  name={""}
-                  value={""}
-                  token={quoteToken}
-                  label="Limit price"
-                  disabled={!market}
-                />
+                <form.Field name="secondAsset.receiveTo" onChange={isSelected}>
+                  {(field) => (
+                    <div className="flex-col flex">
+                      <Caption variant={"caption1"} as={"label"}>
+                        Receive to
+                      </Caption>
 
-                <div className="flex-col flex">
-                  <Caption variant={"caption1"} as={"label"}>
-                    Receive to
-                  </Caption>
-                  <Select name={""} value={""} disabled={!market}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {["wallet"].map((source) => (
-                          <SelectItem key={source} value={source}>
-                            <div className="flex space-x-3">
-                              <WalletIcon />
-                              <Text className="capitalize"> {source}</Text>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!market}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {logics.map(
+                              (logic) =>
+                                logic && (
+                                  <SelectItem key={logic.id} value={logic.id}>
+                                    <div className="flex space-x-3">
+                                      <WalletIcon />
+                                      <Text className="capitalize">
+                                        {logic.id.includes("simple")
+                                          ? "Wallet"
+                                          : logic.id.toUpperCase()}
+                                      </Text>
+                                    </div>
+                                  </SelectItem>
+                                ),
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      {field.state.meta.touchedErrors.length ? (
+                        <div>
+                          <Caption className="text-red-600 text-xs">
+                            Please select a valid option
+                          </Caption>
+                        </div>
+                      ) : undefined}
+                    </div>
+                  )}
+                </form.Field>
+
+                <div className="flex justify-between !my-6">
+                  <span className="text-muted-foreground text-xs">
+                    Receiving amount
+                  </span>
+                  {secondAsset.amount ? (
+                    <span className="text-xs">
+                      {Number(secondAsset.amount).toFixed(
+                        secondAssetToken?.displayedDecimals,
+                      )}{" "}
+                      {secondAssetToken?.symbol}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
                 </div>
               </>
-            ))}
+            )}
 
             <Button
-              onClick={(e) => addMarket(e)}
+              disabled
               variant={"secondary"}
               className="flex justify-center items-center w-full"
             >
@@ -650,23 +644,18 @@ export function Amplified() {
             <Separator className="!my-6" />
 
             <form.Subscribe
-              selector={(state) => [
-                state.canSubmit,
-                state.isSubmitting,
-                state.values.tradeAction,
-              ]}
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
             >
-              {([canSubmit, isSubmitting, tradeAction]) => {
+              {([canSubmit, isSubmitting]) => {
                 return (
                   <Button
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
-                    // disabled={!canSubmit || !market}
-                    disabled
+                    disabled={!canSubmit || !market}
                     rightIcon
                     loading={!!isSubmitting}
                   >
-                    {tradeAction}
+                    Buy
                   </Button>
                 )
               }}
@@ -676,8 +665,15 @@ export function Amplified() {
       </form.Provider>
 
       {formData && (
-        <FromWalletLimitOrderDialog
-          form={formData}
+        <FromWalletAmplifiedOrderDialog
+          form={{
+            ...formData,
+            selectedToken,
+            selectedSource,
+            sendAmount,
+            firstAssetToken,
+            secondAssetToken,
+          }}
           onClose={() => setFormData(undefined)}
         />
       )}

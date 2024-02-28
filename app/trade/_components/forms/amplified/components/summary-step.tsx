@@ -1,58 +1,97 @@
-import { TokenIcon } from "@/components/token-icon"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/utils"
 import type { Token } from "@mangrovedao/mangrove.js"
+import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
+import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import Big from "big.js"
 
+import { TokenIcon } from "@/components/token-icon"
+import { Text } from "@/components/typography/text"
+import { Separator } from "@/components/ui/separator"
+import { cn } from "@/utils"
+import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
   form: Form
-  baseToken?: Token
-  quoteToken?: Token
-  sendToken?: Token
-  receiveToken?: Token
+  tokenToAmplify?: Token
+  sendAmount: string
+  source: SimpleLogic | SimpleAaveLogic
+  receiveTokens?: {
+    token: Token
+    receiveTo: string
+    amount: string
+    limitPrice: string
+  }[]
 }
 
 export function SummaryStep({
-  baseToken,
-  quoteToken,
-  sendToken,
-  receiveToken,
+  tokenToAmplify,
+  receiveTokens,
+  source,
   form,
 }: Props) {
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
-        <div className="flex -space-x-2">
-          <TokenIcon className="w-7 h-auto" symbol={baseToken?.symbol} />
-          <TokenIcon className="w-7 h-auto" symbol={quoteToken?.symbol} />
-        </div>
+        <Text className="text-primary"> Amplify </Text>
+        <TokenIcon className="w-7 h-auto" symbol={tokenToAmplify?.symbol} />
         <span className="text-white text-xl font-medium">
-          {baseToken?.symbol} / {quoteToken?.symbol}
+          {tokenToAmplify?.symbol}
         </span>
       </div>
+      <Line
+        title={`Send from ${source.id.includes("simple") ? "Wallet" : source.id.toUpperCase()}`}
+      >
+        {Big(form.sendAmount ?? 0).toFixed(8)}{" "}
+        <Unit>{tokenToAmplify?.symbol}</Unit>
+      </Line>
       <Separator />
       <div className="space-y-4">
-        <Line title="Source">
-          {Big(form.sendSource ?? 0).toFixed(
-            quoteToken?.displayedAsPriceDecimals,
-          )}{" "}
-        </Line>
-        <Line title="Send from wallet">
-          {Big(form.sendAmount ?? 0).toFixed(sendToken?.displayedDecimals)}{" "}
-          <Unit>{sendToken?.symbol}</Unit>
-        </Line>
-        <Line title="Receive to wallet">
-          {Big(form.sendToken ?? 0).toFixed(receiveToken?.displayedDecimals)}{" "}
-          <Unit>{receiveToken?.symbol}</Unit>
-        </Line>
-        {/* TODO: estimated provision */}
-        {/* <Line title="Est. Provision">
-          0.2503 <Unit>MATIC</Unit>
-        </Line> */}
+        {receiveTokens?.map(
+          (receiveToken) =>
+            receiveToken.token &&
+            receiveToken.receiveTo && (
+              <>
+                <div className="flex items-center space-x-2">
+                  <TokenIcon
+                    className="w-7 h-auto"
+                    symbol={receiveToken.token.symbol}
+                  />
+                  <span className="text-white text-xl font-medium">
+                    {receiveToken.token.symbol}
+                  </span>
+                </div>
+
+                <Line title="Limit Price">
+                  {Big(receiveToken.limitPrice ?? 0).toFixed(
+                    receiveToken.token.displayedAsPriceDecimals,
+                  )}{" "}
+                  <Unit>{receiveToken.token.symbol}</Unit>
+                </Line>
+                <Line
+                  title={`Receive to ${receiveToken.receiveTo.includes("simple") ? "Wallet" : receiveToken.receiveTo.toUpperCase()}`}
+                >
+                  {Big(receiveToken.amount ?? 0).toFixed(
+                    receiveToken.token.displayedDecimals,
+                  )}{" "}
+                  <Unit>{receiveToken.token.symbol}</Unit>
+                </Line>
+              </>
+            ),
+        )}
         <Line title="Time in force">
-          <p>.</p>
+          <div className="flex flex-col items-end">
+            {form.timeInForce}{" "}
+            {form.timeInForce === TimeInForce.GOOD_TIL_TIME && (
+              <Unit>
+                {form.timeToLive}{" "}
+                <span className="lowercase">
+                  {Number(form.timeToLive) > 1
+                    ? `${form.timeToLiveUnit}s`
+                    : form.timeToLiveUnit}
+                </span>
+              </Unit>
+            )}
+          </div>
         </Line>
       </div>
     </div>
@@ -62,6 +101,7 @@ export function SummaryStep({
 type LineProps = {
   title: string
 }
+
 function Line({
   title,
   children,

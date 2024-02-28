@@ -1,10 +1,12 @@
 import Link from "next/link"
 import { parseUnits, type Address } from "viem"
 import {
+  useChainId,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi"
+import * as wagmiChains from "wagmi/chains"
 
 import { Button } from "@/components/ui/button"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
@@ -19,6 +21,7 @@ type Props = {
 }
 
 export function Actions({ faucetToken }: Props) {
+  const chainId = useChainId()
   const isMgv = faucetToken.id.includes("MGV")
   const tokenQuery = useTokenFromAddress(faucetToken.address as Address)
   const mintLimit = useMintLimit(faucetToken.address as Address, !!isMgv)
@@ -67,7 +70,7 @@ export function Actions({ faucetToken }: Props) {
         >
           Faucet
         </Button>
-      ) : (
+      ) : chainId === wagmiChains.polygonMumbai.id ? (
         <Button size="sm" asChild>
           <Link
             href={"https://staging.aave.com/faucet/?marketName=proto_mumbai_v3"}
@@ -77,7 +80,17 @@ export function Actions({ faucetToken }: Props) {
             Go to AAVE faucet
           </Link>
         </Button>
-      )}
+      ) : chainId === wagmiChains.blastSepolia.id ? (
+        <Button size="sm" asChild>
+          <Link
+            href={"https://docs.blast.io/building/guides/weth-yield#testnet-2"}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Go to Blast documentation
+          </Link>
+        </Button>
+      ) : undefined}
     </div>
   )
 }

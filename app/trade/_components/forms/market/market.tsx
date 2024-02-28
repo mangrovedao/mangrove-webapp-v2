@@ -57,7 +57,7 @@ export function Market() {
     : Big(0)
 
   const sliderValue = Math.min(
-    Big(Number(send) ?? 0)
+    Big(!isNaN(Number(send)) ? Number(send) : 0)
       .mul(100)
       .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
       .toNumber(),
@@ -193,7 +193,7 @@ export function Market() {
             <form.Field name="slippage">
               {(field) => (
                 <div className="space-y-2">
-                  <Label>Slippage tolerence</Label>
+                  <Label>Slippage tolerance</Label>
                   {/* Add buttons for 25%, 50%, 75%, and 100% */}
                   <div className="flex space-x-3">
                     {slippageValues.map((value) => (

@@ -105,7 +105,7 @@ function BookContent() {
           <SemiBook
             type="asks"
             data={requestBookQuery.data}
-            priceDecimals={priceDecimals}
+            priceDecimals={market?.quote.displayedDecimals}
           />
           {bids?.length && asks?.length ? (
             <TableRow className="border-none" ref={spreadRef}>
@@ -113,7 +113,7 @@ function BookContent() {
                 Spread
               </OrderBookTableCell>
               <OrderBookTableCell>
-                {spread?.toFixed(priceDecimals)}
+                {spread?.toFixed(market.quote.displayedDecimals)}
               </OrderBookTableCell>
               <OrderBookTableCell className="text-gray">
                 {spreadPercentString}
@@ -123,7 +123,7 @@ function BookContent() {
           <SemiBook
             type="bids"
             data={requestBookQuery.data}
-            priceDecimals={priceDecimals}
+            priceDecimals={market?.quote.displayedDecimals}
           />
         </TableBody>
       </Table>

@@ -20,6 +20,7 @@ type Props = {
 export function useLimit(props: Props) {
   const { mangrove } = useMangrove()
   const { market, marketInfo } = useMarket()
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -50,6 +51,7 @@ export function useLimit(props: Props) {
     sendTokenBalance,
     tickSize,
     spotPrice,
+    defaultLimitPrice,
   } = useTradeInfos("limit", tradeAction)
 
   // TODO: fix TS type for useEventListener
@@ -74,18 +76,22 @@ export function useLimit(props: Props) {
   function computeReceiveAmount() {
     const limitPrice = form.state.values.limitPrice
     const send = form.state.values.send
+    const bigSend = Big(!isNaN(Number(send)) ? Number(send) : 0)
+    const bigLimitPrice = Big(
+      !isNaN(Number(limitPrice)) ? Number(limitPrice) : 0,
+    )
+
     if (send === "") return
 
     let limit,
       receive = ""
     if (tradeAction === TradeAction.SELL) {
-      limit = Big(Number(limitPrice) ?? 0)
-      receive = limit.mul(Big(send ?? 0)).toString()
+      limit = bigLimitPrice
+
+      receive = limit.mul(bigSend).toString()
     } else {
       limit = Number(limitPrice) !== 0 ? Number(limitPrice) : 1
-      receive = Big(Number(send ?? 0))
-        .div(limit)
-        .toString()
+      receive = bigSend.div(limit).toString()
     }
 
     form.store.setState(
@@ -109,15 +115,17 @@ export function useLimit(props: Props) {
   function computeSendAmount() {
     const limitPrice = form.state.values.limitPrice
     const receive = form.state.values.receive
+    const bigReceive = Big(!isNaN(Number(receive)) ? Number(receive) : 0)
+
     if (receive === "") return
     let send = ""
     if (tradeAction === TradeAction.SELL) {
-      send = Big(Number(receive ?? 0))
-        .div(Number(limitPrice ?? 1))
+      send = bigReceive
+        .div(Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 1))
         .toString()
     } else {
-      send = Big(Number(limitPrice ?? 0))
-        .mul(Number(receive ?? 0))
+      send = Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 0)
+        .mul(bigReceive)
         .toString()
     }
 
@@ -151,6 +159,19 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     form?.reset()
   }, [form, market?.base, market?.quote])
+
+  React.useEffect(() => {
+    if (!defaultLimitPrice || !form || !sendToken) return
+
+    //what is this x)
+    setTimeout(() => {
+      form?.setFieldValue(
+        "limitPrice",
+        defaultLimitPrice.toFixed(sendToken.displayedDecimals),
+      )
+      form?.validateAllFields("blur")
+    }, 0)
+  }, [form, defaultLimitPrice])
 
   return {
     tradeAction,

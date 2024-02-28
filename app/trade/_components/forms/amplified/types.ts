@@ -1,4 +1,4 @@
-import type { TradeAction } from "../enums"
+import { TimeInForce, TimeToLiveUnit } from "./enums"
 
 type Asset = {
   amount: string
@@ -8,10 +8,12 @@ type Asset = {
 }
 
 export type Form = {
-  tradeAction: TradeAction
   sendSource: string
   sendAmount: string
   sendToken: string
   firstAsset: Asset
   secondAsset: Asset
+  timeInForce: TimeInForce
+  timeToLive: string
+  timeToLiveUnit: TimeToLiveUnit
 }

@@ -5,7 +5,9 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
+import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -19,13 +21,6 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
@@ -93,7 +88,7 @@ export function Limit() {
     : Big(0)
 
   const sliderValue = Math.min(
-    Big(Number(send) ?? 0)
+    Big(!isNaN(Number(send)) ? Number(send) : 0)
       .mul(100)
       .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
       .toNumber(),
@@ -327,16 +322,9 @@ export function Limit() {
                     <div className="flex flex-col w-full">
                       <Label className="flex items-center">
                         Send from
-                        <TooltipProvider>
-                          <Tooltip delayDuration={200} defaultOpen={false}>
-                            <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                              <TooltipInfo />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <Text>Select the origin of the assets.</Text>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <InfoTooltip>
+                          <Caption>Select the origin of the assets</Caption>
+                        </InfoTooltip>
                       </Label>
 
                       <Select
@@ -352,28 +340,20 @@ export function Limit() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {logics.map((source) =>
-                              !source ? (
-                                <SelectItem
-                                  key={"disabled"}
-                                  value="disabled"
-                                  disabled
-                                >
-                                  <Text> No source available</Text>
-                                </SelectItem>
-                              ) : (
-                                <SelectItem key={source.id} value={source.id}>
-                                  <div className="flex gap-2 w-full">
-                                    <SourceIcon sourceId={source.id} />
-                                    <Text className="capitalize">
-                                      {source.id.includes("simple")
-                                        ? "Wallet"
-                                        : source.id.toUpperCase()}
-                                    </Text>
-                                    {/* {<Caption> {source.description}</Caption>} */}
-                                  </div>
-                                </SelectItem>
-                              ),
+                            {logics.map(
+                              (source) =>
+                                source && (
+                                  <SelectItem key={source.id} value={source.id}>
+                                    <div className="flex gap-2 w-full">
+                                      <SourceIcon sourceId={source.id} />
+                                      <Text className="capitalize">
+                                        {source.id.includes("simple")
+                                          ? "Wallet"
+                                          : source.id.toUpperCase()}
+                                      </Text>
+                                    </div>
+                                  </SelectItem>
+                                ),
                             )}
                             <SelectItem value="disabled" disabled>
                               <Text>More sources coming soon...</Text>
@@ -387,22 +367,15 @@ export function Limit() {
 
                 <form.Field name="receiveTo">
                   {(field) => (
-                    <div className="flex flex-col w-full">
+                    <div className="flex flex-col w-full z-50">
                       <Label className="flex items-center">
                         Receive to
-                        <TooltipProvider>
-                          <Tooltip delayDuration={200} defaultOpen={false}>
-                            <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                              <TooltipInfo />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <Text>
-                                Select the destination of the assets (after the
-                                trade is executed)
-                              </Text>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <InfoTooltip>
+                          <Caption>
+                            Select the destination of the assets (after the
+                            trade is executed)
+                          </Caption>
+                        </InfoTooltip>
                       </Label>
 
                       <Select
@@ -418,27 +391,20 @@ export function Limit() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {logics.map((source) =>
-                              !source ? (
-                                <SelectItem
-                                  key={"disabled"}
-                                  value="disabled"
-                                  disabled
-                                >
-                                  <Text> No source available</Text>
-                                </SelectItem>
-                              ) : (
-                                <SelectItem key={source.id} value={source.id}>
-                                  <div className="flex gap-2 w-full">
-                                    <SourceIcon sourceId={source.id} />
-                                    <Text className="capitalize">
-                                      {source.id.includes("simple")
-                                        ? "Wallet"
-                                        : source.id.toUpperCase()}
-                                    </Text>
-                                  </div>
-                                </SelectItem>
-                              ),
+                            {logics.map(
+                              (source) =>
+                                source && (
+                                  <SelectItem key={source.id} value={source.id}>
+                                    <div className="flex gap-2 w-full">
+                                      <SourceIcon sourceId={source.id} />
+                                      <Text className="capitalize">
+                                        {source.id.includes("simple")
+                                          ? "Wallet"
+                                          : source.id.toUpperCase()}
+                                      </Text>
+                                    </div>
+                                  </SelectItem>
+                                ),
                             )}
 
                             <SelectItem value="disabled" disabled>
