@@ -8,12 +8,13 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { useCurrentTradeTab } from "@/stores/trade-type"
 import { renderElement } from "@/utils/render"
 import { Amplified } from "./amplified/amplified"
 import { Limit } from "./limit/limit"
 import { Market } from "./market/market"
 
-enum FormType {
+export enum FormType {
   LIMIT = "Limit",
   MARKET = "Market",
   AMPLIFIED = "Amplified",
@@ -29,11 +30,14 @@ export function Forms({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
+  const { currentTab, setCurrentTab } = useCurrentTradeTab()
+
   return (
     <CustomTabs
       {...props}
-      defaultValue={Object.values(FormType)[0]}
+      defaultValue={currentTab ?? Object.values(FormType)[0]}
       className={className}
+      onValueChange={(tab) => setCurrentTab(tab as FormType)}
     >
       <CustomTabsList className="w-full py-0 justify-start border-b">
         {Object.values(FormType).map((form) => (
