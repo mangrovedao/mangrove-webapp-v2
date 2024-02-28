@@ -7,6 +7,7 @@ import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
+import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
@@ -37,15 +38,14 @@ export function SummaryStep({
           {tokenToAmplify?.symbol}
         </span>
       </div>
+      <Line
+        title={`Send from ${source.id.includes("simple") ? "Wallet" : source.id.toUpperCase()}`}
+      >
+        {Big(form.sendAmount ?? 0).toFixed(8)}{" "}
+        <Unit>{tokenToAmplify?.symbol}</Unit>
+      </Line>
       <Separator />
       <div className="space-y-4">
-        <Line
-          title={`Send from ${source.id.includes("simple") ? "Wallet" : source.id.toUpperCase()}`}
-        >
-          {Big(form.sendAmount ?? 0).toFixed(8)}{" "}
-          <Unit>{tokenToAmplify?.symbol}</Unit>
-        </Line>
-
         {receiveTokens?.map(
           (receiveToken) =>
             receiveToken.token &&
@@ -78,6 +78,21 @@ export function SummaryStep({
               </>
             ),
         )}
+        <Line title="Time in force">
+          <div className="flex flex-col items-end">
+            {form.timeInForce}{" "}
+            {form.timeInForce === TimeInForce.GOOD_TIL_TIME && (
+              <Unit>
+                {form.timeToLive}{" "}
+                <span className="lowercase">
+                  {Number(form.timeToLive) > 1
+                    ? `${form.timeToLiveUnit}s`
+                    : form.timeToLiveUnit}
+                </span>
+              </Unit>
+            )}
+          </div>
+        </Line>
       </div>
     </div>
   )

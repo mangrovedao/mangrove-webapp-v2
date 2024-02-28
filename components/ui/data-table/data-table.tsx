@@ -21,6 +21,7 @@ interface DataTableProps<TData> {
   pagination?: PaginationProps
   isRowHighlighted?: (row: TData) => boolean
   onRowHover?: (row: TData | null) => void
+  onRowClick?: (row: TData | null) => void
   renderExtraRow?: (row: Row<TData>) => React.ReactNode
   tableRowClasses?: string
 }
@@ -32,6 +33,7 @@ export function DataTable<TData>({
   pagination,
   isRowHighlighted = () => false,
   onRowHover = () => {},
+  onRowClick = () => {},
   renderExtraRow = () => null,
   tableRowClasses,
 }: DataTableProps<TData>) {
@@ -72,10 +74,14 @@ export function DataTable<TData>({
                   className={cn(
                     "text-gray-scale-300 hover:text-white transition-colors group/row",
                     {
+                      "cursor-pointer": onRowClick,
                       "text-white": isRowHighlighted?.(row.original),
                     },
                     tableRowClasses,
                   )}
+                  onClick={(e) => {
+                    onRowClick?.(row.original)
+                  }}
                   onMouseEnter={() => onRowHover?.(row.original)}
                   onMouseLeave={() => onRowHover?.(null)}
                 >

@@ -29,48 +29,52 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
 
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
-      if (!mangrove || !market) return
-      const {
-        tradeAction,
-        send: gives,
-        receive: wants,
-        timeInForce,
-        timeToLive,
-        timeToLiveUnit,
-      } = form
+      try {
+        if (!mangrove || !market) return
+        const {
+          tradeAction,
+          send: gives,
+          receive: wants,
+          timeInForce,
+          timeToLive,
+          timeToLiveUnit,
+        } = form
 
-      const logics = Object.values(mangrove.logics)
-      const isBuy = tradeAction === TradeAction.BUY
-      const { base } = market
+        const logics = Object.values(mangrove.logics)
+        const isBuy = tradeAction === TradeAction.BUY
+        const { base } = market
 
-      const orderParams: Market.TradeParams = {
-        wants,
-        gives,
-        restingOrder: {},
-        forceRoutingToMangroveOrder: true,
-        fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
-        takerGivesLogic: logics.find((logic) => logic?.id === form.sendFrom),
-        takerWantsLogic: logics.find((logic) => logic?.id === form.receiveTo),
-        expiryDate:
-          timeInForce === TimeInForce.GOOD_TIL_TIME
-            ? estimateTimestamp({
-                timeToLiveUnit,
-                timeToLive,
-              })
-            : undefined,
+        const orderParams: Market.TradeParams = {
+          wants,
+          gives,
+          restingOrder: {},
+          forceRoutingToMangroveOrder: true,
+          fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
+          takerGivesLogic: logics.find((logic) => logic?.id === form.sendFrom),
+          takerWantsLogic: logics.find((logic) => logic?.id === form.receiveTo),
+          expiryDate:
+            timeInForce === TimeInForce.GOOD_TIL_TIME
+              ? estimateTimestamp({
+                  timeToLiveUnit,
+                  timeToLive,
+                })
+              : undefined,
+        }
+
+        const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.limit[
+          tradeAction
+        ].sendReceiveToBaseQuote(gives, wants)
+
+        const order = isBuy
+          ? await market.buy(orderParams)
+          : await market.sell(orderParams)
+        const result = await order.result
+
+        successToast(TradeMode.LIMIT, tradeAction, base, baseValue, result)
+        return { order, result }
+      } catch (error) {
+        console.error(error)
       }
-
-      const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.limit[
-        tradeAction
-      ].sendReceiveToBaseQuote(gives, wants)
-
-      const order = isBuy
-        ? await market.buy(orderParams)
-        : await market.sell(orderParams)
-      const result = await order.result
-
-      successToast(TradeMode.LIMIT, tradeAction, base, baseValue, result)
-      return { order, result }
     },
     meta: {
       error: "Failed to post the limit order",

@@ -28,18 +28,26 @@ export default function liquiditySourcing({
   const { mangrove } = useMangrove()
   const [balanceLogic, setBalanceLogic] = React.useState<BalanceLogic>()
 
-  // const getMinVolume = async () => {
-  //   if (!market || !mangrove || !sendToken) return
+  const getMinVolume = async () => {
+    if (!market || !mangrove || !sendToken) return
 
-  //   const ba = market.base.id === sendToken.id ? "bids" : "asks"
-  //   const offerGasreq = 30000
-  //   const minVolume = await mangrove.readerContract.minVolume(
-  //     market.getOLKey(ba),
-  //     offerGasreq,
-  //   )
+    const ba = market.base.id === sendToken.id ? "bids" : "asks"
 
-  //   console.log(minVolume.toString(), ba)
-  // }
+    const offerGasreq = 300_000
+    const semibok = market.getSemibook("asks")
+    const minVolume = semibok.getMinimumVolume(offerGasreq)
+
+    // const minVolume = await mangrove.readerContract.minVolume(
+    //   market.getOLKey(ba),
+    //   offerGasreq,
+    // )
+
+    console.log(
+      "MinVolume",
+      Number(minVolume).toFixed(sendToken.displayedDecimals),
+      ba,
+    )
+  }
 
   const getLogicBalance = async (token: Token, fundOwner: string) => {
     try {
@@ -82,7 +90,7 @@ export default function liquiditySourcing({
   React.useEffect(() => {
     if (!sendToken || !fundOwner) return
     getLogicBalance(sendToken, fundOwner)
-    // getMinVolume()
+    getMinVolume()
   }, [sendFrom, sendToken, fundOwner])
 
   return {

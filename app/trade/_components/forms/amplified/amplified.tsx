@@ -106,7 +106,7 @@ export function Amplified() {
     : Big(0)
 
   const sliderValue = Math.min(
-    Big(Number(sendAmount) ?? 0)
+    Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
       .mul(100)
       .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
       .toNumber(),
@@ -121,10 +121,10 @@ export function Amplified() {
         </Text>
         <InfoTooltip>
           <Caption>
-            The execution of one order will automatically update the others
+            The execution of one order will automatically update others
           </Caption>
           <Caption>
-            if partially filled or cancel the others if fully filled.{" "}
+            if partially filled or cancel others if fully filled.{" "}
           </Caption>
 
           <Link
@@ -269,9 +269,10 @@ export function Amplified() {
                     })}
                     onClick={(e) => {
                       e.preventDefault()
+                      if (!sendToken) return
                       handleSliderChange(Number(value))
                     }}
-                    disabled={!market || !sendToken}
+                    disabled={!market}
                   >
                     {value}%
                   </Button>
