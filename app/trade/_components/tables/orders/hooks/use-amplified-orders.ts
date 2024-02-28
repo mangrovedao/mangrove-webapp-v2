@@ -53,13 +53,9 @@ export function useAmplifiedOrders<T = Order[]>({
           markets,
         })
 
-        const amplifiedOrders = result?.map((order) => {
-            return { ...order, owner: address }
-        })
+        if(!result) return []
 
-        console.log(result)
-
-        return parseAmplifiedOrders(result!)
+        return parseAmplifiedOrders(result)
       } catch (e) {
         console.error(e)
         throw new Error()

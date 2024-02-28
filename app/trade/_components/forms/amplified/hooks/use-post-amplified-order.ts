@@ -58,32 +58,25 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
 
         const amp = new MangroveAmplifier({ mgv: mangrove })
 
-        const assets = form.secondAssetToken
-          ? [
-              {
-                inboundTokenAddress: form.firstAssetToken.address,
-                inboundTokenId: form.firstAssetToken.id,
-                inboundLogic: form.selectedSource,
-                tickspacing: market.tickSpacing,
-                limitPrice: form.firstAsset.limitPrice,
-              },
-              {
-                inboundTokenAddress: form.secondAssetToken.address,
-                inboundTokenId: form.secondAssetToken.id,
-                inboundLogic: form.selectedSource,
-                tickspacing: market.tickSpacing,
-                limitPrice: form.secondAsset.limitPrice,
-              },
-            ]
-          : [
-              {
-                inboundTokenAddress: form.firstAssetToken.address,
-                inboundTokenId: form.firstAssetToken.id,
-                inboundLogic: form.selectedSource,
-                tickspacing: market.tickSpacing,
-                limitPrice: form.firstAsset.limitPrice,
-              },
-            ]
+        const assets = [
+          {
+            inboundTokenAddress: form.firstAssetToken.address,
+            inboundTokenId: form.firstAssetToken.id,
+            inboundLogic: form.selectedSource,
+            tickspacing: market.tickSpacing,
+            limitPrice: form.firstAsset.limitPrice,
+          },
+        ]
+
+        if (form.secondAssetToken) {
+          assets.push({
+            inboundTokenAddress: form.secondAssetToken.address,
+            inboundTokenId: form.secondAssetToken.id,
+            inboundLogic: form.selectedSource,
+            tickspacing: market.tickSpacing,
+            limitPrice: form.secondAsset.limitPrice,
+          })
+        }
 
         const inboundTokens = assets.map((token) => {
           const market = openMarkets?.find((market) => {
