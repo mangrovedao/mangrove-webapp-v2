@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAccount } from "wagmi"
 import ConnectBanner from "./_components/connect-banner"
@@ -8,24 +7,14 @@ import CreateReferralLink from "./_components/create-referal-link"
 import HowItWorks from "./_components/how-it-works"
 import ReferAndEarn from "./_components/refer-and-earn"
 import ReferralGivesInformation from "./_components/referral-gives-information"
-import { useCanCreateReferralLink, useStartReferring } from "./services"
+import { useCanCreateReferralLink } from "./services"
 
 export default function Page() {
   const { isConnected, isConnecting } = useAccount()
-  const { startRefer } = useStartReferring()
   const { data, isLoading } = useCanCreateReferralLink()
-  // const isLoading = false
-  // const data = { success: true }
 
   return (
-    <div className="">
-      <Button
-        onClick={() => {
-          startRefer()
-        }}
-      >
-        Test
-      </Button>
+    <div>
       <div className="text-2xl font-axiforma max-w-[450px] text-center mb-20 mx-auto">
         Refer&nbsp;
         <svg
@@ -44,18 +33,6 @@ export default function Page() {
         friends and boost your earnings!
       </div>
 
-      <pre>
-        {JSON.stringify(
-          {
-            data,
-            isLoading,
-            isConnected,
-            isConnecting,
-          },
-          null,
-          2,
-        )}
-      </pre>
       <div className="space-y-12">
         {!isConnected && !isConnecting ? (
           <ConnectBanner />

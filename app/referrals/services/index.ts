@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import React from "react"
 import { createZodFetcher } from "zod-fetch"
 
 import { Address, Hex, TypedDataDomain, parseAbiParameter } from "viem"
@@ -33,38 +32,26 @@ export const types = {
   Referral: referralAbi.components,
 } as const
 
-export function useStartReferring() {
+export function useSignReferral() {
   const { address } = useAccount()
   const { data: walletClient } = useWalletClient()
   const domain = useDomain()
   const { data } = useCanCreateReferralLink()
-  const createReferralLink = useCreateReferralLink()
 
-  const startRefer = React.useCallback(async () => {
-    if (!address || !walletClient || data?.success === false) return
-    const signature = await walletClient.signTypedData({
-      domain,
-      types,
-      primaryType: "RefLink",
-      message: { owner: address },
-    })
-    console.log({ signature })
-    await createReferralLink.mutateAsync(
-      { signature, address },
-      {
-        onSuccess: (data) => {
-          console.log("success data", data)
-        },
-        onError: (error) => {
-          console.log("error", error)
-        },
-      },
-    )
-  }, [address, domain, walletClient, data])
-
-  return {
-    startRefer,
-  }
+  return useMutation({
+    mutationFn: async () => {
+      if (!address || !walletClient || data?.success === false) return
+      return walletClient.signTypedData({
+        domain,
+        types,
+        primaryType: "RefLink",
+        message: { owner: address },
+      })
+    },
+    meta: {
+      error: "Unable to sign referral",
+    },
+  })
 }
 
 export function useCanCreateReferralLink() {
@@ -86,17 +73,11 @@ export function useCanCreateReferralLink() {
   })
 }
 
-function useCreateReferralLink() {
+export function useCreateReferralLink() {
   const { address } = useAccount()
 
   return useMutation({
-    mutationFn: async ({
-      signature,
-      address,
-    }: {
-      signature: Hex
-      address: Address
-    }) => {
+    mutationFn: async (signature: Hex) => {
       if (!address || !signature) return
       return fetchWithZod(
         startPostResponseSchema,
@@ -114,6 +95,9 @@ function useCreateReferralLink() {
           }),
         },
       )
+    },
+    meta: {
+      error: "Unable to create referral link",
     },
   })
 }
