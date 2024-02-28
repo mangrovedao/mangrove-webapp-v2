@@ -19,6 +19,8 @@ export function useSignReferral() {
     mutationFn: async () => {
       if (!referee || !walletClient || !params.referrer || !params.referrer)
         return
+      console.log(JSON.stringify(domain, null, 2))
+
       return walletClient.signTypedData({
         domain,
         types,

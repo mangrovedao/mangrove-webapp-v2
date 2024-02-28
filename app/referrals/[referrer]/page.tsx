@@ -1,7 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { useSignReferral } from "../services"
-import { useCanBeReferred, useRefer } from "./services"
+import { useCanBeReferred, useRefer, useSignReferral } from "./services"
 
 export default function Page() {
   const { data, error } = useCanBeReferred()
@@ -9,7 +8,6 @@ export default function Page() {
   const { mutate: refer, isPending: isReferring } = useRefer()
 
   const isPending = signPending || isReferring
-  console.log(error?.message, error?.cause, error?.name, data)
 
   if (data?.error === "wrong referrer") {
     return <div>Wrong referrer</div>
@@ -26,6 +24,7 @@ export default function Page() {
         onClick={() => {
           sign(undefined, {
             onSuccess: (signature) => {
+              console.log(signature)
               if (!signature) return
               refer(signature)
             },
