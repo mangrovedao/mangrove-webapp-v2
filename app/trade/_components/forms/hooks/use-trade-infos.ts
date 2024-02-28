@@ -32,6 +32,9 @@ export function useTradeInfos(
   const lowestAskPrice = asks?.[0]?.price
   const highestBidPrice = bids?.[0]?.price
 
+  const defaultLimitPrice =
+    tradeAction === TradeAction.BUY ? highestBidPrice : lowestAskPrice
+
   const fee =
     (tradeAction === TradeAction.BUY
       ? marketInfo?.asksConfig?.fee
@@ -82,5 +85,6 @@ export function useTradeInfos(
     spender,
     tickSize,
     spotPrice: tempSpotPrice,
+    defaultLimitPrice,
   }
 }

@@ -58,17 +58,19 @@ const Badge = ({
 
 type EditOrderSheetProps = {
   onClose: () => void
-  order?: Order
+  orderInfos?: { order: Order; mode: "edit" | "view" }
   market?: Market
 }
 
 export default function EditOrderSheet({
-  order,
+  orderInfos,
   market,
   onClose,
 }: EditOrderSheetProps) {
-  if (!order || !market) return null
+  if (!orderInfos || !market) return null
   const [formData, setFormData] = React.useState<Form>()
+  const order = orderInfos?.order
+  const mode = orderInfos?.mode
   const { expiryDate, isBid } = order
   const {
     handleSubmit,
@@ -89,6 +91,10 @@ export default function EditOrderSheet({
     order,
     market,
   )
+
+  React.useEffect(() => {
+    if (mode === "edit") setToggleEdit(true)
+  }, [])
 
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
@@ -156,9 +162,9 @@ export default function EditOrderSheet({
                 <SheetLine title="Type" item={<Text>Wallet</Text>} />
 
                 <SheetLine
-                  title="Filled"
+                  title="Filled/Amount"
                   item={
-                    <Text>{`${filled} ${
+                    <Text>{`${filled} / ${volume} ${
                       isBid ? base.symbol : quote.symbol
                     }`}</Text>
                   }
@@ -173,7 +179,7 @@ export default function EditOrderSheet({
                   }
                 />
                 <SheetLine
-                  title="Amount"
+                  title="Send Amount"
                   item={
                     !toggleEdit ? (
                       <Text>{`${volume} ${

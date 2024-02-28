@@ -20,6 +20,7 @@ type Props = {
 export function useLimit(props: Props) {
   const { mangrove } = useMangrove()
   const { market, marketInfo } = useMarket()
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -50,6 +51,7 @@ export function useLimit(props: Props) {
     sendTokenBalance,
     tickSize,
     spotPrice,
+    defaultLimitPrice,
   } = useTradeInfos("limit", tradeAction)
 
   // TODO: fix TS type for useEventListener
@@ -151,6 +153,19 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     form?.reset()
   }, [form, market?.base, market?.quote])
+
+  React.useEffect(() => {
+    if (!defaultLimitPrice || !form || !sendToken) return
+
+    //what is this x)
+    setTimeout(() => {
+      form?.setFieldValue(
+        "limitPrice",
+        defaultLimitPrice.toFixed(sendToken.displayedDecimals),
+      )
+      form?.validateAllFields("blur")
+    }, 0)
+  }, [form, defaultLimitPrice])
 
   return {
     tradeAction,

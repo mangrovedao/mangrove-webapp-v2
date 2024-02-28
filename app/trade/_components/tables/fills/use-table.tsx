@@ -10,11 +10,13 @@ import {
 import Big from "big.js"
 import React from "react"
 
+import BlockExplorer from "@/app/strategies/[address]/_components/block-explorer"
 import { TokenPair } from "@/components/token-pair"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
+import { useAccount } from "wagmi"
 import type { Fill } from "./schema"
 
 const columnHelper = createColumnHelper<Fill>()
@@ -26,6 +28,8 @@ type Params = {
 
 export function useTable({ data }: Params) {
   const { market } = useMarket()
+  const { chain } = useAccount()
+
   const columns = React.useMemo(
     () => [
       columnHelper.display({
@@ -104,6 +108,25 @@ export function useTable({ data }: Params) {
       columnHelper.accessor("creationDate", {
         header: "Date",
         cell: (row) => <div>{formatDate(row.getValue())}</div>,
+      }),
+      columnHelper.display({
+        header: "Explorer",
+        cell: ({ row }) => {
+          const { transactionHash } = row.original
+          const blockExplorerUrl = chain?.blockExplorers?.default.url
+
+          return (
+            <div className={cn("flex flex-col")}>
+              <div className="w-full h-full flex justify-end">
+                <BlockExplorer
+                  address={transactionHash}
+                  blockExplorerUrl={blockExplorerUrl}
+                  description={false}
+                />
+              </div>
+            </div>
+          )
+        },
       }),
     ],
     [market],

@@ -11,6 +11,8 @@ import {
 import React from "react"
 
 import { StatusBadge } from "@/app/strategies/new/_components/price-range/components/price-chart/merged-offer-tooltip"
+import InfoTooltip from "@/components/info-tooltip"
+import { Caption } from "@/components/typography/caption"
 import {
   Tooltip,
   TooltipContent,
@@ -64,14 +66,9 @@ export function useOffersTable({ data }: Params) {
         header: () => (
           <div className="flex justify-end text-right items-center">
             Base
-            <TooltipProvider>
-              <Tooltip delayDuration={200}>
-                <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                  <TooltipInfo />
-                </TooltipTrigger>
-                <TooltipContent>Asset to be sent.</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <InfoTooltip>
+              <Caption>Average return of the strategy over 30 days.</Caption>
+            </InfoTooltip>
           </div>
         ),
         cell: ({ row }) => {

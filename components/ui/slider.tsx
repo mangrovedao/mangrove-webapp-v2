@@ -40,7 +40,7 @@ const Slider = React.forwardRef<
     <SliderPrimitive.Root
       ref={ref}
       className={cn(
-        "relative flex touch-none select-none items-center",
+        "relative flex touch-none select-none items-center disabled:text-muted",
         className,
       )}
       {...props}
@@ -58,7 +58,7 @@ const Slider = React.forwardRef<
         </div>
       </SliderPrimitive.Track>
       <Ticks value={props.value} position="top" />
-      <SliderPrimitive.Thumb className="hover:border-green-caribbean focus-visible:outline-none active:!text-gray-scale-200 cursor-pointer whitespace-nowrap rounded-xl border-[1px] border-green-bangladesh bg-background transition-colors disabled:pointer-events-none disabled:opacity-50">
+      <SliderPrimitive.Thumb className=" hover:border-green-caribbean focus-visible:outline-none active:!text-gray-scale-200 cursor-pointer whitespace-nowrap rounded-xl border-[1px] border-green-bangladesh bg-background transition-colors disabled:pointer-events-none disabled:opacity-50">
         <span className="text-xs px-2">{props.value}% </span>
       </SliderPrimitive.Thumb>
     </SliderPrimitive.Root>

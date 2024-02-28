@@ -19,6 +19,10 @@ export default function InfoTooltip({
     <TooltipProvider>
       <Tooltip delayDuration={200}>
         <TooltipTrigger
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
           className={cn(
             "hover:opacity-80 transition-opacity ml-1 text-cloud-300",
             className,

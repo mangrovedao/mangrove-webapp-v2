@@ -26,6 +26,7 @@ type SummaryProps = {
 }
 
 const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
+  console.log("oldvalue", oldValues, "newvlue", newValues)
   return (
     <div className="grid space-y-2">
       <div className="flex justify-between items-center">
@@ -39,7 +40,6 @@ const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
 
         <div>
           <Label>New values</Label>
-
           <Text>
             {Number(newValues.volume).toFixed(displayDecimals?.volume)}
           </Text>
@@ -126,7 +126,7 @@ export default function EditOrderSteps({
           displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
-            volume: form.isBid ? order.initialGives : order.initialWants,
+            volume: order.initialGives,
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />
@@ -166,7 +166,7 @@ export default function EditOrderSteps({
           displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
-            volume: order.isBid ? order.initialWants : order.initialGives,
+            volume: order.initialGives,
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />
@@ -211,7 +211,6 @@ export default function EditOrderSteps({
       <Steps steps={steps} currentStep={currentStep} />
       <div className="space-y-2 flex flex-col flex-1">
         {stepInfos[currentStep - 1]?.body ?? undefined}
-        <div className="bg-[#041010] rounded-lg p-4 flex items-center"></div>
       </div>
       <div className="!mt-8 flex space-x-2 justify-end">
         {stepInfos[currentStep - 1]?.button}
