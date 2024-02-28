@@ -2,7 +2,9 @@
 import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import EditAmplifiedOrderSheet from "./components/edit-amplified-order-sheet"
 import { useAmplifiedOrders } from "./hooks/use-amplified-orders"
 import { useAmplifiedTable } from "./hooks/use-amplified-table"
 import { useOrders } from "./hooks/use-orders"
@@ -14,6 +16,8 @@ export function AmplifiedOrders() {
     pageSize: 10,
   })
   const { market } = useMarket()
+  const { marketsInfoQuery, mangrove } = useMangrove()
+  const { data: openMarkets } = marketsInfoQuery
   const { data: count } = useOrders({
     select: (orders) => orders.length,
   })
@@ -53,12 +57,12 @@ export function AmplifiedOrders() {
           count,
         }}
       />
-      {/* <EditOrderSheet
+      <EditAmplifiedOrderSheet
         orderInfos={orderToEdit}
-        market={market}
+        openMarkets={openMarkets}
         onClose={() => setOrderToEdit(undefined)}
       />
-      <CancelOfferDialog
+      {/* <CancelOfferDialog
         order={orderToDelete}
         market={market}
         onClose={() => setOrderToDelete(undefined)}

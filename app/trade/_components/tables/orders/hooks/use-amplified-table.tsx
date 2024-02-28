@@ -12,13 +12,14 @@ import React from "react"
 
 import { IconButton } from "@/components/icon-button"
 import { TokenIcon } from "@/components/token-icon"
-import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
+import { Address } from "viem"
 import type { AmplifiedOrder } from "../schema"
 
 const columnHelper = createColumnHelper<AmplifiedOrder>()
@@ -41,40 +42,18 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
         header: "Market",
         cell: ({ row }) => {
           const { offers } = row.original
+
           const tokens = offers.map((offer) => {
-            return offer.market.inbound_tkn
+            return useTokenFromAddress(offer.market.inbound_tkn as Address).data
           })
-
-          const symbols = openMarkets?.reduce((acc, market) => {
-            const { base, quote } = market
-            if (
-              tokens.includes(base.address) &&
-              base.symbol &&
-              !acc.includes(base.symbol)
-            ) {
-              acc.push(base.symbol)
-            }
-            if (
-              tokens.includes(quote.address) &&
-              quote.symbol &&
-              !acc.includes(quote.symbol)
-            ) {
-              acc.push(quote.symbol)
-            }
-            return acc
-          }, [] as string[])
-
-          const notSupportedMarketCount = offers.filter(
-            (offer) => !offer.isMarketFound,
-          ).length
 
           return (
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <div className="flex -space-x-2">
-                  {symbols?.map((symbol) =>
-                    symbol ? (
-                      <TokenIcon symbol={symbol} />
+                  {tokens?.map((token) =>
+                    token ? (
+                      <TokenIcon symbol={token.symbol} />
                     ) : (
                       <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary-dark-green">
                         ?
@@ -84,11 +63,6 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
                 </div>
                 <Text>Multiple</Text>
               </div>
-              {notSupportedMarketCount > 1 ? (
-                <Caption>Market(s) not supported</Caption>
-              ) : (
-                <Caption>Market not supported</Caption>
-              )}
             </div>
           )
         },
