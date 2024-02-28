@@ -4,12 +4,12 @@ import Big from "big.js"
 import { type Order } from "../schema"
 
 export function getOrderProgress(order: Order, market?: Market) {
-  const { isBid, takerGot, takerGave, initialWants, initialGives } = order
+  const { takerGot, initialGives } = order
 
   const displayDecimals = market?.base.displayedDecimals
   const volume = Big(initialGives).toFixed(displayDecimals)
 
-  const filled = Big(isBid ? takerGot : takerGave).toFixed(displayDecimals)
+  const filled = Big(takerGot).toFixed(displayDecimals)
 
   const progress = Math.min(
     Math.round(

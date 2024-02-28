@@ -15,12 +15,18 @@ export function successToast(
 ) {
   const summary = result.summary
   const price = result.offerWrites[0]?.offer.price.toFixed(4)
-  const fillText =
-    summary.fillVolume.toNumber() > 0
-      ? "Market order not filled, please increase the slippage."
-      : summary.partialFill
-        ? "Partially filled"
-        : "Filled"
+
+  console.log(JSON.stringify(summary))
+
+  const filledOrder =
+    tradeMode == TradeMode.LIMIT ? "Limit order posted" : "Filled"
+
+  const notFilledOrder =
+    tradeMode == TradeMode.LIMIT
+      ? "Limit order posted"
+      : "Market order not poster, please increase slippage"
+
+  const fillText = Number(summary.totalGot) > 0 ? filledOrder : notFilledOrder
 
   toast(
     <div className="grid gap-2 w-full">
