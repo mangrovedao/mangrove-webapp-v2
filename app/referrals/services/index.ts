@@ -12,7 +12,7 @@ export function useDomain() {
   return {
     chainId,
     name: "MangroveReferral",
-    verifyingContract: process.env.DOMAIN_ADDRESS as Address,
+    verifyingContract: process.env.NEXT_PUBLIC_DOMAIN_ADDRESS as Address,
     version: "1.0.0",
   } satisfies TypedDataDomain
 }

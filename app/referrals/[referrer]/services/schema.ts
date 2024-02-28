@@ -44,7 +44,7 @@ export const referGetResponseSchema = z.union([
   }),
 ])
 
-export const startPostResponseSchema = z.union([
+export const referPostResponseSchema = z.union([
   z.object({
     success: z.literal(true),
     error: z.undefined(),
@@ -53,8 +53,8 @@ export const startPostResponseSchema = z.union([
     success: z.literal(false),
     error: z.union([
       z.literal("Invalid signature"),
-      z.literal("Already started"),
-      zodErrorTypeSchema,
+      z.literal("wrong referrer"),
+      z.literal("already referred"),
     ]),
   }),
 ])

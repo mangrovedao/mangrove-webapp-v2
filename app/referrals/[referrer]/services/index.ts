@@ -1,32 +1,33 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useParams } from "next/navigation"
-import { Hex } from "viem"
+import { Address, Hex } from "viem"
 import { useAccount, useWalletClient } from "wagmi"
 import { createZodFetcher } from "zod-fetch"
 
 import { types, useDomain } from "../../services"
-import { referGetResponseSchema, startPostResponseSchema } from "./schema"
+import { referGetResponseSchema, referPostResponseSchema } from "./schema"
 
 const fetchWithZod = createZodFetcher()
 
 export function useSignReferral() {
-  const { address } = useAccount()
+  const { address: referee } = useAccount()
+  const params = useParams<{ referrer: Address }>()
   const { data: walletClient } = useWalletClient()
   const domain = useDomain()
-  const { data } = useCanBeReferred()
 
   return useMutation({
     mutationFn: async () => {
-      if (!address || !walletClient) return
+      if (!referee || !walletClient || !params.referrer || !params.referrer)
+        return
       return walletClient.signTypedData({
         domain,
         types,
-        primaryType: "RefLink",
-        message: { owner: address },
+        primaryType: "Referral",
+        message: { referrer: params.referrer, referee },
       })
     },
     meta: {
-      error: "Unable to sign referral",
+      error: "Unable to sign referee",
     },
   })
 }
@@ -52,19 +53,20 @@ export function useCanBeReferred() {
 
       return referGetResponseSchema.parse(response)
     },
-    enabled: !!params?.referrer,
+    enabled: !!params?.referrer && !!referee,
   })
 }
 
-export function useCreateReferralLink() {
-  const { address } = useAccount()
+export function useRefer() {
+  const { address: referee } = useAccount()
+  const params = useParams<{ referrer: string }>()
 
   return useMutation({
     mutationFn: async (signature: Hex) => {
-      if (!address || !signature) return
+      if (!referee || !signature || !params.referrer) return
       return fetchWithZod(
-        startPostResponseSchema,
-        `${process.env.NEXT_PUBLIC_REFERRAL_SERVER_URL}/start`,
+        referPostResponseSchema,
+        `${process.env.NEXT_PUBLIC_REFERRAL_SERVER_URL}/refer`,
         {
           method: "POST",
           headers: {
@@ -72,7 +74,8 @@ export function useCreateReferralLink() {
           },
           body: JSON.stringify({
             message: {
-              owner: address,
+              referrer: params.referrer,
+              referee,
             },
             signature,
           }),
@@ -80,7 +83,7 @@ export function useCreateReferralLink() {
       )
     },
     meta: {
-      error: "Unable to create referral link",
+      error: "Unable to refer",
     },
   })
 }
