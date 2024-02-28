@@ -3,11 +3,9 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
-import CancelOfferDialog from "./components/cancel-offer-dialog"
-import EditOrderSheet from "./components/edit-order-sheet"
 import { useAmplifiedOrders } from "./hooks/use-amplified-orders"
+import { useAmplifiedTable } from "./hooks/use-amplified-table"
 import { useOrders } from "./hooks/use-orders"
-import { useTable } from "./hooks/use-table"
 import type { AmplifiedOrder } from "./schema"
 
 export function AmplifiedOrders() {
@@ -25,7 +23,7 @@ export function AmplifiedOrders() {
       skip: (page - 1) * pageSize,
     },
   })
-  console.log(amplifiedOrdersQuery.data)
+
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<AmplifiedOrder>()
   const [orderToEdit, setOrderToEdit] = React.useState<{
@@ -33,7 +31,7 @@ export function AmplifiedOrders() {
     mode: "view" | "edit"
   }>()
 
-  const table = useTable({
+  const table = useAmplifiedTable({
     data: amplifiedOrdersQuery.data,
     onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
     onCancel: setOrderToDelete,
@@ -55,7 +53,7 @@ export function AmplifiedOrders() {
           count,
         }}
       />
-      <EditOrderSheet
+      {/* <EditOrderSheet
         orderInfos={orderToEdit}
         market={market}
         onClose={() => setOrderToEdit(undefined)}
@@ -64,7 +62,7 @@ export function AmplifiedOrders() {
         order={orderToDelete}
         market={market}
         onClose={() => setOrderToDelete(undefined)}
-      />
+      /> */}
     </>
   )
 }

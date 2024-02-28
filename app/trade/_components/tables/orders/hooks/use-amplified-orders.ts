@@ -8,17 +8,17 @@ import useMangrove from "@/providers/mangrove"
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import { parseAmplifiedOrders, type Order } from "../schema"
+import { AmplifiedOrder, parseAmplifiedOrders } from "../schema"
 
 type Params<T> = {
   filters?: {
     first?: number
     skip?: number
   }
-  select?: (data: Order[]) => T
+  select?: (data: AmplifiedOrder[]) => T
 }
 
-export function useAmplifiedOrders<T = Order[]>({
+export function useAmplifiedOrders<T = AmplifiedOrder[]>({
   filters: { first = 100, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
@@ -35,7 +35,7 @@ export function useAmplifiedOrders<T = Order[]>({
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["orders", address, first, skip],
+    queryKey: ["amplified", address, first, skip],
     queryFn: async () => {
       if (!indexerSdk || !address || !olKeys || !openMarkets) return []
       startLoading(TRADE.TABLES.ORDERS)
@@ -53,7 +53,7 @@ export function useAmplifiedOrders<T = Order[]>({
           markets,
         })
 
-        if(!result) return []
+        if (!result) return []
 
         return parseAmplifiedOrders(result)
       } catch (e) {

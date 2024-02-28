@@ -14,12 +14,11 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { useEthersSigner } from "@/utils/adapters"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { parseUnits } from "viem"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 import { estimateTimestamp } from "../utils"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-
 
 type Props = {
   onResult?: (result: Market.OrderResult) => void
@@ -145,6 +144,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         //   blockNumber,
         // })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["amplified"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
       } catch (error) {
         console.error(error)
