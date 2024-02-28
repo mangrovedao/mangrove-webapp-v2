@@ -17,15 +17,10 @@ import {
   XIcon,
 } from "@/svgs"
 import BoxContainer from "./box-container"
-import ConnectBanner from "./connect-banner"
 
 export default function ReferAndEarn() {
-  const { isConnected } = useAccount()
-  if (!isConnected) {
-    return <ConnectBanner />
-  }
-
-  const referralLink = "https://mangroveexchange.io/Referrals-f0fa08d6afe"
+  const { address } = useAccount()
+  const referralLink = `${process.env.NEXT_PUBLIC_VERCEL_URL}/referrals/${address}`
 
   return (
     <div className="space-y-4">
@@ -37,7 +32,7 @@ export default function ReferAndEarn() {
         <div className="flex items-center space-x-4 flex-col space-y-4 md:flex-row md:space-y-0">
           <Text
             variant={"text1"}
-            className="bg-primary-dark-green p-4 rounded-md flex items-center justify-between w-full"
+            className="bg-primary-dark-green p-4 rounded-md flex items-center justify-between w-full line-clamp-1"
           >
             <span className="line-clamp-1">{referralLink}</span>
             <CopyButton textToCopy={referralLink} />
@@ -76,25 +71,25 @@ export default function ReferAndEarn() {
             Icon={PersonIcon}
             iconClassName="size-8"
             title="Total Referrals"
-            value="0"
+            value="-"
           />
           <Item
             Icon={CoinsIcon}
             iconClassName="size-8"
             title="Points earned"
-            value="1234"
+            value="-"
           />
           <Item
             Icon={MeterIcon}
             iconClassName="size-6"
             title="Volume generated"
-            value="$64.12"
+            value="-"
           />
           <Item
             Icon={MeterIcon}
             iconClassName="size-6"
             title="Volume traded"
-            value="$64.12"
+            value="-"
           />
         </div>
       </BoxContainer>

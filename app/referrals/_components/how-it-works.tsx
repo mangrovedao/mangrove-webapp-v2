@@ -17,14 +17,14 @@ const ITEMS: Props[] = [
     stepNumber: 2,
     title: "New user",
     description:
-      "When a new user accesses our platform using your link and either trades or provides liquidity, they become your referral.",
+      "When a new user accesses our platform using your link and either trades or provides liquidity, they become your referee.",
     imgUrl: "/assets/referrals/step-2.webp",
   },
   {
     stepNumber: 3,
     title: "Share more, Earn more",
     description:
-      "Referrals receive a 10% increase in their rewards. You earn an extra 10% based on their total rewards.",
+      "Referees receive a 10% increase in their LP + Trading points. You earn this extra 10% as well.",
     imgUrl: "/assets/referrals/step-3.webp",
   },
 ]

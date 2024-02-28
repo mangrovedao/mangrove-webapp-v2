@@ -12,7 +12,7 @@ type Props = {
 export default function CurrentBoost({
   className,
   level = 2,
-  percentage = 5,
+  percentage = 1.75,
   previousVolume = 15_400,
 }: Props) {
   return (
@@ -49,7 +49,7 @@ export default function CurrentBoost({
                 "text-cloud-00": !percentage,
               })}
             >
-              {percentage}%
+              {percentage}x
             </span>
             <span
               className={cn(

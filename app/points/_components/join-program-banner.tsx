@@ -16,15 +16,10 @@ export function JoinProgramBanner() {
         <div className="space-y-6 p-8 flex-1 flex flex-col justify-center">
           <Title variant={"header1"}>Join MS1 Points Program!</Title>
           <Title className="text-green-bangladesh" variant={"title3"}>
-            Become eligible through one of:
+            Become eligible by making the equivalent of $100 in trading volume
+            (market orders) or generated volume (limit orders).
           </Title>
-          <ul className="list-disc !ml-4 !m-0">
-            {BULLETS.map((bullet) => (
-              <Text variant={"text2"} as={"li"} key={bullet}>
-                {bullet}
-              </Text>
-            ))}
-          </ul>
+
           <span>
             <Button variant={"tertiary"} size={"md"} className="px-5" asChild>
               <Link href={"/trade"}>Trade now</Link>
