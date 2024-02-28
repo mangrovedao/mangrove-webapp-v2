@@ -1,12 +1,6 @@
+import InfoTooltip from "@/components/info-tooltip"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { TooltipInfo } from "@/svgs"
 
 export function AverageReturn({ percentage }: { percentage?: number }) {
   const formattedValue = percentage
@@ -39,16 +33,9 @@ export function AverageReturn({ percentage }: { percentage?: number }) {
           className="text-cloud-300 flex items-center"
         >
           Average return{" "}
-          <TooltipProvider>
-            <Tooltip delayDuration={200}>
-              <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                <TooltipInfo />
-              </TooltipTrigger>
-              <TooltipContent>
-                Average return of the strategy over 30 days.
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <InfoTooltip>
+            <Caption>Average return of the strategy over 30 days.</Caption>
+          </InfoTooltip>
         </Caption>
         <Title variant={"title1"}>{formattedValue}</Title>
       </span>
