@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { useParams } from "next/navigation"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useParams, useRouter } from "next/navigation"
 import { Address, Hex } from "viem"
 import { useAccount, useWalletClient } from "wagmi"
 import { createZodFetcher } from "zod-fetch"
@@ -61,6 +61,8 @@ export function useCanBeReferred() {
 export function useRefer() {
   const { address: referee } = useAccount()
   const params = useParams<{ referrer: string }>()
+  const queryClient = useQueryClient()
+  const { push } = useRouter()
 
   return useMutation({
     mutationFn: async (signature: Hex) => {
@@ -83,7 +85,14 @@ export function useRefer() {
         },
       )
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["can-be-referred"],
+      })
+      push("/referrals")
+    },
     meta: {
+      success: "Referred successfully",
       error: "Unable to refer",
     },
   })

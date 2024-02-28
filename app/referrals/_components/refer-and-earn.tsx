@@ -71,25 +71,25 @@ export default function ReferAndEarn() {
             Icon={PersonIcon}
             iconClassName="size-8"
             title="Total Referrals"
-            value="0"
+            value="-"
           />
           <Item
             Icon={CoinsIcon}
             iconClassName="size-8"
             title="Points earned"
-            value="1234"
+            value="-"
           />
           <Item
             Icon={MeterIcon}
             iconClassName="size-6"
             title="Volume generated"
-            value="$64.12"
+            value="-"
           />
           <Item
             Icon={MeterIcon}
             iconClassName="size-6"
             title="Volume traded"
-            value="$64.12"
+            value="-"
           />
         </div>
       </BoxContainer>

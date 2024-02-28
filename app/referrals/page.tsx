@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAccount } from "wagmi"
+import BoxContainer from "./_components/box-container"
 import ConnectBanner from "./_components/connect-banner"
 import CreateReferralLink from "./_components/create-referal-link"
 import HowItWorks from "./_components/how-it-works"
@@ -11,7 +12,9 @@ import { useCanCreateReferralLink } from "./services"
 
 export default function Page() {
   const { isConnected, isConnecting } = useAccount()
-  const { data, isLoading } = useCanCreateReferralLink()
+  const { data, error, isLoading } = useCanCreateReferralLink()
+
+  console.log(data, error)
 
   return (
     <div>
@@ -40,8 +43,14 @@ export default function Page() {
           <Skeleton className="h-32 w-full" />
         ) : data?.success ? (
           <CreateReferralLink />
-        ) : (
+        ) : typeof data?.error === "string" &&
+          data.error === "already started" ? (
           <ReferAndEarn />
+        ) : (
+          <BoxContainer>
+            Due to excessive demand, we are unable to return your data. Please
+            try again later.
+          </BoxContainer>
         )}
         <hr />
         <ReferralGivesInformation />

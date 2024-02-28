@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createZodFetcher } from "zod-fetch"
 
 import { Address, Hex, TypedDataDomain, parseAbiParameter } from "viem"
@@ -59,15 +59,20 @@ export function useCanCreateReferralLink() {
   return useQuery({
     queryKey: ["can-create-referral-link", address],
     queryFn: async () => {
-      return fetchWithZod(
-        startedGetResponseSchema,
+      const resp = await fetch(
         `${process.env.NEXT_PUBLIC_REFERRAL_SERVER_URL}/start/${address}`,
         {
           headers: {
             "Content-Type": "application/json",
           },
         },
-      )
+      ).then((response) => {
+        if (response.status === 200 || response.status === 400) {
+          return response.json()
+        }
+      })
+
+      return startedGetResponseSchema.parse(resp)
     },
     enabled: !!address,
   })
@@ -75,6 +80,7 @@ export function useCanCreateReferralLink() {
 
 export function useCreateReferralLink() {
   const { address } = useAccount()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (signature: Hex) => {
@@ -96,7 +102,13 @@ export function useCreateReferralLink() {
         },
       )
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["can-create-referral-link", address],
+      })
+    },
     meta: {
+      success: "Referral link created successfully",
       error: "Unable to create referral link",
     },
   })
