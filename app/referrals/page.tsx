@@ -1,10 +1,24 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
 import HowItWorks from "./_components/how-it-works"
 import ReferAndEarn from "./_components/refer-and-earn"
 import ReferralGivesInformation from "./_components/referral-gives-information"
+import { useCanCreateReferralLink, useStartReferring } from "./services"
 
 export default function Page() {
+  const { startRefer } = useStartReferring()
+  const { data } = useCanCreateReferralLink()
+
   return (
     <div className="">
+      <Button
+        onClick={() => {
+          startRefer()
+        }}
+      >
+        Test
+      </Button>
       <div className="text-2xl font-axiforma max-w-[450px] text-center mb-20 mx-auto">
         Refer&nbsp;
         <svg
@@ -24,7 +38,7 @@ export default function Page() {
       </div>
 
       <div className="space-y-12">
-        <ReferAndEarn />
+        {data?.success ? <ReferAndEarn /> : null}
         <hr />
         <ReferralGivesInformation />
         <hr />
