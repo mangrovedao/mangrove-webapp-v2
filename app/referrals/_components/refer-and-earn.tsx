@@ -17,15 +17,10 @@ import {
   XIcon,
 } from "@/svgs"
 import BoxContainer from "./box-container"
-import ConnectBanner from "./connect-banner"
 
 export default function ReferAndEarn() {
-  const { isConnected } = useAccount()
-  if (!isConnected) {
-    return <ConnectBanner />
-  }
-
-  const referralLink = "https://mangroveexchange.io/Referrals-f0fa08d6afe"
+  const { address } = useAccount()
+  const referralLink = `https://app.mangrove.exchance.com/referrals/${address}`
 
   return (
     <div className="space-y-4">
@@ -37,7 +32,7 @@ export default function ReferAndEarn() {
         <div className="flex items-center space-x-4 flex-col space-y-4 md:flex-row md:space-y-0">
           <Text
             variant={"text1"}
-            className="bg-primary-dark-green p-4 rounded-md flex items-center justify-between w-full"
+            className="bg-primary-dark-green p-4 rounded-md flex items-center justify-between w-full line-clamp-1"
           >
             <span className="line-clamp-1">{referralLink}</span>
             <CopyButton textToCopy={referralLink} />
