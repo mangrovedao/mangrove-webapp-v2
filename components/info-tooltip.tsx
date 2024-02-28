@@ -11,9 +11,11 @@ import { cn } from "@/utils"
 
 export default function InfoTooltip({
   children,
+  side,
   className,
 }: PropsWithChildren<{
   className?: string
+  side?: "top" | "right" | "bottom" | "left"
 }>) {
   return (
     <TooltipProvider>
@@ -30,7 +32,7 @@ export default function InfoTooltip({
         >
           <TooltipInfo />
         </TooltipTrigger>
-        <TooltipContent>{children}</TooltipContent>
+        <TooltipContent side={side}>{children}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )

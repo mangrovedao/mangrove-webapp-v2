@@ -44,19 +44,25 @@ function Step({ title, children, number, active = false }: StepProps) {
         <div className="text-[10px] text-gray-scale-300 flex items-center">
           Step {number}
           {title?.includes("deployment") ? (
-            <InfoTooltip>
+            <InfoTooltip side="right">
+              <Caption>Make your approvals safer!</Caption>
               <Caption>
-                Make your approvals safer! If you never used Limit Orders or
-                Amplified Orders on Mangrove, you are required to active your
-                address. Please sign a transaction.
+                If you never used Limit Orders or Amplified Orders on Mangrove,
+              </Caption>
+              <Caption>
+                you are required to active your address. Please sign a
+                transaction.
               </Caption>
             </InfoTooltip>
           ) : undefined}
           {title?.includes("activation") ? (
             <InfoTooltip>
               <Caption>
-                If you never used Amplified Orders on Mangrove, you are required
-                to activate this functionality. Please sign a transaction.
+                If you never used Amplified/Limit Orders on Mangrove,
+              </Caption>
+              <Caption>
+                you are required to activate this functionality. Please sign a
+                transaction.
               </Caption>
             </InfoTooltip>
           ) : undefined}
