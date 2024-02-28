@@ -1,4 +1,5 @@
 import type { Token } from "@mangrovedao/mangrove.js"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import { useQuery } from "@tanstack/react-query"
@@ -6,7 +7,7 @@ import { useQuery } from "@tanstack/react-query"
 export const useIsTokenInfiniteAllowance = (
   token?: Token,
   spender?: string | null,
-  logic?: SimpleAaveLogic | SimpleLogic,
+  logic?:  SimpleLogic | SimpleAaveLogic | OrbitLogic,
 ) => {
   return useQuery({
     queryKey: ["isTokenInfiniteAllowance", token?.id, spender],
