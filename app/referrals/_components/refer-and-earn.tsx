@@ -20,7 +20,7 @@ import BoxContainer from "./box-container"
 
 export default function ReferAndEarn() {
   const { address } = useAccount()
-  const referralLink = `${process.env.NEXT_PUBLIC_VERCEL_URL}/referrals/${address}`
+  const referralLink = `${window.location.origin}/referrals/${address}`
 
   return (
     <div className="space-y-4">

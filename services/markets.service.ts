@@ -6,6 +6,5 @@ export async function getWhitelistedMarketsInfos(
   chainId: number,
 ) {
   const openMarkets = await mangrove?.openMarkets()
-  console.log(openMarkets)
   return filterOpenMarketsWithMarketConfig(openMarkets, chainId)
 }
