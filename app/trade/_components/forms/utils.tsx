@@ -16,10 +16,10 @@ export function successToast(
   const summary = result.summary
   const price = result.offerWrites[0]?.offer.price.toFixed(4)
 
-  console.log(JSON.stringify(summary))
-
   const filledOrder =
-    tradeMode == TradeMode.LIMIT ? "Limit order posted" : "Filled"
+    tradeMode == TradeMode.LIMIT
+      ? `Filled with ${summary.totalGot.toFixed(baseToken.displayedDecimals)} ${summary.restingOrder ? ", remaining volume is posted" : ""} `
+      : `Filled with ${summary.totalGot.toFixed(baseToken.displayedDecimals)}`
 
   const notFilledOrder =
     tradeMode == TradeMode.LIMIT
