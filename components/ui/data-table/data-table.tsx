@@ -80,7 +80,6 @@ export function DataTable<TData>({
                     tableRowClasses,
                   )}
                   onClick={(e) => {
-                    console.log(e)
                     onRowClick?.(row.original)
                   }}
                   onMouseEnter={() => onRowHover?.(row.original)}

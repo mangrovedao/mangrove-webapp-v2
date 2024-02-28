@@ -8,9 +8,14 @@ import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import useMangrove from "@/providers/mangrove"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
+import { ActivateRouter } from "../../components/activate-router"
 import { ApproveStep } from "../../components/approve-step"
+import { DeployRouter } from "../../components/deploy-router"
 import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
+import { useActivateSmartContract } from "../../hooks/use-router-bind"
+import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
+import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
 import type { Form } from "../types"
@@ -41,11 +46,21 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     tickSize,
     spotPrice,
   } = useTradeInfos("limit", form.tradeAction)
+  const { isDeployed, isBound } = useSmartRouter().data ?? {}
 
-  let steps = ["Send"]
+  let steps = [] as string[]
   if (!isInfiniteAllowance) {
     steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
   }
+
+  if (isDeployed) {
+    steps = [...steps, "Limit order deployment"]
+  }
+
+  if (!isBound) {
+    steps = [...steps, "Limit order activation"]
+  }
+  steps = [...steps, "Send"]
 
   const isDialogOpenRef = React.useRef(false)
   React.useEffect(() => {
@@ -57,6 +72,8 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   }, [form])
 
   const approve = useInfiniteApproveToken()
+  const activate = useActivateSmartContract()
+  const deploy = useDeploySmartRouter()
   const post = usePostLimitOrder({
     onResult: (result) => {
       /*
@@ -121,6 +138,40 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
           }}
         >
           Approve
+        </Button>
+      ),
+    },
+    isDeployed && {
+      body: <DeployRouter />,
+      button: (
+        <Button
+          {...btnProps}
+          disabled={deploy.isPending}
+          loading={deploy.isPending}
+          onClick={() => {
+            deploy.mutate(undefined, {
+              onSuccess: goToNextStep,
+            })
+          }}
+        >
+          Deploy
+        </Button>
+      ),
+    },
+    !isBound && {
+      body: <ActivateRouter />,
+      button: (
+        <Button
+          {...btnProps}
+          disabled={activate.isPending}
+          loading={activate.isPending}
+          onClick={() => {
+            activate.mutate(undefined, {
+              onSuccess: goToNextStep,
+            })
+          }}
+        >
+          Activate
         </Button>
       ),
     },

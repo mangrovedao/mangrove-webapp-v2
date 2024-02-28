@@ -87,10 +87,8 @@ export default function EditOrderSheet({
   })
   const { base, quote } = market
 
-  const { progress, progressInPercent, volume, filled } = getOrderProgress(
-    order,
-    market,
-  )
+  const { progress, progressInPercent, volume, filled, amount } =
+    getOrderProgress(order, market)
 
   React.useEffect(() => {
     if (mode === "edit") setToggleEdit(true)
@@ -164,7 +162,7 @@ export default function EditOrderSheet({
                 <SheetLine
                   title="Filled/Amount"
                   item={
-                    <Text>{`${filled} / ${volume} ${
+                    <Text>{`${filled} / ${amount} ${
                       isBid ? base.symbol : quote.symbol
                     }`}</Text>
                   }

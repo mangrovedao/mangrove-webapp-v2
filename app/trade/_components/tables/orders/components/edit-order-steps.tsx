@@ -26,7 +26,6 @@ type SummaryProps = {
 }
 
 const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
-  console.log("oldvalue", oldValues, "newvlue", newValues)
   return (
     <div className="grid space-y-2">
       <div className="flex justify-between items-center">
