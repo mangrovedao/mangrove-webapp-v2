@@ -1,4 +1,5 @@
 import { Token } from "@mangrovedao/mangrove.js"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
@@ -6,7 +7,7 @@ import { toast } from "sonner"
 
 type Props = {
   sendFrom: string
-  logics: (SimpleAaveLogic | SimpleLogic)[]
+  logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic)[]
   fundOwner?: string
   sendToken?: Token
 }
@@ -24,7 +25,7 @@ export default function liquiditySourcing({
 }: Props) {
   const [balanceLogic, setBalanceLogic] = React.useState<BalanceLogic>()
   const [availableLogics, setAvailableLogics] =
-    React.useState<(SimpleAaveLogic | SimpleLogic | undefined)[]>()
+    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
 
   const getPossibleLogics = async (token: Token) => {
     const usableLogics = logics.map(async (logic) => {

@@ -18,14 +18,14 @@ dependencies:
     specifier: '^1.3.0 '
     version: 1.3.0
   '@mangrovedao/indexer-sdk':
-    specifier: 0.0.11-32
-    version: 0.0.11-32(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
+    specifier: 0.0.11-34
+    version: 0.0.11-34(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
     specifier: ^2.1.4
     version: 2.1.4
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.5-19
-    version: 2.0.5-19
+    specifier: 2.0.5-20
+    version: 2.0.5-20
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -3311,8 +3311,8 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/indexer-sdk@0.0.11-32(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
-    resolution: {integrity: sha512-l8eMyaZViyMkGignhaQkPvHhiCSe2qrEBhqXhhOf5M5D4CIAnpxAzUn8vrO98GdIx25SQMDGQUFOiTvOPxQzQQ==}
+  /@mangrovedao/indexer-sdk@0.0.11-34(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-Tb6RZas7Ovgek7TJyfCkJc0JaHSlWB69w/AF+LngsJsEZS0AbAiUXL/wtvIxw5qkUnEwskqQHYnYgi6G8ujmRg==}
     dependencies:
       '@ethersproject/bignumber': 5.7.0
       '@graphprotocol/client-auto-pagination': 2.0.0(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(graphql@16.8.1)
@@ -3352,21 +3352,21 @@ packages:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove-strats@2.1.0-0:
-    resolution: {integrity: sha512-NH/1mRTRK/4PeGdWTh44xkiHZxoTLSJaiDVJCM653QFlOcpTtWEff820QhKmenP168nOwlW52iAf1mTun+B1Rw==}
+  /@mangrovedao/mangrove-strats@2.1.0-2:
+    resolution: {integrity: sha512-n3wHjAyo4sGMYxtbDeWX0Tsowe3Krdc/rfsESkiVN1VI9kRn6esoRqRjiMhzQTZJ22LlYV7beMKyB1Ss2XYsNQ==}
     dependencies:
       '@mangrovedao/mangrove-core': 2.1.0-0
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.5-19:
-    resolution: {integrity: sha512-c/FiT3djq42FVxNXSCL7MepO4SqTW3DyvpOnrdgl5JsxuDCm8G680W/LNBKwUcnEw9W63Z5ZGhZHJzAIE6xIFw==}
+  /@mangrovedao/mangrove.js@2.0.5-20:
+    resolution: {integrity: sha512-+jNPTbZ81wCpC89vubCA9DrhSYEJv4CaBF0bES+cdKCupuo2nKtOXtiMGr+JRKEPvEZ8utzZYsQNGYUyP05Chg==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
       '@mangrovedao/context-addresses': 1.3.0
       '@mangrovedao/mangrove-core': 2.1.0-0
       '@mangrovedao/mangrove-deployments': 2.1.4
-      '@mangrovedao/mangrove-strats': 2.1.0-0
+      '@mangrovedao/mangrove-strats': 2.1.0-2
       '@mangrovedao/reliable-event-subscriber': 1.1.29
       '@types/object-inspect': 1.8.4
       '@types/triple-beam': 1.3.5

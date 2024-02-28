@@ -1,6 +1,7 @@
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { Token } from "@mangrovedao/mangrove.js"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
@@ -8,7 +9,7 @@ import { toast } from "sonner"
 
 type Props = {
   sendFrom: string
-  logics: (SimpleAaveLogic | SimpleLogic | undefined)[]
+  logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]
   fundOwner?: string
   sendToken?: Token
 }
