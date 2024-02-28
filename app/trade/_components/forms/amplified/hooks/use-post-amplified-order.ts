@@ -18,6 +18,8 @@ import { parseUnits } from "viem"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 import { estimateTimestamp } from "../utils"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
+
 
 type Props = {
   onResult?: (result: Market.OrderResult) => void
@@ -41,7 +43,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         selectedToken?: Token
         firstAssetToken?: Token
         secondAssetToken?: Token
-        selectedSource?: SimpleLogic | SimpleAaveLogic
+        selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
         sendAmount: string
       }
     }) => {
