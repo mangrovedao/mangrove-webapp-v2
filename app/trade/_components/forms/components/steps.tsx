@@ -1,3 +1,5 @@
+import InfoTooltip from "@/components/info-tooltip"
+import { Caption } from "@/components/typography/caption"
 import { cn } from "@/utils"
 
 type StepsProps = {
@@ -9,8 +11,13 @@ export function Steps({ currentStep = 1, steps }: StepsProps) {
   return (
     <div className="flex w-full gap-2 !my-8">
       {steps.map((value, i) => (
-        <Step key={value} number={i + 1} active={currentStep >= i + 1}>
-          {value}
+        <Step
+          key={value}
+          number={i + 1}
+          active={currentStep >= i + 1}
+          title={steps[i]}
+        >
+          <div className="flex -space-x-2 items-center">{value}</div>
         </Step>
       ))}
     </div>
@@ -19,11 +26,12 @@ export function Steps({ currentStep = 1, steps }: StepsProps) {
 
 type StepProps = {
   children: React.ReactNode
+  title?: string
   number: number
   active?: boolean
 }
 
-function Step({ children, number, active = false }: StepProps) {
+function Step({ title, children, number, active = false }: StepProps) {
   return (
     <div className="flex-1 space-y-4">
       <div
@@ -33,7 +41,26 @@ function Step({ children, number, active = false }: StepProps) {
         })}
       ></div>
       <div className="space-y-1">
-        <div className="text-[10px] text-gray-scale-300">Step {number}</div>
+        <div className="text-[10px] text-gray-scale-300 flex items-center">
+          Step {number}
+          {title?.includes("deployment") ? (
+            <InfoTooltip>
+              <Caption>
+                Make your approvals safer! If you never used Limit Orders or
+                Amplified Orders on Mangrove, you are required to active your
+                address. Please sign a transaction.
+              </Caption>
+            </InfoTooltip>
+          ) : undefined}
+          {title?.includes("activation") ? (
+            <InfoTooltip>
+              <Caption>
+                If you never used Amplified Orders on Mangrove, you are required
+                to activate this functionality. Please sign a transaction.
+              </Caption>
+            </InfoTooltip>
+          ) : undefined}
+        </div>
         <div
           className={cn("text-xs transition-colors", {
             "text-white": active,

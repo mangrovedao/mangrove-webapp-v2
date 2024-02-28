@@ -42,7 +42,11 @@ export default function liquiditySourcing({
     //   offerGasreq,
     // )
 
-    console.log(Number(minVolume).toFixed(sendToken.displayedDecimals), ba)
+    console.log(
+      "MinVolume",
+      Number(minVolume).toFixed(sendToken.displayedDecimals),
+      ba,
+    )
   }
 
   const getLogicBalance = async (token: Token, fundOwner: string) => {

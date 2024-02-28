@@ -108,8 +108,14 @@ export function useAmplified({ onSubmit }: Props) {
     const keyValue = form.getFieldValue(`${key}`)
     if (!limitPrice) return
 
-    const amount = Big(Number(sendAmount ?? 0))
-      .div(Number(limitPrice) ?? 1)
+    const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
+      .div(
+        Big(
+          !isNaN(Number(limitPrice)) && Number(limitPrice) > 0
+            ? Number(limitPrice)
+            : 1,
+        ),
+      )
       .toString()
 
     form.store.setState(
@@ -134,7 +140,12 @@ export function useAmplified({ onSubmit }: Props) {
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
   ) {
-    // form.setFieldValue("limitPrice", event.detail.price)
+    if (firstAsset?.token === market?.quote.id) {
+      form.setFieldValue("firstAsset.limitPrice", event.detail.price)
+    }
+    if (secondAsset?.token === market?.quote.id) {
+      form.setFieldValue("secondAsset.limitPrice", event.detail.price)
+    }
     form.validateAllFields("blur")
     if (sendAmount === "") return
   }
