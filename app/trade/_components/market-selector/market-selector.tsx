@@ -11,10 +11,8 @@ import {
 } from "@/components/ui/select"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { useCurrentTradeTab } from "@/stores/trade-type"
 import { useRouter } from "next/navigation"
 import { TokenIcon } from "../../../../components/token-icon"
-import { FormType } from "../forms/forms"
 
 function getSymbol(market?: Mangrove.OpenMarketInfo) {
   if (!market) return
@@ -26,7 +24,6 @@ function getValue(market: Mangrove.OpenMarketInfo) {
 }
 
 export default function MarketSelector() {
-  const { currentTab } = useCurrentTradeTab()
   const router = useRouter()
   const { marketsInfoQuery } = useMangrove()
   const { marketInfo } = useMarket()
@@ -51,12 +48,7 @@ export default function MarketSelector() {
           : undefined
       }
       onValueChange={onValueChange}
-      disabled={
-        marketsInfoQuery.isLoading ||
-        !marketInfo ||
-        !isConnected ||
-        currentTab === FormType.AMPLIFIED
-      }
+      disabled={marketsInfoQuery.isLoading || !marketInfo || !isConnected}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
         <SelectValue
