@@ -14,8 +14,6 @@ export default function Page() {
   const { isConnected, isConnecting } = useAccount()
   const { data, error, isLoading } = useCanCreateReferralLink()
 
-  console.log(data, error)
-
   return (
     <div>
       <div className="text-2xl font-axiforma max-w-[450px] text-center mb-20 mx-auto">

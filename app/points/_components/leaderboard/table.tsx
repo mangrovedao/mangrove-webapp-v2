@@ -17,13 +17,10 @@ export function Leaderboard() {
   })
 
   const useUserRankQuery = useUserRank()
-  // console.log("useUserRankQuery", useUserRankQuery)
   const data = [
     ...(useUserRankQuery?.data ?? []),
     ...(leaderboardQuery.data ?? []),
   ]
-
-  console.log("data", leaderboardQuery.data, useUserRankQuery)
 
   const table = useTable({
     data,
