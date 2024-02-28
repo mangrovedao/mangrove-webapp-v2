@@ -9,12 +9,13 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 
 type Props = {
   form: Form
   tokenToAmplify?: Token
   sendAmount: string
-  source: SimpleLogic | SimpleAaveLogic
+  source: SimpleLogic | SimpleAaveLogic | OrbitLogic
   receiveTokens?: {
     token: Token
     receiveTo: string
