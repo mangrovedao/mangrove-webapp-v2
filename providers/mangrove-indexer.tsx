@@ -22,7 +22,6 @@ const useIndexerSdkContext = () => {
       try {
         if (!chain) return null
 
-        console.log("Initializing indexer sdk for chain", chain.name)
         return getSdk({
           chainId: chain.id as ChainsIds,
           helpers: {

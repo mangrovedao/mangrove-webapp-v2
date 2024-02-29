@@ -37,6 +37,13 @@ import {
 } from "@rainbow-me/rainbowkit"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip"
 
 const LINKS = [
   {
@@ -46,10 +53,27 @@ const LINKS = [
   {
     name: "Strategies",
     href: "/strategies",
+    disabled: true,
+    message: "Cooking...",
   },
   {
     name: "Points",
     href: "/points",
+    disabled: true,
+    message: (
+      <div className="z-50">
+        Points program is live! <br />
+        The Points page will be available in the coming days.
+        <br />
+        More info{" "}
+        <Link
+          href={"https://docs.mangrove.exchange/general/points/"}
+          className="text-green-caribbean"
+        >
+          here
+        </Link>
+      </div>
+    ),
   },
   {
     name: "Referrals",
@@ -105,15 +129,41 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
           <Separator orientation="vertical" className="hidden lg:block" />
 
           <div className="space-x-4 lg:space-x-10">
-            {links.map(({ name, href }) => (
+            {links.map(({ name, href, disabled, message }) => (
               <Link
                 key={href}
-                href={href}
-                className={
-                  "hover:opacity-90 transition-opacity inline-flex h-8 items-center relative"
-                }
+                href={disabled ? "#" : href}
+                className={cn(
+                  "hover:opacity-90 transition-opacity inline-flex h-8 items-center relative",
+                  { "text-gray-scale-300": disabled },
+                )}
+                aria-disabled={disabled}
               >
-                <span>{name}</span>
+                {disabled ? (
+                  <TooltipProvider>
+                    <Tooltip delayDuration={200}>
+                      <TooltipTrigger
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                        }}
+                        className={cn(
+                          "hover:opacity-80 transition-opacity ml-1 text-cloud-300",
+                          className,
+                        )}
+                      >
+                        <span>{name}</span>
+                      </TooltipTrigger>
+                      <TooltipPortal>
+                        <TooltipContent side={"bottom"}>
+                          {message}
+                        </TooltipContent>
+                      </TooltipPortal>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <span>{name}</span>
+                )}
                 <span
                   className={cn(
                     "h-[2px] w-full bg-green-caribbean inset-x-0 -bottom-3 absolute opacity-0 transition-all",

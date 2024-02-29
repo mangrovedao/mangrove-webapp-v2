@@ -20,7 +20,6 @@ export function getWhitelistedChainObjects() {
       result.push(chainObject)
     }
   }
-  console.log("result", result)
   return renameChainNames(result)
 }
 

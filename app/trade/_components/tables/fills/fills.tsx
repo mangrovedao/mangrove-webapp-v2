@@ -21,8 +21,6 @@ export function Fills() {
     },
   })
 
-  console.log("fillsQuery", fillsQuery)
-
   const table = useTable({
     data: fillsQuery.data,
   })

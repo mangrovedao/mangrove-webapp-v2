@@ -21,6 +21,9 @@ import BoxContainer from "./box-container"
 export default function ReferAndEarn() {
   const { address } = useAccount()
   const referralLink = `${window.location.origin}/referrals/${address}`
+  const sharingMessage = `Hey frens, check out Mangrove DEX on #Blast ⚡ Trade, re-stake liquidity and earn from up to six sources for yields and points on Blast L-2 🤯
+${referralLink}
+  `
 
   return (
     <div className="space-y-4">
@@ -37,7 +40,7 @@ export default function ReferAndEarn() {
             <span className="line-clamp-1">{referralLink}</span>
             <CopyButton textToCopy={referralLink} />
           </Text>
-          <TwitterShareButton url={referralLink}>
+          <TwitterShareButton url={sharingMessage}>
             <Button size={"lg"} className="whitespace-nowrap">
               Share on X
             </Button>
@@ -50,12 +53,12 @@ export default function ReferAndEarn() {
           </Text>
           <div className="space-x-6">
             <Button size={"icon"} variant={"invisible"} asChild>
-              <TwitterShareButton url={referralLink}>
+              <TwitterShareButton url={sharingMessage}>
                 <XIcon className="w-6" />
               </TwitterShareButton>
             </Button>
             <Button size={"icon"} variant={"invisible"} asChild>
-              <TelegramShareButton url={referralLink}>
+              <TelegramShareButton url={sharingMessage}>
                 <TelegramIcon className="w-6" />
               </TelegramShareButton>
             </Button>

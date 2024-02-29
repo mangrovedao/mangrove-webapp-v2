@@ -1,30 +1,27 @@
 import { cn } from "@/utils"
-
-const POINTS = [
-  {
-    id: "Trader points",
-    points: 100,
-    color: "bg-green-caribbean",
-  },
-  {
-    id: "Liquidity providing points",
-    points: 20,
-    color: "bg-[#8F5AE8]",
-  },
-  {
-    id: "Community points",
-    points: 20,
-    color: "bg-white",
-  },
-  {
-    id: "Referral points",
-    points: 15,
-    color: "bg-green-bangladesh",
-  },
-]
+import { useUserRank } from "./leaderboard/use-leaderboard"
 
 export default function TotalPoints() {
-  const totalPoints = POINTS.reduce((total, item) => total + item.points, 0)
+  const { data } = useUserRank()
+
+  const points = [
+    {
+      id: "Trader points",
+      points: Number(data?.[0]?.taker_points ?? 0),
+      color: "bg-green-caribbean",
+    },
+    {
+      id: "Liquidity providing points",
+      points: Number(data?.[0]?.maker_points ?? 0),
+      color: "bg-[#8F5AE8]",
+    },
+    {
+      id: "Referral points",
+      points: Number(data?.[0]?.referees_points ?? 0),
+      color: "bg-green-bangladesh",
+    },
+  ]
+  const totalPoints = points.reduce((total, item) => total + item.points, 0)
 
   return (
     <div className="w-full max-w-[390px]">
@@ -36,7 +33,7 @@ export default function TotalPoints() {
       </div>
       <div className="h-1 w-full rounded-lg overflow-hidden flex mt-2">
         {totalPoints ? (
-          POINTS.map((item) => (
+          points.map((item) => (
             <span
               key={item.id}
               style={{ width: `${(item.points / totalPoints) * 100}%` }}
@@ -49,7 +46,7 @@ export default function TotalPoints() {
       </div>
       <table className="mt-4 w-full text-white text-xs">
         <tbody>
-          {POINTS.map((item) => {
+          {points.map((item) => {
             const points = item.points ?? 1
             const circleColor = !points ? "bg-cloud-300" : item.color
             const percentage = points ? (item.points / totalPoints) * 100 : 0
