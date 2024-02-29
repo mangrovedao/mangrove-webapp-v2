@@ -7,3 +7,21 @@ export type Form = {
   timeToLiveUnit: TimeToLiveUnit
   isBid: boolean
 }
+
+type Asset = {
+  limitPrice: string
+  receiveAmount: string
+}
+
+export enum AmplifiedOrderStatus {
+  "Open",
+  "Closed",
+}
+
+export type AmplifiedForm = {
+  send: string
+  assets: Asset[]
+  timeToLive: string
+  timeToLiveUnit: TimeToLiveUnit
+  status: AmplifiedOrderStatus
+}

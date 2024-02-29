@@ -7,7 +7,7 @@ import { useEventListener } from "usehooks-ts"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token, configuration } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"

@@ -7,7 +7,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import Big from "big.js"
 import React from "react"
 
 import { IconButton } from "@/components/icon-button"
@@ -88,25 +87,22 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
         header: "Price",
         cell: ({ row }) => {
           const { offers } = row.original
+          const limitPrice = offers.find((offer) => offer.price)?.price
 
-          const okok = market ? (
-            offers[0]?.price ? (
-              <span>
-                {Big(offers[0].price).toFixed(
-                  market.quote.displayedAsPriceDecimals,
-                )}{" "}
-                {market.quote.symbol}
-              </span>
-            ) : (
-              <span>-</span>
-            )
+          return limitPrice ? (
+            <span>
+              {(
+                Number(limitPrice) /
+                10 ** (market?.quote.decimals ?? 1)
+              ).toFixed(market?.quote.displayedDecimals)}{" "}
+              {market?.quote.symbol}
+            </span>
           ) : (
             <Skeleton className="w-20 h-6" />
           )
-
-          return okok
         },
       }),
+      // TODO: add expiry date in indexer
       columnHelper.accessor("offers.isOpen", {
         header: "Status",
         cell: ({ row }) => {
@@ -115,10 +111,8 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
           return isOpen ? (
             <div className="text-green-caribbean">Open</div>
           ) : (
-            <div className="text-red-600">Closed</div>
+            <div className="text-red-100">Closed</div>
           )
-
-          return <div>-</div>
         },
       }),
       columnHelper.display({

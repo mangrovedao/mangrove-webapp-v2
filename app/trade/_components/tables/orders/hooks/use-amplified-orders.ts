@@ -43,8 +43,8 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
         const markets =
           openMarkets.map((market) => {
             return {
-              base: market.base,
-              quote: market.quote,
+              quote: market.base,
+              base: market.quote,
             }
           }) ?? []
 
@@ -55,7 +55,13 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
 
         if (!result) return []
 
-        return parseAmplifiedOrders(result)
+        const filteredResult = result.map((order) => {
+          if (!order.offers.some((offer) => !offer.isMarketFound)) {
+            return order
+          }
+        })
+
+        return parseAmplifiedOrders(filteredResult)
       } catch (e) {
         console.error(e)
         throw new Error()
