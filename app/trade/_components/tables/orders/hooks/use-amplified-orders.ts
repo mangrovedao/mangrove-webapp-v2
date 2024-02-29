@@ -52,7 +52,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
           owner: address,
           markets,
         })
-        console.log(result)
+
         if (!result) return []
 
         const filteredResult = result.map((order) => {
