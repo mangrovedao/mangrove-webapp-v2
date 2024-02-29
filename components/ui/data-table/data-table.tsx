@@ -1,4 +1,5 @@
 "use client"
+import React from "react"
 
 import { flexRender, Row, type Table as TableType } from "@tanstack/react-table"
 
@@ -41,6 +42,7 @@ export function DataTable<TData>({
   const leafColumns = table
     .getAllLeafColumns()
     .filter((column) => column.getIsVisible())
+
   return (
     <>
       <Table>

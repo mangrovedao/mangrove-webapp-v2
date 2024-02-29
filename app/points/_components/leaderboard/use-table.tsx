@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table"
 import React from "react"
 
-import { Rank1Icon } from "@/svgs"
+import { Rank1Icon, Rank2Icon, Rank3Icon } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
 import type { Leaderboard } from "./schema"
 
@@ -23,13 +23,23 @@ type Params = {
 export function useTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
-      columnHelper.display({
+      columnHelper.accessor("rank", {
         header: "Rank",
-        cell: () => (
-          <div className="flex items-center space-x-2">
-            1 <Rank1Icon className="size-7 ml-2" />
-          </div>
-        ),
+        cell: (row) => {
+          const rank = row.getValue()
+          return (
+            <div className="flex items-center space-x-2">
+              {rank}{" "}
+              {rank === 1 ? (
+                <Rank1Icon className="size-7 ml-2" />
+              ) : rank === 2 ? (
+                <Rank2Icon className="size-7 ml-2" />
+              ) : rank === 3 ? (
+                <Rank3Icon className="size-7 ml-2" />
+              ) : null}
+            </div>
+          )
+        },
       }),
       columnHelper.accessor("account", {
         header: "Trader",
