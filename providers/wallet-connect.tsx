@@ -28,6 +28,7 @@ const config = getDefaultConfig({
     [wagmiChains.blastSepolia.id]: http(),
     [wagmiChains.arbitrum.id]: http(),
   },
+  ssr: true,
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
