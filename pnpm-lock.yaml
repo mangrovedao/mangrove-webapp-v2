@@ -15,17 +15,17 @@ dependencies:
     specifier: ^2.0.2
     version: 2.0.2(react@18.2.0)
   '@mangrovedao/context-addresses':
-    specifier: '^1.3.0 '
-    version: 1.3.0
+    specifier: ^1.3.2
+    version: 1.3.2
   '@mangrovedao/indexer-sdk':
     specifier: 0.0.11-34
     version: 0.0.11-34(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
-    specifier: ^2.1.4
-    version: 2.1.4
+    specifier: ^2.2.0
+    version: 2.2.0
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.5-20
-    version: 2.0.5-20
+    specifier: 2.0.5-23
+    version: 2.0.5-23
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -3308,8 +3308,14 @@ packages:
       '@lit-labs/ssr-dom-shim': 1.1.2
     dev: false
 
-  /@mangrovedao/context-addresses@1.3.0:
-    resolution: {integrity: sha512-QkYmKSyRxhtMESnq1YSGMy3J3bOwKbm0yHjENDbMRphvg4ZlvZwLCLNEAM6HZI3G8l0XUASKSmcWwbcuyStgGA==}
+  /@mangrovedao/context-addresses@1.3.2:
+    resolution: {integrity: sha512-zF94O6T59QC2zYKE5b9MuDqes900/eJmZQxCyi26Rt8t3x/ld/h3/d1FtzgPNwDDshKMGWLV0O+kPDXX/ZO/Ow==}
+    dependencies:
+      semver: 7.5.4
+    dev: false
+
+  /@mangrovedao/context-addresses@1.3.3:
+    resolution: {integrity: sha512-ueQ9XkpHKoCOo/C0TB1jjKb27RGryuEqedrUmYJdQLrILDtT1RAbsQmhJSzW2nWK+BOGrUwYOhhkkttvzysEkQ==}
     dependencies:
       semver: 7.5.4
     dev: false
@@ -3344,32 +3350,32 @@ packages:
       - zod
     dev: false
 
-  /@mangrovedao/mangrove-core@2.1.0-0:
-    resolution: {integrity: sha512-oiNN/MsyzbmCU/Q6Ku7VJDkKd4nS4sGozTyeqVNklqltI9eD0a+9rzY7Y0UrExr6JYf/HM5homia9oSVtuW5oQ==}
+  /@mangrovedao/mangrove-core@2.1.1:
+    resolution: {integrity: sha512-AoM6PPQcByK58kVPoeNfnccfYnLat9duSI1o99eacfxhQP32B2pBCA7cIm/u7OgcYUg/ihQ+rTT27HVUO1WJgQ==}
     dev: false
 
-  /@mangrovedao/mangrove-deployments@2.1.4:
-    resolution: {integrity: sha512-rDwO2kwwiy0uFx5v9+wO0v1F/0SvAcnHODgui6FehqYKZ4ZTda5duaPcBpOLXMbLHAmC2e4kz5VfnrGKeAW+1w==}
+  /@mangrovedao/mangrove-deployments@2.2.0:
+    resolution: {integrity: sha512-ayXv9WuEwJwZHJZgfiVNpyAkNTlBBrSluiUJhSyZfA1RwBuatxX3N/IAUBeEJJnaRZ9n3tlhHuwVscF8PhAT2w==}
     dependencies:
-      '@mangrovedao/context-addresses': 1.3.0
+      '@mangrovedao/context-addresses': 1.3.2
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/mangrove-strats@2.1.0-2:
-    resolution: {integrity: sha512-n3wHjAyo4sGMYxtbDeWX0Tsowe3Krdc/rfsESkiVN1VI9kRn6esoRqRjiMhzQTZJ22LlYV7beMKyB1Ss2XYsNQ==}
+  /@mangrovedao/mangrove-strats@2.1.0-3:
+    resolution: {integrity: sha512-W27pKB0J/KZQW2nNslIey5N3bZSQO+WOysJDtC28Jy+BLXRefWLZUjQDZShLba/S09joAAOb9RPRoEEnoGq9dQ==}
     dependencies:
-      '@mangrovedao/mangrove-core': 2.1.0-0
+      '@mangrovedao/mangrove-core': 2.1.1
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.5-20:
-    resolution: {integrity: sha512-+jNPTbZ81wCpC89vubCA9DrhSYEJv4CaBF0bES+cdKCupuo2nKtOXtiMGr+JRKEPvEZ8utzZYsQNGYUyP05Chg==}
+  /@mangrovedao/mangrove.js@2.0.5-23:
+    resolution: {integrity: sha512-GXrbOBsanjMZkI3m81OjNF4ZJeFclo0SdYNIWCdC/lAjlGkGyGTrpVgWpzeRGRVHoyDzcJ2IBNgCudc89FFvNA==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
-      '@mangrovedao/context-addresses': 1.3.0
-      '@mangrovedao/mangrove-core': 2.1.0-0
-      '@mangrovedao/mangrove-deployments': 2.1.4
-      '@mangrovedao/mangrove-strats': 2.1.0-2
+      '@mangrovedao/context-addresses': 1.3.3
+      '@mangrovedao/mangrove-core': 2.1.1
+      '@mangrovedao/mangrove-deployments': 2.2.0
+      '@mangrovedao/mangrove-strats': 2.1.0-3
       '@mangrovedao/reliable-event-subscriber': 1.1.29
       '@types/object-inspect': 1.8.4
       '@types/triple-beam': 1.3.5
