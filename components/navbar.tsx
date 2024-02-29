@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import withClientOnly from "@/hocs/withClientOnly"
+
 import { useDialogStore } from "@/stores/dialog.store"
 import { Bell, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
@@ -36,6 +37,8 @@ import {
   useChainModal,
   useConnectModal,
 } from "@rainbow-me/rainbowkit"
+
+import useLocalStorage from "@/hooks/use-local-storage"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 import {
@@ -205,9 +208,10 @@ const RightPart = withClientOnly(() => {
   function handleChangeNetwork() {
     openChainModal?.()
   }
+  const [hideDisclaimer] = useLocalStorage<boolean>("hideDisclaimer", false)
 
   React.useEffect(() => {
-    if (!isConnected) {
+    if (!isConnected && hideDisclaimer) {
       useDialogStore.setState({
         opened: true,
         title: "Please connect your wallet to access Mangrove dApp",
@@ -230,7 +234,7 @@ const RightPart = withClientOnly(() => {
         ),
       })
     }
-  }, [])
+  }, [hideDisclaimer])
 
   if (!isConnected) {
     return (
