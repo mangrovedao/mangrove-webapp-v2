@@ -293,7 +293,7 @@ export function Amplified() {
               </div>
             </div>
             <div />
-            {!isAmplifiable ? (
+            {selectedToken?.address && !isAmplifiable ? (
               <Caption className="text-orange-700 !my-4">
                 Only one market available for this asset, please post a limit
                 order.
@@ -427,7 +427,7 @@ export function Amplified() {
               <MarketDetails
                 tickSize={tickSize}
                 // spotPrice={"3"}
-                minVolume={minVolume}
+                // minVolume={minVolume}
               />
             ) : undefined}
 
@@ -573,7 +573,7 @@ export function Amplified() {
               <MarketDetails
                 tickSize={tickSize}
                 // spotPrice={"3"}
-                minVolume={minVolume}
+                // minVolume={minVolume}
               />
             ) : undefined}
 

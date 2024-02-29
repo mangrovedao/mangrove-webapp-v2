@@ -377,11 +377,14 @@ export function Limit() {
                     <div className="flex flex-col w-full z-50">
                       <Label className="flex items-center">
                         Receive to
-                        <InfoTooltip>
-                          <Caption>
-                            Select the destination of the assets (after the
-                            trade is executed)
-                          </Caption>
+                        <InfoTooltip className="ml-2" side="left">
+                          <div>
+                            <Caption>
+                              Select the destination of the assets
+                            </Caption>
+
+                            <Caption>(after the trade is executed)</Caption>
+                          </div>
                         </InfoTooltip>
                       </Label>
 
