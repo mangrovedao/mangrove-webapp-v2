@@ -5,15 +5,15 @@ import BoxContainer from "./box-container"
 type Props = {
   className?: string
   level?: number
-  percentage?: number
+  boost?: number
   previousVolume?: number
 }
 
 export default function CurrentBoost({
   className,
-  level = 2,
-  percentage = 5,
-  previousVolume = 15_400,
+  level = 0,
+  boost = 1,
+  previousVolume = 0,
 }: Props) {
   return (
     <BoxContainer className={cn(className)}>
@@ -46,10 +46,10 @@ export default function CurrentBoost({
           <div className="flex items-center">
             <span
               className={cn("font-medium text-[32px]", {
-                "text-cloud-00": !percentage,
+                "text-cloud-00": !boost,
               })}
             >
-              {percentage}%
+              {boost}x
             </span>
             <span
               className={cn(

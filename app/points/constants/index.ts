@@ -1,26 +1,26 @@
 export const LEVELS = [
   {
     amount: 1_000,
-    nextBoost: "2%",
+    nextBoost: "1.75x",
     rankString: "1st",
   },
   {
     amount: 10_000,
-    nextBoost: "5%",
+    nextBoost: "2.5x",
     rankString: "2nd",
   },
   {
     amount: 50_000,
-    nextBoost: "7%",
+    nextBoost: "3x",
     rankString: "3rd",
   },
   {
     amount: 100_000,
-    nextBoost: "10%",
+    nextBoost: "3.5x",
     rankString: "4th",
   },
   {
     amount: 500_000,
-    nextBoost: "15%",
+    nextBoost: "4x",
   },
 ]

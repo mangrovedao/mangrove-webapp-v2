@@ -25,7 +25,7 @@ export default function RefillRow({ row }: { row: Row<MergedOffer> }) {
         <TableCell key={`${cell.id}-${i}`}>&nbsp;</TableCell>
       ))}
       <div className="border border-mango-300 rounded-lg absolute inset-0 flex items-center p-2 space-x-4">
-        <div className="inset-0 flex items-center space-x-4 flex-1">
+        <div className="inset-0 flex items-center space-x-4 flex-2">
           <div
             className={cn(
               "h-full aspect-square bg-mango-300 rounded-lg flex items-center justify-center text-red-100 p-1",

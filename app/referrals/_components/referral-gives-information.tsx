@@ -13,13 +13,13 @@ export default function ReferralGivesInformation() {
         <Item
           badgeLabel="For you"
           percentage="10%"
-          description="worth of their total rewards"
+          description="worth of their LP + Trading points"
           className="col-span-full md:col-span-1"
         />
         <Item
           badgeLabel="For them"
           percentage="10%"
-          description="increase in their rewards"
+          description="increase in their LP + Trading points"
           className="col-span-full md:col-span-1"
         />
       </div>
@@ -47,7 +47,7 @@ function Item({ badgeLabel, percentage, description, ...props }: Props) {
       </span>
       <div className="flex items-center space-x-4 flex-1">
         <span className="font-axiforma text-4xl">{percentage}</span>
-        <span className="text-sm line-clamp-2">{description}</span>
+        <span className="text-sm line-clamp-3">{description}</span>
       </div>
     </BoxContainer>
   )

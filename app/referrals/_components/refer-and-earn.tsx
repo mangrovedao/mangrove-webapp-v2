@@ -17,15 +17,13 @@ import {
   XIcon,
 } from "@/svgs"
 import BoxContainer from "./box-container"
-import ConnectBanner from "./connect-banner"
 
 export default function ReferAndEarn() {
-  const { isConnected } = useAccount()
-  if (!isConnected) {
-    return <ConnectBanner />
-  }
-
-  const referralLink = "https://mangroveexchange.io/Referrals-f0fa08d6afe"
+  const { address } = useAccount()
+  const referralLink = `${window.location.origin}/referrals/${address}`
+  const sharingMessage = `Hey frens, check out Mangrove DEX on #Blast ⚡ Trade, re-stake liquidity and earn from up to six sources for yields and points on Blast L-2 🤯
+${referralLink}
+  `
 
   return (
     <div className="space-y-4">
@@ -37,12 +35,12 @@ export default function ReferAndEarn() {
         <div className="flex items-center space-x-4 flex-col space-y-4 md:flex-row md:space-y-0">
           <Text
             variant={"text1"}
-            className="bg-primary-dark-green p-4 rounded-md flex items-center justify-between w-full"
+            className="bg-primary-dark-green p-4 rounded-md flex items-center justify-between w-full line-clamp-1"
           >
             <span className="line-clamp-1">{referralLink}</span>
             <CopyButton textToCopy={referralLink} />
           </Text>
-          <TwitterShareButton url={referralLink}>
+          <TwitterShareButton url={sharingMessage}>
             <Button size={"lg"} className="whitespace-nowrap">
               Share on X
             </Button>
@@ -55,12 +53,12 @@ export default function ReferAndEarn() {
           </Text>
           <div className="space-x-6">
             <Button size={"icon"} variant={"invisible"} asChild>
-              <TwitterShareButton url={referralLink}>
+              <TwitterShareButton url={sharingMessage}>
                 <XIcon className="w-6" />
               </TwitterShareButton>
             </Button>
             <Button size={"icon"} variant={"invisible"} asChild>
-              <TelegramShareButton url={referralLink}>
+              <TelegramShareButton url={sharingMessage}>
                 <TelegramIcon className="w-6" />
               </TelegramShareButton>
             </Button>
@@ -76,25 +74,25 @@ export default function ReferAndEarn() {
             Icon={PersonIcon}
             iconClassName="size-8"
             title="Total Referrals"
-            value="0"
+            value="-"
           />
           <Item
             Icon={CoinsIcon}
             iconClassName="size-8"
             title="Points earned"
-            value="1234"
+            value="-"
           />
           <Item
             Icon={MeterIcon}
             iconClassName="size-6"
             title="Volume generated"
-            value="$64.12"
+            value="-"
           />
           <Item
             Icon={MeterIcon}
             iconClassName="size-6"
             title="Volume traded"
-            value="$64.12"
+            value="-"
           />
         </div>
       </BoxContainer>

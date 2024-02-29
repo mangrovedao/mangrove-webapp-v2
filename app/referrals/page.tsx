@@ -1,10 +1,21 @@
+"use client"
+
+import { Skeleton } from "@/components/ui/skeleton"
+import { useAccount } from "wagmi"
+import BoxContainer from "./_components/box-container"
+import ConnectBanner from "./_components/connect-banner"
+import CreateReferralLink from "./_components/create-referal-link"
 import HowItWorks from "./_components/how-it-works"
 import ReferAndEarn from "./_components/refer-and-earn"
 import ReferralGivesInformation from "./_components/referral-gives-information"
+import { useCanCreateReferralLink } from "./services"
 
 export default function Page() {
+  const { isConnected, isConnecting } = useAccount()
+  const { data, error, isLoading } = useCanCreateReferralLink()
+
   return (
-    <div className="">
+    <div>
       <div className="text-2xl font-axiforma max-w-[450px] text-center mb-20 mx-auto">
         Refer&nbsp;
         <svg
@@ -24,7 +35,21 @@ export default function Page() {
       </div>
 
       <div className="space-y-12">
-        <ReferAndEarn />
+        {!isConnected && !isConnecting ? (
+          <ConnectBanner />
+        ) : isLoading || isConnecting ? (
+          <Skeleton className="h-32 w-full" />
+        ) : data?.success ? (
+          <CreateReferralLink />
+        ) : typeof data?.error === "string" &&
+          data.error === "already started" ? (
+          <ReferAndEarn />
+        ) : (
+          <BoxContainer>
+            Due to excessive demand, we are unable to return your data. Please
+            try again later.
+          </BoxContainer>
+        )}
         <hr />
         <ReferralGivesInformation />
         <hr />

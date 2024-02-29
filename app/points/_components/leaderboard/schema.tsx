@@ -6,6 +6,8 @@ const leaderboardSchema = z.object({
   taker_points: z.string(),
   maker_points: z.string(),
   total_points: z.string(),
+  referees_points: z.string(),
+  rank: z.number(),
 })
 
 export type Leaderboard = z.infer<typeof leaderboardSchema>

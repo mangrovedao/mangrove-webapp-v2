@@ -16,6 +16,10 @@ function copyIcons() {
     "./node_modules/cryptocurrency-icons/svg/color/matic.svg",
     "./public/cryptocurrency-icons/svg/color/wmatic.svg",
   )
+  fs.copyFileSync(
+    "./public/custom-token-icons/blast/usdb.svg",
+    "./public/cryptocurrency-icons/svg/color/usdb.svg",
+  )
 }
 
 function genetareDicFromManifestFile() {
@@ -27,6 +31,7 @@ function genetareDicFromManifestFile() {
     // TODO: to remove after working on a generic mapping
     { WETH: { color: "#627eea", name: "Wrapped Ethereum", symbol: "WETH" } },
     { WMATIC: { color: "#7F44E0", name: "Wrapped MATIC", symbol: "WMATIC" } },
+    { USDB: { color: "#FCFC01", name: "USDB", symbol: "USDB" } },
   )
   fs.mkdirSync("./generated", { recursive: true })
   fs.writeFileSync("./generated/icons.json", JSON.stringify(dic))
