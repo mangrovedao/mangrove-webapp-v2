@@ -1,10 +1,15 @@
 import React from "react"
 import { useAccount } from "wagmi"
 
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
+import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
+import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
+
 import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import useMangrove from "@/providers/mangrove"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
@@ -22,8 +27,9 @@ import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
 type Props = {
-  form: Form
-
+  form: Form & {
+    selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
+  }
   onClose: () => void
 }
 
@@ -40,13 +46,18 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     quoteToken,
     sendToken,
     receiveToken,
-    isInfiniteAllowance,
     spender,
     feeInPercentageAsString,
     tickSize,
     spotPrice,
   } = useTradeInfos("limit", form.tradeAction)
   const { isDeployed, isBound } = useSmartRouter().data ?? {}
+
+  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
+    sendToken,
+    spender,
+    form.selectedSource,
+  )
 
   let steps = [] as string[]
   if (!isInfiniteAllowance) {

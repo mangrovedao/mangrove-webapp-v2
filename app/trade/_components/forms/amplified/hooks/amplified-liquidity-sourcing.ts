@@ -5,7 +5,6 @@ import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLog
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
-import { toast } from "sonner"
 
 type Props = {
   sendFrom: string
@@ -83,8 +82,7 @@ export default function liquiditySourcing({
         })
       }
     } catch (error) {
-      console.error(error)
-      toast.error("Could not fetch token balance.")
+      return
     }
   }
 

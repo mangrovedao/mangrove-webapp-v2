@@ -22,13 +22,15 @@ import { Slider } from "@/components/ui/slider"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
 import Big from "big.js"
-import { Plus, WalletIcon } from "lucide-react"
+import { Plus } from "lucide-react"
 import Link from "next/link"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
-import liquiditySourcing from "./hooks/liquidity-sourcing"
+
+import SourceIcon from "../limit/components/source-icon"
+import liquiditySourcing from "./hooks/amplified-liquidity-sourcing"
 import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
 import {
@@ -168,7 +170,7 @@ export function Amplified() {
                             logic && (
                               <SelectItem key={logic.id} value={logic.id}>
                                 <div className="flex space-x-3">
-                                  <WalletIcon />
+                                  <SourceIcon sourceId={logic.id} />
                                   <Text className="capitalize">
                                     {logic.id.includes("simple")
                                       ? "Wallet"
@@ -368,7 +370,7 @@ export function Amplified() {
                             logic && (
                               <SelectItem key={logic.id} value={logic.id}>
                                 <div className="flex space-x-3">
-                                  <WalletIcon />
+                                  <SourceIcon sourceId={logic.id} />
                                   <Text className="capitalize">
                                     {logic.id.includes("simple")
                                       ? "Wallet"
@@ -502,7 +504,7 @@ export function Amplified() {
                                 logic && (
                                   <SelectItem key={logic.id} value={logic.id}>
                                     <div className="flex space-x-3">
-                                      <WalletIcon />
+                                      <SourceIcon sourceId={logic.id} />
                                       <Text className="capitalize">
                                         {logic.id.includes("simple")
                                           ? "Wallet"

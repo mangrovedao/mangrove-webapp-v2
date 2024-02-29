@@ -7,7 +7,7 @@ import { useEventListener } from "usehooks-ts"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { Token, configuration } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
@@ -67,6 +67,7 @@ export function useAmplified({ onSubmit }: Props) {
 
   /// GET liquidity sourcing logics ///
   const logics = mangrove ? Object.values(mangrove.logics) : []
+  console.log(availableTokens, openMarkets, logics)
 
   /// GET first asset infos ///
   const firstAsset = form.useStore((state) => state.values.firstAsset)

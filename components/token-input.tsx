@@ -44,6 +44,7 @@ export const EnhancedNumericInput = React.forwardRef<
   ) => {
     const isNativeToken = typeof token === "string"
     const tokenSymbol = isNativeToken ? token : token?.symbol
+
     return (
       <div className={cn("flex-col flex", className)}>
         {label && (
@@ -67,18 +68,18 @@ export const EnhancedNumericInput = React.forwardRef<
             {error}
           </p>
         ) : undefined}
-        {!customBalance && showBalance && (
-          <TokenBalance
-            action={balanceAction}
-            token={token}
-            label={balanceLabel}
-          />
-        )}
         {customBalance && showBalance && (
           <CustomBalance
             action={balanceAction}
             token={token}
             balance={customBalance}
+            label={balanceLabel}
+          />
+        )}
+        {!customBalance && showBalance && (
+          <TokenBalance
+            action={balanceAction}
+            token={token}
             label={balanceLabel}
           />
         )}

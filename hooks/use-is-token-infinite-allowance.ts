@@ -7,13 +7,12 @@ import { useQuery } from "@tanstack/react-query"
 export const useIsTokenInfiniteAllowance = (
   token?: Token,
   spender?: string | null,
-  logic?:  SimpleLogic | SimpleAaveLogic | OrbitLogic,
+  logic?: SimpleLogic | SimpleAaveLogic | OrbitLogic,
 ) => {
   return useQuery({
-    queryKey: ["isTokenInfiniteAllowance", token?.id, spender],
+    queryKey: ["isTokenInfiniteAllowance", token?.id, spender, logic?.id],
     queryFn: async () => {
       if (!(token && spender)) return null
-
       if (logic) {
         const tokenToApprove = await logic.overlying(token)
         return await tokenToApprove.allowanceInfinite({ spender })

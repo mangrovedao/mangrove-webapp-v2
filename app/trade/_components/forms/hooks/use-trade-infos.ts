@@ -21,6 +21,8 @@ export function useTradeInfos(
   )
 
   const sendTokenBalance = useTokenBalance(sendToken)
+  const receiveTokenBalance = useTokenBalance(receiveToken)
+
   const { data: spender } = useSpenderAddress(type)
   const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
     sendToken,
@@ -81,6 +83,7 @@ export function useTradeInfos(
     fee,
     feeInPercentageAsString,
     sendTokenBalance,
+    receiveTokenBalance,
     isInfiniteAllowance,
     spender,
     tickSize,
