@@ -201,8 +201,6 @@ export default function EditAmplifiedOrderSheet({
                   offer.market.outbound_tkn as Address,
                 ).data
 
-                console.log(formatEther(BigInt(offer.gives)))
-
                 const limitPrice = `${Number(offer.price).toFixed(
                   sendToken?.displayedDecimals,
                 )} ${sendToken?.symbol}`

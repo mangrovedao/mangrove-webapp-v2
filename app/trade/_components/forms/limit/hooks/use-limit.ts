@@ -42,7 +42,7 @@ export function useLimit(props: Props) {
   const sendFrom = form.state.values.sendFrom
   const timeInForce = form.useStore((state) => state.values.timeInForce)
   const logics = mangrove ? Object.values(mangrove.logics) : []
-  console.log(mangrove?.getLogicsList())
+
   const {
     quoteToken,
     sendToken,

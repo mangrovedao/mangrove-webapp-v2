@@ -107,12 +107,17 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
           return okok
         },
       }),
-      columnHelper.accessor("creationDate", {
-        header: "Time in force",
-        cell: (row) => {
-          const expiry = row.getValue()
+      columnHelper.accessor("offers.isOpen", {
+        header: "Status",
+        cell: ({ row }) => {
+          const { offers } = row.original
+          const isOpen = offers.find((offer) => offer.isOpen)
+          return isOpen ? (
+            <div className="text-green-caribbean">Open</div>
+          ) : (
+            <div className="text-red-600">Closed</div>
+          )
 
-          // return expiry ? <Timer expiry={new Date(expiry)} /> : <div>-</div>
           return <div>-</div>
         },
       }),

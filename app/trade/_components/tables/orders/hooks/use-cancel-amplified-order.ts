@@ -40,8 +40,8 @@ export function useCancelAmplifiedOrder({ offerId, onCancel }: Props = {}) {
           bundleId: order.bundleId,
           outboundToken: sendToken,
         })
-     
-return retract
+
+        return retract
         // order id = 0xbf16533e50a352c47615fee34574df2b30fdc4a8243a3d8194630a2a5d63d176-0x3b
       } catch (error) {
         console.error(error)
@@ -57,6 +57,8 @@ return retract
         //   blockNumber,
         // })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["amplified"] })
       } catch (error) {
         console.error(error)
       }

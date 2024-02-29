@@ -52,8 +52,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
           owner: address,
           markets,
         })
-        
-        console.log(result)
+
         if (!result) return []
 
         return parseAmplifiedOrders(result)
