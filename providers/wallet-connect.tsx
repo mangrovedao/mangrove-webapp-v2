@@ -32,6 +32,7 @@ const config = getDefaultConfig({
     [blastSepolia.id]: http(),
     [arbitrum.id]: http(),
   },
+  ssr: true,
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
