@@ -197,10 +197,10 @@ export default function EditAmplifiedOrderSheet({
                           title="Limit price"
                           item={asset.limitPrice}
                         />
-                        <SheetLine
+                        {/* <SheetLine
                           title={`Receive to wallet`}
                           item={asset.receiveAmount}
-                        />
+                        /> */}
                       </div>
                     )
                   })
