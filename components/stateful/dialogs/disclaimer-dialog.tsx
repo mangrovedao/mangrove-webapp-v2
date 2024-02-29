@@ -1,13 +1,13 @@
 "use client"
+import { CheckedState } from "@radix-ui/react-checkbox"
 import React from "react"
 
 import Dialog from "@/components/dialogs/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import withClientOnly from "@/hocs/withClientOnly"
+import useLocalStorage from "@/hooks/use-local-storage"
 import { cn } from "@/utils"
-import { CheckedState } from "@radix-ui/react-checkbox"
-import { useLocalStorage } from "usehooks-ts"
 
 function DisclaimerDialog() {
   const [isChecked, setIsChecked] = React.useState<CheckedState | undefined>(
