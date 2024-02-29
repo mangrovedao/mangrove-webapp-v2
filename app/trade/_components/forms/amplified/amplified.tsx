@@ -420,6 +420,7 @@ export function Amplified() {
                 "-"
               )}
             </div>
+
             <Separator className="!my-6" />
 
             {selectedToken ? (
@@ -564,21 +565,22 @@ export function Amplified() {
                     "-"
                   )}
                 </div>
-                <Separator className="!my-6" />
-
-                {selectedToken ? (
-                  <MarketDetails
-                    tickSize={tickSize}
-                    // spotPrice={"3"}
-                    minVolume={minVolume}
-                  />
-                ) : undefined}
               </>
             )}
+
+            <Separator className="!my-4" />
+            {selectedToken ? (
+              <MarketDetails
+                tickSize={tickSize}
+                // spotPrice={"3"}
+                minVolume={minVolume}
+              />
+            ) : undefined}
+
             <Button
               disabled
               variant={"secondary"}
-              className="flex justify-center items-center w-full"
+              className="flex justify-center items-center w-full mt-6"
             >
               <Plus className="h-4 w-4" /> Add Market
             </Button>
