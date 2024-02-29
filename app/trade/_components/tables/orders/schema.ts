@@ -33,6 +33,7 @@ export function parseOrders(data: unknown[]): Order[] {
 const amplifiedOrderSchema = z.object({
   id: z.string(),
   creationDate: z.string(),
+  bundleId: z.string(),
   owner: z
     .object({
       address: z.string(),

@@ -4,6 +4,7 @@ import React from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import CancelAmplifiedOfferDialog from "./components/cancel-amplified-offer-dialog"
 import EditAmplifiedOrderSheet from "./components/edit-amplified-order-sheet"
 import { useAmplifiedOrders } from "./hooks/use-amplified-orders"
 import { useAmplifiedTable } from "./hooks/use-amplified-table"
@@ -62,11 +63,11 @@ export function AmplifiedOrders() {
         openMarkets={openMarkets}
         onClose={() => setOrderToEdit(undefined)}
       />
-      {/* <CancelOfferDialog
+      <CancelAmplifiedOfferDialog
         order={orderToDelete}
         market={market}
         onClose={() => setOrderToDelete(undefined)}
-      /> */}
+      />
     </>
   )
 }

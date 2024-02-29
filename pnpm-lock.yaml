@@ -15,17 +15,17 @@ dependencies:
     specifier: ^2.0.2
     version: 2.0.2(react@18.2.0)
   '@mangrovedao/context-addresses':
-    specifier: ^1.3.0
-    version: 1.3.0
+    specifier: ^1.3.2
+    version: 1.3.2
   '@mangrovedao/indexer-sdk':
-    specifier: 0.0.11-34
-    version: 0.0.11-34(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
+    specifier: 0.0.11-35
+    version: 0.0.11-35(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4)
   '@mangrovedao/mangrove-deployments':
     specifier: ^2.1.4
     version: 2.1.4
   '@mangrovedao/mangrove.js':
-    specifier: 2.0.5-20
-    version: 2.0.5-20
+    specifier: 2.0.5-21
+    version: 2.0.5-21
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.5
     version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -3305,14 +3305,14 @@ packages:
       '@lit-labs/ssr-dom-shim': 1.1.2
     dev: false
 
-  /@mangrovedao/context-addresses@1.3.0:
-    resolution: {integrity: sha512-QkYmKSyRxhtMESnq1YSGMy3J3bOwKbm0yHjENDbMRphvg4ZlvZwLCLNEAM6HZI3G8l0XUASKSmcWwbcuyStgGA==}
+  /@mangrovedao/context-addresses@1.3.2:
+    resolution: {integrity: sha512-zF94O6T59QC2zYKE5b9MuDqes900/eJmZQxCyi26Rt8t3x/ld/h3/d1FtzgPNwDDshKMGWLV0O+kPDXX/ZO/Ow==}
     dependencies:
       semver: 7.5.4
     dev: false
 
-  /@mangrovedao/indexer-sdk@0.0.11-34(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
-    resolution: {integrity: sha512-Tb6RZas7Ovgek7TJyfCkJc0JaHSlWB69w/AF+LngsJsEZS0AbAiUXL/wtvIxw5qkUnEwskqQHYnYgi6G8ujmRg==}
+  /@mangrovedao/indexer-sdk@0.0.11-35(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(@types/node@18.19.10)(tslib@2.6.2)(typescript@5.3.3)(zod@3.22.4):
+    resolution: {integrity: sha512-rXy/dsxkfLTMHnPgrfoaShTvV3flrxKHz/xtKHWLyoKDLXla4xTVAdx+l+CVZ5BDIuvgsbs09A+ENmMclWcH/Q==}
     dependencies:
       '@ethersproject/bignumber': 5.7.0
       '@graphprotocol/client-auto-pagination': 2.0.0(@graphql-tools/delegate@10.0.3)(@graphql-tools/utils@10.0.12)(@graphql-tools/wrap@10.0.1)(graphql@16.8.1)
@@ -3348,7 +3348,7 @@ packages:
   /@mangrovedao/mangrove-deployments@2.1.4:
     resolution: {integrity: sha512-rDwO2kwwiy0uFx5v9+wO0v1F/0SvAcnHODgui6FehqYKZ4ZTda5duaPcBpOLXMbLHAmC2e4kz5VfnrGKeAW+1w==}
     dependencies:
-      '@mangrovedao/context-addresses': 1.3.0
+      '@mangrovedao/context-addresses': 1.3.2
       semver: 7.5.4
     dev: false
 
@@ -3358,12 +3358,12 @@ packages:
       '@mangrovedao/mangrove-core': 2.1.0-0
     dev: false
 
-  /@mangrovedao/mangrove.js@2.0.5-20:
-    resolution: {integrity: sha512-+jNPTbZ81wCpC89vubCA9DrhSYEJv4CaBF0bES+cdKCupuo2nKtOXtiMGr+JRKEPvEZ8utzZYsQNGYUyP05Chg==}
+  /@mangrovedao/mangrove.js@2.0.5-21:
+    resolution: {integrity: sha512-LTivN4DHlrRV7B7HHOMD6t1CH+q6uC9BT58uNMIDar+PJRbNj7OvzZwCclZ+Qqolpyme4U88/rZuo/MXYr/E/A==}
     hasBin: true
     dependencies:
       '@ethersproject/experimental': 5.7.0
-      '@mangrovedao/context-addresses': 1.3.0
+      '@mangrovedao/context-addresses': 1.3.2
       '@mangrovedao/mangrove-core': 2.1.0-0
       '@mangrovedao/mangrove-deployments': 2.1.4
       '@mangrovedao/mangrove-strats': 2.1.0-2
