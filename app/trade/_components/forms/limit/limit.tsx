@@ -81,13 +81,6 @@ export function Limit() {
     ? receiveToBalance
     : receiveTokenBalance
 
-  console.log(
-    "currentBalance",
-    currentBalance.formatted,
-    "currentReceiveBalance",
-    currentReceiveBalance.formatted,
-  )
-
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(currentBalance.formatted)) / 100
     form.setFieldValue("send", amount.toString())
