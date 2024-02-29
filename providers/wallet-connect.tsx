@@ -35,6 +35,12 @@ const blastMainnet = {
       http: [blastMainnetRpcUrl],
     },
   },
+  blockExplorers: {
+    default: {
+      name: "Blastscan",
+      url: "https://blastscan.io/",
+    },
+  },
   // testnet: false,
 } as const satisfies Chain
 
