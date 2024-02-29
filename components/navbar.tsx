@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import withClientOnly from "@/hocs/withClientOnly"
+import { useDialogStore } from "@/stores/dialog.store"
 import { Bell, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
@@ -204,6 +205,32 @@ const RightPart = withClientOnly(() => {
   function handleChangeNetwork() {
     openChainModal?.()
   }
+
+  React.useEffect(() => {
+    if (!isConnected) {
+      useDialogStore.setState({
+        opened: true,
+        title: "Please connect your wallet to access Mangrove dApp",
+        type: "mangrove",
+        children: (
+          <div className="flex flex-col space-y-2">
+            <Button
+              onClick={() => {
+                useDialogStore.setState({
+                  opened: false,
+                })
+                handleConnect()
+              }}
+              disabled={isConnecting}
+              size="lg"
+            >
+              Connect wallet
+            </Button>
+          </div>
+        ),
+      })
+    }
+  }, [])
 
   if (!isConnected) {
     return (
