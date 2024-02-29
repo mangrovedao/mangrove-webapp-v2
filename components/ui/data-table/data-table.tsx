@@ -77,7 +77,8 @@ export function DataTable<TData>({
                     "text-gray-scale-300 hover:text-white transition-colors group/row",
                     {
                       "cursor-pointer": onRowClick,
-                      "text-white": isRowHighlighted?.(row.original),
+                      "text-white hover:opacity-80 transition-all":
+                        isRowHighlighted?.(row.original),
                     },
                     tableRowClasses,
                   )}
@@ -96,7 +97,7 @@ export function DataTable<TData>({
                         className={cn(
                           "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
                           {
-                            "bg-gray-scale-700": isRowHighlighted?.(
+                            "!bg-primary-dark-green": isRowHighlighted?.(
                               row.original,
                             ),
                           },

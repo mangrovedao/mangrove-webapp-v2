@@ -1,5 +1,6 @@
 import { cn } from "@/utils"
 import BoxContainer from "./box-container"
+import { useUserRank } from "./leaderboard/use-leaderboard"
 
 type Props = {
   className?: string
@@ -7,11 +8,11 @@ type Props = {
   totalTraders?: number
 }
 
-export default function Rank({
-  className,
-  rank = 103,
-  totalTraders = 39059,
-}: Props) {
+export default function Rank({ className, totalTraders = 39059 }: Props) {
+  const { data } = useUserRank()
+  const rank = data?.[0]?.rank ?? -1
+  const rankLabel = rank > 0 ? rank : "Unranked"
+
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
@@ -38,12 +39,12 @@ export default function Rank({
                 "text-cloud-00": !rank,
               })}
             >
-              {rank}
+              {rankLabel}
             </span>
           </div>
-          <div className="text-xs text-cloud-200 flex items-center pt-7">
+          {/* <div className="text-xs text-cloud-200 flex items-center pt-7">
             of {totalTraders} traders
-          </div>
+          </div> */}
         </div>
       </div>
     </BoxContainer>

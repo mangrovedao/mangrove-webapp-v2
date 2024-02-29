@@ -3,6 +3,7 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useUserRank } from "./leaderboard/use-leaderboard"
 
 const BULLETS = [
   "hold $100 equivalent in trading or liquidity provision",
@@ -10,6 +11,11 @@ const BULLETS = [
 ]
 
 export function JoinProgramBanner() {
+  const { data } = useUserRank()
+  const points = data?.[0]?.total_points ?? 0
+
+  if (Number(points) >= 100) return null
+
   return (
     <>
       <div className="w-full max-w-[1252px] bg-white text-primary-dark-green rounded-lg mx-auto flex">

@@ -10,7 +10,7 @@ import {
 import React from "react"
 
 import { Rank1Icon, Rank2Icon, Rank3Icon } from "@/svgs"
-import { shortenAddress } from "@/utils/wallet"
+import Address from "./address"
 import type { Leaderboard } from "./schema"
 
 const columnHelper = createColumnHelper<Leaderboard>()
@@ -29,13 +29,15 @@ export function useTable({ data }: Params) {
           const rank = row.getValue()
           return (
             <div className="flex items-center space-x-2">
-              {rank}{" "}
+              {rank > 0 ? rank : undefined}{" "}
               {rank === 1 ? (
                 <Rank1Icon className="size-7 ml-2" />
               ) : rank === 2 ? (
                 <Rank2Icon className="size-7 ml-2" />
               ) : rank === 3 ? (
                 <Rank3Icon className="size-7 ml-2" />
+              ) : rank === -1 ? (
+                "Unranked"
               ) : null}
             </div>
           )
@@ -45,13 +47,12 @@ export function useTable({ data }: Params) {
         header: "Trader",
         cell: (row) => {
           const address = row.getValue()
-          const shortenedAddress = shortenAddress(address)
-          return <div>{shortenedAddress}</div>
+          return <Address address={address} />
         },
       }),
       columnHelper.display({
         header: "Boost",
-        cell: () => <div className={"text-green-caribbean"}>15%</div>,
+        cell: () => <div className={"text-green-caribbean"}>1x</div>,
       }),
       columnHelper.accessor("maker_points", {
         header: () => <div className="text-right">LP points</div>,
@@ -73,7 +74,17 @@ export function useTable({ data }: Params) {
           )
         },
       }),
-
+      columnHelper.accessor("referees_points", {
+        header: () => <div className="text-right">Referral points</div>,
+        cell: (row) => {
+          const refereesPoints = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end">
+              {refereesPoints}
+            </div>
+          )
+        },
+      }),
       columnHelper.accessor("total_points", {
         header: () => <div className="text-right">Total points</div>,
         cell: (row) => {

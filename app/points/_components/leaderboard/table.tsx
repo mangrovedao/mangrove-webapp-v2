@@ -18,24 +18,13 @@ export function Leaderboard() {
   })
 
   const useUserRankQuery = useUserRank()
-  const user1 = {
-    weightFromBlock: 1911920,
-    account: "0x1cfc768eAd0103Fc4310A2612271595ef0D446dD",
-    taker_points: "1537.7794927073496",
-    maker_points: "0",
-    total_points: "1537.7794927073496",
-    referees_points: "0",
-    rank: 106,
-  }
+  const currentuser = useUserRankQuery.data
   const data = React.useMemo(
-    () => [...[user1], ...(leaderboardQuery.data ?? [])],
+    () => [...(currentuser ?? []), ...(leaderboardQuery.data ?? [])],
     [useUserRankQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt],
   )
 
-  console.log(useUserRankQuery)
-
   const table = useTable({
-    // data: leaderboardQuery.data,
     data,
   })
 
@@ -55,6 +44,7 @@ export function Leaderboard() {
           count: 1,
         }}
         tableRowClasses="text-white"
+        isRowHighlighted={(row) => row.account === currentuser?.[0]?.account}
       />
     </div>
   )
