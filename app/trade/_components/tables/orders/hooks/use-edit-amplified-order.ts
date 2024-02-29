@@ -38,7 +38,6 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
 
   // get buying assets[]
   const assets = offers.map((offer) => {
-
     const receiveToken = useTokenFromAddress(
       offer.market.inbound_tkn as Address,
     ).data

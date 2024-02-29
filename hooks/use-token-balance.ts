@@ -7,6 +7,7 @@ export function useTokenBalance(token?: Token) {
     address,
     token: token?.address as `0x`,
   })
+
   return {
     balance: data?.value,
     formatted: data?.formatted,
