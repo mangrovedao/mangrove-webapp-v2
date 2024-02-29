@@ -25,7 +25,6 @@ const useMangroveContext = () => {
         if (mangroveConfig) {
           mangrove.updateConfiguration(mangroveConfig)
         }
-        console.log(mangrove.logics.orbit)
         return mangrove
       } catch (e) {
         const message = getErrorMessage(e)
