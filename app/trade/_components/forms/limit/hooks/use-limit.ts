@@ -58,6 +58,13 @@ export function useLimit(props: Props) {
     defaultLimitPrice,
   } = useTradeInfos("limit", tradeAction)
 
+  const minAsk = market?.getSemibook("asks").getMinimumVolume(130_000)
+  const minBid = market?.getSemibook("bids").getMinimumVolume(130_000)
+  const minVolume =
+    tradeAction === TradeAction.BUY
+      ? minBid?.toFixed(quoteToken?.displayedDecimals)
+      : minAsk?.toFixed(sendToken?.displayedDecimals)
+
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
@@ -198,5 +205,6 @@ export function useLimit(props: Props) {
     timeInForce,
     logics,
     selecteSource,
+    minVolume,
   }
 }

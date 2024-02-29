@@ -62,40 +62,6 @@ export default function liquiditySourcing({
     setUseAbleTokens(usableTokens)
   }
 
-  const getSendFromLogics = async (token: Token) => {
-    const usableLogics = logics.map(async (logic) => {
-      try {
-        if (!logic) return
-        const logicToken = await logic.overlying(token)
-        if (logicToken) {
-          return logic
-        }
-      } catch (error) {
-        // if the logic is not available for the token, we catch the error and return
-        return
-      }
-    })
-    const resolvedLogics = await Promise.all(usableLogics)
-    setSendFromLogics(resolvedLogics)
-  }
-
-  const getReceiveToLogics = async (token: Token) => {
-    const usableLogics = logics.map(async (logic) => {
-      try {
-        if (!logic) return
-        const logicToken = await logic.overlying(token)
-        if (logicToken) {
-          return logic
-        }
-      } catch (error) {
-        // if the logic is not available for the token, we catch the error and return
-        return
-      }
-    })
-    const resolvedLogics = await Promise.all(usableLogics)
-    setReceiveToLogics(resolvedLogics)
-  }
-
   const getSendBalance = async (token: Token, fundOwner: string) => {
     try {
       if (sendFrom === "simple") {
@@ -126,15 +92,9 @@ export default function liquiditySourcing({
   }
 
   React.useEffect(() => {
-    if (!receiveToken || !receiveTo || !fundOwner) return
-    // getReceiveToLogics(receiveToken)
-  }, [receiveTo, receiveToken, fundOwner])
-
-  React.useEffect(() => {
     getPossibleLogicsForToken()
     if (!sendFrom || !sendToken || !fundOwner) return
     getSendBalance(sendToken, fundOwner)
-    // getSendFromLogics(sendToken)
   }, [sendFrom, sendToken, fundOwner])
 
   return {

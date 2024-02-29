@@ -58,6 +58,7 @@ export function Limit() {
     spotPrice,
     logics,
     selecteSource,
+    minVolume,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
@@ -431,6 +432,7 @@ export function Limit() {
             <Separator className="!my-6" />
 
             <MarketDetails
+              minVolume={minVolume}
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
               spotPrice={spotPrice}

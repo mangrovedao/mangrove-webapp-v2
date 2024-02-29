@@ -29,6 +29,7 @@ import { Accordion } from "../components/accordion"
 import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 
+import { MarketDetails } from "../components/market-details"
 import SourceIcon from "../limit/components/source-icon"
 import liquiditySourcing from "./hooks/amplified-liquidity-sourcing"
 import { useAmplified } from "./hooks/use-amplified"
@@ -62,22 +63,23 @@ export function Amplified() {
     availableTokens,
     currentTokens,
     openMarkets,
+    tickSize,
+    minVolume,
   } = useAmplified({
     onSubmit: (formData) => setFormData(formData),
   })
 
   const { address } = useAccount()
 
-  const { useAbleTokens, sendFromLogics, receiveToLogics, sendFromBalance } =
-    liquiditySourcing({
-      availableTokens,
-      receiveTo: [firstAsset.receiveTo, secondAsset.receiveTo],
-      receiveToken: selectedToken,
-      sendToken: selectedToken,
-      sendFrom: sendSource,
-      fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
-      logics,
-    })
+  const { useAbleTokens, sendFromBalance } = liquiditySourcing({
+    availableTokens,
+    receiveTo: [firstAsset.receiveTo, secondAsset.receiveTo],
+    receiveToken: selectedToken,
+    sendToken: selectedToken,
+    sendFrom: sendSource,
+    fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
+    logics,
+  })
 
   const { formatted } = useTokenBalance(selectedToken)
 
@@ -85,15 +87,6 @@ export function Amplified() {
     selectedToken?.id.includes("WBTC") || selectedSource?.id === "simple"
       ? formatted
       : sendFromBalance?.formatted
-
-  console.log(
-    "temp",
-    balanceLogic_temporary,
-    "sendFromBalance",
-    sendFromBalance,
-    "formatted",
-    formatted,
-  )
 
   const selectedTokens = [firstAssetToken, secondAssetToken]
 
@@ -204,7 +197,6 @@ export function Amplified() {
                 </div>
               )}
             </form.Field>
-
             <div className="flex gap-2">
               <form.Field
                 name="sendAmount"
@@ -258,7 +250,6 @@ export function Amplified() {
                 )}
               </form.Field>
             </div>
-
             {selectedToken && (
               <CustomBalance
                 token={selectedToken}
@@ -266,7 +257,6 @@ export function Amplified() {
                 label={"Balance"}
               />
             )}
-
             {/* Slider component */}
             <div className="space-y-5 pt-2 px-3">
               <Slider
@@ -302,20 +292,16 @@ export function Amplified() {
                 ))}
               </div>
             </div>
-
             <div />
-
             {!isAmplifiable ? (
               <Caption className="text-orange-700 !my-4">
                 Only one market available for this asset, please post a limit
                 order.
               </Caption>
             ) : undefined}
-
             <Caption variant={"caption1"} as={"label"}>
               Buy Asset #1
             </Caption>
-
             <div className="flex justify-between space-x-1">
               <form.Field name="firstAsset.token">
                 {(field) => (
@@ -350,7 +336,6 @@ export function Amplified() {
                 )}
               </form.Field>
             </div>
-
             <form.Field
               name="firstAsset.limitPrice"
               onChange={isGreaterThanZeroValidator}
@@ -373,7 +358,6 @@ export function Amplified() {
                 />
               )}
             </form.Field>
-
             <form.Field name="firstAsset.receiveTo">
               {(field) => (
                 <div className="flex-col flex">
@@ -436,10 +420,19 @@ export function Amplified() {
                 "-"
               )}
             </div>
+            <Separator className="!my-6" />
+
+            {selectedToken ? (
+              <MarketDetails
+                tickSize={tickSize}
+                // spotPrice={"3"}
+                minVolume={minVolume}
+              />
+            ) : undefined}
 
             {currentTokens.length > 1 && (
               <>
-                <div className="flex items-center gap-2 justify-center">
+                <div className="flex items-center gap-2 justify-center !mt-6">
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
                   <Caption>or</Caption>
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
@@ -571,9 +564,17 @@ export function Amplified() {
                     "-"
                   )}
                 </div>
+                <Separator className="!my-6" />
+
+                {selectedToken ? (
+                  <MarketDetails
+                    tickSize={tickSize}
+                    // spotPrice={"3"}
+                    minVolume={minVolume}
+                  />
+                ) : undefined}
               </>
             )}
-
             <Button
               disabled
               variant={"secondary"}
@@ -581,9 +582,7 @@ export function Amplified() {
             >
               <Plus className="h-4 w-4" /> Add Market
             </Button>
-
             <Separator className="!my-6" />
-
             <Accordion title="Advanced">
               <form.Field name="timeInForce">
                 {(field) => {
@@ -670,9 +669,7 @@ export function Amplified() {
                 </form.Field>
               </div>
             </Accordion>
-
             <Separator className="!my-6" />
-
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
             >

@@ -84,6 +84,15 @@ export function useAmplified({ onSubmit }: Props) {
   const selectedToken = availableTokens.find(
     (token) => token.id === selectedTokenId,
   )
+
+  // market details
+  const minBid = market?.getSemibook("bids").getMinimumVolume(220_000)
+  const tickSize = marketInfo?.tickSpacing
+    ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
+    : ""
+
+  const minVolume = minBid?.toFixed(selectedToken?.displayedDecimals)
+
   const selectedSource = logics.find((logic) => logic?.id === sendSource)
 
   const compatibleMarkets = openMarkets?.filter(
@@ -170,13 +179,16 @@ export function useAmplified({ onSubmit }: Props) {
     computeReceiveAmount,
     form,
     market,
-    tickSize: marketInfo?.tickSpacing.toString(),
     sendAmount,
     sendSource,
     sendToken,
     selectedToken,
     selectedSource,
     timeInForce,
+
+    //market details
+    tickSize,
+    minVolume,
 
     firstAsset,
     secondAsset,

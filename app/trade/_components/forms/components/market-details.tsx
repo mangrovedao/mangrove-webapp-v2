@@ -3,18 +3,21 @@ type MarketDetailsProps = {
   takerFee?: string
   tickSize?: string
   spotPrice?: string
+  minVolume?: string
 }
 
 export function MarketDetails({
   takerFee,
   tickSize,
   spotPrice,
+  minVolume,
 }: MarketDetailsProps) {
   return (
     <Accordion title="Market details">
       <MarketDetailsLine title="Taker fee" value={takerFee} />
       <MarketDetailsLine title="Tick size" value={tickSize} />
       <MarketDetailsLine title="Current spot price" value={spotPrice} />
+      <MarketDetailsLine title="Minimum volume" value={minVolume} />
     </Accordion>
   )
 }
