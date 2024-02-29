@@ -3,13 +3,14 @@ import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLog
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
-import { toast } from "sonner"
 
 type Props = {
   sendFrom: string
-  logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic)[]
+  receiveTo: string
+  logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]
   fundOwner?: string
   sendToken?: Token
+  receiveToken?: Token
 }
 
 type BalanceLogic = {
@@ -19,59 +20,132 @@ type BalanceLogic = {
 
 export default function liquiditySourcing({
   sendToken,
+  receiveToken,
   sendFrom,
+  receiveTo,
   logics,
   fundOwner,
 }: Props) {
-  const [balanceLogic, setBalanceLogic] = React.useState<BalanceLogic>()
-  const [availableLogics, setAvailableLogics] =
+  const [sendFromBalance, setSendFromBalance] = React.useState<
+    BalanceLogic | undefined
+  >()
+  const [receiveToBalance, setReceiveToBalance] = React.useState<
+    BalanceLogic | undefined
+  >()
+
+  const [sendFromLogics, setSendFromLogics] =
     React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
 
-  const getPossibleLogics = async (token: Token) => {
+  const [receiveToLogics, setReceiveToLogics] =
+    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
+
+  const getSendFromLogics = async (token: Token) => {
     const usableLogics = logics.map(async (logic) => {
-      if (!logic) return
-      //@ts-ignore
-      const canUseLogic = await logic.canUseLogicFor(token)
-      if (canUseLogic) {
-        return logic
+      try {
+        if (!logic) return
+        const logicToken = await logic.overlying(token)
+        if (logicToken) {
+          return logic
+        }
+      } catch (error) {
+        // if the logic is not available for the token, we catch the error and return
+        return
       }
     })
-
     const resolvedLogics = await Promise.all(usableLogics)
-    setAvailableLogics(resolvedLogics)
+    setSendFromLogics(resolvedLogics)
   }
 
-  const getLogicBalance = async (token: Token, fundOwner: string) => {
-    try {
-      if (sendFrom === "simple") return
+  const getReceiveToLogics = async (token: Token) => {
+    const usableLogics = logics.map(async (logic) => {
+      try {
+        if (!logic) return
+        const logicToken = await logic.overlying(token)
+        if (logicToken) {
+          return logic
+        }
+      } catch (error) {
+        // if the logic is not available for the token, we catch the error and return
+        return
+      }
+    })
+    const resolvedLogics = await Promise.all(usableLogics)
+    setReceiveToLogics(resolvedLogics)
+  }
 
-      const selectedLogic = logics.find(
-        (logic) => logic.id === sendFrom,
-      ) as SimpleAaveLogic
-      //@ts-ignore
-      const logicToken = await selectedLogic.overlying(token)
-      const logicBalance = await selectedLogic.logic.balanceLogic(
-        logicToken.address,
+  const getSendBalance = async (token: Token, fundOwner: string) => {
+    try {
+      if (sendFrom === "simple") {
+        setSendFromBalance(undefined)
+        return
+      }
+
+      const selectedLogic = logics.find((logic) => logic?.id === sendFrom) as
+        | SimpleAaveLogic
+        | OrbitLogic
+
+      if (!selectedLogic) return
+
+      const logicBalance = await selectedLogic.balanceOfFromLogic(
+        token,
         fundOwner,
       )
 
-      setBalanceLogic({
-        formatted: logicBalance.toNumber().toFixed(4),
+      setSendFromBalance({
+        formatted: logicBalance
+          .toNumber()
+          .toFixed(sendToken?.displayedDecimals),
         balance: logicBalance.toNumber(),
       })
     } catch (error) {
-      toast.error("Liquidity source not available for this market.")
+      return
+    }
+  }
+
+  const getReceiveBalance = async (token: Token, fundOwner: string) => {
+    try {
+      if (receiveTo === "simple") {
+        setReceiveToBalance(undefined)
+        return
+      }
+      const selectedLogic = logics.find((logic) => logic?.id === receiveTo) as
+        | SimpleAaveLogic
+        | OrbitLogic
+
+      if (!selectedLogic) return
+
+      const logicBalance = await selectedLogic.balanceOfFromLogic(
+        token,
+        fundOwner,
+      )
+
+      setReceiveToBalance({
+        formatted: logicBalance
+          .toNumber()
+          .toFixed(receiveToken?.displayedDecimals),
+        balance: logicBalance.toNumber(),
+      })
+    } catch (error) {
+      return
     }
   }
 
   React.useEffect(() => {
-    if (!sendToken || !fundOwner) return
-    getLogicBalance(sendToken, fundOwner)
-    getPossibleLogics(sendToken)
+    if (!receiveToken || !receiveTo || !fundOwner) return
+    getReceiveBalance(receiveToken, fundOwner)
+    getReceiveToLogics(receiveToken)
+  }, [receiveTo, receiveToken, fundOwner])
+
+  React.useEffect(() => {
+    if (!sendFrom || !sendToken || !fundOwner) return
+    getSendBalance(sendToken, fundOwner)
+    getSendFromLogics(sendToken)
   }, [sendFrom, sendToken, fundOwner])
 
   return {
-    availableLogics,
-    balanceLogic,
+    sendFromLogics,
+    receiveToLogics,
+    sendFromBalance,
+    receiveToBalance,
   }
 }

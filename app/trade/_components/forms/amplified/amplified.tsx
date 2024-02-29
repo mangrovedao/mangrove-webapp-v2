@@ -22,13 +22,16 @@ import { Slider } from "@/components/ui/slider"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
 import Big from "big.js"
-import { Plus, WalletIcon } from "lucide-react"
+import { Plus } from "lucide-react"
 import Link from "next/link"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
-import liquiditySourcing from "./hooks/liquidity-sourcing"
+
+import { MarketDetails } from "../components/market-details"
+import SourceIcon from "../limit/components/source-icon"
+import liquiditySourcing from "./hooks/amplified-liquidity-sourcing"
 import { useAmplified } from "./hooks/use-amplified"
 import type { Form } from "./types"
 import {
@@ -59,23 +62,31 @@ export function Amplified() {
     logics,
     availableTokens,
     currentTokens,
+    openMarkets,
+    tickSize,
+    minVolume,
   } = useAmplified({
     onSubmit: (formData) => setFormData(formData),
   })
 
   const { address } = useAccount()
 
-  const { balanceLogic } = liquiditySourcing({
+  const { useAbleTokens, sendFromBalance } = liquiditySourcing({
+    availableTokens,
+    receiveTo: [firstAsset.receiveTo, secondAsset.receiveTo],
+    receiveToken: selectedToken,
     sendToken: selectedToken,
     sendFrom: sendSource,
     fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
     logics,
   })
+
   const { formatted } = useTokenBalance(selectedToken)
 
-  const balanceLogic_temporary = selectedToken?.id.includes("WBTC")
-    ? formatted
-    : balanceLogic?.formatted
+  const balanceLogic_temporary =
+    selectedToken?.id.includes("WBTC") || selectedSource?.id === "simple"
+      ? formatted
+      : sendFromBalance?.formatted
 
   const selectedTokens = [firstAssetToken, secondAssetToken]
 
@@ -112,6 +123,8 @@ export function Amplified() {
       .toNumber(),
     100,
   ).toFixed(0)
+
+  const isAmplifiable = currentTokens.length > 1
 
   return (
     <div className="grid space-y-2">
@@ -168,7 +181,7 @@ export function Amplified() {
                             logic && (
                               <SelectItem key={logic.id} value={logic.id}>
                                 <div className="flex space-x-3">
-                                  <WalletIcon />
+                                  <SourceIcon sourceId={logic.id} />
                                   <Text className="capitalize">
                                     {logic.id.includes("simple")
                                       ? "Wallet"
@@ -184,7 +197,6 @@ export function Amplified() {
                 </div>
               )}
             </form.Field>
-
             <div className="flex gap-2">
               <form.Field
                 name="sendAmount"
@@ -221,21 +233,23 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {availableTokens.map((token) => (
-                          <SelectItem key={token.id} value={token.id}>
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={token.symbol} />
-                              <Text>{token.symbol}</Text>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        {useAbleTokens.map(
+                          (token) =>
+                            token && (
+                              <SelectItem key={token.id} value={token.id}>
+                                <div className="flex space-x-3">
+                                  <TokenIcon symbol={token.symbol} />
+                                  <Text>{token.symbol}</Text>
+                                </div>
+                              </SelectItem>
+                            ),
+                        )}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 )}
               </form.Field>
             </div>
-
             {selectedToken && (
               <CustomBalance
                 token={selectedToken}
@@ -243,7 +257,6 @@ export function Amplified() {
                 label={"Balance"}
               />
             )}
-
             {/* Slider component */}
             <div className="space-y-5 pt-2 px-3">
               <Slider
@@ -279,13 +292,16 @@ export function Amplified() {
                 ))}
               </div>
             </div>
-
             <div />
-
+            {!isAmplifiable ? (
+              <Caption className="text-orange-700 !my-4">
+                Only one market available for this asset, please post a limit
+                order.
+              </Caption>
+            ) : undefined}
             <Caption variant={"caption1"} as={"label"}>
               Buy Asset #1
             </Caption>
-
             <div className="flex justify-between space-x-1">
               <form.Field name="firstAsset.token">
                 {(field) => (
@@ -295,7 +311,7 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market || !sendToken}
+                    disabled={!market || !sendToken || !isAmplifiable}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
@@ -320,7 +336,6 @@ export function Amplified() {
                 )}
               </form.Field>
             </div>
-
             <form.Field
               name="firstAsset.limitPrice"
               onChange={isGreaterThanZeroValidator}
@@ -343,7 +358,6 @@ export function Amplified() {
                 />
               )}
             </form.Field>
-
             <form.Field name="firstAsset.receiveTo">
               {(field) => (
                 <div className="flex-col flex">
@@ -356,7 +370,7 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market}
+                    disabled={!market || !isAmplifiable}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
@@ -368,7 +382,7 @@ export function Amplified() {
                             logic && (
                               <SelectItem key={logic.id} value={logic.id}>
                                 <div className="flex space-x-3">
-                                  <WalletIcon />
+                                  <SourceIcon sourceId={logic.id} />
                                   <Text className="capitalize">
                                     {logic.id.includes("simple")
                                       ? "Wallet"
@@ -407,9 +421,19 @@ export function Amplified() {
               )}
             </div>
 
+            <Separator className="!my-6" />
+
+            {selectedToken ? (
+              <MarketDetails
+                tickSize={tickSize}
+                // spotPrice={"3"}
+                minVolume={minVolume}
+              />
+            ) : undefined}
+
             {currentTokens.length > 1 && (
               <>
-                <div className="flex items-center gap-2 justify-center">
+                <div className="flex items-center gap-2 justify-center !mt-6">
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
                   <Caption>or</Caption>
                   <Separator className="bg-green-bangladesh max-w-[135px]" />
@@ -502,7 +526,7 @@ export function Amplified() {
                                 logic && (
                                   <SelectItem key={logic.id} value={logic.id}>
                                     <div className="flex space-x-3">
-                                      <WalletIcon />
+                                      <SourceIcon sourceId={logic.id} />
                                       <Text className="capitalize">
                                         {logic.id.includes("simple")
                                           ? "Wallet"
@@ -544,16 +568,23 @@ export function Amplified() {
               </>
             )}
 
+            <Separator className="!my-4" />
+            {selectedToken ? (
+              <MarketDetails
+                tickSize={tickSize}
+                // spotPrice={"3"}
+                minVolume={minVolume}
+              />
+            ) : undefined}
+
             <Button
               disabled
               variant={"secondary"}
-              className="flex justify-center items-center w-full"
+              className="flex justify-center items-center w-full mt-6"
             >
               <Plus className="h-4 w-4" /> Add Market
             </Button>
-
             <Separator className="!my-6" />
-
             <Accordion title="Advanced">
               <form.Field name="timeInForce">
                 {(field) => {
@@ -640,9 +671,7 @@ export function Amplified() {
                 </form.Field>
               </div>
             </Accordion>
-
             <Separator className="!my-6" />
-
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
             >
@@ -651,7 +680,7 @@ export function Amplified() {
                   <Button
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
-                    disabled={!canSubmit || !market}
+                    disabled={!canSubmit || !market || !isAmplifiable}
                     rightIcon
                     loading={!!isSubmitting}
                   >

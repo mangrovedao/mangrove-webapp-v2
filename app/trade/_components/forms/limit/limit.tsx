@@ -42,6 +42,7 @@ export function Limit() {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
+    receiveTokenBalance,
     handleSubmit,
     form,
     quoteToken,
@@ -53,24 +54,39 @@ export function Limit() {
     timeInForce,
     send,
     sendFrom,
+    receiveTo,
     spotPrice,
     logics,
+    selecteSource,
+    minVolume,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
 
   const { address } = useAccount()
 
-  const { balanceLogic, availableLogics } = liquiditySourcing({
-    sendToken,
-    sendFrom,
-    fundOwner: address,
-    //@ts-ignore
-    logics,
-  })
+  const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
+    liquiditySourcing({
+      sendToken,
+      sendFrom,
+      receiveTo,
+      receiveToken,
+      fundOwner: address,
+      logics,
+    })
 
-  const currentBalance =
-    balanceLogic && sendFrom !== "simple" ? balanceLogic : sendTokenBalance
+  const currentBalance = sendFromBalance ? sendFromBalance : sendTokenBalance
+
+  const currentReceiveBalance = receiveToBalance
+    ? receiveToBalance
+    : receiveTokenBalance
+
+  console.log(
+    "currentBalance",
+    currentBalance.formatted,
+    "currentReceiveBalance",
+    currentReceiveBalance.formatted,
+  )
 
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(currentBalance.formatted)) / 100
@@ -182,6 +198,7 @@ export function Limit() {
                   disabled={!(market && form.state.isFormValid)}
                   error={field.state.meta.touchedErrors}
                   showBalance
+                  customBalance={currentReceiveBalance.formatted}
                 />
               )}
             </form.Field>
@@ -340,7 +357,7 @@ export function Limit() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {logics.map(
+                            {sendFromLogics?.map(
                               (source) =>
                                 source && (
                                   <SelectItem key={source.id} value={source.id}>
@@ -355,9 +372,6 @@ export function Limit() {
                                   </SelectItem>
                                 ),
                             )}
-                            <SelectItem value="disabled" disabled>
-                              <Text>More sources coming soon...</Text>
-                            </SelectItem>
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -391,7 +405,7 @@ export function Limit() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {logics.map(
+                            {receiveToLogics?.map(
                               (source) =>
                                 source && (
                                   <SelectItem key={source.id} value={source.id}>
@@ -406,10 +420,6 @@ export function Limit() {
                                   </SelectItem>
                                 ),
                             )}
-
-                            <SelectItem value="disabled" disabled>
-                              <Text>More sources coming soon...</Text>
-                            </SelectItem>
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -422,6 +432,7 @@ export function Limit() {
             <Separator className="!my-6" />
 
             <MarketDetails
+              minVolume={minVolume}
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
               spotPrice={spotPrice}
@@ -454,7 +465,7 @@ export function Limit() {
 
       {formData && (
         <FromWalletLimitOrderDialog
-          form={formData}
+          form={{ ...formData, selectedSource: selecteSource }}
           onClose={() => setFormData(undefined)}
         />
       )}

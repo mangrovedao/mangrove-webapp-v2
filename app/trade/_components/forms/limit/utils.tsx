@@ -57,6 +57,14 @@ export function getFormattedTimeToLive(
 }
 
 export const sourceIcons: { [key: string]: JSX.Element } = {
+  orbit: (
+    <img
+      src="/assets/liquiditySources/orbit.webp"
+      alt="Orbit"
+      width="24"
+      height="24"
+    />
+  ),
   aave: (
     <svg
       xmlns="http://www.w3.org/2000/svg"

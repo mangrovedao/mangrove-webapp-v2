@@ -19,11 +19,14 @@ export function useInfiniteApproveToken() {
         if (!(token && spender)) return
 
         if (logic) {
-          //@ts-ignore
-          const tokenToApprove = await logic.overlying(token)
+          try {
+            const tokenToApprove = await logic.overlying(token)
 
-          const result = await tokenToApprove.approve(spender)
-          return result.wait()
+            const result = await tokenToApprove.approve(spender)
+            return result.wait()
+          } catch (error) {
+            return
+          }
         } else {
           const result = await token.approve(spender)
           return result.wait()
