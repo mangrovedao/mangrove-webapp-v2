@@ -26,10 +26,6 @@ export default function CancelAmplifiedOfferDialog({
   return (
     <Dialog open={!!order} onClose={onClose} type="info">
       <Dialog.Title>Are you sure you want to cancel this order? </Dialog.Title>
-      <Dialog.Description>
-        Funds used to place the order will be returned to your account. It may
-        take a few minutes.
-      </Dialog.Description>
       <Dialog.Footer>
         <div className="flex flex-col gap-4 flex-1">
           <Button

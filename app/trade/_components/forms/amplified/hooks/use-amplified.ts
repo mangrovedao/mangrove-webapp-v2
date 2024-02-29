@@ -67,7 +67,6 @@ export function useAmplified({ onSubmit }: Props) {
 
   /// GET liquidity sourcing logics ///
   const logics = mangrove ? Object.values(mangrove.logics) : []
-  // console.log("openMarkets", openMarkets, " logics", logics)
 
   /// GET first asset infos ///
   const firstAsset = form.useStore((state) => state.values.firstAsset)

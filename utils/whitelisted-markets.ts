@@ -7,12 +7,23 @@ export function filterOpenMarketsWithMarketConfig(
   chainId: number,
 ): Mangrove.OpenMarketInfo[] {
   const marketsConfig = getJsonFromMarketsConfig()
+
   if (!marketsConfig) return []
-  return openMarkets.filter(({ base, quote }) => {
-    return marketsConfig[chainId.toString()]?.some(
-      ([tokenAId, tokenBId]) =>
-        (base.id === tokenAId && quote.id === tokenBId) ||
-        (quote.id === tokenAId && base.id === tokenBId),
-    )
-  })
+  const networkMarkets = marketsConfig[chainId.toString()]?.map(
+    ([tokenAId, tokenBId]) => [tokenAId, tokenBId].join("_"),
+  )
+  return openMarkets
+    .filter(({ base, quote }) => {
+      return marketsConfig[chainId.toString()]?.some(
+        ([tokenAId, tokenBId]) =>
+          (base.id === tokenAId && quote.id === tokenBId) ||
+          (quote.id === tokenAId && base.id === tokenBId),
+      )
+    })
+    .sort((a, b) => {
+      return (
+        (networkMarkets?.indexOf([a.base.id, a.quote.id].join("_")) ?? -1) -
+        (networkMarkets?.indexOf([b.base.id, b.quote.id].join("_")) ?? -1)
+      )
+    })
 }

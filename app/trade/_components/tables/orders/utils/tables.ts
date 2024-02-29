@@ -16,7 +16,7 @@ export function getOrderProgress(order: Order, market?: Market) {
     Math.round(
       Big(filled)
         .mul(100)
-        .div(Big(volume).eq(0) ? 1 : volume)
+        .div(Big(amount).eq(0) ? 1 : amount)
         .toNumber(),
     ),
     100,
