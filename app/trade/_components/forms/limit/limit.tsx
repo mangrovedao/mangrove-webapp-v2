@@ -170,7 +170,7 @@ export function Limit() {
                   token={sendToken}
                   customBalance={currentBalance.formatted}
                   label="Send amount"
-                  disabled={!market}
+                  disabled={!market || currentBalance.formatted === "0"}
                   showBalance
                   error={field.state.meta.touchedErrors}
                 />
@@ -188,7 +188,10 @@ export function Limit() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={!(market && form.state.isFormValid)}
+                  disabled={
+                    !(market && form.state.isFormValid) ||
+                    currentReceiveBalance.formatted === "0"
+                  }
                   error={field.state.meta.touchedErrors}
                   showBalance
                   customBalance={currentReceiveBalance.formatted}

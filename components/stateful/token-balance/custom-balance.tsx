@@ -37,7 +37,7 @@ export function CustomBalance(props: {
                 </span>
               </TooltipTrigger>
               <TooltipContent className="z-50">
-                {Number(props.balance).toFixed(token?.decimals)}
+                {Number(props.balance).toFixed(token?.decimals)} {token?.symbol}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
