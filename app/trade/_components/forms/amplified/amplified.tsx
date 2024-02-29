@@ -61,23 +61,39 @@ export function Amplified() {
     logics,
     availableTokens,
     currentTokens,
+    openMarkets,
   } = useAmplified({
     onSubmit: (formData) => setFormData(formData),
   })
 
   const { address } = useAccount()
 
-  const { balanceLogic } = liquiditySourcing({
-    sendToken: selectedToken,
-    sendFrom: sendSource,
-    fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
-    logics,
-  })
+  const { useAbleTokens, sendFromLogics, receiveToLogics, sendFromBalance } =
+    liquiditySourcing({
+      availableTokens,
+      receiveTo: [firstAsset.receiveTo, secondAsset.receiveTo],
+      receiveToken: selectedToken,
+      sendToken: selectedToken,
+      sendFrom: sendSource,
+      fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
+      logics,
+    })
+
   const { formatted } = useTokenBalance(selectedToken)
 
-  const balanceLogic_temporary = selectedToken?.id.includes("WBTC")
-    ? formatted
-    : balanceLogic?.formatted
+  const balanceLogic_temporary =
+    selectedToken?.id.includes("WBTC") || selectedSource?.id === "simple"
+      ? formatted
+      : sendFromBalance?.formatted
+
+  console.log(
+    "temp",
+    balanceLogic_temporary,
+    "sendFromBalance",
+    sendFromBalance,
+    "formatted",
+    formatted,
+  )
 
   const selectedTokens = [firstAssetToken, secondAssetToken]
 
@@ -114,6 +130,8 @@ export function Amplified() {
       .toNumber(),
     100,
   ).toFixed(0)
+
+  const isAmplifiable = currentTokens.length > 1
 
   return (
     <div className="grid space-y-2">
@@ -223,14 +241,17 @@ export function Amplified() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {availableTokens.map((token) => (
-                          <SelectItem key={token.id} value={token.id}>
-                            <div className="flex space-x-3">
-                              <TokenIcon symbol={token.symbol} />
-                              <Text>{token.symbol}</Text>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        {useAbleTokens.map(
+                          (token) =>
+                            token && (
+                              <SelectItem key={token.id} value={token.id}>
+                                <div className="flex space-x-3">
+                                  <TokenIcon symbol={token.symbol} />
+                                  <Text>{token.symbol}</Text>
+                                </div>
+                              </SelectItem>
+                            ),
+                        )}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -284,6 +305,13 @@ export function Amplified() {
 
             <div />
 
+            {!isAmplifiable ? (
+              <Caption className="text-orange-700 !my-4">
+                Only one market available for this asset, please post a limit
+                order.
+              </Caption>
+            ) : undefined}
+
             <Caption variant={"caption1"} as={"label"}>
               Buy Asset #1
             </Caption>
@@ -297,7 +325,7 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market || !sendToken}
+                    disabled={!market || !sendToken || !isAmplifiable}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
@@ -358,7 +386,7 @@ export function Amplified() {
                     onValueChange={(value: string) => {
                       field.handleChange(value)
                     }}
-                    disabled={!market}
+                    disabled={!market || !isAmplifiable}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select" />
@@ -653,7 +681,7 @@ export function Amplified() {
                   <Button
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
-                    disabled={!canSubmit || !market}
+                    disabled={!canSubmit || !market || !isAmplifiable}
                     rightIcon
                     loading={!!isSubmitting}
                   >
