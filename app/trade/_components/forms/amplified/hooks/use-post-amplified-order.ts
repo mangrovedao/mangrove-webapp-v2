@@ -14,12 +14,11 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { useEthersSigner } from "@/utils/adapters"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { parseUnits } from "viem"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 import { estimateTimestamp } from "../utils"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-
 
 type Props = {
   onResult?: (result: Market.OrderResult) => void
@@ -60,32 +59,25 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
 
         const amp = new MangroveAmplifier({ mgv: mangrove })
 
-        const assets = form.secondAssetToken
-          ? [
-              {
-                inboundTokenAddress: form.firstAssetToken.address,
-                inboundTokenId: form.firstAssetToken.id,
-                inboundLogic: form.selectedSource,
-                tickspacing: market.tickSpacing,
-                limitPrice: form.firstAsset.limitPrice,
-              },
-              {
-                inboundTokenAddress: form.secondAssetToken.address,
-                inboundTokenId: form.secondAssetToken.id,
-                inboundLogic: form.selectedSource,
-                tickspacing: market.tickSpacing,
-                limitPrice: form.secondAsset.limitPrice,
-              },
-            ]
-          : [
-              {
-                inboundTokenAddress: form.firstAssetToken.address,
-                inboundTokenId: form.firstAssetToken.id,
-                inboundLogic: form.selectedSource,
-                tickspacing: market.tickSpacing,
-                limitPrice: form.firstAsset.limitPrice,
-              },
-            ]
+        const assets = [
+          {
+            inboundTokenAddress: form.firstAssetToken.address,
+            inboundTokenId: form.firstAssetToken.id,
+            inboundLogic: form.selectedSource,
+            tickspacing: market.tickSpacing,
+            limitPrice: form.firstAsset.limitPrice,
+          },
+        ]
+
+        if (form.secondAssetToken) {
+          assets.push({
+            inboundTokenAddress: form.secondAssetToken.address,
+            inboundTokenId: form.secondAssetToken.id,
+            inboundLogic: form.selectedSource,
+            tickspacing: market.tickSpacing,
+            limitPrice: form.secondAsset.limitPrice,
+          })
+        }
 
         const inboundTokens = assets.map((token) => {
           const market = openMarkets?.find((market) => {
@@ -152,6 +144,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         //   blockNumber,
         // })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["amplified"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
       } catch (error) {
         console.error(error)

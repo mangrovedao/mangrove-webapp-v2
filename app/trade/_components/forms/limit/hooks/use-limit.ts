@@ -39,9 +39,12 @@ export function useLimit(props: Props) {
 
   const tradeAction = form.useStore((state) => state.values.tradeAction)
   const send = form.useStore((state) => state.values.send)
-  const sendFrom = form.state.values.sendFrom
+  const sendFrom = form.useStore((state) => state.values.sendFrom)
+  const receiveTo = form.useStore((state) => state.values.receiveTo)
+
   const timeInForce = form.useStore((state) => state.values.timeInForce)
   const logics = mangrove ? Object.values(mangrove.logics) : []
+  const selecteSource = logics.find((logic) => logic?.id === sendFrom)
 
   const {
     quoteToken,
@@ -49,10 +52,18 @@ export function useLimit(props: Props) {
     receiveToken,
     feeInPercentageAsString,
     sendTokenBalance,
+    receiveTokenBalance,
     tickSize,
     spotPrice,
     defaultLimitPrice,
   } = useTradeInfos("limit", tradeAction)
+
+  const minAsk = market?.getSemibook("asks").getMinimumVolume(130_000)
+  const minBid = market?.getSemibook("bids").getMinimumVolume(130_000)
+  const minVolume =
+    tradeAction === TradeAction.BUY
+      ? minBid?.toFixed(quoteToken?.displayedDecimals)
+      : minAsk?.toFixed(sendToken?.displayedDecimals)
 
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
@@ -178,6 +189,7 @@ export function useLimit(props: Props) {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
+    receiveTokenBalance,
     handleSubmit,
     form,
     quoteToken,
@@ -185,11 +197,14 @@ export function useLimit(props: Props) {
     sendToken,
     send,
     sendFrom,
+    receiveTo,
     receiveToken,
     tickSize,
     feeInPercentageAsString,
     spotPrice,
     timeInForce,
     logics,
+    selecteSource,
+    minVolume,
   }
 }
