@@ -20,13 +20,15 @@ const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
 const blastMainnetRpcUrl = process.env.NEXT_PUBLIC_BLAST_MAINNET_RPC_URL ?? ""
 
-const blastMainner = {
+const polygon = wagmiChains.polygon
+
+const blastMainnet = {
   id: 81457,
   name: "Blast",
   iconUrl:
     "https://cdn.routescan.io/_next/image?url=https%3A%2F%2Fcms-cdn.avascan.com%2Fcms2%2Fblast.dead36673539.png&w=48&q=100",
   nativeCurrency: {
-    name: "Ethereum",
+    name: "Ether",
     symbol: "ETH",
     decimals: 18,
   },
@@ -35,6 +37,7 @@ const blastMainner = {
       http: [blastMainnetRpcUrl],
     },
   },
+  // testnet: false,
 } as const satisfies Chain
 
 const config = getDefaultConfig({
@@ -42,7 +45,7 @@ const config = getDefaultConfig({
   projectId,
   // @ts-ignore
   chains: blastMainnetRpcUrl
-    ? [...getWhitelistedChainObjects(), blastMainner]
+    ? [blastMainnet, ...getWhitelistedChainObjects()]
     : getWhitelistedChainObjects(),
   transports: {
     [wagmiChains.polygon.id]: http(),
