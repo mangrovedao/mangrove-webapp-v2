@@ -1,4 +1,3 @@
-import InfoTooltip from "@/components/info-tooltip"
 import { MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
 
@@ -21,10 +20,10 @@ export default function Rewards({ points = 12450 }: Props) {
         </span>
       </div>
       <div className="text-xs text-cloud-200 flex items-center pt-11">
-        update in 22h 10m{" "}
-        <InfoTooltip>
+        update every 24 hours {/* update in 22h 10m{" "} */}
+        {/* <InfoTooltip>
           Your total points, recalculated every 24 hours.
-        </InfoTooltip>
+        </InfoTooltip> */}
       </div>
     </div>
   )

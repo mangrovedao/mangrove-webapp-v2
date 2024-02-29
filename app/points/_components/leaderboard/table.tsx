@@ -2,6 +2,7 @@
 import React from "react"
 
 import { Title } from "@/components/typography/title"
+import { DataTable } from "@/components/ui/data-table/data-table"
 import { useLeaderboard, useUserRank } from "./use-leaderboard"
 import { useTable } from "./use-table"
 
@@ -17,10 +18,11 @@ export function Leaderboard() {
   })
 
   const useUserRankQuery = useUserRank()
-  const data = [
-    ...(useUserRankQuery?.data ?? []),
-    ...(leaderboardQuery.data ?? []),
-  ]
+  const currentuser = useUserRankQuery.data
+  const data = React.useMemo(
+    () => [...(currentuser ?? []), ...(leaderboardQuery.data ?? [])],
+    [useUserRankQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt],
+  )
 
   const table = useTable({
     data,
@@ -31,7 +33,7 @@ export function Leaderboard() {
       <Title variant={"title1"} className="mb-10">
         Leaderboard
       </Title>
-      {/* <DataTable
+      <DataTable
         table={table}
         isError={!!leaderboardQuery.error}
         isLoading={leaderboardQuery.isLoading}
@@ -42,7 +44,8 @@ export function Leaderboard() {
           count: 1,
         }}
         tableRowClasses="text-white"
-      /> */}
+        isRowHighlighted={(row) => row.account === currentuser?.[0]?.account}
+      />
     </div>
   )
 }
