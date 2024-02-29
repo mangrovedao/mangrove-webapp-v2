@@ -42,6 +42,14 @@ function renameChainNames(chains: wagmiChains.Chain[]) {
     if (chain.id === wagmiChains.polygonMumbai.id) {
       return { ...chain, name: "Mumbai" }
     }
+
+    if (chain.id === wagmiChains.blastSepolia.id) {
+      return {
+        ...wagmiChains.blastSepolia,
+        iconUrl:
+          "https://cdn.routescan.io/_next/image?url=https%3A%2F%2Fcms-cdn.avascan.com%2Fcms2%2Fblast.dead36673539.png&w=48&q=100",
+      }
+    }
     return chain
   })
 }
