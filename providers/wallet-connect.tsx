@@ -20,8 +20,6 @@ const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
 const blastMainnetRpcUrl = process.env.NEXT_PUBLIC_BLAST_MAINNET_RPC_URL ?? ""
 
-const polygon = wagmiChains.polygon
-
 const blastMainnet = {
   id: 81457,
   name: "Blast",
