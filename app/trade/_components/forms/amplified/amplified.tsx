@@ -212,7 +212,9 @@ export function Amplified() {
                       computeReceiveAmount("firstAsset")
                       computeReceiveAmount("secondAsset")
                     }}
-                    disabled={!market || !sendToken}
+                    disabled={
+                      !market || !sendToken || balanceLogic_temporary === "0"
+                    }
                     error={field.state.meta.errors}
                   />
                 )}
@@ -293,10 +295,10 @@ export function Amplified() {
               </div>
             </div>
             <div />
-            {!isAmplifiable ? (
+            {selectedToken?.address && !isAmplifiable ? (
               <Caption className="text-orange-700 !my-4">
-                Only one market available for this asset, please post a limit
-                order.
+                Only one market is available for this asset, please post a limit
+                order instead.
               </Caption>
             ) : undefined}
             <Caption variant={"caption1"} as={"label"}>
@@ -427,7 +429,7 @@ export function Amplified() {
               <MarketDetails
                 tickSize={tickSize}
                 // spotPrice={"3"}
-                minVolume={minVolume}
+                // minVolume={minVolume}
               />
             ) : undefined}
 
@@ -573,7 +575,7 @@ export function Amplified() {
               <MarketDetails
                 tickSize={tickSize}
                 // spotPrice={"3"}
-                minVolume={minVolume}
+                // minVolume={minVolume}
               />
             ) : undefined}
 

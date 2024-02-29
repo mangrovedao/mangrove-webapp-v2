@@ -1,6 +1,12 @@
 import type { Token } from "@mangrovedao/mangrove.js"
 
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 
 export function TokenBalance(props: {
@@ -22,7 +28,16 @@ export function TokenBalance(props: {
         <Skeleton className="w-24 h-4" />
       ) : (
         <span className="text-xs space-x-1">
-          <span title={formatted?.toString()}>{formattedWithSymbol}</span>
+          <TooltipProvider>
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger className="hover:opacity-80 transition-opacity ml-1">
+                <span title={formatted?.toString()}>{formattedWithSymbol}</span>
+              </TooltipTrigger>
+              <TooltipContent className="z-50">
+                {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {props?.action && (
             <button
               className="text-xs underline"

@@ -31,6 +31,7 @@ export function Market() {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
+    receiveTokenBalance,
     handleSubmit,
     form,
     market,
@@ -112,7 +113,7 @@ export function Market() {
                   }}
                   token={sendToken}
                   label="Send amount"
-                  disabled={!market}
+                  disabled={!market || sendTokenBalance.formatted === "0"}
                   showBalance
                   error={
                     field.state.value === "0" && hasEnoughVolume
@@ -134,7 +135,10 @@ export function Market() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={!(market && form.state.isFormValid)}
+                  disabled={
+                    !(market && form.state.isFormValid) ||
+                    receiveTokenBalance.formatted === "0"
+                  }
                   error={
                     field.state.value === "0" && hasEnoughVolume
                       ? [FIELD_ERRORS.insufficientVolume]
