@@ -40,6 +40,7 @@ import { Separator } from "./ui/separator"
 import {
   Tooltip,
   TooltipContent,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip"
@@ -59,7 +60,20 @@ const LINKS = [
     name: "Points",
     href: "/points",
     disabled: true,
-    message: "Coming soon",
+    message: (
+      <div className="z-50">
+        Points program is live! <br />
+        The Points page will be available in the coming days.
+        <br />
+        More info{" "}
+        <Link
+          href={"https://docs.mangrove.exchange/general/points/"}
+          className="text-green-caribbean"
+        >
+          here
+        </Link>
+      </div>
+    ),
   },
   {
     name: "Referrals",
@@ -140,7 +154,11 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
                       >
                         <span>{name}</span>
                       </TooltipTrigger>
-                      <TooltipContent side={"bottom"}>{message}</TooltipContent>
+                      <TooltipPortal>
+                        <TooltipContent side={"bottom"}>
+                          {message}
+                        </TooltipContent>
+                      </TooltipPortal>
                     </Tooltip>
                   </TooltipProvider>
                 ) : (
