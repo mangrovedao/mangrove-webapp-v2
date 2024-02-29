@@ -13,6 +13,7 @@ import { TRADE } from "../../_constants/loading-keys"
 import { Fills } from "./fills/fills"
 import { useFills } from "./fills/use-fills"
 import { AmplifiedOrders } from "./orders/amplified-order"
+import { useAmplifiedOrders } from "./orders/hooks/use-amplified-orders"
 import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
@@ -41,6 +42,10 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
     select: (fills) => fills.length,
   })
 
+  const { data: amplifedCount } = useAmplifiedOrders({
+    select: (fills) => fills.length,
+  })
+
   return (
     <CustomTabs {...props} defaultValue={Object.values(TradeTables)[0]}>
       <CustomTabsList
@@ -52,7 +57,13 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
             key={`${table}-tab`}
             value={table}
             className="capitalize"
-            count={table === TradeTables.ORDERS ? ordersCount : fillsCount}
+            count={
+              table === TradeTables.ORDERS
+                ? ordersCount
+                : table === TradeTables.FILLS
+                  ? fillsCount
+                  : amplifedCount
+            }
           >
             {table}
           </CustomTabsTrigger>

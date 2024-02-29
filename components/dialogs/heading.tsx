@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { Check, ExclamationMark, Info } from "@/svgs"
+import { Check, ExclamationMark, Info, MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
 import type { DialogType } from "./types"
 
@@ -20,6 +20,8 @@ export function Heading({ type }: { type: DialogType }) {
         >
           {type === "error" ? (
             <ExclamationMark />
+          ) : type === "mangrove" ? (
+            <MangroveLogo />
           ) : type === "info" ? (
             <Info className="h-8 w-auto" />
           ) : (
