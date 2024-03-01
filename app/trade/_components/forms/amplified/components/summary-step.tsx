@@ -7,16 +7,16 @@ import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 
 type Props = {
   form: Form
   tokenToAmplify?: Token
   sendAmount: string
   source: SimpleLogic | SimpleAaveLogic | OrbitLogic
-  receiveTokens?: {
+  assets?: {
     token: Token
     receiveTo: string
     amount: string
@@ -24,12 +24,7 @@ type Props = {
   }[]
 }
 
-export function SummaryStep({
-  tokenToAmplify,
-  receiveTokens,
-  source,
-  form,
-}: Props) {
+export function SummaryStep({ tokenToAmplify, assets, source, form }: Props) {
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
@@ -47,34 +42,34 @@ export function SummaryStep({
       </Line>
       <Separator />
       <div className="space-y-4">
-        {receiveTokens?.map(
-          (receiveToken) =>
-            receiveToken.token &&
-            receiveToken.receiveTo && (
+        {assets?.map(
+          (asset) =>
+            asset.token &&
+            asset.receiveTo && (
               <>
                 <div className="flex items-center space-x-2">
                   <TokenIcon
                     className="w-7 h-auto"
-                    symbol={receiveToken.token.symbol}
+                    symbol={asset.token.symbol}
                   />
                   <span className="text-white text-xl font-medium">
-                    {receiveToken.token.symbol}
+                    {asset.token.symbol}
                   </span>
                 </div>
 
                 <Line title="Limit Price">
-                  {Big(receiveToken.limitPrice ?? 0).toFixed(
-                    receiveToken.token.displayedAsPriceDecimals,
+                  {Big(asset.limitPrice ?? 0).toFixed(
+                    asset.token.displayedAsPriceDecimals,
                   )}{" "}
-                  <Unit>{receiveToken.token.symbol}</Unit>
+                  <Unit>{asset.token.symbol}</Unit>
                 </Line>
                 <Line
-                  title={`Receive to ${receiveToken.receiveTo.includes("simple") ? "Wallet" : receiveToken.receiveTo.toUpperCase()}`}
+                  title={`Receive to ${asset.receiveTo.includes("simple") ? "Wallet" : asset.receiveTo.toUpperCase()}`}
                 >
-                  {Big(receiveToken.amount ?? 0).toFixed(
-                    receiveToken.token.displayedDecimals,
+                  {Big(asset.amount ?? 0).toFixed(
+                    asset.token.displayedDecimals,
                   )}{" "}
-                  <Unit>{receiveToken.token.symbol}</Unit>
+                  <Unit>{asset.token.symbol}</Unit>
                 </Line>
               </>
             ),

@@ -1,12 +1,14 @@
 import React from "react"
 import { useAccount } from "wagmi"
 
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { Token } from "@mangrovedao/mangrove.js"
 import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import { Asset } from "../types"
+import liquiditySourcing from "./amplified-liquidity-sourcing"
 import { ChangingFrom, useNewStratStore } from "./amplified-store"
 
 export const MIN_PRICE_POINTS = 2
@@ -78,7 +80,16 @@ export default function useAmplifiedForm() {
     setTimeToLive,
     setTimeToLiveUnit,
   } = useNewStratStore()
-
+  console.log({
+    sendSource,
+    sendAmount,
+    sendToken,
+    assets,
+    timeInForce,
+    timeToLive,
+    timeToLiveUnit,
+  })
+  console.log(openMarkets)
   const availableTokens =
     openMarkets?.reduce((acc, current) => {
       if (!acc.includes(current.base)) {
@@ -91,7 +102,7 @@ export default function useAmplifiedForm() {
       return acc
     }, [] as Token[]) ?? []
   const logics = mangrove ? Object.values(mangrove.logics) : []
-
+  console.log(logics)
   const minBid = market?.getSemibook("bids").getMinimumVolume(220_000)
   const tickSize = marketInfo?.tickSpacing
     ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
@@ -113,6 +124,26 @@ export default function useAmplifiedForm() {
       (market) => market.base.id == token.id || market.quote.id == token.id,
     )
   })
+  const assetsWithTokens = assets.map((asset) => ({
+    ...asset,
+    token: availableTokens.find((tokens) => (tokens.id = asset.token)),
+  }))
+
+  const { useAbleTokens, sendFromBalance } = liquiditySourcing({
+    availableTokens,
+    sendToken: selectedToken,
+    sendFrom: sendSource,
+    fundOwner: address,
+    logics,
+  })
+  console.log(availableTokens, useAbleTokens)
+
+  const { formatted } = useTokenBalance(selectedToken)
+
+  const balanceLogic_temporary =
+    selectedToken?.id.includes("WBTC") || selectedSource?.id === "simple"
+      ? formatted
+      : sendFromBalance?.formatted
 
   //   const debouncedStepSize = useDebounce(stepSize, 300)
   //   const debouncedPricePoints = useDebounce(pricePoints, 300)
@@ -208,60 +239,22 @@ export default function useAmplifiedForm() {
   React.useEffect(() => {
     const newErrors = { ...errors }
 
-    // Base Deposit Validation
-    // if (Number(base) > Number(baseBalance.formatted) && baseDeposit) {
-    //   newErrors.baseDeposit =
-    //     "Base deposit cannot be greater than wallet balance"
-    // } else if (requiredBase?.gt(0) && Number(baseDeposit) === 0) {
-    //   newErrors.baseDeposit = "Base deposit must be greater than 0"
-    // } else {
-    //   delete newErrors.baseDeposit
-    // }
+    // send amount validation
+    if (Number(sendAmount) > Number(balanceLogic_temporary) && sendAmount) {
+      newErrors.sendAmount = "Amount cannot be greater than wallet balance"
+    } else if (Number(sendAmount) <= 0 && sendAmount) {
+      newErrors.sendAmount = "Amount must be greater than 0"
+    } else {
+      delete newErrors.sendAmount
+    }
 
-    // // Quote Deposit Validation
-    // if (Number(quoteDeposit) > Number(quoteBalance.formatted) && quoteDeposit) {
-    //   newErrors.quoteDeposit =
-    //     "Quote deposit cannot be greater than wallet balance"
-    // } else if (requiredQuote?.gt(0) && Number(quoteDeposit) === 0) {
-    //   newErrors.quoteDeposit = "Quote deposit must be greater than 0"
-    // } else {
-    //   delete newErrors.quoteDeposit
-    // }
-
-    // if (Number(pricePoints) < Number(MIN_PRICE_POINTS) && pricePoints) {
-    //   newErrors.pricePoints = "Price points must be at least 2"
-    // } else {
-    //   delete newErrors.pricePoints
-    // }
-
-    // if (Number(ratio) < Number(MIN_RATIO) && ratio) {
-    //   newErrors.ratio = "Ratio must be at least 1.001"
-    // } else {
-    //   delete newErrors.ratio
-    // }
-
-    // if (
-    //   (Number(stepSize) < Number(MIN_STEP_SIZE) ||
-    //     Number(stepSize) >= Number(pricePoints)) &&
-    //   stepSize
-    // ) {
-    //   newErrors.stepSize =
-    //     "Step size must be at least 1 and inferior to price points"
-    // } else {
-    //   delete newErrors.stepSize
-    // }
-
-    // if (
-    //   Number(bountyDeposit) > Number(nativeBalance?.formatted) &&
-    //   bountyDeposit
-    // ) {
-    //   newErrors.bountyDeposit =
-    //     "Bounty deposit cannot be greater than wallet balance"
-    // } else if (requiredBounty?.gt(0) && Number(bountyDeposit) === 0) {
-    //   newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
-    // } else {
-    //   delete newErrors.bountyDeposit
-    // }
+    assets.map((asset, index) => {
+      if (Number(asset.limitPrice) <= 0 && asset.limitPrice) {
+        newErrors[`limitPrice${index}`] = "Limit Price must be greater than 0"
+      } else {
+        delete newErrors?.[`limitPrice${index}`]
+      }
+    })
 
     setErrors(newErrors)
   }, [
@@ -293,6 +286,10 @@ export default function useAmplifiedForm() {
     selectedSource,
     minVolume,
     currentTokens,
+    useAbleTokens,
+    sendFromBalance,
+    balanceLogic_temporary,
+    assetsWithTokens,
 
     setSendSource,
     setSendAmount,

@@ -60,6 +60,7 @@ export function useLimit(props: Props) {
 
   const minAsk = market?.getSemibook("asks").getMinimumVolume(200_000)
   const minBid = market?.getSemibook("bids").getMinimumVolume(200_000)
+
   const minVolume =
     tradeAction === TradeAction.BUY
       ? minBid?.toFixed(quoteToken?.displayedDecimals)

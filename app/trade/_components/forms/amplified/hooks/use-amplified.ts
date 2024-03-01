@@ -74,6 +74,10 @@ export function useAmplified({ onSubmit }: Props) {
   const selectedToken = availableTokens.find(
     (token) => token.id === selectedTokenId,
   )
+  const assetsWithTokens = assets.map((asset) => ({
+    ...asset,
+    token: availableTokens.find((tokens) => (tokens.id = asset.token)),
+  }))
 
   // market details
   const minBid = market?.getSemibook("bids").getMinimumVolume(220_000)
@@ -195,12 +199,10 @@ export function useAmplified({ onSubmit }: Props) {
     selectedToken,
     selectedSource,
     timeInForce,
-
+    assetsWithTokens,
     assets,
-    //market details
     tickSize,
     minVolume,
-
     logics,
     currentTokens,
     availableTokens,

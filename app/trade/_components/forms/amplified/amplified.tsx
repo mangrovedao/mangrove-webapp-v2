@@ -66,8 +66,6 @@ export function Amplified() {
 
   const { useAbleTokens, sendFromBalance } = liquiditySourcing({
     availableTokens,
-    receiveTo: assets ? assets.map((asset) => asset.receiveTo) : [], // Fix: Add nullish coalescing operator
-    receiveToken: selectedToken,
     sendToken: selectedToken,
     sendFrom: sendSource,
     fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
@@ -584,6 +582,14 @@ export function Amplified() {
             selectedToken,
             selectedSource,
             sendAmount,
+            assetWithTokens: assets.map((asset) => ({
+              token: availableTokens.find(
+                (tokens) => (tokens.id = asset.token),
+              )!,
+              receiveTo: asset.receiveTo,
+              amount: asset.amount,
+              limitPrice: asset.limitPrice,
+            })),
           }}
           onClose={() => setFormData(undefined)}
         />

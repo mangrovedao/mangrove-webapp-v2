@@ -1,4 +1,7 @@
 "use client"
+import Big from "big.js"
+import { Plus, Trash } from "lucide-react"
+import Link from "next/link"
 
 import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
@@ -8,6 +11,7 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -16,21 +20,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
-import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
-import { Label } from "@radix-ui/react-dropdown-menu"
-import { Separator } from "@radix-ui/react-separator"
-import Big from "big.js"
-import { Plus } from "lucide-react"
-import Link from "next/link"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import SourceIcon from "../limit/components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
-import liquiditySourcing from "./hooks/amplified-liquidity-sourcing"
 import useAmplifiedForm from "./hooks/use-amplified-temp"
+
 const sliderValues = [25, 50, 75, 100]
 
 export function Amplified() {
@@ -44,6 +43,7 @@ export function Amplified() {
     sendAmount,
     sendToken,
     assets,
+    assetsWithTokens,
     timeInForce,
     timeToLive,
     timeToLiveUnit,
@@ -56,6 +56,9 @@ export function Amplified() {
     setTimeToLive,
     setTimeToLiveUnit,
     minBid,
+    useAbleTokens,
+    sendFromBalance,
+    balanceLogic_temporary,
     tickSize,
     selectedToken,
     selectedSource,
@@ -71,21 +74,6 @@ export function Amplified() {
     handleTimeToLiveChange,
     handleTimeToLiveUnit,
   } = useAmplifiedForm()
-
-  const { useAbleTokens, sendFromBalance } = liquiditySourcing({
-    availableTokens,
-    sendToken: selectedToken,
-    sendFrom: sendSource,
-    fundOwner: address, //TODO check if fundowner changes if the liquidity sourcing is from a different wallet
-    logics,
-  })
-
-  const { formatted } = useTokenBalance(selectedToken)
-
-  const balanceLogic_temporary =
-    selectedToken?.id.includes("WBTC") || selectedSource?.id === "simple"
-      ? formatted
-      : sendFromBalance?.formatted
 
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(balanceLogic_temporary)) / 100
@@ -107,8 +95,8 @@ export function Amplified() {
     100,
   ).toFixed(0)
 
-  const isAmplifiable = currentTokens.length > 1
   const selectedTokens = assets ? assets.map((asset) => asset.token) : []
+  const isAmplifiable = currentTokens.length > 1
 
   if (!logics)
     return (
@@ -148,6 +136,8 @@ export function Amplified() {
         className={cn("space-y-6")}
         onSubmit={(e) => {
           e.preventDefault()
+          console.log(e)
+          // setFormData()
         }}
       >
         <div className="space-y-2 !mt-6">
@@ -196,7 +186,7 @@ export function Amplified() {
             <Select
               name={"sendToken"}
               value={sendToken}
-              onValueChange={handeSendTokenChange}
+              // onValueChange={handeSendTokenChange}
               disabled={!sendSource}
             >
               <SelectTrigger>
@@ -272,14 +262,36 @@ export function Amplified() {
           {assets.map((asset, index) => {
             return (
               <div key={`asset-${index}`}>
-                <Caption variant={"caption1"} as={"label"}>
-                  Buy Asset #{index + 1}
-                </Caption>
+                <div className="flex justify-between my-2">
+                  <Caption variant={"caption1"} as={"label"}>
+                    Buy Asset #{index + 1}
+                  </Caption>
+                  <span
+                    className={cn("text-red-600 text-xs cursor-pointer", {
+                      "opacity-10 cursor-not-allowed": !isAmplifiable,
+                    })}
+                    onClick={() => {
+                      if (!isAmplifiable) return
+                      handleAssetsChange(assets.filter((_, i) => i !== index))
+                    }}
+                  >
+                    <Trash className="h-4 w-4 hover:opacity-80 transition-opacity" />
+                  </span>
+                </div>
                 <div className="flex justify-between space-x-1">
                   <Select
                     name={"token"}
                     value={asset.token}
-                    onValueChange={() => undefined}
+                    onValueChange={(value) =>
+                      handleAssetsChange([
+                        ...assets.slice(0, index), // Keep the previous assets unchanged
+                        {
+                          ...asset,
+                          token: value, // Update the limit price of the current asset
+                        },
+                        ...assets.slice(index + 1), // Keep the remaining assets unchanged
+                      ])
+                    }
                     disabled={!sendToken || !isAmplifiable}
                   >
                     <SelectTrigger>
@@ -307,13 +319,22 @@ export function Amplified() {
                 <EnhancedNumericInput
                   name={"limitPrice"}
                   value={asset.limitPrice}
-                  // onValueChange={(value: string) => undefined}
+                  onChange={(e) =>
+                    handleAssetsChange([
+                      ...assets.slice(0, index), // Keep the previous assets unchanged
+                      {
+                        ...asset,
+                        limitPrice: e.target.value, // Update the limit price of the current asset
+                      },
+                      ...assets.slice(index + 1), // Keep the remaining assets unchanged
+                    ])
+                  }
                   token={availableTokens.find(
                     (token) => token.id === asset.token,
                   )}
                   label="Limit price"
                   disabled={!asset.token}
-                  // error={errors.limitPrice}
+                  error={errors?.[`limitPrice${index}`]}
                 />
 
                 <div className="flex-col flex">
@@ -323,7 +344,16 @@ export function Amplified() {
                   <Select
                     name={"receiveTo"}
                     value={asset.receiveTo}
-                    onValueChange={(value: string) => undefined}
+                    onValueChange={(value: string) =>
+                      handleAssetsChange([
+                        ...assets.slice(0, index), // Keep the previous assets unchanged
+                        {
+                          ...asset,
+                          receiveTo: value, // Update the limit price of the current asset
+                        },
+                        ...assets.slice(index + 1), // Keep the remaining assets unchanged
+                      ])
+                    }
                     disabled={!isAmplifiable}
                   >
                     <SelectTrigger>
@@ -398,7 +428,18 @@ export function Amplified() {
           })}
         </div>
         <Button
-          disabled
+          disabled={!isAmplifiable}
+          onClick={() => {
+            handleAssetsChange([
+              ...assets,
+              {
+                amount: "",
+                token: "",
+                limitPrice: "",
+                receiveTo: "simple",
+              },
+            ])
+          }}
           variant={"secondary"}
           className="flex justify-center items-center w-full mt-6"
         >
@@ -411,8 +452,9 @@ export function Amplified() {
             <Select
               name={" timeInForce"}
               value={timeInForce}
-              // onValueChange={handleTimeInForceChange}
-              // disabled={!market}
+              onValueChange={(value: TimeInForce) => {
+                handleTimeInForceChange(value)
+              }}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select time in force" />
@@ -438,21 +480,19 @@ export function Amplified() {
               placeholder="1"
               name={"timeToLive"}
               value={timeToLive}
-              // onChange={({ target: { value } }) => {
-              //   if (!value) return
-              //   field.handleChange(value)
-              // }}
-              // disabled={!(market && form.state.isFormValid)}
+              onChange={({ target: { value } }) => {
+                if (!value) return
+                handleTimeToLiveChange(value)
+              }}
               error={errors.timeToLive}
             />
 
             <Select
               name={"timeToLiveUnit"}
               value={timeToLiveUnit}
-              // onValueChange={(value: TimeToLiveUnit) => {
-              //   field.handleChange(value)
-              // }}
-              // disabled={!market}
+              onValueChange={(value: TimeToLiveUnit) => {
+                handleTimeToLiveUnit(value)
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select time unit" />

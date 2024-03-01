@@ -27,10 +27,14 @@ import { SummaryStep } from "./summary-step"
 type Props = {
   form: Form & {
     selectedToken?: Token
-    firstAssetToken?: Token
-    secondAssetToken?: Token
     selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
     sendAmount: string
+    assetWithTokens: {
+      token: Token
+      receiveTo: string
+      amount: string
+      limitPrice: string
+    }[]
   }
   onClose: () => void
 }
@@ -45,13 +49,7 @@ export default function FromWalletAmplifiedOrderDialog({
   form,
   onClose,
 }: Props) {
-  const {
-    selectedToken,
-    firstAssetToken,
-    secondAssetToken,
-    selectedSource,
-    sendAmount,
-  } = form
+  const { selectedToken, selectedSource, sendAmount, assets } = form
 
   const { chain } = useAccount()
   const { data: spender } = useSpenderAddress("amplified")
@@ -116,20 +114,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          receiveTokens={[
-            {
-              receiveTo: form.firstAsset.receiveTo,
-              amount: form.firstAsset.amount,
-              token: firstAssetToken!,
-              limitPrice: form.firstAsset.limitPrice,
-            },
-            {
-              receiveTo: form.secondAsset.receiveTo,
-              amount: form.secondAsset.amount,
-              token: secondAssetToken!,
-              limitPrice: form.secondAsset.limitPrice,
-            },
-          ]}
+          assets={form.assetWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
@@ -202,20 +187,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          receiveTokens={[
-            {
-              receiveTo: form.firstAsset.receiveTo,
-              amount: form.firstAsset.amount,
-              token: firstAssetToken!,
-              limitPrice: form.firstAsset.limitPrice,
-            },
-            {
-              receiveTo: form.secondAsset.receiveTo,
-              amount: form.secondAsset.amount,
-              token: secondAssetToken!,
-              limitPrice: form.secondAsset.limitPrice,
-            },
-          ]}
+          assets={form.assetWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
