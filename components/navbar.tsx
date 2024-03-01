@@ -38,6 +38,9 @@ import {
 } from "@rainbow-me/rainbowkit"
 
 import useLocalStorage from "@/hooks/use-local-storage"
+import { blast } from "@/providers/wallet-connect"
+import { blastSepolia } from "viem/chains"
+import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 import {
@@ -208,6 +211,7 @@ const RightPart = withClientOnly(() => {
     openChainModal?.()
   }
   const [hideDisclaimer] = useLocalStorage<boolean>("hideDisclaimer", false)
+  const [wrapETH, setWrapETH] = React.useState(false)
 
   // React.useEffect(() => {
   //   if (!isConnected && !address) {
@@ -253,6 +257,7 @@ const RightPart = withClientOnly(() => {
 
   return (
     <div className="flex space-x-4 items-center h-8 py-1">
+      <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
       <Button
         variant="invisible"
         className="!space-x-4 lg:flex items-center hidden"
@@ -313,6 +318,16 @@ const RightPart = withClientOnly(() => {
               </Link>
             </DropdownMenuItem>
           )}
+
+          {(chain?.id == blastSepolia.id || chain?.id == blast.id) && (
+            <DropdownMenuItem asChild onClick={() => setWrapETH(!wrapETH)}>
+              <div>
+                <Coins className="mr-2 h-4 w-4" />
+                <span>Wrap ETH</span>
+              </div>
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem
