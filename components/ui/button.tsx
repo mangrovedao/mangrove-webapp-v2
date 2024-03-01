@@ -50,7 +50,7 @@ const buttonVariants = cva(
       },
       {
         variant: ["primary", "tertiary"],
-        className: "disabled:bg-gray-scale-600 disabled:border-transparent",
+        className: "disabled:bg-gray-scale-200 disabled:border-transparent",
       },
     ],
     defaultVariants: {
@@ -64,7 +64,7 @@ const rightIconVariants = cva(
   [
     "text-primary-solid-black aspect-square w-6 flex items-center justify-center bg-white rounded-full ml-2",
     "group-active/button:text-primary-solid-black group-hover/button:text-primary-solid-black",
-    "group-disabled/button:text-gray-scale-600 group-disabled/button:bg-gray-scale-400",
+    "group-disabled/button:text-gray-scale-600 group-disabled/button:bg-gray-scale-300",
   ],
   {
     variants: {
