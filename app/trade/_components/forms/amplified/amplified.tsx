@@ -259,24 +259,24 @@ export function Amplified() {
             </Caption>
           ) : undefined}
 
-          {assets.map((asset, index) => {
+          {assets.map((asset, i) => {
             return (
-              <div key={`asset-${index}`}>
+              <div key={`asset-${i}`}>
                 <div className="flex justify-between my-2">
                   <Caption variant={"caption1"} as={"label"}>
-                    Buy Asset #{index + 1}
+                    Buy Asset #{i + 1}
                   </Caption>
-                  <span
+                  <button
+                    disabled={!isAmplifiable || i < 2}
                     className={cn("text-red-600 text-xs cursor-pointer", {
                       "opacity-10 cursor-not-allowed": !isAmplifiable,
                     })}
                     onClick={() => {
-                      if (!isAmplifiable) return
-                      handleAssetsChange(assets.filter((_, i) => i !== index))
+                      handleAssetsChange(assets.filter((_, i) => i !== i))
                     }}
                   >
                     <Trash className="h-4 w-4 hover:opacity-80 transition-opacity" />
-                  </span>
+                  </button>
                 </div>
                 <div className="flex justify-between space-x-1">
                   <Select
@@ -284,12 +284,12 @@ export function Amplified() {
                     value={asset.token}
                     onValueChange={(value) =>
                       handleAssetsChange([
-                        ...assets.slice(0, index), // Keep the previous assets unchanged
+                        ...assets.slice(0, i),
                         {
                           ...asset,
-                          token: value, // Update the limit price of the current asset
+                          token: value,
                         },
-                        ...assets.slice(index + 1), // Keep the remaining assets unchanged
+                        ...assets.slice(i + 1),
                       ])
                     }
                     disabled={!sendToken || !isAmplifiable}
@@ -321,12 +321,12 @@ export function Amplified() {
                   value={asset.limitPrice}
                   onChange={(e) =>
                     handleAssetsChange([
-                      ...assets.slice(0, index), // Keep the previous assets unchanged
+                      ...assets.slice(0, i),
                       {
                         ...asset,
-                        limitPrice: e.target.value, // Update the limit price of the current asset
+                        limitPrice: e.target.value,
                       },
-                      ...assets.slice(index + 1), // Keep the remaining assets unchanged
+                      ...assets.slice(i + 1),
                     ])
                   }
                   token={availableTokens.find(
@@ -334,7 +334,7 @@ export function Amplified() {
                   )}
                   label="Limit price"
                   disabled={!asset.token}
-                  error={errors?.[`limitPrice${index}`]}
+                  error={errors?.[`limitPrice${i}`]}
                 />
 
                 <div className="flex-col flex">
@@ -346,12 +346,12 @@ export function Amplified() {
                     value={asset.receiveTo}
                     onValueChange={(value: string) =>
                       handleAssetsChange([
-                        ...assets.slice(0, index), // Keep the previous assets unchanged
+                        ...assets.slice(0, i),
                         {
                           ...asset,
-                          receiveTo: value, // Update the limit price of the current asset
+                          receiveTo: value,
                         },
-                        ...assets.slice(index + 1), // Keep the remaining assets unchanged
+                        ...assets.slice(i + 1),
                       ])
                     }
                     disabled={!isAmplifiable}
@@ -416,7 +416,7 @@ export function Amplified() {
                   />
                 ) : undefined}
 
-                {index !== assets.length - 1 ? (
+                {i !== assets.length - 1 ? (
                   <div className="flex items-center gap-2 justify-center !mt-6">
                     <Separator className="bg-green-bangladesh max-w-[135px]" />
                     <Caption>or</Caption>
