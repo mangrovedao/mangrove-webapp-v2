@@ -5,6 +5,7 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { Token } from "@mangrovedao/mangrove.js"
+import Big from "big.js"
 import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import { Asset } from "../types"
@@ -21,40 +22,6 @@ export default function useAmplifiedForm() {
   const { market, marketInfo } = useMarket()
 
   const { data: openMarkets } = marketsInfoQuery
-
-  // TODO: fix TS type for useEventListener
-  // @ts-expect-error
-  useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
-
-  function handleOnOrderbookOfferClicked(
-    event: CustomEvent<{ price: string }>,
-  ) {
-    // const assets = form.getFieldValue(`assets`)
-    // for (let i = 0; i < assets.length; i++) {
-    //   const asset = assets[i]
-    //   if (!asset) return
-    //   if (asset.token === market?.quote.id) {
-    //     form.store.setState(
-    //       (state) => {
-    //         return {
-    //           ...state,
-    //           values: {
-    //             ...state.values,
-    //             assets: [
-    //               ...assets,
-    //               { ...asset, limitPrice: event.detail.price },
-    //             ],
-    //           },
-    //         }
-    //       },
-    //       {
-    //         priority: "high",
-    //       },
-    //     )
-    //     form.validateAllFields("blur")
-    //     if (sendAmount === "") return
-    //   }
-  }
 
   // form.validateAllFields("blur")
   // if (sendAmount === "") return
@@ -81,7 +48,53 @@ export default function useAmplifiedForm() {
     setTimeToLiveUnit,
   } = useNewStratStore()
 
-  // console.log({ openMarkets })
+  // TODO: fix TS type for useEventListener
+  // @ts-expect-error
+  useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
+
+  function handleOnOrderbookOfferClicked(
+    event: CustomEvent<{ price: string }>,
+  ) {
+    for (let i = 0; i < assets.length; i++) {
+      const asset = assets[i]
+      if (!asset) return
+      if (asset.token === market?.quote.id) {
+        setAssets([
+          ...assets.slice(0, i), // Keep the previous assets unchanged
+          {
+            ...asset,
+            limitPrice: event.detail.price, // Update the limit price of the current asset
+          },
+          ...assets.slice(i + 1), // Keep the remaining assets unchanged
+        ])
+      }
+    }
+  }
+
+  const computeReceiveAmount = () => {
+    for (let i = 0; i < assets.length; i++) {
+      if (assets[i] || !assets[i]?.limitPrice) return
+      const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
+        .div(
+          Big(
+            !isNaN(Number(assets[i]?.limitPrice)) &&
+              Number(assets[i]?.limitPrice) > 0
+              ? Number(assets[i]?.limitPrice)
+              : 1,
+          ),
+        )
+        .toString()
+
+      setAssets([
+        ...assets.slice(0, i), // Keep the previous assets unchanged
+        {
+          ...assets[i]!,
+          amount, // Update the limit price of the current asset
+        },
+        ...assets.slice(i + 1), // Keep the remaining assets unchanged
+      ])
+    }
+  }
 
   const availableTokens =
     openMarkets?.reduce((acc, current) => {
@@ -94,8 +107,6 @@ export default function useAmplifiedForm() {
 
       return acc
     }, [] as Token[]) ?? []
-
-  // console.log({ openMarkets, availableTokens })
 
   const logics = mangrove ? Object.values(mangrove.logics) : []
 
@@ -144,18 +155,6 @@ export default function useAmplifiedForm() {
   //   const debouncedStepSize = useDebounce(stepSize, 300)
   //   const debouncedPricePoints = useDebounce(pricePoints, 300)
   //   const fieldsDisabled = !(minPrice && maxPrice)
-
-  //   const setAssets = useNewStratStore(
-  //     (store) => store.setAssets,
-  //   )
-
-  //   React.useEffect(() => {
-  //     if (kandelRequirementsQuery.error) {
-  //       setGlobalError(getErrorMessage(kandelRequirementsQuery.error))
-  //       return
-  //     }
-  //     setGlobalError(undefined)
-  //   }, [kandelRequirementsQuery.error])
 
   React.useEffect(() => {
     if (isChangingFrom === "sendSource" || !sendSource) return
@@ -287,6 +286,7 @@ export default function useAmplifiedForm() {
     balanceLogic_temporary,
     assetsWithTokens,
 
+    computeReceiveAmount,
     setSendSource,
     setSendAmount,
     setSendToken,

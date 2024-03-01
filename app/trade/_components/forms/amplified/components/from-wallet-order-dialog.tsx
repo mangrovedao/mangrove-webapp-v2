@@ -37,6 +37,7 @@ type Props = {
     }[]
   }
   onClose: () => void
+  isOpen: boolean
 }
 
 const btnProps: ButtonProps = {
@@ -47,6 +48,7 @@ const btnProps: ButtonProps = {
 
 export default function FromWalletAmplifiedOrderDialog({
   form,
+  isOpen,
   onClose,
 }: Props) {
   const { selectedToken, selectedSource, sendAmount } = form
@@ -114,7 +116,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          assets={form.assetsWithTokens}
+          assetsWithToken={form.assetsWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
@@ -187,7 +189,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          assets={form.assetsWithTokens}
+          assetsWithToken={form.assetsWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
@@ -229,7 +231,7 @@ export default function FromWalletAmplifiedOrderDialog({
     })
 
   return (
-    <Dialog open={!!form} onClose={onClose} showCloseButton={false}>
+    <Dialog open={!!isOpen} onClose={onClose} showCloseButton={false}>
       <Dialog.Title className="text-xl text-left" close>
         Proceed transaction
       </Dialog.Title>

@@ -75,12 +75,13 @@ export function Amplified() {
     handleTimeInForceChange,
     handleTimeToLiveChange,
     handleTimeToLiveUnit,
+    computeReceiveAmount,
   } = useAmplifiedForm()
 
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(balanceLogic_temporary)) / 100
     setSendAmount(amount.toString())
-    // computeReceiveAmount()
+    computeReceiveAmount()
   }
   const [summaryDialog, setSummaryDialog] = React.useState(false)
 
@@ -539,6 +540,7 @@ export function Amplified() {
         onClose={() => {
           setSummaryDialog(!summaryDialog)
         }}
+        isOpen={summaryDialog}
       />
     </div>
   )

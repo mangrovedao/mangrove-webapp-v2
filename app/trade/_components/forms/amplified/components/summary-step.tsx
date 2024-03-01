@@ -16,7 +16,7 @@ type Props = {
   tokenToAmplify?: Token
   sendAmount: string
   source: SimpleLogic | SimpleAaveLogic | OrbitLogic
-  assets?: {
+  assetsWithToken?: {
     token: Token | undefined
     receiveTo: string
     amount: string
@@ -24,8 +24,13 @@ type Props = {
   }[]
 }
 
-export function SummaryStep({ tokenToAmplify, assets, source, form }: Props) {
-  console.log({ tokenToAmplify, assets, source, form })
+export function SummaryStep({
+  tokenToAmplify,
+  assetsWithToken,
+  source,
+  form,
+}: Props) {
+  console.log({ tokenToAmplify, assetsWithToken, source, form })
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
@@ -38,12 +43,14 @@ export function SummaryStep({ tokenToAmplify, assets, source, form }: Props) {
       <Line
         title={`Send from ${source?.id.includes("simple") ? "Wallet" : source?.id.toUpperCase()}`}
       >
-        {Big(form.sendAmount ?? 0).toFixed(8)}{" "}
+        {Big(
+          !isNaN(Number(form.sendAmount)) ? Number(form.sendAmount) : 0,
+        ).toFixed(8)}{" "}
         <Unit>{tokenToAmplify?.symbol}</Unit>
       </Line>
       <Separator />
       <div className="space-y-4">
-        {assets?.map(
+        {assetsWithToken?.map(
           (asset) =>
             asset.token &&
             asset.receiveTo && (
@@ -59,17 +66,19 @@ export function SummaryStep({ tokenToAmplify, assets, source, form }: Props) {
                 </div>
 
                 <Line title="Limit Price">
-                  {Big(asset.limitPrice ?? 0).toFixed(
-                    asset.token.displayedAsPriceDecimals,
-                  )}{" "}
+                  {Big(
+                    !isNaN(Number(asset.limitPrice))
+                      ? Number(asset.limitPrice)
+                      : 0,
+                  ).toFixed(asset.token.displayedAsPriceDecimals)}{" "}
                   <Unit>{asset.token.symbol}</Unit>
                 </Line>
                 <Line
                   title={`Receive to ${asset.receiveTo.includes("simple") ? "Wallet" : asset.receiveTo.toUpperCase()}`}
                 >
-                  {Big(asset.amount ?? 0).toFixed(
-                    asset.token.displayedDecimals,
-                  )}{" "}
+                  {Big(
+                    !isNaN(Number(asset.amount)) ? Number(asset.amount) : 0,
+                  ).toFixed(asset.token.displayedDecimals)}{" "}
                   <Unit>{asset.token.symbol}</Unit>
                 </Line>
               </>
