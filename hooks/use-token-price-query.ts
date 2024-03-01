@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { getTokenPriceInToken } from "@/services/tokens.service"
 
+// useTokenPrice query from CEX
 const useTokenPriceQuery = (
   tokenSymbol?: string,
   priceTokenSymbol?: string,
