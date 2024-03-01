@@ -24,9 +24,11 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
+import React from "react"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import SourceIcon from "../limit/components/source-icon"
+import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import useAmplifiedForm from "./hooks/use-amplified-temp"
 
@@ -80,6 +82,7 @@ export function Amplified() {
     setSendAmount(amount.toString())
     // computeReceiveAmount()
   }
+  const [summaryDialog, setSummaryDialog] = React.useState(false)
 
   const sendTokenBalanceAsBig = balanceLogic_temporary
     ? Big(Number(balanceLogic_temporary))
@@ -134,8 +137,6 @@ export function Amplified() {
         className={cn("space-y-6")}
         onSubmit={(e) => {
           e.preventDefault()
-          console.log(e)
-          // setFormData()
         }}
       >
         <div className="space-y-2 !mt-6">
@@ -514,11 +515,31 @@ export function Amplified() {
           size={"lg"}
           disabled={!isAmplifiable}
           rightIcon
+          onClick={() => {
+            setSummaryDialog(!summaryDialog)
+          }}
           // loading={!!isSubmitting}
         >
           Buy
         </Button>
       </form>
+      <FromWalletAmplifiedOrderDialog
+        form={{
+          assets,
+          assetsWithTokens,
+          sendSource,
+          sendToken,
+          sendAmount,
+          selectedToken,
+          selectedSource,
+          timeInForce,
+          timeToLive,
+          timeToLiveUnit,
+        }}
+        onClose={() => {
+          setSummaryDialog(!summaryDialog)
+        }}
+      />
     </div>
   )
 }

@@ -17,7 +17,7 @@ type Props = {
   sendAmount: string
   source: SimpleLogic | SimpleAaveLogic | OrbitLogic
   assets?: {
-    token: Token
+    token: Token | undefined
     receiveTo: string
     amount: string
     limitPrice: string
@@ -25,6 +25,7 @@ type Props = {
 }
 
 export function SummaryStep({ tokenToAmplify, assets, source, form }: Props) {
+  console.log({ tokenToAmplify, assets, source, form })
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
@@ -35,7 +36,7 @@ export function SummaryStep({ tokenToAmplify, assets, source, form }: Props) {
         </span>
       </div>
       <Line
-        title={`Send from ${source.id.includes("simple") ? "Wallet" : source.id.toUpperCase()}`}
+        title={`Send from ${source?.id.includes("simple") ? "Wallet" : source?.id.toUpperCase()}`}
       >
         {Big(form.sendAmount ?? 0).toFixed(8)}{" "}
         <Unit>{tokenToAmplify?.symbol}</Unit>

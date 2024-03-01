@@ -29,8 +29,8 @@ type Props = {
     selectedToken?: Token
     selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
     sendAmount: string
-    assetWithTokens: {
-      token: Token
+    assetsWithTokens: {
+      token: Token | undefined
       receiveTo: string
       amount: string
       limitPrice: string
@@ -49,7 +49,7 @@ export default function FromWalletAmplifiedOrderDialog({
   form,
   onClose,
 }: Props) {
-  const { selectedToken, selectedSource, sendAmount, assets } = form
+  const { selectedToken, selectedSource, sendAmount } = form
 
   const { chain } = useAccount()
   const { data: spender } = useSpenderAddress("amplified")
@@ -114,7 +114,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          assets={form.assetWithTokens}
+          assets={form.assetsWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
@@ -187,7 +187,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          assets={form.assetWithTokens}
+          assets={form.assetsWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
