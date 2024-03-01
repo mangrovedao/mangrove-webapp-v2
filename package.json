@@ -82,7 +82,7 @@
     "tailwindcss-animate": "^1.0.7",
     "use-resize-observer": "^9.1.0",
     "usehooks-ts": "^2.10.0",
-    "viem": "2.x",
+    "viem": "~2.7.16",
     "wagmi": "^2.5.7",
     "zod": "^3.22.4",
     "zod-fetch": "^0.1.1",
