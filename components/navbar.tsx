@@ -235,6 +235,12 @@ const RightPart = withClientOnly(() => {
   //   }
   // }, [isConnected])
 
+  React.useEffect(() => {
+    if (address && !chain?.id) {
+      disconnect()
+    }
+  }, [chain?.id])
+
   if (!isConnected) {
     return (
       <>
