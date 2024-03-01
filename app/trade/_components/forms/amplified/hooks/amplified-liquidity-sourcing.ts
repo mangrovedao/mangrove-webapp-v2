@@ -48,7 +48,6 @@ export default function liquiditySourcing({
     })
 
     const usableTokens = await Promise.all(tokenToTest)
-
     setUseAbleTokens(usableTokens)
   }
 

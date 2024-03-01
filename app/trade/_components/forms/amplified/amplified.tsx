@@ -62,8 +62,6 @@ export function Amplified() {
   })
   const { address } = useAccount()
 
-  console.log(assets)
-
   const { useAbleTokens, sendFromBalance } = liquiditySourcing({
     availableTokens,
     sendToken: selectedToken,
@@ -296,8 +294,6 @@ export function Amplified() {
               {(field) =>
                 field.state.value &&
                 field.state.value.map((asset, index) => () => {
-                  console.log(asset, index)
-
                   return (
                     <div key={`asset-${index}`}>
                       <Caption variant={"caption1"} as={"label"}>

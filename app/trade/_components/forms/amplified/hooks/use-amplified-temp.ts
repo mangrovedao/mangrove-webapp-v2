@@ -80,16 +80,9 @@ export default function useAmplifiedForm() {
     setTimeToLive,
     setTimeToLiveUnit,
   } = useNewStratStore()
-  console.log({
-    sendSource,
-    sendAmount,
-    sendToken,
-    assets,
-    timeInForce,
-    timeToLive,
-    timeToLiveUnit,
-  })
-  console.log(openMarkets)
+
+  // console.log({ openMarkets })
+
   const availableTokens =
     openMarkets?.reduce((acc, current) => {
       if (!acc.includes(current.base)) {
@@ -101,8 +94,11 @@ export default function useAmplifiedForm() {
 
       return acc
     }, [] as Token[]) ?? []
+
+  // console.log({ openMarkets, availableTokens })
+
   const logics = mangrove ? Object.values(mangrove.logics) : []
-  console.log(logics)
+
   const minBid = market?.getSemibook("bids").getMinimumVolume(220_000)
   const tickSize = marketInfo?.tickSpacing
     ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
@@ -124,9 +120,10 @@ export default function useAmplifiedForm() {
       (market) => market.base.id == token.id || market.quote.id == token.id,
     )
   })
+
   const assetsWithTokens = assets.map((asset) => ({
     ...asset,
-    token: availableTokens.find((tokens) => (tokens.id = asset.token)),
+    token: availableTokens.find((tokens) => tokens.id === asset.token),
   }))
 
   const { useAbleTokens, sendFromBalance } = liquiditySourcing({
@@ -136,7 +133,6 @@ export default function useAmplifiedForm() {
     fundOwner: address,
     logics,
   })
-  console.log(availableTokens, useAbleTokens)
 
   const { formatted } = useTokenBalance(selectedToken)
 

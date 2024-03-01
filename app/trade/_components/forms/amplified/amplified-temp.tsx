@@ -50,15 +50,15 @@ export function Amplified() {
     address,
     setSendSource,
     setSendAmount,
+    useAbleTokens,
+    sendFromBalance,
+    balanceLogic_temporary,
     setSendToken,
     setAssets,
     setTimeInForce,
     setTimeToLive,
     setTimeToLiveUnit,
     minBid,
-    useAbleTokens,
-    sendFromBalance,
-    balanceLogic_temporary,
     tickSize,
     selectedToken,
     selectedSource,
@@ -77,9 +77,7 @@ export function Amplified() {
 
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(balanceLogic_temporary)) / 100
-    // form.setFieldValue("sendAmount", amount.toString())
-    // form.validateAllFields("change")
-
+    setSendAmount(amount.toString())
     // computeReceiveAmount()
   }
 
@@ -186,7 +184,7 @@ export function Amplified() {
             <Select
               name={"sendToken"}
               value={sendToken}
-              // onValueChange={handeSendTokenChange}
+              onValueChange={handeSendTokenChange}
               disabled={!sendSource}
             >
               <SelectTrigger>

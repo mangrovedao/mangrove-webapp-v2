@@ -35,8 +35,6 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["amplified", address, first, skip],
     queryFn: async () => {
-      console.log(indexerSdk, isConnected)
-
       try {
         if (!indexerSdk || !address || !openMarkets) return []
         startLoading(TRADE.TABLES.ORDERS)
