@@ -57,7 +57,7 @@ export function useActivateSmartContract() {
           address: proxy,
           abi: SmartRouterABI,
           functionName: "bind",
-          args: [amplifier.address],
+          args: [amplifier.address as Address],
         })
 
         const result = await publicClient.waitForTransactionReceipt({
