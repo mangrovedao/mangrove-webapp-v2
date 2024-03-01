@@ -6,6 +6,7 @@ import React from "react"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
@@ -64,30 +65,44 @@ function Item({
   )
 }
 
-const keyLabels = {
-  high: "24h High",
-  low: "24h Low",
-}
-
 export function PricesBar() {
-  const { market } = useMarket()
+  const { market, requestBookQuery } = useMarket()
   const base = market?.base
   const quote = market?.quote
   const oneMinutePriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol)
   const oneDayPriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol, "1d")
+  const { data, isLoading: mangroveTokenPriceLoading } =
+    useMangroveTokenPricesQuery(base?.address, quote?.address)
 
-  const oneMinuteClose = oneMinutePriceQuery?.data?.close ?? 0
-  const oneDayClose = oneDayPriceQuery?.data?.close ?? 0
-  const variationPercentage = (oneMinuteClose * 100) / oneDayClose - 100
-  const variationPercentageAbs = Math.abs(variationPercentage)
-  const variation24h = oneMinuteClose - oneDayClose
+  const { diffTakerGave, takerGave, minPrice, maxPrice } =
+    data?.[`${base?.address}-${quote?.address}`] ?? {}
+
+  const { asks, bids } = requestBookQuery.data ?? {}
+
+  const lowestAskPrice = asks?.[0]?.price
+  const highestBidPrice = bids?.[0]?.price
+  const priceDecimals = determinePriceDecimalsFromToken(
+    lowestAskPrice?.toNumber(),
+    market?.quote,
+  )
+  const spotPrice =
+    !lowestAskPrice || !highestBidPrice
+      ? undefined
+      : Math.max(
+          lowestAskPrice?.toNumber() || 0,
+          highestBidPrice?.toNumber() || 0,
+        )
+
+  const fixedSpotPrice = spotPrice?.toFixed(priceDecimals)
+
+  const variation24hPercentage = (diffTakerGave ?? 0 * 100) / (spotPrice ?? 1)
 
   return (
     <ScrollArea>
       <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
         <Item
           label={quote?.symbol ? `Price (${quote?.symbol})` : "Price"}
-          value={oneMinutePriceQuery?.data?.close}
+          value={fixedSpotPrice ? Number(fixedSpotPrice ?? 0) : undefined}
           skeleton={oneMinutePriceQuery?.isLoading}
           quote={quote}
         />
@@ -96,21 +111,19 @@ export function PricesBar() {
 
         <Item
           label={`24h Change`}
-          value={variation24h}
+          value={diffTakerGave}
           quote={quote}
-          skeleton={
-            oneDayPriceQuery?.isLoading ?? oneMinutePriceQuery?.isLoading
-          }
+          skeleton={mangroveTokenPriceLoading}
           rightElement={
             <span
               className={cn("space-x-[2px] text-xs inline-flex ml-2", {
-                "text-green-caribbean": variation24h >= 0,
-                "text-red-100": variation24h < 0,
+                "text-green-caribbean": variation24hPercentage >= 0,
+                "text-red-100": variation24hPercentage < 0,
               })}
             >
               <VariationArrow
                 className={cn("h-3", {
-                  "rotate-180": variation24h < 0,
+                  "rotate-180": variation24hPercentage < 0,
                 })}
               />
               <span>
@@ -118,32 +131,33 @@ export function PricesBar() {
                   style: "percent",
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                }).format(variationPercentageAbs / 100)}
+                }).format(variation24hPercentage / 100)}
               </span>
             </span>
           }
         />
 
-        {Object.entries(keyLabels).map(([key, label]) => (
-          <React.Fragment key={key}>
-            <Separator orientation="vertical" className="h-4" />
+        <Item
+          label="24h High"
+          value={maxPrice ? Number(maxPrice ?? 0) : undefined}
+          quote={quote}
+          skeleton={mangroveTokenPriceLoading}
+        />
 
-            <Item
-              label={label}
-              value={oneDayPriceQuery?.data?.[key as keyof typeof keyLabels]}
-              quote={quote}
-              skeleton={oneDayPriceQuery?.isLoading}
-            />
-          </React.Fragment>
-        ))}
+        <Item
+          label="24h Low"
+          value={minPrice ? Number(minPrice ?? 0) : undefined}
+          quote={quote}
+          skeleton={mangroveTokenPriceLoading}
+        />
 
         <Separator orientation="vertical" className="h-4" />
 
         <Item
           label="24h Volume"
-          value={oneDayPriceQuery?.data?.volume}
+          value={takerGave ? Number(takerGave ?? 0) : undefined}
           quote={quote}
-          skeleton={oneDayPriceQuery?.isLoading}
+          skeleton={mangroveTokenPriceLoading}
         />
       </div>
       <ScrollBar orientation="horizontal" />
