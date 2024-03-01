@@ -30,7 +30,13 @@ export function CustomBalance(props: {
         <span className="text-xs space-x-1">
           <TooltipProvider>
             <Tooltip delayDuration={200}>
-              <TooltipTrigger className="hover:opacity-80 transition-opacity ml-1">
+              <TooltipTrigger
+                className="hover:opacity-80 transition-opacity ml-1"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                }}
+              >
                 <span>
                   {Number(props.balance).toFixed(token?.displayedDecimals)}{" "}
                   {token?.symbol}
@@ -45,9 +51,9 @@ export function CustomBalance(props: {
           {props?.action && (
             <button
               className="text-xs underline"
-              onClick={() =>
+              onClick={(e) => {
                 props.balance && props?.action?.onClick(props.balance)
-              }
+              }}
             >
               {props?.action.text}
             </button>

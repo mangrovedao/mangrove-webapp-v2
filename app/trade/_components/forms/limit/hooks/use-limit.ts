@@ -58,8 +58,8 @@ export function useLimit(props: Props) {
     defaultLimitPrice,
   } = useTradeInfos("limit", tradeAction)
 
-  const minAsk = market?.getSemibook("asks").getMinimumVolume(130_000)
-  const minBid = market?.getSemibook("bids").getMinimumVolume(130_000)
+  const minAsk = market?.getSemibook("asks").getMinimumVolume(200_000)
+  const minBid = market?.getSemibook("bids").getMinimumVolume(200_000)
   const minVolume =
     tradeAction === TradeAction.BUY
       ? minBid?.toFixed(quoteToken?.displayedDecimals)

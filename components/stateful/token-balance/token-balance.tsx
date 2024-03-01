@@ -30,10 +30,22 @@ export function TokenBalance(props: {
         <span className="text-xs space-x-1">
           <TooltipProvider>
             <Tooltip delayDuration={200}>
-              <TooltipTrigger className="hover:opacity-80 transition-opacity ml-1">
+              <TooltipTrigger
+                className="hover:opacity-80 transition-opacity ml-1"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                }}
+              >
                 <span title={formatted?.toString()}>{formattedWithSymbol}</span>
               </TooltipTrigger>
-              <TooltipContent className="z-50">
+              <TooltipContent
+                className="z-50"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                }}
+              >
                 {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
               </TooltipContent>
             </Tooltip>
@@ -41,7 +53,9 @@ export function TokenBalance(props: {
           {props?.action && (
             <button
               className="text-xs underline"
-              onClick={() => formatted && props?.action?.onClick(formatted)}
+              onClick={(e) => {
+                formatted && props?.action?.onClick(formatted)
+              }}
             >
               {props?.action.text}
             </button>
