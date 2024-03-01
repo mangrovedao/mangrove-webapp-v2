@@ -6,11 +6,9 @@ import React from "react"
 
 type Props = {
   sendFrom: string
-  receiveTo: string[]
   logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]
   fundOwner?: string
   sendToken?: Token
-  receiveToken?: Token
   availableTokens: Token[]
 }
 
@@ -21,9 +19,7 @@ type BalanceLogic = {
 
 export default function liquiditySourcing({
   sendToken,
-  receiveToken,
   sendFrom,
-  receiveTo,
   logics,
   fundOwner,
   availableTokens,
@@ -31,12 +27,6 @@ export default function liquiditySourcing({
   const [sendFromBalance, setSendFromBalance] = React.useState<
     BalanceLogic | undefined
   >()
-
-  const [sendFromLogics, setSendFromLogics] =
-    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
-
-  const [receiveToLogics, setReceiveToLogics] =
-    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
 
   const [useAbleTokens, setUseAbleTokens] = React.useState<
     (Token | undefined)[]
@@ -98,8 +88,6 @@ export default function liquiditySourcing({
   }, [sendFrom, sendToken, fundOwner])
 
   return {
-    sendFromLogics,
-    receiveToLogics,
     sendFromBalance,
     useAbleTokens,
   }

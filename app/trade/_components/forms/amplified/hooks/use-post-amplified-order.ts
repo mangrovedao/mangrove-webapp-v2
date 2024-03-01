@@ -4,9 +4,11 @@ import {
   Token,
   type Market,
 } from "@mangrovedao/mangrove.js"
+import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { parseUnits } from "viem"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
@@ -14,8 +16,6 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { useEthersSigner } from "@/utils/adapters"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { parseUnits } from "viem"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 import { estimateTimestamp } from "../utils"
@@ -65,7 +65,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
             inboundTokenId: form.firstAssetToken.id,
             inboundLogic: form.selectedSource,
             tickspacing: market.tickSpacing,
-            limitPrice: form.firstAsset.limitPrice,
+            limitPrice: form.assets[0]?.limitPrice,
           },
         ]
 
@@ -75,7 +75,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
             inboundTokenId: form.secondAssetToken.id,
             inboundLogic: form.selectedSource,
             tickspacing: market.tickSpacing,
-            limitPrice: form.secondAsset.limitPrice,
+            limitPrice: form.assets[0]?.limitPrice,
           })
         }
 
@@ -91,7 +91,10 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
 
           const ba = market?.base.id === token.inboundTokenId ? "bids" : "asks"
           const priceHelper = new TickPriceHelper(ba, market!)
-          const tick = priceHelper.tickFromPrice(token.limitPrice, "nearest")
+          const tick = priceHelper.tickFromPrice(
+            token?.limitPrice || "0",
+            "nearest",
+          )
 
           return {
             inboundToken: token.inboundTokenAddress,

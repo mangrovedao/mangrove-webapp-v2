@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
+import { Token } from "@mangrovedao/mangrove.js"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
+import Big from "big.js"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { Token } from "@mangrovedao/mangrove.js"
-import Big from "big.js"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -26,18 +26,20 @@ export function useAmplified({ onSubmit }: Props) {
       sendSource: "",
       sendAmount: "",
       sendToken: "",
-      firstAsset: {
-        amount: "",
-        token: "",
-        limitPrice: "",
-        receiveTo: "simple",
-      },
-      secondAsset: {
-        amount: "",
-        token: "",
-        limitPrice: "",
-        receiveTo: "simple",
-      },
+      assets: [
+        {
+          amount: "",
+          token: "",
+          limitPrice: "",
+          receiveTo: "simple",
+        },
+        {
+          amount: "",
+          token: "",
+          limitPrice: "",
+          receiveTo: "simple",
+        },
+      ],
       timeInForce: TimeInForce.GOOD_TIL_TIME,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
@@ -50,6 +52,7 @@ export function useAmplified({ onSubmit }: Props) {
   const sendSource = form.useStore((state) => state.values.sendSource)
   const timeInForce = form.useStore((state) => state.values.timeInForce)
   const selectedTokenId = form.useStore((state) => state.values.sendToken)
+  const assets = form.useStore((state) => state.values.assets)
 
   const { data: openMarkets } = marketsInfoQuery
 
@@ -67,18 +70,6 @@ export function useAmplified({ onSubmit }: Props) {
 
   /// GET liquidity sourcing logics ///
   const logics = mangrove ? Object.values(mangrove.logics) : []
-
-  /// GET first asset infos ///
-  const firstAsset = form.useStore((state) => state.values.firstAsset)
-  const firstAssetToken = availableTokens.find(
-    (token) => token.id === firstAsset.token,
-  )
-
-  /// GET second asset infos ///
-  const secondAsset = form.useStore((state) => state.values.secondAsset)
-  const secondAssetToken = availableTokens.find(
-    (token) => token.id === secondAsset.token,
-  )
 
   const selectedToken = availableTokens.find(
     (token) => token.id === selectedTokenId,
@@ -112,49 +103,71 @@ export function useAmplified({ onSubmit }: Props) {
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
-  const computeReceiveAmount = (key: "firstAsset" | "secondAsset") => {
-    const limitPrice = form.getFieldValue(`${key}.limitPrice`)
-    const keyValue = form.getFieldValue(`${key}`)
-    if (!limitPrice) return
+  const computeReceiveAmount = (index: number) => {
+    const limitPrice = form.getFieldValue(`assets`)[index]?.limitPrice
+    const assets = form.getFieldValue(`assets`)
+    if (!limitPrice || !assets) return
 
-    const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
-      .div(
-        Big(
-          !isNaN(Number(limitPrice)) && Number(limitPrice) > 0
-            ? Number(limitPrice)
-            : 1,
-        ),
-      )
-      .toString()
+    for (let i = 0; i < assets.length; i++) {
+      const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
+        .div(
+          Big(
+            !isNaN(Number(limitPrice)) && Number(limitPrice) > 0
+              ? Number(limitPrice)
+              : 1,
+          ),
+        )
+        .toString()
 
-    form.store.setState(
-      (state) => {
-        return {
-          ...state,
-          values: {
-            ...state.values,
-            [key]: {
-              ...keyValue,
-              amount,
-            },
-          },
-        }
-      },
-      {
-        priority: "high",
-      },
-    )
+      // form.store.setState(
+      //   (state) => {
+      //     return {
+      //       ...state,
+      //       values: {
+      //         ...state.values,
+      //         assets: [...assets, { ...assets[i], limitPrice, amount }],
+      //       },
+      //     }
+      //   },
+      //   {
+      //     priority: "high",
+      //   },
+      // )
+    }
   }
 
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
   ) {
-    if (firstAsset?.token === market?.quote.id) {
-      form.setFieldValue("firstAsset.limitPrice", event.detail.price)
+    const assets = form.getFieldValue(`assets`)
+
+    for (let i = 0; i < assets.length; i++) {
+      const asset = assets[i]
+      if (!asset) return
+      if (asset.token === market?.quote.id) {
+        form.store.setState(
+          (state) => {
+            return {
+              ...state,
+              values: {
+                ...state.values,
+                assets: [
+                  ...assets,
+                  { ...asset, limitPrice: event.detail.price },
+                ],
+              },
+            }
+          },
+          {
+            priority: "high",
+          },
+        )
+
+        form.validateAllFields("blur")
+        if (sendAmount === "") return
+      }
     }
-    if (secondAsset?.token === market?.quote.id) {
-      form.setFieldValue("secondAsset.limitPrice", event.detail.price)
-    }
+
     form.validateAllFields("blur")
     if (sendAmount === "") return
   }
@@ -165,12 +178,10 @@ export function useAmplified({ onSubmit }: Props) {
     void form.handleSubmit()
   }
 
-  React.useEffect(() => {
-    form.validateAllFields("change")
-  }, [form])
+  // React.useEffect(() => {}, [form])
 
   React.useEffect(() => {
-    form?.reset()
+    // form?.reset()
   }, [form])
 
   return {
@@ -185,14 +196,11 @@ export function useAmplified({ onSubmit }: Props) {
     selectedSource,
     timeInForce,
 
+    assets,
     //market details
     tickSize,
     minVolume,
 
-    firstAsset,
-    secondAsset,
-    firstAssetToken,
-    secondAssetToken,
     logics,
     currentTokens,
     availableTokens,
