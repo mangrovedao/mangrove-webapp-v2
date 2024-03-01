@@ -301,6 +301,18 @@ export function Amplified() {
                 order instead.
               </Caption>
             ) : undefined}
+            <p className="text-orange-300 text-xs !mb-4">
+              There is a minimum amount required for amplify orders on Mangrove.
+              If you want to know more, please read{" "}
+              <Link
+                href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/amplify-order"
+                target="_blank"
+                rel="noreferrer"
+                className="text-green-caribbean"
+              >
+                here
+              </Link>
+            </p>
             <Caption variant={"caption1"} as={"label"}>
               Buy Asset #1
             </Caption>
@@ -422,9 +434,7 @@ export function Amplified() {
                 "-"
               )}
             </div>
-
             <Separator className="!my-6" />
-
             {selectedToken ? (
               <MarketDetails
                 tickSize={tickSize}
@@ -432,7 +442,6 @@ export function Amplified() {
                 // minVolume={minVolume}
               />
             ) : undefined}
-
             {currentTokens.length > 1 && (
               <>
                 <div className="flex items-center gap-2 justify-center !mt-6">
@@ -569,7 +578,6 @@ export function Amplified() {
                 </div>
               </>
             )}
-
             <Separator className="!my-4" />
             {selectedToken ? (
               <MarketDetails
@@ -578,7 +586,6 @@ export function Amplified() {
                 // minVolume={minVolume}
               />
             ) : undefined}
-
             <Button
               disabled
               variant={"secondary"}
