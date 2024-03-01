@@ -9,8 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
-import { VariationArrow } from "@/svgs"
-import { cn } from "@/utils"
 import { determinePriceDecimalsFromToken, formatNumber } from "@/utils/numbers"
 
 function Container({ children }: React.PropsWithChildren) {
@@ -93,12 +91,6 @@ export function PricesBar() {
           highestBidPrice?.toNumber() || 0,
         ).toFixed(priceDecimals)
 
-  const oneMinuteClose = oneMinutePriceQuery?.data?.close ?? 0
-  const oneDayClose = oneDayPriceQuery?.data?.close ?? 0
-  const variationPercentage = (oneMinuteClose * 100) / oneDayClose - 100
-  const variationPercentageAbs = Math.abs(variationPercentage)
-  const variation24h = oneMinuteClose - oneDayClose
-
   return (
     <ScrollArea>
       <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
@@ -116,27 +108,27 @@ export function PricesBar() {
           value={diffTakerGave}
           quote={quote}
           skeleton={mangroveTokenPriceLoading}
-          rightElement={
-            <span
-              className={cn("space-x-[2px] text-xs inline-flex ml-2", {
-                "text-green-caribbean": variation24h >= 0,
-                "text-red-100": variation24h < 0,
-              })}
-            >
-              <VariationArrow
-                className={cn("h-3", {
-                  "rotate-180": variation24h < 0,
-                })}
-              />
-              <span>
-                {new Intl.NumberFormat(undefined, {
-                  style: "percent",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(variationPercentageAbs / 100)}
-              </span>
-            </span>
-          }
+          // rightElement={
+          //   <span
+          //     className={cn("space-x-[2px] text-xs inline-flex ml-2", {
+          //       "text-green-caribbean": diffTakerGave && diffTakerGave >= 0,
+          //       "text-red-100": diffTakerGave && diffTakerGave < 0,
+          //     })}
+          //   >
+          //     <VariationArrow
+          //       className={cn("h-3", {
+          //         "rotate-180": diffTakerGave && diffTakerGave < 0,
+          //       })}
+          //     />
+          //     <span>
+          //       {new Intl.NumberFormat(undefined, {
+          //         style: "percent",
+          //         minimumFractionDigits: 2,
+          //         maximumFractionDigits: 2,
+          //       }).format(variationPercentageAbs / 100)}
+          //     </span>
+          //   </span>
+          // }
         />
 
         <Item
