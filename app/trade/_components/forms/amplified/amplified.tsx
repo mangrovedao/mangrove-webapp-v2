@@ -302,15 +302,14 @@ export function Amplified() {
               </Caption>
             ) : undefined}
             <p className="text-orange-300 text-xs !mb-4">
-              There is a minimum amount required for amplify orders on Mangrove.
-              If you want to know more, please read{" "}
+              There is a minimum amount required for amplify orders on Mangrove.{" "}
               <Link
                 href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/amplify-order"
                 target="_blank"
                 rel="noreferrer"
                 className="text-green-caribbean"
               >
-                here
+                Learn more
               </Link>
             </p>
             <Caption variant={"caption1"} as={"label"}>
