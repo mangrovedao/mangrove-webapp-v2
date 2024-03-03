@@ -23,9 +23,6 @@ export default function useAmplifiedForm() {
 
   const { data: openMarkets } = marketsInfoQuery
 
-  // form.validateAllFields("blur")
-  // if (sendAmount === "") return
-
   const {
     setGlobalError,
     errors,
@@ -59,21 +56,19 @@ export default function useAmplifiedForm() {
       const asset = assets[i]
       if (!asset) return
       if (asset.token === market?.quote.id) {
-        setAssets([
-          ...assets.slice(0, i), // Keep the previous assets unchanged
-          {
+        setAssets(
+          updateItemAt(assets, i, (asset) => ({
             ...asset,
-            limitPrice: event.detail.price, // Update the limit price of the current asset
-          },
-          ...assets.slice(i + 1), // Keep the remaining assets unchanged
-        ])
+            limitPrice: event.detail.price,
+          })),
+        )
       }
     }
   }
 
   const computeReceiveAmount = () => {
     for (let i = 0; i < assets.length; i++) {
-      if (assets[i] || !assets[i]?.limitPrice) return
+      if (!assets[i] || !assets[i]?.limitPrice) return
       const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
         .div(
           Big(
@@ -85,14 +80,12 @@ export default function useAmplifiedForm() {
         )
         .toString()
 
-      setAssets([
-        ...assets.slice(0, i), // Keep the previous assets unchanged
-        {
-          ...assets[i]!,
-          amount, // Update the limit price of the current asset
-        },
-        ...assets.slice(i + 1), // Keep the remaining assets unchanged
-      ])
+      setAssets(
+        updateItemAt(assets, i, (asset) => ({
+          ...asset,
+          amount,
+        })),
+      )
     }
   }
 
@@ -135,6 +128,7 @@ export default function useAmplifiedForm() {
   const assetsWithTokens = assets.map((asset) => ({
     ...asset,
     token: availableTokens.find((tokens) => tokens.id === asset.token),
+    receiveTo: logics.find((logic) => logic?.id === asset.receiveTo),
   }))
 
   const { useAbleTokens, sendFromBalance } = liquiditySourcing({
@@ -148,13 +142,7 @@ export default function useAmplifiedForm() {
   const { formatted } = useTokenBalance(selectedToken)
 
   const balanceLogic_temporary =
-    selectedToken?.id.includes("WBTC") || selectedSource?.id === "simple"
-      ? formatted
-      : sendFromBalance?.formatted
-
-  //   const debouncedStepSize = useDebounce(stepSize, 300)
-  //   const debouncedPricePoints = useDebounce(pricePoints, 300)
-  //   const fieldsDisabled = !(minPrice && maxPrice)
+    selectedSource?.id === "simple" ? formatted : sendFromBalance?.formatted
 
   React.useEffect(() => {
     if (isChangingFrom === "sendSource" || !sendSource) return
@@ -204,6 +192,8 @@ export default function useAmplifiedForm() {
   ) => {
     handleFieldChange("assets")
     const value = Array.isArray(e) ? e : []
+
+    console.log({ e, value })
     setAssets(value)
   }
 
@@ -262,6 +252,14 @@ export default function useAmplifiedForm() {
     timeToLiveUnit,
   ])
 
+  function updateItemAt<T>(
+    array: T[],
+    index: number,
+    update: (item: T) => T,
+  ): T[] {
+    return array.map((item, i) => (i === index ? update(item) : item))
+  }
+
   return {
     setGlobalError,
     errors,
@@ -285,7 +283,7 @@ export default function useAmplifiedForm() {
     sendFromBalance,
     balanceLogic_temporary,
     assetsWithTokens,
-
+    updateItemAt,
     computeReceiveAmount,
     setSendSource,
     setSendAmount,

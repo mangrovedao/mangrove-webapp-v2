@@ -22,7 +22,7 @@ const useMangroveContext = () => {
       try {
         const mangrove = await Mangrove.connect({ signer })
         // overwrite the mangrove's configuration thanks to the mangroveConfig env variable
-        console.log(mangroveConfig)
+
         if (mangroveConfig) {
           mangrove.updateConfiguration(mangroveConfig)
         }
@@ -41,8 +41,6 @@ const useMangroveContext = () => {
   const { data: mangrove } = mangroveQuery
 
   const marketsInfoQuery = useWhitelistedMarketsInfos(mangrove)
-
-  console.log(marketsInfoQuery.data)
 
   return { mangroveQuery, mangrove, marketsInfoQuery }
 }

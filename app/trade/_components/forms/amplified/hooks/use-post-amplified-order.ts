@@ -15,9 +15,8 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import { useEthersSigner } from "@/utils/adapters"
 import { TimeInForce } from "../enums"
-import type { Form } from "../types"
+import type { AssetWithInfos, Form } from "../types"
 import { estimateTimestamp } from "../utils"
 
 type Props = {
@@ -26,7 +25,6 @@ type Props = {
 
 export function usePostAmplifiedOrder({ onResult }: Props = {}) {
   const { mangrove, marketsInfoQuery } = useMangrove()
-  const signer = useEthersSigner()
   const { market } = useMarket()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
@@ -38,68 +36,51 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
     mutationFn: async ({
       form,
     }: {
-      form: Form & {
+      form: Omit<Form, "assets"> & {
         selectedToken?: Token
-        firstAssetToken?: Token
-        secondAssetToken?: Token
         selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
         sendAmount: string
+        assetsWithTokens: AssetWithInfos[]
       }
     }) => {
       try {
-        if (
-          !mangrove ||
-          !market ||
-          !form.selectedToken ||
-          !form.selectedSource ||
-          !form.firstAssetToken
-        )
+        if (!mangrove || !market || !form.selectedToken || !form.selectedSource)
           return
         const { data: openMarkets } = marketsInfoQuery
 
         const amp = new MangroveAmplifier({ mgv: mangrove })
 
-        const assets = [
-          {
-            inboundTokenAddress: form.firstAssetToken.address,
-            inboundTokenId: form.firstAssetToken.id,
-            inboundLogic: form.selectedSource,
+        const assets = form.assetsWithTokens.map((asset) => {
+          return {
+            inboundTokenAddress: asset.token?.address,
+            inboundTokenId: asset.token?.id,
+            inboundLogic: asset.receiveTo,
             tickspacing: market.tickSpacing,
-            limitPrice: form.assets[0]?.limitPrice,
-          },
-        ]
+            limitPrice: asset.limitPrice,
+          }
+        })
 
-        if (form.secondAssetToken) {
-          assets.push({
-            inboundTokenAddress: form.secondAssetToken.address,
-            inboundTokenId: form.secondAssetToken.id,
-            inboundLogic: form.selectedSource,
-            tickspacing: market.tickSpacing,
-            limitPrice: form.assets[0]?.limitPrice,
-          })
-        }
-
-        const inboundTokens = assets.map((token) => {
+        const inboundTokens = assets.map((asset) => {
           const market = openMarkets?.find((market) => {
             return (
-              (market.base.id === token.inboundTokenId &&
+              (market.base.id === asset.inboundTokenId &&
                 market.quote.id === form.selectedToken?.id) ||
-              (market.quote.id === token.inboundTokenId &&
+              (market.quote.id === asset.inboundTokenId &&
                 market.base.id === form.selectedToken?.id)
             )
           })
 
-          const ba = market?.base.id === token.inboundTokenId ? "bids" : "asks"
+          const ba = market?.base.id === asset.inboundTokenId ? "bids" : "asks"
           const priceHelper = new TickPriceHelper(ba, market!)
           const tick = priceHelper.tickFromPrice(
-            token?.limitPrice || "0",
+            asset?.limitPrice || "0",
             "nearest",
           )
 
           return {
-            inboundToken: token.inboundTokenAddress,
-            inboundLogic: token.inboundLogic,
-            tickSpacing: token.tickspacing,
+            inboundToken: asset.inboundTokenAddress,
+            inboundLogic: asset.inboundLogic,
+            tickSpacing: asset.tickspacing,
             tick,
           }
         })

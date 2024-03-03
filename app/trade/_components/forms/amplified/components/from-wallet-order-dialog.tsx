@@ -21,20 +21,18 @@ import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
 import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
-import type { Form } from "../types"
+import type { AssetWithInfos, Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
+/**
+ * Props for the FromWalletOrderDialog component.
+ */
 type Props = {
-  form: Form & {
+  form: Omit<Form, "assets"> & {
     selectedToken?: Token
     selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
     sendAmount: string
-    assetsWithTokens: {
-      token: Token | undefined
-      receiveTo: string
-      amount: string
-      limitPrice: string
-    }[]
+    assetsWithTokens: AssetWithInfos[]
   }
   onClose: () => void
   isOpen: boolean

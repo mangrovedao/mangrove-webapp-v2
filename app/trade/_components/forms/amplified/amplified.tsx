@@ -178,8 +178,11 @@ export function Amplified() {
             <EnhancedNumericInput
               name={"sendAmount"}
               value={sendAmount}
-              onChange={handleSentAmountChange}
-              // disabled={//   !market || !sendToken || balanceLogic_temporary === "0"}
+              onChange={(e) => {
+                handleSentAmountChange(e.target.value)
+                computeReceiveAmount()
+              }}
+              disabled={!sendToken || balanceLogic_temporary === "0"}
               error={errors.sendAmount}
             />
 
@@ -228,7 +231,7 @@ export function Amplified() {
               onValueChange={([value]) => {
                 handleSliderChange(Number(value))
               }}
-              //   disabled={!(market && form.state.isFormValid) || !sendToken}
+              disabled={!sendToken}
             />
             <div className="flex justify-center space-x-3">
               {sliderValues.map((value) => (
@@ -244,7 +247,7 @@ export function Amplified() {
                     if (!sendToken) return
                     handleSliderChange(Number(value))
                   }}
-                  //   disabled={!market}
+                  disabled={!sendToken}
                 >
                   {value}%
                 </Button>
@@ -269,9 +272,11 @@ export function Amplified() {
                   <button
                     disabled={!isAmplifiable || i < 2}
                     className={cn("text-red-600 text-xs cursor-pointer", {
-                      "opacity-10 cursor-not-allowed": !isAmplifiable,
+                      "opacity-20 cursor-not-allowed": !isAmplifiable || i < 2,
                     })}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       handleAssetsChange(assets.filter((_, i) => i !== i))
                     }}
                   >
@@ -319,7 +324,7 @@ export function Amplified() {
                 <EnhancedNumericInput
                   name={"limitPrice"}
                   value={asset.limitPrice}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     handleAssetsChange([
                       ...assets.slice(0, i),
                       {
@@ -328,7 +333,8 @@ export function Amplified() {
                       },
                       ...assets.slice(i + 1),
                     ])
-                  }
+                    computeReceiveAmount()
+                  }}
                   token={availableTokens.find(
                     (token) => token.id === asset.token,
                   )}
@@ -379,13 +385,6 @@ export function Amplified() {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  {/* {errors. ? (
-                      <div>
-                        <Caption className="text-red-600 text-xs">
-                          Please select a valid option
-                        </Caption>
-                      </div>
-                    ) : undefined} */}
                 </div>
                 <div className="flex justify-between !my-6">
                   <span className="text-muted-foreground text-xs">
@@ -526,7 +525,6 @@ export function Amplified() {
       </form>
       <FromWalletAmplifiedOrderDialog
         form={{
-          assets,
           assetsWithTokens,
           sendSource,
           sendToken,

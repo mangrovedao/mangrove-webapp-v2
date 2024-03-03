@@ -9,19 +9,14 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { TimeInForce } from "../enums"
-import type { Form } from "../types"
+import type { AssetWithInfos, Form } from "../types"
 
 type Props = {
-  form: Form
+  form: Omit<Form, "assets">
   tokenToAmplify?: Token
   sendAmount: string
   source: SimpleLogic | SimpleAaveLogic | OrbitLogic
-  assetsWithToken?: {
-    token: Token | undefined
-    receiveTo: string
-    amount: string
-    limitPrice: string
-  }[]
+  assetsWithToken?: AssetWithInfos[]
 }
 
 export function SummaryStep({
@@ -30,7 +25,6 @@ export function SummaryStep({
   source,
   form,
 }: Props) {
-  console.log({ tokenToAmplify, assetsWithToken, source, form })
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
@@ -74,7 +68,7 @@ export function SummaryStep({
                   <Unit>{asset.token.symbol}</Unit>
                 </Line>
                 <Line
-                  title={`Receive to ${asset.receiveTo.includes("simple") ? "Wallet" : asset.receiveTo.toUpperCase()}`}
+                  title={`Receive to ${asset.receiveTo.id === "simple" ? "Wallet" : asset.receiveTo.id.toUpperCase()}`}
                 >
                   {Big(
                     !isNaN(Number(asset.amount)) ? Number(asset.amount) : 0,
