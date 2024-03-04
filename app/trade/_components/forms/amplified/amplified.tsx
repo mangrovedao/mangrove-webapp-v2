@@ -247,7 +247,17 @@ export function Amplified() {
               order instead.
             </Caption>
           ) : undefined}
-
+          <p className="text-orange-300 text-xs !mb-4">
+            There is a minimum amount required for amplify orders on Mangrove.{" "}
+            <Link
+              href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/amplify-order"
+              target="_blank"
+              rel="noreferrer"
+              className="text-green-caribbean"
+            >
+              Learn more
+            </Link>
+          </p>
           {assets.map((asset, i) => {
             return (
               <div key={`asset-${i}`} className="space-y-2">

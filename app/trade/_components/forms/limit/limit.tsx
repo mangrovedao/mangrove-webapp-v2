@@ -22,6 +22,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
+import Link from "next/link"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
@@ -273,6 +274,18 @@ export function Limit() {
                 />
               )}
             </form.Field>
+
+            <p className="text-orange-300 text-xs">
+              There is a minimum amount required for limit orders on Mangrove.{" "}
+              <Link
+                href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
+                target="_blank"
+                rel="noreferrer"
+                className="text-green-caribbean"
+              >
+                Learn more
+              </Link>
+            </p>
 
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
