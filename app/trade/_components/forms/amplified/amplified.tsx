@@ -62,7 +62,7 @@ export function Amplified() {
     handleTimeInForceChange,
     handleTimeToLiveChange,
     handleTimeToLiveUnit,
-    openMarkets,
+    getCurrentTokenPrice,
   } = useAmplifiedForm()
 
   const handleSliderChange = (value: number) => {
@@ -86,6 +86,7 @@ export function Amplified() {
 
   const selectedTokens = assets ? assets.map((asset) => asset.token) : []
   const isAmplifiable = currentTokens.length > 1
+  const tokensLeft = selectedTokens.length < currentTokens.length
 
   if (!logics)
     return (
@@ -265,6 +266,7 @@ export function Amplified() {
                   <Caption variant={"caption1"} as={"label"}>
                     Buy Asset #{i + 1}
                   </Caption>
+
                   <button
                     disabled={!isAmplifiable || i < 2}
                     className={cn("text-red-600 text-xs cursor-pointer", {
@@ -333,11 +335,7 @@ export function Amplified() {
                     ])
                     // computeReceiveAmount()
                   }}
-                  token={
-                    openMarkets?.find(
-                      (market) => market.base.id === asset.token,
-                    )?.quote
-                  }
+                  token={getCurrentTokenPrice(asset.token)}
                   label="Limit price"
                   disabled={!asset.token}
                   error={errors[`limitPrice-${i}`]}
@@ -432,7 +430,7 @@ export function Amplified() {
           })}
         </div>
         <Button
-          disabled={!isAmplifiable}
+          disabled={!isAmplifiable || !tokensLeft}
           onClick={() => {
             handleAssetsChange([
               ...assets,

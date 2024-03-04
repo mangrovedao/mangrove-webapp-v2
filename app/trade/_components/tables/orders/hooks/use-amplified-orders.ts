@@ -33,7 +33,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["amplified", address, first, skip],
+    queryKey: ["amplified", address],
     queryFn: async () => {
       try {
         if (!indexerSdk || !address || !openMarkets) return []
@@ -52,7 +52,6 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
         })
 
         if (!result) return []
-
         const filteredResult = result.map((order) => {
           if (!order.offers.some((offer) => !offer.isMarketFound)) {
             return order

@@ -28,7 +28,6 @@ export function AmplifiedOrders() {
       skip: (page - 1) * pageSize,
     },
   })
-
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<AmplifiedOrder>()
   const [orderToEdit, setOrderToEdit] = React.useState<{

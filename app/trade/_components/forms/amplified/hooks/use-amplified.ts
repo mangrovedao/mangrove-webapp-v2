@@ -166,6 +166,13 @@ export default function useAmplifiedForm() {
     setSendSource(value)
   }
 
+  const getCurrentTokenPrice = (tokenId: string) => {
+    const market = openMarkets?.find(
+      (market) => market.base.id === tokenId || market.quote.id === tokenId,
+    )
+    return market?.quote || market?.base
+  }
+
   const computeReceiveAmount = (
     amount: string,
     limitPrice: string,
@@ -306,7 +313,7 @@ export default function useAmplifiedForm() {
   ])
 
   return {
-    // computeReceiveAmount,
+    getCurrentTokenPrice,
     setGlobalError,
     errors,
     setErrors,
