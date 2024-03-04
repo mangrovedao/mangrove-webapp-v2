@@ -57,7 +57,7 @@ export const EnhancedNumericInput = React.forwardRef<
           className={inputClassName}
           ref={ref}
           icon={tokenSymbol}
-          symbol={tokenSymbol}
+          // symbol={tokenSymbol}
           aria-invalid={!!error?.length}
         />
         {error?.length ? (
