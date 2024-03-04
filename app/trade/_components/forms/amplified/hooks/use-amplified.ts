@@ -23,7 +23,6 @@ export default function useAmplifiedForm() {
 
   const { data: openMarkets } = marketsInfoQuery
 
-  console.log({ openMarkets })
   const {
     setGlobalError,
     errors,
