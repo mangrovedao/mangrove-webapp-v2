@@ -36,11 +36,7 @@ const sliderValues = [25, 50, 75, 100]
 
 export function Amplified() {
   const {
-    setGlobalError,
     errors,
-    setErrors,
-    isChangingFrom,
-    setIsChangingFrom,
     sendSource,
     sendAmount,
     sendToken,
@@ -49,18 +45,9 @@ export function Amplified() {
     timeInForce,
     timeToLive,
     timeToLiveUnit,
-    address,
-    setSendSource,
     setSendAmount,
     useAbleTokens,
-    sendFromBalance,
     balanceLogic_temporary,
-    setSendToken,
-    setAssets,
-    setTimeInForce,
-    setTimeToLive,
-    setTimeToLiveUnit,
-    minBid,
     tickSize,
     selectedToken,
     selectedSource,
@@ -75,13 +62,13 @@ export function Amplified() {
     handleTimeInForceChange,
     handleTimeToLiveChange,
     handleTimeToLiveUnit,
-    computeReceiveAmount,
+    openMarkets,
   } = useAmplifiedForm()
 
   const handleSliderChange = (value: number) => {
     const amount = (value * Number(balanceLogic_temporary)) / 100
     setSendAmount(amount.toString())
-    computeReceiveAmount()
+    // if(!sendToken) setAssets([])
   }
   const [summaryDialog, setSummaryDialog] = React.useState(false)
 
@@ -148,7 +135,6 @@ export function Amplified() {
               name={"sendSource"}
               value={sendSource}
               onValueChange={handleSendSource}
-              //   disabled={}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
@@ -180,7 +166,7 @@ export function Amplified() {
               value={sendAmount}
               onChange={(e) => {
                 handleSentAmountChange(e.target.value)
-                computeReceiveAmount()
+                // computeReceiveAmount()
               }}
               disabled={!sendToken || balanceLogic_temporary === "0"}
               error={errors.sendAmount}
@@ -264,7 +250,7 @@ export function Amplified() {
 
           {assets.map((asset, i) => {
             return (
-              <div key={`asset-${i}`}>
+              <div key={`asset-${i}`} className="space-y-2">
                 <div className="flex justify-between my-2">
                   <Caption variant={"caption1"} as={"label"}>
                     Buy Asset #{i + 1}
@@ -277,7 +263,9 @@ export function Amplified() {
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      handleAssetsChange(assets.filter((_, i) => i !== i))
+                      handleAssetsChange(
+                        assets.filter((_, index) => index !== i),
+                      )
                     }}
                   >
                     <Trash className="h-4 w-4 hover:opacity-80 transition-opacity" />
@@ -333,14 +321,16 @@ export function Amplified() {
                       },
                       ...assets.slice(i + 1),
                     ])
-                    computeReceiveAmount()
+                    // computeReceiveAmount()
                   }}
-                  token={availableTokens.find(
-                    (token) => token.id === asset.token,
-                  )}
+                  token={
+                    openMarkets?.find(
+                      (market) => market.base.id === asset.token,
+                    )?.quote
+                  }
                   label="Limit price"
                   disabled={!asset.token}
-                  error={errors?.[`limitPrice${i}`]}
+                  error={errors[`limitPrice-${i}`]}
                 />
 
                 <div className="flex-col flex">
@@ -385,6 +375,11 @@ export function Amplified() {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
+                  {errors[`receiveTo-${i}`] ? (
+                    <Caption className="text-red-100">
+                      {errors[`receiveTo-${i}`]}
+                    </Caption>
+                  ) : undefined}
                 </div>
                 <div className="flex justify-between !my-6">
                   <span className="text-muted-foreground text-xs">
@@ -483,7 +478,7 @@ export function Amplified() {
                 if (!value) return
                 handleTimeToLiveChange(value)
               }}
-              error={errors.timeToLive}
+              error={errors["timeToLive"]}
             />
 
             <Select
@@ -513,7 +508,7 @@ export function Amplified() {
         <Button
           className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
           size={"lg"}
-          disabled={!isAmplifiable}
+          disabled={!isAmplifiable || Object.keys(errors).length > 0}
           rightIcon
           onClick={() => {
             setSummaryDialog(!summaryDialog)

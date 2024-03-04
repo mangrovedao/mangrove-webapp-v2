@@ -26,4 +26,4 @@ export type AssetWithInfos = {
   receiveTo: SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined
   amount: string
   limitPrice: string
-}[]
+}

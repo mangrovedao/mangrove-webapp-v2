@@ -104,6 +104,12 @@ export function Limit() {
     100,
   ).toFixed(0)
 
+  console.log(
+    sendFromLogics,
+    receiveToLogics,
+    sendFromBalance,
+    receiveToBalance,
+  )
   return (
     <>
       <form.Provider>
@@ -135,6 +141,7 @@ export function Limit() {
               </CustomRadioGroup>
             )}
           </form.Field>
+
           <div className="space-y-4 !mt-6">
             <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
               {(field) => (
@@ -153,7 +160,103 @@ export function Limit() {
                 />
               )}
             </form.Field>
+            <div className="flex justify-between space-x-2 pt-2">
+              <form.Field name="sendFrom">
+                {(field) => (
+                  <div className="flex flex-col w-full">
+                    <Label className="flex items-center">
+                      Send from
+                      <InfoTooltip>
+                        <Caption>Select the origin of the assets</Caption>
+                      </InfoTooltip>
+                    </Label>
 
+                    <Select
+                      name={field.name}
+                      value={field.state.value}
+                      onValueChange={(value: string) => {
+                        field.handleChange(value)
+                      }}
+                      disabled={!market}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {sendFromLogics?.map(
+                            (source) =>
+                              source && (
+                                <SelectItem key={source.id} value={source.id}>
+                                  <div className="flex gap-2 w-full">
+                                    <SourceIcon sourceId={source.id} />
+                                    <Text className="capitalize">
+                                      {source.id.includes("simple")
+                                        ? "Wallet"
+                                        : source.id.toUpperCase()}
+                                    </Text>
+                                  </div>
+                                </SelectItem>
+                              ),
+                          )}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field name="receiveTo">
+                {(field) => (
+                  <div className="flex flex-col w-full z-50">
+                    <Label className="flex items-center">
+                      Receive to
+                      <InfoTooltip className="ml-2" side="left">
+                        <div>
+                          <Caption>
+                            Select the destination of the assets
+                          </Caption>
+
+                          <Caption>(after the trade is executed)</Caption>
+                        </div>
+                      </InfoTooltip>
+                    </Label>
+
+                    <Select
+                      name={field.name}
+                      value={field.state.value}
+                      onValueChange={(value: string) => {
+                        field.handleChange(value)
+                      }}
+                      disabled={!market}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {receiveToLogics?.map(
+                            (source) =>
+                              source && (
+                                <SelectItem key={source.id} value={source.id}>
+                                  <div className="flex gap-2 w-full">
+                                    <SourceIcon sourceId={source.id} />
+                                    <Text className="capitalize">
+                                      {source.id.includes("simple")
+                                        ? "Wallet"
+                                        : source.id.toUpperCase()}
+                                    </Text>
+                                  </div>
+                                </SelectItem>
+                              ),
+                          )}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </form.Field>
+            </div>
             <form.Field
               name="send"
               onChange={sendValidator(Number(currentBalance.formatted ?? 0))}
@@ -176,6 +279,7 @@ export function Limit() {
                 />
               )}
             </form.Field>
+
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
                 <EnhancedNumericInput
@@ -198,7 +302,6 @@ export function Limit() {
                 />
               )}
             </form.Field>
-
             {/* Slider component */}
             <div className="space-y-5 pt-2 px-3">
               <Slider
@@ -233,7 +336,6 @@ export function Limit() {
                 ))}
               </div>
             </div>
-
             <Separator className="!my-6" />
 
             <Accordion title="Advanced">
@@ -327,106 +429,6 @@ export function Limit() {
             </Accordion>
 
             <Separator className="!my-6" />
-
-            <Accordion title="Liquidity Sourcing">
-              <div className="flex justify-between space-x-2 pt-2">
-                <form.Field name="sendFrom">
-                  {(field) => (
-                    <div className="flex flex-col w-full">
-                      <Label className="flex items-center">
-                        Send from
-                        <InfoTooltip>
-                          <Caption>Select the origin of the assets</Caption>
-                        </InfoTooltip>
-                      </Label>
-
-                      <Select
-                        name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: string) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!market}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {sendFromLogics?.map(
-                              (source) =>
-                                source && (
-                                  <SelectItem key={source.id} value={source.id}>
-                                    <div className="flex gap-2 w-full">
-                                      <SourceIcon sourceId={source.id} />
-                                      <Text className="capitalize">
-                                        {source.id.includes("simple")
-                                          ? "Wallet"
-                                          : source.id.toUpperCase()}
-                                      </Text>
-                                    </div>
-                                  </SelectItem>
-                                ),
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </form.Field>
-
-                <form.Field name="receiveTo">
-                  {(field) => (
-                    <div className="flex flex-col w-full z-50">
-                      <Label className="flex items-center">
-                        Receive to
-                        <InfoTooltip className="ml-2" side="left">
-                          <div>
-                            <Caption>
-                              Select the destination of the assets
-                            </Caption>
-
-                            <Caption>(after the trade is executed)</Caption>
-                          </div>
-                        </InfoTooltip>
-                      </Label>
-
-                      <Select
-                        name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: string) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!market}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {receiveToLogics?.map(
-                              (source) =>
-                                source && (
-                                  <SelectItem key={source.id} value={source.id}>
-                                    <div className="flex gap-2 w-full">
-                                      <SourceIcon sourceId={source.id} />
-                                      <Text className="capitalize">
-                                        {source.id.includes("simple")
-                                          ? "Wallet"
-                                          : source.id.toUpperCase()}
-                                      </Text>
-                                    </div>
-                                  </SelectItem>
-                                ),
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </form.Field>
-              </div>
-            </Accordion>
 
             <Separator className="!my-6" />
 

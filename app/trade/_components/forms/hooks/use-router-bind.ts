@@ -42,7 +42,6 @@ export function useActivateSmartContract() {
           abi: MangroveOrderABI,
           functionName: "ROUTER_IMPLEMENTATION",
         })
-
         const {
           result: [proxy, deployed],
           request,

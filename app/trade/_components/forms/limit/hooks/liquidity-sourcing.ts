@@ -2,6 +2,7 @@ import { Token } from "@mangrovedao/mangrove.js"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
+import { useQuery } from "@tanstack/react-query"
 import React from "react"
 
 type Props = {
@@ -16,6 +17,19 @@ type Props = {
 type BalanceLogic = {
   formatted: string
   balance: number
+}
+
+export function useAbleToken(
+  logic: SimpleLogic | SimpleAaveLogic | OrbitLogic,
+  token: Token,
+) {
+  return useQuery({
+    queryKey: ["availableLogic"],
+    queryFn: async () => {
+      return await logic.overlying(token)
+    },
+    enabled: !!logic && !!token,
+  })
 }
 
 export default function liquiditySourcing({
@@ -44,6 +58,7 @@ export default function liquiditySourcing({
       try {
         if (!logic) return
         const logicToken = await logic.overlying(token)
+        const isUsable = useAbleToken(logic, token).data
         if (logicToken) {
           return logic
         }

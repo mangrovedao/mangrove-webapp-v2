@@ -60,32 +60,51 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           }
         })
 
-        const inboundTokens = assets.map((asset) => {
-          const market = openMarkets?.find((market) => {
-            return (
-              (market.base.id === asset.inboundTokenId &&
-                market.quote.id === form.selectedToken?.id) ||
-              (market.quote.id === asset.inboundTokenId &&
-                market.base.id === form.selectedToken?.id)
-            )
-          })
+        type Assets = {
+          inboundToken: string | undefined
+          inboundLogic: SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined
+          tickSpacing: number
+          tick: number
+        }[]
 
-          const ba = market?.base.id === asset.inboundTokenId ? "bids" : "asks"
-          const priceHelper = new TickPriceHelper(ba, market!)
-          const tick = priceHelper.tickFromPrice(
-            asset?.limitPrice || "0",
-            "nearest",
+        const hasLogic = (
+          token: Assets[0],
+        ): token is Omit<Assets[0], "inboundLogic" | "inboundToken"> & {
+          inboundLogic: SimpleLogic | SimpleAaveLogic | OrbitLogic
+          inboundToken: string
+        } => {
+          return (
+            token.inboundLogic !== undefined && token.inboundToken !== undefined
           )
+        }
 
-          return {
-            inboundToken: asset.inboundTokenAddress,
-            inboundLogic: asset.inboundLogic,
-            tickSpacing: asset.tickspacing,
-            tick,
-          }
-        })
+        const inboundTokens = assets
+          .map((asset) => {
+            const market = openMarkets?.find((market) => {
+              return (
+                (market.base.id === asset.inboundTokenId &&
+                  market.quote.id === form.selectedToken?.id) ||
+                (market.quote.id === asset.inboundTokenId &&
+                  market.base.id === form.selectedToken?.id)
+              )
+            })
 
-        if (!assets) return
+            const ba =
+              market?.base.id === asset.inboundTokenId ? "bids" : "asks"
+            const priceHelper = new TickPriceHelper(ba, market!)
+            const tick = priceHelper.tickFromPrice(
+              asset?.limitPrice || "0",
+              "nearest",
+            )
+
+            return {
+              inboundToken: asset.inboundTokenAddress,
+              inboundLogic: asset.inboundLogic,
+              tickSpacing: asset.tickspacing,
+              tick,
+            }
+          })
+          .filter(hasLogic)
 
         const order = await amp.addBundle({
           outboundToken: form.selectedToken.address,

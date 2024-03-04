@@ -23,6 +23,7 @@ export default function useAmplifiedForm() {
 
   const { data: openMarkets } = marketsInfoQuery
 
+  console.log({ openMarkets })
   const {
     setGlobalError,
     errors,
@@ -56,38 +57,48 @@ export default function useAmplifiedForm() {
       const asset = assets[i]
       if (!asset) return
       if (asset.token === market?.quote.id) {
-        setAssets(
-          updateItemAt(assets, i, (asset) => ({
+        handleAssetsChange([
+          ...assets.slice(0, i),
+          {
             ...asset,
             limitPrice: event.detail.price,
-          })),
-        )
+          },
+          ...assets.slice(i + 1),
+        ])
       }
     }
   }
 
-  const computeReceiveAmount = () => {
-    for (let i = 0; i < assets.length; i++) {
-      if (!assets[i] || !assets[i]?.limitPrice) return
-      const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
-        .div(
-          Big(
-            !isNaN(Number(assets[i]?.limitPrice)) &&
-              Number(assets[i]?.limitPrice) > 0
-              ? Number(assets[i]?.limitPrice)
-              : 1,
-          ),
-        )
-        .toString()
+  // const computeReceiveAmount = React.useCallback(() => {
 
-      setAssets(
-        updateItemAt(assets, i, (asset) => ({
-          ...asset,
-          amount,
-        })),
-      )
-    }
-  }
+  //   })
+  //   handleAssetsChange(assetsWithReceivingAmounts)
+  // }, [setAssets])
+
+  // const computeReceiveAmount = () => {
+  //   assets.forEach((asset, i) => {
+  //     const amount = Big(
+  //       !isNaN(Number(asset.limitPrice)) ? Number(asset.limitPrice) : 0,
+  //     )
+  //       .times(
+  //         Big(
+  //           !isNaN(Number(asset.amount)) && Number(asset.amount) > 0
+  //             ? Number(asset.amount)
+  //             : 0,
+  //         ),
+  //       )
+  //       .toString()
+
+  //     handleAssetsChange([
+  //       ...assets.slice(0, i),
+  //       {
+  //         ...asset,
+  //         amount,
+  //       },
+  //       ...assets.slice(i + 1),
+  //     ])
+  //   })
+  // }
 
   const availableTokens =
     openMarkets?.reduce((acc, current) => {
@@ -144,21 +155,6 @@ export default function useAmplifiedForm() {
   const balanceLogic_temporary =
     selectedSource?.id === "simple" ? formatted : sendFromBalance?.formatted
 
-  React.useEffect(() => {
-    if (isChangingFrom === "sendSource" || !sendSource) return
-    setSendSource(sendSource)
-  }, [sendSource])
-
-  React.useEffect(() => {
-    if (isChangingFrom === "sendAmount" || !sendAmount) return
-    setSendAmount(sendAmount)
-  }, [sendAmount])
-
-  React.useEffect(() => {
-    if (isChangingFrom === "sendToken" || !sendToken) return
-    setSendToken(sendToken)
-  }, [sendToken])
-
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)
   }
@@ -171,12 +167,31 @@ export default function useAmplifiedForm() {
     setSendSource(value)
   }
 
-  const handleSentAmountChange = (
-    e: React.ChangeEvent<HTMLInputElement> | string,
+  const computeReceiveAmount = (
+    amount: string,
+    limitPrice: string,
+    tokenId: string,
   ) => {
-    handleFieldChange("sendAmount")
-    const value = typeof e === "string" ? e : e.target.value
-    setSendAmount(value)
+    if (!limitPrice || !amount) return "0"
+    if (openMarkets?.find((market) => market.base.id === tokenId)) {
+      return Big(!isNaN(Number(amount)) ? Number(amount) : 0)
+        .div(
+          Big(
+            !isNaN(Number(limitPrice)) && Number(limitPrice) > 0
+              ? Number(limitPrice)
+              : 1,
+          ),
+        )
+        .toString()
+    } else {
+      return Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 0)
+        .times(
+          Big(
+            !isNaN(Number(amount)) && Number(amount) > 0 ? Number(amount) : 0,
+          ),
+        )
+        .toString()
+    }
   }
 
   const handeSendTokenChange = (
@@ -187,14 +202,48 @@ export default function useAmplifiedForm() {
     setSendToken(value)
   }
 
+  const handleSentAmountChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("sendAmount")
+    const value = typeof e === "string" ? e : e.target.value
+    setSendAmount(value)
+  }
+
+  React.useEffect(() => {
+    handleAssetsChange(
+      assets.map((asset) => {
+        const amount = computeReceiveAmount(
+          sendAmount,
+          asset.limitPrice,
+          asset.token,
+        )
+        return {
+          ...asset,
+          amount: !sendAmount ? "0" : amount,
+        }
+      }),
+    )
+  }, [sendAmount])
+
   const handleAssetsChange = (
     e: React.ChangeEvent<HTMLInputElement> | Asset[],
   ) => {
     handleFieldChange("assets")
     const value = Array.isArray(e) ? e : []
-
-    console.log({ e, value })
-    setAssets(value)
+    setAssets(
+      value.map((asset) => {
+        const amount = computeReceiveAmount(
+          sendAmount,
+          asset.limitPrice,
+          asset.token,
+        )
+        return {
+          ...asset,
+          amount,
+        }
+      }),
+    )
   }
 
   const handleTimeInForceChange = (
@@ -224,7 +273,6 @@ export default function useAmplifiedForm() {
   React.useEffect(() => {
     const newErrors = { ...errors }
 
-    // send amount validation
     if (Number(sendAmount) > Number(balanceLogic_temporary) && sendAmount) {
       newErrors.sendAmount = "Amount cannot be greater than wallet balance"
     } else if (Number(sendAmount) <= 0 && sendAmount) {
@@ -235,9 +283,15 @@ export default function useAmplifiedForm() {
 
     assets.map((asset, index) => {
       if (Number(asset.limitPrice) <= 0 && asset.limitPrice) {
-        newErrors[`limitPrice${index}`] = "Limit Price must be greater than 0"
+        newErrors[`limitPrice-${index}`] = "Limit Price must be greater than 0"
+      } else if (!asset.receiveTo) {
+        newErrors[`receiveTo-${index}`] = "Please select a receive logic"
+      } else if (!asset.token) {
+        newErrors[`token-${index}`] = "Please select a token"
       } else {
-        delete newErrors?.[`limitPrice${index}`]
+        delete newErrors[`limitPrice-${index}`]
+        delete newErrors[`receiveTo-${index}`]
+        delete newErrors[`token-${index}`]
       }
     })
 
@@ -252,15 +306,8 @@ export default function useAmplifiedForm() {
     timeToLiveUnit,
   ])
 
-  function updateItemAt<T>(
-    array: T[],
-    index: number,
-    update: (item: T) => T,
-  ): T[] {
-    return array.map((item, i) => (i === index ? update(item) : item))
-  }
-
   return {
+    // computeReceiveAmount,
     setGlobalError,
     errors,
     setErrors,
@@ -283,8 +330,6 @@ export default function useAmplifiedForm() {
     sendFromBalance,
     balanceLogic_temporary,
     assetsWithTokens,
-    updateItemAt,
-    computeReceiveAmount,
     setSendSource,
     setSendAmount,
     setSendToken,
@@ -302,5 +347,6 @@ export default function useAmplifiedForm() {
     handleTimeInForceChange,
     handleTimeToLiveChange,
     handleTimeToLiveUnit,
+    openMarkets,
   }
 }
