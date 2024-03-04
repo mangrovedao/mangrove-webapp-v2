@@ -206,10 +206,7 @@ export function Limit() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={
-                    !(market && form.state.isFormValid) ||
-                    currentReceiveBalance.formatted === "0"
-                  }
+                  disabled={!(market && form.state.isFormValid)}
                   error={field.state.meta.touchedErrors}
                   showBalance
                   customBalance={currentReceiveBalance.formatted}

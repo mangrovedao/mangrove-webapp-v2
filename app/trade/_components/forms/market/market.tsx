@@ -140,10 +140,7 @@ export function Market() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={
-                    !(market && form.state.isFormValid) ||
-                    receiveTokenBalance.formatted === "0"
-                  }
+                  disabled={!(market && form.state.isFormValid)}
                   error={
                     field.state.value === "0" && hasEnoughVolume
                       ? [FIELD_ERRORS.insufficientVolume]
