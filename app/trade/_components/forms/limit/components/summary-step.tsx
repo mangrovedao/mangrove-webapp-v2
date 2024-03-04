@@ -22,6 +22,13 @@ export function SummaryStep({
   receiveToken,
   form,
 }: Props) {
+  const sendFrom = form.sendFrom.includes("simple")
+    ? "Wallet"
+    : form.sendFrom.toUpperCase()
+  const receiveTo = form.receiveTo.includes("simple")
+    ? "Wallet"
+    : form.receiveTo.toUpperCase()
+
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
@@ -41,11 +48,11 @@ export function SummaryStep({
           )}{" "}
           <Unit>{quoteToken?.symbol}</Unit>
         </Line>
-        <Line title="Send from wallet">
+        <Line title={`Send from ${sendFrom}`}>
           {Big(form.send ?? 0).toFixed(sendToken?.displayedDecimals)}{" "}
           <Unit>{sendToken?.symbol}</Unit>
         </Line>
-        <Line title="Receive to wallet">
+        <Line title={`Receive to ${receiveTo}`}>
           {Big(form.receive ?? 0).toFixed(receiveToken?.displayedDecimals)}{" "}
           <Unit>{receiveToken?.symbol}</Unit>
         </Line>
