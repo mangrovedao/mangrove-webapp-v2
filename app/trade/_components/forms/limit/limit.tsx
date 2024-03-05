@@ -104,7 +104,6 @@ export function Limit() {
     100,
   ).toFixed(0)
 
-  console.log({ sendFromLogics })
   return (
     <>
       <form.Provider>
