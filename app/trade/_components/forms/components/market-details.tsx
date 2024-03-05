@@ -3,7 +3,16 @@ type MarketDetailsProps = {
   takerFee?: string
   tickSize?: string
   spotPrice?: string
-  minVolume?: string
+  minVolume?: {
+    bid: {
+      volume: string | undefined
+      token: string | undefined
+    }
+    ask: {
+      volume: string | undefined
+      token: string | undefined
+    }
+  }
 }
 
 export function MarketDetails({
@@ -17,7 +26,10 @@ export function MarketDetails({
       <MarketDetailsLine title="Taker fee" value={takerFee} />
       <MarketDetailsLine title="Tick size" value={tickSize} />
       <MarketDetailsLine title="Current spot price" value={spotPrice} />
-      <MarketDetailsLine title="Minimum volume" value={minVolume} />
+      <MarketDetailsLine
+        title={`Minimum volume`}
+        value={`${minVolume?.ask.volume} ${minVolume?.ask.token} / ${minVolume?.bid.volume} ${minVolume?.bid.token}`}
+      />
     </Accordion>
   )
 }
