@@ -63,8 +63,26 @@ export function useLimit(props: Props) {
 
   const minVolume =
     tradeAction === TradeAction.BUY
-      ? minBid?.toFixed(quoteToken?.displayedDecimals)
-      : minAsk?.toFixed(sendToken?.displayedDecimals)
+      ? {
+          bid: {
+            volume: minAsk?.toFixed(receiveToken?.displayedDecimals),
+            token: receiveToken?.symbol,
+          },
+          ask: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+        }
+      : {
+          bid: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+          ask: {
+            volume: minAsk?.toFixed(sendToken?.displayedDecimals),
+            token: sendToken?.symbol,
+          },
+        }
 
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
@@ -162,6 +180,10 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
     const receive = form?.getFieldValue("receive")
+
+    form.setFieldValue("sendFrom", "simple")
+    form.setFieldValue("receiveTo", "simple")
+
     if (!(send && receive)) return
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)

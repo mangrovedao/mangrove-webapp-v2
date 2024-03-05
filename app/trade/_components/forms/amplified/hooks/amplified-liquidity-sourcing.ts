@@ -1,12 +1,13 @@
 import { Token } from "@mangrovedao/mangrove.js"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
+import { DefaultLogics } from "../../types"
 
 type Props = {
   sendFrom: string
-  logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]
+  receiveTo: string[]
+  logics: DefaultLogics[]
   fundOwner?: string
   sendToken?: Token
   availableTokens: Token[]

@@ -113,8 +113,10 @@ export function Market() {
                     computeReceiveAmount()
                   }}
                   balanceAction={{
-                    onClick: () =>
+                    onClick: () => {
                       field.handleChange(sendTokenBalance.formatted || "0"),
+                        computeReceiveAmount()
+                    },
                   }}
                   token={sendToken}
                   label="Send amount"

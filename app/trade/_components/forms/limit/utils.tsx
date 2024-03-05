@@ -57,6 +57,14 @@ export function getFormattedTimeToLive(
 }
 
 export const sourceIcons: { [key: string]: JSX.Element } = {
+  zeroLend: (
+    <img
+      src="/assets/liquiditySources/zerolend.webp"
+      alt="ZeroLend"
+      width="18"
+      height="24"
+    />
+  ),
   orbit: (
     <img
       src="/assets/liquiditySources/orbit.webp"

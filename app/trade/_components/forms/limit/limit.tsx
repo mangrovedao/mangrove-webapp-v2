@@ -8,7 +8,6 @@ import {
 import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
-import { Text } from "@/components/typography/text"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -22,7 +21,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
-import Link from "next/link"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
@@ -33,7 +31,7 @@ import { TimeInForce, TimeToLiveUnit } from "./enums"
 import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
-import { isGreaterThanZeroValidator, sendValidator } from "./validators"
+import { isGreaterThanZeroValidator, sendVolumeValidator } from "./validators"
 
 const sliderValues = [25, 50, 75, 100]
 
@@ -104,6 +102,8 @@ export function Limit() {
       .toNumber(),
     100,
   ).toFixed(0)
+
+  const sendVolume = minVolume.ask.volume
 
   return (
     <>
@@ -185,11 +185,11 @@ export function Limit() {
                                 <SelectItem key={source.id} value={source.id}>
                                   <div className="flex gap-2 w-full">
                                     <SourceIcon sourceId={source.id} />
-                                    <Text className="capitalize">
+                                    <Caption className="capitalize">
                                       {source.id.includes("simple")
                                         ? "Wallet"
                                         : source.id.toUpperCase()}
-                                    </Text>
+                                    </Caption>
                                   </div>
                                 </SelectItem>
                               ),
@@ -236,11 +236,11 @@ export function Limit() {
                                 <SelectItem key={source.id} value={source.id}>
                                   <div className="flex gap-2 w-full">
                                     <SourceIcon sourceId={source.id} />
-                                    <Text className="capitalize">
+                                    <Caption className="capitalize">
                                       {source.id.includes("simple")
                                         ? "Wallet"
                                         : source.id.toUpperCase()}
-                                    </Text>
+                                    </Caption>
                                   </div>
                                 </SelectItem>
                               ),
@@ -254,7 +254,10 @@ export function Limit() {
             </div>
             <form.Field
               name="send"
-              onChange={sendValidator(Number(currentBalance.formatted ?? 0))}
+              onChange={sendVolumeValidator(
+                Number(currentBalance.formatted ?? 0),
+                Number(sendVolume ?? 0),
+              )}
             >
               {(field) => (
                 <EnhancedNumericInput
@@ -265,9 +268,22 @@ export function Limit() {
                     field.handleChange(value)
                     computeReceiveAmount()
                   }}
+                  minimumVolume={sendVolume}
+                  volumeAction={{
+                    onClick: () => {
+                      field.handleChange(sendVolume || "0"),
+                        computeReceiveAmount()
+                    },
+                  }}
                   balanceAction={{
-                    onClick: () =>
-                      field.handleChange(currentBalance.formatted || "0"),
+                    onClick: () => {
+                      field.handleChange(
+                        Number(currentBalance.formatted).toFixed(
+                          sendToken?.displayedDecimals,
+                        ) || "0",
+                      ),
+                        computeReceiveAmount()
+                    },
                   }}
                   token={sendToken}
                   customBalance={currentBalance.formatted}
@@ -278,18 +294,6 @@ export function Limit() {
                 />
               )}
             </form.Field>
-
-            <p className="text-orange-300 text-xs">
-              There is a minimum amount required for limit orders on Mangrove.{" "}
-              <Link
-                href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
-                target="_blank"
-                rel="noreferrer"
-                className="text-green-caribbean"
-              >
-                Learn more
-              </Link>
-            </p>
 
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
