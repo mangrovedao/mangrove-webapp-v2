@@ -7,6 +7,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { TooltipContent } from "@radix-ui/react-tooltip"
+import Link from "next/link"
+import InfoTooltip from "./info-tooltip"
 
 export function MinimumVolume(props: {
   token?: Token | string
@@ -21,9 +23,24 @@ export function MinimumVolume(props: {
 
   return (
     <div className="flex justify-between items-center mt-1">
-      <span className="text-xs text-secondary float-left">
-        {props.label ?? "Min. Volume"}
-      </span>
+      <div className="flex items-center">
+        <span className=" text-xs text-secondary float-left">
+          {props.label ?? "Min. Volume"}
+        </span>
+        <InfoTooltip>
+          <p className="text-xs">
+            There is a minimum amount required for limit orders on Mangrove.{" "}
+            <Link
+              href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
+              target="_blank"
+              rel="noreferrer"
+              className="text-green-caribbean"
+            >
+              Learn more
+            </Link>
+          </p>
+        </InfoTooltip>
+      </div>
       {!props.volume || !props.token ? (
         <Skeleton className="w-24 h-4" />
       ) : (
