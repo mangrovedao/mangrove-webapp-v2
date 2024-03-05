@@ -9,6 +9,7 @@ import {
 import { TooltipContent } from "@radix-ui/react-tooltip"
 import Link from "next/link"
 import InfoTooltip from "./info-tooltip"
+import { Caption } from "./typography/caption"
 
 export function MinimumVolume(props: {
   token?: Token | string
@@ -27,9 +28,10 @@ export function MinimumVolume(props: {
         <span className=" text-xs text-secondary float-left">
           {props.label ?? "Min. Volume"}
         </span>
-        <InfoTooltip>
-          <p className="text-xs">
-            There is a minimum amount required for limit orders on Mangrove.{" "}
+        <InfoTooltip className="flex flex-col">
+          <Caption className="text-xs">There is a minimum amount</Caption>
+          <Caption>
+            required for limit orders on Mangrove.{" "}
             <Link
               href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
               target="_blank"
@@ -38,7 +40,7 @@ export function MinimumVolume(props: {
             >
               Learn more
             </Link>
-          </p>
+          </Caption>
         </InfoTooltip>
       </div>
       {!props.volume || !props.token ? (
