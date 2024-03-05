@@ -180,8 +180,6 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
     const receive = form?.getFieldValue("receive")
-    const receiveTo = form?.getFieldValue("receiveTo")
-    const sendFrom = form?.getFieldValue("sendFrom")
 
     form.setFieldValue("sendFrom", "simple")
     form.setFieldValue("receiveTo", "simple")
