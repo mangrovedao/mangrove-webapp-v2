@@ -26,10 +26,12 @@ export function MarketDetails({
       <MarketDetailsLine title="Taker fee" value={takerFee} />
       <MarketDetailsLine title="Tick size" value={tickSize} />
       <MarketDetailsLine title="Current spot price" value={spotPrice} />
-      <MarketDetailsLine
-        title={`Minimum volume`}
-        value={`${minVolume?.ask.volume} ${minVolume?.ask.token} / ${minVolume?.bid.volume} ${minVolume?.bid.token}`}
-      />
+      {minVolume ? (
+        <MarketDetailsLine
+          title={`Minimum volume`}
+          value={`${minVolume?.ask.volume} ${minVolume?.ask.token} / ${minVolume?.bid.volume} ${minVolume?.bid.token}`}
+        />
+      ) : undefined}
     </Accordion>
   )
 }

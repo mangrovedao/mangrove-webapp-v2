@@ -55,6 +55,32 @@ export function useTradeInfos(
     market?.quote,
   )
 
+  const minAsk = market?.getSemibook("asks").getMinimumVolume(200_000)
+  const minBid = market?.getSemibook("bids").getMinimumVolume(200_000)
+
+  const minVolume =
+    tradeAction === TradeAction.BUY
+      ? {
+          bid: {
+            volume: minAsk?.toFixed(receiveToken?.displayedDecimals),
+            token: receiveToken?.symbol,
+          },
+          ask: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+        }
+      : {
+          bid: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+          ask: {
+            volume: minAsk?.toFixed(sendToken?.displayedDecimals),
+            token: sendToken?.symbol,
+          },
+        }
+
   // const spread = lowestAskPrice
   //   ?.sub(highestBidPrice ?? 0)
   //   .toFixed(priceDecimals)
@@ -89,5 +115,6 @@ export function useTradeInfos(
     tickSize,
     spotPrice: tempSpotPrice,
     defaultLimitPrice,
+    minVolume,
   }
 }
