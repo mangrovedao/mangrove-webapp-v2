@@ -18,7 +18,7 @@ type EnhancedNumericInputProps = {
   label?: string
   showBalance?: boolean
   balanceLabel?: string
-  balanceAction?: { onClick: (value: string) => void; text: string }
+  balanceAction?: { onClick: (value: string) => void; text?: string }
   error?: ValidationError[] | string
   inputClassName?: string
 } & NumericInputProps
