@@ -31,6 +31,7 @@ import SourceIcon from "../limit/components/source-icon"
 import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import useAmplifiedForm from "./hooks/use-amplified"
+import { getCurrentTokenPrice } from "./utils"
 
 const sliderValues = [25, 50, 75, 100]
 
@@ -39,6 +40,7 @@ export function Amplified() {
     errors,
     sendSource,
     sendAmount,
+    openMarkets,
     sendToken,
     assets,
     assetsWithTokens,
@@ -62,7 +64,6 @@ export function Amplified() {
     handleTimeInForceChange,
     handleTimeToLiveChange,
     handleTimeToLiveUnit,
-    getCurrentTokenPrice,
   } = useAmplifiedForm()
 
   const handleSliderChange = (value: number) => {
@@ -335,7 +336,7 @@ export function Amplified() {
                     ])
                     // computeReceiveAmount()
                   }}
-                  token={getCurrentTokenPrice(asset.token)}
+                  token={getCurrentTokenPrice(asset.token, openMarkets)}
                   label="Limit price"
                   disabled={!asset.token}
                   error={errors[`limitPrice-${i}`]}

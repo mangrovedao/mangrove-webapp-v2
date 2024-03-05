@@ -2,11 +2,14 @@
 "use client"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import useMangrove from "@/providers/mangrove"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
+import Big from "big.js"
 import React from "react"
 import { Address, formatUnits } from "viem"
 import { TimeToLiveUnit } from "../../../forms/amplified/enums"
+import { getCurrentTokenPriceFromAddress } from "../../../forms/amplified/utils"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm, AmplifiedOrderStatus } from "../types"
 
@@ -18,16 +21,16 @@ type Props = {
 export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
   const { offers } = order
 
+  const {
+    marketsInfoQuery: { data: openMarkets },
+  } = useMangrove()
+
   const sendToken = useTokenFromAddress(
     offers.find((offer) => offer?.market.outbound_tkn as Address)?.market
       .outbound_tkn as Address,
   ).data
 
   const isClosed = offers.find((offer) => !offer?.isOpen)
-
-  const limitPrice = `${Number(
-    offers.find((offer) => offer?.price)?.market.inbound_tkn,
-  ).toFixed(sendToken?.displayedDecimals)}`
 
   const gives = `${Number(
     formatUnits(
@@ -36,19 +39,47 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     ),
   ).toFixed(sendToken?.displayedDecimals)}`
 
-  // get buying assets[]
   const assets = offers.map((offer) => {
+    const quoteToken = getCurrentTokenPriceFromAddress(
+      offer.market.inbound_tkn,
+      openMarkets,
+    )
+    const isBid = openMarkets?.find(
+      (market) => market.base.address === offer.market.inbound_tkn,
+    )
+
     const receiveToken = useTokenFromAddress(
       offer.market.inbound_tkn as Address,
     ).data
 
-    const limitPrice = `${(
-      Number(offer.price) /
-      10 ** (sendToken?.decimals ?? 1)
-    ).toFixed(sendToken?.displayedDecimals)} ${sendToken?.symbol}`
+    const limitPrice = `${Number(offer.price).toFixed(quoteToken?.displayedDecimals)} ${getCurrentTokenPriceFromAddress(offer.market.inbound_tkn, openMarkets)?.symbol}`
 
-    const wants = Number(offer.gives) * Number(offer.price)
-    const receiveAmount = `${(Number(wants) / 10 ** (sendToken?.decimals ?? 1)).toFixed(receiveToken?.displayedDecimals)} ${receiveToken?.symbol}`
+    let wants
+
+    if (isBid) {
+      wants = Big(!isNaN(Number(offer.gives)) ? Number(offer.gives) : 0)
+        .div(
+          Big(
+            !isNaN(Number(offer.price)) && Number(offer.price) > 0
+              ? Number(offer.price)
+              : 1,
+          ),
+        )
+        .toString()
+    } else {
+      wants = Big(!isNaN(Number(offer.price)) ? Number(offer.price) : 0)
+        .times(
+          Big(
+            !isNaN(Number(offer.gives)) && Number(offer.gives) > 0
+              ? Number(offer.gives)
+              : 0,
+          ),
+        )
+        .toString()
+    }
+
+    //TODO: check this when not tired
+    let receiveAmount = `${(Number(wants) / 10 ** (sendToken?.decimals ?? 1)).toFixed(receiveToken?.displayedDecimals)} ${receiveToken?.symbol}`
 
     return {
       limitPrice,
@@ -60,7 +91,6 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      limitPrice,
       assets,
       send: gives,
       timeToLive: "1",
@@ -92,7 +122,6 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     form,
     setToggleEdit,
     toggleEdit,
-    limitPrice,
     assets,
     send,
     sendToken,

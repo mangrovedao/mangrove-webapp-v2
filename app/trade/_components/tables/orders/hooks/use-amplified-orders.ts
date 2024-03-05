@@ -70,7 +70,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
     meta: {
       error: "Unable to retrieve amplified orders",
     },
-    enabled: !!(isConnected && indexerSdk),
+    enabled: !!(isConnected && address && indexerSdk && openMarkets),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

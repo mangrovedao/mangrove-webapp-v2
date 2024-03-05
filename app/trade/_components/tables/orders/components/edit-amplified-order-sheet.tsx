@@ -80,7 +80,6 @@ export default function EditAmplifiedOrderSheet({
     form,
     setToggleEdit,
     toggleEdit,
-    limitPrice,
     assets,
     send,
     sendToken,
@@ -197,10 +196,10 @@ export default function EditAmplifiedOrderSheet({
                           title="Limit price"
                           item={asset.limitPrice}
                         />
-                        {/* <SheetLine
+                        <SheetLine
                           title={`Receive to wallet`}
                           item={asset.receiveAmount}
-                        /> */}
+                        />
                       </div>
                     )
                   })
@@ -307,7 +306,7 @@ export default function EditAmplifiedOrderSheet({
                   </form.Subscribe>
                 </SheetRoot.SheetClose>
 
-                {/* {!toggleEdit ? (
+                {!toggleEdit ? (
                   <Button
                     className="flex-1"
                     variant="primary"
@@ -335,7 +334,7 @@ export default function EditAmplifiedOrderSheet({
                       )
                     }}
                   </form.Subscribe>
-                )} */}
+                )}
               </SheetRoot.SheetFooter>
             </form>
           )}

@@ -68,37 +68,6 @@ export default function useAmplifiedForm() {
     }
   }
 
-  // const computeReceiveAmount = React.useCallback(() => {
-
-  //   })
-  //   handleAssetsChange(assetsWithReceivingAmounts)
-  // }, [setAssets])
-
-  // const computeReceiveAmount = () => {
-  //   assets.forEach((asset, i) => {
-  //     const amount = Big(
-  //       !isNaN(Number(asset.limitPrice)) ? Number(asset.limitPrice) : 0,
-  //     )
-  //       .times(
-  //         Big(
-  //           !isNaN(Number(asset.amount)) && Number(asset.amount) > 0
-  //             ? Number(asset.amount)
-  //             : 0,
-  //         ),
-  //       )
-  //       .toString()
-
-  //     handleAssetsChange([
-  //       ...assets.slice(0, i),
-  //       {
-  //         ...asset,
-  //         amount,
-  //       },
-  //       ...assets.slice(i + 1),
-  //     ])
-  //   })
-  // }
-
   const availableTokens =
     openMarkets?.reduce((acc, current) => {
       if (!acc.includes(current.base)) {
@@ -164,13 +133,6 @@ export default function useAmplifiedForm() {
     handleFieldChange("sendSource")
     const value = typeof e === "string" ? e : e.target.value
     setSendSource(value)
-  }
-
-  const getCurrentTokenPrice = (tokenId: string) => {
-    const market = openMarkets?.find(
-      (market) => market.base.id === tokenId || market.quote.id === tokenId,
-    )
-    return market?.quote || market?.base
   }
 
   const computeReceiveAmount = (
@@ -313,12 +275,12 @@ export default function useAmplifiedForm() {
   ])
 
   return {
-    getCurrentTokenPrice,
     setGlobalError,
     errors,
     setErrors,
     isChangingFrom,
     setIsChangingFrom,
+    openMarkets,
     sendSource,
     sendAmount,
     sendToken,
@@ -353,6 +315,5 @@ export default function useAmplifiedForm() {
     handleTimeInForceChange,
     handleTimeToLiveChange,
     handleTimeToLiveUnit,
-    openMarkets,
   }
 }
