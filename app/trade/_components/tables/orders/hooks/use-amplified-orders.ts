@@ -6,7 +6,6 @@ import { useAccount } from "wagmi"
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import useMangrove from "@/providers/mangrove"
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { AmplifiedOrder, parseAmplifiedOrders } from "../schema"
 
@@ -23,7 +22,6 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
-  const { olKeys } = useMarket()
   const { marketsInfoQuery } = useMangrove()
   const { data: openMarkets } = marketsInfoQuery
 
@@ -37,7 +35,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["amplified", address, first, skip],
     queryFn: async () => {
-      if (!indexerSdk || !address || !olKeys || !openMarkets) return []
+      if (!indexerSdk || !address || !openMarkets) return []
       startLoading(TRADE.TABLES.ORDERS)
       try {
         const markets =
@@ -60,8 +58,8 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
             return order
           }
         })
-        console.log(result)
 
+        console.log(result)
         return parseAmplifiedOrders(filteredResult)
       } catch (e) {
         console.error(e)
@@ -74,7 +72,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
     meta: {
       error: "Unable to retrieve amplified orders",
     },
-    enabled: !!(isConnected && indexerSdk),
+    enabled: !!(isConnected && address && indexerSdk && openMarkets),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
