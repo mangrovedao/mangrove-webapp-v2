@@ -14,7 +14,7 @@ export function TokenBalance(props: {
   label?: string
   action?: {
     onClick: (value: string) => void
-    text: string
+    text?: string
   }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
@@ -35,6 +35,7 @@ export function TokenBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
+                  props.action?.onClick(formatted || "0")
                 }}
               >
                 <span title={formatted?.toString()}>{formattedWithSymbol}</span>
@@ -50,7 +51,7 @@ export function TokenBalance(props: {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {props?.action && (
+          {props?.action && props?.action.text && (
             <button
               className="text-xs underline"
               onClick={(e) => {

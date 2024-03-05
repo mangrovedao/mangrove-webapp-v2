@@ -97,6 +97,7 @@ export function Market() {
               </CustomRadioGroup>
             )}
           </form.Field>
+
           <div className="space-y-4 !mt-6">
             <form.Field
               name="send"
@@ -110,6 +111,10 @@ export function Market() {
                   onChange={({ target: { value } }) => {
                     field.handleChange(value)
                     computeReceiveAmount()
+                  }}
+                  balanceAction={{
+                    onClick: () =>
+                      field.handleChange(sendTokenBalance.formatted || "0"),
                   }}
                   token={sendToken}
                   label="Send amount"
@@ -135,10 +140,7 @@ export function Market() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={
-                    !(market && form.state.isFormValid) ||
-                    receiveTokenBalance.formatted === "0"
-                  }
+                  disabled={!(market && form.state.isFormValid)}
                   error={
                     field.state.value === "0" && hasEnoughVolume
                       ? [FIELD_ERRORS.insufficientVolume]

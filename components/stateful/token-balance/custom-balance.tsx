@@ -14,7 +14,7 @@ export function CustomBalance(props: {
   label?: string
   action?: {
     onClick: (value: string) => void
-    text: string
+    text?: string
   }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
@@ -35,6 +35,7 @@ export function CustomBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
+                  props.action?.onClick(props.balance || "0")
                 }}
               >
                 <span>
@@ -48,7 +49,7 @@ export function CustomBalance(props: {
             </Tooltip>
           </TooltipProvider>
 
-          {props?.action && (
+          {props?.action && props?.action.text && (
             <button
               className="text-xs underline"
               onClick={(e) => {

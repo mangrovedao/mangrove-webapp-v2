@@ -167,6 +167,10 @@ export function Limit() {
                     field.handleChange(value)
                     computeReceiveAmount()
                   }}
+                  balanceAction={{
+                    onClick: () =>
+                      field.handleChange(currentBalance.formatted || "0"),
+                  }}
                   token={sendToken}
                   customBalance={currentBalance.formatted}
                   label="Send amount"
@@ -176,6 +180,7 @@ export function Limit() {
                 />
               )}
             </form.Field>
+
             <p className="text-orange-300 text-xs">
               There is a minimum amount required for limit orders on Mangrove.{" "}
               <Link
@@ -187,6 +192,7 @@ export function Limit() {
                 Learn more
               </Link>
             </p>
+
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
                 <EnhancedNumericInput
@@ -199,10 +205,7 @@ export function Limit() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={
-                    !(market && form.state.isFormValid) ||
-                    currentReceiveBalance.formatted === "0"
-                  }
+                  disabled={!(market && form.state.isFormValid)}
                   error={field.state.meta.touchedErrors}
                   showBalance
                   customBalance={currentReceiveBalance.formatted}
