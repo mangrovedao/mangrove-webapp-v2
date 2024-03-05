@@ -61,7 +61,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
     <img
       src="/assets/liquiditySources/zerolend.webp"
       alt="ZeroLend"
-      width="24"
+      width="18"
       height="24"
     />
   ),

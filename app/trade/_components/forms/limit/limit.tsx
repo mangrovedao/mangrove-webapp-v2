@@ -8,7 +8,6 @@ import {
 import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
-import { Text } from "@/components/typography/text"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -370,13 +369,13 @@ export function Limit() {
                               (source) =>
                                 source && (
                                   <SelectItem key={source.id} value={source.id}>
-                                    <div className="flex gap-2 w-full">
+                                    <div className="flex gap-2 w-full items-center">
                                       <SourceIcon sourceId={source.id} />
-                                      <Text className="capitalize">
+                                      <Caption className="capitalize">
                                         {source.id.includes("simple")
                                           ? "Wallet"
                                           : source.id.toUpperCase()}
-                                      </Text>
+                                      </Caption>
                                     </div>
                                   </SelectItem>
                                 ),
@@ -421,13 +420,13 @@ export function Limit() {
                               (source) =>
                                 source && (
                                   <SelectItem key={source.id} value={source.id}>
-                                    <div className="flex gap-2 w-full">
+                                    <div className="flex gap-2 w-full items-center">
                                       <SourceIcon sourceId={source.id} />
-                                      <Text className="capitalize">
+                                      <Caption className="capitalize">
                                         {source.id.includes("simple")
                                           ? "Wallet"
                                           : source.id.toUpperCase()}
-                                      </Text>
+                                      </Caption>
                                     </div>
                                   </SelectItem>
                                 ),
