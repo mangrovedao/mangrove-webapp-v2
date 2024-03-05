@@ -60,6 +60,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
             return order
           }
         })
+        console.log(result)
 
         return parseAmplifiedOrders(filteredResult)
       } catch (e) {
