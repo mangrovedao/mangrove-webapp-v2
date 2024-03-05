@@ -265,6 +265,10 @@ export function Limit() {
                     field.handleChange(value)
                     computeReceiveAmount()
                   }}
+                  balanceAction={{
+                    onClick: () =>
+                      field.handleChange(currentBalance.formatted || "0"),
+                  }}
                   token={sendToken}
                   customBalance={currentBalance.formatted}
                   label="Send amount"
@@ -299,10 +303,7 @@ export function Limit() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={
-                    !(market && form.state.isFormValid) ||
-                    currentReceiveBalance.formatted === "0"
-                  }
+                  disabled={!(market && form.state.isFormValid)}
                   error={field.state.meta.touchedErrors}
                   showBalance
                   customBalance={currentReceiveBalance.formatted}

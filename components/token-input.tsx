@@ -18,7 +18,7 @@ type EnhancedNumericInputProps = {
   label?: string
   showBalance?: boolean
   balanceLabel?: string
-  balanceAction?: { onClick: (value: string) => void; text: string }
+  balanceAction?: { onClick: (value: string) => void; text?: string }
   error?: ValidationError[] | string
   inputClassName?: string
 } & NumericInputProps
@@ -57,7 +57,7 @@ export const EnhancedNumericInput = React.forwardRef<
           className={inputClassName}
           ref={ref}
           icon={tokenSymbol}
-          symbol={tokenSymbol}
+          // symbol={tokenSymbol}
           aria-invalid={!!error?.length}
         />
         {error?.length ? (
