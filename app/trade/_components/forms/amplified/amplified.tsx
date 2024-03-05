@@ -180,7 +180,7 @@ export function Amplified() {
                           (logic) =>
                             logic && (
                               <SelectItem key={logic.id} value={logic.id}>
-                                <div className="flex space-x-3">
+                                <div className="flex gap-2 w-full items-center">
                                   <SourceIcon sourceId={logic.id} />
                                   <Text className="capitalize">
                                     {logic.id.includes("simple")
@@ -394,7 +394,7 @@ export function Amplified() {
                           (logic) =>
                             logic && (
                               <SelectItem key={logic.id} value={logic.id}>
-                                <div className="flex space-x-3">
+                                <div className="flex gap-2 w-full items-center">
                                   <SourceIcon sourceId={logic.id} />
                                   <Text className="capitalize">
                                     {logic.id.includes("simple")

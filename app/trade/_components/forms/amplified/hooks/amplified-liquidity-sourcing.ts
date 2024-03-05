@@ -1,13 +1,13 @@
 import { Token } from "@mangrovedao/mangrove.js"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
+import { DefaultLogics } from "../../types"
 
 type Props = {
   sendFrom: string
   receiveTo: string[]
-  logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]
+  logics: DefaultLogics[]
   fundOwner?: string
   sendToken?: Token
   receiveToken?: Token
@@ -32,11 +32,10 @@ export default function liquiditySourcing({
     BalanceLogic | undefined
   >()
 
-  const [sendFromLogics, setSendFromLogics] =
-    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
+  const [sendFromLogics, setSendFromLogics] = React.useState<DefaultLogics[]>()
 
   const [receiveToLogics, setReceiveToLogics] =
-    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
+    React.useState<DefaultLogics[]>()
 
   const [useAbleTokens, setUseAbleTokens] = React.useState<
     (Token | undefined)[]
