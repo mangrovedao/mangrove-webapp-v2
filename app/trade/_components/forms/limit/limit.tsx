@@ -32,7 +32,11 @@ import { TimeInForce, TimeToLiveUnit } from "./enums"
 import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
-import { isGreaterThanZeroValidator, sendValidator } from "./validators"
+import {
+  isGreaterThanZeroValidator,
+  sendValidator,
+  sendVolumeValidator,
+} from "./validators"
 
 const sliderValues = [25, 50, 75, 100]
 
@@ -104,6 +108,8 @@ export function Limit() {
     100,
   ).toFixed(0)
 
+  const sendVolume = minVolume.ask.volume
+
   return (
     <>
       <form.Provider>
@@ -156,7 +162,10 @@ export function Limit() {
 
             <form.Field
               name="send"
-              onChange={sendValidator(Number(currentBalance.formatted ?? 0))}
+              onChange={
+                sendValidator(Number(currentBalance.formatted ?? 0)) &&
+                sendVolumeValidator(Number(sendVolume ?? 0), sendVolume ?? "")
+              }
             >
               {(field) => (
                 <EnhancedNumericInput
@@ -167,9 +176,20 @@ export function Limit() {
                     field.handleChange(value)
                     computeReceiveAmount()
                   }}
+                  minimumVolume={sendVolume}
+                  volumeAction={{
+                    onClick: () => {
+                      field.handleChange(sendVolume || "0"),
+                        computeReceiveAmount()
+                    },
+                  }}
                   balanceAction={{
                     onClick: () => {
-                      field.handleChange(currentBalance.formatted || "0"),
+                      field.handleChange(
+                        Number(currentBalance.formatted).toFixed(
+                          sendToken?.displayedDecimals,
+                        ) || "0",
+                      ),
                         computeReceiveAmount()
                     },
                   }}

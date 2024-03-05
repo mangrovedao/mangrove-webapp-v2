@@ -11,3 +11,6 @@ export const sendValidator = (value: number) =>
     .number()
     .gt(0, FIELD_ERRORS.fieldRequired)
     .lte(value, FIELD_ERRORS.insufficientBalance)
+
+export const sendVolumeValidator = (value: number, minVolume: string) =>
+  z.coerce.number().gte(value, `${FIELD_ERRORS.minVolume} ${minVolume}`)

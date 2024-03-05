@@ -60,10 +60,29 @@ export function useLimit(props: Props) {
 
   const minAsk = market?.getSemibook("asks").getMinimumVolume(200_000)
   const minBid = market?.getSemibook("bids").getMinimumVolume(200_000)
+
   const minVolume =
     tradeAction === TradeAction.BUY
-      ? minBid?.toFixed(quoteToken?.displayedDecimals)
-      : minAsk?.toFixed(sendToken?.displayedDecimals)
+      ? {
+          bid: {
+            volume: minAsk?.toFixed(receiveToken?.displayedDecimals),
+            token: receiveToken?.symbol,
+          },
+          ask: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+        }
+      : {
+          bid: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+          ask: {
+            volume: minAsk?.toFixed(sendToken?.displayedDecimals),
+            token: sendToken?.symbol,
+          },
+        }
 
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
