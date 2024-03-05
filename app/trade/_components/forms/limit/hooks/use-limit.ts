@@ -182,8 +182,10 @@ export function useLimit(props: Props) {
     const receive = form?.getFieldValue("receive")
     const receiveTo = form?.getFieldValue("receiveTo")
     const sendFrom = form?.getFieldValue("sendFrom")
-    if (!sendFrom) form.setFieldValue("sendFrom", "simple")
-    if (!receiveTo) form.setFieldValue("receiveTo", "simple")
+
+    form.setFieldValue("sendFrom", "simple")
+    form.setFieldValue("receiveTo", "simple")
+
     if (!(send && receive)) return
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
