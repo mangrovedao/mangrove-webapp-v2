@@ -168,8 +168,10 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   balanceAction={{
-                    onClick: () =>
+                    onClick: () => {
                       field.handleChange(currentBalance.formatted || "0"),
+                        computeReceiveAmount()
+                    },
                   }}
                   token={sendToken}
                   customBalance={currentBalance.formatted}
