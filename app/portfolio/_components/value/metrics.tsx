@@ -13,7 +13,7 @@ export default function Metrics() {
   return (
     <div className="grid grid-cols-5">
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+        <div className="bg-muted p-2 size-10 rounded-xl items-center flex justify-center">
           <TransactionIcon />
         </div>
         <div className="flex flex-col space-y-2">
@@ -27,7 +27,7 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+        <div className="bg-muted p-2 size-10 rounded-xl items-center flex justify-center">
           <PercentageIcon />
         </div>
         <div className="flex flex-col space-y-2">
@@ -41,7 +41,7 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+        <div className="bg-muted p-2 size-10 rounded-xl items-center flex justify-center">
           <GraphIcon />
         </div>
         <div className="flex flex-col space-y-2">
@@ -55,7 +55,7 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+        <div className="bg-muted p-2 size-10 rounded-xl items-center flex justify-center">
           <RewardIcon />
         </div>
         <div className="flex flex-col space-y-2">
@@ -69,7 +69,7 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+        <div className="bg-muted p-2 size-10 rounded-xl items-center flex justify-center">
           <SpeedIcon />
         </div>
         <div className="flex flex-col space-y-2">
