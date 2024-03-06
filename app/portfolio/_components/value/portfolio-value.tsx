@@ -9,7 +9,7 @@ export default function PortfolioValue() {
     <div className="p-6 flex flex-col justify-between h-full">
       <h1>Portfolio Value</h1>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         <h6 className="md:text-5xl text-2xl">$ 1,234.12</h6>
         <div className="flex space-x-3">
           <div className="flex text-[#00DF81] space-x-1 items-center">
