@@ -44,6 +44,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     spender,
     feeInPercentageAsString,
     tickSize,
+    minVolume,
     spotPrice,
   } = useTradeInfos("limit", form.tradeAction)
   // const { isDeployed, isBound } = useSmartRouter().data ?? {}
@@ -239,6 +240,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
               spotPrice={spotPrice}
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
+              minVolume={minVolume}
             />
           </div>
         </div>

@@ -277,11 +277,7 @@ export function Limit() {
                   }}
                   balanceAction={{
                     onClick: () => {
-                      field.handleChange(
-                        Number(currentBalance.formatted).toFixed(
-                          sendToken?.displayedDecimals,
-                        ) || "0",
-                      ),
+                      field.handleChange(currentBalance.formatted || "0"),
                         computeReceiveAmount()
                     },
                   }}
