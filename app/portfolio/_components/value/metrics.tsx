@@ -3,13 +3,18 @@
 import { IconToolTip } from "@/components/icon-tooltip"
 import InfoTooltip from "@/components/info-tooltip"
 import { TooltipInfo } from "@/svgs"
+import PercentageIcon from "../../_icons/PercentageIcon"
+import TransactionIcon from "../../_icons/TransactionIcon"
+import GraphIcon from "../../_icons/GraphIcon"
+import RewardIcon from "../../_icons/RewardIcon"
+import SpeedIcon from "../../_icons/SpeedIcon"
 
 export default function Metrics() {
   return (
     <div className="grid grid-cols-5">
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 w-10 rounded-xl text-cloud-100 flex justify-center">
-          ix
+        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+          <TransactionIcon />
         </div>
         <div className="flex flex-col space-y-2">
           <span className="flex items-center">
@@ -22,8 +27,8 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 w-10 rounded-xl text-cloud-100 flex justify-center">
-          ix
+        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+          <PercentageIcon />
         </div>
         <div className="flex flex-col space-y-2">
           <span className="flex items-center">
@@ -36,8 +41,8 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 w-10 rounded-xl text-cloud-100 flex justify-center">
-          ix
+        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+          <GraphIcon />
         </div>
         <div className="flex flex-col space-y-2">
           <span className="flex items-center">
@@ -50,8 +55,8 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 w-10 rounded-xl text-cloud-100 flex justify-center">
-          ix
+        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+          <RewardIcon />
         </div>
         <div className="flex flex-col space-y-2">
           <span className="flex items-center">
@@ -64,8 +69,8 @@ export default function Metrics() {
         </div>
       </div>
       <div className="flex items-end space-x-3 px-5">
-        <div className="bg-muted p-2 w-10 rounded-xl text-cloud-100 flex justify-center">
-          ix
+        <div className="bg-muted p-2 size-10 rounded-xl text-cloud-100 items-center flex justify-center">
+          <SpeedIcon />
         </div>
         <div className="flex flex-col space-y-2">
           <span className="flex items-center">
