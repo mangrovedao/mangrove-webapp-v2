@@ -15,6 +15,8 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
+import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/ZeroLendLogic"
+import { DefaultLogics } from "../../types"
 import { TimeInForce } from "../enums"
 import type { AssetWithInfos, Form } from "../types"
 import { estimateTimestamp } from "../utils"
@@ -38,7 +40,11 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
     }: {
       form: Omit<Form, "assets"> & {
         selectedToken?: Token
-        selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
+        selectedSource?:
+          | SimpleLogic
+          | SimpleAaveLogic
+          | OrbitLogic
+          | ZeroLendLogic
         sendAmount: string
         assetsWithTokens: AssetWithInfos[]
       }
@@ -62,7 +68,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
 
         type Assets = {
           inboundToken: string | undefined
-          inboundLogic: SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined
+          inboundLogic: DefaultLogics
           tickSpacing: number
           tick: number
         }[]
@@ -70,7 +76,11 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         const hasLogic = (
           token: Assets[0],
         ): token is Omit<Assets[0], "inboundLogic" | "inboundToken"> & {
-          inboundLogic: SimpleLogic | SimpleAaveLogic | OrbitLogic
+          inboundLogic:
+            | SimpleLogic
+            | SimpleAaveLogic
+            | OrbitLogic
+            | ZeroLendLogic
           inboundToken: string
         } => {
           return (

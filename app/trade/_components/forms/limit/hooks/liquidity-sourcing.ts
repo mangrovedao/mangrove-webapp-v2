@@ -1,9 +1,4 @@
 import { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
-import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/ZeroLendLogic"
-import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { DefaultLogics } from "../../types"
 
@@ -21,18 +16,19 @@ type BalanceLogic = {
   balance: number
 }
 
-export function useAbleToken(
-  logic: SimpleLogic | SimpleAaveLogic | OrbitLogic | ZeroLendLogic,
-  token: Token,
-) {
-  return useQuery({
-    queryKey: ["availableLogic"],
-    queryFn: async () => {
-      return await logic.overlying(token)
-    },
-    enabled: !!logic && !!token,
-  })
-}
+// export function useAbleToken(
+//   logic: DefaultLogics,
+//   token: Token,
+// ) {
+//   return useQuery({
+//     queryKey: ["availableLogic"],
+//     queryFn: async () => {
+//       return await logic?.overlying(token)
+//     },
+
+//     enabled: !!(logic && token),
+//   })
+// }
 
 export default function liquiditySourcing({
   sendToken,
@@ -59,7 +55,7 @@ export default function liquiditySourcing({
       try {
         if (!logic) return
         const logicToken = await logic.overlying(token)
-        const isUsable = useAbleToken(logic, token).data
+        // const isUsable = useAbleToken(logic, token).data
         if (logicToken) {
           return logic
         }

@@ -1,4 +1,4 @@
-import Mangrove from "@mangrovedao/mangrove.js"
+import Mangrove, { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 
 import { TokenIcon } from "@/components/token-icon"
@@ -8,10 +8,10 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import * as SheetRoot from "@/components/ui/sheet"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMangrove from "@/providers/mangrove"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { Address } from "viem"
+import { sendValidator } from "../../../forms/amplified/validators"
 import { TimeInForce } from "../../../forms/limit/enums"
 import { useEditAmplifiedOrder } from "../hooks/use-edit-amplified-order"
 import { AmplifiedOrder } from "../schema"
@@ -63,8 +63,6 @@ export default function EditAmplifiedOrderSheet({
   openMarkets,
   onClose,
 }: EditAmplifiedOrderSheetProps) {
-  const { marketsInfoQuery, mangrove } = useMangrove()
-
   if (!orderInfos || !openMarkets) return null
   const [formData, setFormData] = React.useState<AmplifiedForm>()
   const order = orderInfos.order
@@ -84,6 +82,7 @@ export default function EditAmplifiedOrderSheet({
     send,
     sendToken,
     status,
+    sendTokenBalance,
   } = useEditAmplifiedOrder({
     order,
     onSubmit: (formData) => setFormData(formData),
@@ -103,9 +102,8 @@ export default function EditAmplifiedOrderSheet({
           {formData ? (
             <EditAmplifiedOrderSteps
               order={order}
-              form={formData!}
+              form={{ ...formData, sendToken: sendToken as Token }}
               onClose={onClose}
-              displayDecimals={0}
             />
           ) : (
             <form
@@ -167,7 +165,34 @@ export default function EditAmplifiedOrderSheet({
 
                 <SheetLine
                   title="Amount"
-                  item={<Text>{`${send} ${sendToken?.symbol}`}</Text>}
+                  item={
+                    !toggleEdit ? (
+                      <Text>{`${send} ${sendToken?.symbol}`}</Text>
+                    ) : (
+                      <form.Field
+                        name="send"
+                        onChange={sendValidator(Number(sendTokenBalance ?? 0))}
+                      >
+                        {(field) => (
+                          <EnhancedNumericInput
+                            className="h-10"
+                            inputClassName="h-10"
+                            name={field.name}
+                            value={field.state.value}
+                            placeholder={send}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => {
+                              field.handleChange(e.target.value)
+                            }}
+                            error={field.state.meta.touchedErrors}
+                            token={sendToken?.symbol}
+                            showBalance
+                            disabled={!sendToken || sendTokenBalance === "0"}
+                          />
+                        )}
+                      </form.Field>
+                    )
+                  }
                 />
 
                 <SheetLine
@@ -184,7 +209,23 @@ export default function EditAmplifiedOrderSheet({
                   }
                 />
 
-                {!toggleEdit ? (
+                {assets.map((asset, index) => {
+                  return (
+                    <div key={`asset-${index}`}>
+                      <div className="flex space-x-2 mb-4">
+                        <TokenIcon symbol={asset.token?.symbol} />
+                        <Text>{asset.token?.symbol} </Text>
+                      </div>
+                      <SheetLine title="Limit price" item={asset.limitPrice} />
+                      <SheetLine
+                        title={`Receive to wallet`}
+                        item={asset.receiveAmount}
+                      />
+                    </div>
+                  )
+                })}
+
+                {/* {!toggleEdit ? (
                   assets.map((asset, index) => {
                     return (
                       <div key={`asset-${index}`}>
@@ -231,16 +272,16 @@ export default function EditAmplifiedOrderSheet({
                                   onBlur={field.handleBlur}
                                   onChange={(e) => {
                                     field.handleChange([
-                                      ...field.state.value.slice(0, index), // Keep the previous assets unchanged
+                                      ...field.state.value.slice(0, index),
                                       {
                                         ...asset,
-                                        limitPrice: e.target.value, // Update the limit price of the current asset
+                                        limitPrice: e.target.value,
                                       },
-                                      ...field.state.value.slice(index + 1), // Keep the remaining assets unchanged
+                                      ...field.state.value.slice(index + 1),
                                     ])
                                   }}
                                   error={field.state.meta.touchedErrors}
-                                  token={sendToken!}
+                                  token={sendToken?.symbol}
                                   disabled={!openMarkets}
                                 />
                               }
@@ -258,16 +299,16 @@ export default function EditAmplifiedOrderSheet({
                                   onBlur={field.handleBlur}
                                   onChange={(e) => {
                                     field.handleChange([
-                                      ...field.state.value.slice(0, index), // Keep the previous assets unchanged
+                                      ...field.state.value.slice(0, index),
                                       {
                                         ...asset,
-                                        receiveAmount: e.target.value, // Update the limit price of the current asset
+                                        receiveAmount: e.target.value,
                                       },
-                                      ...field.state.value.slice(index + 1), // Keep the remaining assets unchanged
+                                      ...field.state.value.slice(index + 1),
                                     ])
                                   }}
                                   error={field.state.meta.touchedErrors}
-                                  token={asset.token!}
+                                  token={asset.token?.symbol}
                                   disabled={!openMarkets}
                                 />
                               }
@@ -277,7 +318,7 @@ export default function EditAmplifiedOrderSheet({
                       })
                     }
                   </form.Field>
-                )}
+                )} */}
               </SheetRoot.SheetBody>
 
               <SheetRoot.SheetFooter>

@@ -68,12 +68,13 @@ export const getCurrentTokenPrice = (
 }
 
 export const getCurrentTokenPriceFromAddress = (
-  tokenId: string,
+  tokenAddress: string,
   openMarkets?: Mangrove.OpenMarketInfo[],
 ) => {
   const market = openMarkets?.find(
     (market) =>
-      market.base.address === tokenId || market.quote.address === tokenId,
+      market.base.address.toLowerCase() == tokenAddress.toLowerCase() ||
+      market.quote.address.toLowerCase() == tokenAddress.toLowerCase(),
   )
   return market?.quote || market?.base
 }

@@ -1,16 +1,13 @@
 import { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import React from "react"
 import { DefaultLogics } from "../../types"
 
 type Props = {
-  sendFrom: string
-  receiveTo: string[]
+  sendFrom?: string
   logics: DefaultLogics[]
   fundOwner?: string
   sendToken?: Token
-  availableTokens: Token[]
+  availableTokens?: Token[]
 }
 
 type BalanceLogic = {
@@ -18,7 +15,7 @@ type BalanceLogic = {
   balance: number
 }
 
-export default function liquiditySourcing({
+export default function amplifiedLiquiditySourcing({
   sendToken,
   sendFrom,
   logics,
@@ -34,6 +31,7 @@ export default function liquiditySourcing({
   >([])
 
   const getPossibleLogicsForToken = async () => {
+    if (!availableTokens) return
     const tokenToTest = availableTokens.map(async (token) => {
       if (sendFrom !== "simple") {
         try {
@@ -59,9 +57,7 @@ export default function liquiditySourcing({
         return
       }
 
-      const selectedLogic = logics.find((logic) => logic?.id === sendFrom) as
-        | SimpleAaveLogic
-        | OrbitLogic
+      const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
 
       if (!selectedLogic) return
 

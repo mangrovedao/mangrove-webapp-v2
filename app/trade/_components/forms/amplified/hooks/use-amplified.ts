@@ -9,7 +9,7 @@ import Big from "big.js"
 import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import { Asset } from "../types"
-import liquiditySourcing from "./amplified-liquidity-sourcing"
+import amplifiedLiquiditySourcing from "./amplified-liquidity-sourcing"
 import { ChangingFrom, useNewStratStore } from "./amplified-store"
 
 export const MIN_PRICE_POINTS = 2
@@ -110,7 +110,7 @@ export default function useAmplifiedForm() {
     receiveTo: logics.find((logic) => logic?.id === asset.receiveTo),
   }))
 
-  const { useAbleTokens, sendFromBalance } = liquiditySourcing({
+  const { useAbleTokens, sendFromBalance } = amplifiedLiquiditySourcing({
     availableTokens,
     sendToken: selectedToken,
     sendFrom: sendSource,
