@@ -57,6 +57,10 @@ const LINKS = [
     href: "/trade",
   },
   {
+    name: "Portfolio",
+    href: "/portfolio",
+  },
+  {
     name: "Strategies",
     href: "/strategies",
     disabled: true,
