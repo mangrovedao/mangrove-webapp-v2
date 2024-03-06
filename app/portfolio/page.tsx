@@ -1,6 +1,8 @@
 "use client"
 
+import Balance from "./_components/value/balance"
 import Metrics from "./_components/value/metrics"
+import OpenOrders from "./_components/value/open-orders"
 import PortfolioValue from "./_components/value/portfolio-value"
 
 export default function Page() {
@@ -15,6 +17,12 @@ export default function Page() {
         </section>
         <div className="border-y py-8 col-span-3">
           <Metrics />
+        </div>
+        <div className="py-8 col-span-3">
+          <Balance />
+        </div>
+        <div className="py-8 col-span-3">
+          <OpenOrders />
         </div>
       </div>
     </main>
