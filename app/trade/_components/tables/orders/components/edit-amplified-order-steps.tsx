@@ -139,6 +139,7 @@ export default function EditAmplifiedOrderSteps({
               {
                 token: form.sendToken,
                 spender,
+                logic: form.sendFrom,
               },
               {
                 onSuccess: goToNextStep,

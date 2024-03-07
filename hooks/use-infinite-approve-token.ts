@@ -17,7 +17,6 @@ export function useInfiniteApproveToken() {
     }) => {
       try {
         if (!(token && spender)) return
-
         if (logic) {
           try {
             const tokenToApprove = await logic.overlying(token)
@@ -28,6 +27,7 @@ export function useInfiniteApproveToken() {
             return
           }
         } else {
+          console.log(spender)
           const result = await token.approve(spender)
           return result.wait()
         }
