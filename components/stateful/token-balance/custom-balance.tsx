@@ -18,7 +18,7 @@ export function CustomBalance(props: {
   }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
-  console.log({ props })
+
   return (
     <div className="flex justify-between items-center mt-1">
       <span className="text-xs text-secondary float-left">
