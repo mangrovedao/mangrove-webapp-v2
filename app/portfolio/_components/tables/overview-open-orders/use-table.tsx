@@ -18,8 +18,6 @@ import { cn } from "@/utils"
 import Big from "big.js"
 import Link from "next/link"
 import { OpenOrders } from "./schema"
-import { IconButton } from "@/components/icon-button"
-import { Close, Pen } from "@/svgs"
 
 const columnHelper = createColumnHelper<OpenOrders>()
 const DEFAULT_DATA: OpenOrders[] = []
@@ -51,10 +49,6 @@ export function useTable({ data }: Params) {
         ),
         enableSorting: true,
       }),
-      columnHelper.display({
-        header: "Date",
-        enableSorting: true,
-      }),
       columnHelper.accessor("isBid", {
         header: "Side",
         cell: (row) => {
@@ -74,7 +68,15 @@ export function useTable({ data }: Params) {
         cell: () => <span>Limit</span>,
       }),
       columnHelper.display({
-        header: "Filled/Amount",
+        id: "filled-amount",
+        header: () => (
+          <div className="flex items-center">
+            <span>Filled/Amount</span>
+            <InfoTooltip className="pb-0.5">
+              Executed amount (Filled) of the total order amount (Amount).
+            </InfoTooltip>
+          </div>
+        ),
         cell: ({ row }) => {
           const { initialWants, takerGot, initialGives, isBid, takerGave } =
             row.original
@@ -115,49 +117,63 @@ export function useTable({ data }: Params) {
         enableSorting: false,
       }),
       columnHelper.display({
-        header: "Price",
-        enableSorting: true,
-      }),
-      columnHelper.display({
-        id: "time-in-force",
+        id: "strategy-address",
         header: () => (
           <div className="flex items-center">
-            <span>Time in force left</span>
+            <span>Strategy address </span>
             <InfoTooltip className="pb-0.5">
-              Time left until your order becomes inactive.
+              EVM address for your strategy.
             </InfoTooltip>
           </div>
         ),
-      }),
-      columnHelper.display({
-        id: "actions",
-        header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
+          const address = "0x"
           return (
-            <div className="w-full h-full flex justify-end items-center space-x-1">
-              <IconButton
-                variant="primary"
-                className="px-4"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              >
-                <Pen />
-              </IconButton>
-              <IconButton
-                variant="secondary"
-                className="px-4"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              >
-                <Close />
-              </IconButton>
-            </div>
+            <Link href="" target="_blank" className="underline">
+              {address}
+            </Link>
           )
         },
+      }),
+      columnHelper.display({
+        header: "Market",
+        cell: () => (
+          <div className="flex items-center space-x-2">
+            <TokenPair
+              titleProps={{
+                variant: "title3",
+                className: "text-sm text-current font-normal",
+                as: "span",
+              }}
+              tokenClasses="w-4 h-4"
+              baseToken={market?.base}
+              quoteToken={market?.quote}
+            />
+          </div>
+        ),
+        enableSorting: true,
+      }),
+      columnHelper.display({
+        id: "return",
+        header: () => (
+          <div className="flex items-center">
+            <span>Return (%)</span>
+            <InfoTooltip className="pb-0.5">
+              EVM address for your strategy.
+            </InfoTooltip>
+          </div>
+        ),
+        cell: ({ row }) => {
+          const percent = 5
+          return (
+            <span className="text-sm text-muted-foreground">{percent} %</span>
+          )
+        },
+        enableSorting: true,
+      }),
+      columnHelper.display({
+        id: "strategy-value",
+        header: () => <div className="text-right">Stratedy value ($)</div>,
       }),
     ],
     [],

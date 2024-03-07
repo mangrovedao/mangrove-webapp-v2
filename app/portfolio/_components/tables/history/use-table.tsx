@@ -18,8 +18,6 @@ import { cn } from "@/utils"
 import Big from "big.js"
 import Link from "next/link"
 import { OpenOrders } from "./schema"
-import { IconButton } from "@/components/icon-button"
-import { Close, Pen } from "@/svgs"
 
 const columnHelper = createColumnHelper<OpenOrders>()
 const DEFAULT_DATA: OpenOrders[] = []
@@ -56,14 +54,16 @@ export function useTable({ data }: Params) {
         enableSorting: true,
       }),
       columnHelper.accessor("isBid", {
-        header: "Side",
+        header: "Status",
         cell: (row) => {
-          const isBid = row.getValue()
+          const isCompleted = row.getValue()
           return (
             <div
-              className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
+              className={cn(
+                isCompleted ? "text-green-caribbean" : "text-red-100",
+              )}
             >
-              {isBid ? "Buy" : "Sell"}
+              {isCompleted ? <span>Completed</span> : "Cancelled"}
             </div>
           )
         },
@@ -133,29 +133,11 @@ export function useTable({ data }: Params) {
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
+          const address: string = row.getValue("address")
           return (
-            <div className="w-full h-full flex justify-end items-center space-x-1">
-              <IconButton
-                variant="primary"
-                className="px-4"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              >
-                <Pen />
-              </IconButton>
-              <IconButton
-                variant="secondary"
-                className="px-4"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              >
-                <Close />
-              </IconButton>
-            </div>
+            <Link href="" target="_blank" className="underline">
+              {address}
+            </Link>
           )
         },
       }),

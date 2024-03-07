@@ -1,7 +1,7 @@
 "use client"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { useTable } from "../tables/open-orders/use-table"
+import { useTable } from "../tables/overview-open-orders/use-table"
 
 export default function OpenOrders() {
   const table = useTable({
