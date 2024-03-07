@@ -10,6 +10,8 @@ const tokenSchema = z.object({
   inboundTkn: z.string(),
   takerGot: z.string(),
   takerGave: z.string(),
+  totalTakerGot: z.string(),
+  totalTakerGave: z.string(),
   minPrice: z.string(),
   maxPrice: z.string(),
   diffTakerGave: z.number(),
