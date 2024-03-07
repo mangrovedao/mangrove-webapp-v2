@@ -97,6 +97,7 @@ export default function useAmplifiedForm() {
       market.base.id === selectedToken?.id ||
       market.quote.id === selectedToken?.id,
   )
+
   const currentTokens = availableTokens?.filter((token) => {
     if (selectedToken?.id === token.id) return false
 
@@ -238,6 +239,25 @@ export default function useAmplifiedForm() {
     const value = typeof e === "string" ? e : TimeToLiveUnit.DAY
     setTimeToLive(value)
   }
+
+  // let minVolume = 0
+  // React.useEffect(() => {
+  //   assets.forEach((asset, index) => {
+  //     const minAsk = market?.getSemibook("asks").getMinimumVolume(200_000)
+  //     const minBid = market?.getSemibook("bids").getMinimumVolume(200_000)
+  //     const isBid = openMarkets?.find(
+  //       (market) => market.base.id === asset.token,
+  //     )
+
+  //     if (isBid) {
+  //       minVolume += minBid ? Number(minBid) : 0
+  //     } else {
+  //       minVolume += minAsk ? Number(minAsk) : 0
+  //     }
+  //   })
+  // }, assets)
+
+  // console.log("minVolume", minVolume)
 
   React.useEffect(() => {
     const newErrors = { ...errors }

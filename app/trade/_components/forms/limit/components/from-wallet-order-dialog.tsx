@@ -54,11 +54,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     spender,
     form.selectedSource,
   )
-  console.log(isInfiniteAllowance, {
-    sendToken,
-    spender,
-    ok: form.selectedSource,
-  })
 
   let steps = [] as string[]
   if (!isInfiniteAllowance) {

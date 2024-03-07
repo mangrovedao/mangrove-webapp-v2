@@ -27,7 +27,6 @@ export function useInfiniteApproveToken() {
             return
           }
         } else {
-          console.log(spender)
           const result = await token.approve(spender)
           return result.wait()
         }
