@@ -7,13 +7,13 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
 import * as SheetRoot from "@/components/ui/sheet"
+import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { sendValidator } from "../../../forms/amplified/validators"
-import { TimeInForce } from "../../../forms/limit/enums"
 import { useEditAmplifiedOrder } from "../hooks/use-edit-amplified-order"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm } from "../types"
@@ -198,24 +198,25 @@ export default function EditAmplifiedOrderSheet({
                       )
                     }
                   />
-
-                  <SheetLine
+                  {/* <SheetLine
                     title="Time in force"
                     item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
                     secondaryItem={
                       false ? (
                         <Text className="text-muted-foreground">
-                          {/* <Timer expiry={expiryDate} /> */}
+                          <Timer expiry={expiryDate} />
                         </Text>
                       ) : (
                         <>timer</>
                       )
                     }
-                  />
+                  /> */}
 
                   {assets.map((asset, index) => {
                     return (
                       <div key={`asset-${index}`}>
+                        <Separator className="!my-6" />
+
                         <div className="flex space-x-2 mb-4">
                           <TokenIcon symbol={asset.token?.symbol} />
                           <Text>{asset.token?.symbol} </Text>
@@ -389,7 +390,10 @@ export default function EditAmplifiedOrderSheet({
                 </SheetRoot.SheetFooter>
               </form>
             )}
-            <ScrollBar orientation="vertical" />
+            <ScrollBar
+              orientation="vertical"
+              className="bg-primary-dark-green"
+            />
           </ScrollArea>
         </form.Provider>
       </SheetRoot.SheetContent>
