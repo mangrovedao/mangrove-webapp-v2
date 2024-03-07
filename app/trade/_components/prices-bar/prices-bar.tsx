@@ -74,8 +74,14 @@ export function PricesBar() {
   const { data, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(base?.address, quote?.address)
 
-  const { diffTakerGave, takerGave, minPrice, maxPrice } =
-    data?.[`${base?.address}-${quote?.address}`] ?? {}
+  const [side, setSide] = React.useState<"base" | "quote">("base")
+
+  const { diffTakerGave, takerGave, totalTakerGave, minPrice, maxPrice } =
+    side === "base"
+      ? data?.[`${base?.address}-${quote?.address}`] ?? {}
+      : data?.[`${quote?.address}-${base?.address}`] ?? {}
+
+  const token = side === "base" ? quote : base
 
   const { asks, bids } = requestBookQuery.data ?? {}
 
@@ -112,7 +118,7 @@ export function PricesBar() {
         <Item
           label={`24h Change`}
           value={diffTakerGave}
-          token={quote}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
           rightElement={
             <span
@@ -140,14 +146,14 @@ export function PricesBar() {
         <Item
           label="24h High"
           value={maxPrice ? Number(maxPrice ?? 0) : undefined}
-          token={quote}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
         />
 
         <Item
           label="24h Low"
           value={minPrice ? Number(minPrice ?? 0) : undefined}
-          token={quote}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
         />
 
@@ -155,10 +161,21 @@ export function PricesBar() {
 
         <Item
           label="Volume"
-          value={takerGave ? Number(takerGave ?? 0) : undefined}
-          token={quote}
+          value={totalTakerGave ? Number(totalTakerGave ?? 0) : undefined}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
         />
+
+        {/* <Button
+          variant={"secondary"}
+          size={"icon"}
+          className="p-1"
+          onClick={() => {
+            setSide(side === "base" ? "quote" : "base")
+          }}
+        >
+          <ArrowLeftRight />
+        </Button> */}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
