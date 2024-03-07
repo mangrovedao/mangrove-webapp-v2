@@ -53,7 +53,6 @@ export function Amplified() {
     tickSize,
     selectedToken,
     selectedSource,
-    minVolume,
     currentTokens,
     availableTokens,
     logics,
@@ -96,6 +95,10 @@ export function Amplified() {
       </div>
     )
 
+  const isAssetsEmpty = assets.some(
+    (asset) => !asset.token || !asset.amount || !asset.limitPrice,
+  )
+
   return (
     <div className="grid space-y-2">
       <div className="flex items-center">
@@ -111,7 +114,7 @@ export function Amplified() {
           </Caption>
 
           <Link
-            className="text-primary underline"
+            className="text-green-caribbean underline"
             href={
               "https://docs.mangrove.exchange/general/web-app/trade/how-to-amplify-order"
             }
@@ -170,6 +173,13 @@ export function Amplified() {
                 handleSentAmountChange(e.target.value)
                 // computeReceiveAmount()
               }}
+              // minimumVolume={sendVolume}
+              // volumeAction={{
+              //   onClick: () => {
+              //     handleSentAmountChange(sendVolume || "0"), computeReceiveAmount()
+              //   },
+              // }}
+
               disabled={!sendToken || balanceLogic_temporary === "0"}
               error={errors.sendAmount}
             />
@@ -205,6 +215,11 @@ export function Amplified() {
               token={selectedToken}
               balance={balanceLogic_temporary}
               label={"Balance"}
+              action={{
+                onClick: () => {
+                  handleSentAmountChange(balanceLogic_temporary || "0")
+                },
+              }}
             />
           )}
 
@@ -249,17 +264,7 @@ export function Amplified() {
               order instead.
             </Caption>
           ) : undefined}
-          <p className="text-orange-300 text-xs !mb-4">
-            There is a minimum amount required for amplify orders on Mangrove.{" "}
-            <Link
-              href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/amplify-order"
-              target="_blank"
-              rel="noreferrer"
-              className="text-green-caribbean"
-            >
-              Learn more
-            </Link>
-          </p>
+
           {assets.map((asset, i) => {
             return (
               <div key={`asset-${i}`} className="space-y-2">
@@ -412,11 +417,13 @@ export function Amplified() {
                   )}
                 </div>
                 {selectedToken ? (
-                  <MarketDetails
-                    tickSize={tickSize}
-                    // spotPrice={"3"}
-                    // minVolume={minVolume}
-                  />
+                  <div className="!text-xs">
+                    <MarketDetails
+                      tickSize={tickSize}
+                      // spotPrice={"3"}
+                      // minVolume={minVolume}
+                    />
+                  </div>
                 ) : undefined}
 
                 {i !== assets.length - 1 ? (
@@ -517,7 +524,9 @@ export function Amplified() {
         <Button
           className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
           size={"lg"}
-          disabled={!isAmplifiable || Object.keys(errors).length > 0}
+          disabled={
+            !isAmplifiable || Object.keys(errors).length > 0 || isAssetsEmpty
+          }
           rightIcon
           onClick={() => {
             setSummaryDialog(!summaryDialog)

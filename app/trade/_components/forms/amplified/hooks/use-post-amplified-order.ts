@@ -16,6 +16,7 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/ZeroLendLogic"
+import { toast } from "sonner"
 import { DefaultLogics } from "../../types"
 import { TimeInForce } from "../enums"
 import type { AssetWithInfos, Form } from "../types"
@@ -116,6 +117,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           })
           .filter(hasLogic)
 
+        //TODO: check why we don't have tx hash
         const order = await amp.addBundle({
           outboundToken: form.selectedToken.address,
           outboundVolume: parseUnits(
@@ -133,10 +135,11 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           inboundTokens,
         })
 
-        //TODO: check why we don't have tx hash
+        toast.success("Amplified order posted successfully")
         return order
       } catch (error) {
         console.error(error)
+        toast.error(`Failed to post the amplified order`)
       }
     },
     meta: {
@@ -156,9 +159,8 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         // await resolveWhenBlockIsIndexed.mutateAsync({
         //   blockNumber,
         // })
-        queryClient.invalidateQueries({ queryKey: ["orders"] })
+
         queryClient.invalidateQueries({ queryKey: ["amplified"] })
-        queryClient.invalidateQueries({ queryKey: ["fills"] })
       } catch (error) {
         console.error(error)
       }

@@ -18,7 +18,7 @@ export const useIsTokenInfiniteAllowance = (
         return token.allowanceInfinite({ spender })
       }
     },
-    enabled: !!token && !!spender,
+    enabled: !!(token && spender),
     meta: {
       error: "Failed to fetch token allowance",
     },

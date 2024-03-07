@@ -120,16 +120,17 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
           const { offers } = row.original
-          const isExpired = 0 // TODO: add expiry date in indexer
-            ? new Date(0) < new Date()
-            : true
+          const isOpen = offers[0]?.isOpen
+          // const isExpired = 0 // TODO: add expiry date in indexer
+          //   ? new Date(0) < new Date()
+          //   : true
 
           return (
             <div className="w-full h-full flex justify-end space-x-1">
               <IconButton
                 tooltip="Modify"
                 className="aspect-square w-6 rounded-full"
-                disabled={isExpired}
+                disabled={isOpen}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()

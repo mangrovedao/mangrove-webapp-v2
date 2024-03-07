@@ -58,6 +58,7 @@ export default function FromWalletAmplifiedOrderDialog({
     spender,
     selectedSource,
   )
+
   const { isDeployed, isBound } = useSmartRouter().data ?? {}
 
   let steps = [] as string[]

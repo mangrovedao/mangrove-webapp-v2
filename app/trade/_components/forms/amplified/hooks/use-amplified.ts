@@ -9,6 +9,7 @@ import Big from "big.js"
 import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import { Asset } from "../types"
+import { getCurrentTokenPrice } from "../utils"
 import amplifiedLiquiditySourcing from "./amplified-liquidity-sourcing"
 import { ChangingFrom, useNewStratStore } from "./amplified-store"
 
@@ -52,20 +53,22 @@ export default function useAmplifiedForm() {
   function handleOnOrderbookOfferClicked(
     event: CustomEvent<{ price: string }>,
   ) {
-    for (let i = 0; i < assets.length; i++) {
-      const asset = assets[i]
+    let newAssets = [...assets]
+
+    assets.forEach((asset, i) => {
       if (!asset) return
-      if (asset.token === market?.quote.id) {
-        handleAssetsChange([
-          ...assets.slice(0, i),
-          {
-            ...asset,
-            limitPrice: event.detail.price,
-          },
-          ...assets.slice(i + 1),
-        ])
+
+      const tokenPrice = getCurrentTokenPrice(asset.token, openMarkets)
+
+      if (tokenPrice?.id === market?.quote.id) {
+        newAssets[i] = {
+          ...asset,
+          limitPrice: event.detail.price,
+        }
       }
-    }
+    })
+
+    handleAssetsChange(newAssets)
   }
 
   const availableTokens =
@@ -82,14 +85,12 @@ export default function useAmplifiedForm() {
 
   const logics = mangrove ? Object.values(mangrove.logics) : []
 
-  const minBid = market?.getSemibook("bids").getMinimumVolume(220_000)
   const tickSize = marketInfo?.tickSpacing
     ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
     : ""
 
   const selectedToken = availableTokens.find((token) => token.id == sendToken)
   const selectedSource = logics.find((logic) => logic?.id == sendSource)
-  const minVolume = minBid?.toFixed(selectedToken?.displayedDecimals)
 
   const compatibleMarkets = openMarkets?.filter(
     (market) =>
@@ -288,11 +289,9 @@ export default function useAmplifiedForm() {
     timeInForce,
     timeToLive,
     timeToLiveUnit,
-    minBid,
     tickSize,
     selectedToken,
     selectedSource,
-    minVolume,
     currentTokens,
     useAbleTokens,
     sendFromBalance,

@@ -163,6 +163,9 @@ export default function EditAmplifiedOrderSteps({
                 form,
               },
               {
+                onSettled: () => {
+                  onClose()
+                },
                 onError: (error: Error) => {
                   onClose()
                   tradeService.openTxFailedDialog(
@@ -187,7 +190,7 @@ export default function EditAmplifiedOrderSteps({
     })
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 p-3">
       <div className="text-xl text-left">Proceed transaction</div>
       <Steps steps={steps} currentStep={currentStep} />
       <div className="space-y-2 flex flex-col flex-1">

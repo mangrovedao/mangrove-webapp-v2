@@ -53,7 +53,9 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
 
         if (!result) return []
         const filteredResult = result.map((order) => {
-          if (!order.offers.some((offer) => !offer.isMarketFound)) {
+          if (
+            !order.offers.some((offer) => !offer.isMarketFound && !offer.isOpen)
+          ) {
             return order
           }
         })

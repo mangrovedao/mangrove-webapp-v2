@@ -18,7 +18,7 @@ export function CustomBalance(props: {
   }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
-
+  console.log({ props })
   return (
     <div className="flex justify-between items-center mt-1">
       <span className="text-xs text-secondary float-left">
@@ -35,6 +35,7 @@ export function CustomBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
+
                   props.action?.onClick(props.balance || "0")
                 }}
               >

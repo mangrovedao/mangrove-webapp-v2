@@ -78,6 +78,7 @@ export function SummaryStep({
               </>
             ),
         )}
+        <Separator className="!my-5" />
         <Line title="Time in force">
           <div className="flex flex-col items-end">
             {form.timeInForce}{" "}

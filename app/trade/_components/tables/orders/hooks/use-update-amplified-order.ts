@@ -52,8 +52,8 @@ export function useUpdateAmplifiedOrder({
         toast.success("Amplified order updated successfully")
         return { tx }
       } catch (error) {
-        toast.error("Failed to update the amplified order")
         console.error(error)
+        toast.error("Failed to update the amplified order")
       }
     },
     meta: {
