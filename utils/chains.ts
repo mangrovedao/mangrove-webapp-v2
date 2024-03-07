@@ -1,6 +1,6 @@
 import { env } from "@/env.mjs"
+import { type Chain } from "@rainbow-me/rainbowkit"
 import * as wagmiChains from "wagmi/chains"
-import { type Chain } from "wagmi/chains"
 
 const WHITELISTED_CHAIN_IDS = env.NEXT_PUBLIC_WHITELISTED_CHAIN_IDS
 const DEFAULT_CHAIN_ID = "80001"
@@ -43,9 +43,12 @@ function renameChainNames(chains: wagmiChains.Chain[]) {
       return { ...chain, name: "Mumbai" }
     }
 
-    if (chain.id === wagmiChains.blastSepolia.id) {
+    if (
+      chain.id === wagmiChains.blastSepolia.id ||
+      chain.id === wagmiChains.blast.id
+    ) {
       return {
-        ...wagmiChains.blastSepolia,
+        ...chain,
         iconUrl:
           "https://cdn.routescan.io/_next/image?url=https%3A%2F%2Fcms-cdn.avascan.com%2Fcms2%2Fblast.dead36673539.png&w=48&q=100",
       }

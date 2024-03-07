@@ -38,8 +38,7 @@ import {
 } from "@rainbow-me/rainbowkit"
 
 import useLocalStorage from "@/hooks/use-local-storage"
-import { blast } from "@/providers/wallet-connect"
-import { blastSepolia } from "viem/chains"
+import { blast, blastSepolia } from "viem/chains"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
@@ -319,7 +318,7 @@ const RightPart = withClientOnly(() => {
             </DropdownMenuItem>
           )}
 
-          {(chain?.id == blastSepolia.id || chain?.id == blast.id) && (
+          {(chain?.id === blastSepolia.id || chain?.id === blast.id) && (
             <DropdownMenuItem asChild onClick={() => setWrapETH(!wrapETH)}>
               <div>
                 <Coins className="mr-2 h-4 w-4" />
