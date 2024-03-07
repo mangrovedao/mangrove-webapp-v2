@@ -30,17 +30,17 @@ function Item({
   value,
   skeleton = true,
   showSymbol = false,
-  quote,
+  token,
   rightElement,
 }: {
   label: string
   value?: number | bigint
   skeleton?: boolean
   showSymbol?: boolean
-  quote?: Token
+  token?: Token
   rightElement?: React.ReactElement
 }) {
-  const displayedPriceDecimals = determinePriceDecimalsFromToken(value, quote)
+  const displayedPriceDecimals = determinePriceDecimalsFromToken(value, token)
 
   return (
     <Container>
@@ -55,7 +55,8 @@ function Item({
             currency: showSymbol ? "USD" : undefined,
             minimumFractionDigits: displayedPriceDecimals,
             maximumFractionDigits: displayedPriceDecimals,
-          })}
+          })}{" "}
+          {token?.symbol}
           {rightElement}
         </Value>
       ) : (
@@ -70,12 +71,17 @@ export function PricesBar() {
   const base = market?.base
   const quote = market?.quote
   const oneMinutePriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol)
-  const oneDayPriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol, "1d")
   const { data, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(base?.address, quote?.address)
 
-  const { diffTakerGave, takerGave, minPrice, maxPrice } =
-    data?.[`${base?.address}-${quote?.address}`] ?? {}
+  const [side, setSide] = React.useState<"base" | "quote">("base")
+
+  const { diffTakerGave, takerGave, totalTakerGave, minPrice, maxPrice } =
+    side === "base"
+      ? data?.[`${base?.address}-${quote?.address}`] ?? {}
+      : data?.[`${quote?.address}-${base?.address}`] ?? {}
+
+  const token = side === "base" ? quote : base
 
   const { asks, bids } = requestBookQuery.data ?? {}
 
@@ -93,7 +99,7 @@ export function PricesBar() {
           highestBidPrice?.toNumber() || 0,
         )
 
-  const fixedSpotPrice = spotPrice?.toFixed(priceDecimals)
+  const fixedSpotPrice = spotPrice
 
   const variation24hPercentage = (diffTakerGave ?? 0 * 100) / (spotPrice ?? 1)
 
@@ -101,10 +107,10 @@ export function PricesBar() {
     <ScrollArea>
       <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
         <Item
-          label={quote?.symbol ? `Price (${quote?.symbol})` : "Price"}
+          label={"Price"}
           value={fixedSpotPrice ? Number(fixedSpotPrice ?? 0) : undefined}
           skeleton={oneMinutePriceQuery?.isLoading}
-          quote={quote}
+          token={quote}
         />
 
         <Separator orientation="vertical" className="h-4" />
@@ -112,7 +118,7 @@ export function PricesBar() {
         <Item
           label={`24h Change`}
           value={diffTakerGave}
-          quote={quote}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
           rightElement={
             <span
@@ -140,25 +146,36 @@ export function PricesBar() {
         <Item
           label="24h High"
           value={maxPrice ? Number(maxPrice ?? 0) : undefined}
-          quote={quote}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
         />
 
         <Item
           label="24h Low"
           value={minPrice ? Number(minPrice ?? 0) : undefined}
-          quote={quote}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
         />
 
         <Separator orientation="vertical" className="h-4" />
 
         <Item
-          label="24h Volume"
-          value={takerGave ? Number(takerGave ?? 0) : undefined}
-          quote={quote}
+          label="Volume"
+          value={totalTakerGave ? Number(totalTakerGave ?? 0) : undefined}
+          token={token}
           skeleton={mangroveTokenPriceLoading}
         />
+
+        {/* <Button
+          variant={"secondary"}
+          size={"icon"}
+          className="p-1"
+          onClick={() => {
+            setSide(side === "base" ? "quote" : "base")
+          }}
+        >
+          <ArrowLeftRight />
+        </Button> */}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
