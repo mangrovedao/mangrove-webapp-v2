@@ -438,8 +438,6 @@ export function Limit() {
 
             <Separator className="!my-6" />
 
-            <Separator className="!my-6" />
-
             <MarketDetails
               minVolume={minVolume}
               takerFee={feeInPercentageAsString}
