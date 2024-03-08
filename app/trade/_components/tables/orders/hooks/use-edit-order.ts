@@ -35,7 +35,9 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const logics = mangrove?.getLogicsList()
 
   const findLogicByAddress = (address: string) =>
-    logics?.find((logic) => logic.address === address)
+    logics?.find(
+      (logic) => logic.address.toLowerCase() === address.toLowerCase(),
+    )
 
   const sendFrom = findLogicByAddress(outboundRoute)
   const receiveTo = findLogicByAddress(inboundRoute)
