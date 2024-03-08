@@ -81,6 +81,8 @@ export default function EditOrderSheet({
     isOrderExpired,
     formattedPrice,
     sendTokenBalance,
+    sendFrom,
+    receiveTo,
   } = useEditOrder({
     order,
     onSubmit: (formData) => setFormData(formData),
@@ -157,10 +159,10 @@ export default function EditOrderSheet({
                   }
                 />
 
-                <SheetLine title="Type" item={<Text>Wallet</Text>} />
+                <SheetLine title="Type" item={<Text>Limit</Text>} />
 
                 <SheetLine
-                  title="Filled/Amount"
+                  title={`Filled/Amount`}
                   item={
                     <Text>{`${filled} / ${amount} ${
                       isBid ? base.symbol : quote.symbol
@@ -176,8 +178,13 @@ export default function EditOrderSheet({
                     </div>
                   }
                 />
+
                 <SheetLine
-                  title="Send Amount"
+                  title={`Send from ${
+                    sendFrom?.id.includes("simple")
+                      ? "Wallet"
+                      : sendFrom?.id.toUpperCase()
+                  }`}
                   item={
                     !toggleEdit ? (
                       <Text>{`${volume} ${
@@ -240,6 +247,19 @@ export default function EditOrderSheet({
                         )}
                       </form.Field>
                     )
+                  }
+                />
+
+                <SheetLine
+                  title={`Receive to ${
+                    receiveTo?.id.includes("simple")
+                      ? "Wallet"
+                      : receiveTo?.id.toUpperCase()
+                  }`}
+                  item={
+                    <Text>{`${amount} ${
+                      isBid ? base.symbol : quote.symbol
+                    }`}</Text>
                   }
                 />
 
