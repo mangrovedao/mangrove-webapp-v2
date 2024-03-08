@@ -131,9 +131,14 @@ export default function EditOrderSteps({
         />
       ),
       button: (
-        <Button {...btnProps} onClick={goToNextStep}>
-          Proceed
-        </Button>
+        <>
+          <Button onClick={onClose} variant={"secondary"}>
+            Back
+          </Button>
+          <Button {...btnProps} onClick={goToNextStep}>
+            Proceed
+          </Button>
+        </>
       ),
     },
     !isInfiniteAllowance && {
@@ -171,28 +176,33 @@ export default function EditOrderSteps({
         />
       ),
       button: (
-        <Button
-          {...btnProps}
-          loading={post.isPending}
-          disabled={post.isPending}
-          onClick={() => {
-            post.mutate(
-              {
-                form,
-              },
-              {
-                onError: (error: Error) => {
-                  onClose()
-                  tradeService.openTxFailedDialog(
-                    getTitleDescriptionErrorMessages(error),
-                  )
+        <>
+          <Button onClick={onClose} variant={"secondary"}>
+            Back
+          </Button>
+          <Button
+            {...btnProps}
+            loading={post.isPending}
+            disabled={post.isPending}
+            onClick={() => {
+              post.mutate(
+                {
+                  form,
                 },
-              },
-            )
-          }}
-        >
-          Proceed
-        </Button>
+                {
+                  onError: (error: Error) => {
+                    onClose()
+                    tradeService.openTxFailedDialog(
+                      getTitleDescriptionErrorMessages(error),
+                    )
+                  },
+                },
+              )
+            }}
+          >
+            Proceed
+          </Button>
+        </>
       ),
     },
   ]

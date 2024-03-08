@@ -92,6 +92,7 @@ export default function EditOrderSheet({
   const { progress, progressInPercent, volume, filled, amount } =
     getOrderProgress(order, market)
 
+  console.log({ order })
   React.useEffect(() => {
     if (mode === "edit") setToggleEdit(true)
   }, [])
@@ -107,7 +108,7 @@ export default function EditOrderSheet({
             <EditOrderSteps
               order={order}
               form={formData}
-              onClose={onClose}
+              onClose={() => setFormData(undefined)}
               displayDecimals={displayDecimals}
             />
           ) : (
