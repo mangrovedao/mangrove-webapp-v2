@@ -67,6 +67,7 @@ const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
     </div>
   )
 }
+
 type Props = {
   order: Order
   form: Form
@@ -121,7 +122,7 @@ export default function EditOrderSteps({
        * to undesired effects.
        */
       if (!isDialogOpenRef.current) return
-      onClose()
+      onCloseForm()
       tradeService.openTxCompletedDialog({
         address: result ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
@@ -209,9 +210,6 @@ export default function EditOrderSteps({
                   form,
                 },
                 {
-                  onSettled() {
-                    onCloseForm()
-                  },
                   onError: (error: Error) => {
                     onClose()
                     tradeService.openTxFailedDialog(
