@@ -69,7 +69,7 @@ ${referralLink}
         <div className="flex space-x-2 items-center mb-8">
           <Title variant={"title1"}>Your referrals statistics</Title>
           <Caption className="bg-primary-dark-green rounded-full px-2 py-1">
-            Point will be available soon...
+            Overview of collected points will be available soon
           </Caption>
         </div>
         <div className="grid grid-cols-1  md:grid-cols-4 gap-2">

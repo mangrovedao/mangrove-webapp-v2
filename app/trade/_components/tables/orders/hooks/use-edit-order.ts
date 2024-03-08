@@ -6,6 +6,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
 
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { hasExpired } from "@/utils/date"
 import { TradeAction } from "../../../forms/enums"
@@ -23,11 +24,23 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const { market } = useMarket()
   const {
     initialGives,
-    initialWants,
     price: currentPrice,
     isBid,
     expiryDate,
+    outboundRoute,
+    inboundRoute,
   } = order
+
+  const { mangrove } = useMangrove()
+  const logics = mangrove?.getLogicsList()
+
+  const findLogicByAddress = (address: string) =>
+    logics?.find(
+      (logic) => logic.address.toLowerCase() === address.toLowerCase(),
+    )
+
+  const sendFrom = findLogicByAddress(outboundRoute)
+  const receiveTo = findLogicByAddress(inboundRoute)
 
   const baseDecimals = market?.base.displayedDecimals
   const quoteDecimals = market?.quote.displayedDecimals
@@ -70,8 +83,10 @@ export function useEditOrder({ order, onSubmit }: Props) {
 
   return {
     handleSubmit,
-    form,
     setToggleEdit,
+    form,
+    sendFrom,
+    receiveTo,
     toggleEdit,
     isOrderExpired,
     formattedPrice,

@@ -76,6 +76,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
           const baseSymbol = market?.base.symbol
           const quoteSymbol = market?.quote.symbol
           const symbol = isBid ? baseSymbol : quoteSymbol
+
           const displayDecimals = isBid
             ? market?.base.displayedDecimals
             : market?.quote.displayedDecimals
