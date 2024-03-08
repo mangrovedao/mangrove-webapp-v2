@@ -257,7 +257,7 @@ export default function EditOrderSheet({
                 <SheetLine
                   title={
                     <Text className="text-wrap">
-                      Send from{" "}
+                      Receive to{" "}
                       {receiveTo?.id.includes("simple")
                         ? "Wallet"
                         : receiveTo?.id.toUpperCase()}
