@@ -56,7 +56,7 @@ export function Limit() {
     receiveTo,
     spotPrice,
     logics,
-    selecteSource,
+    selectedSource,
     minVolume,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
@@ -472,7 +472,7 @@ export function Limit() {
 
       {formData && (
         <FromWalletLimitOrderDialog
-          form={{ ...formData, selectedSource: selecteSource }}
+          form={{ ...formData, selectedSource: selectedSource, minVolume }}
           onClose={() => setFormData(undefined)}
         />
       )}

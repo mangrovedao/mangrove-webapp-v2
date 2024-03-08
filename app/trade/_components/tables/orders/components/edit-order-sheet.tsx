@@ -23,14 +23,14 @@ import EditOrderSteps from "./edit-order-steps"
 import { Timer } from "./timer"
 
 type SheetLineProps = {
-  title: string
+  title: React.ReactNode
   item: React.ReactNode
   secondaryItem?: React.ReactNode
 }
 
 const SheetLine = ({ title, item, secondaryItem }: SheetLineProps) => (
   <div className="flex justify-between items-center">
-    <Text className="text-muted-foreground whitespace-nowrap">{title}:</Text>
+    <Text className="text-muted-foreground whitespace-nowrap">{title}</Text>
     <div className="grid justify-items-end max-w-60">
       {item}
       {secondaryItem}
@@ -81,6 +81,8 @@ export default function EditOrderSheet({
     isOrderExpired,
     formattedPrice,
     sendTokenBalance,
+    sendFrom,
+    receiveTo,
   } = useEditOrder({
     order,
     onSubmit: (formData) => setFormData(formData),
@@ -106,6 +108,7 @@ export default function EditOrderSheet({
               order={order}
               form={formData}
               onClose={() => setFormData(undefined)}
+              onCloseForm={() => setToggleEdit(false)}
               displayDecimals={displayDecimals}
             />
           ) : (
@@ -157,10 +160,10 @@ export default function EditOrderSheet({
                   }
                 />
 
-                <SheetLine title="Type" item={<Text>Wallet</Text>} />
+                <SheetLine title="Type" item={<Text>Limit</Text>} />
 
                 <SheetLine
-                  title="Filled/Amount"
+                  title={`Filled/Amount`}
                   item={
                     <Text>{`${filled} / ${amount} ${
                       isBid ? base.symbol : quote.symbol
@@ -174,41 +177,6 @@ export default function EditOrderSheet({
                       />
                       <Text>{progressInPercent}%</Text>
                     </div>
-                  }
-                />
-                <SheetLine
-                  title="Send Amount"
-                  item={
-                    !toggleEdit ? (
-                      <Text>{`${volume} ${
-                        isBid ? quote.symbol : base.symbol
-                      }`}</Text>
-                    ) : (
-                      <form.Field
-                        name="send"
-                        onChange={sendValidator(
-                          Number(sendTokenBalance.formatted ?? 0),
-                        )}
-                      >
-                        {(field) => (
-                          <EnhancedNumericInput
-                            className="h-10"
-                            inputClassName="h-10"
-                            name={field.name}
-                            value={field.state.value}
-                            placeholder={volume}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => {
-                              field.handleChange(e.target.value)
-                            }}
-                            error={field.state.meta.touchedErrors}
-                            token={isBid ? quote : base}
-                            disabled={!market}
-                            showBalance
-                          />
-                        )}
-                      </form.Field>
-                    )
                   }
                 />
 
@@ -244,6 +212,65 @@ export default function EditOrderSheet({
                 />
 
                 <SheetLine
+                  title={
+                    <Text className="text-wrap">
+                      Send from{" "}
+                      {sendFrom?.id.includes("simple")
+                        ? "Wallet"
+                        : sendFrom?.id.toUpperCase()}
+                    </Text>
+                  }
+                  item={
+                    !toggleEdit ? (
+                      <Text>{`${volume} ${
+                        isBid ? base.symbol : quote.symbol
+                      }`}</Text>
+                    ) : (
+                      <form.Field
+                        name="send"
+                        onChange={sendValidator(
+                          Number(sendTokenBalance.formatted ?? 0),
+                        )}
+                      >
+                        {(field) => (
+                          <EnhancedNumericInput
+                            className="h-10"
+                            inputClassName="h-10"
+                            name={field.name}
+                            value={field.state.value}
+                            placeholder={volume}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => {
+                              field.handleChange(e.target.value)
+                            }}
+                            error={field.state.meta.touchedErrors}
+                            token={isBid ? quote : base}
+                            disabled={!market}
+                            showBalance
+                          />
+                        )}
+                      </form.Field>
+                    )
+                  }
+                />
+
+                <SheetLine
+                  title={
+                    <Text className="text-wrap">
+                      Receive to{" "}
+                      {receiveTo?.id.includes("simple")
+                        ? "Wallet"
+                        : receiveTo?.id.toUpperCase()}
+                    </Text>
+                  }
+                  item={
+                    <Text>{`${amount} ${
+                      isBid ? base.symbol : quote.symbol
+                    }`}</Text>
+                  }
+                />
+
+                <SheetLine
                   title="Time in force"
                   item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
                   secondaryItem={
@@ -275,7 +302,7 @@ export default function EditOrderSheet({
                           }
                           disabled={isSubmitting}
                         >
-                          Cancel
+                          {toggleEdit ? "Cancel" : "Close"}
                         </Button>
                       )
                     }}
