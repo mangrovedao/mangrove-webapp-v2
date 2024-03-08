@@ -44,14 +44,26 @@ const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
           </Text>
         </div>
       </div>
-      <div className="flex justify-between">
-        <Label>Price</Label>
 
-        <Text className="text-muted-foreground">
+
+      <div className="flex justify-between items-center">
+        <Label>Price</Label>
+        <div>
+          <Label>Old values</Label>
+          <Text className="text-muted-foreground">
           {Number(oldValues.price).toFixed(displayDecimals?.price)}
-        </Text>
-        <Text>{Number(newValues.price).toFixed(displayDecimals?.price)}</Text>
+
+          </Text>
+        </div>
+
+        <div>
+          <Label>New values</Label>
+          <Text>
+          {Number(newValues.price).toFixed(displayDecimals?.price)}
+          </Text>
+        </div>
       </div>
+
     </div>
   )
 }
@@ -135,7 +147,7 @@ export default function EditOrderSteps({
       ),
       button: (
         <>
-          <Button onClick={onClose} variant={"secondary"} {...btnProps}>
+          <Button onClick={onClose} variant={"secondary"} >
             Back
           </Button>
           <Button {...btnProps} onClick={goToNextStep}>
@@ -198,7 +210,6 @@ export default function EditOrderSteps({
                 },
                 {
                   onSettled() {
-                    console.log(1)
                     onCloseForm()
                   },
                   onError: (error: Error) => {
