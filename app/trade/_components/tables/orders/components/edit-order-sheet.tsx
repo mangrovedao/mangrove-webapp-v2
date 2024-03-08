@@ -23,14 +23,14 @@ import EditOrderSteps from "./edit-order-steps"
 import { Timer } from "./timer"
 
 type SheetLineProps = {
-  title: string
+  title: React.ReactNode
   item: React.ReactNode
   secondaryItem?: React.ReactNode
 }
 
 const SheetLine = ({ title, item, secondaryItem }: SheetLineProps) => (
   <div className="flex justify-between items-center">
-    <Text className="text-muted-foreground whitespace-nowrap">{title}:</Text>
+    <Text className="text-muted-foreground whitespace-nowrap">{title}</Text>
     <div className="grid justify-items-end max-w-60">
       {item}
       {secondaryItem}
@@ -211,15 +211,18 @@ export default function EditOrderSheet({
                 />
 
                 <SheetLine
-                  title={`Send from ${
-                    sendFrom?.id.includes("simple")
-                      ? "Wallet"
-                      : sendFrom?.id.toUpperCase()
-                  }`}
+                  title={
+                    <Text className="text-wrap">
+                      Send from{" "}
+                      {sendFrom?.id.includes("simple")
+                        ? "Wallet"
+                        : sendFrom?.id.toUpperCase()}
+                    </Text>
+                  }
                   item={
                     !toggleEdit ? (
                       <Text>{`${volume} ${
-                        isBid ? quote.symbol : base.symbol
+                        isBid ? base.symbol : quote.symbol
                       }`}</Text>
                     ) : (
                       <form.Field
@@ -251,11 +254,14 @@ export default function EditOrderSheet({
                 />
 
                 <SheetLine
-                  title={`Receive to ${
-                    receiveTo?.id.includes("simple")
-                      ? "Wallet"
-                      : receiveTo?.id.toUpperCase()
-                  }`}
+                  title={
+                    <Text className="text-wrap">
+                      Send from{" "}
+                      {receiveTo?.id.includes("simple")
+                        ? "Wallet"
+                        : receiveTo?.id.toUpperCase()}
+                    </Text>
+                  }
                   item={
                     <Text>{`${amount} ${
                       isBid ? base.symbol : quote.symbol
