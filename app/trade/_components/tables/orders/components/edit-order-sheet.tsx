@@ -180,6 +180,37 @@ export default function EditOrderSheet({
                 />
 
                 <SheetLine
+                  title="Limit price"
+                  item={
+                    !toggleEdit ? (
+                      <Text>{formattedPrice}</Text>
+                    ) : (
+                      <form.Field
+                        name="limitPrice"
+                        onChange={isGreaterThanZeroValidator}
+                      >
+                        {(field) => (
+                          <EnhancedNumericInput
+                            className="h-10"
+                            inputClassName="h-10"
+                            name={field.name}
+                            value={field.state.value}
+                            placeholder={formattedPrice}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => {
+                              field.handleChange(e.target.value)
+                            }}
+                            error={field.state.meta.touchedErrors}
+                            token={quote}
+                            disabled={!market}
+                          />
+                        )}
+                      </form.Field>
+                    )
+                  }
+                />
+
+                <SheetLine
                   title={`Send from ${
                     sendFrom?.id.includes("simple")
                       ? "Wallet"
@@ -212,37 +243,6 @@ export default function EditOrderSheet({
                             token={isBid ? quote : base}
                             disabled={!market}
                             showBalance
-                          />
-                        )}
-                      </form.Field>
-                    )
-                  }
-                />
-
-                <SheetLine
-                  title="Limit price"
-                  item={
-                    !toggleEdit ? (
-                      <Text>{formattedPrice}</Text>
-                    ) : (
-                      <form.Field
-                        name="limitPrice"
-                        onChange={isGreaterThanZeroValidator}
-                      >
-                        {(field) => (
-                          <EnhancedNumericInput
-                            className="h-10"
-                            inputClassName="h-10"
-                            name={field.name}
-                            value={field.state.value}
-                            placeholder={formattedPrice}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => {
-                              field.handleChange(e.target.value)
-                            }}
-                            error={field.state.meta.touchedErrors}
-                            token={quote}
-                            disabled={!market}
                           />
                         )}
                       </form.Field>
