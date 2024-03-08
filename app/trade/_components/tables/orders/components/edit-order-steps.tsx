@@ -59,6 +59,7 @@ type Props = {
   order: Order
   form: Form
   onClose: () => void
+  onCloseForm: () => void
   displayDecimals?: decimals
 }
 
@@ -72,6 +73,8 @@ export default function EditOrderSteps({
   order,
   form,
   onClose,
+  onCloseForm,
+
   displayDecimals,
 }: Props) {
   const { chain } = useAccount()
@@ -132,7 +135,7 @@ export default function EditOrderSteps({
       ),
       button: (
         <>
-          <Button onClick={onClose} variant={"secondary"}>
+          <Button onClick={onClose} variant={"secondary"} {...btnProps}>
             Back
           </Button>
           <Button {...btnProps} onClick={goToNextStep}>
@@ -177,7 +180,11 @@ export default function EditOrderSteps({
       ),
       button: (
         <>
-          <Button onClick={onClose} variant={"secondary"}>
+          <Button
+            onClick={onClose}
+            variant={"secondary"}
+            disabled={post.isPending}
+          >
             Back
           </Button>
           <Button
@@ -191,7 +198,8 @@ export default function EditOrderSteps({
                 },
                 {
                   onSettled() {
-                    onClose()
+                    console.log(1)
+                    onCloseForm()
                   },
                   onError: (error: Error) => {
                     onClose()
