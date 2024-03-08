@@ -190,6 +190,9 @@ export default function EditOrderSteps({
                   form,
                 },
                 {
+                  onSettled() {
+                    onClose()
+                  },
                   onError: (error: Error) => {
                     onClose()
                     tradeService.openTxFailedDialog(
