@@ -24,6 +24,16 @@ import { SummaryStep } from "./summary-step"
 type Props = {
   form: Form & {
     selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
+    minVolume: {
+      bid: {
+        volume: string | undefined
+        token: string | undefined
+      }
+      ask: {
+        volume: string | undefined
+        token: string | undefined
+      }
+    }
   }
   onClose: () => void
 }
@@ -44,7 +54,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     spender,
     feeInPercentageAsString,
     tickSize,
-    minVolume,
     spotPrice,
   } = useTradeInfos("limit", form.tradeAction)
   // const { isDeployed, isBound } = useSmartRouter().data ?? {}
@@ -240,7 +249,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
               spotPrice={spotPrice}
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
-              minVolume={minVolume}
+              minVolume={form.minVolume}
             />
           </div>
         </div>
