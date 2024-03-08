@@ -122,6 +122,7 @@ export default function EditOrderSteps({
        * to undesired effects.
        */
       if (!isDialogOpenRef.current) return
+      onClose()
       onCloseForm()
       tradeService.openTxCompletedDialog({
         address: result ?? "",
