@@ -52,18 +52,19 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
         })
 
         if (!result) return []
-        const filteredResult = result.map((order) => {
-          if (
-            !order.offers.some((offer) => !offer.isMarketFound && !offer.isOpen)
-          ) {
-            return order
-          }
+
+        const filteredResult = result.filter((order) => {
+          const allOffersMarketFound = order.offers.every(
+            (offer) => offer.isMarketFound,
+          )
+          const hasOneOfferOpen = order.offers.some((offer) => offer.isOpen)
+          return allOffersMarketFound && hasOneOfferOpen
         })
 
         return parseAmplifiedOrders(filteredResult)
       } catch (e) {
         console.error(e)
-        throw new Error()
+        throw new Error("")
       } finally {
         stopLoading(TRADE.TABLES.ORDERS)
       }

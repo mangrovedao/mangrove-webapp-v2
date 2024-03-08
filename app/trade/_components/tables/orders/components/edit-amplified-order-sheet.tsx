@@ -48,7 +48,11 @@ const Badge = ({
       { "text-red-100 bg-red-950": isExpired },
     )}
   >
-    <span className="bg-green-caribbean rounded-full h-[6px] w-[6px]" />
+    <span
+      className={cn("bg-green-caribbean rounded-full h-[6px] w-[6px]", {
+        "bg-red-600": isExpired,
+      })}
+    />
     <Title variant="title3">{title}</Title>
   </div>
 )
@@ -132,8 +136,12 @@ export default function EditAmplifiedOrderSheet({
                     title="Status"
                     item={
                       <Badge
-                        title={false ? "Closed" : "Open"}
-                        isExpired={false}
+                        title={
+                          !order.offers.find((offer) => offer.isOpen)
+                            ? "Closed"
+                            : "Open"
+                        }
+                        isExpired={!order.offers.find((offer) => offer.isOpen)}
                       />
                     }
                   />

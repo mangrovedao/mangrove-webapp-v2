@@ -107,7 +107,7 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
         header: "Status",
         cell: ({ row }) => {
           const { offers } = row.original
-          const isOpen = offers.find((offer) => offer.isOpen)
+          const isOpen = offers.some((offer) => offer.isOpen)
           return isOpen ? (
             <div className="text-green-caribbean">Open</div>
           ) : (

@@ -105,7 +105,7 @@ export default function EditOrderSheet({
             <EditOrderSteps
               order={order}
               form={formData}
-              onClose={onClose}
+              onClose={() => setFormData(undefined)}
               displayDecimals={displayDecimals}
             />
           ) : (
