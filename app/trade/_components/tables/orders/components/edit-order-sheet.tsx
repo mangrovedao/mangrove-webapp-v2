@@ -301,7 +301,7 @@ export default function EditOrderSheet({
                           }
                           disabled={isSubmitting}
                         >
-                          Cancel
+                          {toggleEdit ? "Cancel" : "Close"}
                         </Button>
                       )
                     }}
