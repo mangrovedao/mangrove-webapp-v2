@@ -61,6 +61,7 @@ export function useLimit(props: Props) {
   const minAsk = market
     ?.getSemibook("asks")
     .getMinimumVolume(selectedSource?.gasOverhead || 200_000)
+
   const minBid = market
     ?.getSemibook("bids")
     .getMinimumVolume(selectedSource?.gasOverhead || 200_000)

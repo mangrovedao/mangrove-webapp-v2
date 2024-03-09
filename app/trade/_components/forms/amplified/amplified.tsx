@@ -4,6 +4,7 @@ import { Plus, Trash } from "lucide-react"
 import Link from "next/link"
 
 import InfoTooltip from "@/components/info-tooltip"
+import { MinimumVolume } from "@/components/minimum-volume"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenIcon } from "@/components/token-icon"
 import { EnhancedNumericInput } from "@/components/token-input"
@@ -47,7 +48,6 @@ export function Amplified() {
     timeInForce,
     timeToLive,
     timeToLiveUnit,
-    setSendAmount,
     useAbleTokens,
     balanceLogic_temporary,
     tickSize,
@@ -56,6 +56,8 @@ export function Amplified() {
     currentTokens,
     availableTokens,
     logics,
+    minVolume,
+    setSendAmount,
     handleSendSource,
     handleSentAmountChange,
     handeSendTokenChange,
@@ -171,15 +173,7 @@ export function Amplified() {
               value={sendAmount}
               onChange={(e) => {
                 handleSentAmountChange(e.target.value)
-                // computeReceiveAmount()
               }}
-              // minimumVolume={sendVolume}
-              // volumeAction={{
-              //   onClick: () => {
-              //     handleSentAmountChange(sendVolume || "0"), computeReceiveAmount()
-              //   },
-              // }}
-
               disabled={!sendToken || balanceLogic_temporary === "0"}
               error={errors.sendAmount}
             />
@@ -210,7 +204,8 @@ export function Amplified() {
               </SelectContent>
             </Select>
           </div>
-          {sendToken && (
+
+          {sendToken ? (
             <CustomBalance
               token={selectedToken}
               balance={balanceLogic_temporary}
@@ -221,7 +216,20 @@ export function Amplified() {
                 },
               }}
             />
-          )}
+          ) : undefined}
+
+          {sendToken && minVolume.volume ? (
+            <MinimumVolume
+              token={selectedToken}
+              volume={minVolume.total.toString()}
+              label={"Min. Volume"}
+              action={{
+                onClick: () => {
+                  handleSentAmountChange(minVolume.total.toString())
+                },
+              }}
+            />
+          ) : undefined}
 
           <div className="space-y-5 pt-2 px-3">
             <Slider
@@ -339,7 +347,6 @@ export function Amplified() {
                       },
                       ...assets.slice(i + 1),
                     ])
-                    // computeReceiveAmount()
                   }}
                   token={getCurrentTokenPrice(asset.token, openMarkets)}
                   label="Limit price"
@@ -421,7 +428,7 @@ export function Amplified() {
                     <MarketDetails
                       tickSize={tickSize}
                       // spotPrice={"3"}
-                      // minVolume={minVolume}
+                      amplifiedMinVolume={minVolume.volume.toString()}
                     />
                   </div>
                 ) : undefined}

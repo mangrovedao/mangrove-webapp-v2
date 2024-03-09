@@ -104,12 +104,13 @@ export default function EditAmplifiedOrderSheet({
           <SheetRoot.SheetTitle>Order Details</SheetRoot.SheetTitle>
         </SheetRoot.SheetHeader>
         <form.Provider>
-          <ScrollArea className="h-full " scrollHideDelay={200}>
+          <ScrollArea scrollHideDelay={200}>
             {formData ? (
               <EditAmplifiedOrderSteps
                 order={order}
                 form={{ ...formData, sendToken: sendToken as Token }}
-                onClose={onClose}
+                onClose={() => setFormData(undefined)}
+                onCloseForm={() => setToggleEdit(false)}
               />
             ) : (
               <form
@@ -344,7 +345,7 @@ export default function EditAmplifiedOrderSheet({
                         return (
                           <Button
                             className="w-full"
-                            variant="primary"
+                            variant="secondary"
                             size="lg"
                             onClick={
                               toggleEdit
@@ -356,7 +357,7 @@ export default function EditAmplifiedOrderSheet({
                             }
                             disabled={isSubmitting}
                           >
-                            Close
+                            {toggleEdit ? "Back" : "Close"}
                           </Button>
                         )
                       }}
@@ -398,6 +399,7 @@ export default function EditAmplifiedOrderSheet({
                 </SheetRoot.SheetFooter>
               </form>
             )}
+
             <ScrollBar
               orientation="vertical"
               className="bg-primary-dark-green"

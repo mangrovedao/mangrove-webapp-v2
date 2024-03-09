@@ -51,6 +51,7 @@ type Props = {
   order: AmplifiedOrder
   form: AmplifiedForm & { sendToken: Token }
   onClose: () => void
+  onCloseForm: () => void
 }
 
 const btnProps: ButtonProps = {
@@ -63,6 +64,7 @@ export default function EditAmplifiedOrderSteps({
   order,
   form,
   onClose,
+  onCloseForm,
 }: Props) {
   const { chain } = useAccount()
 
@@ -107,6 +109,7 @@ export default function EditAmplifiedOrderSteps({
        */
       if (!isDialogOpenRef.current) return
       onClose()
+      onCloseForm()
       tradeService.openTxCompletedDialog({
         address: result ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
@@ -122,9 +125,14 @@ export default function EditAmplifiedOrderSteps({
     !isInfiniteAllowance && {
       body: <Summary oldAmount={oldAmount} newAmount={form.send} />,
       button: (
-        <Button {...btnProps} onClick={goToNextStep}>
-          Proceed
-        </Button>
+        <>
+          <Button onClick={onClose} variant={"secondary"}>
+            Back
+          </Button>
+          <Button {...btnProps} onClick={goToNextStep}>
+            Proceed
+          </Button>
+        </>
       ),
     },
     !isInfiniteAllowance && {
@@ -154,31 +162,33 @@ export default function EditAmplifiedOrderSteps({
     {
       body: <Summary oldAmount={oldAmount} newAmount={form.send} />,
       button: (
-        <Button
-          {...btnProps}
-          loading={post.isPending}
-          disabled={post.isPending}
-          onClick={() => {
-            post.mutate(
-              {
-                form,
-              },
-              {
-                onSettled: () => {
-                  onClose()
+        <>
+          <Button onClick={onClose} variant={"secondary"}>
+            Back
+          </Button>
+          <Button
+            {...btnProps}
+            loading={post.isPending}
+            disabled={post.isPending}
+            onClick={() => {
+              post.mutate(
+                {
+                  form,
                 },
-                onError: (error: Error) => {
-                  onClose()
-                  tradeService.openTxFailedDialog(
-                    getTitleDescriptionErrorMessages(error),
-                  )
+                {
+                  onError: (error: Error) => {
+                    onClose()
+                    tradeService.openTxFailedDialog(
+                      getTitleDescriptionErrorMessages(error),
+                    )
+                  },
                 },
-              },
-            )
-          }}
-        >
-          Proceed
-        </Button>
+              )
+            }}
+          >
+            Proceed
+          </Button>
+        </>
       ),
     },
   ]

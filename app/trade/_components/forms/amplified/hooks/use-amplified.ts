@@ -44,6 +44,8 @@ export default function useAmplifiedForm() {
     setTimeInForce,
     setTimeToLive,
     setTimeToLiveUnit,
+    setMinVolume,
+    minVolume,
   } = useNewStratStore()
 
   // TODO: fix TS type for useEventListener
@@ -240,24 +242,28 @@ export default function useAmplifiedForm() {
     setTimeToLive(value)
   }
 
-  // let minVolume = 0
-  // React.useEffect(() => {
-  //   assets.forEach((asset, index) => {
-  //     const minAsk = market?.getSemibook("asks").getMinimumVolume(200_000)
-  //     const minBid = market?.getSemibook("bids").getMinimumVolume(200_000)
-  //     const isBid = openMarkets?.find(
-  //       (market) => market.base.id === asset.token,
-  //     )
+  React.useEffect(() => {
+    let newMinVolume = 0
+    let minVolume = 0
+    const selectedSourceGasOverhead = selectedSource?.gasOverhead || 200_000
+    const semibookAsks = market?.getSemibook("asks")
+    const semibookBids = market?.getSemibook("bids")
+    const isBid = openMarkets?.find((market) => market.base.id === sendToken)
+      ?.base.id
 
-  //     if (isBid) {
-  //       minVolume += minBid ? Number(minBid) : 0
-  //     } else {
-  //       minVolume += minAsk ? Number(minAsk) : 0
-  //     }
-  //   })
-  // }, assets)
+    assets.forEach((asset) => {
+      if (!asset.token || !asset.limitPrice) return
+      minVolume = isBid
+        ? Number(semibookAsks?.getMinimumVolume(selectedSourceGasOverhead) || 0)
+        : Number(semibookBids?.getMinimumVolume(selectedSourceGasOverhead) || 0)
+      newMinVolume += minVolume ? Number(minVolume) : 0
+    })
 
-  // console.log("minVolume", minVolume)
+    setMinVolume({
+      total: newMinVolume.toFixed(selectedToken?.displayedDecimals),
+      volume: minVolume.toFixed(selectedToken?.displayedDecimals),
+    })
+  }, [assets, sendToken])
 
   React.useEffect(() => {
     const newErrors = { ...errors }
@@ -266,6 +272,8 @@ export default function useAmplifiedForm() {
       newErrors.sendAmount = "Amount cannot be greater than wallet balance"
     } else if (Number(sendAmount) <= 0 && sendAmount) {
       newErrors.sendAmount = "Amount must be greater than 0"
+    } else if (minVolume.total && minVolume.total > sendAmount) {
+      newErrors.sendAmount = "Amount cannot be lower than min. volume"
     } else {
       delete newErrors.sendAmount
     }
@@ -286,6 +294,7 @@ export default function useAmplifiedForm() {
 
     setErrors(newErrors)
   }, [
+    minVolume,
     sendSource,
     sendAmount,
     sendToken,
@@ -296,13 +305,11 @@ export default function useAmplifiedForm() {
   ])
 
   return {
-    setGlobalError,
     errors,
-    setErrors,
     isChangingFrom,
-    setIsChangingFrom,
     openMarkets,
     sendSource,
+    minVolume,
     sendAmount,
     sendToken,
     assets,
@@ -317,6 +324,12 @@ export default function useAmplifiedForm() {
     sendFromBalance,
     balanceLogic_temporary,
     assetsWithTokens,
+    address,
+    availableTokens,
+    logics,
+    setGlobalError,
+    setIsChangingFrom,
+    setErrors,
     setSendSource,
     setSendAmount,
     setSendToken,
@@ -324,9 +337,6 @@ export default function useAmplifiedForm() {
     setTimeInForce,
     setTimeToLive,
     setTimeToLiveUnit,
-    address,
-    availableTokens,
-    logics,
     handleSendSource,
     handleSentAmountChange,
     handeSendTokenChange,

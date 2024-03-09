@@ -13,6 +13,7 @@ type MarketDetailsProps = {
       token: string | undefined
     }
   }
+  amplifiedMinVolume?: string
 }
 
 export function MarketDetails({
@@ -20,12 +21,19 @@ export function MarketDetails({
   tickSize,
   spotPrice,
   minVolume,
+  amplifiedMinVolume,
 }: MarketDetailsProps) {
+  console.log(amplifiedMinVolume)
   return (
     <Accordion title="Market details">
       <MarketDetailsLine title="Taker fee" value={takerFee} />
       <MarketDetailsLine title="Tick size" value={tickSize} />
       <MarketDetailsLine title="Current spot price" value={spotPrice} />
+
+      {amplifiedMinVolume ? (
+        <MarketDetailsLine title="Minimum Volume" value={amplifiedMinVolume} />
+      ) : undefined}
+
       {minVolume ? (
         <MarketDetailsLine
           title={`Minimum volume`}

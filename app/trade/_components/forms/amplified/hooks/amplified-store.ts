@@ -17,6 +17,7 @@ export type NewStratStore = {
   sendSource: string
   sendAmount: string
   sendToken: string
+  minVolume: { total: string; volume: string }
   assets: Asset[]
   timeInForce: TimeInForce
   timeToLive: string
@@ -31,6 +32,7 @@ type NewStratActions = {
   setSendSource: (source: string) => void
   setSendAmount: (amount: string) => void
   setSendToken: (token: string) => void
+  setMinVolume: (minVolume: { total: string; volume: string }) => void
   setAssets: (assets: Asset[]) => void
   setTimeInForce: (timeInForce: TimeInForce) => void
   setTimeToLive: (timeInForce: string) => void
@@ -47,6 +49,7 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   sendSource: "",
   sendAmount: "",
   sendToken: "",
+  minVolume: { total: "0", volume: "0" },
   assets: [
     {
       amount: "",
@@ -72,11 +75,11 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   setSendSource: (sendSource) => set({ sendSource }),
   setSendAmount: (sendAmount) => set({ sendAmount }),
   setSendToken: (sendToken) => set({ sendToken }),
+  setMinVolume: (minVolume) => set({ minVolume }),
   setAssets: (assets) => set({ assets }),
   setTimeInForce: (timeInForce) => set({ timeInForce }),
   setTimeToLive: (timeToLive) => set({ timeToLive }),
   setTimeToLiveUnit: (timeToLiveUnit) => set({ timeToLiveUnit }),
-
   setGlobalError: (globalError) => set({ globalError }),
   setErrors: (errors) => set({ errors }),
   setIsChangingFrom: (isChangingFrom) => set({ isChangingFrom }),
