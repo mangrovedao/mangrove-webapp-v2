@@ -84,20 +84,25 @@ export function PricesBar() {
   const token = side === "base" ? quote : base
 
   const { asks, bids } = requestBookQuery.data ?? {}
-
   const lowestAskPrice = asks?.[0]?.price
   const highestBidPrice = bids?.[0]?.price
   const priceDecimals = determinePriceDecimalsFromToken(
     lowestAskPrice?.toNumber(),
     market?.quote,
   )
-  const spotPrice =
-    !lowestAskPrice || !highestBidPrice
-      ? undefined
-      : Math.max(
-          lowestAskPrice?.toNumber() || 0,
-          highestBidPrice?.toNumber() || 0,
-        )
+
+  let spotPrice =
+    lowestAskPrice && highestBidPrice
+      ? lowestAskPrice
+          ?.add(highestBidPrice ?? 0)
+          ?.div(2)
+          .toNumber()
+      : !lowestAskPrice && !highestBidPrice
+        ? undefined
+        : Math.max(
+            lowestAskPrice?.toNumber() || 0,
+            highestBidPrice?.toNumber() || 0,
+          )
 
   const fixedSpotPrice = spotPrice
 
