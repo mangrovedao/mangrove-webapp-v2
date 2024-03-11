@@ -183,7 +183,7 @@ export function Limit() {
                             (source) =>
                               source && (
                                 <SelectItem key={source.id} value={source.id}>
-                                  <div className="flex gap-2 w-full">
+                                  <div className="flex gap-2 w-full items-center">
                                     <SourceIcon sourceId={source.id} />
                                     <Caption className="capitalize">
                                       {source.id.includes("simple")
@@ -234,7 +234,7 @@ export function Limit() {
                             (source) =>
                               source && (
                                 <SelectItem key={source.id} value={source.id}>
-                                  <div className="flex gap-2 w-full">
+                                  <div className="flex gap-2 w-full items-center">
                                     <SourceIcon sourceId={source.id} />
                                     <Caption className="capitalize">
                                       {source.id.includes("simple")

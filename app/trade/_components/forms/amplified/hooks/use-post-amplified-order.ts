@@ -2,7 +2,6 @@ import {
   MangroveAmplifier,
   TickPriceHelper,
   Token,
-  type Market,
 } from "@mangrovedao/mangrove.js"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
@@ -15,6 +14,7 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
+import { TransactionReceipt } from "@ethersproject/providers"
 import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/ZeroLendLogic"
 import { toast } from "sonner"
 import { DefaultLogics } from "../../types"
@@ -23,7 +23,7 @@ import type { AssetWithInfos, Form } from "../types"
 import { estimateTimestamp } from "../utils"
 
 type Props = {
-  onResult?: (result: Market.OrderResult) => void
+  onResult?: (result: TransactionReceipt) => void
 }
 
 export function usePostAmplifiedOrder({ onResult }: Props = {}) {
@@ -118,7 +118,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           .filter(hasLogic)
 
         //TODO: check why we don't have tx hash
-        const order = await amp.addBundle({
+        const tx = await amp.addBundle({
           outboundToken: form.selectedToken.address,
           outboundVolume: parseUnits(
             form.sendAmount,
@@ -136,7 +136,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         })
 
         toast.success("Amplified order posted successfully")
-        return order
+        return { tx }
       } catch (error) {
         console.error(error)
         toast.error(`Failed to post the amplified order`)
@@ -151,15 +151,17 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
        * This is because the onSuccess callback from the mutation will only be triggered
        * after all the preceding logic has been executed.
        */
-      // onResult?.(data)
+
+      const { tx } = data ?? {}
       try {
+        if (!tx) return
+        onResult?.(tx)
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-        // const { blockNumber } = await (await order.response).wait()
-        // await resolveWhenBlockIsIndexed.mutateAsync({
-        //   blockNumber,
-        // })
-
+        const blockNumber = tx.blockNumber
+        await resolveWhenBlockIsIndexed.mutateAsync({
+          blockNumber,
+        })
         queryClient.invalidateQueries({ queryKey: ["amplified"] })
       } catch (error) {
         console.error(error)

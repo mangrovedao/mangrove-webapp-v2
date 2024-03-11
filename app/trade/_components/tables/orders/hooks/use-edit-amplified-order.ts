@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
-
-import { useTokenBalance } from "@/hooks/use-token-balance"
-import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import useMangrove from "@/providers/mangrove"
 import { Token } from "@mangrovedao/mangrove.js"
 import { useForm } from "@tanstack/react-form"
@@ -10,6 +7,9 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
 import { Address, formatUnits } from "viem"
+
+import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { TimeToLiveUnit } from "../../../forms/amplified/enums"
 import amplifiedLiquiditySourcing from "../../../forms/amplified/hooks/amplified-liquidity-sourcing"
 import { getCurrentTokenPriceFromAddress } from "../../../forms/amplified/utils"
@@ -53,7 +53,7 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
   const gives = `${Number(
     formatUnits(
       BigInt(offers.find((offer) => offer.gives)?.gives || "0"),
-      sendToken?.decimals ?? 4,
+      sendToken?.decimals || 4,
     ),
   ).toFixed(sendToken?.displayedDecimals)}`
 

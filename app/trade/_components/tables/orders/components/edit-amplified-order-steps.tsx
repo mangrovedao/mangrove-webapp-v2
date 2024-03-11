@@ -5,7 +5,7 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
+import { useIsLiquidityInfiniteAllowance } from "@/hooks/use-liquidity-infinite-allowance"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
@@ -69,7 +69,7 @@ export default function EditAmplifiedOrderSteps({
   const { chain } = useAccount()
 
   const { data: spender } = useSpenderAddress("amplified")
-  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
+  const { data: isInfiniteAllowance } = useIsLiquidityInfiniteAllowance(
     form.sendToken,
     spender,
     form.sendFrom,
@@ -176,6 +176,10 @@ export default function EditAmplifiedOrderSteps({
                   form,
                 },
                 {
+                  onSettled() {
+                    onClose()
+                    onCloseForm()
+                  },
                   onError: (error: Error) => {
                     onClose()
                     tradeService.openTxFailedDialog(

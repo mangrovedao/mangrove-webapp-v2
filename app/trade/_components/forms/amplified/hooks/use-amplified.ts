@@ -272,7 +272,7 @@ export default function useAmplifiedForm() {
       newErrors.sendAmount = "Amount cannot be greater than wallet balance"
     } else if (Number(sendAmount) <= 0 && sendAmount) {
       newErrors.sendAmount = "Amount must be greater than 0"
-    } else if (minVolume.total && minVolume.total > sendAmount) {
+    } else if (sendAmount && minVolume.total && minVolume.total > sendAmount) {
       newErrors.sendAmount = "Amount cannot be lower than min. volume"
     } else {
       delete newErrors.sendAmount

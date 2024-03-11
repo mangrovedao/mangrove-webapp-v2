@@ -109,7 +109,7 @@ export default function EditAmplifiedOrderSheet({
               <EditAmplifiedOrderSteps
                 order={order}
                 form={{ ...formData, sendToken: sendToken as Token }}
-                onClose={() => setFormData(undefined)}
+                onClose={onClose}
                 onCloseForm={() => setToggleEdit(false)}
               />
             ) : (
@@ -198,7 +198,7 @@ export default function EditAmplifiedOrderSheet({
                                 field.handleChange(e.target.value)
                               }}
                               error={field.state.meta.touchedErrors}
-                              token={sendToken?.symbol}
+                              token={sendToken || ""}
                               showBalance
                               disabled={!sendToken || sendTokenBalance === "0"}
                             />
@@ -241,101 +241,6 @@ export default function EditAmplifiedOrderSheet({
                       </div>
                     )
                   })}
-
-                  {/* {!toggleEdit ? (
-                  assets.map((asset, index) => {
-                    return (
-                      <div key={`asset-${index}`}>
-                        <div className="flex space-x-2 mb-4">
-                          <TokenIcon symbol={asset.token?.symbol} />
-                          <Text>{asset.token?.symbol} </Text>
-                        </div>
-                        <SheetLine
-                          title="Limit price"
-                          item={asset.limitPrice}
-                        />
-                        <SheetLine
-                          title={`Receive to wallet`}
-                          item={asset.receiveAmount}
-                        />
-                      </div>
-                    )
-                  })
-                ) : (
-                  <form.Field name="assets">
-                    {(field) =>
-                      field.state.value &&
-                      field.state.value.length > 0 &&
-                      field.state.value.map((asset, index) => {
-                        return (
-                          <div
-                            key={`edit-asset-${index}`}
-                            className="space-y-2"
-                          >
-                            <div className="flex space-x-2 mb-4">
-                              <TokenIcon symbol={asset.token?.symbol} />
-                              <Text>{asset.token?.symbol}</Text>
-                            </div>
-
-                            <SheetLine
-                              title="Limit price"
-                              item={
-                                <EnhancedNumericInput
-                                  className="h-10"
-                                  inputClassName="h-10"
-                                  name={field.name}
-                                  value={asset.limitPrice}
-                                  placeholder={asset.limitPrice}
-                                  onBlur={field.handleBlur}
-                                  onChange={(e) => {
-                                    field.handleChange([
-                                      ...field.state.value.slice(0, index),
-                                      {
-                                        ...asset,
-                                        limitPrice: e.target.value,
-                                      },
-                                      ...field.state.value.slice(index + 1),
-                                    ])
-                                  }}
-                                  error={field.state.meta.touchedErrors}
-                                  token={sendToken?.symbol}
-                                  disabled={!openMarkets}
-                                />
-                              }
-                            />
-
-                            <SheetLine
-                              title="Receive to wallet"
-                              item={
-                                <EnhancedNumericInput
-                                  className="h-10"
-                                  inputClassName="h-10"
-                                  name={field.name}
-                                  value={asset.receiveAmount}
-                                  placeholder={asset.receiveAmount}
-                                  onBlur={field.handleBlur}
-                                  onChange={(e) => {
-                                    field.handleChange([
-                                      ...field.state.value.slice(0, index),
-                                      {
-                                        ...asset,
-                                        receiveAmount: e.target.value,
-                                      },
-                                      ...field.state.value.slice(index + 1),
-                                    ])
-                                  }}
-                                  error={field.state.meta.touchedErrors}
-                                  token={asset.token?.symbol}
-                                  disabled={!openMarkets}
-                                />
-                              }
-                            />
-                          </div>
-                        )
-                      })
-                    }
-                  </form.Field>
-                )} */}
                 </SheetRoot.SheetBody>
 
                 <SheetRoot.SheetFooter>

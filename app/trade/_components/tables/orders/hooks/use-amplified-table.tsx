@@ -15,7 +15,6 @@ import { Text } from "@/components/typography/text"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { Address } from "viem"
@@ -32,8 +31,6 @@ type Params = {
 
 export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
   const { market } = useMarket()
-  const { marketsInfoQuery, mangrove } = useMangrove()
-  const { data: openMarkets } = marketsInfoQuery
 
   const columns = React.useMemo(
     () => [
@@ -120,7 +117,7 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
           const { offers } = row.original
-          const isOpen = offers[0]?.isOpen
+          const isClosed = offers.some((offer) => !offer.isOpen)
           // const isExpired = 0 // TODO: add expiry date in indexer
           //   ? new Date(0) < new Date()
           //   : true
@@ -130,7 +127,7 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
               <IconButton
                 tooltip="Modify"
                 className="aspect-square w-6 rounded-full"
-                disabled={isOpen}
+                disabled={isClosed}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -140,6 +137,7 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
                 <Pen />
               </IconButton>
               <IconButton
+                disabled={isClosed}
                 tooltip="Retract offer"
                 className="aspect-square w-6 rounded-full"
                 onClick={(e) => {

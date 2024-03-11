@@ -23,7 +23,6 @@ export function MarketDetails({
   minVolume,
   amplifiedMinVolume,
 }: MarketDetailsProps) {
-  console.log(amplifiedMinVolume)
   return (
     <Accordion title="Market details">
       <MarketDetailsLine title="Taker fee" value={takerFee} />

@@ -7,7 +7,7 @@ import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { MangroveAmplifier, Token } from "@mangrovedao/mangrove.js"
 import { toast } from "sonner"
-import { parseEther } from "viem"
+import { parseUnits } from "viem"
 import { AmplifiedForm } from "../types"
 
 type useUpdateOrderProps = {
@@ -39,7 +39,7 @@ export function useUpdateAmplifiedOrder({
         if (!mangrove || !market || !bundleId) return
         const { send: volume } = form
         const amp = new MangroveAmplifier({ mgv: mangrove })
-        const parsedVolume = parseEther(volume)
+        const parsedVolume = parseUnits(volume, form.sendToken.decimals)
 
         const tx = await amp.updateBundle({
           bundleId,
@@ -61,7 +61,7 @@ export function useUpdateAmplifiedOrder({
     },
     onSuccess: async (data) => {
       if (!data) return
-      //   const { updateOrder } = data
+      const { tx } = data
       /*
        * We use a custom callback to handle the success message once it's ready.
        * This is because the onSuccess callback from the mutation will only be triggered
@@ -70,17 +70,15 @@ export function useUpdateAmplifiedOrder({
       try {
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+        const blockNumber = tx.blockNumber
 
-        // const { blockNumber, transactionHash } = await (
-        //   await updateOrder.response
-        // ).wait()
+        onResult?.(tx.transactionHash)
 
-        // onResult?.(transactionHash)
-
-        // await resolveWhenBlockIsIndexed.mutateAsync({
-        //   blockNumber,
-        // })
-
+        await resolveWhenBlockIsIndexed.mutateAsync({
+          blockNumber,
+        })
+        queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["amplified"] })
       } catch (error) {
         console.error(error)

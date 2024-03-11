@@ -100,7 +100,7 @@ export default function FromWalletAmplifiedOrderDialog({
       if (!isDialogOpenRef.current) return
       onClose()
       tradeService.openTxCompletedDialog({
-        address: result.txReceipt.transactionHash ?? "",
+        address: result.transactionHash ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
       })
     },
