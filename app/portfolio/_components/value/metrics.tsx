@@ -1,8 +1,6 @@
 "use client"
 
-import { IconToolTip } from "@/components/icon-tooltip"
 import InfoTooltip from "@/components/info-tooltip"
-import { TooltipInfo } from "@/svgs"
 import PercentageIcon from "../../_icons/PercentageIcon"
 import TransactionIcon from "../../_icons/TransactionIcon"
 import GraphIcon from "../../_icons/GraphIcon"
