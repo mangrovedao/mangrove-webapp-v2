@@ -1,10 +1,10 @@
 "use client"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { useTable } from "../tables/overview-open-orders/use-table"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { useTable } from "../tables/overview-open-orders/use-table"
 
-export default function OpenOrders() {
+export default function MyStrategies() {
   const table = useTable({
     data: [],
   })
@@ -13,9 +13,9 @@ export default function OpenOrders() {
     <ScrollArea className="h-full w-full" scrollHideDelay={200}>
       <div className="px-6 space-y-2">
         <div className="flex items-center space-x-2">
-          <span>Open orders</span>
+          <span>My Strategies</span>
           <span className="bg-muted py-1 px-2 text-cloud-200 rounded-lg">
-            3
+            5
           </span>
         </div>
         <DataTable

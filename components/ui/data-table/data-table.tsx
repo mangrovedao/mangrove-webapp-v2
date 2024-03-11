@@ -46,7 +46,7 @@ export function DataTable<TData>({
   return (
     <>
       <Table>
-        <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
+        <TableHeader className="sticky top-[0] bg-background whitespace-nowrap z-40 p-0 text-xs">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {

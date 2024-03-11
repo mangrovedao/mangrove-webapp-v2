@@ -3,13 +3,14 @@
 import Balance from "./_components/value/balance"
 import OverviewCharts from "./_components/value/charts"
 import Metrics from "./_components/value/metrics"
+import MyStrategies from "./_components/value/my-strategies"
 import OpenOrders from "./_components/value/open-orders"
 import PortfolioValue from "./_components/value/portfolio-value"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 export default function Page() {
   return (
-    <ScrollArea className="h-screen pb-6" scrollHideDelay={200}>
+    <ScrollArea className="h-screen pb-6 w-full" scrollHideDelay={200}>
       <main className="w-full">
         <div className="lg:grid w-full grid-cols-3">
           <section className="border-r h-96 col-span-1">
@@ -25,7 +26,10 @@ export default function Page() {
             <Balance />
           </div>
           <div className="py-8 col-span-3">
-            <OpenOrders />
+            <div className="flex">
+              <OpenOrders />
+              <MyStrategies />
+            </div>
           </div>
         </div>
       </main>
