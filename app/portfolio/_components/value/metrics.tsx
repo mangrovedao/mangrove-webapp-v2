@@ -11,7 +11,7 @@ import SpeedIcon from "../../_icons/SpeedIcon"
 
 export default function Metrics() {
   return (
-    <div className="grid grid-cols-5">
+    <div className="grid lg:grid-cols-5">
       <div className="flex items-end space-x-3 px-5">
         <div className="bg-muted p-2 size-10 rounded-xl items-center flex justify-center">
           <TransactionIcon />
