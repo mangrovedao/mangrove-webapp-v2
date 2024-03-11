@@ -281,9 +281,9 @@ export default function useAmplifiedForm() {
     assets.map((asset, index) => {
       if (Number(asset.limitPrice) <= 0 && asset.limitPrice) {
         newErrors[`limitPrice-${index}`] = "Limit Price must be greater than 0"
-      } else if (!asset.receiveTo) {
+      } else if (!asset.receiveTo && asset.token) {
         newErrors[`receiveTo-${index}`] = "Please select a receive logic"
-      } else if (!asset.token) {
+      } else if (!asset.token && asset.limitPrice) {
         newErrors[`token-${index}`] = "Please select a token"
       } else {
         delete newErrors[`limitPrice-${index}`]

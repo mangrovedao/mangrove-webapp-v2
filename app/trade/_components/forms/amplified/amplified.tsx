@@ -528,6 +528,9 @@ export function Amplified() {
         </Accordion>
         <Separator className="!my-6" />
 
+        {Object.entries(errors).map(([key, value]) => (
+          <Caption className="text-red-600 text-center">{value}</Caption>
+        ))}
         <Button
           className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
           size={"lg"}
