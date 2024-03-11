@@ -25,24 +25,29 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
 
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
-      if (!mangrove || !market) return
-      const { isBid, limitPrice: price, send: volume } = form
+      try {
+        if (!mangrove || !market) return
+        const { isBid, limitPrice: price, send: volume } = form
 
-      const updateOrder = isBid
-        ? await market.updateRestingOrder("bids", {
-            offerId: Number(offerId),
-            volume,
-            price,
-          })
-        : await market.updateRestingOrder("asks", {
-            offerId: Number(offerId),
-            volume,
-            price,
-          })
+        const updateOrder = isBid
+          ? await market.updateRestingOrder("bids", {
+              offerId: Number(offerId),
+              volume,
+              price,
+            })
+          : await market.updateRestingOrder("asks", {
+              offerId: Number(offerId),
+              volume,
+              price,
+            })
 
-      await updateOrder.result
+        await updateOrder.result
 
-      return { updateOrder }
+        return { updateOrder }
+      } catch (error) {
+        console.error(error)
+        throw new Error("Failed to update the limit order")
+      }
     },
     meta: {
       error: "Failed to update the limit order",
