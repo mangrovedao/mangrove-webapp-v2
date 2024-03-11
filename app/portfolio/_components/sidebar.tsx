@@ -40,7 +40,7 @@ export default function Sidebar() {
         {getIsCurrentRoute("/portfolio/strategies") && (
           <div className="bg-green-caribbean size-2 rounded-full" />
         )}
-        <span>My Strategies</span>
+        <span className="whitespace-nowrap">My Strategies</span>
       </Link>
       <Link
         href="/portfolio/history"
