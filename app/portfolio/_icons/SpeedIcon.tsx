@@ -8,7 +8,7 @@ const SpeedIcon = (props: SVGProps<SVGSVGElement>) => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#clip0_4933_39722)">
+    <g clipPath="url(#clip0_4933_39722)">
       <path
         d="M8.6001 9.11121L11.4445 6.26685"
         stroke="#AACBC4"

@@ -2,7 +2,7 @@
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { useTable } from "../tables/overview-open-orders/use-table"
+import { useTable } from "../tables/my-strategies/use-table"
 
 export default function MyStrategies() {
   const table = useTable({

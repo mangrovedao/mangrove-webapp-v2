@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const myStrategiesSchema = z.object({
+const openOrdersSchema = z.object({
   creationDate: z.date(),
   latestUpdateDate: z.date(),
   expiryDate: z.date().optional(),
@@ -15,4 +15,4 @@ const myStrategiesSchema = z.object({
   price: z.string(),
   offerId: z.string(),
 })
-export type MyStrategies = z.infer<typeof myStrategiesSchema>
+export type OpenOrders = z.infer<typeof openOrdersSchema>
