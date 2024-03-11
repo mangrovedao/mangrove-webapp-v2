@@ -6,7 +6,7 @@ import UpArrowIcon from "../../_icons/UpArrowIcon"
 
 export default function PortfolioValue() {
   return (
-    <div className="p-6 flex flex-col justify-between h-full">
+    <div className="p-4 2xl:p-6 flex flex-col justify-between h-full">
       <h1>Portfolio Value</h1>
 
       <div className="space-y-2">
@@ -27,8 +27,8 @@ export default function PortfolioValue() {
           <span className="opacity-70 pl-4">Past week</span>
         </div>
 
-        <div className="bg-primary-bush-green items-center rounded-xl p-6 flex">
-          <div className="pr-10">
+        <div className="bg-primary-bush-green items-center rounded-xl p-4 xl:p-6 flex">
+          <div className="pr-4">
             <CircularProgressBar
               size={75}
               strokeWidth={20}
@@ -37,7 +37,7 @@ export default function PortfolioValue() {
             />
           </div>
 
-          <div className="flex flex-col flex-1">
+          <div className="flex flex-col flex-1 text-sm">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <div className="bg-green-caribbean size-2.5 rounded-full" />
