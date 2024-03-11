@@ -12,7 +12,9 @@ export default function Page() {
     <main className="w-full">
       <h1 className="p-4">My Strategies</h1>
 
-      <DataTable table={table} />
+      <div className="px-3">
+        <DataTable table={table} />
+      </div>
     </main>
   )
 }
