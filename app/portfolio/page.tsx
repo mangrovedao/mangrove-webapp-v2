@@ -1,7 +1,7 @@
 "use client"
 
 import Balance from "./_components/value/balance"
-import OverviewCharts from "./_components/value/charts"
+import OverviewChart from "./_components/value/chart"
 import Metrics from "./_components/value/metrics"
 import MyStrategies from "./_components/value/my-strategies"
 import OpenOrders from "./_components/value/open-orders"
@@ -17,7 +17,7 @@ export default function Page() {
             <PortfolioValue />
           </section>
           <section className="col-span-2">
-            <OverviewCharts />
+            <OverviewChart />
           </section>
           <div className="border-y py-8 col-span-3">
             <Metrics />
