@@ -26,7 +26,7 @@ export default function Page() {
             <Balance />
           </div>
           <div className="py-8 col-span-3">
-            <div className="flex">
+            <div className="flex divide-x">
               <OpenOrders />
               <MyStrategies />
             </div>
