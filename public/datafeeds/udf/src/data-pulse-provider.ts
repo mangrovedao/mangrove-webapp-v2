@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-inferrable-types */
-/* eslint-disable @typescript-eslint/consistent-indexed-object-style */
 import {
   LibrarySymbolInfo,
   ResolutionString,

@@ -1,7 +1,7 @@
 import type { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
+import type { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
+import type { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
+import type { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import { useQuery } from "@tanstack/react-query"
 
 export const useIsTokenInfiniteAllowance = (
@@ -16,9 +16,8 @@ export const useIsTokenInfiniteAllowance = (
       if (logic) {
         const tokenToApprove = await logic.overlying(token)
         return await tokenToApprove.allowanceInfinite({ spender })
-      } else {
-        return token.allowanceInfinite({ spender })
       }
+      return token.allowanceInfinite({ spender })
     },
     enabled: !!token && !!spender,
     meta: {

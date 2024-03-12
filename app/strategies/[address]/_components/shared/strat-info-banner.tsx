@@ -10,8 +10,12 @@ export default function StratInfoBanner() {
 
   const avgReturnPercentage = strategyQuery.data?.return as number | undefined
 
-  const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+  const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${
+    baseToken?.symbol
+  }`
+  const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${
+    quoteToken?.symbol
+  }`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
 
   return (

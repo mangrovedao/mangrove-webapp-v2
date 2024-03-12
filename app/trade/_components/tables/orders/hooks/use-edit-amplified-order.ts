@@ -48,7 +48,10 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     ).toFixed(sendToken?.displayedDecimals)} ${sendToken?.symbol}`
 
     const wants = Number(offer.gives) * Number(offer.price)
-    const receiveAmount = `${(Number(wants) / 10 ** (sendToken?.decimals ?? 1)).toFixed(receiveToken?.displayedDecimals)} ${receiveToken?.symbol}`
+    const receiveAmount = `${(
+      Number(wants) /
+      10 ** (sendToken?.decimals ?? 1)
+    ).toFixed(receiveToken?.displayedDecimals)} ${receiveToken?.symbol}`
 
     return {
       limitPrice,

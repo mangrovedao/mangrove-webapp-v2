@@ -40,7 +40,9 @@ export function SummaryStep({
         </span>
       </div>
       <Line
-        title={`Send from ${source.id.includes("simple") ? "Wallet" : source.id.toUpperCase()}`}
+        title={`Send from ${
+          source.id.includes("simple") ? "Wallet" : source.id.toUpperCase()
+        }`}
       >
         {Big(form.sendAmount ?? 0).toFixed(8)}{" "}
         <Unit>{tokenToAmplify?.symbol}</Unit>
@@ -69,7 +71,11 @@ export function SummaryStep({
                   <Unit>{receiveToken.token.symbol}</Unit>
                 </Line>
                 <Line
-                  title={`Receive to ${receiveToken.receiveTo.includes("simple") ? "Wallet" : receiveToken.receiveTo.toUpperCase()}`}
+                  title={`Receive to ${
+                    receiveToken.receiveTo.includes("simple")
+                      ? "Wallet"
+                      : receiveToken.receiveTo.toUpperCase()
+                  }`}
                 >
                   {Big(receiveToken.amount ?? 0).toFixed(
                     receiveToken.token.displayedDecimals,

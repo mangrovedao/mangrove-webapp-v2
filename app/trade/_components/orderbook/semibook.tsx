@@ -92,9 +92,9 @@ export const SemiBook = React.forwardRef<
           <style jsx>{`
             .order-book-line-bg {
               width: ${cumulatedVolumePercentage.toNumber()}%;
-              background: ${type === "bids"
-                ? "#021B1A"
-                : "rgba(255, 0, 0, 0.15)"};
+              background: ${
+                type === "bids" ? "#021B1A" : "rgba(255, 0, 0, 0.15)"
+              };
             }
           `}</style>
         </TableRow>

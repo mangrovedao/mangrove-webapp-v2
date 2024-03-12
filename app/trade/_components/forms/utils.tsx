@@ -18,7 +18,9 @@ export function successToast(
 
   const filledOrder =
     tradeMode == TradeMode.LIMIT
-      ? `Filled with ${summary.totalGot.toFixed(baseToken.displayedDecimals)} ${summary.restingOrder ? ", remaining volume is posted" : ""} `
+      ? `Filled with ${summary.totalGot.toFixed(baseToken.displayedDecimals)} ${
+          summary.restingOrder ? ", remaining volume is posted" : ""
+        } `
       : `Filled with ${summary.totalGot.toFixed(baseToken.displayedDecimals)}`
 
   const notFilledOrder =

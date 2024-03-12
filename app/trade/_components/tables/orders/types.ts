@@ -1,4 +1,4 @@
-import { TimeToLiveUnit } from "../../forms/limit/enums"
+import type { TimeToLiveUnit } from "../../forms/limit/enums"
 
 export type Form = {
   limitPrice: string
@@ -14,8 +14,8 @@ type Asset = {
 }
 
 export enum AmplifiedOrderStatus {
-  "Open",
-  "Closed",
+  Open = 0,
+  Closed = 1,
 }
 
 export type AmplifiedForm = {

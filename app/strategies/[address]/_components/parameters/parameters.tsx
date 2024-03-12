@@ -44,11 +44,15 @@ const InfoBar = () => {
       <InfoLine title="Step size" value={currentParameter?.stepSize} />
       <InfoLine
         title="Min price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${
+          quote?.symbol
+        }`}
       />
       <InfoLine
         title="Max price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${
+          quote?.symbol
+        }`}
       />
     </div>
   )

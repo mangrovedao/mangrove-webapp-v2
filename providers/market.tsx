@@ -1,6 +1,6 @@
 "use client"
 
-import { type TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
+import type { TokenAndOlkey } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import { useQuery } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
 import React from "react"
@@ -18,6 +18,7 @@ const useMarketContext = () => {
   const { mangrove, marketsInfoQuery } = useMangrove()
   const [currentMarket, setCurrentMarket] = React.useState<string>()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const marketInfo = React.useMemo(() => {
     if (!(marketsInfoQuery.data?.length && chain?.id && mangrove)) return
 

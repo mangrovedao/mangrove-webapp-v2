@@ -1,23 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react"
 
 export function useKeyPress(targetKey: string): boolean {
   // State for keeping track of whether key is pressed
   const [keyPressed, setKeyPressed] = React.useState(false)
   // If pressed key is our target key then set to true
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   function downHandler({ key }: any): void {
     if (key === targetKey) {
       setKeyPressed(true)
     }
   }
   // If released key is our target key then set to false
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const upHandler = ({ key }: any): void => {
     if (key === targetKey) {
       setKeyPressed(false)
     }
   }
   // Add event listeners
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   React.useEffect(() => {
     window.addEventListener("keydown", downHandler)
     window.addEventListener("keyup", upHandler)

@@ -65,9 +65,9 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const { sendTokenBalance } = useTradeInfos("limit", tradeAction)
   const [toggleEdit, setToggleEdit] = React.useState(false)
 
-  const formattedPrice = `${Number(currentPrice).toFixed(
-    quoteDecimals,
-  )} ${market?.quote?.symbol}`
+  const formattedPrice = `${Number(currentPrice).toFixed(quoteDecimals)} ${
+    market?.quote?.symbol
+  }`
 
   const isOrderExpired = expiryDate && hasExpired(expiryDate)
 
