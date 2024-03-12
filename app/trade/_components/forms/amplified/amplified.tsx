@@ -326,7 +326,7 @@ export function Amplified() {
                           >
                             <div className="flex space-x-3">
                               <TokenIcon symbol={token.symbol} />
-                              <Text>{token.id}</Text>
+                              <Text>{token.symbol}</Text>
                             </div>
                           </SelectItem>
                         ))}

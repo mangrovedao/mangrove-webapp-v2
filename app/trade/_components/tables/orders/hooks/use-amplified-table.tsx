@@ -13,7 +13,6 @@ import { IconButton } from "@/components/icon-button"
 import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
@@ -83,20 +82,7 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         header: "Price",
         cell: ({ row }) => {
-          const { offers } = row.original
-          const limitPrice = offers.find((offer) => offer.price)?.price
-
-          return limitPrice ? (
-            <span>
-              {(
-                Number(limitPrice) /
-                10 ** (market?.quote.decimals ?? 1)
-              ).toFixed(market?.quote.displayedDecimals)}{" "}
-              {market?.quote.symbol}
-            </span>
-          ) : (
-            <Skeleton className="w-20 h-6" />
-          )
+          return <span>-</span>
         },
       }),
       // TODO: add expiry date in indexer
