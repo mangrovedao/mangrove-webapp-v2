@@ -56,6 +56,21 @@ export function useKandelRequirements({
         return null
 
       try {
+        console.log(
+          JSON.stringify(
+            {
+              onAave,
+              offerType: "asks",
+              market: {
+                base: market.base.id,
+                quote: market.quote.id,
+              },
+            },
+            null,
+            2,
+          ),
+        )
+
         const minimumBasePerOffer =
           await kandelStrategies.seeder.getMinimumVolume({
             market,
@@ -97,7 +112,6 @@ export function useKandelRequirements({
 
         const availableBase = requiredBase
         const availableQuote = requiredQuote
-
         const distribution =
           await generator.recalculateDistributionFromAvailable({
             distribution: minimumDistribution,
@@ -133,6 +147,7 @@ export function useKandelRequirements({
         }
       } catch (e) {
         const message = getErrorMessage(e)
+        console.error("Error: ", message)
         if (message.includes("revert")) {
           throw new Error(`Error: one of the parameters is invalid`)
         }
