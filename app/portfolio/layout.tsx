@@ -10,8 +10,8 @@ export default function Layout({ children }: React.PropsWithChildren) {
     <MarketProvider>
       <IndexerSdkProvider>
         <Navbar />
-        <div className="flex">
-          <section className="w-[12rem] h-screen border-x">
+        <div className="flex flex-col md:flex-row">
+          <section className="md:w-[12rem] 2xl:w-[14rem] w-svw md:h-screen border-y md:border-x">
             <Sidebar />
           </section>
           {children}
