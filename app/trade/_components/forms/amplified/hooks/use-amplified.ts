@@ -125,7 +125,9 @@ export default function useAmplifiedForm() {
   const { formatted } = useTokenBalance(selectedToken)
 
   const balanceLogic_temporary =
-    selectedSource?.id === "simple" ? formatted : sendFromBalance?.formatted
+    selectedSource?.id === "simple" || selectedSource?.id === "aave"
+      ? formatted
+      : sendFromBalance?.formatted
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)

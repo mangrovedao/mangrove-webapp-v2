@@ -118,7 +118,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           .filter(hasLogic)
 
         //TODO: check why we don't have tx hash
-        const tx = await amp.addBundle({
+        const bundle = await amp.addBundle({
           outboundToken: form.selectedToken.address,
           outboundVolume: parseUnits(
             form.sendAmount,
@@ -136,7 +136,9 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         })
 
         toast.success("Amplified order posted successfully")
-        return { tx }
+        const tx = (await bundle.response).wait()
+        const hash = await tx
+        return { tx: hash }
       } catch (error) {
         console.error(error)
         toast.error(`Failed to post the amplified order`)
@@ -162,6 +164,9 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber,
         })
+
+        queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["fills"] })
         queryClient.invalidateQueries({ queryKey: ["amplified"] })
       } catch (error) {
         console.error(error)

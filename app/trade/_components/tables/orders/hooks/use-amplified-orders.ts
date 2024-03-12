@@ -57,8 +57,12 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
           const allOffersMarketFound = order.offers.every(
             (offer) => offer.isMarketFound,
           )
-          const hasOneOfferOpen = order.offers.some((offer) => offer.isOpen)
-          return allOffersMarketFound && hasOneOfferOpen
+
+          const isExpired = order.expiryDate
+          ? new Date(order.expiryDate) < new Date()
+          : true
+
+          return allOffersMarketFound && !isExpired
         })
 
         return parseAmplifiedOrders(filteredResult)

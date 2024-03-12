@@ -18,6 +18,8 @@ import { useEditAmplifiedOrder } from "../hooks/use-edit-amplified-order"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm } from "../types"
 import EditAmplifiedOrderSteps from "./edit-amplified-order-steps"
+import { TimeInForce } from "../../../forms/amplified/enums"
+import { Timer } from "./timer"
 
 type SheetLineProps = {
   title: string
@@ -72,7 +74,7 @@ export default function EditAmplifiedOrderSheet({
   const [formData, setFormData] = React.useState<AmplifiedForm>()
   const order = orderInfos.order
   const mode = orderInfos.mode
-  const { creationDate, owner, offers } = order
+  const { creationDate, owner, offers, expiryDate} = order
 
   const tokens = offers.map((offer) => {
     return useTokenFromAddress(offer.market.inbound_tkn as Address).data
@@ -146,7 +148,7 @@ export default function EditAmplifiedOrderSheet({
                       />
                     }
                   />
-
+                  
                   {creationDate && (
                     <SheetLine
                       title="Order Date"
@@ -207,19 +209,19 @@ export default function EditAmplifiedOrderSheet({
                       )
                     }
                   />
-                  {/* <SheetLine
-                    title="Time in force"
-                    item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
-                    secondaryItem={
-                      false ? (
-                        <Text className="text-muted-foreground">
-                          <Timer expiry={expiryDate} />
-                        </Text>
-                      ) : (
-                        <>timer</>
-                      )
-                    }
-                  /> */}
+
+                  <SheetLine
+                  title="Time in force"
+                  item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
+                  secondaryItem={
+                    expiryDate && (
+                      <Text className="text-muted-foreground">
+                        <Timer expiry={expiryDate} />
+                      </Text>
+                    )
+                  }
+                />
+             
 
                   {assets.map((asset, index) => {
                     return (
@@ -234,6 +236,12 @@ export default function EditAmplifiedOrderSheet({
                           title="Limit price"
                           item={asset.limitPrice}
                         />
+
+<SheetLine
+                          title="Status"
+                          item={asset.limitPrice}
+                        />
+
                         <SheetLine
                           title={`Receive to wallet`}
                           item={asset.receiveAmount}

@@ -18,6 +18,7 @@ import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { Address } from "viem"
 import type { AmplifiedOrder } from "../schema"
+import { Timer } from "../components/timer"
 
 const columnHelper = createColumnHelper<AmplifiedOrder>()
 const DEFAULT_DATA: AmplifiedOrder[] = []
@@ -85,35 +86,27 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
           return <span>-</span>
         },
       }),
-      // TODO: add expiry date in indexer
-      columnHelper.accessor("offers.isOpen", {
-        header: "Status",
-        cell: ({ row }) => {
-          const { offers } = row.original
-          const isOpen = offers.some((offer) => offer.isOpen)
-          return isOpen ? (
-            <div className="text-green-caribbean">Open</div>
-          ) : (
-            <div className="text-red-100">Closed</div>
-          )
+      columnHelper.accessor("expiryDate", {
+        header: "Time in force",
+        cell: (row) => {
+          const expiry = row.getValue()
+          return expiry ? <Timer expiry={expiry} /> : <div>-</div>
         },
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
-          const { offers } = row.original
-          const isClosed = offers.some((offer) => !offer.isOpen)
-          // const isExpired = 0 // TODO: add expiry date in indexer
-          //   ? new Date(0) < new Date()
-          //   : true
-
+          const { expiryDate } = row.original
+          const isExpired = expiryDate
+            ? new Date(expiryDate) < new Date()
+            : true
           return (
             <div className="w-full h-full flex justify-end space-x-1">
               <IconButton
                 tooltip="Modify"
                 className="aspect-square w-6 rounded-full"
-                disabled={isClosed}
+                disabled={isExpired}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -123,7 +116,7 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
                 <Pen />
               </IconButton>
               <IconButton
-                disabled={isClosed}
+                disabled={isExpired}
                 tooltip="Retract offer"
                 className="aspect-square w-6 rounded-full"
                 onClick={(e) => {

@@ -193,7 +193,7 @@ export function Amplified() {
                     (token) =>
                       token && (
                         <SelectItem key={token.id} value={token.id}>
-                          <div className="flex space-x-3">
+                          <div className="flex space-x-3 items-center">
                             <TokenIcon symbol={token.symbol} />
                             <Text>{token.symbol}</Text>
                           </div>
@@ -324,9 +324,9 @@ export function Amplified() {
                             value={token.id}
                             disabled={selectedTokens.includes(token.id)}
                           >
-                            <div className="flex space-x-3">
+                            <div className="flex space-x-3 items-center">
                               <TokenIcon symbol={token.symbol} />
-                              <Text>{token.symbol}</Text>
+                              <Text className="text-wrap">{token.symbol}</Text>
                             </div>
                           </SelectItem>
                         ))}

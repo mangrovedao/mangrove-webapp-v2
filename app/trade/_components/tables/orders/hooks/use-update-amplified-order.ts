@@ -41,7 +41,7 @@ export function useUpdateAmplifiedOrder({
         const amp = new MangroveAmplifier({ mgv: mangrove })
         const parsedVolume = parseUnits(volume, form.sendToken.decimals)
 
-        const tx = await amp.updateBundle({
+        const editBundle = await amp.updateBundle({
           bundleId,
           expiryDate: form.timeToLive,
           outboundToken: form.sendToken.address,
@@ -50,7 +50,10 @@ export function useUpdateAmplifiedOrder({
         })
 
         toast.success("Amplified order updated successfully")
-        return { tx }
+
+        const tx = (await editBundle.response).wait()
+        const hash = await tx
+        return { tx: hash }
       } catch (error) {
         console.error(error)
         toast.error("Failed to update the amplified order")
@@ -71,7 +74,6 @@ export function useUpdateAmplifiedOrder({
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
         const blockNumber = tx.blockNumber
-
         onResult?.(tx.transactionHash)
 
         await resolveWhenBlockIsIndexed.mutateAsync({
