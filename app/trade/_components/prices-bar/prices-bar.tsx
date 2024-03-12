@@ -3,6 +3,7 @@
 import type { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 
+import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -12,6 +13,7 @@ import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
 import { determinePriceDecimalsFromToken, formatNumber } from "@/utils/numbers"
+import { ArrowLeftRight } from "lucide-react"
 
 function Container({ children }: React.PropsWithChildren) {
   return <span className="text-xs font-medium space-y-[2px]">{children}</span>
@@ -104,6 +106,10 @@ export function PricesBar() {
             highestBidPrice?.toNumber() || 0,
           )
 
+  if (side === "quote") {
+    spotPrice = 1 / (spotPrice ?? 1)
+  }
+
   const fixedSpotPrice = spotPrice
 
   const variation24hPercentage = (diffTakerGave ?? 0 * 100) / (spotPrice ?? 1)
@@ -115,7 +121,7 @@ export function PricesBar() {
           label={"Price"}
           value={fixedSpotPrice ? Number(fixedSpotPrice ?? 0) : undefined}
           skeleton={oneMinutePriceQuery?.isLoading}
-          token={quote}
+          token={side === "quote" ? base : quote}
         />
 
         <Separator orientation="vertical" className="h-4" />
@@ -171,7 +177,7 @@ export function PricesBar() {
           skeleton={mangroveTokenPriceLoading}
         />
 
-        {/* <Button
+        <Button
           variant={"secondary"}
           size={"icon"}
           className="p-1"
@@ -180,7 +186,7 @@ export function PricesBar() {
           }}
         >
           <ArrowLeftRight />
-        </Button> */}
+        </Button>
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
