@@ -49,10 +49,9 @@ export function useUpdateAmplifiedOrder({
           updateExpiry: false,
         })
 
-        toast.success("Amplified order updated successfully")
-
         const tx = (await editBundle.response).wait()
         const hash = await tx
+        toast.success("Amplified order updated successfully")
         return { tx: hash }
       } catch (error) {
         console.error(error)

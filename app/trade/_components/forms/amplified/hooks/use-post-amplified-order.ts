@@ -135,9 +135,10 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           inboundTokens,
         })
 
-        toast.success("Amplified order posted successfully")
         const tx = (await bundle.response).wait()
         const hash = await tx
+
+        toast.success("Amplified order posted successfully")
         return { tx: hash }
       } catch (error) {
         console.error(error)
