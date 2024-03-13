@@ -11,6 +11,10 @@ type Props = {
   midPrice?: number | null
 }
 
+function isPositiveNumber(value: number | null | undefined): value is number {
+  return value !== null && value !== undefined && value > 0
+}
+
 export function BackgroundRectangles({
   height,
   paddingBottom,
@@ -37,29 +41,27 @@ export function BackgroundRectangles({
 
   const rectHeight = height - paddingBottom
 
+  const leftX = leftBidBound && xScaleTransformed(leftBidBound)
+  const rightX = rightBidBound && xScaleTransformed(rightBidBound)
+
+  if (!(leftX && rightX && isPositiveNumber(rectHeight))) return null
+
   return (
     <>
       {priceRange && midPrice ? (
         <>
-          {leftBidBound && rightBidBound && (
-            <>
-              <LinearGradient
-                id={bidsGradientId}
-                from={"rgba(3, 98, 76, 0.00)"}
-                to={"rgba(11, 69, 58, 0.50)"}
-              />
-              <rect
-                x={xScaleTransformed(leftBidBound)}
-                y={0}
-                width={
-                  xScaleTransformed(rightBidBound) -
-                  xScaleTransformed(leftBidBound)
-                }
-                height={rectHeight}
-                fill={`url(#${bidsGradientId})`}
-              />
-            </>
-          )}
+          <LinearGradient
+            id={bidsGradientId}
+            from={"rgba(3, 98, 76, 0.00)"}
+            to={"rgba(11, 69, 58, 0.50)"}
+          />
+          <rect
+            x={leftX}
+            y={0}
+            width={rightX - leftX}
+            height={rectHeight}
+            fill={`url(#${bidsGradientId})`}
+          />
           {leftAskBound && rightAskBound && (
             <>
               <LinearGradient

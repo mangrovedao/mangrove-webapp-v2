@@ -7,7 +7,6 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
@@ -83,30 +82,27 @@ const UnallocatedInventory = () => {
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
             <Caption className="text-muted-foreground">Asset</Caption>
             <Caption className="text-muted-foreground">Amount</Caption>
           </tr>
         </thead>
-        <Separator />
-        <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
+        <tbody className="w-full flex flex-col gap-4 divide-y">
+          <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
               {unallocatedBase} {base?.symbol}
             </Text>
           </tr>
-          <Separator />
-          <tr className="flex justify-between">
+          <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
               {unallocatedQuote} {quote?.symbol}
             </Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
 
       {/* Dialogs */}
@@ -154,32 +150,28 @@ const PublishedInventory = () => {
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
             <Caption className="text-muted-foreground">Asset</Caption>
             <Caption className="text-muted-foreground">Amount</Caption>
           </tr>
         </thead>
-        <Separator />
-        <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
+        <tbody className="w-full flex flex-col gap-4 divide-y">
+          <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
               {depositedBase} {base?.symbol}
             </Text>
           </tr>
-          <Separator />
-          <tr className="flex justify-between">
+          <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
               {depositedQuote} {quote?.symbol}
             </Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
       <CloseDialog isOpen={close} onClose={toggleClose} />
@@ -192,9 +184,9 @@ const BountyInventory = () => {
   const [bounty, toggleBounty] = React.useReducer((isOpen) => !isOpen, false)
   const { currentParameter } = useParameters()
 
-  const table = useInventoryTable({
-    data: [{ amount: "0.0000", asset: "USDC" }],
-  })
+  // const table = useInventoryTable({
+  //   data: [{ amount: "0.0000", asset: "USDC" }],
+  // })
 
   return (
     <div>
@@ -210,23 +202,20 @@ const BountyInventory = () => {
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
             <Caption className="text-muted-foreground">Asset</Caption>
             <Caption className="text-muted-foreground">Amount</Caption>
           </tr>
         </thead>
-        <Separator />
         <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
+          <tr className="flex justify-between pt-4">
             <Text>MATIC</Text>
             <Text>{currentParameter.lockedBounty} MATIC</Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
       <Bounty open={bounty} onClose={toggleBounty} />

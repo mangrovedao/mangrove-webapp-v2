@@ -185,7 +185,7 @@ function CustomBrush({
           x={isNaN(brushX) ? 0 : brushX}
           y={0}
           width={isNaN(brushWidth) ? 0 : brushWidth}
-          height={isNaN(height) ? 0 : height}
+          height={isNaN(height) || height < 0 ? 0 : height}
           className={cn("opacity-10", {
             "fill-green-bangladesh": selectionStatus === "start",
             "fill-transparent": selectionStatus === "end",

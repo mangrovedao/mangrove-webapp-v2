@@ -35,7 +35,7 @@ function BlockExplorer({
             <Link
               rel="noopener noreferrer"
               target="_blank"
-              href={`${blockExplorerUrl}/tx/${address}`}
+              href={`${blockExplorerUrl}/address/${address}`}
             >
               <span>{shortenAddress(address ?? "")}</span>
               {!copy && <ExternalLink className="mr-2 h-4 w-4" />}
