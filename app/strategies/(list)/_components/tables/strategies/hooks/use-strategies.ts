@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { useAccount } from "wagmi"
+import { useAccount, useChainId } from "wagmi"
 
 import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import useMangrove from "@/providers/mangrove"
@@ -21,6 +21,7 @@ export function useStrategies<T = Strategy[]>({
   select,
 }: Params<T> = {}) {
   const { mangrove } = useMangrove()
+  const chainId = useChainId()
   const { address, isConnected } = useAccount()
   const { indexerSdk } = useIndexerSdk()
   const { data: knownTokens } = useWhitelistedMarketsInfos(mangrove, {
@@ -34,10 +35,10 @@ export function useStrategies<T = Strategy[]>({
   })
 
   return useQuery({
-    queryKey: ["strategies", address, first, skip],
+    queryKey: ["strategies", chainId, address, first, skip],
     queryFn: async () => {
       try {
-        if (!(indexerSdk && address && knownTokens)) return []
+        if (!(indexerSdk && address && knownTokens && chainId)) return []
         const result = await indexerSdk.getKandels({
           owner: address.toLowerCase(),
           first,
@@ -55,7 +56,7 @@ export function useStrategies<T = Strategy[]>({
     meta: {
       error: "Unable to retrieve all strategies",
     },
-    enabled: !!(isConnected && indexerSdk && address && knownTokens),
+    enabled: !!(isConnected && indexerSdk && address && knownTokens && chainId),
     retry: false,
   })
 }
