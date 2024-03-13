@@ -46,7 +46,7 @@ const InfoBar = () => {
       />
       <InfoLine
         title="Max price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={`${currentParameter?.maxPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
       />
     </div>
   )
