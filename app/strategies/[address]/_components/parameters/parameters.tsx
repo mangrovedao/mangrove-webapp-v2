@@ -8,6 +8,8 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import Big from "big.js"
+import { useAccount } from "wagmi"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
 import CloseDialog from "./dialogs/close"
@@ -42,11 +44,11 @@ const InfoBar = () => {
       <InfoLine title="Step size" value={currentParameter?.stepSize} />
       <InfoLine
         title="Min price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={`${currentParameter?.minPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`}
       />
       <InfoLine
         title="Max price"
-        value={`${currentParameter?.maxPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={`${currentParameter?.maxPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`}
       />
     </div>
   )
@@ -92,13 +94,18 @@ const UnallocatedInventory = () => {
           <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
-              {unallocatedBase} {base?.symbol}
+              {Big(Number(unallocatedBase)).toFixed(base?.displayedDecimals, 1)}{" "}
+              {base?.symbol}
             </Text>
           </tr>
           <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
-              {unallocatedQuote} {quote?.symbol}
+              {Big(Number(unallocatedQuote)).toFixed(
+                quote?.displayedAsPriceDecimals,
+                1,
+              )}{" "}
+              {quote?.symbol}
             </Text>
           </tr>
         </tbody>
@@ -124,13 +131,6 @@ const PublishedInventory = () => {
     false,
   )
   const [close, toggleClose] = React.useReducer((isOpen) => !isOpen, false)
-
-  // const table = useInventoryTable({
-  //   data: [
-  //     { amount: "0.00000", asset: "WETH" },
-  //     { amount: "0.0000", asset: "USDC" },
-  //   ],
-  // })
 
   return (
     <div>
@@ -160,13 +160,23 @@ const PublishedInventory = () => {
           <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
-              {depositedBase} {base?.symbol}
+              {depositedBase &&
+                Big(Number(depositedBase)).toFixed(
+                  base?.displayedDecimals,
+                  1,
+                )}{" "}
+              {base?.symbol}
             </Text>
           </tr>
           <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
-              {depositedQuote} {quote?.symbol}
+              {depositedQuote &&
+                Big(Number(depositedQuote)).toFixed(
+                  quote?.displayedAsPriceDecimals,
+                  1,
+                )}{" "}
+              {quote?.symbol}
             </Text>
           </tr>
         </tbody>
@@ -182,10 +192,7 @@ const PublishedInventory = () => {
 const BountyInventory = () => {
   const [bounty, toggleBounty] = React.useReducer((isOpen) => !isOpen, false)
   const { currentParameter } = useParameters()
-
-  // const table = useInventoryTable({
-  //   data: [{ amount: "0.0000", asset: "USDC" }],
-  // })
+  const { chain } = useAccount()
 
   return (
     <div>
@@ -210,8 +217,11 @@ const BountyInventory = () => {
         </thead>
         <tbody className="w-full flex flex-col gap-4">
           <tr className="flex justify-between pt-4">
-            <Text>MATIC</Text>
-            <Text>{currentParameter.lockedBounty} MATIC</Text>
+            <Text>{chain?.nativeCurrency.symbol}</Text>
+            <Text>
+              {Big(currentParameter.lockedBounty ?? 0).toString()}{" "}
+              {chain?.nativeCurrency.symbol}
+            </Text>
           </tr>
         </tbody>
       </table>
