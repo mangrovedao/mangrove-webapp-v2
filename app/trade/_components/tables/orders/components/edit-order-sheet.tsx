@@ -108,7 +108,10 @@ export default function EditOrderSheet({
               order={order}
               form={formData}
               onClose={onClose}
-              onCloseForm={() => setToggleEdit(false)}
+              onCloseForm={() => {
+                setToggleEdit(false)
+                setFormData(undefined)
+              }}
               displayDecimals={displayDecimals}
             />
           ) : (

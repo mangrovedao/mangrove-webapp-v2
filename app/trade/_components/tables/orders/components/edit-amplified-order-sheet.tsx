@@ -7,18 +7,29 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import * as SheetRoot from "@/components/ui/sheet"
 import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
-import { sendValidator } from "../../../forms/amplified/validators"
+import { TimeInForce, TimeToLiveUnit } from "../../../forms/amplified/enums"
+import {
+  isGreaterThanZeroValidator,
+  sendValidator,
+} from "../../../forms/amplified/validators"
 import { useEditAmplifiedOrder } from "../hooks/use-edit-amplified-order"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm } from "../types"
 import EditAmplifiedOrderSteps from "./edit-amplified-order-steps"
-import { TimeInForce } from "../../../forms/amplified/enums"
 import { Timer } from "./timer"
 
 type SheetLineProps = {
@@ -74,7 +85,7 @@ export default function EditAmplifiedOrderSheet({
   const [formData, setFormData] = React.useState<AmplifiedForm>()
   const order = orderInfos.order
   const mode = orderInfos.mode
-  const { creationDate, owner, offers, expiryDate} = order
+  const { creationDate, offers, expiryDate } = order
 
   const tokens = offers.map((offer) => {
     return useTokenFromAddress(offer.market.inbound_tkn as Address).data
@@ -88,6 +99,9 @@ export default function EditAmplifiedOrderSheet({
     assets,
     send,
     sendToken,
+    timeInForce,
+    timeToLive,
+    timeToLiveUnit,
     status,
     sendTokenBalance,
   } = useEditAmplifiedOrder({
@@ -112,7 +126,10 @@ export default function EditAmplifiedOrderSheet({
                 order={order}
                 form={{ ...formData, sendToken: sendToken as Token }}
                 onClose={onClose}
-                onCloseForm={() => setToggleEdit(false)}
+                onCloseForm={() => {
+                  setToggleEdit(false)
+                  setFormData(undefined)
+                }}
               />
             ) : (
               <form
@@ -148,7 +165,7 @@ export default function EditAmplifiedOrderSheet({
                       />
                     }
                   />
-                  
+
                   {creationDate && (
                     <SheetLine
                       title="Order Date"
@@ -210,18 +227,116 @@ export default function EditAmplifiedOrderSheet({
                     }
                   />
 
-                  <SheetLine
-                  title="Time in force"
-                  item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
-                  secondaryItem={
-                    expiryDate && (
-                      <Text className="text-muted-foreground">
-                        <Timer expiry={expiryDate} />
-                      </Text>
-                    )
-                  }
-                />
-             
+                  {toggleEdit ? (
+                    <SheetLine
+                      title="Time in force"
+                      item={
+                        <div className="flex flex-col space-y-2">
+                          <form.Field name="timeInForce">
+                            {(field) => {
+                              return (
+                                <div className="grid text-md space-y-2">
+                                  <Select
+                                    name={field.name}
+                                    value={field.state.value}
+                                    onValueChange={(value: TimeInForce) => {
+                                      field.handleChange(value)
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-full">
+                                      <SelectValue placeholder="Select time in force" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectGroup>
+                                        {Object.values(TimeInForce).map(
+                                          (timeInForce) => (
+                                            <SelectItem
+                                              key={timeInForce}
+                                              value={timeInForce}
+                                            >
+                                              {timeInForce}
+                                            </SelectItem>
+                                          ),
+                                        )}
+                                      </SelectGroup>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              )
+                            }}
+                          </form.Field>
+
+                          <div
+                            className={cn("flex justify-between space-x-2", {
+                              hidden: timeInForce !== TimeInForce.GOOD_TIL_TIME,
+                            })}
+                          >
+                            <form.Field
+                              name="timeToLive"
+                              onChange={isGreaterThanZeroValidator}
+                            >
+                              {(field) => (
+                                <EnhancedNumericInput
+                                  placeholder="1"
+                                  name={field.name}
+                                  value={field.state.value}
+                                  onBlur={field.handleBlur}
+                                  onChange={({ target: { value } }) => {
+                                    if (!value) return
+                                    field.handleChange(value)
+                                  }}
+                                  disabled={!form.state.isFormValid}
+                                  error={field.state.meta.touchedErrors}
+                                />
+                              )}
+                            </form.Field>
+                            <form.Field name="timeToLiveUnit">
+                              {(field) => (
+                                <Select
+                                  name={field.name}
+                                  value={field.state.value}
+                                  onValueChange={(value: TimeToLiveUnit) => {
+                                    field.handleChange(value)
+                                  }}
+                                  // disabled={!market}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select time unit" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      {Object.values(TimeToLiveUnit).map(
+                                        (timeToLiveUnit) => (
+                                          <SelectItem
+                                            key={timeToLiveUnit}
+                                            value={timeToLiveUnit}
+                                          >
+                                            {timeToLiveUnit}
+                                          </SelectItem>
+                                        ),
+                                      )}
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                              )}
+                            </form.Field>
+                          </div>
+                        </div>
+                      }
+                    />
+                  ) : (
+                    <SheetLine
+                      title="Time in force"
+                      item={<Text>{timeInForce}</Text>}
+                      secondaryItem={
+                        expiryDate && (
+                          <Text className="text-muted-foreground">
+                            <Timer expiry={expiryDate} />
+                          </Text>
+                        )
+                      }
+                    />
+                  )}
 
                   {assets.map((asset, index) => {
                     return (
@@ -237,15 +352,12 @@ export default function EditAmplifiedOrderSheet({
                           item={asset.limitPrice}
                         />
 
-<SheetLine
-                          title="Status"
-                          item={asset.limitPrice}
-                        />
-
                         <SheetLine
                           title={`Receive to wallet`}
                           item={asset.receiveAmount}
                         />
+
+                        <SheetLine title="Status" item={asset.status} />
                       </div>
                     )
                   })}
@@ -279,6 +391,9 @@ export default function EditAmplifiedOrderSheet({
 
                   {!toggleEdit ? (
                     <Button
+                      disabled={
+                        !assets.some((asset) => asset.status === "Open")
+                      }
                       className="flex-1"
                       variant="primary"
                       size="lg"

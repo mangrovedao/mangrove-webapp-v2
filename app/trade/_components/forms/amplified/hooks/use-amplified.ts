@@ -1,10 +1,10 @@
+import { Semibook, Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 import { useAccount } from "wagmi"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { Token } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
@@ -248,21 +248,44 @@ export default function useAmplifiedForm() {
     let newMinVolume = 0
     let minVolume = 0
     const selectedSourceGasOverhead = selectedSource?.gasOverhead || 200_000
+    const variableCost = Big(60_000).mul(assetsWithTokens.length).add(60_000)
+    let gasreq = Big(0)
+    for (const asset of assetsWithTokens) {
+      gasreq = Big(
+        Math.max(
+          asset.receiveTo?.gasOverhead || 0,
+          selectedSource?.gasOverhead || 0,
+        ),
+      ).add(variableCost)
+    }
+
     const semibookAsks = market?.getSemibook("asks")
     const semibookBids = market?.getSemibook("bids")
-    const isBid = openMarkets?.find((market) => market.base.id === sendToken)
-      ?.base.id
+    const isBid = openMarkets?.find(
+      (market) => market.base.id === sendToken,
+    )?.quote
+    const priceToken = isBid
+    const getMinimumVolume = (semibook?: Semibook) => {
+      return Number(semibook?.getMinimumVolume(gasreq.toNumber()) || 0)
+    }
+
+    const calculateMinVolume = (asset: Asset) => {
+      if (!asset.token || !asset.limitPrice) return 0
+      const semibook = isBid ? semibookAsks : semibookBids
+      return getMinimumVolume(semibook)
+    }
 
     assets.forEach((asset) => {
-      if (!asset.token || !asset.limitPrice) return
-      minVolume = isBid
-        ? Number(semibookAsks?.getMinimumVolume(selectedSourceGasOverhead) || 0)
-        : Number(semibookBids?.getMinimumVolume(selectedSourceGasOverhead) || 0)
-      newMinVolume += minVolume ? Number(minVolume) : 0
+      minVolume = calculateMinVolume(asset)
+      newMinVolume += minVolume
     })
 
     setMinVolume({
-      total: newMinVolume.toFixed(selectedToken?.displayedDecimals),
+      total: newMinVolume.toFixed(
+        isBid
+          ? selectedToken?.displayedDecimals
+          : priceToken?.displayedDecimals,
+      ),
       volume: minVolume.toFixed(selectedToken?.displayedDecimals),
     })
   }, [assets, sendToken])

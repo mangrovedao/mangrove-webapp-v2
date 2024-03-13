@@ -1,3 +1,4 @@
+import { TimeInForce } from "../../forms/amplified/enums"
 import { TimeToLiveUnit } from "../../forms/limit/enums"
 import { DefaultLogics } from "../../forms/types"
 
@@ -23,6 +24,7 @@ export type AmplifiedForm = {
   send: string
   sendFrom: DefaultLogics
   assets: Asset[]
+  timeInForce: TimeInForce
   timeToLive: string
   timeToLiveUnit: TimeToLiveUnit
   status: AmplifiedOrderStatus

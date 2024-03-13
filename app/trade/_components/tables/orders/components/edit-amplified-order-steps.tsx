@@ -6,14 +6,17 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useIsLiquidityInfiniteAllowance } from "@/hooks/use-liquidity-infinite-allowance"
+import { formatExpiryDate } from "@/utils/date"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { Token } from "@mangrovedao/mangrove.js"
+import { add } from "date-fns"
 import React from "react"
 import { useStep } from "usehooks-ts"
 import { formatUnits } from "viem"
 import { ApproveStep } from "../../../forms/components/approve-step"
 import { Steps } from "../../../forms/components/steps"
 import { useSpenderAddress } from "../../../forms/hooks/use-spender-address"
+import { TimeToLiveUnit } from "../../../forms/limit/enums"
 import { useUpdateAmplifiedOrder } from "../hooks/use-update-amplified-order"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm } from "../types"
@@ -21,9 +24,16 @@ import { AmplifiedForm } from "../types"
 type SummaryProps = {
   oldAmount: string
   newAmount: string
+  oldExpiration?: string
+  newExpiration?: string
 }
 
-const Summary = ({ oldAmount, newAmount }: SummaryProps) => {
+const Summary = ({
+  oldAmount,
+  oldExpiration,
+  newAmount,
+  newExpiration,
+}: SummaryProps) => {
   return (
     <>
       <div className="grid space-y-2">
@@ -34,12 +44,14 @@ const Summary = ({ oldAmount, newAmount }: SummaryProps) => {
             <Text className="text-muted-foreground">
               {Number(oldAmount).toFixed(4)}
             </Text>
+            <Text className="text-muted-foreground">{oldExpiration}</Text>
           </div>
           <div>
             <Label>New values</Label>
             <Text className="text-muted-foreground">
               {Number(newAmount).toFixed(4)}
             </Text>
+            <Text className="text-muted-foreground">{newExpiration}</Text>
           </div>
         </div>
       </div>
@@ -121,12 +133,32 @@ export default function EditAmplifiedOrderSteps({
 
   const { goToNextStep } = helpers
 
+  const expiryDateUnits =
+    form.timeToLiveUnit === TimeToLiveUnit.DAY
+      ? "days"
+      : form.timeToLiveUnit === TimeToLiveUnit.HOUR
+        ? "hours"
+        : "minutes"
+
+  const newExpiryDate = `${formatExpiryDate(
+    add(new Date(), {
+      [expiryDateUnits]: Number(form.timeToLive),
+    }),
+  )} `
+
   const stepInfos = [
     !isInfiniteAllowance && {
-      body: <Summary oldAmount={oldAmount} newAmount={form.send} />,
+      body: (
+        <Summary
+          oldAmount={oldAmount}
+          newAmount={form.send}
+          newExpiration={newExpiryDate}
+          oldExpiration={formatExpiryDate(order.expiryDate)}
+        />
+      ),
       button: (
         <>
-          <Button onClick={onClose} variant={"secondary"}>
+          <Button onClick={onCloseForm} variant={"secondary"}>
             Back
           </Button>
           <Button {...btnProps} onClick={goToNextStep}>
@@ -160,10 +192,17 @@ export default function EditAmplifiedOrderSteps({
       ),
     },
     {
-      body: <Summary oldAmount={oldAmount} newAmount={form.send} />,
+      body: (
+        <Summary
+          oldAmount={oldAmount}
+          newAmount={form.send}
+          newExpiration={newExpiryDate}
+          oldExpiration={formatExpiryDate(order.expiryDate)}
+        />
+      ),
       button: (
         <>
-          <Button onClick={onClose} variant={"secondary"}>
+          <Button onClick={onCloseForm} variant={"secondary"}>
             Back
           </Button>
           <Button

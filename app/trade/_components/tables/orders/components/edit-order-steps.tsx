@@ -144,7 +144,7 @@ export default function EditOrderSteps({
       ),
       button: (
         <>
-          <Button onClick={onClose} variant={"secondary"}>
+          <Button onClick={onCloseForm} variant={"secondary"}>
             Back
           </Button>
           <Button {...btnProps} onClick={goToNextStep}>
@@ -190,7 +190,7 @@ export default function EditOrderSteps({
       button: (
         <>
           <Button
-            onClick={onClose}
+            onClick={onCloseForm}
             variant={"secondary"}
             disabled={post.isPending}
           >

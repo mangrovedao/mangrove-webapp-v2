@@ -10,7 +10,8 @@ import { Address, formatUnits } from "viem"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import { TimeToLiveUnit } from "../../../forms/amplified/enums"
+import { formatExpiryDate } from "@/utils/date"
+import { TimeInForce, TimeToLiveUnit } from "../../../forms/amplified/enums"
 import amplifiedLiquiditySourcing from "../../../forms/amplified/hooks/amplified-liquidity-sourcing"
 import { getCurrentTokenPriceFromAddress } from "../../../forms/amplified/utils"
 import { AmplifiedOrder } from "../schema"
@@ -101,11 +102,24 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     let receiveAmount = `${(Number(wants) / 10 ** (sendToken?.decimals ?? 1)).toFixed(receiveToken?.displayedDecimals)} ${receiveToken?.symbol}`
 
     return {
+      status: offer.isFilled
+        ? "Filled"
+        : offer.isFailed
+          ? "Failed"
+          : offer.isRetracted
+            ? "Retracted"
+            : "Open",
       limitPrice,
       receiveAmount,
       token: receiveToken,
     }
   })
+
+  const orderTimeInForce = order.expiryDate
+    ? TimeInForce.GOOD_TIL_TIME
+    : TimeInForce.FILL_OR_KILL
+
+  const orderTimeToLive = formatExpiryDate(order.expiryDate).replace(/\D/g, "")
 
   const form = useForm({
     validator: zodValidator,
@@ -113,7 +127,8 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
       assets,
       send: gives,
       sendFrom,
-      timeToLive: "1",
+      timeInForce: orderTimeInForce,
+      timeToLive: orderTimeToLive,
       timeToLiveUnit: TimeToLiveUnit.DAY,
       status: isClosed
         ? AmplifiedOrderStatus.Closed
@@ -121,8 +136,10 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     },
     onSubmit: (values) => onSubmit(values),
   })
-
   const send = form.useStore((state) => state.values.send)
+  const timeInForce = form.useStore((state) => state.values.timeInForce)
+  const timeToLiveUnit = form.useStore((state) => state.values.timeToLiveUnit)
+  const timeToLive = form.useStore((state) => state.values.timeToLive)
   const status = form.useStore((state) => state.values.status)
 
   const [toggleEdit, setToggleEdit] = React.useState(false)
@@ -138,11 +155,14 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
   }, [toggleEdit, form])
 
   return {
-    logics,
     handleSubmit,
-    form,
     setToggleEdit,
+    logics,
+    form,
     toggleEdit,
+    timeInForce,
+    timeToLive,
+    timeToLiveUnit,
     assets,
     send,
     sendFrom,
