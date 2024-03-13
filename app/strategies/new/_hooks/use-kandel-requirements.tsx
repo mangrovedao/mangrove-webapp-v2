@@ -56,21 +56,6 @@ export function useKandelRequirements({
         return null
 
       try {
-        console.log(
-          JSON.stringify(
-            {
-              onAave,
-              offerType: "asks",
-              market: {
-                base: market.base.id,
-                quote: market.quote.id,
-              },
-            },
-            null,
-            2,
-          ),
-        )
-
         const minimumBasePerOffer =
           await kandelStrategies.seeder.getMinimumVolume({
             market,

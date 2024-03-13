@@ -45,6 +45,8 @@ export default function Tabs(
             key={`${table}-content`}
             value={table}
             style={{ height: "var(--history-table-content-height)" }}
+            forceMount
+            className="data-[state=inactive]:hidden"
           >
             <div className="">{renderElement(TABS_CONTENT[table])}</div>
           </CustomTabsContent>

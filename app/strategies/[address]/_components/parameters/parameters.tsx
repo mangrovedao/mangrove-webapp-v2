@@ -16,7 +16,6 @@ import { Publish } from "./dialogs/publish"
 import { UnPublish } from "./dialogs/unpublish"
 import { Withdraw } from "./dialogs/withdraw"
 import { useParameters } from "./hook/use-parameters"
-import { useInventoryTable } from "./table/use-inventory-table"
 
 const InfoLine = ({
   title,
@@ -126,12 +125,12 @@ const PublishedInventory = () => {
   )
   const [close, toggleClose] = React.useReducer((isOpen) => !isOpen, false)
 
-  const table = useInventoryTable({
-    data: [
-      { amount: "0.00000", asset: "WETH" },
-      { amount: "0.0000", asset: "USDC" },
-    ],
-  })
+  // const table = useInventoryTable({
+  //   data: [
+  //     { amount: "0.00000", asset: "WETH" },
+  //     { amount: "0.0000", asset: "USDC" },
+  //   ],
+  // })
 
   return (
     <div>

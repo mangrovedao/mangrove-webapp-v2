@@ -58,6 +58,7 @@ export default function Page() {
       <BlockExplorer
         blockExplorerUrl={blockExplorerUrl}
         address={strategyAddress}
+        type="address"
       />
 
       <Tabs />
