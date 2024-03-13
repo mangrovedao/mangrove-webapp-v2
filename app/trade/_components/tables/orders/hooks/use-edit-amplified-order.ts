@@ -107,7 +107,7 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
         : offer.isFailed
           ? "Failed"
           : offer.isRetracted
-            ? "Retracted"
+            ? "Cancelled"
             : "Open",
       limitPrice,
       receiveAmount,
