@@ -1,5 +1,8 @@
 "use client"
+
 import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 import { Market } from "./_components/charts/charts"
 import { Forms } from "./_components/forms/forms"
 import { OrderBook } from "./_components/orderbook/orderbook"
@@ -97,6 +100,26 @@ export default function Page() {
           }
         }
       `}</style>
+      <div className="fixed bottom-14 left-0 right-0 z-50">
+        <Alert
+          variant="destructive"
+          className="mx-auto w-full max-w-[50%] flex items-center"
+        >
+          <AlertCircle className="size-5" />
+          <AlertDescription className="!text-lg">
+            Blast Mainnet is experiencing issues, please{" "}
+            <a
+              href="https://twitter.com/Blast_L2"
+              target="_blank"
+              rel="noopenner noreferrer"
+              className="underline"
+            >
+              follow Blast on X
+            </a>{" "}
+            for updates.
+          </AlertDescription>
+        </Alert>
+      </div>
     </main>
   )
 }
