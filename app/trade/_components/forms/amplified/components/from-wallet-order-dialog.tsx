@@ -21,18 +21,21 @@ import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
 import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
-import type { Form } from "../types"
+import type { AssetWithInfos, Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
+/**
+ * Props for the FromWalletOrderDialog component.
+ */
 type Props = {
-  form: Form & {
+  form: Omit<Form, "assets"> & {
     selectedToken?: Token
-    firstAssetToken?: Token
-    secondAssetToken?: Token
     selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
     sendAmount: string
+    assetsWithTokens: AssetWithInfos[]
   }
   onClose: () => void
+  isOpen: boolean
 }
 
 const btnProps: ButtonProps = {
@@ -43,15 +46,10 @@ const btnProps: ButtonProps = {
 
 export default function FromWalletAmplifiedOrderDialog({
   form,
+  isOpen,
   onClose,
 }: Props) {
-  const {
-    selectedToken,
-    firstAssetToken,
-    secondAssetToken,
-    selectedSource,
-    sendAmount,
-  } = form
+  const { selectedToken, selectedSource, sendAmount } = form
 
   const { chain } = useAccount()
   const { data: spender } = useSpenderAddress("amplified")
@@ -60,6 +58,7 @@ export default function FromWalletAmplifiedOrderDialog({
     spender,
     selectedSource,
   )
+
   const { isDeployed, isBound } = useSmartRouter().data ?? {}
 
   let steps = [] as string[]
@@ -101,7 +100,7 @@ export default function FromWalletAmplifiedOrderDialog({
       if (!isDialogOpenRef.current) return
       onClose()
       tradeService.openTxCompletedDialog({
-        address: result.txReceipt.transactionHash ?? "",
+        address: result.transactionHash ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
       })
     },
@@ -116,20 +115,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          receiveTokens={[
-            {
-              receiveTo: form.firstAsset.receiveTo,
-              amount: form.firstAsset.amount,
-              token: firstAssetToken!,
-              limitPrice: form.firstAsset.limitPrice,
-            },
-            {
-              receiveTo: form.secondAsset.receiveTo,
-              amount: form.secondAsset.amount,
-              token: secondAssetToken!,
-              limitPrice: form.secondAsset.limitPrice,
-            },
-          ]}
+          assetsWithToken={form.assetsWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
@@ -153,6 +139,7 @@ export default function FromWalletAmplifiedOrderDialog({
               {
                 token: selectedToken,
                 spender,
+                logic: selectedSource,
               },
               {
                 onSuccess: goToNextStep,
@@ -202,20 +189,7 @@ export default function FromWalletAmplifiedOrderDialog({
       body: (
         <SummaryStep
           form={form}
-          receiveTokens={[
-            {
-              receiveTo: form.firstAsset.receiveTo,
-              amount: form.firstAsset.amount,
-              token: firstAssetToken!,
-              limitPrice: form.firstAsset.limitPrice,
-            },
-            {
-              receiveTo: form.secondAsset.receiveTo,
-              amount: form.secondAsset.amount,
-              token: secondAssetToken!,
-              limitPrice: form.secondAsset.limitPrice,
-            },
-          ]}
+          assetsWithToken={form.assetsWithTokens}
           tokenToAmplify={selectedToken}
           sendAmount={sendAmount}
           source={selectedSource!}
@@ -257,7 +231,7 @@ export default function FromWalletAmplifiedOrderDialog({
     })
 
   return (
-    <Dialog open={!!form} onClose={onClose} showCloseButton={false}>
+    <Dialog open={!!isOpen} onClose={onClose} showCloseButton={false}>
       <Dialog.Title className="text-xl text-left" close>
         Proceed transaction
       </Dialog.Title>

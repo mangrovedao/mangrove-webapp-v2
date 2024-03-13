@@ -36,7 +36,7 @@ export function MinimumVolume(props: {
               href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
               target="_blank"
               rel="noreferrer"
-              className="text-green-caribbean"
+              className="text-green-caribbean underline"
             >
               Learn more
             </Link>
