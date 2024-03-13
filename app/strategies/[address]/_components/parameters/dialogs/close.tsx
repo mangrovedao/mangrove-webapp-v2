@@ -59,6 +59,7 @@ export default function CloseDialog({ isOpen, onClose }: Props) {
           }}
           disabled={closeStrategy.isPending}
           loading={closeStrategy.isPending}
+          size={"lg"}
         >
           Yes, close strategy
         </Button>
@@ -67,6 +68,7 @@ export default function CloseDialog({ isOpen, onClose }: Props) {
           className="w-full"
           variant={"secondary"}
           disabled={closeStrategy.isPending}
+          size={"lg"}
         >
           No, cancel
         </Button>

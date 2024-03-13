@@ -9,20 +9,14 @@ import { ApproveStep } from "@/app/strategies/new/_components/form/components/ap
 import { Steps } from "@/app/strategies/new/_components/form/components/steps"
 import { useApproveKandelStrategy } from "@/app/strategies/new/_hooks/use-approve-kandel-strategy"
 import Dialog from "@/components/dialogs/dialog"
+import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
-import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import Link from "next/link"
@@ -155,6 +149,7 @@ export function Withdraw({ open, onClose }: Props) {
           }
           onClick={goToNextStep}
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Proceed{" "}
           <div
@@ -186,6 +181,7 @@ export function Withdraw({ open, onClose }: Props) {
           className="w-full flex items-center justify-center !mt-6"
           disabled={approve.isPending}
           loading={approve.isPending}
+          size={"lg"}
           onClick={() => {
             approve.mutate(
               {
@@ -283,21 +279,12 @@ export function Withdraw({ open, onClose }: Props) {
             >
               Withdraw
             </Title>
-            <TooltipProvider>
-              <Tooltip delayDuration={200} defaultOpen={false}>
-                <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                  <TooltipInfo />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <Text>Only unpublished funds are available to withdraw.</Text>
-                  <Link href={KANDEL_DOC_URL} target="_blank">
-                    <Caption className="text-primary underline">
-                      Learn more
-                    </Caption>
-                  </Link>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <InfoTooltip>
+              <Text>Only unpublished funds are available to withdraw.</Text>
+              <Link href={KANDEL_DOC_URL} target="_blank">
+                <Caption className="text-primary underline">Learn more</Caption>
+              </Link>
+            </InfoTooltip>
           </div>
         </Dialog.Title>
         <Steps steps={steps} currentStep={currentStep} />

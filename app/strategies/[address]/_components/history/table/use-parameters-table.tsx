@@ -33,7 +33,7 @@ export function useParametersTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("date", {
-        header: "date",
+        header: "Date",
         cell: ({ row }) => {
           const { date } = row.original
           if (!date) return <div>N/A</div>

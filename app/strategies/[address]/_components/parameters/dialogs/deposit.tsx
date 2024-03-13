@@ -98,6 +98,7 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
           }
           onClick={goToNextStep}
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Proceed{" "}
           <div
@@ -148,6 +149,7 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
             })
           }
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Deposit
           <div

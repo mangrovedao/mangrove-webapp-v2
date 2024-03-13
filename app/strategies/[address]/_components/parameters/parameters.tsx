@@ -1,8 +1,8 @@
 "use client"
 
-import { Info } from "lucide-react"
 import React from "react"
 
+import InfoTooltip from "@/components/info-tooltip"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
@@ -65,9 +65,9 @@ const UnallocatedInventory = () => {
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           <Title>Unallocated inventory</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+          <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
           <Button onClick={toggleDeposit}>Deposit</Button>
@@ -136,9 +136,9 @@ const PublishedInventory = () => {
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           <Title>Published inventory</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+          <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
           <Button onClick={toggleUnpublish}>Un-publish</Button>
@@ -191,9 +191,9 @@ const BountyInventory = () => {
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           <Title>Bounty</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+          <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
           <Button onClick={toggleBounty}>Add Bounty</Button>

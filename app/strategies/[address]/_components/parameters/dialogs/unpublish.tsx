@@ -135,6 +135,7 @@ export function UnPublish({ open, onClose }: Props) {
           }
           onClick={goToNextStep}
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Proceed{" "}
           <div
@@ -200,6 +201,7 @@ export function UnPublish({ open, onClose }: Props) {
             })
           }
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           UnPublish
           <div
