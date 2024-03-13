@@ -35,6 +35,7 @@ export function CustomBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
+
                   props.action?.onClick(props.balance || "0")
                 }}
               >

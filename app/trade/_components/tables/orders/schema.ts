@@ -36,6 +36,7 @@ const amplifiedOrderSchema = z.object({
   id: z.string(),
   creationDate: z.string(),
   bundleId: z.string(),
+  expiryDate: z.date(), 
   owner: z
     .object({
       address: z.string(),
