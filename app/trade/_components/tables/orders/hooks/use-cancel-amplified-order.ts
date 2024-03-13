@@ -41,7 +41,8 @@ export function useCancelAmplifiedOrder({ offerId, onCancel }: Props = {}) {
           outboundToken: sendToken,
         })
 
-        return retract
+        const tx = await retract.response
+        return tx
         // order id = 0xbf16533e50a352c47615fee34574df2b30fdc4a8243a3d8194630a2a5d63d176-0x3b
       } catch (error) {
         console.error(error)
@@ -49,13 +50,14 @@ export function useCancelAmplifiedOrder({ offerId, onCancel }: Props = {}) {
       }
     },
     onSuccess: async (data) => {
-      onCancel?.()
       try {
+        onCancel?.()
         startLoading(TRADE.TABLES.ORDERS)
-        // const { blockNumber } = await (await retract.response).wait()
-        // await resolveWhenBlockIsIndexed.mutateAsync({
-        //   blockNumber,
-        // })
+        if (!data) return
+        const { blockNumber } = data
+        await resolveWhenBlockIsIndexed.mutateAsync({
+          blockNumber,
+        })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
         queryClient.invalidateQueries({ queryKey: ["amplified"] })

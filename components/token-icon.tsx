@@ -17,7 +17,7 @@ export function TokenIcon({
   const src = getSvgUrl(symbol)
   return (
     <span
-      className={cn("w-6 h-6 rounded-full", className)}
+      className={cn("w-6 max-h-6 rounded-full", className)}
       style={{ backgroundColor: color }}
     >
       <img src={src} alt={`${name} token icon`} className={imgClasses} />

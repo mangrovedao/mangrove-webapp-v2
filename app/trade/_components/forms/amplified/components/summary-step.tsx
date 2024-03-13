@@ -7,26 +7,21 @@ import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
-import { TimeInForce } from "../enums"
-import type { Form } from "../types"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
+import { TimeInForce } from "../enums"
+import type { AssetWithInfos, Form } from "../types"
 
 type Props = {
-  form: Form
+  form: Omit<Form, "assets">
   tokenToAmplify?: Token
   sendAmount: string
   source: SimpleLogic | SimpleAaveLogic | OrbitLogic
-  receiveTokens?: {
-    token: Token
-    receiveTo: string
-    amount: string
-    limitPrice: string
-  }[]
+  assetsWithToken?: AssetWithInfos[]
 }
 
 export function SummaryStep({
   tokenToAmplify,
-  receiveTokens,
+  assetsWithToken,
   source,
   form,
 }: Props) {
@@ -40,45 +35,50 @@ export function SummaryStep({
         </span>
       </div>
       <Line
-        title={`Send from ${source.id.includes("simple") ? "Wallet" : source.id.toUpperCase()}`}
+        title={`Send from ${source?.id.includes("simple") ? "Wallet" : source?.id.toUpperCase()}`}
       >
-        {Big(form.sendAmount ?? 0).toFixed(8)}{" "}
+        {Big(
+          !isNaN(Number(form.sendAmount)) ? Number(form.sendAmount) : 0,
+        ).toFixed(8)}{" "}
         <Unit>{tokenToAmplify?.symbol}</Unit>
       </Line>
       <Separator />
       <div className="space-y-4">
-        {receiveTokens?.map(
-          (receiveToken) =>
-            receiveToken.token &&
-            receiveToken.receiveTo && (
+        {assetsWithToken?.map(
+          (asset) =>
+            asset.token &&
+            asset.receiveTo && (
               <>
                 <div className="flex items-center space-x-2">
                   <TokenIcon
                     className="w-7 h-auto"
-                    symbol={receiveToken.token.symbol}
+                    symbol={asset.token.symbol}
                   />
                   <span className="text-white text-xl font-medium">
-                    {receiveToken.token.symbol}
+                    {asset.token.symbol}
                   </span>
                 </div>
 
                 <Line title="Limit Price">
-                  {Big(receiveToken.limitPrice ?? 0).toFixed(
-                    receiveToken.token.displayedAsPriceDecimals,
-                  )}{" "}
-                  <Unit>{receiveToken.token.symbol}</Unit>
+                  {Big(
+                    !isNaN(Number(asset.limitPrice))
+                      ? Number(asset.limitPrice)
+                      : 0,
+                  ).toFixed(asset.token.displayedAsPriceDecimals)}{" "}
+                  <Unit>{asset.token.symbol}</Unit>
                 </Line>
                 <Line
-                  title={`Receive to ${receiveToken.receiveTo.includes("simple") ? "Wallet" : receiveToken.receiveTo.toUpperCase()}`}
+                  title={`Receive to ${asset.receiveTo.id === "simple" ? "Wallet" : asset.receiveTo.id.toUpperCase()}`}
                 >
-                  {Big(receiveToken.amount ?? 0).toFixed(
-                    receiveToken.token.displayedDecimals,
-                  )}{" "}
-                  <Unit>{receiveToken.token.symbol}</Unit>
+                  {Big(
+                    !isNaN(Number(asset.amount)) ? Number(asset.amount) : 0,
+                  ).toFixed(asset.token.displayedDecimals)}{" "}
+                  <Unit>{asset.token.symbol}</Unit>
                 </Line>
               </>
             ),
         )}
+        <Separator className="!my-5" />
         <Line title="Time in force">
           <div className="flex flex-col items-end">
             {form.timeInForce}{" "}

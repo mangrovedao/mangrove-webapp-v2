@@ -16,6 +16,20 @@ type BalanceLogic = {
   balance: number
 }
 
+// export function useAbleToken(
+//   logic: DefaultLogics,
+//   token: Token,
+// ) {
+//   return useQuery({
+//     queryKey: ["availableLogic"],
+//     queryFn: async () => {
+//       return await logic?.overlying(token)
+//     },
+
+//     enabled: !!(logic && token),
+//   })
+// }
+
 export default function liquiditySourcing({
   sendToken,
   receiveToken,
@@ -41,6 +55,7 @@ export default function liquiditySourcing({
       try {
         if (!logic) return
         const logicToken = await logic.overlying(token)
+        // const isUsable = useAbleToken(logic, token).data
         if (logicToken) {
           return logic
         }

@@ -13,13 +13,12 @@ import { IconButton } from "@/components/icon-button"
 import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { Address } from "viem"
 import type { AmplifiedOrder } from "../schema"
+import { Timer } from "../components/timer"
 
 const columnHelper = createColumnHelper<AmplifiedOrder>()
 const DEFAULT_DATA: AmplifiedOrder[] = []
@@ -32,8 +31,6 @@ type Params = {
 
 export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
   const { market } = useMarket()
-  const { marketsInfoQuery, mangrove } = useMangrove()
-  const { data: openMarkets } = marketsInfoQuery
 
   const columns = React.useMemo(
     () => [
@@ -86,44 +83,24 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         header: "Price",
         cell: ({ row }) => {
-          const { offers } = row.original
-          const limitPrice = offers.find((offer) => offer.price)?.price
-
-          return limitPrice ? (
-            <span>
-              {(
-                Number(limitPrice) /
-                10 ** (market?.quote.decimals ?? 1)
-              ).toFixed(market?.quote.displayedDecimals)}{" "}
-              {market?.quote.symbol}
-            </span>
-          ) : (
-            <Skeleton className="w-20 h-6" />
-          )
+          return <span>-</span>
         },
       }),
-      // TODO: add expiry date in indexer
-      columnHelper.accessor("offers.isOpen", {
-        header: "Status",
-        cell: ({ row }) => {
-          const { offers } = row.original
-          const isOpen = offers.find((offer) => offer.isOpen)
-          return isOpen ? (
-            <div className="text-green-caribbean">Open</div>
-          ) : (
-            <div className="text-red-100">Closed</div>
-          )
+      columnHelper.accessor("expiryDate", {
+        header: "Time in force",
+        cell: (row) => {
+          const expiry = row.getValue()
+          return expiry ? <Timer expiry={expiry} /> : <div>-</div>
         },
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
-          const { offers } = row.original
-          const isExpired = 0 // TODO: add expiry date in indexer
-            ? new Date(0) < new Date()
+          const { expiryDate } = row.original
+          const isExpired = expiryDate
+            ? new Date(expiryDate) < new Date()
             : true
-
           return (
             <div className="w-full h-full flex justify-end space-x-1">
               <IconButton
@@ -139,6 +116,7 @@ export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
                 <Pen />
               </IconButton>
               <IconButton
+                disabled={isExpired}
                 tooltip="Retract offer"
                 className="aspect-square w-6 rounded-full"
                 onClick={(e) => {

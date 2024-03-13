@@ -5,15 +5,21 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import { Form } from "../types"
+import { MangroveAmplifier, Token } from "@mangrovedao/mangrove.js"
+import { toast } from "sonner"
+import { parseUnits } from "viem"
+import { AmplifiedForm } from "../types"
 
 type useUpdateOrderProps = {
-  form: Form
-  offerId?: string
+  form: AmplifiedForm & { sendToken: Token }
+  bundleId?: string
   onResult?: (tx: string) => void
 }
 
-export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
+export function useUpdateAmplifiedOrder({
+  bundleId,
+  onResult,
+}: useUpdateOrderProps) {
   const { mangrove } = useMangrove()
   const { market } = useMarket()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
@@ -24,37 +30,40 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
   ])
 
   return useMutation({
-    mutationFn: async ({ form }: { form: Form }) => {
+    mutationFn: async ({
+      form,
+    }: {
+      form: AmplifiedForm & { sendToken: Token }
+    }) => {
       try {
-        if (!mangrove || !market) return
-        const { isBid, limitPrice: price, send: volume } = form
+        if (!mangrove || !market || !bundleId) return
+        const { send: volume } = form
+        const amp = new MangroveAmplifier({ mgv: mangrove })
+        const parsedVolume = parseUnits(volume, form.sendToken.decimals)
 
-        const updateOrder = isBid
-          ? await market.updateRestingOrder("bids", {
-              offerId: Number(offerId),
-              volume,
-              price,
-            })
-          : await market.updateRestingOrder("asks", {
-              offerId: Number(offerId),
-              volume,
-              price,
-            })
+        const editBundle = await amp.updateBundle({
+          bundleId,
+          expiryDate: form.timeToLive,
+          outboundToken: form.sendToken.address,
+          outboundVolume: parsedVolume,
+          updateExpiry: false,
+        })
 
-        await updateOrder.result
-
-        return { updateOrder }
+        const tx = (await editBundle.response).wait()
+        const hash = await tx
+        toast.success("Amplified order updated successfully")
+        return { tx: hash }
       } catch (error) {
         console.error(error)
-        throw new Error("Failed to update the limit order")
+        toast.error("Failed to update the amplified order")
       }
     },
     meta: {
-      error: "Failed to update the limit order",
+      error: "Failed to update the amplified limit order",
     },
     onSuccess: async (data) => {
       if (!data) return
-      const { updateOrder } = data
+      const { tx } = data
       /*
        * We use a custom callback to handle the success message once it's ready.
        * This is because the onSuccess callback from the mutation will only be triggered
@@ -63,18 +72,14 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
       try {
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-
-        const { blockNumber, transactionHash } = await (
-          await updateOrder.response
-        ).wait()
-
-        onResult?.(transactionHash)
+        const blockNumber = tx.blockNumber
+        onResult?.(tx.transactionHash)
 
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber,
         })
-        queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["amplified"] })
       } catch (error) {
         console.error(error)
