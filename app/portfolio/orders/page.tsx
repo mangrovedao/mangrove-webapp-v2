@@ -8,11 +8,17 @@ import {
 } from "@/components/custom-tabs"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { useTable } from "../_components/tables/open-orders/use-table"
+import { useOrders } from "@/app/trade/_components/tables/orders/hooks/use-orders"
 
 export default function Page() {
-  const table = useTable({
-    data: [],
+  const { data } = useOrders({
+    select: (orders) => orders.length,
   })
+
+  console.log("🚀 ~ Page ~ count:", data)
+  // const table = useTable({
+  //   data: [],
+  // })
 
   return (
     <main className="w-full">
@@ -25,7 +31,7 @@ export default function Page() {
           <CustomTabsTrigger value={"amplified"}>Amplified</CustomTabsTrigger>
           <CustomTabsTrigger value={"stop"}>Stop</CustomTabsTrigger>
         </CustomTabsList>
-        <CustomTabsContent className="p-4" value="all">
+        {/* <CustomTabsContent className="p-4" value="all">
           <DataTable table={table} />
         </CustomTabsContent>
         <CustomTabsContent className="p-4" value="limit">
@@ -36,7 +42,7 @@ export default function Page() {
         </CustomTabsContent>
         <CustomTabsContent className="p-4" value="stop">
           <DataTable table={table} />
-        </CustomTabsContent>
+        </CustomTabsContent> */}
       </CustomTabs>
     </main>
   )
