@@ -8,10 +8,22 @@ import {
 } from "@/components/custom-tabs"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { useTable } from "../_components/tables/history/use-table"
+import { useFills } from "@/app/trade/_components/tables/fills/use-fills"
+import { useState } from "react"
 
 export default function Page() {
+  const [{ page, pageSize }, setPageDetails] = useState<PageDetails>({
+    page: 1,
+    pageSize: 10,
+  })
+  const fillsQuery = useFills({
+    filters: {
+      skip: (page - 1) * pageSize,
+    },
+  })
+
   const table = useTable({
-    data: [],
+    data: fillsQuery.data,
   })
 
   return (

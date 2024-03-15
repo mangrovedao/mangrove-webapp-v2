@@ -1,8 +1,7 @@
 "use client"
 
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import DownArrowIcon from "../../_icons/DownArrowIcon"
-import UpArrowIcon from "../../_icons/UpArrowIcon"
+import { ChevronDown, ChevronUp } from "lucide-react"
 
 export default function PortfolioValue() {
   return (
@@ -14,13 +13,13 @@ export default function PortfolioValue() {
         <div className="flex space-x-3">
           <div className="flex text-[#00DF81] space-x-1 items-center">
             <span>
-              <UpArrowIcon />
+              <ChevronUp />
             </span>
             <span>13%</span>
           </div>
           <div className="flex text-[#FF5C5C] space-x-1 items-center">
             <span>
-              <DownArrowIcon />
+              <ChevronDown />
             </span>
             <span>3%</span>
           </div>

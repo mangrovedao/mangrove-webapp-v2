@@ -17,16 +17,19 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import Big from "big.js"
 import Link from "next/link"
-import { OpenOrders } from "./schema"
+import { Fill } from "./schema"
+import { shortenAddress } from "@/utils/wallet"
+import { ExternalLinkIcon } from "lucide-react"
 
-const columnHelper = createColumnHelper<OpenOrders>()
-const DEFAULT_DATA: OpenOrders[] = []
+const columnHelper = createColumnHelper<Fill>()
+const DEFAULT_DATA: Fill[] = []
 
 type Params = {
-  data?: OpenOrders[]
+  data?: Fill[]
 }
 
 export function useTable({ data }: Params) {
+  console.log("🚀 ~ useTable ~ data:", data)
   const { market } = useMarket()
 
   const columns = React.useMemo(
@@ -51,92 +54,95 @@ export function useTable({ data }: Params) {
       }),
       columnHelper.display({
         header: "Date",
+        cell: ({ row }) => {
+          const { creationDate } = row.original
+          return creationDate ? new Date(creationDate).toDateString() : ""
+        },
         enableSorting: true,
       }),
       columnHelper.accessor("isBid", {
-        header: "Status",
+        header: "Side",
         cell: (row) => {
-          const isCompleted = row.getValue()
+          const isBid = row.getValue()
           return (
             <div
-              className={cn(
-                isCompleted ? "text-green-caribbean" : "text-red-100",
-              )}
+              className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
             >
-              {isCompleted ? <span>Completed</span> : "Cancelled"}
+              {isBid ? "Buy" : "Sell"}
             </div>
           )
         },
         sortingFn: "datetime",
       }),
-      columnHelper.display({
-        header: "Type",
-        cell: () => <span>Limit</span>,
-      }),
-      columnHelper.display({
-        header: "Filled/Amount",
-        cell: ({ row }) => {
-          const { initialWants, takerGot, initialGives, isBid, takerGave } =
-            row.original
-          const baseSymbol = market?.base.symbol
-          const quoteSymbol = market?.quote.symbol
-          const symbol = isBid ? baseSymbol : quoteSymbol
-          const displayDecimals = isBid
-            ? market?.base.displayedDecimals
-            : market?.quote.displayedDecimals
+        columnHelper.display({
+          header: "Type",
+          cell: () => <span>Limit</span>,
+        }),
+        columnHelper.display({
+          header: "Filled/Amount",
+          cell: ({ row }) => {
+            const { initialWants, takerGot, isBid } = row.original
+            const baseSymbol = market?.base.symbol
+            const quoteSymbol = market?.quote.symbol
+            const symbol = isBid ? baseSymbol : quoteSymbol
+            const displayDecimals = isBid
+              ? market?.base.displayedDecimals
+              : market?.quote.displayedDecimals
 
-          const amount = Big(initialWants).toFixed(displayDecimals)
-          const filled = Big(takerGot).toFixed(displayDecimals)
-          const progress = Math.min(
-            Math.round(
-              Big(filled)
-                .mul(100)
-                .div(Big(amount).eq(0) ? 1 : amount)
-                .toNumber(),
-            ),
-            100,
-          )
-          return market ? (
-            <div className={cn("flex items-center")}>
-              <span className="text-sm text-muted-foreground">
-                {filled}
-                &nbsp;/
-              </span>
-              <span className="">
-                &nbsp;
-                {amount} {symbol}
-              </span>
-              <CircularProgressBar progress={progress} className="ml-3" />
-            </div>
-          ) : (
-            <Skeleton className="w-32 h-6" />
-          )
-        },
-        enableSorting: false,
-      }),
-      columnHelper.display({
+            const amount = Big(initialWants).toFixed(displayDecimals)
+            const filled = Big(takerGot).toFixed(displayDecimals)
+            const progress = Math.min(
+              Math.round(
+                Big(filled)
+                  .mul(100)
+                  .div(Big(amount).eq(0) ? 1 : amount)
+                  .toNumber(),
+              ),
+              100,
+            )
+            return market ? (
+              <div className={cn("flex items-center")}>
+                <span className="text-sm text-muted-foreground">
+                  {filled}
+                  &nbsp;/
+                </span>
+                <span className="">
+                  &nbsp;
+                  {amount} {symbol}
+                </span>
+                <CircularProgressBar progress={progress} className="ml-3" />
+              </div>
+            ) : (
+              <Skeleton className="w-32 h-6" />
+            )
+          },
+          enableSorting: false,
+        }),
+      columnHelper.accessor("price", {
         header: "Price",
         enableSorting: true,
       }),
-      columnHelper.display({
-        id: "time-in-force",
-        header: () => (
-          <div className="flex items-center">
-            <span>Time in force left</span>
-            <InfoTooltip className="pb-0.5">
-              Time left until your order becomes inactive.
-            </InfoTooltip>
-          </div>
-        ),
+      columnHelper.accessor("status", {
+        header: "Status",
+        cell: ({ row }) => {
+          const { status } = row.original
+          return <div>{status}</div>
+        },
+        sortingFn: "datetime",
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
-          const address: string = row.getValue("address")
+          const { transactionHash } = row.original
           return (
-            <Link href="" target="_blank" className="underline">
-              {address}
+            <Link
+              href={`https://blastscan.io/tx/${transactionHash}`}
+              target="_blank"
+              className="underline flex justify-end space-x-2 w-full"
+            >
+              <ExternalLinkIcon size={16} />
+              <span>{shortenAddress(transactionHash)}</span>
             </Link>
           )
         },

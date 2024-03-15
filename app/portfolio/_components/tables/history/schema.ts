@@ -1,9 +1,7 @@
 import { z } from "zod"
 
-const openOrdersSchema = z.object({
+const fillSchema = z.object({
   creationDate: z.date(),
-  latestUpdateDate: z.date(),
-  expiryDate: z.date().optional(),
   transactionHash: z.string(),
   isBid: z.boolean(),
   takerGot: z.string(),
@@ -13,6 +11,7 @@ const openOrdersSchema = z.object({
   initialWants: z.string(),
   initialGives: z.string(),
   price: z.string(),
-  offerId: z.string(),
+  status: z.string(),
+  isMarketOrder: z.boolean(),
 })
-export type OpenOrders = z.infer<typeof openOrdersSchema>
+export type Fill = z.infer<typeof fillSchema>
