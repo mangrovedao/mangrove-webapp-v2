@@ -72,9 +72,9 @@ export function useTable({ data }: Params) {
         },
         sortingFn: "datetime",
       }),
-      columnHelper.display({
+      columnHelper.accessor("isMarketOrder", {
         header: "Type",
-        cell: () => <span>Limit</span>,
+        cell: (row) => (row.getValue() ? "Market" : "Limit"),
       }),
       columnHelper.display({
         header: "Filled/Amount",
