@@ -1,3 +1,4 @@
+import Mangrove from "@mangrovedao/mangrove.js"
 import { TimeToLiveUnit } from "./enums"
 
 function getNumberOfSeconds(timeToLiveUnit: `${TimeToLiveUnit}`) {
@@ -54,4 +55,26 @@ export function getFormattedTimeToLive(
   return `${timeToLiveValue} ${getFormattedUnit(
     timeToLiveUnit ?? TimeToLiveUnit.DAY,
   )}${Number(timeToLiveValue) > 1 ? "s" : ""}`
+}
+
+export const getCurrentTokenPrice = (
+  tokenId: string,
+  openMarkets?: Mangrove.OpenMarketInfo[],
+) => {
+  const market = openMarkets?.find(
+    (market) => market.base.id === tokenId || market.quote.id === tokenId,
+  )
+  return market?.quote || market?.base
+}
+
+export const getCurrentTokenPriceFromAddress = (
+  tokenAddress: string,
+  openMarkets?: Mangrove.OpenMarketInfo[],
+) => {
+  const market = openMarkets?.find(
+    (market) =>
+      market.base.address.toLowerCase() == tokenAddress.toLowerCase() ||
+      market.quote.address.toLowerCase() == tokenAddress.toLowerCase(),
+  )
+  return market?.quote || market?.base
 }

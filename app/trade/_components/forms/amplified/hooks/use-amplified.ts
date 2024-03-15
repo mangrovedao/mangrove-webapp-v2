@@ -1,57 +1,77 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-"use client"
-import { useForm } from "@tanstack/react-form"
-import { zodValidator } from "@tanstack/zod-form-adapter"
+import { Semibook, Token } from "@mangrovedao/mangrove.js"
 import React from "react"
-import { useEventListener } from "usehooks-ts"
+import { useAccount } from "wagmi"
 
+import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { Token } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
+import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
-import type { Form } from "../types"
+import { Asset } from "../types"
+import { getCurrentTokenPrice } from "../utils"
+import amplifiedLiquiditySourcing from "./amplified-liquidity-sourcing"
+import { ChangingFrom, useNewStratStore } from "./amplified-store"
 
-type Props = {
-  onSubmit?: (data: Form) => void
-}
+export const MIN_PRICE_POINTS = 2
+export const MIN_RATIO = 1.001
+export const MIN_STEP_SIZE = 1
 
-export function useAmplified({ onSubmit }: Props) {
+export default function useAmplifiedForm() {
+  const { address } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
   const { market, marketInfo } = useMarket()
 
-  const form = useForm({
-    validator: zodValidator,
-    defaultValues: {
-      sendSource: "",
-      sendAmount: "",
-      sendToken: "",
-      firstAsset: {
-        amount: "",
-        token: "",
-        limitPrice: "",
-        receiveTo: "simple",
-      },
-      secondAsset: {
-        amount: "",
-        token: "",
-        limitPrice: "",
-        receiveTo: "simple",
-      },
-      timeInForce: TimeInForce.GOOD_TIL_TIME,
-      timeToLive: "28",
-      timeToLiveUnit: TimeToLiveUnit.DAY,
-    },
-    onSubmit: (values) => onSubmit?.(values),
-  })
-
-  const sendAmount = form.useStore((state) => state.values.sendAmount)
-  const sendToken = form.useStore((state) => state.values.sendToken)
-  const sendSource = form.useStore((state) => state.values.sendSource)
-  const timeInForce = form.useStore((state) => state.values.timeInForce)
-  const selectedTokenId = form.useStore((state) => state.values.sendToken)
-
   const { data: openMarkets } = marketsInfoQuery
+
+  const {
+    setGlobalError,
+    errors,
+    setErrors,
+    isChangingFrom,
+    setIsChangingFrom,
+    sendSource,
+    sendAmount,
+    sendToken,
+    assets,
+    timeInForce,
+    timeToLive,
+    timeToLiveUnit,
+    setSendSource,
+    setSendAmount,
+    setSendToken,
+    setAssets,
+    setTimeInForce,
+    setTimeToLive,
+    setTimeToLiveUnit,
+    setMinVolume,
+    minVolume,
+  } = useNewStratStore()
+
+  // TODO: fix TS type for useEventListener
+  // @ts-expect-error
+  useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
+
+  function handleOnOrderbookOfferClicked(
+    event: CustomEvent<{ price: string }>,
+  ) {
+    let newAssets = [...assets]
+
+    assets.forEach((asset, i) => {
+      if (!asset) return
+
+      const tokenPrice = getCurrentTokenPrice(asset.token, openMarkets)
+
+      if (tokenPrice?.id === market?.quote.id) {
+        newAssets[i] = {
+          ...asset,
+          limitPrice: event.detail.price,
+        }
+      }
+    })
+
+    handleAssetsChange(newAssets)
+  }
 
   const availableTokens =
     openMarkets?.reduce((acc, current) => {
@@ -65,34 +85,14 @@ export function useAmplified({ onSubmit }: Props) {
       return acc
     }, [] as Token[]) ?? []
 
-  /// GET liquidity sourcing logics ///
   const logics = mangrove ? Object.values(mangrove.logics) : []
 
-  /// GET first asset infos ///
-  const firstAsset = form.useStore((state) => state.values.firstAsset)
-  const firstAssetToken = availableTokens.find(
-    (token) => token.id === firstAsset.token,
-  )
-
-  /// GET second asset infos ///
-  const secondAsset = form.useStore((state) => state.values.secondAsset)
-  const secondAssetToken = availableTokens.find(
-    (token) => token.id === secondAsset.token,
-  )
-
-  const selectedToken = availableTokens.find(
-    (token) => token.id === selectedTokenId,
-  )
-
-  // market details
-  const minBid = market?.getSemibook("bids").getMinimumVolume(220_000)
   const tickSize = marketInfo?.tickSpacing
     ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
     : ""
 
-  const minVolume = minBid?.toFixed(selectedToken?.displayedDecimals)
-
-  const selectedSource = logics.find((logic) => logic?.id === sendSource)
+  const selectedToken = availableTokens.find((token) => token.id == sendToken)
+  const selectedSource = logics.find((logic) => logic?.id == sendSource)
 
   const compatibleMarkets = openMarkets?.filter(
     (market) =>
@@ -108,94 +108,266 @@ export function useAmplified({ onSubmit }: Props) {
     )
   })
 
-  // TODO: fix TS type for useEventListener
-  // @ts-expect-error
-  useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
+  const assetsWithTokens = assets.map((asset) => ({
+    ...asset,
+    token: availableTokens.find((tokens) => tokens.id === asset.token),
+    receiveTo: logics.find((logic) => logic?.id === asset.receiveTo),
+  }))
 
-  const computeReceiveAmount = (key: "firstAsset" | "secondAsset") => {
-    const limitPrice = form.getFieldValue(`${key}.limitPrice`)
-    const keyValue = form.getFieldValue(`${key}`)
-    if (!limitPrice) return
+  const { useAbleTokens, sendFromBalance } = amplifiedLiquiditySourcing({
+    availableTokens,
+    sendToken: selectedToken,
+    sendFrom: sendSource,
+    fundOwner: address,
+    logics,
+  })
 
-    const amount = Big(!isNaN(Number(sendAmount)) ? Number(sendAmount) : 0)
-      .div(
-        Big(
-          !isNaN(Number(limitPrice)) && Number(limitPrice) > 0
-            ? Number(limitPrice)
-            : 1,
-        ),
-      )
-      .toString()
+  const { formatted } = useTokenBalance(selectedToken)
 
-    form.store.setState(
-      (state) => {
+  const balanceLogic_temporary =
+    selectedSource?.id === "simple" || selectedSource?.id === "aave"
+      ? formatted
+      : sendFromBalance?.formatted
+
+  const handleFieldChange = (field: ChangingFrom) => {
+    setIsChangingFrom(field)
+  }
+
+  const handleSendSource = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("sendSource")
+    const value = typeof e === "string" ? e : e.target.value
+    setSendSource(value)
+  }
+
+  const computeReceiveAmount = (
+    amount: string,
+    limitPrice: string,
+    tokenId: string,
+  ) => {
+    if (!limitPrice || !amount) return "0"
+    if (openMarkets?.find((market) => market.base.id === tokenId)) {
+      return Big(!isNaN(Number(amount)) ? Number(amount) : 0)
+        .div(
+          Big(
+            !isNaN(Number(limitPrice)) && Number(limitPrice) > 0
+              ? Number(limitPrice)
+              : 1,
+          ),
+        )
+        .toString()
+    } else {
+      return Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 0)
+        .times(
+          Big(
+            !isNaN(Number(amount)) && Number(amount) > 0 ? Number(amount) : 0,
+          ),
+        )
+        .toString()
+    }
+  }
+
+  const handeSendTokenChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("sendToken")
+    const value = typeof e === "string" ? e : e.target.value
+    setSendToken(value)
+  }
+
+  const handleSentAmountChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("sendAmount")
+    const value = typeof e === "string" ? e : e.target.value
+    setSendAmount(value)
+  }
+
+  React.useEffect(() => {
+    handleAssetsChange(
+      assets.map((asset) => {
+        const amount = computeReceiveAmount(
+          sendAmount,
+          asset.limitPrice,
+          asset.token,
+        )
         return {
-          ...state,
-          values: {
-            ...state.values,
-            [key]: {
-              ...keyValue,
-              amount,
-            },
-          },
+          ...asset,
+          amount: !sendAmount ? "0" : amount,
         }
-      },
-      {
-        priority: "high",
-      },
+      }),
+    )
+  }, [sendAmount])
+
+  const handleAssetsChange = (
+    e: React.ChangeEvent<HTMLInputElement> | Asset[],
+  ) => {
+    handleFieldChange("assets")
+    const value = Array.isArray(e) ? e : []
+    setAssets(
+      value.map((asset) => {
+        const amount = computeReceiveAmount(
+          sendAmount,
+          asset.limitPrice,
+          asset.token,
+        )
+        return {
+          ...asset,
+          amount,
+        }
+      }),
     )
   }
 
-  function handleOnOrderbookOfferClicked(
-    event: CustomEvent<{ price: string }>,
-  ) {
-    if (firstAsset?.token === market?.quote.id) {
-      form.setFieldValue("firstAsset.limitPrice", event.detail.price)
-    }
-    if (secondAsset?.token === market?.quote.id) {
-      form.setFieldValue("secondAsset.limitPrice", event.detail.price)
-    }
-    form.validateAllFields("blur")
-    if (sendAmount === "") return
+  const handleTimeInForceChange = (
+    e: React.ChangeEvent<HTMLInputElement> | TimeInForce,
+  ) => {
+    handleFieldChange("timeInForce")
+    const value = typeof e === "string" ? e : TimeInForce.IMMEDIATE_OR_CANCEL
+    setTimeInForce(value)
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    e.stopPropagation()
-    void form.handleSubmit()
+  const handleTimeToLiveChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("timeToLive")
+    const value = typeof e === "string" ? e : e.target.value
+    setTimeToLive(value)
+  }
+
+  const handleTimeToLiveUnit = (
+    e: React.ChangeEvent<HTMLInputElement> | TimeToLiveUnit,
+  ) => {
+    handleFieldChange("timeToLiveUnit")
+    const value = typeof e === "string" ? e : TimeToLiveUnit.DAY
+    setTimeToLive(value)
   }
 
   React.useEffect(() => {
-    form.validateAllFields("change")
-  }, [form])
+    let newMinVolume = 0
+    let minVolume = 0
+    const selectedSourceGasOverhead = selectedSource?.gasOverhead || 200_000
+    const variableCost = Big(60_000).mul(assetsWithTokens.length).add(60_000)
+    let gasreq = Big(0)
+    for (const asset of assetsWithTokens) {
+      gasreq = Big(
+        Math.max(
+          asset.receiveTo?.gasOverhead || 0,
+          selectedSource?.gasOverhead || 0,
+        ),
+      ).add(variableCost)
+    }
+
+    const semibookAsks = market?.getSemibook("asks")
+    const semibookBids = market?.getSemibook("bids")
+    const isBid = openMarkets?.find(
+      (market) => market.base.id === sendToken,
+    )?.quote
+    const priceToken = isBid
+    const getMinimumVolume = (semibook?: Semibook) => {
+      return Number(semibook?.getMinimumVolume(gasreq.toNumber()) || 0)
+    }
+
+    const calculateMinVolume = (asset: Asset) => {
+      if (!asset.token || !asset.limitPrice) return 0
+      const semibook = isBid ? semibookAsks : semibookBids
+      return getMinimumVolume(semibook)
+    }
+
+    assets.forEach((asset) => {
+      minVolume = calculateMinVolume(asset)
+      newMinVolume += minVolume
+    })
+
+    setMinVolume({
+      total: newMinVolume.toFixed(
+        isBid
+          ? selectedToken?.displayedDecimals
+          : priceToken?.displayedDecimals,
+      ),
+      volume: minVolume.toFixed(selectedToken?.displayedDecimals),
+    })
+  }, [assets, sendToken])
 
   React.useEffect(() => {
-    form?.reset()
-  }, [form])
+    const newErrors = { ...errors }
+
+    if (Number(sendAmount) > Number(balanceLogic_temporary) && sendAmount) {
+      newErrors.sendAmount = "Amount cannot be greater than wallet balance"
+    } else if (Number(sendAmount) <= 0 && sendAmount) {
+      newErrors.sendAmount = "Amount must be greater than 0"
+    } else if (sendAmount && minVolume.total && minVolume.total > sendAmount) {
+      newErrors.sendAmount = "Amount cannot be lower than min. volume"
+    } else {
+      delete newErrors.sendAmount
+    }
+
+    assets.map((asset, index) => {
+      if (Number(asset.limitPrice) <= 0 && asset.limitPrice) {
+        newErrors[`limitPrice-${index}`] = "Limit Price must be greater than 0"
+      } else if (!asset.receiveTo && asset.token) {
+        newErrors[`receiveTo-${index}`] = "Please select a receive logic"
+      } else if (!asset.token && asset.limitPrice) {
+        newErrors[`token-${index}`] = "Please select a token"
+      } else {
+        delete newErrors[`limitPrice-${index}`]
+        delete newErrors[`receiveTo-${index}`]
+        delete newErrors[`token-${index}`]
+      }
+    })
+
+    setErrors(newErrors)
+  }, [
+    minVolume,
+    sendSource,
+    sendAmount,
+    sendToken,
+    assets,
+    timeInForce,
+    timeToLive,
+    timeToLiveUnit,
+  ])
 
   return {
-    handleSubmit,
-    computeReceiveAmount,
-    form,
-    market,
-    sendAmount,
+    errors,
+    isChangingFrom,
+    openMarkets,
     sendSource,
+    minVolume,
+    sendAmount,
     sendToken,
+    assets,
+    timeInForce,
+    timeToLive,
+    timeToLiveUnit,
+    tickSize,
     selectedToken,
     selectedSource,
-    timeInForce,
-
-    //market details
-    tickSize,
-    minVolume,
-
-    firstAsset,
-    secondAsset,
-    firstAssetToken,
-    secondAssetToken,
-    logics,
     currentTokens,
+    useAbleTokens,
+    sendFromBalance,
+    balanceLogic_temporary,
+    assetsWithTokens,
+    address,
     availableTokens,
-    openMarkets,
+    logics,
+    setGlobalError,
+    setIsChangingFrom,
+    setErrors,
+    setSendSource,
+    setSendAmount,
+    setSendToken,
+    setAssets,
+    setTimeInForce,
+    setTimeToLive,
+    setTimeToLiveUnit,
+    handleSendSource,
+    handleSentAmountChange,
+    handeSendTokenChange,
+    handleAssetsChange,
+    handleTimeInForceChange,
+    handleTimeToLiveChange,
+    handleTimeToLiveUnit,
   }
 }

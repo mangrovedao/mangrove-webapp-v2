@@ -1,13 +1,11 @@
 import { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
+import { DefaultLogics } from "../../types"
 
 type Props = {
   sendFrom: string
   receiveTo: string
-  logics: (SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]
+  logics: DefaultLogics[]
   fundOwner?: string
   sendToken?: Token
   receiveToken?: Token
@@ -17,6 +15,20 @@ type BalanceLogic = {
   formatted: string
   balance: number
 }
+
+// export function useAbleToken(
+//   logic: DefaultLogics,
+//   token: Token,
+// ) {
+//   return useQuery({
+//     queryKey: ["availableLogic"],
+//     queryFn: async () => {
+//       return await logic?.overlying(token)
+//     },
+
+//     enabled: !!(logic && token),
+//   })
+// }
 
 export default function liquiditySourcing({
   sendToken,
@@ -33,17 +45,17 @@ export default function liquiditySourcing({
     BalanceLogic | undefined
   >()
 
-  const [sendFromLogics, setSendFromLogics] =
-    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
+  const [sendFromLogics, setSendFromLogics] = React.useState<DefaultLogics[]>()
 
   const [receiveToLogics, setReceiveToLogics] =
-    React.useState<(SimpleLogic | SimpleAaveLogic | OrbitLogic | undefined)[]>()
+    React.useState<DefaultLogics[]>()
 
   const getSendFromLogics = async (token: Token) => {
     const usableLogics = logics.map(async (logic) => {
       try {
         if (!logic) return
         const logicToken = await logic.overlying(token)
+        // const isUsable = useAbleToken(logic, token).data
         if (logicToken) {
           return logic
         }
@@ -80,9 +92,7 @@ export default function liquiditySourcing({
         return
       }
 
-      const selectedLogic = logics.find((logic) => logic?.id === sendFrom) as
-        | SimpleAaveLogic
-        | OrbitLogic
+      const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
 
       if (!selectedLogic) return
 
@@ -108,9 +118,7 @@ export default function liquiditySourcing({
         setReceiveToBalance(undefined)
         return
       }
-      const selectedLogic = logics.find((logic) => logic?.id === receiveTo) as
-        | SimpleAaveLogic
-        | OrbitLogic
+      const selectedLogic = logics.find((logic) => logic?.id === receiveTo)
 
       if (!selectedLogic) return
 

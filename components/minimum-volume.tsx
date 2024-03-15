@@ -7,10 +7,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { TooltipContent } from "@radix-ui/react-tooltip"
+import Link from "next/link"
+import InfoTooltip from "./info-tooltip"
+import { Caption } from "./typography/caption"
 
-export function CustomBalance(props: {
+export function MinimumVolume(props: {
   token?: Token | string
-  balance?: string
+  volume?: string
   label?: string
   action?: {
     onClick: (value: string) => void
@@ -21,10 +24,26 @@ export function CustomBalance(props: {
 
   return (
     <div className="flex justify-between items-center mt-1">
-      <span className="text-xs text-secondary float-left">
-        {props.label ?? "Balance"}
-      </span>
-      {!props.balance || !props.token ? (
+      <div className="flex items-center">
+        <span className=" text-xs text-secondary float-left">
+          {props.label ?? "Min. Volume"}
+        </span>
+        <InfoTooltip className="flex flex-col">
+          <Caption className="text-xs">There is a minimum amount</Caption>
+          <Caption>
+            required for limit orders on Mangrove.{" "}
+            <Link
+              href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
+              target="_blank"
+              rel="noreferrer"
+              className="text-green-caribbean underline"
+            >
+              Learn more
+            </Link>
+          </Caption>
+        </InfoTooltip>
+      </div>
+      {!props.volume || !props.token ? (
         <Skeleton className="w-24 h-4" />
       ) : (
         <span className="text-xs space-x-1">
@@ -35,17 +54,16 @@ export function CustomBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
-
-                  props.action?.onClick(props.balance || "0")
+                  props.action?.onClick(props.volume || "0")
                 }}
               >
                 <span>
-                  {Number(props.balance).toFixed(token?.displayedDecimals)}{" "}
+                  {Number(props.volume).toFixed(token?.displayedDecimals)}{" "}
                   {token?.symbol}
                 </span>
               </TooltipTrigger>
-              <TooltipContent className="z-50">
-                {Number(props.balance).toFixed(token?.decimals)} {token?.symbol}
+              <TooltipContent className="z-50" side="bottom">
+                {Number(props.volume).toFixed(token?.decimals)} {token?.symbol}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -54,7 +72,7 @@ export function CustomBalance(props: {
             <button
               className="text-xs underline"
               onClick={(e) => {
-                props.balance && props?.action?.onClick(props.balance)
+                props.volume && props?.action?.onClick(props.volume)
               }}
             >
               {props?.action.text}

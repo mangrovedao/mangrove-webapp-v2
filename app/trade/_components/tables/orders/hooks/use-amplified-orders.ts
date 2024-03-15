@@ -6,7 +6,6 @@ import { useAccount } from "wagmi"
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import useMangrove from "@/providers/mangrove"
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { AmplifiedOrder, parseAmplifiedOrders } from "../schema"
 
@@ -23,7 +22,6 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
-  const { olKeys } = useMarket()
   const { marketsInfoQuery } = useMangrove()
   const { data: openMarkets } = marketsInfoQuery
 
@@ -35,11 +33,11 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["amplified", address, first, skip],
+    queryKey: ["amplified", address],
     queryFn: async () => {
-      if (!indexerSdk || !address || !olKeys || !openMarkets) return []
-      startLoading(TRADE.TABLES.ORDERS)
       try {
+        if (!indexerSdk || !address || !openMarkets) return []
+        startLoading(TRADE.TABLES.ORDERS)
         const markets =
           openMarkets.map((market) => {
             return {
@@ -55,16 +53,24 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
 
         if (!result) return []
 
-        const filteredResult = result.map((order) => {
-          if (!order.offers.some((offer) => !offer.isMarketFound)) {
-            return order
-          }
+        const filteredResult = result.filter((order) => {
+          const allOffersMarketFound = order.offers.every(
+            (offer) => offer.isMarketFound,
+          )
+
+          const atLeastOneOpenOffer = order.offers.some((offer) => offer.isOpen)
+
+          const isExpired = order.expiryDate
+            ? new Date(order.expiryDate) < new Date()
+            : true
+
+          return allOffersMarketFound && !isExpired && atLeastOneOpenOffer
         })
 
         return parseAmplifiedOrders(filteredResult)
       } catch (e) {
         console.error(e)
-        throw new Error()
+        throw new Error("")
       } finally {
         stopLoading(TRADE.TABLES.ORDERS)
       }
@@ -73,7 +79,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
     meta: {
       error: "Unable to retrieve amplified orders",
     },
-    enabled: !!(isConnected && indexerSdk),
+    enabled: !!(isConnected && address && indexerSdk && openMarkets),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

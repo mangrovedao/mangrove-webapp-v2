@@ -9,16 +9,19 @@ import {
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { cn } from "@/utils"
+import { MinimumVolume } from "./minimum-volume"
 import { Caption } from "./typography/caption"
 
 type EnhancedNumericInputProps = {
   token?: Token | string
   customBalance?: string
+  minimumVolume?: string
   disabled?: boolean
   label?: string
   showBalance?: boolean
   balanceLabel?: string
-  balanceAction?: { onClick: (value: string) => void; text: string }
+  balanceAction?: { onClick: (value: string) => void; text?: string }
+  volumeAction?: { onClick: (value: string) => void; text?: string }
   error?: ValidationError[] | string
   inputClassName?: string
 } & NumericInputProps
@@ -35,6 +38,8 @@ export const EnhancedNumericInput = React.forwardRef<
       balanceLabel,
       customBalance,
       balanceAction,
+      volumeAction,
+      minimumVolume,
       error,
       className,
       inputClassName,
@@ -57,7 +62,7 @@ export const EnhancedNumericInput = React.forwardRef<
           className={inputClassName}
           ref={ref}
           icon={tokenSymbol}
-          symbol={tokenSymbol}
+          // symbol={tokenSymbol}
           aria-invalid={!!error?.length}
         />
         {error?.length ? (
@@ -68,6 +73,7 @@ export const EnhancedNumericInput = React.forwardRef<
             {error}
           </p>
         ) : undefined}
+
         {customBalance && showBalance && (
           <CustomBalance
             action={balanceAction}
@@ -80,6 +86,14 @@ export const EnhancedNumericInput = React.forwardRef<
           <TokenBalance
             action={balanceAction}
             token={token}
+            label={balanceLabel}
+          />
+        )}
+        {minimumVolume && (
+          <MinimumVolume
+            action={volumeAction}
+            token={token}
+            volume={minimumVolume}
             label={balanceLabel}
           />
         )}

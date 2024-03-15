@@ -44,7 +44,7 @@ export function useLimit(props: Props) {
 
   const timeInForce = form.useStore((state) => state.values.timeInForce)
   const logics = mangrove ? Object.values(mangrove.logics) : []
-  const selecteSource = logics.find((logic) => logic?.id === sendFrom)
+  const selectedSource = logics.find((logic) => logic?.id === sendFrom)
 
   const {
     quoteToken,
@@ -58,12 +58,36 @@ export function useLimit(props: Props) {
     defaultLimitPrice,
   } = useTradeInfos("limit", tradeAction)
 
-  const minAsk = market?.getSemibook("asks").getMinimumVolume(200_000)
-  const minBid = market?.getSemibook("bids").getMinimumVolume(200_000)
+  const minAsk = market
+    ?.getSemibook("asks")
+    .getMinimumVolume(selectedSource?.gasOverhead || 200_000)
+
+  const minBid = market
+    ?.getSemibook("bids")
+    .getMinimumVolume(selectedSource?.gasOverhead || 200_000)
+
   const minVolume =
     tradeAction === TradeAction.BUY
-      ? minBid?.toFixed(quoteToken?.displayedDecimals)
-      : minAsk?.toFixed(sendToken?.displayedDecimals)
+      ? {
+          bid: {
+            volume: minAsk?.toFixed(receiveToken?.displayedDecimals),
+            token: receiveToken?.symbol,
+          },
+          ask: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+        }
+      : {
+          bid: {
+            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            token: quoteToken?.symbol,
+          },
+          ask: {
+            volume: minAsk?.toFixed(sendToken?.displayedDecimals),
+            token: sendToken?.symbol,
+          },
+        }
 
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
@@ -161,6 +185,10 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
     const receive = form?.getFieldValue("receive")
+
+    form.setFieldValue("sendFrom", "simple")
+    form.setFieldValue("receiveTo", "simple")
+
     if (!(send && receive)) return
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
@@ -204,7 +232,7 @@ export function useLimit(props: Props) {
     spotPrice,
     timeInForce,
     logics,
-    selecteSource,
+    selectedSource,
     minVolume,
   }
 }

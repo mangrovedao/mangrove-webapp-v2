@@ -44,21 +44,30 @@ const Summary = ({ oldValues, newValues, displayDecimals }: SummaryProps) => {
           </Text>
         </div>
       </div>
-      <div className="flex justify-between">
-        <Label>Price</Label>
 
-        <Text className="text-muted-foreground">
-          {Number(oldValues.price).toFixed(displayDecimals?.price)}
-        </Text>
-        <Text>{Number(newValues.price).toFixed(displayDecimals?.price)}</Text>
+      <div className="flex justify-between items-center">
+        <Label>Price</Label>
+        <div>
+          <Label>Old values</Label>
+          <Text className="text-muted-foreground">
+            {Number(oldValues.price).toFixed(displayDecimals?.price)}
+          </Text>
+        </div>
+
+        <div>
+          <Label>New values</Label>
+          <Text>{Number(newValues.price).toFixed(displayDecimals?.price)}</Text>
+        </div>
       </div>
     </div>
   )
 }
+
 type Props = {
   order: Order
   form: Form
   onClose: () => void
+  onCloseForm: () => void
   displayDecimals?: decimals
 }
 
@@ -72,6 +81,8 @@ export default function EditOrderSteps({
   order,
   form,
   onClose,
+  onCloseForm,
+
   displayDecimals,
 }: Props) {
   const { chain } = useAccount()
@@ -107,6 +118,7 @@ export default function EditOrderSteps({
        */
       if (!isDialogOpenRef.current) return
       onClose()
+      onCloseForm()
       tradeService.openTxCompletedDialog({
         address: result ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
@@ -131,9 +143,14 @@ export default function EditOrderSteps({
         />
       ),
       button: (
-        <Button {...btnProps} onClick={goToNextStep}>
-          Proceed
-        </Button>
+        <>
+          <Button onClick={onCloseForm} variant={"secondary"}>
+            Back
+          </Button>
+          <Button {...btnProps} onClick={goToNextStep}>
+            Proceed
+          </Button>
+        </>
       ),
     },
     !isInfiniteAllowance && {
@@ -171,28 +188,37 @@ export default function EditOrderSteps({
         />
       ),
       button: (
-        <Button
-          {...btnProps}
-          loading={post.isPending}
-          disabled={post.isPending}
-          onClick={() => {
-            post.mutate(
-              {
-                form,
-              },
-              {
-                onError: (error: Error) => {
-                  onClose()
-                  tradeService.openTxFailedDialog(
-                    getTitleDescriptionErrorMessages(error),
-                  )
+        <>
+          <Button
+            onClick={onCloseForm}
+            variant={"secondary"}
+            disabled={post.isPending}
+          >
+            Back
+          </Button>
+          <Button
+            {...btnProps}
+            loading={post.isPending}
+            disabled={post.isPending}
+            onClick={() => {
+              post.mutate(
+                {
+                  form,
                 },
-              },
-            )
-          }}
-        >
-          Proceed
-        </Button>
+                {
+                  onError: (error: Error) => {
+                    onClose()
+                    tradeService.openTxFailedDialog(
+                      getTitleDescriptionErrorMessages(error),
+                    )
+                  },
+                },
+              )
+            }}
+          >
+            Proceed
+          </Button>
+        </>
       ),
     },
   ]

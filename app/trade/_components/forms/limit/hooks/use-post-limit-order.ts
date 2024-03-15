@@ -44,14 +44,29 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
         const isBuy = tradeAction === TradeAction.BUY
         const { base } = market
 
+        const takerGivesLogic = logics.find(
+          (logic) => logic?.id === form.sendFrom,
+        )
+
+        const takerWantsLogic = logics.find(
+          (logic) => logic?.id === form.receiveTo,
+        )
+
+        const restingOrderGasreq = Math.max(
+          takerGivesLogic?.gasOverhead || 200_000,
+          takerWantsLogic?.gasOverhead || 200_000,
+        )
+
         const orderParams: Market.TradeParams = {
           wants,
           gives,
-          restingOrder: {},
+          restingOrder: {
+            restingOrderGasreq,
+          },
           forceRoutingToMangroveOrder: true,
           fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
-          takerGivesLogic: logics.find((logic) => logic?.id === form.sendFrom),
-          takerWantsLogic: logics.find((logic) => logic?.id === form.receiveTo),
+          takerGivesLogic,
+          takerWantsLogic,
           expiryDate:
             timeInForce === TimeInForce.GOOD_TIL_TIME
               ? estimateTimestamp({
