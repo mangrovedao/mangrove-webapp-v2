@@ -33,6 +33,7 @@ export function useTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.display({
+        id: "market",
         header: "Market",
         cell: () => (
           <div className="flex items-center space-x-2">
@@ -51,6 +52,7 @@ export function useTable({ data }: Params) {
         enableSorting: true,
       }),
       columnHelper.display({
+        id: "date",
         header: "Date",
         cell: ({ row }) => {
           const { creationDate } = row.original
@@ -59,6 +61,7 @@ export function useTable({ data }: Params) {
         enableSorting: true,
       }),
       columnHelper.accessor("isBid", {
+        id: "side",
         header: "Side",
         cell: (row) => {
           const isBid = row.getValue()
@@ -73,10 +76,12 @@ export function useTable({ data }: Params) {
         sortingFn: "datetime",
       }),
       columnHelper.accessor("isMarketOrder", {
+        id: "type",
         header: "Type",
         cell: (row) => (row.getValue() ? "Market" : "Limit"),
       }),
       columnHelper.display({
+        id: "filled",
         header: "Filled/Amount",
         cell: ({ row }) => {
           const { initialWants, takerGot, isBid } = row.original
@@ -117,10 +122,12 @@ export function useTable({ data }: Params) {
         enableSorting: false,
       }),
       columnHelper.accessor("price", {
+        id: "price",
         header: "Price",
         enableSorting: true,
       }),
       columnHelper.accessor("status", {
+        id: "status",
         header: "Status",
         cell: ({ row }) => {
           const { status } = row.original
