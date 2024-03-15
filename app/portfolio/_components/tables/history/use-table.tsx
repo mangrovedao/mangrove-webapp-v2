@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-table"
 import React from "react"
 
-import InfoTooltip from "@/components/info-tooltip"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
