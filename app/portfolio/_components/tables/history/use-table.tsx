@@ -19,7 +19,7 @@ import Big from "big.js"
 import Link from "next/link"
 import { Fill } from "./schema"
 import { shortenAddress } from "@/utils/wallet"
-import { ExternalLinkIcon } from "lucide-react"
+import { Ban, Check, ExternalLinkIcon } from "lucide-react"
 
 const columnHelper = createColumnHelper<Fill>()
 const DEFAULT_DATA: Fill[] = []
@@ -29,7 +29,6 @@ type Params = {
 }
 
 export function useTable({ data }: Params) {
-  console.log("🚀 ~ useTable ~ data:", data)
   const { market } = useMarket()
 
   const columns = React.useMemo(
@@ -74,50 +73,50 @@ export function useTable({ data }: Params) {
         },
         sortingFn: "datetime",
       }),
-        columnHelper.display({
-          header: "Type",
-          cell: () => <span>Limit</span>,
-        }),
-        columnHelper.display({
-          header: "Filled/Amount",
-          cell: ({ row }) => {
-            const { initialWants, takerGot, isBid } = row.original
-            const baseSymbol = market?.base.symbol
-            const quoteSymbol = market?.quote.symbol
-            const symbol = isBid ? baseSymbol : quoteSymbol
-            const displayDecimals = isBid
-              ? market?.base.displayedDecimals
-              : market?.quote.displayedDecimals
+      columnHelper.display({
+        header: "Type",
+        cell: () => <span>Limit</span>,
+      }),
+      columnHelper.display({
+        header: "Filled/Amount",
+        cell: ({ row }) => {
+          const { initialWants, takerGot, isBid } = row.original
+          const baseSymbol = market?.base.symbol
+          const quoteSymbol = market?.quote.symbol
+          const symbol = isBid ? baseSymbol : quoteSymbol
+          const displayDecimals = isBid
+            ? market?.base.displayedDecimals
+            : market?.quote.displayedDecimals
 
-            const amount = Big(initialWants).toFixed(displayDecimals)
-            const filled = Big(takerGot).toFixed(displayDecimals)
-            const progress = Math.min(
-              Math.round(
-                Big(filled)
-                  .mul(100)
-                  .div(Big(amount).eq(0) ? 1 : amount)
-                  .toNumber(),
-              ),
-              100,
-            )
-            return market ? (
-              <div className={cn("flex items-center")}>
-                <span className="text-sm text-muted-foreground">
-                  {filled}
-                  &nbsp;/
-                </span>
-                <span className="">
-                  &nbsp;
-                  {amount} {symbol}
-                </span>
-                <CircularProgressBar progress={progress} className="ml-3" />
-              </div>
-            ) : (
-              <Skeleton className="w-32 h-6" />
-            )
-          },
-          enableSorting: false,
-        }),
+          const amount = Big(initialWants).toFixed(displayDecimals)
+          const filled = Big(takerGot).toFixed(displayDecimals)
+          const progress = Math.min(
+            Math.round(
+              Big(filled)
+                .mul(100)
+                .div(Big(amount).eq(0) ? 1 : amount)
+                .toNumber(),
+            ),
+            100,
+          )
+          return market ? (
+            <div className={cn("flex items-center")}>
+              <span className="text-sm text-muted-foreground">
+                {filled}
+                &nbsp;/
+              </span>
+              <span className="">
+                &nbsp;
+                {amount} {symbol}
+              </span>
+              <CircularProgressBar progress={progress} className="ml-3" />
+            </div>
+          ) : (
+            <Skeleton className="w-32 h-6" />
+          )
+        },
+        enableSorting: false,
+      }),
       columnHelper.accessor("price", {
         header: "Price",
         enableSorting: true,
@@ -126,7 +125,22 @@ export function useTable({ data }: Params) {
         header: "Status",
         cell: ({ row }) => {
           const { status } = row.original
-          return <div>{status}</div>
+          const isFilled = status === "FILLED"
+          return (
+            <div
+              className={cn(
+                "capitalize flex items-center space-x-1 px-2 py-0.5 rounded",
+                isFilled
+                  ? "text-green-caribbean bg-primary-dark-green"
+                  : "text-red-100 bg-red-950 ",
+              )}
+            >
+              {isFilled ? <Check size={15} /> : <Ban size={15} />}
+              <span className="pt-0.5">
+                {isFilled ? "Filled" : status.toLowerCase()}
+              </span>
+            </div>
+          )
         },
         sortingFn: "datetime",
       }),
