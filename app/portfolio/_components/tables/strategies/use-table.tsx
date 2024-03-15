@@ -14,13 +14,13 @@ import { TokenPair } from "@/components/token-pair"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
-import { Strategies } from "./schema"
+import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 
-const columnHelper = createColumnHelper<Strategies>()
-const DEFAULT_DATA: Strategies[] = []
+const columnHelper = createColumnHelper<Strategy>()
+const DEFAULT_DATA: Strategy[] = []
 
 type Params = {
-  data?: Strategies[]
+  data?: Strategy[]
 }
 
 export function useTable({ data }: Params) {
@@ -55,7 +55,7 @@ export function useTable({ data }: Params) {
       columnHelper.display({
         header: "Value",
       }),
-      columnHelper.accessor("status", {
+      columnHelper.accessor("offers.index", {
         header: "Status",
         cell: (row) => {
           const isCompleted = row.getValue()

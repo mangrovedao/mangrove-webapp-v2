@@ -7,11 +7,13 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { useTable } from "../_components/tables/history/use-table"
+import { useTable } from "../_components/tables/history/orders/use-table"
+import { useTable as useStrategiesTable } from "../_components/tables/history/strategies/use-table"
 import { useFills } from "@/app/trade/_components/tables/fills/use-fills"
 import { useState } from "react"
 import HistoryDetailSheet from "../_components/history/history-detail-sheet"
-import { Fill } from "../_components/tables/history/schema"
+import { useStrategies } from "@/app/strategies/(list)/_components/tables/strategies/hooks/use-strategies"
+import { Fill } from "@/app/trade/_components/tables/fills/schema"
 
 export default function Page() {
   const [showSheet, setShowSheet] = useState(false)
@@ -26,8 +28,18 @@ export default function Page() {
     },
   })
 
-  const table = useTable({
+  const ordersTable = useTable({
     data: fillsQuery.data,
+  })
+
+  const { data } = useStrategies({
+    filters: {
+      skip: (page - 1) * pageSize,
+    },
+  })
+
+  const strategiesTable = useStrategiesTable({
+    data,
   })
 
   return (
@@ -41,7 +53,7 @@ export default function Page() {
         </CustomTabsList>
         <CustomTabsContent className="p-4" value="trades">
           <DataTable
-            table={table}
+            table={ordersTable}
             onRowClick={(row) => {
               setShowSheet(true)
               setRowInfo(row)
@@ -55,7 +67,7 @@ export default function Page() {
           )}
         </CustomTabsContent>
         <CustomTabsContent className="p-4" value="strategies">
-          <DataTable table={table} />
+          <DataTable table={strategiesTable} />
         </CustomTabsContent>
       </CustomTabs>
     </main>

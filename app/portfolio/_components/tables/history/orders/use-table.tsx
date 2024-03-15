@@ -9,16 +9,16 @@ import {
 } from "@tanstack/react-table"
 import React from "react"
 
+import { Fill } from "@/app/trade/_components/tables/fills/schema"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import Big from "big.js"
-import Link from "next/link"
-import { Fill } from "./schema"
 import { shortenAddress } from "@/utils/wallet"
+import Big from "big.js"
 import { Ban, Check, ExternalLinkIcon } from "lucide-react"
+import Link from "next/link"
 
 const columnHelper = createColumnHelper<Fill>()
 const DEFAULT_DATA: Fill[] = []
