@@ -12,7 +12,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
       <IndexerSdkProvider>
         <Navbar />
         <ScrollArea
-          className="min-h-[var(--bar-height)] pb-6 w-full"
+          className="min-h-[calc(100vh_-_var(--bar-height))] w-full"
           scrollHideDelay={200}
         >
           <div className="flex flex-col md:flex-row">
