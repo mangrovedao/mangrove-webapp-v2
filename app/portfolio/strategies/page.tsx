@@ -16,7 +16,6 @@ export default function Page() {
     },
   })
 
-  console.log("🚀 ~ Page ~ data:", data)
   const table = useTable({
     data,
   })
