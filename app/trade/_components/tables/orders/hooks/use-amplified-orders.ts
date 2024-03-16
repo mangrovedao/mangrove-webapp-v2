@@ -63,7 +63,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
           const isExpired = order.expiryDate
             ? new Date(order.expiryDate) < new Date()
             : true
-
+          
           return allOffersMarketFound && !closedOffers && !isExpired
         })
 
