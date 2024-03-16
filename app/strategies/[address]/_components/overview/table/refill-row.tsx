@@ -3,20 +3,28 @@ import { Row } from "@tanstack/react-table"
 import Big from "big.js"
 import { Info } from "lucide-react"
 
+import RefillOfferDialog from "@/app/strategies/(shared)/_components/refill-dialog"
+import { useRefillOffer } from "@/app/strategies/(shared)/_hooks/use-refill-offer"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell } from "@/components/ui/table"
 import { cn } from "@/utils"
+import React from "react"
 import { useRefillRequirements } from "../../../_hooks/use-refill-requirements"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffer } from "../../../_utils/inventory"
 
-export default function RefillRow({ row }: { row: Row<MergedOffer> }) {
-  const { strategyStatusQuery } = useKandel()
+export default function RefillRow({ row, openRefill }: { row: Row<MergedOffer> ; openRefill: (offer: MergedOffer) => void }) {
+
+  const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
+    useKandel()
   const { data } = useRefillRequirements({
     offer: row.original,
   })
-  const { base, quote } = strategyStatusQuery.data?.market ?? {}
+
+  const { market } = strategyStatusQuery.data ?? {}
+  const { base, quote } = market ?? {}
+  const refill = useRefillOffer({ offer: row.original })
 
   return (
     <tr className="relative hidden md:table-row">
@@ -43,7 +51,13 @@ export default function RefillRow({ row }: { row: Row<MergedOffer> }) {
           {/* <LabelValueItem label="Min quote" value={Big(0)} token={quote} /> */}
         </div>
         {/* TODO: implement re-fill */}
-        <Button size={"sm"} className="px-5">
+        <Button
+          size={"sm"}
+          className="px-5"
+          onClick={() => openRefill(row.original)}
+          loading={refill.isPending}
+          disabled={refill.isPending}
+        >
           Re-fill
         </Button>
       </div>
