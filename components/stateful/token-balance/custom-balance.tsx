@@ -32,13 +32,12 @@ export function CustomBalance(props: {
           <TooltipProvider>
             <Tooltip delayDuration={200}>
               <TooltipTrigger
-                title={undefined}
                 className="hover:opacity-80 transition-opacity ml-1"
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
 
-                  props.action?.onClick(props.balance || "0")
+                  props.action?.onClick(props.balance || "")
                 }}
               >
                 <span>

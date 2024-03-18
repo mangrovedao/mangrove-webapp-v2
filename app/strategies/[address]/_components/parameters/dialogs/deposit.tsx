@@ -55,14 +55,16 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
     market?.quote ?? undefined,
   )
 
+  console.log({ baseBalance, quoteBalance })
   const stepInfos = [
     {
       body: (
         <div className="grid gap-4">
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setBaseAmount(baseBalance?.toString() || ""),
+              onClick: () => setBaseAmount(baseBalance as string),
             }}
+            value={baseAmount}
             label={`${market?.base.symbol} amount`}
             showBalance
             token={market?.base}
@@ -75,8 +77,9 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
           />
 
           <EnhancedNumericInput
+            value={quoteAmount}
             balanceAction={{
-              onClick: () => setQuoteAmount(quoteBalance?.toString() || ""),
+              onClick: () => setQuoteAmount(quoteBalance as string),
             }}
             label={`${market?.quote.symbol} amount`}
             showBalance
@@ -176,6 +179,13 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
       }
     })
 
+  const closeDialog = () => {
+    setBaseAmount("")
+    setQuoteAmount("")
+    reset()
+    onClose()
+  }
+
   return (
     <>
       <SuccessDialog
@@ -196,7 +206,7 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
         onClose={toggleDepositCompleted}
       />
 
-      <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
+      <Dialog open={!!open} onClose={closeDialog} showCloseButton={false}>
         <Dialog.Title className="text-xl text-left" close>
           <Title
             as={"div"}

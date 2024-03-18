@@ -37,7 +37,7 @@ export function Publish({ open, onClose }: Props) {
     useKandel()
 
   const { unPublishedBase, unPublishedQuote } = useParameters()
-  console.log({ unPublishedBase, unPublishedQuote })
+
   const { market } = strategyStatusQuery.data ?? {}
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
@@ -202,6 +202,13 @@ export function Publish({ open, onClose }: Props) {
       }
     })
 
+  const closeDialog = () => {
+    setBaseAmount("")
+    setQuoteAmount("")
+    reset()
+    onClose()
+  }
+
   return (
     <>
       <SuccessDialog
@@ -210,7 +217,7 @@ export function Publish({ open, onClose }: Props) {
         onClose={togglePublishCompleted}
       />
 
-      <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
+      <Dialog open={!!open} onClose={closeDialog} showCloseButton={false}>
         <Dialog.Title className="text-xl text-left" close>
           <div className="flex space-x-2 items-center">
             <Title
