@@ -10,159 +10,113 @@ import {
 import React from "react"
 
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
-import { TokenPair } from "@/components/token-pair"
-import useMarket from "@/providers/market"
-import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
-import { ExternalLinkIcon } from "lucide-react"
 import Link from "next/link"
+import { Market } from "@/app/strategies/(list)/_components/tables/strategies/components/market"
+import { Button } from "@/components/ui/button"
+import Status from "@/app/strategies/(shared)/_components/status"
+import { Value } from "@/app/strategies/(list)/_components/tables/strategies/components/value"
+import { useAccount } from "wagmi"
 
 const columnHelper = createColumnHelper<Strategy>()
 const DEFAULT_DATA: Strategy[] = []
 
 type Params = {
   data?: Strategy[]
+  onManage: (strategy: Strategy) => void
 }
 
-export function useTable({ data }: Params) {
-  const { market } = useMarket()
+export function useTable({ data, onManage }: Params) {
+  const { chain } = useAccount()
 
   const columns = React.useMemo(
     () => [
-      columnHelper.display({
-        id: "market",
-        header: "Market",
-        cell: () => (
-          <div className="flex items-center space-x-2">
-            <TokenPair
-              titleProps={{
-                variant: "title3",
-                className: "text-sm text-current font-normal",
-                as: "span",
-              }}
-              tokenClasses="w-4 h-4"
-              baseToken={market?.base}
-              quoteToken={market?.quote}
-            />
-          </div>
-        ),
-        enableSorting: true,
-      }),
-      columnHelper.display({
-        id: "date",
-        header: "Date",
+      columnHelper.accessor("address", {
+        header: "Strategy address",
         cell: ({ row }) => {
-          const { creationDate } = row.original
-          return creationDate ? new Date(creationDate).toDateString() : ""
-        },
-        enableSorting: true,
-      }),
-      columnHelper.accessor("quote", {
-        id: "side",
-        header: "Side",
-        cell: (row) => {
-          const isBid = row.getValue()
+          const { address } = row.original
+          const blockExplorerUrl = chain?.blockExplorers?.default.url
           return (
-            <div
-              className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
-            >
-              {isBid ? "Buy" : "Sell"}
+            <div className="flex flex-col underline">
+              <Link
+                className="hover:opacity-80 transition-opacity"
+                href={`${blockExplorerUrl}/address/${address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {shortenAddress(address)}
+              </Link>
             </div>
           )
         },
-        sortingFn: "datetime",
       }),
-      // columnHelper.accessor("isMarketOrder", {
-      //   id: "type",
-      //   header: "Type",
-      //   cell: (row) => (row.getValue() ? "Market" : "Limit"),
-      // }),
-      // columnHelper.display({
-      //   id: "filled",
-      //   header: "Filled/Amount",
-      //   cell: ({ row }) => {
-      //     const { initialWants, takerGot, isBid } = row.original
-      //     const baseSymbol = market?.base.symbol
-      //     const quoteSymbol = market?.quote.symbol
-      //     const symbol = isBid ? baseSymbol : quoteSymbol
-      //     const displayDecimals = isBid
-      //       ? market?.base.displayedDecimals
-      //       : market?.quote.displayedDecimals
-
-      //     const amount = Big(initialWants).toFixed(displayDecimals)
-      //     const filled = Big(takerGot).toFixed(displayDecimals)
-      //     const progress = Math.min(
-      //       Math.round(
-      //         Big(filled)
-      //           .mul(100)
-      //           .div(Big(amount).eq(0) ? 1 : amount)
-      //           .toNumber(),
-      //       ),
-      //       100,
-      //     )
-      //     return market ? (
-      //       <div className={cn("flex items-center")}>
-      //         <span className="text-sm text-muted-foreground">
-      //           {filled}
-      //           &nbsp;/
-      //         </span>
-      //         <span className="">
-      //           &nbsp;
-      //           {amount} {symbol}
-      //         </span>
-      //         <CircularProgressBar progress={progress} className="ml-3" />
-      //       </div>
-      //     ) : (
-      //       <Skeleton className="w-32 h-6" />
-      //     )
-      //   },
-      //   enableSorting: false,
-      // }),
-      // columnHelper.accessor("price", {
-      //   id: "price",
-      //   header: "Price",
-      //   enableSorting: true,
-      // }),
-      // columnHelper.accessor("status", {
-      //   id: "status",
-      //   header: "Status",
-      //   cell: ({ row }) => {
-      //     const { status } = row.original
-      //     const isFilled = status === "FILLED"
-      //     return (
-      //       <div
-      //         className={cn(
-      //           "capitalize flex items-center space-x-1 px-2 py-0.5 rounded",
-      //           isFilled
-      //             ? "text-green-caribbean bg-primary-dark-green"
-      //             : "text-red-100 bg-red-950 ",
-      //         )}
-      //       >
-      //         {isFilled ? <Check size={15} /> : <Ban size={15} />}
-      //         <span className="pt-0.5">
-      //           {isFilled ? "Filled" : status.toLowerCase()}
-      //         </span>
-      //       </div>
-      //     )
-      //   },
-      //   sortingFn: "datetime",
-      // }),
+      columnHelper.display({
+        header: "Market",
+        cell: ({ row }) => {
+          const { base, quote } = row.original
+          return <Market base={base} quote={quote} />
+        },
+      }),
+      columnHelper.display({
+        header: "Balance",
+      }),
+      columnHelper.display({
+        header: "Value",
+        cell: ({ row }) => {
+          const { base, quote, depositedBase, depositedQuote } = row.original
+          return (
+            <Value
+              base={base}
+              baseValue={depositedBase}
+              quote={quote}
+              quoteValue={depositedQuote}
+            />
+          )
+        },
+      }),
+      columnHelper.display({
+        header: "Status",
+        cell: ({ row }) => {
+          const { base, quote, address, offers } = row.original
+          return (
+            <Status
+              base={base}
+              quote={quote}
+              address={address}
+              offers={offers}
+            />
+          )
+        },
+      }),
+        columnHelper.display({
+          header: "Return (%)",
+          cell: ({ row }) => {
+            const { return: ret } = row.original
+            return (
+              <div className="flex flex-col">
+                <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+              </div>
+            )
+          },
+        }),
+      columnHelper.display({
+        header: "Liquidity source",
+        cell: () => "Wallet",
+        enableSorting: true,
+      }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => {
-          const { transactionHash } = row.original
-          return (
-            <Link
-              href={`https://blastscan.io/tx/${transactionHash}`}
-              target="_blank"
-              className="underline flex justify-end space-x-2 w-full"
+        cell: ({ row }) => (
+          <div className="w-full h-full flex justify-end space-x-1">
+            <Button
+              className="flex items-center"
+              onClick={() => onManage(row.original)}
             >
-              <ExternalLinkIcon size={16} />
-              <span>{shortenAddress(transactionHash)}</span>
-            </Link>
-          )
-        },
+              Reopen
+            </Button>
+          </div>
+        ),
       }),
     ],
     [],

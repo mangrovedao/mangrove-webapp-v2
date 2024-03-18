@@ -14,6 +14,8 @@ import { useState } from "react"
 import HistoryDetailSheet from "../_components/history/history-detail-sheet"
 import { useStrategies } from "@/app/strategies/(list)/_components/tables/strategies/hooks/use-strategies"
 import { Fill } from "@/app/trade/_components/tables/fills/schema"
+import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
+import { useRouter } from "next/navigation"
 
 export default function Page() {
   const [showSheet, setShowSheet] = useState(false)
@@ -27,6 +29,7 @@ export default function Page() {
       skip: (page - 1) * pageSize,
     },
   })
+  const { push } = useRouter()
 
   const ordersTable = useTable({
     data: fillsQuery.data,
@@ -40,6 +43,9 @@ export default function Page() {
 
   const strategiesTable = useStrategiesTable({
     data,
+    onManage: (strategy: Strategy) => {
+      push(`/strategies/${strategy.address}`)
+    },
   })
 
   return (
