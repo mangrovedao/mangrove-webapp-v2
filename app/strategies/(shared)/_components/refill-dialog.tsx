@@ -33,7 +33,12 @@ export default function RefillOfferDialog({ offer, onClose }: Props) {
             Yes, refill offer
           </Button>
           <Dialog.Close>
-            <Button variant={"secondary"} className="w-full" size="lg">
+            <Button
+              variant={"secondary"}
+              className="w-full"
+              size="lg"
+              disabled={refill.isPending}
+            >
               No, cancel
             </Button>
           </Dialog.Close>
