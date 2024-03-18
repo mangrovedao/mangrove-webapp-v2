@@ -14,6 +14,8 @@ const orderSchema = z.object({
   initialGives: z.string(),
   price: z.string(),
   offerId: z.string(),
+  inboundRoute: z.string(),
+  outboundRoute: z.string(),
 })
 export type Order = z.infer<typeof orderSchema>
 
@@ -34,6 +36,7 @@ const amplifiedOrderSchema = z.object({
   id: z.string(),
   creationDate: z.string(),
   bundleId: z.string(),
+  expiryDate: z.date(), 
   owner: z
     .object({
       address: z.string(),

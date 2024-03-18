@@ -51,6 +51,7 @@ export function useOrders<T = Order[]>({
           skip,
           maker: address.toLowerCase(),
         })
+
         return parseOrders(result)
       } catch (e) {
         console.error(getErrorMessage(e))

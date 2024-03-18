@@ -1,17 +1,13 @@
 import { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import React from "react"
 import { DefaultLogics } from "../../types"
 
 type Props = {
-  sendFrom: string
-  receiveTo: string[]
+  sendFrom?: string
   logics: DefaultLogics[]
   fundOwner?: string
   sendToken?: Token
-  receiveToken?: Token
-  availableTokens: Token[]
+  availableTokens?: Token[]
 }
 
 type BalanceLogic = {
@@ -19,11 +15,9 @@ type BalanceLogic = {
   balance: number
 }
 
-export default function liquiditySourcing({
+export default function amplifiedLiquiditySourcing({
   sendToken,
-  receiveToken,
   sendFrom,
-  receiveTo,
   logics,
   fundOwner,
   availableTokens,
@@ -32,16 +26,12 @@ export default function liquiditySourcing({
     BalanceLogic | undefined
   >()
 
-  const [sendFromLogics, setSendFromLogics] = React.useState<DefaultLogics[]>()
-
-  const [receiveToLogics, setReceiveToLogics] =
-    React.useState<DefaultLogics[]>()
-
   const [useAbleTokens, setUseAbleTokens] = React.useState<
     (Token | undefined)[]
   >([])
 
   const getPossibleLogicsForToken = async () => {
+    if (!availableTokens) return
     const tokenToTest = availableTokens.map(async (token) => {
       if (sendFrom !== "simple") {
         try {
@@ -57,7 +47,6 @@ export default function liquiditySourcing({
     })
 
     const usableTokens = await Promise.all(tokenToTest)
-
     setUseAbleTokens(usableTokens)
   }
 
@@ -68,9 +57,7 @@ export default function liquiditySourcing({
         return
       }
 
-      const selectedLogic = logics.find((logic) => logic?.id === sendFrom) as
-        | SimpleAaveLogic
-        | OrbitLogic
+      const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
 
       if (!selectedLogic) return
 
@@ -97,8 +84,6 @@ export default function liquiditySourcing({
   }, [sendFrom, sendToken, fundOwner])
 
   return {
-    sendFromLogics,
-    receiveToLogics,
     sendFromBalance,
     useAbleTokens,
   }

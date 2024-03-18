@@ -38,12 +38,13 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const { data: ordersCount } = useOrders({
     select: (orders) => orders.length,
   })
+
   const { data: fillsCount } = useFills({
     select: (fills) => fills.length,
   })
 
   const { data: amplifedCount } = useAmplifiedOrders({
-    select: (fills) => fills.length,
+    select: (amplified) => amplified.length,
   })
 
   return (

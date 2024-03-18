@@ -35,12 +35,19 @@ export function CustomBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
+
                   props.action?.onClick(props.balance || "0")
                 }}
               >
                 <span>
-                  {Number(props.balance).toFixed(token?.displayedDecimals)}{" "}
-                  {token?.symbol}
+                  {!token ? (
+                    `${props.balance} ${props.token}`
+                  ) : (
+                    <>
+                      {Number(props.balance).toFixed(token?.displayedDecimals)}{" "}
+                      {token?.symbol}
+                    </>
+                  )}
                 </span>
               </TooltipTrigger>
               <TooltipContent className="z-50">

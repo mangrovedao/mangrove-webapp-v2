@@ -8,6 +8,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import * as SheetRoot from "@/components/ui/sheet"
+import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { TimeInForce } from "../../../forms/limit/enums"
@@ -23,14 +24,14 @@ import EditOrderSteps from "./edit-order-steps"
 import { Timer } from "./timer"
 
 type SheetLineProps = {
-  title: string
+  title: React.ReactNode
   item: React.ReactNode
   secondaryItem?: React.ReactNode
 }
 
 const SheetLine = ({ title, item, secondaryItem }: SheetLineProps) => (
   <div className="flex justify-between items-center">
-    <Text className="text-muted-foreground whitespace-nowrap">{title}:</Text>
+    <Text className="text-muted-foreground whitespace-nowrap">{title}</Text>
     <div className="grid justify-items-end max-w-60">
       {item}
       {secondaryItem}
@@ -81,6 +82,8 @@ export default function EditOrderSheet({
     isOrderExpired,
     formattedPrice,
     sendTokenBalance,
+    sendFrom,
+    receiveTo,
   } = useEditOrder({
     order,
     onSubmit: (formData) => setFormData(formData),
@@ -101,219 +104,256 @@ export default function EditOrderSheet({
           <SheetRoot.SheetTitle>Order Details</SheetRoot.SheetTitle>
         </SheetRoot.SheetHeader>
         <form.Provider>
-          {formData ? (
-            <EditOrderSteps
-              order={order}
-              form={formData}
-              onClose={onClose}
-              displayDecimals={displayDecimals}
-            />
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              autoComplete="off"
-              className="flex flex-col flex-1"
-            >
-              <SheetRoot.SheetBody>
-                <TokenPair
-                  tokenClasses="h-7 w-7"
-                  baseToken={base}
-                  quoteToken={quote}
-                  titleProps={{ variant: "title1" }}
-                />
+          <ScrollArea scrollHideDelay={200}>
+            {formData ? (
+              <EditOrderSteps
+                order={order}
+                form={formData}
+                onClose={onClose}
+                onCloseForm={() => {
+                  setToggleEdit(false)
+                  setFormData(undefined)
+                }}
+                displayDecimals={displayDecimals}
+              />
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                autoComplete="off"
+                className="flex flex-col flex-1 p-3"
+              >
+                <SheetRoot.SheetBody>
+                  <TokenPair
+                    tokenClasses="h-7 w-7"
+                    baseToken={base}
+                    quoteToken={quote}
+                    titleProps={{ variant: "title1" }}
+                  />
 
-                <SheetLine
-                  title="Status"
-                  item={
-                    <Badge
-                      title={isOrderExpired ? "Closed" : "Open"}
-                      isExpired={isOrderExpired}
-                    />
-                  }
-                />
-
-                {expiryDate && (
                   <SheetLine
-                    title="Order Date"
-                    item={<Text>{formatDateWithoutHours(expiryDate)}</Text>}
-                    secondaryItem={
-                      <Text className="text-muted-foreground">
-                        {formatHoursOnly(expiryDate)}
+                    title="Status"
+                    item={
+                      <Badge
+                        title={isOrderExpired ? "Closed" : "Open"}
+                        isExpired={isOrderExpired}
+                      />
+                    }
+                  />
+
+                  {expiryDate && (
+                    <SheetLine
+                      title="Order Date"
+                      item={<Text>{formatDateWithoutHours(expiryDate)}</Text>}
+                      secondaryItem={
+                        <Text className="text-muted-foreground">
+                          {formatHoursOnly(expiryDate)}
+                        </Text>
+                      }
+                    />
+                  )}
+
+                  <SheetLine
+                    title="Side"
+                    item={
+                      <Text
+                        className={
+                          isBid ? "text-green-caribbean" : "text-red-100"
+                        }
+                      >
+                        {isBid ? "Buy" : "Sell"}
                       </Text>
                     }
                   />
-                )}
 
-                <SheetLine
-                  title="Side"
-                  item={
-                    <Text
-                      className={
-                        isBid ? "text-green-caribbean" : "text-red-100"
-                      }
-                    >
-                      {isBid ? "Buy" : "Sell"}
-                    </Text>
-                  }
-                />
+                  <SheetLine title="Type" item={<Text>Limit</Text>} />
 
-                <SheetLine title="Type" item={<Text>Wallet</Text>} />
-
-                <SheetLine
-                  title="Filled/Amount"
-                  item={
-                    <Text>{`${filled} / ${amount} ${
-                      isBid ? base.symbol : quote.symbol
-                    }`}</Text>
-                  }
-                  secondaryItem={
-                    <div className="flex gap-1 align-baseline">
-                      <CircularProgressBar
-                        progress={progress}
-                        className="h-5 w-5"
-                      />
-                      <Text>{progressInPercent}%</Text>
-                    </div>
-                  }
-                />
-                <SheetLine
-                  title="Send Amount"
-                  item={
-                    !toggleEdit ? (
-                      <Text>{`${volume} ${
-                        isBid ? quote.symbol : base.symbol
+                  <SheetLine
+                    title={`Filled/Amount`}
+                    item={
+                      <Text>{`${filled} / ${amount} ${
+                        isBid ? base.symbol : quote.symbol
                       }`}</Text>
-                    ) : (
-                      <form.Field
-                        name="send"
-                        onChange={sendValidator(
-                          Number(sendTokenBalance.formatted ?? 0),
-                        )}
-                      >
-                        {(field) => (
-                          <EnhancedNumericInput
-                            className="h-10"
-                            inputClassName="h-10"
-                            name={field.name}
-                            value={field.state.value}
-                            placeholder={volume}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => {
-                              field.handleChange(e.target.value)
-                            }}
-                            error={field.state.meta.touchedErrors}
-                            token={isBid ? quote : base}
-                            disabled={!market}
-                            showBalance
-                          />
-                        )}
-                      </form.Field>
-                    )
-                  }
-                />
+                    }
+                    secondaryItem={
+                      <div className="flex gap-1 align-baseline">
+                        <CircularProgressBar
+                          progress={progress}
+                          className="h-5 w-5"
+                        />
+                        <Text>{progressInPercent}%</Text>
+                      </div>
+                    }
+                  />
 
-                <SheetLine
-                  title="Limit price"
-                  item={
-                    !toggleEdit ? (
-                      <Text>{formattedPrice}</Text>
-                    ) : (
-                      <form.Field
-                        name="limitPrice"
-                        onChange={isGreaterThanZeroValidator}
-                      >
-                        {(field) => (
-                          <EnhancedNumericInput
-                            className="h-10"
-                            inputClassName="h-10"
-                            name={field.name}
-                            value={field.state.value}
-                            placeholder={formattedPrice}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => {
-                              field.handleChange(e.target.value)
-                            }}
-                            error={field.state.meta.touchedErrors}
-                            token={quote}
-                            disabled={!market}
-                          />
-                        )}
-                      </form.Field>
-                    )
-                  }
-                />
+                  <SheetLine
+                    title="Limit price"
+                    item={
+                      !toggleEdit ? (
+                        <Text>{formattedPrice}</Text>
+                      ) : (
+                        <form.Field
+                          name="limitPrice"
+                          onChange={isGreaterThanZeroValidator}
+                        >
+                          {(field) => (
+                            <EnhancedNumericInput
+                              className="h-10"
+                              inputClassName="h-10"
+                              name={field.name}
+                              value={field.state.value}
+                              placeholder={formattedPrice}
+                              onBlur={field.handleBlur}
+                              onChange={(e) => {
+                                field.handleChange(e.target.value)
+                              }}
+                              error={field.state.meta.touchedErrors}
+                              token={quote}
+                              disabled={!market}
+                            />
+                          )}
+                        </form.Field>
+                      )
+                    }
+                  />
 
-                <SheetLine
-                  title="Time in force"
-                  item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
-                  secondaryItem={
-                    expiryDate && (
-                      <Text className="text-muted-foreground">
-                        <Timer expiry={expiryDate} />
+                  <SheetLine
+                    title={
+                      <Text className="text-wrap">
+                        Send from{" "}
+                        {sendFrom?.id.includes("simple")
+                          ? "Wallet"
+                          : sendFrom?.id.toUpperCase()}
                       </Text>
-                    )
-                  }
-                />
-              </SheetRoot.SheetBody>
-
-              <SheetRoot.SheetFooter>
-                <SheetRoot.SheetClose className="flex-1">
-                  <form.Subscribe selector={(state) => [state.isSubmitting]}>
-                    {([isSubmitting]) => {
-                      return (
-                        <Button
-                          className="w-full"
-                          variant="secondary"
-                          size="lg"
-                          onClick={
-                            toggleEdit
-                              ? (e) => {
-                                  e.preventDefault()
-                                  setToggleEdit(!toggleEdit)
-                                }
-                              : undefined
-                          }
-                          disabled={isSubmitting}
+                    }
+                    item={
+                      !toggleEdit ? (
+                        <Text>{`${volume} ${
+                          isBid ? base.symbol : quote.symbol
+                        }`}</Text>
+                      ) : (
+                        <form.Field
+                          name="send"
+                          onChange={sendValidator(
+                            Number(sendTokenBalance.formatted ?? 0),
+                          )}
                         >
-                          Cancel
-                        </Button>
+                          {(field) => (
+                            <EnhancedNumericInput
+                              className="h-10"
+                              inputClassName="h-10"
+                              name={field.name}
+                              value={field.state.value}
+                              placeholder={volume}
+                              onBlur={field.handleBlur}
+                              onChange={(e) => {
+                                field.handleChange(e.target.value)
+                              }}
+                              error={field.state.meta.touchedErrors}
+                              token={isBid ? quote : base}
+                              disabled={!market}
+                              showBalance
+                            />
+                          )}
+                        </form.Field>
                       )
-                    }}
-                  </form.Subscribe>
-                </SheetRoot.SheetClose>
+                    }
+                  />
 
-                {!toggleEdit ? (
-                  <Button
-                    className="flex-1"
-                    variant="primary"
-                    size="lg"
-                    onClick={() => setToggleEdit(!toggleEdit)}
-                  >
-                    Modify
-                  </Button>
-                ) : (
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  >
-                    {([canSubmit, isSubmitting]) => {
-                      return (
-                        <Button
-                          type="submit"
-                          className="flex-1"
-                          variant="primary"
-                          size="lg"
-                          disabled={!canSubmit || !market}
-                          loading={!!isSubmitting}
-                        >
-                          Save
-                        </Button>
+                  <SheetLine
+                    title={
+                      <Text className="text-wrap">
+                        Receive to{" "}
+                        {receiveTo?.id.includes("simple")
+                          ? "Wallet"
+                          : receiveTo?.id.toUpperCase()}
+                      </Text>
+                    }
+                    item={
+                      <Text>{`${amount} ${
+                        isBid ? base.symbol : quote.symbol
+                      }`}</Text>
+                    }
+                  />
+
+                  <SheetLine
+                    title="Time in force"
+                    item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
+                    secondaryItem={
+                      expiryDate && (
+                        <Text className="text-muted-foreground">
+                          <Timer expiry={expiryDate} />
+                        </Text>
                       )
-                    }}
-                  </form.Subscribe>
-                )}
-              </SheetRoot.SheetFooter>
-            </form>
-          )}
+                    }
+                  />
+                </SheetRoot.SheetBody>
+
+                <SheetRoot.SheetFooter>
+                  <SheetRoot.SheetClose className="flex-1">
+                    <form.Subscribe selector={(state) => [state.isSubmitting]}>
+                      {([isSubmitting]) => {
+                        return (
+                          <Button
+                            className="w-full"
+                            variant="secondary"
+                            size="lg"
+                            onClick={
+                              toggleEdit
+                                ? (e) => {
+                                    e.preventDefault()
+                                    setToggleEdit(!toggleEdit)
+                                  }
+                                : undefined
+                            }
+                            disabled={isSubmitting}
+                          >
+                            {toggleEdit ? "Cancel" : "Close"}
+                          </Button>
+                        )
+                      }}
+                    </form.Subscribe>
+                  </SheetRoot.SheetClose>
+
+                  {!toggleEdit ? (
+                    <Button
+                      className="flex-1"
+                      variant="primary"
+                      size="lg"
+                      onClick={() => setToggleEdit(!toggleEdit)}
+                    >
+                      Modify
+                    </Button>
+                  ) : (
+                    <form.Subscribe
+                      selector={(state) => [
+                        state.canSubmit,
+                        state.isSubmitting,
+                      ]}
+                    >
+                      {([canSubmit, isSubmitting]) => {
+                        return (
+                          <Button
+                            type="submit"
+                            className="flex-1"
+                            variant="primary"
+                            size="lg"
+                            disabled={!canSubmit || !market}
+                            loading={!!isSubmitting}
+                          >
+                            Save
+                          </Button>
+                        )
+                      }}
+                    </form.Subscribe>
+                  )}
+                </SheetRoot.SheetFooter>
+              </form>
+            )}
+            <ScrollBar
+              orientation="vertical"
+              className="bg-primary-dark-green"
+            />
+          </ScrollArea>
         </form.Provider>
       </SheetRoot.SheetContent>
     </SheetRoot.Sheet>

@@ -1,6 +1,6 @@
 import { env } from "@/env.mjs"
-import { type Chain } from "@rainbow-me/rainbowkit"
-import * as wagmiChains from "wagmi/chains"
+import type { Chain } from "viem/chains"
+import * as wagmiChains from "viem/chains"
 
 const WHITELISTED_CHAIN_IDS = env.NEXT_PUBLIC_WHITELISTED_CHAIN_IDS
 const DEFAULT_CHAIN_ID = "80001"

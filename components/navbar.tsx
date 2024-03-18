@@ -39,6 +39,7 @@ import {
 
 import useLocalStorage from "@/hooks/use-local-storage"
 import { blast, blastSepolia } from "viem/chains"
+import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
@@ -211,6 +212,7 @@ const RightPart = withClientOnly(() => {
   }
   const [hideDisclaimer] = useLocalStorage<boolean>("hideDisclaimer", false)
   const [wrapETH, setWrapETH] = React.useState(false)
+  const [unWrapETH, setUnWrapETH] = React.useState(false)
 
   // React.useEffect(() => {
   //   if (!isConnected && !address) {
@@ -257,6 +259,8 @@ const RightPart = withClientOnly(() => {
   return (
     <div className="flex space-x-4 items-center h-8 py-1">
       <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
+      <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
+
       <Button
         variant="invisible"
         className="!space-x-4 lg:flex items-center hidden"
@@ -318,13 +322,24 @@ const RightPart = withClientOnly(() => {
             </DropdownMenuItem>
           )}
 
-          {(chain?.id === blastSepolia.id || chain?.id === blast.id) && (
-            <DropdownMenuItem asChild onClick={() => setWrapETH(!wrapETH)}>
-              <div>
-                <Coins className="mr-2 h-4 w-4" />
-                <span>Wrap ETH</span>
-              </div>
-            </DropdownMenuItem>
+          {(chain?.id == blastSepolia.id || chain?.id == blast.id) && (
+            <>
+              <DropdownMenuItem asChild onClick={() => setWrapETH(!wrapETH)}>
+                <div>
+                  <Coins className="mr-2 h-4 w-4" />
+                  <span>Wrap ETH</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                asChild
+                onClick={() => setUnWrapETH(!unWrapETH)}
+              >
+                <div>
+                  <Coins className="mr-2 h-4 w-4" />
+                  <span>Unwrap wETH</span>
+                </div>
+              </DropdownMenuItem>
+            </>
           )}
 
           <DropdownMenuSeparator />
