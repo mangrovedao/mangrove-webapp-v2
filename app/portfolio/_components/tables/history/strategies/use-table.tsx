@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button"
 import Status from "@/app/strategies/(shared)/_components/status"
 import { Value } from "@/app/strategies/(list)/_components/tables/strategies/components/value"
 import { useAccount } from "wagmi"
+import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const columnHelper = createColumnHelper<Strategy>()
 const DEFAULT_DATA: Strategy[] = []
@@ -88,17 +90,19 @@ export function useTable({ data, onManage }: Params) {
           )
         },
       }),
-        columnHelper.display({
-          header: "Return (%)",
-          cell: ({ row }) => {
-            const { return: ret } = row.original
-            return (
-              <div className="flex flex-col">
-                <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+      columnHelper.display({
+        header: "Return (%)",
+        cell: ({ row }) => {
+          const { return: returnValue } = row.original
+          return (
+            <div className="flex flex-col">
+              <div>
+                {isNaN(returnValue as number) ? "-" : returnValue?.toString()}
               </div>
-            )
-          },
-        }),
+            </div>
+          )
+        },
+      }),
       columnHelper.display({
         header: "Liquidity source",
         cell: () => "Wallet",
@@ -107,16 +111,42 @@ export function useTable({ data, onManage }: Params) {
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => (
-          <div className="w-full h-full flex justify-end space-x-1">
-            <Button
-              className="flex items-center"
-              onClick={() => onManage(row.original)}
-            >
-              Reopen
-            </Button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const { data } = useStrategyStatus({
+            address: row.original.address,
+            base: row.original?.base,
+            quote: row.original?.quote,
+            offers: row.original?.offers,
+          })
+          const status = data?.status
+
+          if (!status)
+            return (
+              <div className="w-full flex justify-end">
+                <Skeleton className="w-20 h-5 self-end" />
+              </div>
+            )
+
+          return (
+            <div className="w-full h-full flex justify-end space-x-1">
+              {status === "active" ? (
+                <Button
+                  className="flex items-center"
+                  onClick={() => onManage(row.original)}
+                >
+                  Manage
+                </Button>
+              ) : (
+                <Button
+                  className="flex items-center"
+                  // onClick={() => onManage(row.original)}
+                >
+                  Reopen
+                </Button>
+              )}
+            </div>
+          )
+        },
       }),
     ],
     [],
