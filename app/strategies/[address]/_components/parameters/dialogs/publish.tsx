@@ -37,7 +37,7 @@ export function Publish({ open, onClose }: Props) {
     useKandel()
 
   const { unPublishedBase, unPublishedQuote } = useParameters()
-
+  console.log({ unPublishedBase, unPublishedQuote })
   const { market } = strategyStatusQuery.data ?? {}
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
@@ -66,7 +66,6 @@ export function Publish({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setBaseAmount(unPublishedBase),
-              text: "MAX",
             }}
             value={baseAmount}
             label={`${market?.base.symbol} amount`}
@@ -77,7 +76,7 @@ export function Publish({ open, onClose }: Props) {
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
               Number(baseAmount) > Number(unPublishedBase)
-                ? "Invalid amount"
+                ? "Insufficient balance"
                 : ""
             }
           />
@@ -85,7 +84,6 @@ export function Publish({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setQuoteAmount(unPublishedQuote),
-              text: "MAX",
             }}
             value={quoteAmount}
             label={`${market?.quote.symbol} amount`}
@@ -96,7 +94,7 @@ export function Publish({ open, onClose }: Props) {
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
               Number(quoteAmount) > Number(unPublishedQuote)
-                ? "Invalid amount"
+                ? "Insufficient balance"
                 : ""
             }
           />

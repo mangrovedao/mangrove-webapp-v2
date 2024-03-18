@@ -98,7 +98,7 @@ export const useParameters = () => {
   const getUnpublishedBalances = async () => {
     const asks = await stratInstance?.getUnpublished("asks")
     const bids = await stratInstance?.getUnpublished("bids")
-
+    console.log(JSON.stringify({ asks, bids }))
     return [asks, bids]
   }
 

@@ -88,7 +88,6 @@ export function UnPublish({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setBaseAmount(upublishedBase),
-              text: "MAX",
             }}
             value={baseAmount}
             label={`${market?.base.symbol} amount`}
@@ -99,7 +98,7 @@ export function UnPublish({ open, onClose }: Props) {
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
               Number(baseAmount) > Number(upublishedBase)
-                ? "Invalid amount"
+                ? "Insufficient balance"
                 : ""
             }
           />
@@ -107,7 +106,6 @@ export function UnPublish({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setQuoteAmount(upublishedQuote),
-              text: "MAX",
             }}
             value={quoteAmount}
             label={`${market?.quote.symbol} amount`}
@@ -118,7 +116,7 @@ export function UnPublish({ open, onClose }: Props) {
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
               Number(quoteAmount) > Number(upublishedQuote)
-                ? "Invalid amount"
+                ? "Insufficient balance"
                 : ""
             }
           />
@@ -180,7 +178,9 @@ export function UnPublish({ open, onClose }: Props) {
                 Funds are evenly distributed across the active strategy.
               </Caption>
               <Link href={KANDEL_DOC_URL} target="_blank">
-                <Caption className="text-primary underline">Learn more</Caption>
+                <Caption className="text-green-caribbean underline">
+                  Learn more
+                </Caption>
               </Link>
             </div>
           </div>

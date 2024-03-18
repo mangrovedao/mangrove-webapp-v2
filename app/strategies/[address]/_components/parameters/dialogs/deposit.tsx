@@ -62,28 +62,30 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setBaseAmount(baseBalance?.toString() || ""),
-              text: "MAX",
             }}
             label={`${market?.base.symbol} amount`}
             showBalance
             token={market?.base}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
-              Number(baseAmount) > Number(baseBalance) ? "Invalid amount" : ""
+              Number(baseAmount) > Number(baseBalance)
+                ? "Insufficient balance"
+                : ""
             }
           />
 
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setQuoteAmount(quoteBalance?.toString() || ""),
-              text: "MAX",
             }}
             label={`${market?.quote.symbol} amount`}
             showBalance
             token={market?.quote}
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
-              Number(quoteAmount) > Number(quoteBalance) ? "Invalid amount" : ""
+              Number(quoteAmount) > Number(quoteBalance)
+                ? "Insufficient balance"
+                : ""
             }
           />
         </div>

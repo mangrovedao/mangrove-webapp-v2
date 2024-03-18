@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
@@ -31,6 +32,7 @@ export function TokenBalance(props: {
           <TooltipProvider>
             <Tooltip delayDuration={200}>
               <TooltipTrigger
+                title={undefined}
                 className="hover:opacity-80 transition-opacity ml-1"
                 onClick={(e) => {
                   e.stopPropagation()
@@ -40,15 +42,17 @@ export function TokenBalance(props: {
               >
                 <span title={formatted?.toString()}>{formattedWithSymbol}</span>
               </TooltipTrigger>
-              <TooltipContent
-                className="z-50"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                }}
-              >
-                {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
-              </TooltipContent>
+
+              <TooltipPortal>
+                <TooltipContent
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                  }}
+                >
+                  {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
+                </TooltipContent>
+              </TooltipPortal>
             </Tooltip>
           </TooltipProvider>
           {props?.action && props?.action.text && (
