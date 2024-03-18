@@ -48,7 +48,7 @@ export function useRefillOffer({ offer, onCancel }: Props) {
       try {
         if (!strategy || !strategyQuery) return
         const { stratInstance } = strategy
-  
+
         const singleOfferDistributionChunk = {
           bids:
             offer.offerType === "bids"
@@ -71,13 +71,13 @@ export function useRefillOffer({ offer, onCancel }: Props) {
                 ]
               : [],
         }
-  
+
         const transaction = await stratInstance?.populateGeneralChunks({
           distributionChunks: [singleOfferDistributionChunk],
         })
 
         const result = await Promise.all(transaction.map((tx) => tx?.wait()))
-  
+
         return { lastTx: result[result.length - 1] }
       } catch (error) {
         console.error(error)
@@ -87,11 +87,12 @@ export function useRefillOffer({ offer, onCancel }: Props) {
       try {
         if (!data) return
         const { lastTx } = data
+        await resolveWhenBlockIsIndexed.mutateAsync({
+          blockNumber: lastTx?.blockNumber,
+        })
+        queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+        queryClient.invalidateQueries({ queryKey: ["strategy"] })
         onCancel?.()
-        // await resolveWhenBlockIsIndexed.mutateAsync({
-        //   blockNumber: lastTx?.blockNumber,
-        // })
-        // queryClient.invalidateQueries({ queryKey: ["orders"] })
       } catch (error) {
         console.error(error)
       }
