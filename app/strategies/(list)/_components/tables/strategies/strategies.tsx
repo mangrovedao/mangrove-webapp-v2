@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation"
 import React from "react"
 
+import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
 import type { Strategy } from "../../../_schemas/kandels"
@@ -29,7 +30,7 @@ export function Strategies({ type }: Props) {
   })
 
   // selected strategy to cancel
-  const [, setStrategyToCancel] = React.useState<Strategy>()
+  const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
 
   const table = useTable({
     type,
@@ -37,20 +38,28 @@ export function Strategies({ type }: Props) {
     onManage: (strategy: Strategy) => {
       push(`/strategies/${strategy.address}`)
     },
-    onCancel: setStrategyToCancel, // TODO: implement cancel dialog
+    onCancel: (strategy: Strategy) => setCloseStrategy(strategy), // TODO: implement cancel dialog
   })
 
   return (
-    <DataTable
-      table={table}
-      isError={!!strategiesQuery.error}
-      isLoading={strategiesQuery.isLoading || !market}
-      pagination={{
-        onPageChange: setPageDetails,
-        page,
-        pageSize,
-        count,
-      }}
-    />
+    <>
+      <DataTable
+        table={table}
+        isError={!!strategiesQuery.error}
+        isLoading={strategiesQuery.isLoading || !market}
+        onRowClick={(strategy) => push(`/strategies/${strategy?.address}`)}
+        pagination={{
+          onPageChange: setPageDetails,
+          page,
+          pageSize,
+          count,
+        }}
+      />
+      <CloseStrategyDialog
+        strategyAddress={closeStrategy?.address || ""}
+        isOpen={!!closeStrategy}
+        onClose={() => setCloseStrategy(undefined)}
+      />
+    </>
   )
 }

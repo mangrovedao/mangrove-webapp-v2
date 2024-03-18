@@ -87,6 +87,7 @@ export function useRefillOffer({ offer, onCancel }: Props) {
       try {
         if (!data) return
         const { lastTx } = data
+        console.log(lastTx)
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber: lastTx?.blockNumber,
         })

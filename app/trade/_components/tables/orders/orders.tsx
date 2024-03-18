@@ -6,15 +6,12 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import CancelOfferDialog from "./components/cancel-offer-dialog"
 import EditOrderSheet from "./components/edit-order-sheet"
-import { useAmplifiedOrders } from "./hooks/use-amplified-orders"
-import { useAmplifiedTable } from "./hooks/use-amplified-table"
 import { useOrders } from "./hooks/use-orders"
 import { useTable } from "./hooks/use-table"
-import type { AmplifiedOrder, Order } from "./schema"
+import type { Order } from "./schema"
 
 export function Orders() {
-  const { marketsInfoQuery, mangrove } = useMangrove()
-  const { data: openMarkets } = marketsInfoQuery
+  const { marketsInfoQuery } = useMangrove()
 
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
@@ -29,28 +26,6 @@ export function Orders() {
       skip: (page - 1) * pageSize,
     },
   })
-
-  const amplifiedOrdersQuery = useAmplifiedOrders({
-    filters: {
-      skip: (page - 1) * pageSize,
-    },
-  })
-
-  // selected order to delete
-  const [amplifiedOrderToDelete, setAmplifiedOrderToDelete] =
-    React.useState<AmplifiedOrder>()
-  const [amplifiedOrderToEdit, setAmplifiedOrderToEdit] = React.useState<{
-    order: AmplifiedOrder
-    mode: "view" | "edit"
-  }>()
-
-  const amplifiedTable = useAmplifiedTable({
-    data: amplifiedOrdersQuery.data,
-    onEdit: (order) => setAmplifiedOrderToEdit({ order, mode: "edit" }),
-    onCancel: setAmplifiedOrderToDelete,
-  })
-
-  // regular orders
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<Order>()

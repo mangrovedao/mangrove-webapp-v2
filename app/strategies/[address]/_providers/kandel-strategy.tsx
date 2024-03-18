@@ -39,6 +39,8 @@ const useKandelStrategyContext = () => {
     //@ts-expect-error TODO: it's an error type from the indexer SDK
     return getMergedOffers(sdkOffers, indexerOffers, market)
   }, [
+    strategyQuery.dataUpdatedAt,
+    strategyStatusQuery.dataUpdatedAt,
     strategyQuery.data?.offers,
     strategyStatusQuery.data?.offerStatuses,
     strategyStatusQuery.data?.market,

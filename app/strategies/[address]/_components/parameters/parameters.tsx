@@ -12,7 +12,6 @@ import Big from "big.js"
 import { useAccount } from "wagmi"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
-import CloseDialog from "./dialogs/close"
 import { Deposit } from "./dialogs/deposit"
 import { Publish } from "./dialogs/publish"
 import { UnPublish } from "./dialogs/unpublish"
@@ -183,7 +182,7 @@ const PublishedInventory = () => {
       </table>
 
       {/* Dialogs */}
-      <CloseDialog isOpen={close} onClose={toggleClose} />
+      {/* <CloseStrategyDialog isOpen={close} onClose={toggleClose} /> */}
       <UnPublish open={unPublish} onClose={toggleUnpublish} />
     </div>
   )

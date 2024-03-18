@@ -5,9 +5,10 @@ import React from "react"
 import { TokenPair } from "@/components/token-pair"
 import { Button } from "@/components/ui/button"
 import Status from "../(shared)/_components/status"
+import useStrategyStatus from "../(shared)/_hooks/use-strategy-status"
 import BackButton from "./_components/back-button"
 import BlockExplorer from "./_components/block-explorer"
-import CloseDialog from "./_components/parameters/dialogs/close"
+import CloseStrategyDialog from "./_components/parameters/dialogs/close"
 import InformationBanner from "./_components/shared/information-banner"
 import Tabs from "./_components/tabs"
 import useKandel from "./_providers/kandel-strategy"
@@ -22,7 +23,14 @@ export default function Page() {
     quoteToken,
     blockExplorerUrl,
   } = useKandel()
+
   const { base, quote, address, offers } = strategyQuery.data ?? {}
+  const { data } = useStrategyStatus({
+    address,
+    base,
+    quote,
+    offers,
+  })
   const showStatus = base && quote && address && offers
   return (
     <div className="max-w-5xl mx-auto px-4 xl:px-0">
@@ -50,6 +58,7 @@ export default function Page() {
           onClick={() => toggleCloseStrategy(!closeStrategy)}
           size={"lg"}
           rightIcon
+          disabled={data?.status !== "active"}
         >
           Close strategy
         </Button>
@@ -63,7 +72,8 @@ export default function Page() {
 
       <Tabs />
 
-      <CloseDialog
+      <CloseStrategyDialog
+        strategyAddress={strategyAddress}
         isOpen={closeStrategy}
         onClose={() => toggleCloseStrategy(false)}
       />

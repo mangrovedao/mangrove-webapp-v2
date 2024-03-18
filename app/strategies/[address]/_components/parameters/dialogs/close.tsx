@@ -1,26 +1,23 @@
 import { AlertCircle } from "lucide-react"
 
-import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import Dialog from "@/components/dialogs/dialog"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { useCloseStrategy } from "../../../_hooks/use-close-strategy"
-import useKandelContext from "../../../_providers/kandel-strategy"
 
 type Props = {
   isOpen: boolean
+  strategyAddress: string
   onClose: () => void
 }
 
-export default function CloseDialog({ isOpen, onClose }: Props) {
-  const { getMarketFromAddresses } = useMarket()
-  const { strategyQuery } = useKandelContext()
-  const { kandelStrategies } = useKandel()
-  const { base, quote, address: strategyAddress } = strategyQuery.data ?? {}
-
+export default function CloseStrategyDialog({
+  isOpen,
+  onClose,
+  strategyAddress,
+}: Props) {
   const closeStrategy = useCloseStrategy({ strategyAddress })
 
   return (
@@ -47,15 +44,7 @@ export default function CloseDialog({ isOpen, onClose }: Props) {
         <Button
           className="w-full"
           onClick={() => {
-            closeStrategy.mutate(
-              {
-                getMarketFromAddresses,
-                kandelStrategies,
-                base,
-                quote,
-              },
-              { onSuccess: () => onClose },
-            )
+            closeStrategy.mutate(undefined, { onSuccess: () => onClose() })
           }}
           disabled={closeStrategy.isPending}
           loading={closeStrategy.isPending}

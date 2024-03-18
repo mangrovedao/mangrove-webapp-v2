@@ -55,7 +55,6 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
     market?.quote ?? undefined,
   )
 
-  console.log({ baseBalance, quoteBalance })
   const stepInfos = [
     {
       body: (
