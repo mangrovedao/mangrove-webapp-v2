@@ -46,7 +46,9 @@ export function useRefillOffer({ offer, onCancel }: Props) {
     mutationKey: ["refillOffer", offer.index],
     mutationFn: async () => {
       try {
-        if (!strategy || !strategyQuery) return
+        if (!strategy || !strategyQuery)
+          throw new Error("Could not refill offer")
+
         const { stratInstance } = strategy
 
         const singleOfferDistributionChunk = {
@@ -87,10 +89,10 @@ export function useRefillOffer({ offer, onCancel }: Props) {
       try {
         if (!data) return
         const { lastTx } = data
-        console.log(lastTx)
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber: lastTx?.blockNumber,
         })
+        queryClient.invalidateQueries({ queryKey: ["refill-requirements"] })
         queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
         queryClient.invalidateQueries({ queryKey: ["strategy"] })
         onCancel?.()

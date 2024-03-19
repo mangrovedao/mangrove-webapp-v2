@@ -45,14 +45,7 @@ export default function Page() {
             quoteToken={quoteToken}
             tokenClasses="h-7 w-7"
           />
-          {showStatus ? (
-            <Status
-              address={address}
-              base={base}
-              quote={quote}
-              offers={offers}
-            />
-          ) : undefined}
+          {showStatus ? <Status status={data?.status} /> : undefined}
         </div>
         <Button
           onClick={() => toggleCloseStrategy(!closeStrategy)}

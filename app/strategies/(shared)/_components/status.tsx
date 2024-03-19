@@ -1,21 +1,13 @@
-import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { Title } from "@/components/typography/title"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Check, Close, Closed } from "@/svgs"
 import { cn } from "@/utils"
-import useStrategyStatus from "../_hooks/use-strategy-status"
 
-type Props = Pick<Strategy, "address" | "base" | "quote" | "offers">
+type Props = {
+  status: "active" | "inactive" | "closed" | undefined
+}
 
-export default function Status({ address, base, quote, offers }: Props) {
-  const { data } = useStrategyStatus({
-    address,
-    base,
-    quote,
-    offers,
-  })
-  const status = data?.status
-
+export default function Status({ status }: Props) {
   if (!status) return <Skeleton className="w-20 h-5" />
 
   const Icon =
