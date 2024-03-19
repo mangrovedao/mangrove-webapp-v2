@@ -58,7 +58,15 @@ export function useTable({ data }: Params) {
         },
       }),
       columnHelper.display({
-        header: "Return (%)",
+        id: "return",
+        header: () => (
+          <div className="flex items-center">
+            <span>Return (%)</span>
+            <InfoTooltip className="pb-0.5">
+              EVM address for your strategy.
+            </InfoTooltip>
+          </div>
+        ),
         cell: ({ row }) => {
           const { return: ret } = row.original
           return (
@@ -67,6 +75,7 @@ export function useTable({ data }: Params) {
             </div>
           )
         },
+        enableSorting: true,
       }),
       columnHelper.display({
         header: "Value",
