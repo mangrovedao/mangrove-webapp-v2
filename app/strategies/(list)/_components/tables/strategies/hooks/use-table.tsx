@@ -11,6 +11,7 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
@@ -32,6 +33,7 @@ type Params = {
 
 export function useTable({ type, data, onCancel, onManage }: Params) {
   const { chain } = useAccount()
+
   const columns = React.useMemo(
     () => [
       columnHelper.display({
@@ -105,14 +107,14 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         header: "Status",
         cell: ({ row }) => {
           const { base, quote, address, offers } = row.original
-          return (
-            <Status
-              base={base}
-              quote={quote}
-              address={address}
-              offers={offers}
-            />
-          )
+          const { data } = useStrategyStatus({
+            address,
+            base,
+            quote,
+            offers,
+          })
+
+          return <Status status={data?.status} />
         },
       }),
       columnHelper.display({
