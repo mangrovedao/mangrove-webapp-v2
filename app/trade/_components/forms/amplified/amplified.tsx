@@ -118,7 +118,7 @@ export function Amplified() {
           <Link
             className="text-green-caribbean underline"
             href={
-              "https://docs.mangrove.exchange/general/web-app/trade/how-to-amplify-order"
+              "https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/amplify-order"
             }
             target="_blank"
             rel="noreferrer"
