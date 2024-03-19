@@ -49,7 +49,17 @@ export default function Page() {
           <CustomTabsTrigger value={"stop"}>Stop</CustomTabsTrigger>
         </CustomTabsList>
         <CustomTabsContent className="p-4" value="all">
-          <DataTable table={table} />
+          <DataTable
+            table={table}
+            isError={!!ordersQuery.error}
+            isLoading={ordersQuery.isLoading}
+            pagination={{
+              onPageChange: setPageDetails,
+              page,
+              pageSize,
+              count: ordersQuery.data?.length ?? 0,
+            }}
+          />
           <EditOrderSheet
             orderInfos={orderToEdit}
             market={market}

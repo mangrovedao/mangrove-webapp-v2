@@ -35,7 +35,7 @@ export default function Page() {
     data: fillsQuery.data,
   })
 
-  const { data } = useStrategies({
+  const { data, error, isLoading } = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,
     },
@@ -64,6 +64,14 @@ export default function Page() {
               setShowSheet(true)
               setRowInfo(row)
             }}
+            isError={!!error}
+            isLoading={isLoading}
+            pagination={{
+              onPageChange: setPageDetails,
+              page,
+              pageSize,
+              count: data?.length ?? 0,
+            }}
           />
           {showSheet && (
             <HistoryDetailSheet
@@ -73,7 +81,17 @@ export default function Page() {
           )}
         </CustomTabsContent>
         <CustomTabsContent className="p-4" value="strategies">
-          <DataTable table={strategiesTable} />
+          <DataTable
+            table={strategiesTable}
+            isError={!!fillsQuery.error}
+            isLoading={fillsQuery.isLoading}
+            pagination={{
+              onPageChange: setPageDetails,
+              page,
+              pageSize,
+              count: fillsQuery.data?.length ?? 0,
+            }}
+          />
         </CustomTabsContent>
       </CustomTabs>
     </main>

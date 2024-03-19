@@ -11,14 +11,14 @@ export default function OpenOrders() {
     page: 1,
     pageSize: 10,
   })
-  const ordersQuery = useOrders({
+  const { data, isLoading, error } = useOrders({
     filters: {
       skip: (page - 1) * pageSize,
     },
   })
 
   const table = useTable({
-    data: ordersQuery.data,
+    data,
   })
 
   return (
@@ -32,17 +32,14 @@ export default function OpenOrders() {
         </div>
         <DataTable
           table={table}
-          // isError={!!ordersQuery.error}
-          // isLoading={ordersQuery.isLoading || !market}
-          // onRowClick={(order) =>
-          //   setOrderToEdit({ order: order as Order, mode: "view" })
-          // }
-          // pagination={{
-          //   onPageChange: setPageDetails,
-          //   page,
-          //   pageSize,
-          //   count,
-          // }}
+          isError={!!error}
+          isLoading={isLoading}
+          pagination={{
+            onPageChange: setPageDetails,
+            page,
+            pageSize,
+            count: data?.length ?? 0,
+          }}
         />
       </div>
       <ScrollBar orientation="horizontal" className="z-50" />

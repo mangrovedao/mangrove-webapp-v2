@@ -12,7 +12,7 @@ export default function Page() {
     page: 1,
     pageSize: 10,
   })
-  const { data } = useStrategies({
+  const { data, error, isLoading } = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,
     },
@@ -32,7 +32,17 @@ export default function Page() {
       <h1 className="p-4">My Strategies</h1>
 
       <div className="px-3">
-        <DataTable table={table} />
+        <DataTable
+          table={table}
+          isError={!!error}
+          isLoading={isLoading}
+          pagination={{
+            onPageChange: setPageDetails,
+            page,
+            pageSize,
+            count: data?.length ?? 0,
+          }}
+        />
       </div>
     </main>
   )

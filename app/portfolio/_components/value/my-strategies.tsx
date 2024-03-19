@@ -11,7 +11,7 @@ export default function MyStrategies() {
     page: 1,
     pageSize: 10,
   })
-  const { data } = useStrategies({
+  const { data, isLoading, error } = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,
     },
@@ -32,17 +32,14 @@ export default function MyStrategies() {
         </div>
         <DataTable
           table={table}
-          // isError={!!ordersQuery.error}
-          // isLoading={ordersQuery.isLoading || !market}
-          // onRowClick={(order) =>
-          //   setOrderToEdit({ order: order as Order, mode: "view" })
-          // }
-          // pagination={{
-          //   onPageChange: setPageDetails,
-          //   page,
-          //   pageSize,
-          //   count,
-          // }}
+          isError={!!error}
+          isLoading={isLoading}
+          pagination={{
+            onPageChange: setPageDetails,
+            page,
+            pageSize,
+            count: data?.length ?? 0,
+          }}
         />
       </div>
       <ScrollBar orientation="horizontal" className="z-50" />
