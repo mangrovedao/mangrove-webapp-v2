@@ -18,6 +18,7 @@ import Link from "next/link"
 import { Market } from "@/app/strategies/(list)/_components/tables/strategies/components/market"
 import { Value } from "@/app/strategies/(list)/_components/tables/strategies/components/value"
 import Status from "@/app/strategies/(shared)/_components/status"
+import { ValueInUSD } from "../history/strategies/value"
 
 const columnHelper = createColumnHelper<Strategy>()
 const DEFAULT_DATA: Strategy[] = []
@@ -78,7 +79,7 @@ export function useTable({ data, onCancel, onManage }: Params) {
         cell: ({ row }) => {
           const { base, quote, depositedBase, depositedQuote } = row.original
           return (
-            <Value
+            <ValueInUSD
               base={base}
               baseValue={depositedBase}
               quote={quote}

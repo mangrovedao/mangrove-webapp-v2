@@ -19,6 +19,8 @@ import { Value } from "@/app/strategies/(list)/_components/tables/strategies/com
 import { useAccount } from "wagmi"
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { Skeleton } from "@/components/ui/skeleton"
+import useTokenPriceQuery from "@/hooks/use-token-price-query"
+import { ValueInUSD } from "./value"
 
 const columnHelper = createColumnHelper<Strategy>()
 const DEFAULT_DATA: Strategy[] = []
@@ -78,10 +80,10 @@ export function useTable({ data, onManage }: Params) {
         cell: ({ row }) => {
           const { base, quote, depositedBase, depositedQuote } = row.original
           return (
-            <Value
+            <ValueInUSD
               base={base}
-              baseValue={depositedBase}
               quote={quote}
+              baseValue={depositedBase}
               quoteValue={depositedQuote}
             />
           )
