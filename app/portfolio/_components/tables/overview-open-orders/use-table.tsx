@@ -16,13 +16,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import Big from "big.js"
-import { MyStrategies } from "./schema"
+import { Order } from "@/app/trade/_components/tables/orders/schema"
 
-const columnHelper = createColumnHelper<MyStrategies>()
-const DEFAULT_DATA: MyStrategies[] = []
+const columnHelper = createColumnHelper<Order>()
+const DEFAULT_DATA: Order[] = []
 
 type Params = {
-  data?: MyStrategies[]
+  data?: Order[]
 }
 
 export function useTable({ data }: Params) {
@@ -77,8 +77,7 @@ export function useTable({ data }: Params) {
           </div>
         ),
         cell: ({ row }) => {
-          const { initialWants, takerGot, initialGives, isBid, takerGave } =
-            row.original
+          const { initialWants, takerGot, isBid } = row.original
           const baseSymbol = market?.base.symbol
           const quoteSymbol = market?.quote.symbol
           const symbol = isBid ? baseSymbol : quoteSymbol
@@ -98,7 +97,7 @@ export function useTable({ data }: Params) {
             100,
           )
           return market ? (
-            <div className={cn("flex items-center")}>
+            <div className={"flex items-center justify-end w-full"}>
               <span className="text-sm text-muted-foreground">
                 {filled}
                 &nbsp;/

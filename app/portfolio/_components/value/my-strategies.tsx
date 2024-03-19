@@ -3,10 +3,22 @@
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useTable } from "../tables/my-strategies/use-table"
+import { useState } from "react"
+import { useStrategies } from "@/app/strategies/(list)/_components/tables/strategies/hooks/use-strategies"
 
 export default function MyStrategies() {
+  const [{ page, pageSize }, setPageDetails] = useState<PageDetails>({
+    page: 1,
+    pageSize: 10,
+  })
+  const { data } = useStrategies({
+    filters: {
+      skip: (page - 1) * pageSize,
+    },
+  })
+
   const table = useTable({
-    data: [],
+    data,
   })
 
   return (

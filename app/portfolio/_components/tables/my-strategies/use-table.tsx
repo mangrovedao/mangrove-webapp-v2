@@ -13,78 +13,74 @@ import InfoTooltip from "@/components/info-tooltip"
 import { TokenPair } from "@/components/token-pair"
 import useMarket from "@/providers/market"
 import Link from "next/link"
-import { OpenOrders } from "./schema"
+import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
+import { useAccount } from "wagmi"
+import { shortenAddress } from "@/utils/wallet"
+import { Market } from "@/app/strategies/(list)/_components/tables/strategies/components/market"
+import { Value } from "@/app/strategies/(list)/_components/tables/strategies/components/value"
 
-const columnHelper = createColumnHelper<OpenOrders>()
-const DEFAULT_DATA: OpenOrders[] = []
+const columnHelper = createColumnHelper<Strategy>()
+const DEFAULT_DATA: Strategy[] = []
 
 type Params = {
-  data?: OpenOrders[]
+  data?: Strategy[]
 }
 
 export function useTable({ data }: Params) {
-  const { market } = useMarket()
+  const { chain } = useAccount()
 
   const columns = React.useMemo(
     () => [
-      columnHelper.display({
-        id: "strategy-address",
-        header: () => (
-          <div className="flex items-center">
-            <span>Strategy address </span>
-            <InfoTooltip className="pb-0.5">
-              EVM address for your strategy.
-            </InfoTooltip>
-          </div>
-        ),
+      columnHelper.accessor("address", {
+        header: "Strategy address",
         cell: ({ row }) => {
-          const address = "0x"
+          const { address } = row.original
+          const blockExplorerUrl = chain?.blockExplorers?.default.url
           return (
-            <Link href="" target="_blank" className="underline">
-              {address}
-            </Link>
+            <div className="flex flex-col underline">
+              <Link
+                className="hover:opacity-80 transition-opacity"
+                href={`${blockExplorerUrl}/address/${address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {shortenAddress(address)}
+              </Link>
+            </div>
           )
         },
       }),
       columnHelper.display({
         header: "Market",
-        cell: () => (
-          <div className="flex items-center space-x-2">
-            <TokenPair
-              titleProps={{
-                variant: "title3",
-                className: "text-sm text-current font-normal",
-                as: "span",
-              }}
-              tokenClasses="w-4 h-4"
-              baseToken={market?.base}
-              quoteToken={market?.quote}
-            />
-          </div>
-        ),
-        enableSorting: true,
+        cell: ({ row }) => {
+          const { base, quote } = row.original
+          return <Market base={base} quote={quote} />
+        },
       }),
       columnHelper.display({
-        id: "return",
-        header: () => (
-          <div className="flex items-center">
-            <span>Return (%)</span>
-            <InfoTooltip className="pb-0.5">
-              EVM address for your strategy.
-            </InfoTooltip>
-          </div>
-        ),
+        header: "Return (%)",
         cell: ({ row }) => {
-          const percent = 5
+          const { return: ret } = row.original
           return (
-            <span className="text-sm text-muted-foreground">{percent} %</span>
+            <div className="flex flex-col">
+              <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+            </div>
           )
         },
-        enableSorting: true,
       }),
       columnHelper.display({
-        id: "strategy-value",
-        header: () => <div className="text-right">Stratedy value ($)</div>,
+        header: "Value",
+        cell: ({ row }) => {
+          const { base, quote, depositedBase, depositedQuote } = row.original
+          return (
+            <Value
+              base={base}
+              baseValue={depositedBase}
+              quote={quote}
+              quoteValue={depositedQuote}
+            />
+          )
+        },
       }),
     ],
     [],

@@ -3,10 +3,22 @@
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { useTable } from "../tables/overview-open-orders/use-table"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { useState } from "react"
+import { useOrders } from "@/app/trade/_components/tables/orders/hooks/use-orders"
 
 export default function OpenOrders() {
+  const [{ page, pageSize }, setPageDetails] = useState<PageDetails>({
+    page: 1,
+    pageSize: 10,
+  })
+  const ordersQuery = useOrders({
+    filters: {
+      skip: (page - 1) * pageSize,
+    },
+  })
+
   const table = useTable({
-    data: [],
+    data: ordersQuery.data,
   })
 
   return (

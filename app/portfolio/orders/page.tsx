@@ -39,10 +39,10 @@ export default function Page() {
           <CustomTabsTrigger value={"amplified"}>Amplified</CustomTabsTrigger>
           <CustomTabsTrigger value={"stop"}>Stop</CustomTabsTrigger>
         </CustomTabsList>
-        {/* <CustomTabsContent className="p-4" value="all">
+        <CustomTabsContent className="p-4" value="all">
           <DataTable table={table} />
         </CustomTabsContent>
-        <CustomTabsContent className="p-4" value="limit">
+        {/* <CustomTabsContent className="p-4" value="limit">
           <DataTable table={table} />
         </CustomTabsContent>
         <CustomTabsContent className="p-4" value="amplified">

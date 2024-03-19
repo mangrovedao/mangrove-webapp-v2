@@ -16,15 +16,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import Big from "big.js"
-import { OpenOrders } from "./schema"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
+import { Order } from "@/app/trade/_components/tables/orders/schema"
 
-const columnHelper = createColumnHelper<OpenOrders>()
-const DEFAULT_DATA: OpenOrders[] = []
+const columnHelper = createColumnHelper<Order>()
+const DEFAULT_DATA: Order[] = []
 
 type Params = {
-  data?: OpenOrders[]
+  data?: Order[]
 }
 
 export function useTable({ data }: Params) {
