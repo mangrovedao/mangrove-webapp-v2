@@ -1,23 +1,24 @@
 import { cn } from "@/utils"
-import { useUserRank } from "./leaderboard/use-leaderboard"
+import { useUserBoosts, useUserRank } from "./leaderboard/use-leaderboard"
 
 export default function TotalPoints() {
   const { data } = useUserRank()
+  const userBoostsQuery = useUserBoosts()
 
   const points = [
     {
       id: "Trader points",
-      points: Number(data?.[0]?.taker_points ?? 0),
+      points: Number(data?.taker_points ?? 0),
       color: "bg-green-caribbean",
     },
     {
       id: "Liquidity providing points",
-      points: Number(data?.[0]?.maker_points ?? 0),
+      points: Number(data?.maker_points ?? 0),
       color: "bg-[#8F5AE8]",
     },
     {
       id: "Referral points",
-      points: Number(data?.[0]?.referees_points ?? 0),
+      points: Number(data?.referees_points ?? 0),
       color: "bg-green-bangladesh",
     },
   ]

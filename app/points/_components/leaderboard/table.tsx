@@ -18,9 +18,9 @@ export function Leaderboard() {
   })
 
   const useUserRankQuery = useUserRank()
-  const currentuser = useUserRankQuery.data
+  const currentUser = useUserRankQuery.data
   const data = React.useMemo(
-    () => [...(currentuser ?? []), ...(leaderboardQuery.data ?? [])],
+    () => [currentUser, ...(leaderboardQuery.data?.leaderboard ?? [])],
     [useUserRankQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt],
   )
 
@@ -44,7 +44,7 @@ export function Leaderboard() {
           count: 1,
         }}
         tableRowClasses="text-white"
-        isRowHighlighted={(row) => row.account === currentuser?.[0]?.account}
+        isRowHighlighted={(row) => row.account === currentUser?.account}
       />
     </div>
   )
