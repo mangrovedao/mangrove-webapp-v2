@@ -61,6 +61,17 @@ export function useTable({ data, onManage }: Params) {
       }),
       columnHelper.display({
         header: "Balance",
+        cell: ({ row }) => {
+          const { base, quote, depositedBase, depositedQuote } = row.original
+          return (
+            <Value
+              base={base}
+              baseValue={depositedBase}
+              quote={quote}
+              quoteValue={depositedQuote}
+            />
+          )
+        },
       }),
       columnHelper.display({
         header: "Value",
