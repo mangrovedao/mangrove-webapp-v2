@@ -1,5 +1,7 @@
 "use client"
 
+import { useOrders } from "@/app/trade/_components/tables/orders/hooks/use-orders"
+import { Order } from "@/app/trade/_components/tables/orders/schema"
 import {
   CustomTabs,
   CustomTabsContent,
@@ -7,9 +9,11 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { useTable } from "../_components/tables/open-orders/use-table"
-import { useOrders } from "@/app/trade/_components/tables/orders/hooks/use-orders"
 import { useState } from "react"
+import { useTable } from "../_components/tables/open-orders/use-table"
+import EditOrderSheet from "@/app/trade/_components/tables/orders/components/edit-order-sheet"
+import CancelOfferDialog from "@/app/trade/_components/tables/orders/components/cancel-offer-dialog"
+import useMarket from "@/providers/market"
 
 export default function Page() {
   const [{ page, pageSize }, setPageDetails] = useState<PageDetails>({
@@ -21,12 +25,17 @@ export default function Page() {
       skip: (page - 1) * pageSize,
     },
   })
+  const [orderToDelete, setOrderToDelete] = useState<Order>()
+  const [orderToEdit, setOrderToEdit] = useState<{
+    order: Order
+    mode: "view" | "edit"
+  }>()
+  const { market } = useMarket()
 
-  console.log("🚀 ~ Page ~ data:", ordersQuery.data)
   const table = useTable({
     data: ordersQuery.data,
-    // onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
-    // onCancel: setOrderToDelete,
+    onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
+    onCancel: setOrderToDelete,
   })
   return (
     <main className="w-full">
@@ -41,6 +50,16 @@ export default function Page() {
         </CustomTabsList>
         <CustomTabsContent className="p-4" value="all">
           <DataTable table={table} />
+          <EditOrderSheet
+            orderInfos={orderToEdit}
+            market={market}
+            onClose={() => setOrderToEdit(undefined)}
+          />
+          <CancelOfferDialog
+            order={orderToDelete}
+            market={market}
+            onClose={() => setOrderToDelete(undefined)}
+          />
         </CustomTabsContent>
         {/* <CustomTabsContent className="p-4" value="limit">
           <DataTable table={table} />

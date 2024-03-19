@@ -19,15 +19,18 @@ import Big from "big.js"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { Order } from "@/app/trade/_components/tables/orders/schema"
+import { Timer } from "@/app/trade/_components/tables/orders/components/timer"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
 
 type Params = {
   data?: Order[]
+  onCancel: (order: Order) => void
+  onEdit: (order: Order) => void
 }
 
-export function useTable({ data }: Params) {
+export function useTable({ data, onCancel, onEdit }: Params) {
   const { market } = useMarket()
 
   const columns = React.useMemo(
@@ -51,7 +54,12 @@ export function useTable({ data }: Params) {
         enableSorting: true,
       }),
       columnHelper.display({
+        id: "date",
         header: "Date",
+        cell: ({ row }) => {
+          const { creationDate } = row.original
+          return creationDate ? new Date(creationDate).toDateString() : ""
+        },
         enableSorting: true,
       }),
       columnHelper.accessor("isBid", {
@@ -113,11 +121,25 @@ export function useTable({ data }: Params) {
         },
         enableSorting: false,
       }),
-      columnHelper.display({
+      columnHelper.accessor("price", {
         header: "Price",
-        enableSorting: true,
+        cell: (row) =>
+          market ? (
+            row.getValue() ? (
+              <span>
+                {Big(row.getValue()).toFixed(
+                  market.quote.displayedAsPriceDecimals,
+                )}{" "}
+                {market.quote.symbol}
+              </span>
+            ) : (
+              <span>-</span>
+            )
+          ) : (
+            <Skeleton className="w-20 h-6" />
+          ),
       }),
-      columnHelper.display({
+      columnHelper.accessor("expiryDate", {
         id: "time-in-force",
         header: () => (
           <div className="flex items-center">
@@ -127,29 +149,41 @@ export function useTable({ data }: Params) {
             </InfoTooltip>
           </div>
         ),
+        cell: (row) => {
+          const expiry = row.getValue()
+          return expiry ? <Timer expiry={expiry} /> : <div>-</div>
+        },
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
+          const { expiryDate } = row.original
+          const isExpired = expiryDate
+            ? new Date(expiryDate) < new Date()
+            : true
+
           return (
-            <div className="w-full h-full flex justify-end items-center space-x-1">
+            <div className="w-full h-full flex justify-end space-x-1">
               <IconButton
-                variant="primary"
-                className="px-4"
+                tooltip="Modify"
+                className="aspect-square w-6 rounded-full"
+                disabled={isExpired}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
+                  onEdit(row.original)
                 }}
               >
                 <Pen />
               </IconButton>
               <IconButton
-                variant="secondary"
-                className="px-4"
+                tooltip="Retract offer"
+                className="aspect-square w-6 rounded-full"
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
+                  onCancel(row.original)
                 }}
               >
                 <Close />
