@@ -25,7 +25,8 @@ export function Leaderboard() {
   )
 
   const table = useTable({
-    data,
+    //@ts-ignore
+    data: data,
   })
 
   return (

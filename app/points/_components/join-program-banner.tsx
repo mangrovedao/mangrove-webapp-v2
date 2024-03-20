@@ -5,14 +5,9 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useUserPoints } from "./leaderboard/use-leaderboard"
 
-const BULLETS = [
-  "hold $100 equivalent in trading or liquidity provision",
-  "participation in testnet (hold a Mangrove NFT) or beta mainnet",
-]
-
 export function JoinProgramBanner() {
   const { data } = useUserPoints()
-  const points = data?.[0]?.total_points ?? 0
+  const points = data?.total_points ?? 0
 
   if (Number(points) >= 100) return null
 
