@@ -147,14 +147,22 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
               <IconButton
                 tooltip="Manage"
                 className="aspect-square w-6 rounded-full"
-                onClick={() => onManage(row.original)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onManage(row.original)
+                }}
               >
                 <Pen />
               </IconButton>
               <IconButton
                 tooltip="Cancel strategy"
                 className="aspect-square w-6 rounded-full"
-                onClick={() => onCancel(row.original)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onCancel(row.original)
+                }}
               >
                 <Close />
               </IconButton>

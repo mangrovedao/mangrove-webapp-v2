@@ -14,8 +14,7 @@ type Props = {
 }
 
 export function useRefillOffer({ offer, onCancel }: Props) {
-  const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
-    useKandel()
+  const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
   const { data } = useRefillRequirements({
     offer,
   })
@@ -78,9 +77,9 @@ export function useRefillOffer({ offer, onCancel }: Props) {
           distributionChunks: [singleOfferDistributionChunk],
         })
 
-        const result = await Promise.all(transaction.map((tx) => tx?.wait()))
+        const txs = await Promise.all(transaction.map((tx) => tx?.wait()))
 
-        return { lastTx: result[result.length - 1] }
+        return { txs }
       } catch (error) {
         console.error(error)
       }
@@ -88,11 +87,15 @@ export function useRefillOffer({ offer, onCancel }: Props) {
     onSuccess: async (data) => {
       try {
         if (!data) return
-        const { lastTx } = data
-        await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber: lastTx?.blockNumber,
-        })
-        queryClient.invalidateQueries({ queryKey: ["refill-requirements"] })
+        const { txs } = data
+        await Promise.all(
+          txs.map(async (tx) => {
+            console.log(tx)
+            await resolveWhenBlockIsIndexed.mutateAsync({
+              blockNumber: tx?.blockNumber,
+            })
+          }),
+        )
         queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
         queryClient.invalidateQueries({ queryKey: ["strategy"] })
         onCancel?.()
