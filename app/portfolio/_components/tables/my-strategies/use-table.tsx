@@ -10,8 +10,6 @@ import {
 import React from "react"
 
 import InfoTooltip from "@/components/info-tooltip"
-import { TokenPair } from "@/components/token-pair"
-import useMarket from "@/providers/market"
 import Link from "next/link"
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useAccount } from "wagmi"
