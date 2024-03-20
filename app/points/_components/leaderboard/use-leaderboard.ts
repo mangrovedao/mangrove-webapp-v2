@@ -1,9 +1,9 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { useAccount } from "wagmi"
 
 import { getErrorMessage } from "@/utils/errors"
-import { useAccount } from "wagmi"
 import { parseBoosts } from "../../schemas/boosts"
 import { parseLeaderboard } from "../../schemas/leaderboard"
 import { parsePoints } from "../../schemas/points"
@@ -40,7 +40,7 @@ export function useLeaderboard({
   })
 }
 
-export function useUserRank() {
+export function useUserPoints() {
   const { address } = useAccount()
   return useQuery({
     queryKey: ["user-points", address],
@@ -67,14 +67,14 @@ export function useUserRank() {
 }
 
 export function useUserBoosts() {
-  const { address, chainId } = useAccount()
+  const { address } = useAccount()
   return useQuery({
-    queryKey: ["user-boosts", address, chainId],
+    queryKey: ["user-boosts", address],
     queryFn: async () => {
       try {
         if (!address) return null
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/boosts/${address}/${chainId}`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/boosts/${address}`,
         )
         const boosts = await res.json()
         return parseBoosts(boosts)
@@ -86,7 +86,7 @@ export function useUserBoosts() {
     meta: {
       error: "Unable to retrieve user boosts data",
     },
-    enabled: !!address && !!chainId,
+    enabled: !!address,
     retry: false,
     staleTime: 1 * 60 * 1000, // 1 minute
   })

@@ -3,10 +3,10 @@ import { z } from "zod"
 const leaderboardEntrySchema = z.object({
   rank: z.number(),
   account: z.string(),
-  taker_points: z.string(),
-  maker_points: z.string(),
-  referees_points: z.string(),
-  total_points: z.string(),
+  taker_points: z.string().transform(parseFloat).transform(Math.floor),
+  maker_points: z.string().transform(parseFloat).transform(Math.floor),
+  referees_points: z.string().transform(parseFloat).transform(Math.floor),
+  total_points: z.string().transform(parseFloat).transform(Math.floor),
 })
 
 export const leaderboardSchema = z.object({
@@ -16,6 +16,7 @@ export const leaderboardSchema = z.object({
 })
 
 export type Leaderboard = z.infer<typeof leaderboardSchema>
+export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>
 
 export function parseLeaderboard(data: unknown) {
   try {

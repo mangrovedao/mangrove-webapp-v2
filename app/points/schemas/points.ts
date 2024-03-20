@@ -4,10 +4,10 @@ export const pointsSchema = z.object({
   last_updated_block: z.number(),
   rank: z.number(),
   account: z.string(),
-  taker_points: z.string(),
-  maker_points: z.string(),
-  referees_points: z.string(),
-  total_points: z.string(),
+  taker_points: z.string().transform(parseFloat).transform(Math.floor),
+  maker_points: z.string().transform(parseFloat).transform(Math.floor),
+  referees_points: z.string().transform(parseFloat).transform(Math.floor),
+  total_points: z.string().transform(parseFloat).transform(Math.floor),
   last_updated_timestamp: z.number(),
 })
 

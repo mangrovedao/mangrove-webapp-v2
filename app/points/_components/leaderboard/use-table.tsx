@@ -10,14 +10,14 @@ import {
 import React from "react"
 
 import { Rank1Icon, Rank2Icon, Rank3Icon } from "@/svgs"
+import { LeaderboardEntry } from "../../schemas/leaderboard"
 import Address from "./address"
-import type { Leaderboard } from "./schema"
 
-const columnHelper = createColumnHelper<Leaderboard>()
-const DEFAULT_DATA: Leaderboard[] = []
+const columnHelper = createColumnHelper<LeaderboardEntry>()
+const DEFAULT_DATA: LeaderboardEntry[] = []
 
 type Params = {
-  data?: Leaderboard[]
+  data?: LeaderboardEntry[]
 }
 
 export function useTable({ data }: Params) {

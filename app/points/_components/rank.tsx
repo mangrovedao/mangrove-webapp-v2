@@ -1,16 +1,10 @@
 import { cn } from "@/utils"
 import BoxContainer from "./box-container"
-import { useUserRank } from "./leaderboard/use-leaderboard"
+import { useUserPoints } from "./leaderboard/use-leaderboard"
 
-type Props = {
-  className?: string
-  rank?: number
-  totalTraders?: number
-}
-
-export default function Rank({ className, totalTraders = 39059 }: Props) {
-  const { data } = useUserRank()
-  const rank = data?.[0]?.rank ?? -1
+export default function Rank({ className }: { className?: string }) {
+  const { data } = useUserPoints()
+  const rank = data?.rank ?? -1
   const rankLabel = rank > 0 ? rank : "Unranked"
 
   return (

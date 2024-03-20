@@ -15,7 +15,7 @@ type Props = {
 
 export default function NextLevel({
   className,
-  volume = 10,
+  volume = 0,
   // nextRankingDate = new Date("2024-03-04T23:59:59.999Z"),
 }: Props) {
   const disabled = !volume

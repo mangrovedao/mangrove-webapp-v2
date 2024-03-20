@@ -3,7 +3,7 @@ import React from "react"
 
 import { Title } from "@/components/typography/title"
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { useLeaderboard, useUserRank } from "./use-leaderboard"
+import { useLeaderboard, useUserPoints } from "./use-leaderboard"
 import { useTable } from "./use-table"
 
 export function Leaderboard() {
@@ -17,11 +17,11 @@ export function Leaderboard() {
     },
   })
 
-  const useUserRankQuery = useUserRank()
-  const currentUser = useUserRankQuery.data
+  const useUserPointsQuery = useUserPoints()
+  const currentUser = useUserPointsQuery.data
   const data = React.useMemo(
     () => [currentUser, ...(leaderboardQuery.data?.leaderboard ?? [])],
-    [useUserRankQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt],
+    [useUserPointsQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt],
   )
 
   const table = useTable({
