@@ -98,6 +98,7 @@ export const useParameters = () => {
   const getUnpublishedBalances = async () => {
     const asks = await stratInstance?.getUnpublished("asks")
     const bids = await stratInstance?.getUnpublished("bids")
+    // TODO: fixe the negative values
     console.log(JSON.stringify({ asks, bids }))
     return [asks, bids]
   }

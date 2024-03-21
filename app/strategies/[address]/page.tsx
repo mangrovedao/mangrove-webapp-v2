@@ -4,6 +4,7 @@ import React from "react"
 
 import { TokenPair } from "@/components/token-pair"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 import Status from "../(shared)/_components/status"
 import useStrategyStatus from "../(shared)/_hooks/use-strategy-status"
 import BackButton from "./_components/back-button"
@@ -15,8 +16,10 @@ import useKandel from "./_providers/kandel-strategy"
 
 export default function Page() {
   const [closeStrategy, toggleCloseStrategy] = React.useState(false)
+  const { push } = useRouter()
 
   const {
+    strategyStatusQuery,
     strategyQuery,
     strategyAddress,
     baseToken,
@@ -31,6 +34,7 @@ export default function Page() {
     quote,
     offers,
   })
+
   const showStatus = base && quote && address && offers
   return (
     <div className="max-w-5xl mx-auto px-4 xl:px-0">
@@ -47,14 +51,27 @@ export default function Page() {
           />
           {showStatus ? <Status status={data?.status} /> : undefined}
         </div>
-        <Button
-          onClick={() => toggleCloseStrategy(!closeStrategy)}
-          size={"lg"}
-          rightIcon
-          disabled={data?.status !== "active"}
-        >
-          Close strategy
-        </Button>
+        <div className="flex justify-between space-x-2">
+          <Button
+            size={"lg"}
+            disabled={!data?.status}
+            onClick={() =>
+              push(
+                `/strategies/${strategyAddress}/edit?market=${baseToken?.id},${quoteToken?.id}`,
+              )
+            }
+          >
+            {data?.status === "closed" ? "Re-open" : "Edit Parameters"}
+          </Button>
+          <Button
+            onClick={() => toggleCloseStrategy(!closeStrategy)}
+            size={"lg"}
+            rightIcon
+            disabled={data?.status !== "active"}
+          >
+            Close strategy
+          </Button>
+        </div>
       </div>
 
       <BlockExplorer

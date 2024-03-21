@@ -14,12 +14,15 @@ export default function Status({ status }: Props) {
     status === "active" ? Check : status === "inactive" ? Close : Closed
   return (
     <div
-      className={cn("rounded py-0.5 pl-1 pr-2 inline-flex space-x-0.5", {
-        hidden: !status,
-        "bg-primary-dark-green text-green-caribbean": status === "active",
-        "bg-cherry-400 text-cherry-100": status === "inactive",
-        "bg-cloud-500 text-cloud-00": status === "closed",
-      })}
+      className={cn(
+        "rounded py-0.5 pl-1 pr-2 inline-flex items-center space-x-0.5",
+        {
+          hidden: !status,
+          "bg-primary-dark-green text-green-caribbean": status === "active",
+          "bg-cherry-400 text-cherry-100": status === "inactive",
+          "bg-cloud-500 text-cloud-00": status === "closed",
+        },
+      )}
     >
       <Icon className="w-5 h-auto" />
       <Title variant={"title3"} className="text-inherit capitalize">
