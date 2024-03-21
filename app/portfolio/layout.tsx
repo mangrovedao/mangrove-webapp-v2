@@ -6,6 +6,11 @@ import { MarketProvider } from "@/providers/market"
 import Sidebar from "./_components/sidebar"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { KandelStrategiesProvider } from "../strategies/(list)/_providers/kandel-strategies"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Portfolio | Mangrove DEX",
+}
 
 export default function Layout({ children }: React.PropsWithChildren) {
   return (
