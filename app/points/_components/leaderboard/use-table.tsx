@@ -50,9 +50,12 @@ export function useTable({ data }: Params) {
           return <Address address={address} />
         },
       }),
-      columnHelper.display({
+      columnHelper.accessor("boost", {
         header: "Boost",
-        cell: () => <div className={"text-green-caribbean"}>1x</div>,
+        cell: (row) => {
+          const boost = row.getValue()
+          return <div>{boost}</div>
+        },
       }),
       columnHelper.accessor("maker_points", {
         header: () => <div className="text-right">LP points</div>,
@@ -70,6 +73,17 @@ export function useTable({ data }: Params) {
           return (
             <div className="w-full h-full flex justify-end">
               {tradingPoints}
+            </div>
+          )
+        },
+      }),
+      columnHelper.accessor("community_points", {
+        header: () => <div className="text-right">Community points</div>,
+        cell: (row) => {
+          const communityPoints = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end">
+              {communityPoints}
             </div>
           )
         },

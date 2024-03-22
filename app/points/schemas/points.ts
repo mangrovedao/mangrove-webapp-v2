@@ -9,6 +9,8 @@ export const pointsSchema = z.object({
   referees_points: z.string().transform(parseFloat).transform(Math.floor),
   total_points: z.string().transform(parseFloat).transform(Math.floor),
   last_updated_timestamp: z.number(),
+  boost: z.string().transform(parseFloat),
+  community_points: z.string().transform(parseFloat),
 })
 
 export type Points = z.infer<typeof pointsSchema>

@@ -7,6 +7,8 @@ const leaderboardEntrySchema = z.object({
   maker_points: z.string().transform(parseFloat).transform(Math.floor),
   referees_points: z.string().transform(parseFloat).transform(Math.floor),
   total_points: z.string().transform(parseFloat).transform(Math.floor),
+  boost: z.string().transform(parseFloat),
+  community_points: z.string().transform(parseFloat),
 })
 
 export const leaderboardSchema = z.object({

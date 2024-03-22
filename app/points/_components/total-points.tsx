@@ -1,10 +1,8 @@
 import { cn } from "@/utils"
-import { useUserBoosts, useUserPoints } from "./leaderboard/use-leaderboard"
+import { useUserPoints } from "./leaderboard/use-leaderboard"
 
 export default function TotalPoints() {
   const { data: userPoints } = useUserPoints()
-  const { data: userBoosts } = useUserBoosts()
-  const userBoost = userBoosts?.[0]
 
   const points = [
     {
@@ -16,6 +14,11 @@ export default function TotalPoints() {
       id: "Liquidity providing points",
       points: Number(userPoints?.maker_points ?? 0),
       color: "bg-[#8F5AE8]",
+    },
+    {
+      id: "Community points",
+      points: Number(userPoints?.community_points ?? 0),
+      color: "bg-white",
     },
     {
       id: "Referral points",
