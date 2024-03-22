@@ -18,18 +18,18 @@ export default function Layout({ children }: React.PropsWithChildren) {
       <IndexerSdkProvider>
         <KandelStrategiesProvider>
           <Navbar />
-          <ScrollArea
-            className="min-h-[calc(100vh_-_var(--bar-height))] w-full"
-            scrollHideDelay={200}
-          >
-            <div className="flex flex-col md:flex-row">
-              <section className="md:w-[12rem] 2xl:w-[14rem] w-full md:h-screen border-y md:border-x">
-                <Sidebar />
-              </section>
+          <div className="flex flex-col md:flex-row">
+            <section className="md:w-[12rem] 2xl:w-[14rem] w-full md:h-screen border-y md:border-x">
+              <Sidebar />
+            </section>
+            <ScrollArea
+              className="h-[calc(100vh-(var(--bar-height)))] w-full"
+              scrollHideDelay={200}
+            >
               {children}
-            </div>
-            <ScrollBar orientation="vertical" className="z-50" />
-          </ScrollArea>
+              <ScrollBar orientation="vertical" className="z-50" />
+            </ScrollArea>
+          </div>
         </KandelStrategiesProvider>
       </IndexerSdkProvider>
     </MarketProvider>
