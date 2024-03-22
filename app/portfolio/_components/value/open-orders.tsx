@@ -17,6 +17,10 @@ export default function OpenOrders() {
     },
   })
 
+  const { data: ordersCount } = useOrders({
+    select: (orders) => orders.length,
+  })
+
   const table = useTable({
     data,
   })
@@ -26,9 +30,11 @@ export default function OpenOrders() {
       <div className="px-6 space-y-2">
         <div className="flex items-center space-x-2">
           <span>Open orders</span>
-          <span className="bg-muted py-1 px-2 text-cloud-200 rounded-lg">
-            3
-          </span>
+          {ordersCount && (
+            <span className="bg-muted py-1 px-2 text-cloud-200 rounded-lg">
+              {ordersCount}
+            </span>
+          )}
         </div>
         <DataTable
           table={table}

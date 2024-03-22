@@ -17,6 +17,10 @@ export default function MyStrategies() {
     },
   })
 
+  const { data: strategiesCount } = useStrategies({
+    select: (strategies) => strategies.length,
+  })
+
   const table = useTable({
     data,
   })
@@ -26,9 +30,11 @@ export default function MyStrategies() {
       <div className="px-6 space-y-2">
         <div className="flex items-center space-x-2">
           <span>My Strategies</span>
-          <span className="bg-muted py-1 px-2 text-cloud-200 rounded-lg">
-            5
-          </span>
+          {strategiesCount && (
+            <span className="bg-muted py-1 px-2 text-cloud-200 rounded-lg">
+              {strategiesCount}
+            </span>
+          )}
         </div>
         <DataTable
           table={table}
