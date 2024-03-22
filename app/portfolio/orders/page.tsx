@@ -82,9 +82,29 @@ export default function Page() {
             onClose={() => setOrderToDelete(undefined)}
           />
         </CustomTabsContent>
-        {/* <CustomTabsContent className="p-4" value="limit">
-          <DataTable table={amplifiedTable} />
-        </CustomTabsContent> */}
+        <CustomTabsContent className="p-4" value="limit">
+          <DataTable
+            table={table}
+            isError={!!ordersQuery.error}
+            isLoading={ordersQuery.isLoading}
+            pagination={{
+              onPageChange: setPageDetails,
+              page,
+              pageSize,
+              count: ordersQuery.data?.length ?? 0,
+            }}
+          />
+          <EditOrderSheet
+            orderInfos={orderToEdit}
+            market={market}
+            onClose={() => setOrderToEdit(undefined)}
+          />
+          <CancelOfferDialog
+            order={orderToDelete}
+            market={market}
+            onClose={() => setOrderToDelete(undefined)}
+          />
+        </CustomTabsContent>
         <CustomTabsContent className="p-4" value="amplified">
           <DataTable table={amplifiedTable} />
         </CustomTabsContent>
