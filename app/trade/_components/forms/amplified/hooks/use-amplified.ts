@@ -8,7 +8,7 @@ import useMarket from "@/providers/market"
 import Big from "big.js"
 import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
-import { Asset } from "../types"
+import { Asset, AssetWithInfos } from "../types"
 import { getCurrentTokenPrice } from "../utils"
 import amplifiedLiquiditySourcing from "./amplified-liquidity-sourcing"
 import { ChangingFrom, useNewStratStore } from "./amplified-store"
@@ -245,40 +245,34 @@ export default function useAmplifiedForm() {
   }
 
   React.useEffect(() => {
-    let newMinVolume = 0
-    let minVolume = 0
     const selectedSourceGasOverhead = selectedSource?.gasOverhead || 200_000
     const variableCost = Big(60_000).mul(assetsWithTokens.length).add(60_000)
-    let gasreq = Big(0)
-    for (const asset of assetsWithTokens) {
-      gasreq = Big(
-        Math.max(
-          asset.receiveTo?.gasOverhead || 0,
-          selectedSource?.gasOverhead || 0,
-        ),
-      ).add(variableCost)
-    }
-
     const semibookAsks = market?.getSemibook("asks")
     const semibookBids = market?.getSemibook("bids")
     const isBid = openMarkets?.find(
       (market) => market.base.id === sendToken,
     )?.quote
     const priceToken = isBid
-    const getMinimumVolume = (semibook?: Semibook) => {
+
+    const calculateGasReq = (asset: AssetWithInfos) => {
+      return Big(
+        Math.max(asset.receiveTo?.gasOverhead || 0, selectedSourceGasOverhead),
+      ).add(variableCost)
+    }
+
+    const getMinimumVolume = (gasreq: Big, semibook?: Semibook) => {
       return Number(semibook?.getMinimumVolume(gasreq.toNumber()) || 0)
     }
 
-    const calculateMinVolume = (asset: Asset) => {
+    const calculateMinVolume = (asset: AssetWithInfos, semibook?: Semibook) => {
       if (!asset.token || !asset.limitPrice) return 0
-      const semibook = isBid ? semibookAsks : semibookBids
-      return getMinimumVolume(semibook)
+      return getMinimumVolume(calculateGasReq(asset), semibook)
     }
 
-    assets.forEach((asset) => {
-      minVolume = calculateMinVolume(asset)
-      newMinVolume += minVolume
-    })
+    const newMinVolume = assetsWithTokens.reduce((acc, asset) => {
+      const semibook = isBid ? semibookAsks : semibookBids
+      return acc + calculateMinVolume(asset, semibook)
+    }, 0)
 
     setMinVolume({
       total: newMinVolume.toFixed(
@@ -286,7 +280,7 @@ export default function useAmplifiedForm() {
           ? selectedToken?.displayedDecimals
           : priceToken?.displayedDecimals,
       ),
-      volume: minVolume.toFixed(selectedToken?.displayedDecimals),
+      volume: newMinVolume.toFixed(selectedToken?.displayedDecimals),
     })
   }, [assets, sendToken])
 

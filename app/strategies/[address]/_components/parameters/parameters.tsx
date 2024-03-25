@@ -1,23 +1,21 @@
 "use client"
 
-import { Info } from "lucide-react"
 import React from "react"
 
+import InfoTooltip from "@/components/info-tooltip"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import Big from "big.js"
+import { useAccount } from "wagmi"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
-import CloseDialog from "./dialogs/close"
-import { Deposit } from "./dialogs/deposit"
 import { Publish } from "./dialogs/publish"
 import { UnPublish } from "./dialogs/unpublish"
 import { Withdraw } from "./dialogs/withdraw"
 import { useParameters } from "./hook/use-parameters"
-import { useInventoryTable } from "./table/use-inventory-table"
 
 const InfoLine = ({
   title,
@@ -44,11 +42,11 @@ const InfoBar = () => {
       <InfoLine title="Step size" value={currentParameter?.stepSize} />
       <InfoLine
         title="Min price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={`${currentParameter?.minPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`}
       />
       <InfoLine
         title="Max price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={`${currentParameter?.maxPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`}
       />
     </div>
   )
@@ -67,12 +65,12 @@ const UnallocatedInventory = () => {
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           <Title>Unallocated inventory</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+          <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleDeposit}>Deposit</Button>
+          {/* <Button onClick={toggleDeposit}>Deposit</Button> */}
           <Button onClick={togglePublish} variant={"secondary"}>
             Publish
           </Button>
@@ -83,38 +81,40 @@ const UnallocatedInventory = () => {
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
             <Caption className="text-muted-foreground">Asset</Caption>
             <Caption className="text-muted-foreground">Amount</Caption>
           </tr>
         </thead>
-        <Separator />
-        <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
+        <tbody className="w-full flex flex-col gap-4 divide-y">
+          <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
-              {unallocatedBase} {base?.symbol}
+              {Big(Number(unallocatedBase)).toFixed(base?.displayedDecimals, 1)}{" "}
+              {base?.symbol}
             </Text>
           </tr>
-          <Separator />
-          <tr className="flex justify-between">
+          <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
-              {unallocatedQuote} {quote?.symbol}
+              {Big(Number(unallocatedQuote)).toFixed(
+                quote?.displayedAsPriceDecimals,
+                1,
+              )}{" "}
+              {quote?.symbol}
             </Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
 
       {/* Dialogs */}
-      <Deposit
+      {/* <Deposit
         open={deposit}
         onClose={toggleDeposit}
         togglePublish={togglePublish}
-      />
+      /> */}
       <Publish open={publish} onClose={togglePublish} />
       <Withdraw open={withdraw} onClose={toggleWithdraw} />
     </div>
@@ -130,59 +130,59 @@ const PublishedInventory = () => {
   )
   const [close, toggleClose] = React.useReducer((isOpen) => !isOpen, false)
 
-  const table = useInventoryTable({
-    data: [
-      { amount: "0.00000", asset: "WETH" },
-      { amount: "0.0000", asset: "USDC" },
-    ],
-  })
-
   return (
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           <Title>Published inventory</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+          <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleUnpublish}>Un-publish</Button>
-          <Button onClick={toggleClose} variant={"secondary"}>
-            Close Strategy
+          {/* TODO: create dialog for add inventory */}
+          {/* <Button onClick={toggleClose}>Add</Button> */}
+          <Button onClick={toggleUnpublish} variant={"secondary"}>
+            Unpublish
           </Button>
         </div>
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
             <Caption className="text-muted-foreground">Asset</Caption>
             <Caption className="text-muted-foreground">Amount</Caption>
           </tr>
         </thead>
-        <Separator />
-        <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
+        <tbody className="w-full flex flex-col gap-4 divide-y">
+          <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
-              {depositedBase} {base?.symbol}
+              {depositedBase &&
+                Big(Number(depositedBase)).toFixed(
+                  base?.displayedDecimals,
+                  1,
+                )}{" "}
+              {base?.symbol}
             </Text>
           </tr>
-          <Separator />
-          <tr className="flex justify-between">
+          <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
-              {depositedQuote} {quote?.symbol}
+              {depositedQuote &&
+                Big(Number(depositedQuote)).toFixed(
+                  quote?.displayedAsPriceDecimals,
+                  1,
+                )}{" "}
+              {quote?.symbol}
             </Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
-      <CloseDialog isOpen={close} onClose={toggleClose} />
+      {/* <CloseStrategyDialog isOpen={close} onClose={toggleClose} /> */}
       <UnPublish open={unPublish} onClose={toggleUnpublish} />
     </div>
   )
@@ -191,42 +191,39 @@ const PublishedInventory = () => {
 const BountyInventory = () => {
   const [bounty, toggleBounty] = React.useReducer((isOpen) => !isOpen, false)
   const { currentParameter } = useParameters()
-
-  const table = useInventoryTable({
-    data: [{ amount: "0.0000", asset: "USDC" }],
-  })
+  const { chain } = useAccount()
 
   return (
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           <Title>Bounty</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+          <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleBounty}>Add Bounty</Button>
+          {/* <Button onClick={toggleBounty}>Add</Button> */}
         </div>
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
             <Caption className="text-muted-foreground">Asset</Caption>
             <Caption className="text-muted-foreground">Amount</Caption>
           </tr>
         </thead>
-        <Separator />
         <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
-            <Text>MATIC</Text>
-            <Text>{currentParameter.lockedBounty} MATIC</Text>
+          <tr className="flex justify-between pt-4">
+            <Text>{chain?.nativeCurrency.symbol}</Text>
+            <Text>
+              {Big(currentParameter.lockedBounty ?? 0).toString()}{" "}
+              {chain?.nativeCurrency.symbol}
+            </Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
       <Bounty open={bounty} onClose={toggleBounty} />
@@ -245,7 +242,7 @@ export default function Parameters() {
 
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
-        <UnallocatedInventory />
+        {/* <UnallocatedInventory /> */}
         <PublishedInventory />
         <BountyInventory />
       </div>

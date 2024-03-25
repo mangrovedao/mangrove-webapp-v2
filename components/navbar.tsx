@@ -60,7 +60,7 @@ const LINKS = [
   {
     name: "Strategies",
     href: "/strategies",
-    disabled: true,
+    disabled: false,
     message: "Cooking...",
   },
   {

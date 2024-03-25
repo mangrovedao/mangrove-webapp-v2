@@ -3,6 +3,7 @@ import type { Token } from "@mangrovedao/mangrove.js"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
@@ -36,7 +37,7 @@ export function CustomBalance(props: {
                   e.stopPropagation()
                   e.preventDefault()
 
-                  props.action?.onClick(props.balance || "0")
+                  props.action?.onClick(props.balance || "")
                 }}
               >
                 <span>
@@ -50,9 +51,17 @@ export function CustomBalance(props: {
                   )}
                 </span>
               </TooltipTrigger>
-              <TooltipContent className="z-50">
-                {Number(props.balance).toFixed(token?.decimals)} {token?.symbol}
-              </TooltipContent>
+              <TooltipPortal>
+                <TooltipContent
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                  }}
+                >
+                  {Number(props.balance).toFixed(token?.decimals)}{" "}
+                  {token?.symbol}
+                </TooltipContent>
+              </TooltipPortal>
             </Tooltip>
           </TooltipProvider>
 

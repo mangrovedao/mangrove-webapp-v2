@@ -34,11 +34,14 @@ const useKandelStrategyContext = () => {
   const mergedOffers = React.useMemo(() => {
     const indexerOffers = strategyQuery.data?.offers
     const sdkOffers = strategyStatusQuery.data?.offerStatuses
+    console.log({ sdkOffers })
     const market = strategyStatusQuery.data?.market
     if (!(sdkOffers && indexerOffers && market)) return
-    //@ts-expect-error TODO: it's an error type from the indexer SDK
+    // @ts-expect-error TODO: it's an error type from the indexer SDK
     return getMergedOffers(sdkOffers, indexerOffers, market)
   }, [
+    strategyQuery.dataUpdatedAt,
+    strategyStatusQuery.dataUpdatedAt,
     strategyQuery.data?.offers,
     strategyStatusQuery.data?.offerStatuses,
     strategyStatusQuery.data?.market,

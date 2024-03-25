@@ -11,6 +11,7 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
@@ -32,6 +33,7 @@ type Params = {
 
 export function useTable({ type, data, onCancel, onManage }: Params) {
   const { chain } = useAccount()
+
   const columns = React.useMemo(
     () => [
       columnHelper.display({
@@ -105,14 +107,14 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         header: "Status",
         cell: ({ row }) => {
           const { base, quote, address, offers } = row.original
-          return (
-            <Status
-              base={base}
-              quote={quote}
-              address={address}
-              offers={offers}
-            />
-          )
+          const { data } = useStrategyStatus({
+            address,
+            base,
+            quote,
+            offers,
+          })
+
+          return <Status status={data?.status} />
         },
       }),
       columnHelper.display({
@@ -134,29 +136,39 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       // TODO: get from indexer
       columnHelper.display({
         header: "Reward",
-        cell: () => "3.39%",
+        cell: () => "-",
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => (
-          <div className="w-full h-full flex justify-end space-x-1">
-            <IconButton
-              tooltip="Manage"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onManage(row.original)}
-            >
-              <Pen />
-            </IconButton>
-            <IconButton
-              tooltip="Cancel strategy"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onCancel(row.original)}
-            >
-              <Close />
-            </IconButton>
-          </div>
-        ),
+        cell: ({ row }) => {
+          return (
+            <div className="w-full h-full flex justify-end space-x-1">
+              <IconButton
+                tooltip="Manage"
+                className="aspect-square w-6 rounded-full"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onManage(row.original)
+                }}
+              >
+                <Pen />
+              </IconButton>
+              <IconButton
+                tooltip="Cancel strategy"
+                className="aspect-square w-6 rounded-full"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onCancel(row.original)
+                }}
+              >
+                <Close />
+              </IconButton>
+            </div>
+          )
+        },
       }),
     ],
     [onManage, onCancel],

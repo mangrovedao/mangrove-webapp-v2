@@ -11,6 +11,7 @@ type Props = {
   blockExplorerUrl?: string
   description?: boolean
   copy?: boolean
+  type?: "address" | "tx"
 }
 
 function BlockExplorer({
@@ -18,9 +19,10 @@ function BlockExplorer({
   address,
   blockExplorerUrl,
   copy,
+  type = "tx",
 }: Props) {
   return (
-    <div className="flex items-center text-sm font-normal justify-between w-full">
+    <div className="flex items-center text-sm font-normal justify-between">
       {description ? (
         <span className="text-cloud-300">View on block explorer:</span>
       ) : undefined}
@@ -35,7 +37,7 @@ function BlockExplorer({
             <Link
               rel="noopener noreferrer"
               target="_blank"
-              href={`${blockExplorerUrl}/tx/${address}`}
+              href={`${blockExplorerUrl}/${type}/${address}`}
             >
               <span>{shortenAddress(address ?? "")}</span>
               {!copy && <ExternalLink className="mr-2 h-4 w-4" />}

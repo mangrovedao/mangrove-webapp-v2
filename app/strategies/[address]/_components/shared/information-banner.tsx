@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Info } from "@/svgs"
 import { cn } from "@/utils"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import useKandel from "../../_providers/kandel-strategy"
 
 export default function InformationBanner() {
-  const { strategyStatusQuery, mergedOffers } = useKandel()
   const [bannerOpen, setBannerOpen] = React.useState(true)
+  const { push } = useRouter()
+  const { strategyStatusQuery, mergedOffers, baseToken, quoteToken } =
+    useKandel()
+  const { isOutOfRange, stratInstance } = strategyStatusQuery.data ?? {}
 
-  const { isOutOfRange, unexpectedDeadOffers } = strategyStatusQuery.data ?? {}
   const allOffersAreDead = !mergedOffers || mergedOffers?.length === 0
 
   const isInactive = strategyStatusQuery.data?.status === "inactive"
@@ -77,36 +80,40 @@ export default function InformationBanner() {
             )}
             {isActive && (
               <li>
-                We’ve notice empty offer in this strategy. You can refill it
-                bellow.
+                We’ve notice empty offer in this strategy.
+                {/* You can refill it
+                bellow. */}
               </li>
             )}
           </ul>
 
-          {isInactive && (
-            <div className="space-x-2">
-              {/* TODO: plug button */}
-              <Button className="px-5" size={"md"}>
-                Edit Parameters
-              </Button>
-              <Button
-                variant={"secondary"}
-                size={"md"}
-                className="px-5"
-                asChild
+          {/* {isInactive ||
+            (!isActive && ( */}
+          <div className="space-x-2 mt-2">
+            {/* <Button
+              className="px-5"
+              size={"md"}
+              onClick={() =>
+                push(
+                  `/strategies/${stratInstance?.address}/edit?market=${baseToken?.id},${quoteToken?.id}`,
+                )
+              }
+            >
+              Edit Parameters
+            </Button> */}
+            <Button variant={"secondary"} size={"md"} className="px-5" asChild>
+              <Link
+                href={
+                  "https://docs.mangrove.exchange/general/web-app/strategies/manage-strat/statuses-and-alerts"
+                }
+                target="_blank"
+                rel="noreferrer"
               >
-                <Link
-                  href={
-                    "https://docs.mangrove.exchange/general/web-app/strategies/manage-strat/statuses-and-alerts"
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Learn more
-                </Link>
-              </Button>
-            </div>
-          )}
+                Learn more
+              </Link>
+            </Button>
+          </div>
+          {/* ))} */}
         </div>
       </div>
     </aside>

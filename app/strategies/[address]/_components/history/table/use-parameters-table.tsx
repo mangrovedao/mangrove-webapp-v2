@@ -8,38 +8,35 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
-import { useAccount } from "wagmi"
 
 import { formatDate } from "@/utils/date"
 import useKandel from "../../../_providers/kandel-strategy"
-import BlockExplorer from "../../block-explorer"
 
 const columnHelper = createColumnHelper<Parameters>()
 const DEFAULT_DATA: Parameters[] = []
 
 export type Parameters = {
-  date: Date
+  date: Date | undefined
   spread: string
-  ratio: string
-  pricePoints: string
-  amount: string
-  txHash: string
+  ratio: string | undefined
+  pricePoints: string | null | undefined
+  amount: string | undefined
 }
 
 type Params = {
   data?: Parameters[]
 }
 
-export function useParametersTables({ data }: Params) {
-  const { chain } = useAccount()
+export function useParametersTable({ data }: Params) {
   const { baseToken } = useKandel()
 
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("date", {
-        header: "date",
+        header: "Date",
         cell: ({ row }) => {
           const { date } = row.original
+          if (!date) return <div>N/A</div>
           return <div>{formatDate(date)}</div>
         },
       }),
@@ -81,23 +78,6 @@ export function useParametersTables({ data }: Params) {
           return (
             <div className="w-full h-full flex justify-end">
               {amount} {baseToken?.symbol}
-            </div>
-          )
-        },
-      }),
-      columnHelper.accessor("txHash", {
-        id: "txHash",
-        header: () => <div className="text-right">Transaction Hash</div>,
-        cell: ({ row }) => {
-          const { txHash } = row.original
-          const blockExplorerUrl = chain?.blockExplorers?.default.url
-          return (
-            <div className="w-full h-full flex justify-end">
-              <BlockExplorer
-                address={txHash}
-                blockExplorerUrl={blockExplorerUrl}
-                description={false}
-              />
             </div>
           )
         },

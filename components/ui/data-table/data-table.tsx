@@ -71,7 +71,7 @@ export function DataTable<TData>({
             rows.map((row) => (
               <>
                 <TableRow
-                  key={row.id}
+                  key={`row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
                     "text-gray-scale-300 hover:text-white transition-colors group/row",

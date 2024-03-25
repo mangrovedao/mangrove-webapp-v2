@@ -7,7 +7,7 @@ export function useDeposit({
   volumes,
 }: {
   stratInstance?: GeometricKandelInstance
-  volumes: { baseAmount: string; quoteAmount: string }
+  volumes: { baseAmount?: string; quoteAmount?: string }
 }) {
   const queryClient = useQueryClient()
 

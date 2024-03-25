@@ -49,7 +49,7 @@ export function UnPublish({ open, onClose }: Props) {
     return { asks, bids }
   }
 
-  let steps = ["Set", "UnPublish"]
+  let steps = ["Set", "Unpublish"]
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
 
@@ -88,7 +88,6 @@ export function UnPublish({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setBaseAmount(upublishedBase),
-              text: "MAX",
             }}
             value={baseAmount}
             label={`${market?.base.symbol} amount`}
@@ -99,7 +98,7 @@ export function UnPublish({ open, onClose }: Props) {
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
               Number(baseAmount) > Number(upublishedBase)
-                ? "Invalid amount"
+                ? "Insufficient balance"
                 : ""
             }
           />
@@ -107,7 +106,6 @@ export function UnPublish({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setQuoteAmount(upublishedQuote),
-              text: "MAX",
             }}
             value={quoteAmount}
             label={`${market?.quote.symbol} amount`}
@@ -118,7 +116,7 @@ export function UnPublish({ open, onClose }: Props) {
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
               Number(quoteAmount) > Number(upublishedQuote)
-                ? "Invalid amount"
+                ? "Insufficient balance"
                 : ""
             }
           />
@@ -135,6 +133,7 @@ export function UnPublish({ open, onClose }: Props) {
           }
           onClick={goToNextStep}
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Proceed{" "}
           <div
@@ -179,7 +178,9 @@ export function UnPublish({ open, onClose }: Props) {
                 Funds are evenly distributed across the active strategy.
               </Caption>
               <Link href={KANDEL_DOC_URL} target="_blank">
-                <Caption className="text-primary underline">Learn more</Caption>
+                <Caption className="text-green-caribbean underline">
+                  Learn more
+                </Caption>
               </Link>
             </div>
           </div>
@@ -200,6 +201,7 @@ export function UnPublish({ open, onClose }: Props) {
             })
           }
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           UnPublish
           <div
@@ -240,7 +242,7 @@ export function UnPublish({ open, onClose }: Props) {
               variant={"header1"}
               className="space-x-3 flex items-center"
             >
-              UnPublish
+              Unpublish
             </Title>
             <InfoIcon className="h-4 w-4 text-muted-foreground" />
           </div>
