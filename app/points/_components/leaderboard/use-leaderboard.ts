@@ -1,29 +1,29 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { useAccount } from "wagmi"
 
 import { getErrorMessage } from "@/utils/errors"
-import { useAccount } from "wagmi"
-import { parseLeaderboard, type Leaderboard } from "./schema"
+import { parseBoosts } from "../../schemas/boosts"
+import { parseLeaderboard } from "../../schemas/leaderboard"
+import { parsePoints } from "../../schemas/points"
 
-type Params<T> = {
+type Params = {
   filters?: {
     first?: number
     skip?: number
   }
-  select?: (data: Leaderboard[]) => T
 }
 
-export function useLeaderboard<T = Leaderboard[]>({
+export function useLeaderboard({
   filters: { first = 100, skip = 0 } = {},
-  select,
-}: Params<T> = {}) {
+}: Params = {}) {
   return useQuery({
     queryKey: ["leaderboard", first, skip],
     queryFn: async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_LEADERBOARD_API}/incentives/leaderboard`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/leaderboard`,
         )
         const leaderboard = await res.json()
         return parseLeaderboard(leaderboard)
@@ -32,7 +32,6 @@ export function useLeaderboard<T = Leaderboard[]>({
         throw new Error()
       }
     },
-    select,
     meta: {
       error: "Unable to retrieve leaderboard",
     },
@@ -41,18 +40,18 @@ export function useLeaderboard<T = Leaderboard[]>({
   })
 }
 
-export function useUserRank() {
+export function useUserPoints() {
   const { address } = useAccount()
   return useQuery({
-    queryKey: ["user-leaderboard", address],
+    queryKey: ["user-points", address],
     queryFn: async () => {
       try {
-        if (!address) return []
+        if (!address) return null
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_LEADERBOARD_API}/incentives/points/${address}`, // TODO: unmock with user address
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/points/${address}`,
         )
-        const leaderboard = await res.json()
-        return parseLeaderboard(leaderboard)
+        const points = await res.json()
+        return parsePoints(points)
       } catch (e) {
         console.error(getErrorMessage(e))
         throw new Error()
@@ -60,6 +59,32 @@ export function useUserRank() {
     },
     meta: {
       error: "Unable to retrieve user rank data",
+    },
+    enabled: !!address,
+    retry: false,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+export function useUserBoosts() {
+  const { address } = useAccount()
+  return useQuery({
+    queryKey: ["user-boosts", address],
+    queryFn: async () => {
+      try {
+        if (!address) return null
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/boosts/${address}`,
+        )
+        const boosts = await res.json()
+        return parseBoosts(boosts)
+      } catch (e) {
+        console.error(getErrorMessage(e))
+        throw new Error()
+      }
+    },
+    meta: {
+      error: "Unable to retrieve user boosts data",
     },
     enabled: !!address,
     retry: false,

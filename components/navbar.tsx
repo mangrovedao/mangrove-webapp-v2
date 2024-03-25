@@ -66,21 +66,21 @@ const LINKS = [
   {
     name: "Points",
     href: "/points",
-    disabled: true,
-    message: (
-      <div className="z-50">
-        Points program is live! <br />
-        The Points page will be available in the coming days.
-        <br />
-        More info{" "}
-        <Link
-          href={"https://docs.mangrove.exchange/general/points/"}
-          className="text-green-caribbean"
-        >
-          here
-        </Link>
-      </div>
-    ),
+    disabled: false,
+    // message: (
+    //   <div className="z-50">
+    //     Points program is live! <br />
+    //     The Points page will be available in the coming days.
+    //     <br />
+    //     More info{" "}
+    //     <Link
+    //       href={"https://docs.mangrove.exchange/general/points/"}
+    //       className="text-green-caribbean"
+    //     >
+    //       here
+    //     </Link>
+    //   </div>
+    // ),
   },
   {
     name: "Referrals",
