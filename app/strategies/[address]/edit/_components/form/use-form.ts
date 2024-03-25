@@ -3,6 +3,7 @@ import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import useKandel from "../../../_providers/kandel-strategy"
@@ -15,7 +16,7 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const { address } = useAccount()
-
+  const { mangrove } = useMangrove()
   const { market } = useMarket()
   const baseToken = market?.base
   const quoteToken = market?.quote
@@ -23,6 +24,14 @@ export default function useForm() {
   const quoteBalance = useTokenBalance(quoteToken)
   const { data: nativeBalance } = useBalance({
     address,
+  })
+
+  const logics = mangrove?.getLogicsList().map((item) => {
+    if (item.id.includes("simple")) {
+      return { ...item, id: "Wallet" }
+    } else {
+      return item
+    }
   })
 
   const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
@@ -81,13 +90,17 @@ export default function useForm() {
     ratio,
     stepSize,
     bountyDeposit,
+    sendFrom,
+    receiveTo,
+    isChangingFrom,
     setBaseDeposit,
+    setSendFrom,
+    setReceiveTo,
     setQuoteDeposit,
     setPricePoints,
     setRatio,
     setStepSize,
     setBountyDeposit,
-    isChangingFrom,
     setIsChangingFrom,
     setDistribution,
   } = useNewStratStore()
@@ -163,6 +176,22 @@ export default function useForm() {
     handleFieldChange("baseDeposit")
     const value = typeof e === "string" ? e : e.target.value
     setBaseDeposit(value)
+  }
+
+  const handleSendFromChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("sendFrom")
+    const value = typeof e === "string" ? e : e.target.value
+    setSendFrom(value)
+  }
+
+  const handleReceiveToChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("receiveTo")
+    const value = typeof e === "string" ? e : e.target.value
+    setReceiveTo(value)
   }
 
   const handleQuoteDepositChange = (
@@ -285,18 +314,23 @@ export default function useForm() {
     pricePoints,
     baseDeposit,
     quoteDeposit,
-    handleBaseDepositChange,
-    handleQuoteDepositChange,
-    handlePricePointsChange,
+    nativeBalance,
+    bountyDeposit,
     fieldsDisabled,
     errors,
     kandelRequirementsQuery,
     ratio,
-    handleRatioChange,
     stepSize,
+    sendFrom,
+    receiveTo,
+    logics,
+    handleBaseDepositChange,
+    handleQuoteDepositChange,
+    handlePricePointsChange,
+    handleSendFromChange,
+    handleReceiveToChange,
+    handleRatioChange,
     handleStepSizeChange,
-    nativeBalance,
-    bountyDeposit,
     handleBountyDepositChange,
   }
 }

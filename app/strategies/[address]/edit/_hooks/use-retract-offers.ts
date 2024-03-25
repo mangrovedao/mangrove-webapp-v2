@@ -23,6 +23,7 @@ export function useRetractOffers({
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
           market,
+          type: "smart",
         })
 
         const txs = await kandelInstance.retractAndWithdraw()

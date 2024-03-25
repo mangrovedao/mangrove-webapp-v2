@@ -37,6 +37,7 @@ export function useLaunchKandelStrategy() {
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
           market,
+          type: "smart",
         })
 
         const populateTxs = await kandelInstance.populateGeometricDistribution({

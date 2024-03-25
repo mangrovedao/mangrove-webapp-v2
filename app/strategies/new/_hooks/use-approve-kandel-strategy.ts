@@ -23,7 +23,7 @@ export function useApproveKandelStrategy({
 
         const { result } = await kandelStrategies.seeder.sow({
           market,
-          onAave: false,
+          type: "smart",
           liquiditySharing: false,
         })
 

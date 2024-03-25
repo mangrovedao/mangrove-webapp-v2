@@ -40,6 +40,7 @@ export function useEditKandelStrategy() {
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
           market,
+          type: "smart",
         })
 
         if (hasLiveOffers) {

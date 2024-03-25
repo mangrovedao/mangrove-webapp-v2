@@ -1,8 +1,11 @@
+import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/SimpleAaveLogic"
+import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/ZeroLendLogic"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
-import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/ZeroLendLogic"
+import { MonoswapV3Logic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/UniV3/MonoswapV3Logic"
+import { ThrusterV3Logic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/UniV3/ThrusterV3Logic"
 
+import { PacFinanceLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/PacFinanceLogic"
 import { type TradeAction, type TradeMode } from "./enums"
 
 type TradeModeValue = `${TradeMode}`
@@ -22,4 +25,7 @@ export type DefaultLogics =
   | SimpleAaveLogic
   | OrbitLogic
   | ZeroLendLogic
+  | ThrusterV3Logic
+  | MonoswapV3Logic
+  | PacFinanceLogic
   | undefined
