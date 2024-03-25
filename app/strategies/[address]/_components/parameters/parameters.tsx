@@ -12,7 +12,6 @@ import Big from "big.js"
 import { useAccount } from "wagmi"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
-import { Deposit } from "./dialogs/deposit"
 import { Publish } from "./dialogs/publish"
 import { UnPublish } from "./dialogs/unpublish"
 import { Withdraw } from "./dialogs/withdraw"
@@ -71,7 +70,7 @@ const UnallocatedInventory = () => {
           <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleDeposit}>Deposit</Button>
+          {/* <Button onClick={toggleDeposit}>Deposit</Button> */}
           <Button onClick={togglePublish} variant={"secondary"}>
             Publish
           </Button>
@@ -111,11 +110,11 @@ const UnallocatedInventory = () => {
       </table>
 
       {/* Dialogs */}
-      <Deposit
+      {/* <Deposit
         open={deposit}
         onClose={toggleDeposit}
         togglePublish={togglePublish}
-      />
+      /> */}
       <Publish open={publish} onClose={togglePublish} />
       <Withdraw open={withdraw} onClose={toggleWithdraw} />
     </div>
@@ -140,9 +139,10 @@ const PublishedInventory = () => {
           <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleUnpublish}>Un-publish</Button>
-          <Button onClick={toggleClose} variant={"secondary"}>
-            Close Strategy
+          {/* TODO: create dialog for add inventory */}
+          {/* <Button onClick={toggleClose}>Add</Button> */}
+          <Button onClick={toggleUnpublish} variant={"secondary"}>
+            Unpublish
           </Button>
         </div>
       </div>
@@ -202,7 +202,7 @@ const BountyInventory = () => {
           <InfoTooltip>TODO:</InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleBounty}>Add Bounty</Button>
+          {/* <Button onClick={toggleBounty}>Add</Button> */}
         </div>
       </div>
 
@@ -242,7 +242,7 @@ export default function Parameters() {
 
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
-        <UnallocatedInventory />
+        {/* <UnallocatedInventory /> */}
         <PublishedInventory />
         <BountyInventory />
       </div>

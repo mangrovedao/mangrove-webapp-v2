@@ -1,4 +1,5 @@
 import { Token } from "@mangrovedao/mangrove.js"
+import { useRouter } from "next/navigation"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -49,6 +50,7 @@ export default function EditStrategyDialog({
   })
   const { strategyQuery } = useKandel()
   const kandelAddress = strategyQuery.data?.address
+  const router = useRouter()
 
   const {
     mutate: approveKandelStrategy,
@@ -192,6 +194,8 @@ export default function EditStrategyDialog({
               {
                 onSuccess: () => {
                   onClose()
+                  // next/redirect doesn't work in this case...
+                  window.location.href = `/strategies/${kandelAddress}`
                 },
               },
             )

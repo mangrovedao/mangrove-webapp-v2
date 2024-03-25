@@ -49,7 +49,7 @@ export function UnPublish({ open, onClose }: Props) {
     return { asks, bids }
   }
 
-  let steps = ["Set", "UnPublish"]
+  let steps = ["Set", "Unpublish"]
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
 
@@ -242,7 +242,7 @@ export function UnPublish({ open, onClose }: Props) {
               variant={"header1"}
               className="space-x-3 flex items-center"
             >
-              UnPublish
+              Unpublish
             </Title>
             <InfoIcon className="h-4 w-4 text-muted-foreground" />
           </div>

@@ -25,9 +25,9 @@ export function useRetractOffers({
           market,
         })
 
-        const txs = await kandelInstance.retractOffers()
+        const txs = await kandelInstance.retractAndWithdraw()
         await Promise.all(txs.map((x) => x.wait()))
-        console.log(txs)
+
         toast.success("Kandel offers successfully retracted")
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)

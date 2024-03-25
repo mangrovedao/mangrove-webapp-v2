@@ -66,7 +66,6 @@ export function useEditKandelStrategy() {
 
         await Promise.all(populateTxs.map((x) => x.wait()))
         toast.success("Kandel strategy successfully edited")
-        router.push(`/strategies/${kandelAddress}`)
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)

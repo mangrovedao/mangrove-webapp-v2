@@ -49,7 +49,7 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      <Fieldset className="space-y-4" legend="Set initial inventory">
+      <Fieldset className="space-y-4" legend="Edit inventory">
         <div>
           <EnhancedNumericInput
             token={baseToken}

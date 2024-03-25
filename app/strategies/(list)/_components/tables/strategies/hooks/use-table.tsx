@@ -136,7 +136,7 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       // TODO: get from indexer
       columnHelper.display({
         header: "Reward",
-        cell: () => "3.39%",
+        cell: () => "-",
       }),
       columnHelper.display({
         id: "actions",

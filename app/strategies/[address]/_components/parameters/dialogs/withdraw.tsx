@@ -103,7 +103,6 @@ export function Withdraw({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setBaseAmount(upublishedBase),
-              text: "MAX",
             }}
             value={baseAmount}
             label={`${market?.base.symbol} amount`}
@@ -122,10 +121,10 @@ export function Withdraw({ open, onClose }: Props) {
           <EnhancedNumericInput
             balanceAction={{
               onClick: () => setQuoteAmount(upublishedQuote),
-              text: "MAX",
             }}
             value={quoteAmount}
             label={`${market?.quote.symbol} amount`}
+            customBalance={upublishedQuote}
             balanceLabel="Unpublished inventory"
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={

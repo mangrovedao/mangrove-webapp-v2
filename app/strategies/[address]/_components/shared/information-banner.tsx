@@ -80,8 +80,9 @@ export default function InformationBanner() {
             )}
             {isActive && (
               <li>
-                We’ve notice empty offer in this strategy. You can refill it
-                bellow.
+                We’ve notice empty offer in this strategy.
+                {/* You can refill it
+                bellow. */}
               </li>
             )}
           </ul>
