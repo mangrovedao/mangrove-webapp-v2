@@ -26,7 +26,7 @@ export function useTable({ data }: Params) {
       columnHelper.accessor("rank", {
         header: "Rank",
         cell: (row) => {
-          const rank = row.getValue()
+          const rank = row?.getValue()
           return (
             <div className="flex items-center space-x-2">
               {rank > 0 ? rank : undefined}{" "}

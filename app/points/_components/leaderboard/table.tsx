@@ -17,12 +17,16 @@ export function Leaderboard() {
     },
   })
 
-  const useUserPointsQuery = useUserPoints()
-  const currentUser = useUserPointsQuery.data
-  const data = React.useMemo(
-    () => [currentUser, ...(leaderboardQuery.data?.leaderboard ?? [])],
-    [useUserPointsQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt],
-  )
+  const userPointsQuery = useUserPoints()
+  const currentUser = userPointsQuery.data
+  const data = React.useMemo(() => {
+    if (leaderboardQuery.isLoading || userPointsQuery.isLoading) return []
+    let data = leaderboardQuery.data?.leaderboard ?? []
+    if (currentUser) {
+      data = [currentUser, ...data]
+    }
+    return data
+  }, [userPointsQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt])
 
   const table = useTable({
     //@ts-ignore
