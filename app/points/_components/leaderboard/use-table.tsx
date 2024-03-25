@@ -10,6 +10,7 @@ import {
 import React from "react"
 
 import { Rank1Icon, Rank2Icon, Rank3Icon } from "@/svgs"
+import { formatNumber } from "@/utils/numbers"
 import { LeaderboardEntry } from "../../schemas/leaderboard"
 import Address from "./address"
 
@@ -28,7 +29,7 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const rank = row?.getValue()
           return (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 font-roboto">
               {rank > 0 ? rank : undefined}{" "}
               {rank === 1 ? (
                 <Rank1Icon className="size-7 ml-2" />
@@ -54,7 +55,8 @@ export function useTable({ data }: Params) {
         header: "Boost",
         cell: (row) => {
           const boost = row.getValue()
-          return <div>{boost}</div>
+          if (boost === 0) return <div className="font-roboto">1x</div>
+          return <div className="font-roboto">{boost}x</div>
         },
       }),
       columnHelper.accessor("maker_points", {
@@ -62,7 +64,9 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const makerPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">{makerPoints}</div>
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(makerPoints)}
+            </div>
           )
         },
       }),
@@ -71,8 +75,8 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const tradingPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">
-              {tradingPoints}
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(tradingPoints)}
             </div>
           )
         },
@@ -82,8 +86,8 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const communityPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">
-              {communityPoints}
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(communityPoints)}
             </div>
           )
         },
@@ -93,8 +97,8 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const refereesPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">
-              {refereesPoints}
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(refereesPoints)}
             </div>
           )
         },
@@ -104,7 +108,9 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const totalPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">{totalPoints}</div>
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(totalPoints)}
+            </div>
           )
         },
       }),

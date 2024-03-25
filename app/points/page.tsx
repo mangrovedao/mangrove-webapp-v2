@@ -30,10 +30,16 @@ export default function Page() {
         <CurrentBoost
           className="col-span-full md:col-span-1"
           boost={currentBoost}
-          previousVolume={volume}
+          volume={volume}
+          type={userBoost?.type}
         />
         <Rank className="col-span-full md:col-span-1" />
-        <NextLevel className="col-span-full" volume={volume} />
+        <NextLevel
+          className="col-span-full"
+          volume={volume}
+          boost={userBoost?.boost}
+          type={userBoost?.type}
+        />
       </div>
       <Leaderboard />
     </div>

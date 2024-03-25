@@ -90,7 +90,6 @@ export function useRefillOffer({ offer, onCancel }: Props) {
         const { txs } = data
         await Promise.all(
           txs.map(async (tx) => {
-            console.log(tx)
             await resolveWhenBlockIsIndexed.mutateAsync({
               blockNumber: tx?.blockNumber,
             })

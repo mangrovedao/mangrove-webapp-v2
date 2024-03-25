@@ -1,20 +1,26 @@
+import InfoTooltip from "@/components/info-tooltip"
 import { cn } from "@/utils"
+import { getLevels } from "../constants"
+import { BoostType } from "../schemas/boosts"
 import { formatNumber } from "../utils"
 import BoxContainer from "./box-container"
 
 type Props = {
   className?: string
   level?: number
+  volume?: number
+  type?: BoostType
   boost?: number
-  previousVolume?: number
 }
 
 export default function CurrentBoost({
   className,
   level = 0,
   boost = 1,
-  previousVolume = 0,
+  volume = 0,
+  type,
 }: Props) {
+  const { nextIndex } = getLevels(volume)
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
@@ -43,7 +49,7 @@ export default function CurrentBoost({
         </div>
         <div>
           <div className="text-sm text-cloud-200">Current boost</div>
-          <div className="flex items-center">
+          <div className="flex items-center flex-wrap">
             <span
               className={cn("font-medium text-[32px]", {
                 "text-cloud-00": !boost,
@@ -57,11 +63,23 @@ export default function CurrentBoost({
                 !level ? "bg-cloud-300" : "text-primary-bush-green",
               )}
             >
-              Level {level}
+              Level {nextIndex}
             </span>
+            {type === "NFT" && (
+              <span
+                className={cn(
+                  "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
+                )}
+              >
+                NFT Temporary Boost
+                <InfoTooltip className="text-white">
+                  You've received a 3x boost for holding a NFT
+                </InfoTooltip>
+              </span>
+            )}
           </div>
           <div className="text-xs text-cloud-200 flex items-center pt-7">
-            previous volume {formatNumber(previousVolume)}
+            previous volume {formatNumber(volume)}
           </div>
         </div>
       </div>
