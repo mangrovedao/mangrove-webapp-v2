@@ -7,19 +7,21 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
+import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
+import { ResolutionString } from "@/public/charting_library/charting_library"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 
 enum ChartType {
   DEPTH = "Depth chart",
-  // PRICE = "Price chart",
+  PRICE = "Price chart",
 }
 
 const TABS_CONTENT = {
   [ChartType.DEPTH]: DepthChart,
-  // [ChartType.PRICE]: (
-  //   <TVChartContainer symbol={"AAPL"} interval={`1D` as ResolutionString} />
-  // ),
+  [ChartType.PRICE]: (
+    <TVChartContainer symbol={"AAPL"} interval={`1D` as ResolutionString} />
+  ),
 }
 
 export function Market({

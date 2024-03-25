@@ -8,6 +8,7 @@ import {
   type ChartingLibraryWidgetOptions,
 } from "../../public/charting_library"
 import { Skeleton } from "../ui/skeleton"
+import datafeed from "./datafeed"
 
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
@@ -20,14 +21,7 @@ export const TVChartContainer = (
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: props.symbol,
       // BEWARE: no trailing slash is expected in feed URL
-      datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(
-        "https://demo_feed.tradingview.com",
-        undefined,
-        {
-          maxResponseLength: 1000,
-          expectedOrder: "latestFirst",
-        },
-      ),
+      datafeed: datafeed,
 
       interval: props.interval!,
       container: chartContainerRef.current,
