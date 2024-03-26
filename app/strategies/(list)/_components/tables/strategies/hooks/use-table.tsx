@@ -7,6 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import Big from "big.js"
 import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
@@ -92,13 +93,24 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Value",
         cell: ({ row }) => {
-          const { base, quote, depositedBase, depositedQuote } = row.original
+          const { base, quote, offers } = row.original
+          const asksOffers = offers?.filter((item) => item.offerType === "asks")
+          const bidsOffers = offers?.filter((item) => item.offerType === "bids")
+
+          const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
+            return acc.add(Big(curr.gives))
+          }, Big(0))
+
+          const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
+            return acc.add(Big(curr.gives))
+          }, Big(0))
+
           return (
             <Value
               base={base}
-              baseValue={depositedBase}
+              baseValue={baseAmountDeposited.toFixed(6)}
               quote={quote}
-              quoteValue={depositedQuote}
+              quoteValue={quoteAmountDeposited.toFixed(6)}
             />
           )
         },
