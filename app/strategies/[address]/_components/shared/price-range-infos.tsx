@@ -2,6 +2,7 @@ import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/co
 import { AverageReturn } from "../../../(shared)/_components/average-return"
 import useKandel from "../../_providers/kandel-strategy"
 import { MergedOffers } from "../../_utils/inventory"
+import { useParameters } from "../parameters/hook/use-parameters"
 import { LegendItem } from "./legend-item"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
@@ -16,6 +17,7 @@ export default function PriceRangeInfos() {
   } = useKandel()
   const { bidsBalance, asksBalance } = strategyStatusQuery.data ?? {}
 
+  const { publishedBase, publishedQuote } = useParameters()
   const bids = strategyStatusQuery.data?.book?.bids ?? []
   const asks = strategyStatusQuery.data?.book?.asks ?? []
 
@@ -26,8 +28,8 @@ export default function PriceRangeInfos() {
         number,
       ])
     : undefined
-  const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+  const baseValue = `${publishedBase?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
   const chartIsLoading =
     (strategyStatusQuery.isLoading && strategyQuery.isLoading) ||

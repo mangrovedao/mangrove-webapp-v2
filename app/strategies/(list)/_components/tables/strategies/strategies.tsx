@@ -47,7 +47,10 @@ export function Strategies({ type }: Props) {
         table={table}
         isError={!!strategiesQuery.error}
         isLoading={strategiesQuery.isLoading || !market}
-        onRowClick={(strategy) => push(`/strategies/${strategy?.address}`)}
+        onRowClick={(strategy) =>
+          // note: lost of context after redirecting with push method here
+          (window.location.href = `/strategies/${strategy?.address}`)
+        }
         pagination={{
           onPageChange: setPageDetails,
           page,
