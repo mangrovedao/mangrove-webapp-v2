@@ -1,20 +1,31 @@
+import InfoTooltip from "@/components/info-tooltip"
 import { cn } from "@/utils"
+import { getLevels } from "../constants"
 import { formatNumber } from "../utils"
 import BoxContainer from "./box-container"
 
 type Props = {
   className?: string
   level?: number
+  volume?: number
+  type?: string
   boost?: number
-  previousVolume?: number
+}
+
+function formatNFTName(name: string): string {
+  return name
+    .replace(/(?!^)([A-Z][a-z])/g, " $1") // Insert a space before each uppercase letter that is not at the start of the string and is not preceded by another uppercase letter
+    .trim() // Remove any leading or trailing spaces
 }
 
 export default function CurrentBoost({
   className,
   level = 0,
   boost = 1,
-  previousVolume = 0,
+  volume = 0,
+  type,
 }: Props) {
+  const { nextIndex } = getLevels(volume)
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
@@ -43,7 +54,7 @@ export default function CurrentBoost({
         </div>
         <div>
           <div className="text-sm text-cloud-200">Current boost</div>
-          <div className="flex items-center">
+          <div className="flex items-center flex-wrap">
             <span
               className={cn("font-medium text-[32px]", {
                 "text-cloud-00": !boost,
@@ -57,11 +68,24 @@ export default function CurrentBoost({
                 !level ? "bg-cloud-300" : "text-primary-bush-green",
               )}
             >
-              Level {level}
+              Level {nextIndex}
             </span>
+            {type?.includes("NFT") && (
+              <span
+                className={cn(
+                  "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
+                )}
+              >
+                {formatNFTName(type)}
+                <InfoTooltip className="text-white">
+                  You've received a {boost}x boost for holding the{" "}
+                  {formatNFTName(type)}
+                </InfoTooltip>
+              </span>
+            )}
           </div>
           <div className="text-xs text-cloud-200 flex items-center pt-7">
-            previous volume {formatNumber(previousVolume)}
+            previous volume {formatNumber(volume)}
           </div>
         </div>
       </div>

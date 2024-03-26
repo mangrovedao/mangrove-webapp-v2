@@ -99,7 +99,6 @@ export const useParameters = () => {
     const asks = await stratInstance?.getUnpublished("asks")
     const bids = await stratInstance?.getUnpublished("bids")
     // TODO: fixe the negative values
-
     return [asks, bids]
   }
 
