@@ -210,7 +210,7 @@ export function Form({ className }: { className?: string }) {
       <Fieldset legend="Settings">
         <div>
           <EnhancedNumericInput
-            label="Number of price points"
+            label="Number of offers"
             value={pricePoints}
             onChange={handlePricePointsChange}
             disabled={fieldsDisabled}
