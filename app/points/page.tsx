@@ -1,6 +1,7 @@
 "use client"
 
 import { useAccount } from "wagmi"
+
 import { ConnectWalletBanner } from "./_components/connect-wallet-banner"
 import CurrentBoost from "./_components/current-boost"
 import { JoinProgramBanner } from "./_components/join-program-banner"
