@@ -14,6 +14,7 @@ export function Leaderboard() {
   const leaderboardQuery = useLeaderboard({
     filters: {
       skip: (page - 1) * pageSize,
+      first: pageSize,
     },
   })
 
@@ -46,7 +47,7 @@ export function Leaderboard() {
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count: 1,
+          count: leaderboardQuery.data?.leaderboard_length ?? 0,
         }}
         tableRowClasses="text-white"
         isRowHighlighted={(row) => row.account === currentUser?.account}

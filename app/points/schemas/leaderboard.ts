@@ -15,6 +15,7 @@ export const leaderboardSchema = z.object({
   leaderboard: z.array(leaderboardEntrySchema),
   last_updated_timestamp: z.number(),
   last_updated_block: z.number(),
+  leaderboard_length: z.number(),
 })
 
 export type Leaderboard = z.infer<typeof leaderboardSchema>

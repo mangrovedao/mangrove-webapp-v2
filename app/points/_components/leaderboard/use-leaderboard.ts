@@ -23,7 +23,7 @@ export function useLeaderboard({
     queryFn: async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/leaderboard`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/leaderboard?offset=${skip}&limit=${first}`,
         )
         const leaderboard = await res.json()
         return parseLeaderboard(leaderboard)
