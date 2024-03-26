@@ -14,7 +14,6 @@ type FormValues = Pick<
 > & {
   distribution: GeometricKandelDistribution | undefined
   kandelAddress?: string
-  hasLiveOffers?: boolean
 }
 
 export function useEditKandelStrategy() {
@@ -31,7 +30,6 @@ export function useEditKandelStrategy() {
       stepSize,
       pricePoints,
       kandelAddress,
-      hasLiveOffers,
     }: FormValues) => {
       try {
         if (!(market && kandelStrategies && distribution && kandelAddress))
@@ -43,21 +41,10 @@ export function useEditKandelStrategy() {
           type: "smart",
         })
 
-        if (hasLiveOffers) {
-          const retractTXs = await kandelInstance.retractAndWithdraw()
-          retractTXs && (await Promise.all(retractTXs.map((x) => x.wait())))
-        }
-
-        const approvalTxs = await kandelInstance.approveIfHigher(
-          baseDeposit,
-          quoteDeposit,
-        )
-        await Promise.all(approvalTxs.map((tx) => tx?.wait()))
-
         const populateTxs = await kandelInstance.populateGeometricDistribution({
           distribution,
-          depositBaseAmount: baseDeposit,
-          depositQuoteAmount: quoteDeposit,
+          // depositBaseAmount: baseDeposit,
+          // depositQuoteAmount: quoteDeposit,
           funds: bountyDeposit,
           parameters: {
             pricePoints: Number(pricePoints),

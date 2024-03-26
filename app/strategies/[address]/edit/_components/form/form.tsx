@@ -1,25 +1,13 @@
 "use client"
 
-import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
-import InfoTooltip from "@/components/info-tooltip"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
-import { Caption } from "@/components/typography/caption"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
-import useForm, { MIN_PRICE_POINTS, MIN_RATIO, MIN_STEP_SIZE } from "./use-form"
+import useForm, { MIN_PRICE_POINTS, MIN_STEP_SIZE } from "./use-form"
 
 export function Form({ className }: { className?: string }) {
   const {
@@ -66,73 +54,7 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      <Fieldset className="space-y-4" legend="Edit inventory">
-        <div>
-          <EnhancedNumericInput
-            token={baseToken}
-            label={`${baseToken?.symbol} deposit`}
-            value={baseDeposit}
-            onChange={handleBaseDepositChange}
-            disabled={fieldsDisabled}
-            error={errors.baseDeposit}
-          />
-          <MinimumRecommended
-            token={baseToken}
-            value={requiredBase?.toFixed(baseToken.decimals)}
-            action={{
-              onClick: () =>
-                requiredBase &&
-                handleBaseDepositChange(requiredBase.toString()),
-              text: "Update",
-            }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
-          />
-          <TokenBalance
-            label="Wallet balance"
-            token={baseToken}
-            action={{
-              onClick: handleBaseDepositChange,
-              text: "MAX",
-            }}
-          />
-        </div>
-        <div>
-          <EnhancedNumericInput
-            token={quoteToken}
-            label={`${quoteToken?.symbol} deposit`}
-            value={quoteDeposit}
-            onChange={handleQuoteDepositChange}
-            disabled={fieldsDisabled}
-            error={errors.quoteDeposit}
-          />
-
-          <MinimumRecommended
-            token={quoteToken}
-            value={requiredQuote?.toFixed(quoteToken.decimals)}
-            action={{
-              onClick: () =>
-                requiredQuote &&
-                handleQuoteDepositChange(requiredQuote.toString()),
-              text: "Update",
-            }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
-          />
-          <TokenBalance
-            label="Wallet balance"
-            token={quoteToken}
-            action={{
-              onClick: handleQuoteDepositChange,
-              text: "MAX",
-            }}
-          />
-        </div>
-      </Fieldset>
-
-      <Fieldset legend="Liquidity sourcing">
+      {/* <Fieldset legend="Liquidity sourcing">
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
             <Label className="flex items-center">
@@ -216,6 +138,73 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
+      </Fieldset> */}
+
+      <Fieldset className="space-y-4" legend="Edit inventory">
+        <div>
+          <EnhancedNumericInput
+            token={baseToken}
+            label={`${baseToken?.symbol} deposit`}
+            value={baseDeposit}
+            onChange={handleBaseDepositChange}
+            disabled={fieldsDisabled}
+            error={errors.baseDeposit}
+          />
+          <MinimumRecommended
+            token={baseToken}
+            value={requiredBase?.toFixed(baseToken.decimals)}
+            action={{
+              onClick: () =>
+                requiredBase &&
+                handleBaseDepositChange(requiredBase.toString()),
+              text: "Update",
+            }}
+            loading={
+              kandelRequirementsQuery.status !== "success" || fieldsDisabled
+            }
+          />
+
+          <TokenBalance
+            label="Wallet balance"
+            token={baseToken}
+            action={{
+              onClick: handleBaseDepositChange,
+              text: "MAX",
+            }}
+          />
+        </div>
+        <div>
+          <EnhancedNumericInput
+            token={quoteToken}
+            label={`${quoteToken?.symbol} deposit`}
+            value={quoteDeposit}
+            onChange={handleQuoteDepositChange}
+            disabled={fieldsDisabled}
+            error={errors.quoteDeposit}
+          />
+
+          <MinimumRecommended
+            token={quoteToken}
+            value={requiredQuote?.toFixed(quoteToken.decimals)}
+            action={{
+              onClick: () =>
+                requiredQuote &&
+                handleQuoteDepositChange(requiredQuote.toString()),
+              text: "Update",
+            }}
+            loading={
+              kandelRequirementsQuery.status !== "success" || fieldsDisabled
+            }
+          />
+          <TokenBalance
+            label="Wallet balance"
+            token={quoteToken}
+            action={{
+              onClick: handleQuoteDepositChange,
+              text: "MAX",
+            }}
+          />
+        </div>
       </Fieldset>
 
       <Fieldset legend="Settings">
@@ -233,7 +222,7 @@ export function Form({ className }: { className?: string }) {
           />
         </div>
 
-        <div>
+        {/* <div>
           <EnhancedNumericInput
             label="Ratio"
             value={ratio}
@@ -242,7 +231,7 @@ export function Form({ className }: { className?: string }) {
             error={isChangingFrom === "ratio" ? errors.ratio : undefined}
           />
           <MustBeAtLeastInfo min={MIN_RATIO} onMinClicked={handleRatioChange} />
-        </div>
+        </div> */}
         <div>
           <EnhancedNumericInput
             label="Step size"

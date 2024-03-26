@@ -28,8 +28,8 @@ export function useRetractOffers({
 
         const txs = await kandelInstance.retractAndWithdraw()
         await Promise.all(txs.map((x) => x.wait()))
-
         toast.success("Kandel offers successfully retracted")
+        return txs
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
@@ -38,5 +38,26 @@ export function useRetractOffers({
       }
     },
     meta: { disableGenericError: true },
+    onSuccess: async (data) => {
+      // const { order, result } = data
+      // /*
+      //  * We use a custom callback to handle the success message once it's ready.
+      //  * This is because the onSuccess callback from the mutation will only be triggered
+      //  * after all the preceding logic has been executed.
+      //  */
+      // onResult?.(result)
+      // try {
+      //   // Start showing loading state indicator on parts of the UI that depend on
+      //   startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+      //   const { blockNumber } = await (await order.response).wait()
+      //   await resolveWhenBlockIsIndexed.mutateAsync({
+      //     blockNumber,
+      //   })
+      //   queryClient.invalidateQueries({ queryKey: ["orders"] })
+      //   queryClient.invalidateQueries({ queryKey: ["fills"] })
+      // } catch (error) {
+      //   console.error(error)
+      // }
+    },
   })
 }

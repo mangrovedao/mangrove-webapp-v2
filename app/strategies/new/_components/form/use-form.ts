@@ -25,6 +25,7 @@ export default function useForm() {
   const { data: nativeBalance } = useBalance({
     address,
   })
+
   const mangroveLogics = mangrove ? Object.values(mangrove.logics) : []
 
   const {
@@ -60,6 +61,8 @@ export default function useForm() {
     onAave: false,
     minPrice,
     maxPrice,
+    availableBase: baseDeposit,
+    availableQuote: quoteDeposit,
     stepSize: debouncedStepSize,
     pricePoints: debouncedPricePoints,
     ratio,
@@ -80,6 +83,10 @@ export default function useForm() {
   React.useEffect(() => {
     setDistribution(distribution)
   }, [distribution])
+
+  React.useEffect(() => {
+    kandelRequirementsQuery.refetch()
+  }, [baseDeposit, quoteDeposit])
 
   const setOffersWithPrices = useNewStratStore(
     (store) => store.setOffersWithPrices,

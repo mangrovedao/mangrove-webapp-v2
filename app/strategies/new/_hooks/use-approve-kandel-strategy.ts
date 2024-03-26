@@ -9,7 +9,7 @@ import { NewStratStore } from "../_stores/new-strat.store"
 
 type FormValues = Pick<NewStratStore, "baseDeposit" | "quoteDeposit">
 
-export function useApproveKandelStrategy({
+export function useCreateKandelStrategy({
   setKandelAddress,
 }: {
   setKandelAddress: (address: string) => void
@@ -17,7 +17,7 @@ export function useApproveKandelStrategy({
   const { market } = useMarket()
   const { kandelStrategies } = useKandel()
   return useMutation({
-    mutationFn: async ({ baseDeposit, quoteDeposit }: FormValues) => {
+    mutationFn: async () => {
       try {
         if (!(market && kandelStrategies)) return
 
@@ -29,17 +29,8 @@ export function useApproveKandelStrategy({
 
         const kandelInstance = await result
 
-        const approvalTxs = await kandelInstance.approveIfHigher(
-          Number(baseDeposit),
-          Number(quoteDeposit),
-        )
-
-        // waiting for all approvals
-        await Promise.all(approvalTxs.map((tx) => tx?.wait()))
-
         setKandelAddress(kandelInstance.address)
-
-        toast.success("Kandel strategy successfully approved")
+        toast.success("Kandel strategy instance successfully created")
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)

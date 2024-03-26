@@ -1,7 +1,4 @@
 import type { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import React from "react"
 import { useAccount } from "wagmi"
 
@@ -20,6 +17,7 @@ import { useActivateSmartContract } from "../../hooks/use-router-bind"
 import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
 import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
+import { DefaultLogics } from "../../types"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { AssetWithInfos, Form } from "../types"
 import { SummaryStep } from "./summary-step"
@@ -30,7 +28,7 @@ import { SummaryStep } from "./summary-step"
 type Props = {
   form: Omit<Form, "assets"> & {
     selectedToken?: Token
-    selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
+    selectedSource?: DefaultLogics
     sendAmount: string
     assetsWithTokens: AssetWithInfos[]
   }
@@ -61,21 +59,13 @@ export default function FromWalletAmplifiedOrderDialog({
 
   const { isDeployed, isBound } = useSmartRouter().data ?? {}
 
-  let steps = [] as string[]
-
-  if (!isInfiniteAllowance) {
-    steps = ["Summary", `Approve ${selectedToken?.symbol}`, ...steps]
-  }
-
-  if (isDeployed) {
-    steps = [...steps, "Amplified order deployment"]
-  }
-
-  if (!isBound) {
-    steps = [...steps, "Amplified order activation"]
-  }
-
-  steps = [...steps, "Send"]
+  let steps = [
+    "Summary",
+    !isInfiniteAllowance ? `Approve ${selectedToken?.symbol}` : "",
+    isDeployed ? "Amplified order deployment" : "",
+    !isBound ? "Amplified order activation" : "",
+    "Send",
+  ].filter(Boolean)
 
   const isDialogOpenRef = React.useRef(false)
   React.useEffect(() => {

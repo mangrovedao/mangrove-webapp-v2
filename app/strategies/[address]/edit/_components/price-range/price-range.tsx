@@ -74,6 +74,7 @@ export const PriceRange = withClientOnly(function ({
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
   const hasLiveOffers = mergedOffers?.some((x) => x.live)
+  console.log(mergedOffers)
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {

@@ -10,7 +10,6 @@ import {
 import React from "react"
 
 import { formatDate } from "@/utils/date"
-import useKandel from "../../../_providers/kandel-strategy"
 
 const columnHelper = createColumnHelper<Parameters>()
 const DEFAULT_DATA: Parameters[] = []
@@ -28,8 +27,6 @@ type Params = {
 }
 
 export function useParametersTable({ data }: Params) {
-  const { baseToken } = useKandel()
-
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("date", {
@@ -75,11 +72,7 @@ export function useParametersTable({ data }: Params) {
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount } = row.original
-          return (
-            <div className="w-full h-full flex justify-end">
-              {amount} {baseToken?.symbol}
-            </div>
-          )
+          return <div className="w-full h-full flex justify-end">{amount}</div>
         },
       }),
     ],

@@ -1,28 +1,15 @@
 "use client"
 
-import useLiquiditySourcing from "@/app/strategies/(shared)/_hooks/use-liquidity-sourcing"
-import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
-import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
-import { Caption } from "@/components/typography/caption"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
-import useForm, { MIN_PRICE_POINTS, MIN_RATIO, MIN_STEP_SIZE } from "./use-form"
+import useForm, { MIN_PRICE_POINTS, MIN_STEP_SIZE } from "./use-form"
 
 export function Form({ className }: { className?: string }) {
   const {
@@ -56,26 +43,25 @@ export function Form({ className }: { className?: string }) {
     handleReceiveToChange,
   } = useForm()
 
-  const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
-    useLiquiditySourcing({
-      sendToken: baseToken,
-      sendFrom,
-      receiveTo,
-      receiveToken: quoteToken,
-      fundOwner: address,
-      mangroveLogics,
-    })
-  console.log({ sendFromBalance, receiveToBalance })
+  // const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
+  //   useLiquiditySourcing({
+  //     sendToken: baseToken,
+  //     sendFrom,
+  //     receiveTo,
+  //     receiveToken: quoteToken,
+  //     fundOwner: address,
+  //     mangroveLogics,
+  //   })
 
   const { formatted: baseTokenBalance } = useTokenBalance(baseToken)
   const { formatted: quoteTokenBalance } = useTokenBalance(quoteToken)
 
-  const baseBalance = sendFromBalance
-    ? sendFromBalance.formatted
-    : baseTokenBalance
-  const quoteBalance = receiveToBalance
-    ? receiveToBalance.formatted
-    : quoteTokenBalance
+  // const baseBalance = sendFromBalance
+  //   ? sendFromBalance.formatted
+  //   : baseTokenBalance
+  // const quoteBalance = receiveToBalance
+  //   ? receiveToBalance.formatted
+  //   : quoteTokenBalance
 
   if (!baseToken || !quoteToken)
     return (
@@ -91,7 +77,7 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      <Fieldset legend="Liquidity sourcing">
+      {/* <Fieldset legend="Liquidity sourcing">
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
             <Label className="flex items-center">
@@ -177,7 +163,7 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
-      </Fieldset>
+      </Fieldset> */}
 
       <Fieldset className="space-y-4" legend="Set initial inventory">
         <div>
@@ -206,7 +192,7 @@ export function Form({ className }: { className?: string }) {
           <CustomBalance
             label="Wallet balance"
             token={baseToken}
-            balance={baseBalance}
+            balance={baseTokenBalance}
             action={{
               onClick: handleBaseDepositChange,
               text: "MAX",
@@ -240,7 +226,7 @@ export function Form({ className }: { className?: string }) {
           <CustomBalance
             label="Wallet balance"
             token={quoteToken}
-            balance={quoteBalance}
+            balance={quoteTokenBalance}
             action={{
               onClick: handleBaseDepositChange,
               text: "MAX",
@@ -263,7 +249,7 @@ export function Form({ className }: { className?: string }) {
             onMinClicked={handlePricePointsChange}
           />
         </div>
-
+        {/* 
         <div>
           <EnhancedNumericInput
             label="Ratio"
@@ -273,7 +259,7 @@ export function Form({ className }: { className?: string }) {
             error={isChangingFrom === "ratio" ? errors.ratio : undefined}
           />
           <MustBeAtLeastInfo min={MIN_RATIO} onMinClicked={handleRatioChange} />
-        </div>
+        </div> */}
         <div>
           <EnhancedNumericInput
             label="Step size"

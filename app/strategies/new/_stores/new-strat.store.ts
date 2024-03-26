@@ -73,8 +73,8 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   stepSize: "1",
   bountyDeposit: "",
 
-  sendFrom: "",
-  receiveTo: "",
+  sendFrom: "simple",
+  receiveTo: "simple",
 
   priceRange: ["", ""],
   offersWithPrices: undefined,

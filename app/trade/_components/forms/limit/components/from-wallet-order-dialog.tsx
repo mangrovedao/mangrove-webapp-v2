@@ -1,10 +1,6 @@
 import React from "react"
 import { useAccount } from "wagmi"
 
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
-
 import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
@@ -17,13 +13,14 @@ import { ApproveStep } from "../../components/approve-step"
 import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
+import { DefaultLogics } from "../../types"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
 type Props = {
   form: Form & {
-    selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
+    selectedSource?: DefaultLogics
     minVolume: {
       bid: {
         volume: string | undefined
@@ -143,7 +140,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
             approve.mutate(
               {
                 token: sendToken,
-                //@ts-ignore
                 logic,
                 spender,
               },

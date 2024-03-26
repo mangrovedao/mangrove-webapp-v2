@@ -6,6 +6,7 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
+import Big from "big.js"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
@@ -38,6 +39,17 @@ export default function useForm() {
   const { depositedBase, depositedQuote, currentParameter, offers } =
     strategyQuery.data ?? {}
 
+  const asksOffers = offers?.filter((item) => item.offerType === "asks")
+  const bidsOffers = offers?.filter((item) => item.offerType === "bids")
+
+  const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
+    return acc.add(Big(curr.gives))
+  }, Big(0))
+
+  const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
+    return acc.add(Big(curr.gives))
+  }, Big(0))
+
   const { offerStatuses } = strategyStatusQuery.data ?? {}
 
   const { priceRatio: currentPriceRatio } = offerStatuses ?? {}
@@ -69,12 +81,16 @@ export default function useForm() {
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
-      setBaseDeposit(depositedBase || "0")
-      setQuoteDeposit(depositedQuote || "0")
+      setBaseDeposit(
+        baseAmountDeposited?.toFixed(baseToken?.displayedDecimals) || "0",
+      )
+      setQuoteDeposit(
+        quoteAmountDeposited?.toFixed(quoteToken?.displayedDecimals) || "0",
+      )
       setPricePoints(currentParameter?.length || "0")
       setRatio(currentPriceRatio?.toFixed(4) || "0")
       setStepSize(currentParameter?.stepSize || "0")
-      setBountyDeposit(lockedBounty || "0")
+      setBountyDeposit(Number(lockedBounty).toFixed(6) || "0")
       // setDistribution()
     }
   }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
@@ -288,6 +304,11 @@ export default function useForm() {
         "Bounty deposit cannot be greater than wallet balance"
     } else if (requiredBounty?.gt(0) && Number(bountyDeposit) === 0) {
       newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
+    } else if (
+      bountyDeposit &&
+      Number(requiredBounty) > Number(bountyDeposit)
+    ) {
+      newErrors.bountyDeposit = "Bounty deposit must be updated"
     } else {
       delete newErrors.bountyDeposit
     }
