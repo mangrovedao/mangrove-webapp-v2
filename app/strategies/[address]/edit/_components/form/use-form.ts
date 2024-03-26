@@ -128,6 +128,8 @@ export default function useForm() {
     onAave: false,
     minPrice,
     maxPrice,
+    availableBase: baseDeposit,
+    availableQuote: quoteDeposit,
     stepSize: debouncedStepSize,
     pricePoints: debouncedPricePoints,
     ratio,

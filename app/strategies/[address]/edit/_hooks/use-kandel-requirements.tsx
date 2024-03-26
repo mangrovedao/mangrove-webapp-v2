@@ -12,6 +12,8 @@ export type Params = {
   stepSize: number | string
   minPrice: BigSource
   maxPrice: BigSource
+  availableBase?: BigSource
+  availableQuote?: BigSource
   pricePoints: number | string
   ratio?: number | string
   isChangingFrom?: ChangingFrom
@@ -21,6 +23,8 @@ export function useKandelRequirements({
   onAave = false,
   minPrice,
   maxPrice,
+  availableBase,
+  availableQuote,
   stepSize,
   pricePoints,
   ratio,
@@ -36,6 +40,7 @@ export function useKandelRequirements({
       midPrice,
       stepSize,
       pricePoints,
+      onAave,
       market?.base.id,
       market?.quote?.id,
       ratio,
@@ -94,13 +99,11 @@ export function useKandelRequirements({
         const { requiredBase, requiredQuote } =
           minimumDistribution.getOfferedVolumeForDistribution()
 
-        const availableBase = requiredBase
-        const availableQuote = requiredQuote
         const distribution =
           await generator.recalculateDistributionFromAvailable({
             distribution: minimumDistribution,
-            availableBase,
-            availableQuote,
+            availableBase: availableBase ? availableBase : requiredBase,
+            availableQuote: availableQuote ? availableQuote : requiredQuote,
           })
 
         const offers = distribution.getOffersWithPrices()

@@ -22,7 +22,6 @@ export const useIsTokenInfiniteAllowance = (
           return
         }
       } else {
-        console.log("no logic passed")
         return token.allowanceInfinite({ spender })
       }
     },

@@ -53,8 +53,16 @@ export default function Page() {
         </div>
         <div className="flex justify-between space-x-2">
           <Button
+            onClick={() => toggleCloseStrategy(!closeStrategy)}
+            size={"lg"}
+            disabled={data?.status !== "active"}
+          >
+            Close strategy
+          </Button>
+          <Button
             size={"lg"}
             disabled={!data?.status}
+            rightIcon
             onClick={() =>
               push(
                 `/strategies/${strategyAddress}/edit?market=${baseToken?.id},${quoteToken?.id}`,
@@ -62,14 +70,6 @@ export default function Page() {
             }
           >
             {data?.status === "closed" ? "Re-open" : "Edit Parameters"}
-          </Button>
-          <Button
-            onClick={() => toggleCloseStrategy(!closeStrategy)}
-            size={"lg"}
-            rightIcon
-            disabled={data?.status !== "active"}
-          >
-            Close strategy
           </Button>
         </div>
       </div>
