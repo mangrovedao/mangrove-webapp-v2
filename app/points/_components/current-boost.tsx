@@ -1,7 +1,6 @@
 import InfoTooltip from "@/components/info-tooltip"
 import { cn } from "@/utils"
 import { getLevels } from "../constants"
-import { BoostType } from "../schemas/boosts"
 import { formatNumber } from "../utils"
 import BoxContainer from "./box-container"
 
@@ -9,8 +8,14 @@ type Props = {
   className?: string
   level?: number
   volume?: number
-  type?: BoostType
+  type?: string
   boost?: number
+}
+
+function formatNFTName(name: string): string {
+  return name
+    .replace(/(?!^)([A-Z][a-z])/g, " $1") // Insert a space before each uppercase letter that is not at the start of the string and is not preceded by another uppercase letter
+    .trim() // Remove any leading or trailing spaces
 }
 
 export default function CurrentBoost({
@@ -65,15 +70,16 @@ export default function CurrentBoost({
             >
               Level {nextIndex}
             </span>
-            {type === "NFT" && (
+            {type?.includes("NFT") && (
               <span
                 className={cn(
                   "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
                 )}
               >
-                NFT Temporary Boost
+                {formatNFTName(type)}
                 <InfoTooltip className="text-white">
-                  You've received a 3x boost for holding a NFT
+                  You've received a {boost}x boost for holding the{" "}
+                  {formatNFTName(type)}
                 </InfoTooltip>
               </span>
             )}

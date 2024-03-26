@@ -1,9 +1,11 @@
 import { cn } from "@/utils"
+import { formatNumber } from "@/utils/numbers"
 import BoxContainer from "./box-container"
-import { useUserPoints } from "./leaderboard/use-leaderboard"
+import { useLeaderboard, useUserPoints } from "./leaderboard/use-leaderboard"
 
 export default function Rank({ className }: { className?: string }) {
   const { data } = useUserPoints()
+  const leaderboardQuery = useLeaderboard()
   const rank = data?.rank ?? -1
   const rankLabel = rank > 0 ? rank : "Unranked"
 
@@ -36,9 +38,12 @@ export default function Rank({ className }: { className?: string }) {
               {rankLabel}
             </span>
           </div>
-          {/* <div className="text-xs text-cloud-200 flex items-center pt-7">
-            of {totalTraders} traders
-          </div> */}
+          {leaderboardQuery.data?.leaderboard_length ? (
+            <div className="text-xs text-cloud-200 flex items-center pt-7">
+              of {formatNumber(leaderboardQuery.data?.leaderboard_length)}{" "}
+              traders
+            </div>
+          ) : undefined}
         </div>
       </div>
     </BoxContainer>

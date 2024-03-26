@@ -3,7 +3,6 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
 import { LEVELS, getLevels } from "../constants"
-import { BoostType } from "../schemas/boosts"
 import { formatNumber } from "../utils"
 import Animals from "./animals"
 import BoxContainer from "./box-container"
@@ -12,7 +11,6 @@ type Props = {
   className?: string
   volume?: number
   nextRankingDate?: Date
-  type?: BoostType
   boost?: number
 }
 

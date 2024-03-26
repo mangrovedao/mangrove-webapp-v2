@@ -38,7 +38,6 @@ export default function Page() {
           className="col-span-full"
           volume={volume}
           boost={userBoost?.boost}
-          type={userBoost?.type}
         />
       </div>
       <Leaderboard />
