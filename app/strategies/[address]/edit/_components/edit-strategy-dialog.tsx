@@ -366,7 +366,7 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>
-                {Number(baseDeposit).toFixed(baseToken?.decimals) || 0}
+                {Number(baseDeposit).toFixed(baseToken?.displayedDecimals) || 0}
               </Text>
               <Text className="text-muted-foreground">{baseToken?.symbol}</Text>
             </div>
@@ -378,7 +378,8 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>
-                {Number(quoteDeposit).toFixed(quoteToken?.decimals) || 0}
+                {Number(quoteDeposit).toFixed(quoteToken?.displayedDecimals) ||
+                  0}
               </Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
@@ -393,7 +394,7 @@ const Summary = ({
           title={`Min price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{minPrice}</Text>
+              <Text>{minPrice?.toFixed(quoteToken?.displayedDecimals)}</Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
               </Text>
@@ -405,7 +406,7 @@ const Summary = ({
           title={`Max price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{maxPrice}</Text>
+              <Text>{maxPrice?.toFixed(quoteToken?.displayedDecimals)}</Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
               </Text>
