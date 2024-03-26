@@ -36,7 +36,6 @@ export function useKandelRequirements({
       midPrice,
       stepSize,
       pricePoints,
-      onAave,
       market?.base.id,
       market?.quote?.id,
       ratio,
@@ -60,14 +59,14 @@ export function useKandelRequirements({
           await kandelStrategies.seeder.getMinimumVolume({
             market,
             offerType: "asks",
-            onAave,
+            type: "smart",
           })
 
         const minimumQuotePerOffer =
           await kandelStrategies.seeder.getMinimumVolume({
             market,
             offerType: "bids",
-            onAave,
+            type: "smart",
           })
 
         const param: Parameters<
@@ -114,7 +113,7 @@ export function useKandelRequirements({
         const requiredBounty =
           await kandelStrategies.seeder.getRequiredProvision(
             {
-              onAave,
+              type: "smart",
               market,
               liquiditySharing: false,
             },

@@ -13,7 +13,6 @@ import { useAccount } from "wagmi"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
 import { Publish } from "./dialogs/publish"
-import { UnPublish } from "./dialogs/unpublish"
 import { Withdraw } from "./dialogs/withdraw"
 import { useParameters } from "./hook/use-parameters"
 
@@ -122,7 +121,7 @@ const UnallocatedInventory = () => {
 }
 
 const PublishedInventory = () => {
-  const { quote, base, depositedBase, depositedQuote } = useParameters()
+  const { quote, base, publishedBase, publishedQuote } = useParameters()
 
   const [unPublish, toggleUnpublish] = React.useReducer(
     (isOpen) => !isOpen,
@@ -141,9 +140,9 @@ const PublishedInventory = () => {
         <div className="flex gap-2">
           {/* TODO: create dialog for add inventory */}
           {/* <Button onClick={toggleClose}>Add</Button> */}
-          <Button onClick={toggleUnpublish} variant={"secondary"}>
+          {/* <Button onClick={toggleUnpublish} variant={"secondary"}>
             Unpublish
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -159,8 +158,8 @@ const PublishedInventory = () => {
           <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
-              {depositedBase &&
-                Big(Number(depositedBase)).toFixed(
+              {publishedBase &&
+                Big(Number(publishedBase)).toFixed(
                   base?.displayedDecimals,
                   1,
                 )}{" "}
@@ -170,8 +169,8 @@ const PublishedInventory = () => {
           <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
-              {depositedQuote &&
-                Big(Number(depositedQuote)).toFixed(
+              {publishedQuote &&
+                Big(Number(publishedQuote)).toFixed(
                   quote?.displayedAsPriceDecimals,
                   1,
                 )}{" "}
@@ -183,7 +182,7 @@ const PublishedInventory = () => {
 
       {/* Dialogs */}
       {/* <CloseStrategyDialog isOpen={close} onClose={toggleClose} /> */}
-      <UnPublish open={unPublish} onClose={toggleUnpublish} />
+      {/* <UnPublish open={unPublish} onClose={toggleUnpublish} /> */}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
@@ -15,6 +16,7 @@ export const MIN_STEP_SIZE = 1
 export default function useForm() {
   const { address } = useAccount()
 
+  const { mangrove } = useMangrove()
   const { market } = useMarket()
   const baseToken = market?.base
   const quoteToken = market?.quote
@@ -23,6 +25,8 @@ export default function useForm() {
   const { data: nativeBalance } = useBalance({
     address,
   })
+
+  const mangroveLogics = mangrove ? Object.values(mangrove.logics) : []
 
   const {
     priceRange: [minPrice, maxPrice],
@@ -35,15 +39,19 @@ export default function useForm() {
     ratio,
     stepSize,
     bountyDeposit,
+    isChangingFrom,
+    sendFrom,
+    receiveTo,
     setBaseDeposit,
     setQuoteDeposit,
     setPricePoints,
     setRatio,
     setStepSize,
     setBountyDeposit,
-    isChangingFrom,
     setIsChangingFrom,
     setDistribution,
+    setSendFrom,
+    setReceiveTo,
   } = useNewStratStore()
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedPricePoints = useDebounce(pricePoints, 300)
@@ -53,6 +61,8 @@ export default function useForm() {
     onAave: false,
     minPrice,
     maxPrice,
+    availableBase: baseDeposit,
+    availableQuote: quoteDeposit,
     stepSize: debouncedStepSize,
     pricePoints: debouncedPricePoints,
     ratio,
@@ -73,6 +83,10 @@ export default function useForm() {
   React.useEffect(() => {
     setDistribution(distribution)
   }, [distribution])
+
+  React.useEffect(() => {
+    kandelRequirementsQuery.refetch()
+  }, [baseDeposit, quoteDeposit])
 
   const setOffersWithPrices = useNewStratStore(
     (store) => store.setOffersWithPrices,
@@ -109,6 +123,22 @@ export default function useForm() {
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)
+  }
+
+  const handleSendFromChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("sendFrom")
+    const value = typeof e === "string" ? e : e.target.value
+    setSendFrom(value)
+  }
+
+  const handleReceiveToChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("receiveTo")
+    const value = typeof e === "string" ? e : e.target.value
+    setReceiveTo(value)
   }
 
   const handleBaseDepositChange = (
@@ -230,6 +260,7 @@ export default function useForm() {
   ])
 
   return {
+    address,
     baseToken,
     quoteToken,
     requiredBase,
@@ -239,18 +270,23 @@ export default function useForm() {
     pricePoints,
     baseDeposit,
     quoteDeposit,
-    handleBaseDepositChange,
-    handleQuoteDepositChange,
-    handlePricePointsChange,
+    nativeBalance,
+    bountyDeposit,
     fieldsDisabled,
     errors,
     kandelRequirementsQuery,
     ratio,
-    handleRatioChange,
     stepSize,
+    sendFrom,
+    receiveTo,
+    mangroveLogics,
+    handleBaseDepositChange,
+    handleQuoteDepositChange,
+    handlePricePointsChange,
+    handleSendFromChange,
+    handleReceiveToChange,
+    handleRatioChange,
     handleStepSizeChange,
-    nativeBalance,
-    bountyDeposit,
     handleBountyDepositChange,
   }
 }

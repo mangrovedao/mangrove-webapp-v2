@@ -24,6 +24,7 @@ export function useApproveKandelStrategy({
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
           market,
+          type: "smart",
         })
 
         const approvalTxs = await kandelInstance.approveIfHigher(

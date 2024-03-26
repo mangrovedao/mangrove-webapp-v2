@@ -60,6 +60,8 @@ export const PriceRange = withClientOnly(function ({
     ratio,
     pricePoints,
     distribution,
+    sendFrom,
+    receiveTo,
   } = useNewStratStore()
 
   const formIsInvalid =
@@ -74,6 +76,7 @@ export const PriceRange = withClientOnly(function ({
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
   const hasLiveOffers = mergedOffers?.some((x) => x.live)
+  console.log(mergedOffers)
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
@@ -339,6 +342,8 @@ export const PriceRange = withClientOnly(function ({
             stepSize,
             bountyDeposit,
             hasLiveOffers,
+            sendFrom,
+            receiveTo,
           }}
           isOpen={summaryDialog}
           onClose={() => setSummaryDialog(false)}

@@ -42,6 +42,7 @@ export default function useStrategyStatus({
         const stratInstance = await kandelStrategies.instance({
           address: address,
           market,
+          type: "smart",
         })
 
         const asksBalance = await stratInstance.getBalance("asks") // base

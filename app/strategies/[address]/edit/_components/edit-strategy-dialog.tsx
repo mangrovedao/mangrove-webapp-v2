@@ -3,20 +3,25 @@ import { useRouter } from "next/navigation"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
+import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { useStep } from "@/hooks/use-step"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import useKandel from "../../_providers/kandel-strategy"
 import { useApproveKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useEditKandelStrategy } from "../_hooks/use-edit-kandel-strategy"
 import { useRetractOffers } from "../_hooks/use-retract-offers"
 import { NewStratStore } from "../_stores/new-strat.store"
-import { ApproveStep } from "./form/components/approve-step"
+
+import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { Steps } from "./form/components/steps"
 
 type StrategyDetails = Omit<
@@ -43,6 +48,7 @@ export default function EditStrategyDialog({
 }: Props) {
   const { address } = useAccount()
   const { market } = useMarket()
+  const { mangrove } = useMangrove()
   const { base: baseToken, quote: quoteToken } = market ?? {}
 
   const { data: nativeBalance } = useBalance({
@@ -59,17 +65,43 @@ export default function EditStrategyDialog({
     kandelAddress,
   })
 
+  const approveBaseToken = useInfiniteApproveToken()
+  const approveQuoteToken = useInfiniteApproveToken()
+
   const { mutate: retractOffers, isPending: isRetractingOffers } =
     useRetractOffers({ kandelAddress })
 
   const { mutate: editKandelStrategy, isPending: isEditingKandelStrategy } =
     useEditKandelStrategy()
 
+  const logics = mangrove ? Object.values(mangrove.logics) : []
+
+  const baseLogic = logics.find((logic) => logic?.id === strategy?.sendFrom)
+  const quoteLogic = logics.find((logic) => logic?.id === strategy?.receiveTo)
+
+  const { data: spender } = useSpenderAddress("kandel")
+
+  const { data: baseTokenApproved } = useIsTokenInfiniteAllowance(
+    baseToken,
+    spender,
+    baseLogic,
+  )
+
+  const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
+    baseToken,
+    spender,
+    quoteLogic,
+  )
+
   let steps = [
     "Summary",
-    `Approve ${baseToken?.symbol}/${quoteToken?.symbol}`,
-    strategy?.hasLiveOffers ? "Retract Offers" : "",
-    "Deposit",
+    strategy?.hasLiveOffers ? "Retract offers" : "",
+    // TODO: apply liquidity sourcing with setLogics
+    // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
+    // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
+    !baseTokenApproved ? `Approve ${baseToken?.symbol}` : "",
+    !quoteTokenApproved ? `Approve ${quoteToken?.symbol}` : "",
+    "Edit",
   ].filter(Boolean)
 
   const [currentStep, helpers] = useStep(steps.length)
@@ -91,29 +123,23 @@ export default function EditStrategyDialog({
       ),
     },
 
-    {
+    !baseTokenApproved && {
       body: (
         <div className="text-center">
-          <ApproveStep
-            baseToken={baseToken}
-            baseDeposit={strategy?.baseDeposit}
-            quoteToken={quoteToken}
-            quoteDeposit={strategy?.quoteDeposit}
-          />
+          <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
         </div>
       ),
       button: (
         <Button
           {...btnProps}
-          disabled={isApprovingKandelStrategy}
-          loading={isApprovingKandelStrategy}
+          disabled={approveBaseToken.isPending}
+          loading={approveBaseToken.isPending}
           onClick={() => {
-            if (!strategy) return
-            const { baseDeposit, quoteDeposit } = strategy
-            approveKandelStrategy(
+            approveBaseToken.mutate(
               {
-                baseDeposit,
-                quoteDeposit,
+                token: baseToken,
+                logic: baseLogic,
+                spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -121,11 +147,38 @@ export default function EditStrategyDialog({
             )
           }}
         >
-          Approve
+          Approve {baseToken?.symbol}
         </Button>
       ),
     },
-
+    !quoteTokenApproved && {
+      body: (
+        <div className="text-center">
+          <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
+        </div>
+      ),
+      button: (
+        <Button
+          {...btnProps}
+          disabled={approveQuoteToken.isPending}
+          loading={approveQuoteToken.isPending}
+          onClick={() => {
+            approveQuoteToken.mutate(
+              {
+                token: quoteToken,
+                logic: quoteLogic,
+                spender,
+              },
+              {
+                onSuccess: goToNextStep,
+              },
+            )
+          }}
+        >
+          Approve {quoteToken?.symbol}
+        </Button>
+      ),
+    },
     strategy?.hasLiveOffers && {
       body: (
         <div className="bg-[#041010] rounded-lg px-4 pt-4 pb-12 space-y-8">

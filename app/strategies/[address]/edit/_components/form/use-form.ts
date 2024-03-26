@@ -3,8 +3,10 @@ import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
+import Big from "big.js"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
@@ -15,7 +17,7 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const { address } = useAccount()
-
+  const { mangrove } = useMangrove()
   const { market } = useMarket()
   const baseToken = market?.base
   const quoteToken = market?.quote
@@ -25,9 +27,28 @@ export default function useForm() {
     address,
   })
 
+  const logics = mangrove?.getLogicsList().map((item) => {
+    if (item.id.includes("simple")) {
+      return { ...item, id: "Wallet" }
+    } else {
+      return item
+    }
+  })
+
   const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
   const { depositedBase, depositedQuote, currentParameter, offers } =
     strategyQuery.data ?? {}
+
+  const asksOffers = offers?.filter((item) => item.offerType === "asks")
+  const bidsOffers = offers?.filter((item) => item.offerType === "bids")
+
+  const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
+    return acc.add(Big(curr.gives))
+  }, Big(0))
+
+  const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
+    return acc.add(Big(curr.gives))
+  }, Big(0))
 
   const { offerStatuses } = strategyStatusQuery.data ?? {}
 
@@ -60,12 +81,16 @@ export default function useForm() {
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
-      setBaseDeposit(depositedBase || "0")
-      setQuoteDeposit(depositedQuote || "0")
+      setBaseDeposit(
+        baseAmountDeposited?.toFixed(baseToken?.displayedDecimals) || "0",
+      )
+      setQuoteDeposit(
+        quoteAmountDeposited?.toFixed(quoteToken?.displayedDecimals) || "0",
+      )
       setPricePoints(currentParameter?.length || "0")
       setRatio(currentPriceRatio?.toFixed(4) || "0")
       setStepSize(currentParameter?.stepSize || "0")
-      setBountyDeposit(lockedBounty || "0")
+      setBountyDeposit(Number(lockedBounty).toFixed(6) || "0")
       // setDistribution()
     }
   }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
@@ -81,13 +106,17 @@ export default function useForm() {
     ratio,
     stepSize,
     bountyDeposit,
+    sendFrom,
+    receiveTo,
+    isChangingFrom,
     setBaseDeposit,
+    setSendFrom,
+    setReceiveTo,
     setQuoteDeposit,
     setPricePoints,
     setRatio,
     setStepSize,
     setBountyDeposit,
-    isChangingFrom,
     setIsChangingFrom,
     setDistribution,
   } = useNewStratStore()
@@ -163,6 +192,22 @@ export default function useForm() {
     handleFieldChange("baseDeposit")
     const value = typeof e === "string" ? e : e.target.value
     setBaseDeposit(value)
+  }
+
+  const handleSendFromChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("sendFrom")
+    const value = typeof e === "string" ? e : e.target.value
+    setSendFrom(value)
+  }
+
+  const handleReceiveToChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("receiveTo")
+    const value = typeof e === "string" ? e : e.target.value
+    setReceiveTo(value)
   }
 
   const handleQuoteDepositChange = (
@@ -259,6 +304,11 @@ export default function useForm() {
         "Bounty deposit cannot be greater than wallet balance"
     } else if (requiredBounty?.gt(0) && Number(bountyDeposit) === 0) {
       newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
+    } else if (
+      bountyDeposit &&
+      Number(requiredBounty) > Number(bountyDeposit)
+    ) {
+      newErrors.bountyDeposit = "Bounty deposit must be updated"
     } else {
       delete newErrors.bountyDeposit
     }
@@ -285,18 +335,23 @@ export default function useForm() {
     pricePoints,
     baseDeposit,
     quoteDeposit,
-    handleBaseDepositChange,
-    handleQuoteDepositChange,
-    handlePricePointsChange,
+    nativeBalance,
+    bountyDeposit,
     fieldsDisabled,
     errors,
     kandelRequirementsQuery,
     ratio,
-    handleRatioChange,
     stepSize,
+    sendFrom,
+    receiveTo,
+    logics,
+    handleBaseDepositChange,
+    handleQuoteDepositChange,
+    handlePricePointsChange,
+    handleSendFromChange,
+    handleReceiveToChange,
+    handleRatioChange,
     handleStepSizeChange,
-    nativeBalance,
-    bountyDeposit,
     handleBountyDepositChange,
   }
 }

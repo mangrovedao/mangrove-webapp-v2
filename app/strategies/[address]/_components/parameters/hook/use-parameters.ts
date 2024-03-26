@@ -88,7 +88,7 @@ export const useParameters = () => {
       (acc: Big, offer) =>
         acc.add(
           offer.live && offer.offerType === offerType
-            ? Big(offer[key])
+            ? Big(offer.gives)
             : Big(0),
         ),
       Big(0),
@@ -135,6 +135,8 @@ export const useParameters = () => {
       creationDate,
       strategyAddress,
     },
+    publishedBase,
+    publishedQuote,
     unallocatedBase,
     unallocatedQuote,
     unPublishedBase,

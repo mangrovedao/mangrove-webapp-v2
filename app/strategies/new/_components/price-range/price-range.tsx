@@ -43,14 +43,6 @@ export const PriceRange = withClientOnly(function ({
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
   const {
-    setPriceRange,
-    offersWithPrices,
-    setOffersWithPrices,
-    globalError,
-    errors,
-    setErrors,
-    isChangingFrom,
-    setIsChangingFrom,
     baseDeposit,
     quoteDeposit,
     bountyDeposit,
@@ -58,6 +50,16 @@ export const PriceRange = withClientOnly(function ({
     ratio,
     pricePoints,
     distribution,
+    offersWithPrices,
+    globalError,
+    errors,
+    isChangingFrom,
+    sendFrom,
+    receiveTo,
+    setPriceRange,
+    setOffersWithPrices,
+    setErrors,
+    setIsChangingFrom,
   } = useNewStratStore()
 
   const formIsInvalid =
@@ -328,6 +330,8 @@ export const PriceRange = withClientOnly(function ({
             ratio,
             stepSize,
             bountyDeposit,
+            sendFrom,
+            receiveTo,
           }}
           isOpen={summaryDialog}
           onClose={() => setSummaryDialog(false)}

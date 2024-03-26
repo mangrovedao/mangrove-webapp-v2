@@ -14,6 +14,7 @@ import { formatExpiryDate } from "@/utils/date"
 import { TimeInForce, TimeToLiveUnit } from "../../../forms/amplified/enums"
 import amplifiedLiquiditySourcing from "../../../forms/amplified/hooks/amplified-liquidity-sourcing"
 import { getCurrentTokenPriceFromAddress } from "../../../forms/amplified/utils"
+import { DefaultTradeLogics } from "../../../forms/types"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm, AmplifiedOrderStatus } from "../types"
 
@@ -30,7 +31,13 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     mangrove,
   } = useMangrove()
 
-  const logics = mangrove ? Object.values(mangrove.logics) : []
+  const logics = (
+    mangrove
+      ? Object.values(mangrove.logics).filter(
+          (item) => item?.approvalType !== "ERC721",
+        )
+      : []
+  ) as DefaultTradeLogics[]
 
   const sendToken = useTokenFromAddress(
     offers.find((offer) => offer?.market.outbound_tkn as Address)?.market

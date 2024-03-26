@@ -16,6 +16,7 @@ export const bidsOrAsksSchema = z.union([z.literal("bids"), z.literal("asks")])
 
 export const kandelTypeStringSchema = z.union([
   z.literal("Kandel"),
+  z.literal("SmartKandel"),
   z.literal("KandelAAVE"),
 ])
 

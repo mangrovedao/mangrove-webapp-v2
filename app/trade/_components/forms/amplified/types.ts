@@ -1,8 +1,6 @@
 import { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
-import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/ZeroLendLogic"
+
+import { DefaultTradeLogics } from "../types"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 
 export type Asset = {
@@ -14,12 +12,7 @@ export type Asset = {
 
 export type AssetWithInfos = {
   token: Token | undefined
-  receiveTo:
-    | SimpleLogic
-    | SimpleAaveLogic
-    | OrbitLogic
-    | ZeroLendLogic
-    | undefined
+  receiveTo: DefaultTradeLogics
   amount: string
   limitPrice: string
 }

@@ -2,24 +2,31 @@ import { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
+import { ActivateRouter } from "@/app/trade/_components/forms/components/activate-router"
+import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
+import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { useStep } from "@/hooks/use-step"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
-import { useApproveKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
+import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
+import { useStrategySmartRouter } from "../../(shared)/_hooks/use-smart-router"
+import { useCreateKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
 import { NewStratStore } from "../_stores/new-strat.store"
-import { ApproveStep } from "./form/components/approve-step"
 import { Steps } from "./form/components/steps"
 
 type StrategyDetails = Omit<
   NewStratStore,
   "isChangingFrom" | "globalError" | "errors" | "priceRange"
-> & { onAave?: boolean; riskAppetite?: string; priceRange?: [number, number] }
+> & { riskAppetite?: string; priceRange?: [number, number] }
 
 type Props = {
   strategy?: StrategyDetails
@@ -40,6 +47,7 @@ export default function DeployStrategyDialog({
 }: Props) {
   const { address } = useAccount()
   const { market } = useMarket()
+  const { mangrove } = useMangrove()
   const { base: baseToken, quote: quoteToken } = market ?? {}
 
   const { data: nativeBalance } = useBalance({
@@ -48,21 +56,51 @@ export default function DeployStrategyDialog({
 
   const [kandelAddress, setKandelAddress] = React.useState("")
 
-  const {
-    mutate: approveKandelStrategy,
-    isPending: isApprovingKandelStrategy,
-  } = useApproveKandelStrategy({
-    setKandelAddress: (address) => setKandelAddress(address),
-  })
+  const { mutate: createKandelStrategy, isPending: isCreatingKandelStrategy } =
+    useCreateKandelStrategy({
+      setKandelAddress: (address) => setKandelAddress(address),
+    })
+
+  const approveBaseToken = useInfiniteApproveToken()
+  const approveQuoteToken = useInfiniteApproveToken()
+  const activateSmartRouter = useActivateStrategySmartRouter(kandelAddress)
 
   const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
     useLaunchKandelStrategy()
 
+  const logics = mangrove ? Object.values(mangrove.logics) : []
+
+  const baseLogic = logics.find((logic) => logic?.id === strategy?.sendFrom)
+  const quoteLogic = logics.find((logic) => logic?.id === strategy?.receiveTo)
+
+  const { data: spender } = useSpenderAddress("kandel")
+
+  const { data: baseTokenApproved } = useIsTokenInfiniteAllowance(
+    baseToken,
+    spender,
+    baseLogic,
+  )
+
+  const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
+    baseToken,
+    spender,
+    quoteLogic,
+  )
+
+  const { isBound } = useStrategySmartRouter({ kandelAddress }).data ?? {}
+
   let steps = [
     "Summary",
-    `Approve ${baseToken?.symbol}/${quoteToken?.symbol}`,
-    "Deposit",
-  ]
+    "Create strategy instance",
+    !isBound ? "Activate strategy" : "",
+    // TODO: apply liquidity sourcing with setLogics
+    // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
+    // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
+    !baseTokenApproved ? `Approve ${baseToken?.symbol}` : "",
+    !quoteTokenApproved ? `Approve ${quoteToken?.symbol}` : "",
+    "Launch strategy",
+  ].filter(Boolean)
+
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
   const stepInfos = [
@@ -83,27 +121,70 @@ export default function DeployStrategyDialog({
     },
     {
       body: (
-        <div className="text-center">
-          <ApproveStep
-            baseToken={baseToken}
-            baseDeposit={strategy?.baseDeposit}
-            quoteToken={quoteToken}
-            quoteDeposit={strategy?.quoteDeposit}
-          />
+        <div className="bg-[#041010] rounded-lg px-4 pt-4 pb-12 space-y-8">
+          <div className="flex justify-center items-center">
+            Create kandel instance
+          </div>
+          <h1 className="text-2xl text-white">
+            Allow Mangrove to create your kandel instance?
+          </h1>
+          <p className="text-base text-gray-scale-300">
+            By granting permission, you are allowing the following contract to
+            access your funds.
+          </p>
         </div>
       ),
       button: (
         <Button
           {...btnProps}
-          disabled={isApprovingKandelStrategy}
-          loading={isApprovingKandelStrategy}
+          disabled={isCreatingKandelStrategy}
+          loading={isCreatingKandelStrategy}
           onClick={() => {
-            if (!strategy) return
-            const { baseDeposit, quoteDeposit } = strategy
-            approveKandelStrategy(
+            createKandelStrategy(undefined, {
+              onSuccess: goToNextStep,
+            })
+          }}
+        >
+          Create kandel instance
+        </Button>
+      ),
+    },
+
+    !isBound && {
+      body: <ActivateRouter />,
+      button: (
+        <Button
+          {...btnProps}
+          disabled={activateSmartRouter.isPending}
+          loading={activateSmartRouter.isPending}
+          onClick={() => {
+            activateSmartRouter.mutate(undefined, {
+              onSuccess: goToNextStep,
+            })
+          }}
+        >
+          Activate
+        </Button>
+      ),
+    },
+
+    !baseTokenApproved && {
+      body: (
+        <div className="text-center">
+          <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
+        </div>
+      ),
+      button: (
+        <Button
+          {...btnProps}
+          disabled={approveBaseToken.isPending}
+          loading={approveBaseToken.isPending}
+          onClick={() => {
+            approveBaseToken.mutate(
               {
-                baseDeposit,
-                quoteDeposit,
+                token: baseToken,
+                logic: baseLogic,
+                spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -111,7 +192,35 @@ export default function DeployStrategyDialog({
             )
           }}
         >
-          Approve
+          Approve {baseToken?.symbol}
+        </Button>
+      ),
+    },
+    !quoteTokenApproved && {
+      body: (
+        <div className="text-center">
+          <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
+        </div>
+      ),
+      button: (
+        <Button
+          {...btnProps}
+          disabled={approveQuoteToken.isPending}
+          loading={approveQuoteToken.isPending}
+          onClick={() => {
+            approveQuoteToken.mutate(
+              {
+                token: quoteToken,
+                logic: quoteLogic,
+                spender,
+              },
+              {
+                onSuccess: goToNextStep,
+              },
+            )
+          }}
+        >
+          Approve {quoteToken?.symbol}
         </Button>
       ),
     },
@@ -150,6 +259,8 @@ export default function DeployStrategyDialog({
                 bountyDeposit,
                 stepSize,
                 pricePoints,
+                baseLogic,
+                quoteLogic,
               },
               {
                 onSuccess: () => {

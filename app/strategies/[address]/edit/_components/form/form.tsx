@@ -7,7 +7,7 @@ import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
-import useForm, { MIN_PRICE_POINTS, MIN_RATIO, MIN_STEP_SIZE } from "./use-form"
+import useForm, { MIN_PRICE_POINTS, MIN_STEP_SIZE } from "./use-form"
 
 export function Form({ className }: { className?: string }) {
   const {
@@ -20,6 +20,8 @@ export function Form({ className }: { className?: string }) {
     quoteDeposit,
     fieldsDisabled,
     errors,
+    sendFrom,
+    receiveTo,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     kandelRequirementsQuery,
@@ -33,6 +35,9 @@ export function Form({ className }: { className?: string }) {
     nativeBalance,
     bountyDeposit,
     handleBountyDepositChange,
+    handleSendFromChange,
+    handleReceiveToChange,
+    logics,
   } = useForm()
 
   if (!baseToken || !quoteToken)
@@ -49,6 +54,92 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
+      {/* <Fieldset legend="Liquidity sourcing">
+        <div className="flex justify-between space-x-2 pt-2">
+          <div className="flex flex-col w-full">
+            <Label className="flex items-center">
+              Send from
+              <InfoTooltip>
+                <Caption>Select the origin of the assets</Caption>
+              </InfoTooltip>
+            </Label>
+
+            <Select
+              name={"SendFrom"}
+              value={sendFrom}
+              onValueChange={(value: string) => {
+                handleSendFromChange(value)
+              }}
+              // disabled={!market}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {logics?.map(
+                    (logic) =>
+                      logic && (
+                        <SelectItem key={logic.id} value={logic.id}>
+                          <div className="flex gap-2 w-full items-center">
+                            <SourceIcon sourceId={logic.id} />
+                            <Caption className="capitalize">
+                              {logic.id.toUpperCase()}
+                            </Caption>
+                          </div>
+                        </SelectItem>
+                      ),
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col w-full z-50">
+            <Label className="flex items-center">
+              Receive to
+              <InfoTooltip className="ml-2" side="left">
+                <div>
+                  <Caption>Select the destination of the assets</Caption>
+
+                  <Caption>(after the trade is executed)</Caption>
+                </div>
+              </InfoTooltip>
+            </Label>
+
+            <Select
+              name={"receiveTo"}
+              value={receiveTo}
+              onValueChange={(value: string) => {
+                handleReceiveToChange(value)
+              }}
+              // disabled={!market}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {logics?.map(
+                    (logic) =>
+                      logic && (
+                        <SelectItem key={logic.id} value={logic.id}>
+                          <div className="flex gap-2 w-full items-center">
+                            <SourceIcon sourceId={logic.id} />
+                            <Caption className="capitalize">
+                              {logic.id.toUpperCase()}
+                            </Caption>
+                          </div>
+                        </SelectItem>
+                      ),
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </Fieldset> */}
+
       <Fieldset className="space-y-4" legend="Edit inventory">
         <div>
           <EnhancedNumericInput
@@ -72,6 +163,7 @@ export function Form({ className }: { className?: string }) {
               kandelRequirementsQuery.status !== "success" || fieldsDisabled
             }
           />
+
           <TokenBalance
             label="Wallet balance"
             token={baseToken}
@@ -130,7 +222,7 @@ export function Form({ className }: { className?: string }) {
           />
         </div>
 
-        <div>
+        {/* <div>
           <EnhancedNumericInput
             label="Ratio"
             value={ratio}
@@ -139,7 +231,7 @@ export function Form({ className }: { className?: string }) {
             error={isChangingFrom === "ratio" ? errors.ratio : undefined}
           />
           <MustBeAtLeastInfo min={MIN_RATIO} onMinClicked={handleRatioChange} />
-        </div>
+        </div> */}
         <div>
           <EnhancedNumericInput
             label="Step size"

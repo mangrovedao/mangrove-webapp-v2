@@ -17,6 +17,8 @@ export type ChangingFrom =
   | "ratio"
   | "stepSize"
   | "bountyDeposit"
+  | "sendFrom"
+  | "receiveTo"
   | undefined
   | null
 
@@ -27,6 +29,9 @@ export type NewStratStore = {
   ratio: string
   stepSize: string
   bountyDeposit: string
+
+  sendFrom: string
+  receiveTo: string
 
   priceRange: [string, string]
   offersWithPrices?: OffersWithPrices
@@ -45,6 +50,8 @@ type NewStratActions = {
   setRatio: (ratio: string) => void
   setStepSize: (stepSize: string) => void
   setBountyDeposit: (bountyDeposit: string) => void
+  setSendFrom: (source: string) => void
+  setReceiveTo: (source: string) => void
 
   setPriceRange: (min: string, max: string) => void
   setOffersWithPrices: (offersWithPrices?: OffersWithPrices) => void
@@ -66,6 +73,9 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   stepSize: "1",
   bountyDeposit: "",
 
+  sendFrom: "simple",
+  receiveTo: "simple",
+
   priceRange: ["", ""],
   offersWithPrices: undefined,
 
@@ -81,6 +91,9 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   setRatio: (ratio) => set({ ratio }),
   setStepSize: (stepSize) => set({ stepSize }),
   setBountyDeposit: (bountyDeposit) => set({ bountyDeposit }),
+
+  setSendFrom: (sendFrom) => set({ sendFrom }),
+  setReceiveTo: (receiveTo) => set({ receiveTo }),
 
   setPriceRange: (min, max) => set({ priceRange: [min, max] }),
   setOffersWithPrices: (offersWithPrices) => set({ offersWithPrices }),

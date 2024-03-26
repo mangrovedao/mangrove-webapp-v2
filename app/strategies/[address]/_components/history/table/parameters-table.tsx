@@ -5,9 +5,10 @@ import { useParameters } from "../../parameters/hook/use-parameters"
 import { Parameters, useParametersTable } from "./use-parameters-table"
 
 export default function HistoryTable() {
-  const { strategyQuery, strategyStatusQuery } = useKandel()
+  const { strategyQuery, strategyStatusQuery, baseToken, quoteToken } =
+    useKandel()
 
-  const { currentParameter, depositedBase } = useParameters()
+  const { currentParameter, publishedBase, publishedQuote } = useParameters()
   const { creationDate, length, priceRatio } = currentParameter
 
   const data: Parameters[] = useMemo(
@@ -16,11 +17,11 @@ export default function HistoryTable() {
         date: creationDate,
         spread: "-",
         pricePoints: length,
-        amount: depositedBase,
+        amount: `${publishedBase.toFixed(6)} ${baseToken?.symbol} - ${publishedQuote.toFixed(6)} ${quoteToken?.symbol}`,
         ratio: priceRatio?.toFixed(4),
       },
     ],
-    [creationDate, length, depositedBase, priceRatio],
+    [creationDate, length, publishedBase.toFixed(6), priceRatio],
   )
 
   const table = useParametersTable({
