@@ -17,7 +17,7 @@ import { useActivateSmartContract } from "../../hooks/use-router-bind"
 import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
 import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
-import { DefaultLogics } from "../../types"
+import { DefaultTradeLogics } from "../../types"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { AssetWithInfos, Form } from "../types"
 import { SummaryStep } from "./summary-step"
@@ -28,7 +28,7 @@ import { SummaryStep } from "./summary-step"
 type Props = {
   form: Omit<Form, "assets"> & {
     selectedToken?: Token
-    selectedSource?: DefaultLogics
+    selectedSource?: DefaultTradeLogics
     sendAmount: string
     assetsWithTokens: AssetWithInfos[]
   }

@@ -60,6 +60,8 @@ export const PriceRange = withClientOnly(function ({
     ratio,
     pricePoints,
     distribution,
+    sendFrom,
+    receiveTo,
   } = useNewStratStore()
 
   const formIsInvalid =
@@ -340,6 +342,8 @@ export const PriceRange = withClientOnly(function ({
             stepSize,
             bountyDeposit,
             hasLiveOffers,
+            sendFrom,
+            receiveTo,
           }}
           isOpen={summaryDialog}
           onClose={() => setSummaryDialog(false)}

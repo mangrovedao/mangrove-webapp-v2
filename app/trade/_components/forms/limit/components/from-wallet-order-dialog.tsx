@@ -13,14 +13,14 @@ import { ApproveStep } from "../../components/approve-step"
 import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
-import { DefaultLogics } from "../../types"
+import { DefaultTradeLogics } from "../../types"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
 type Props = {
   form: Form & {
-    selectedSource?: DefaultLogics
+    selectedSource?: DefaultTradeLogics
     minVolume: {
       bid: {
         volume: string | undefined

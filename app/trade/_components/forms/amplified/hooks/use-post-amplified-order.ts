@@ -4,9 +4,9 @@ import {
   Token,
 } from "@mangrovedao/mangrove.js"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { parseUnits } from "viem"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -15,9 +15,11 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { TransactionReceipt } from "@ethersproject/providers"
-import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/ZeroLendLogic"
-import { toast } from "sonner"
-import { DefaultLogics } from "../../types"
+
+import { PacFinanceLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/PacFinanceLogic"
+import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/SimpleAaveLogic"
+import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/ZeroLendLogic"
+import { DefaultTradeLogics } from "../../types"
 import { TimeInForce } from "../enums"
 import type { AssetWithInfos, Form } from "../types"
 import { estimateTimestamp } from "../utils"
@@ -69,7 +71,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
 
         type Assets = {
           inboundToken: string | undefined
-          inboundLogic: DefaultLogics
+          inboundLogic: DefaultTradeLogics
           tickSpacing: number
           tick: number
         }[]
@@ -82,6 +84,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
             | SimpleAaveLogic
             | OrbitLogic
             | ZeroLendLogic
+            | PacFinanceLogic
           inboundToken: string
         } => {
           return (

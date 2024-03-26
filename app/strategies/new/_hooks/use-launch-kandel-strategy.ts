@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
-import { DefaultLogics } from "@/app/trade/_components/forms/types"
+
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { DefaultStrategyLogics } from "../../(shared)/type"
 import { NewStratStore } from "../_stores/new-strat.store"
 
 type FormValues = Pick<
@@ -16,8 +17,8 @@ type FormValues = Pick<
 > & {
   distribution: GeometricKandelDistribution | undefined
   kandelAddress: string
-  baseLogic: DefaultLogics
-  quoteLogic: DefaultLogics
+  baseLogic: DefaultStrategyLogics
+  quoteLogic: DefaultStrategyLogics
 }
 
 export function useLaunchKandelStrategy() {

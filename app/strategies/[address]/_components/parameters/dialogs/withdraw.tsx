@@ -7,7 +7,7 @@ import { useAccount } from "wagmi"
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { ApproveStep } from "@/app/strategies/new/_components/form/components/approve-step"
 import { Steps } from "@/app/strategies/new/_components/form/components/steps"
-import { useApproveKandelStrategy } from "@/app/strategies/new/_hooks/use-approve-kandel-strategy"
+import { useCreateKandelStrategy } from "@/app/strategies/new/_hooks/use-approve-kandel-strategy"
 import Dialog from "@/components/dialogs/dialog"
 import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
@@ -87,7 +87,7 @@ export function Withdraw({ open, onClose }: Props) {
     fetchUnpublishedBalances()
   }, [strategyStatusQuery.data])
 
-  const approve = useApproveKandelStrategy({
+  const approve = useCreateKandelStrategy({
     setKandelAddress: (address) => address,
   })
 
@@ -182,15 +182,9 @@ export function Withdraw({ open, onClose }: Props) {
           loading={approve.isPending}
           size={"lg"}
           onClick={() => {
-            approve.mutate(
-              {
-                baseDeposit: baseAmount,
-                quoteDeposit: quoteAmount,
-              },
-              {
-                onSuccess: goToNextStep,
-              },
-            )
+            approve.mutate(undefined, {
+              onSuccess: goToNextStep,
+            })
           }}
         >
           Approve

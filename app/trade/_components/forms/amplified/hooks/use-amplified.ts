@@ -7,6 +7,7 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import Big from "big.js"
 import { useEventListener } from "usehooks-ts"
+import { DefaultTradeLogics } from "../../types"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import { Asset, AssetWithInfos } from "../types"
 import { getCurrentTokenPrice } from "../utils"
@@ -85,14 +86,20 @@ export default function useAmplifiedForm() {
       return acc
     }, [] as Token[]) ?? []
 
-  const logics = mangrove ? Object.values(mangrove.logics) : []
+  const logics = (
+    mangrove
+      ? Object.values(mangrove.logics).filter(
+          (item) => item?.approvalType !== "ERC721",
+        )
+      : []
+  ) as DefaultTradeLogics[]
 
   const tickSize = marketInfo?.tickSpacing
     ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
     : ""
 
   const selectedToken = availableTokens.find((token) => token.id == sendToken)
-  const selectedSource = logics.find((logic) => logic?.id == sendSource)
+  const selectedSource = logics?.find((logic) => logic?.id == sendSource)
 
   const compatibleMarkets = openMarkets?.filter(
     (market) =>

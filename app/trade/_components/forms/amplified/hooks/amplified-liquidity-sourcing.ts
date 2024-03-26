@@ -1,10 +1,10 @@
 import { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
-import { DefaultLogics } from "../../types"
+import { DefaultTradeLogics } from "../../types"
 
 type Props = {
   sendFrom?: string
-  logics: DefaultLogics[]
+  logics: DefaultTradeLogics[]
   fundOwner?: string
   sendToken?: Token
   availableTokens?: Token[]
