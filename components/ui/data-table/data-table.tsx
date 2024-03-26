@@ -25,6 +25,7 @@ interface DataTableProps<TData> {
   onRowClick?: (row: TData | null) => void
   renderExtraRow?: (row: Row<TData>) => React.ReactNode
   tableRowClasses?: string
+  skeletonRows?: number
 }
 
 export function DataTable<TData>({
@@ -37,6 +38,7 @@ export function DataTable<TData>({
   onRowClick,
   renderExtraRow = () => null,
   tableRowClasses,
+  skeletonRows = 2,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
@@ -66,7 +68,7 @@ export function DataTable<TData>({
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <LoadingBody cells={leafColumns.length} rows={2} />
+            <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
           ) : rows?.length ? (
             rows.map((row) => (
               <>

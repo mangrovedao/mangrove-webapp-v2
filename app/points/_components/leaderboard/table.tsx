@@ -21,13 +21,18 @@ export function Leaderboard() {
   const userPointsQuery = useUserPoints()
   const currentUser = userPointsQuery.data
   const data = React.useMemo(() => {
-    if (leaderboardQuery.isLoading || userPointsQuery.isLoading) return []
-    let data = leaderboardQuery.data?.leaderboard ?? []
-    if (currentUser) {
-      data = [currentUser, ...data]
-    }
-    return data
-  }, [userPointsQuery.dataUpdatedAt, leaderboardQuery.dataUpdatedAt])
+    if (leaderboardQuery.isLoading) return []
+    return leaderboardQuery.data?.leaderboard ?? []
+  }, [leaderboardQuery.dataUpdatedAt])
+  const userData = React.useMemo(() => {
+    if (userPointsQuery.isLoading) return []
+    return [userPointsQuery.data] ?? []
+  }, [userPointsQuery.dataUpdatedAt])
+
+  const userTable = useTable({
+    //@ts-ignore
+    data: userData,
+  })
 
   const table = useTable({
     //@ts-ignore
@@ -36,10 +41,22 @@ export function Leaderboard() {
 
   return (
     <div className="mt-16 !text-white">
-      <Title variant={"title1"} className="mb-10">
+      <Title variant={"title1"} className="mb-5">
+        Your points
+      </Title>
+      <DataTable
+        skeletonRows={1}
+        table={userTable}
+        isError={!!userPointsQuery.error}
+        isLoading={userPointsQuery.isLoading}
+        tableRowClasses="text-white"
+        isRowHighlighted={(row) => row.account === currentUser?.account}
+      />
+      <Title variant={"title1"} className="mt-10 mb-5">
         Leaderboard
       </Title>
       <DataTable
+        skeletonRows={10}
         table={table}
         isError={!!leaderboardQuery.error}
         isLoading={leaderboardQuery.isLoading}
@@ -50,7 +67,6 @@ export function Leaderboard() {
           count: leaderboardQuery.data?.leaderboard_length ?? 0,
         }}
         tableRowClasses="text-white"
-        isRowHighlighted={(row) => row.account === currentUser?.account}
       />
     </div>
   )

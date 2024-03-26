@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { getErrorMessage } from "@/utils/errors"
@@ -37,6 +37,7 @@ export function useLeaderboard({
     },
     retry: false,
     staleTime: 1 * 60 * 1000, // 1 minute
+    placeholderData: keepPreviousData,
   })
 }
 

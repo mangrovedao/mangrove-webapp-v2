@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
@@ -21,11 +22,22 @@ export function JoinProgramBanner() {
             (market orders) or generated volume (limit orders).
           </Title>
 
-          <span>
+          <div className="space-x-2">
+            <span>
+              <Button variant={"tertiary"} size={"md"} className="px-5" asChild>
+                <Link href={"/trade"}>Trade now</Link>
+              </Button>
+            </span>
             <Button variant={"tertiary"} size={"md"} className="px-5" asChild>
-              <Link href={"/trade"}>Trade now</Link>
+              <Link
+                href={"https://docs.mangrove.exchange/general/points/"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Caption className="text-primary">Learn more</Caption>
+              </Link>
             </Button>
-          </span>
+          </div>
         </div>
         <div className="h-auto w-1/2 relative rounded-lg overflow-hidden hidden xl:block">
           <img
