@@ -58,11 +58,13 @@ export function useParametersTable({ data }: Params) {
 
       columnHelper.display({
         id: "pricePoints",
-        header: () => <div className="text-right">No. of Price Points</div>,
+        header: () => <div className="text-right">No. of offers</div>,
         cell: ({ row }) => {
           const { pricePoints } = row.original
           return (
-            <div className="w-full h-full flex justify-end">{pricePoints}</div>
+            <div className="w-full h-full flex justify-end">
+              {Number(pricePoints) - 1}
+            </div>
           )
         },
       }),

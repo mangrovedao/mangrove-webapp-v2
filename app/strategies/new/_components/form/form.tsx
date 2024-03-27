@@ -9,7 +9,7 @@ import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
-import useForm, { MIN_PRICE_POINTS, MIN_STEP_SIZE } from "./use-form"
+import useForm, { MIN_NUMBER_OF_OFFERS, MIN_STEP_SIZE } from "./use-form"
 
 export function Form({ className }: { className?: string }) {
   const {
@@ -25,8 +25,7 @@ export function Form({ className }: { className?: string }) {
     errors,
     kandelRequirementsQuery,
     isChangingFrom,
-    pricePoints,
-    ratio,
+    numberOfOffers,
     stepSize,
     nativeBalance,
     bountyDeposit,
@@ -35,8 +34,7 @@ export function Form({ className }: { className?: string }) {
     mangroveLogics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
-    handlePricePointsChange,
-    handleRatioChange,
+    handleNumberOfOffersChange,
     handleStepSizeChange,
     handleBountyDepositChange,
     handleSendFromChange,
@@ -228,7 +226,7 @@ export function Form({ className }: { className?: string }) {
             token={quoteToken}
             balance={quoteTokenBalance}
             action={{
-              onClick: handleBaseDepositChange,
+              onClick: handleQuoteDepositChange,
               text: "MAX",
             }}
           />
@@ -239,14 +237,14 @@ export function Form({ className }: { className?: string }) {
         <div>
           <EnhancedNumericInput
             label="Number of offers"
-            value={pricePoints}
-            onChange={handlePricePointsChange}
+            value={numberOfOffers}
+            onChange={handleNumberOfOffersChange}
             disabled={fieldsDisabled}
             error={errors.pricePoints}
           />
           <MustBeAtLeastInfo
-            min={MIN_PRICE_POINTS}
-            onMinClicked={handlePricePointsChange}
+            min={MIN_NUMBER_OF_OFFERS}
+            onMinClicked={handleNumberOfOffersChange}
           />
         </div>
         {/* 

@@ -1,16 +1,19 @@
 import { GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
 import { useMutation } from "@tanstack/react-query"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { NewStratStore } from "../_stores/new-strat.store"
+import { NewStratStore } from "../../../new/_stores/new-strat.store"
 
 type FormValues = Pick<
   NewStratStore,
-  "baseDeposit" | "quoteDeposit" | "pricePoints" | "stepSize" | "bountyDeposit"
+  | "baseDeposit"
+  | "quoteDeposit"
+  | "numberOfOffers"
+  | "stepSize"
+  | "bountyDeposit"
 > & {
   distribution: GeometricKandelDistribution | undefined
   kandelAddress?: string
@@ -19,7 +22,6 @@ type FormValues = Pick<
 export function useEditKandelStrategy() {
   const { market } = useMarket()
   const { kandelStrategies } = useKandel()
-  const router = useRouter()
 
   return useMutation({
     mutationFn: async ({
@@ -28,7 +30,7 @@ export function useEditKandelStrategy() {
       distribution,
       bountyDeposit,
       stepSize,
-      pricePoints,
+      numberOfOffers,
       kandelAddress,
     }: FormValues) => {
       try {
@@ -47,7 +49,7 @@ export function useEditKandelStrategy() {
           // depositQuoteAmount: quoteDeposit,
           funds: bountyDeposit,
           parameters: {
-            pricePoints: Number(pricePoints),
+            pricePoints: Number(numberOfOffers) + 1,
             stepSize: Number(stepSize),
           },
         })

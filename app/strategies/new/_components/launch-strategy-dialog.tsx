@@ -247,7 +247,7 @@ export default function DeployStrategyDialog({
               distribution,
               bountyDeposit,
               stepSize,
-              pricePoints,
+              numberOfOffers,
             } = strategy
 
             launchKandelStrategy(
@@ -258,7 +258,7 @@ export default function DeployStrategyDialog({
                 distribution,
                 bountyDeposit,
                 stepSize,
-                pricePoints,
+                numberOfOffers,
                 baseLogic,
                 quoteLogic,
               },
@@ -346,8 +346,7 @@ const Summary = ({
   const {
     baseDeposit,
     quoteDeposit,
-    ratio,
-    pricePoints,
+    numberOfOffers,
     stepSize,
     bountyDeposit,
     priceRange,
@@ -433,10 +432,9 @@ const Summary = ({
 
       <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <SummaryLine
-          title={`No. of price points`}
-          value={<Text>{pricePoints}</Text>}
+          title={`No. of offers`}
+          value={<Text>{numberOfOffers}</Text>}
         />
-        <SummaryLine title={`Ratio`} value={<Text>{ratio}</Text>} />
         <SummaryLine title={`Step Size`} value={<Text>{stepSize}</Text>} />
       </div>
 

@@ -14,8 +14,11 @@ import {
 } from "@/utils/numbers"
 import { Address } from "viem"
 import { AverageReturn } from "../../../../(shared)/_components/average-return"
+import {
+  ChangingFrom,
+  useNewStratStore,
+} from "../../../../new/_stores/new-strat.store"
 import useKandel from "../../../_providers/kandel-strategy"
-import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import EditStrategyDialog from "../edit-strategy-dialog"
 import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
@@ -45,23 +48,22 @@ export const PriceRange = withClientOnly(function ({
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
   const {
-    setPriceRange,
-    offersWithPrices,
-    setOffersWithPrices,
-    globalError,
-    errors,
-    setErrors,
-    isChangingFrom,
-    setIsChangingFrom,
     baseDeposit,
     quoteDeposit,
     bountyDeposit,
     stepSize,
-    ratio,
-    pricePoints,
+    numberOfOffers,
     distribution,
+    offersWithPrices,
+    globalError,
+    errors,
+    isChangingFrom,
     sendFrom,
     receiveTo,
+    setPriceRange,
+    setOffersWithPrices,
+    setErrors,
+    setIsChangingFrom,
   } = useNewStratStore()
 
   const formIsInvalid =
@@ -70,7 +72,7 @@ export const PriceRange = withClientOnly(function ({
     !minPrice ||
     !maxPrice ||
     !stepSize ||
-    !pricePoints ||
+    !numberOfOffers ||
     !distribution
 
   const priceRange: [number, number] | undefined =
@@ -336,8 +338,7 @@ export const PriceRange = withClientOnly(function ({
             baseDeposit,
             quoteDeposit,
             priceRange,
-            pricePoints,
-            ratio,
+            numberOfOffers,
             stepSize,
             bountyDeposit,
             hasLiveOffers,

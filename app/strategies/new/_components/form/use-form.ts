@@ -9,8 +9,7 @@ import { getErrorMessage } from "@/utils/errors"
 import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 
-export const MIN_PRICE_POINTS = 2
-export const MIN_RATIO = 1.001
+export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
@@ -35,8 +34,7 @@ export default function useForm() {
     setErrors,
     baseDeposit,
     quoteDeposit,
-    pricePoints,
-    ratio,
+    numberOfOffers,
     stepSize,
     bountyDeposit,
     isChangingFrom,
@@ -44,8 +42,7 @@ export default function useForm() {
     receiveTo,
     setBaseDeposit,
     setQuoteDeposit,
-    setPricePoints,
-    setRatio,
+    setNumberOfOffers,
     setStepSize,
     setBountyDeposit,
     setIsChangingFrom,
@@ -54,7 +51,7 @@ export default function useForm() {
     setReceiveTo,
   } = useNewStratStore()
   const debouncedStepSize = useDebounce(stepSize, 300)
-  const debouncedPricePoints = useDebounce(pricePoints, 300)
+  const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
   const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
@@ -64,8 +61,7 @@ export default function useForm() {
     availableBase: baseDeposit,
     availableQuote: quoteDeposit,
     stepSize: debouncedStepSize,
-    pricePoints: debouncedPricePoints,
-    ratio,
+    numberOfOffers: debouncedNumberOfOffers,
     isChangingFrom,
   })
 
@@ -74,7 +70,6 @@ export default function useForm() {
     requiredQuote,
     requiredBounty,
     offersWithPrices,
-    priceRatio,
     pricePoints: points,
     distribution,
   } = kandelRequirementsQuery.data || {}
@@ -101,20 +96,14 @@ export default function useForm() {
     setGlobalError(undefined)
   }, [kandelRequirementsQuery.error])
 
-  // Update ratio field if number of price points is changing
-  React.useEffect(() => {
-    if (isChangingFrom === "ratio" || !priceRatio) return
-    setRatio(priceRatio.toFixed(4))
-  }, [priceRatio])
-
   React.useEffect(() => {
     if (
-      isChangingFrom === "pricePoints" ||
+      isChangingFrom === "numberOfOffers" ||
       !points ||
-      Number(pricePoints) === points
+      Number(numberOfOffers) === points - 1
     )
       return
-    setPricePoints(points.toString())
+    setNumberOfOffers(points.toString())
   }, [points])
 
   React.useEffect(() => {
@@ -157,20 +146,12 @@ export default function useForm() {
     setQuoteDeposit(value)
   }
 
-  const handlePricePointsChange = (
+  const handleNumberOfOffersChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
-    handleFieldChange("pricePoints")
+    handleFieldChange("numberOfOffers")
     const value = typeof e === "string" ? e : e.target.value
-    setPricePoints(value)
-  }
-
-  const handleRatioChange = (
-    e: React.ChangeEvent<HTMLInputElement> | string,
-  ) => {
-    handleFieldChange("ratio")
-    const value = typeof e === "string" ? e : e.target.value
-    setRatio(value)
+    setNumberOfOffers(value)
   }
 
   const handleStepSizeChange = (
@@ -212,25 +193,22 @@ export default function useForm() {
       delete newErrors.quoteDeposit
     }
 
-    if (Number(pricePoints) < Number(MIN_PRICE_POINTS) && pricePoints) {
-      newErrors.pricePoints = "Price points must be at least 2"
+    if (
+      Number(numberOfOffers) < Number(MIN_NUMBER_OF_OFFERS) &&
+      numberOfOffers
+    ) {
+      newErrors.numberOfOffers = "Number of offers must be at least 1"
     } else {
-      delete newErrors.pricePoints
-    }
-
-    if (Number(ratio) < Number(MIN_RATIO) && ratio) {
-      newErrors.ratio = "Ratio must be at least 1.001"
-    } else {
-      delete newErrors.ratio
+      delete newErrors.numberOfOffers
     }
 
     if (
       (Number(stepSize) < Number(MIN_STEP_SIZE) ||
-        Number(stepSize) >= Number(pricePoints)) &&
+        Number(stepSize) >= Number(numberOfOffers) + 1) &&
       stepSize
     ) {
       newErrors.stepSize =
-        "Step size must be at least 1 and inferior to price points"
+        "Step size must be at least 1 and inferior or equal to number of offers"
     } else {
       delete newErrors.stepSize
     }
@@ -251,8 +229,7 @@ export default function useForm() {
   }, [
     baseDeposit,
     quoteDeposit,
-    pricePoints,
-    ratio,
+    numberOfOffers,
     stepSize,
     bountyDeposit,
     requiredBase,
@@ -267,7 +244,7 @@ export default function useForm() {
     requiredQuote,
     requiredBounty,
     isChangingFrom,
-    pricePoints,
+    numberOfOffers,
     baseDeposit,
     quoteDeposit,
     nativeBalance,
@@ -275,17 +252,15 @@ export default function useForm() {
     fieldsDisabled,
     errors,
     kandelRequirementsQuery,
-    ratio,
     stepSize,
     sendFrom,
     receiveTo,
     mangroveLogics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
-    handlePricePointsChange,
+    handleNumberOfOffersChange,
     handleSendFromChange,
     handleReceiveToChange,
-    handleRatioChange,
     handleStepSizeChange,
     handleBountyDepositChange,
   }

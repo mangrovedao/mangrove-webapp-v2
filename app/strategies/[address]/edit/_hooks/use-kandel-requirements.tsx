@@ -5,7 +5,7 @@ import { BigSource } from "big.js"
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
-import { ChangingFrom } from "../_stores/new-strat.store"
+import { ChangingFrom } from "../../../new/_stores/new-strat.store"
 
 export type Params = {
   onAave?: boolean
@@ -14,7 +14,7 @@ export type Params = {
   maxPrice: BigSource
   availableBase?: BigSource
   availableQuote?: BigSource
-  pricePoints: number | string
+  numberOfOffers: number | string
   ratio?: number | string
   isChangingFrom?: ChangingFrom
 }
@@ -26,9 +26,8 @@ export function useKandelRequirements({
   availableBase,
   availableQuote,
   stepSize,
-  pricePoints,
+  numberOfOffers,
   ratio,
-  isChangingFrom,
 }: Params) {
   const { market, midPrice } = useMarket()
   const { kandelStrategies, generator, config } = useKandel()
@@ -39,7 +38,7 @@ export function useKandelRequirements({
       maxPrice,
       midPrice,
       stepSize,
-      pricePoints,
+      numberOfOffers,
       onAave,
       market?.base.id,
       market?.quote?.id,
@@ -85,9 +84,7 @@ export function useKandelRequirements({
             maxPrice,
             stepSize: Number(stepSize) ?? config.stepSize,
             midPrice,
-            pricePoints:
-              isChangingFrom !== "ratio" ? Number(pricePoints) : undefined,
-            priceRatio: isChangingFrom === "ratio" ? Number(ratio) : undefined,
+            pricePoints: Number(numberOfOffers) + 1, // number of offers = price points - 1
           },
         }
 

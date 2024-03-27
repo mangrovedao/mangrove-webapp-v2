@@ -3,11 +3,11 @@ import type { Token } from "@mangrovedao/mangrove.js"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
+  TooltipContent,
   TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { TooltipContent } from "@radix-ui/react-tooltip"
 
 export function CustomBalance(props: {
   token?: Token | string

@@ -47,8 +47,7 @@ export const PriceRange = withClientOnly(function ({
     quoteDeposit,
     bountyDeposit,
     stepSize,
-    ratio,
-    pricePoints,
+    numberOfOffers,
     distribution,
     offersWithPrices,
     globalError,
@@ -68,7 +67,7 @@ export const PriceRange = withClientOnly(function ({
     !minPrice ||
     !maxPrice ||
     !stepSize ||
-    !pricePoints ||
+    !numberOfOffers ||
     !distribution
 
   const priceRange: [number, number] | undefined =
@@ -326,8 +325,7 @@ export const PriceRange = withClientOnly(function ({
             baseDeposit,
             quoteDeposit,
             priceRange,
-            pricePoints,
-            ratio,
+            numberOfOffers,
             stepSize,
             bountyDeposit,
             sendFrom,
