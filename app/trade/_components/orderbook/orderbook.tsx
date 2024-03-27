@@ -52,7 +52,7 @@ function BookContent() {
   const lowestAskPrice = asks?.[0]?.price
   const highestBidPrice = bids?.[0]?.price
   const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
-  const spread = lowestAskPrice?.sub(highestBidPrice ?? 0)
+  const spread = lowestAskPrice?.sub(highestBidPrice ?? 0).abs()
   const spreadPercent =
     spread
       ?.mul(100)

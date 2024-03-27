@@ -13,20 +13,23 @@ export type ChangingFrom =
   | "chart"
   | "baseDeposit"
   | "quoteDeposit"
-  | "pricePoints"
-  | "ratio"
+  | "numberOfOffers"
   | "stepSize"
   | "bountyDeposit"
+  | "sendFrom"
+  | "receiveTo"
   | undefined
   | null
 
 export type NewStratStore = {
   baseDeposit: string
   quoteDeposit: string
-  pricePoints: string
-  ratio: string
+  numberOfOffers: string
   stepSize: string
   bountyDeposit: string
+
+  sendFrom: string
+  receiveTo: string
 
   priceRange: [string, string]
   offersWithPrices?: OffersWithPrices
@@ -41,10 +44,11 @@ export type NewStratStore = {
 type NewStratActions = {
   setBaseDeposit: (baseDeposit: string) => void
   setQuoteDeposit: (quoteDeposit: string) => void
-  setPricePoints: (pricePoints: string) => void
-  setRatio: (ratio: string) => void
+  setNumberOfOffers: (numberOfOffers: string) => void
   setStepSize: (stepSize: string) => void
   setBountyDeposit: (bountyDeposit: string) => void
+  setSendFrom: (source: string) => void
+  setReceiveTo: (source: string) => void
 
   setPriceRange: (min: string, max: string) => void
   setOffersWithPrices: (offersWithPrices?: OffersWithPrices) => void
@@ -61,10 +65,12 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
 ) => ({
   baseDeposit: "",
   quoteDeposit: "",
-  pricePoints: "10",
-  ratio: "",
+  numberOfOffers: "10",
   stepSize: "1",
   bountyDeposit: "",
+
+  sendFrom: "simple",
+  receiveTo: "simple",
 
   priceRange: ["", ""],
   offersWithPrices: undefined,
@@ -77,10 +83,12 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
 
   setBaseDeposit: (baseDeposit) => set({ baseDeposit }),
   setQuoteDeposit: (quoteDeposit) => set({ quoteDeposit }),
-  setPricePoints: (pricePoints) => set({ pricePoints }),
-  setRatio: (ratio) => set({ ratio }),
+  setNumberOfOffers: (numberOfOffers) => set({ numberOfOffers }),
   setStepSize: (stepSize) => set({ stepSize }),
   setBountyDeposit: (bountyDeposit) => set({ bountyDeposit }),
+
+  setSendFrom: (sendFrom) => set({ sendFrom }),
+  setReceiveTo: (receiveTo) => set({ receiveTo }),
 
   setPriceRange: (min, max) => set({ priceRange: [min, max] }),
   setOffersWithPrices: (offersWithPrices) => set({ offersWithPrices }),

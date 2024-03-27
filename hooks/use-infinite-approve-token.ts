@@ -1,7 +1,6 @@
-import type { Token } from "@mangrovedao/mangrove.js"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
+import { DefaultStrategyLogics } from "@/app/strategies/(shared)/type"
+import { DefaultTradeLogics } from "@/app/trade/_components/forms/types"
+import { Token } from "@mangrovedao/mangrove.js"
 import { useMutation } from "@tanstack/react-query"
 
 export function useInfiniteApproveToken() {
@@ -12,7 +11,7 @@ export function useInfiniteApproveToken() {
       logic,
     }: {
       token?: Token
-      logic?: SimpleLogic | SimpleAaveLogic | OrbitLogic
+      logic?: DefaultTradeLogics | DefaultStrategyLogics
       spender?: string | null
     }) => {
       try {
@@ -20,9 +19,13 @@ export function useInfiniteApproveToken() {
         if (logic) {
           try {
             const tokenToApprove = await logic.overlying(token)
-
-            const result = await tokenToApprove.approve(spender)
-            return result.wait()
+            if (tokenToApprove instanceof Token) {
+              const result = await tokenToApprove.approve(spender)
+              return result.wait()
+            } else {
+              // TODO: implement logic for erc721
+              return
+            }
           } catch (error) {
             return
           }

@@ -44,7 +44,7 @@ export default function UnrealizedPnl() {
             </Tooltip>
           </TooltipProvider>
         </Caption>
-        <Title variant={"title1"}>{"-"}</Title>
+        <Title variant={"title1"}>{"N/A"}</Title>
       </span>
     </div>
   )

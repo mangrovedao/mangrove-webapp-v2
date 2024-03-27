@@ -10,6 +10,7 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
+import { DefaultTradeLogics } from "../../types"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -43,7 +44,14 @@ export function useLimit(props: Props) {
   const receiveTo = form.useStore((state) => state.values.receiveTo)
 
   const timeInForce = form.useStore((state) => state.values.timeInForce)
-  const logics = mangrove ? Object.values(mangrove.logics) : []
+  const logics = (
+    mangrove
+      ? Object.values(mangrove.logics).filter(
+          (item) => item?.approvalType !== "ERC721",
+        )
+      : []
+  ) as DefaultTradeLogics[]
+
   const selectedSource = logics.find((logic) => logic?.id === sendFrom)
 
   const {

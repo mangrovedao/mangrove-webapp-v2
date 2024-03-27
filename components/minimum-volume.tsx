@@ -3,10 +3,11 @@ import type { Token } from "@mangrovedao/mangrove.js"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
+  TooltipContent,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { TooltipContent } from "@radix-ui/react-tooltip"
 import Link from "next/link"
 import InfoTooltip from "./info-tooltip"
 import { Caption } from "./typography/caption"
@@ -62,9 +63,12 @@ export function MinimumVolume(props: {
                   {token?.symbol}
                 </span>
               </TooltipTrigger>
-              <TooltipContent className="z-50" side="bottom">
-                {Number(props.volume).toFixed(token?.decimals)} {token?.symbol}
-              </TooltipContent>
+              <TooltipPortal>
+                <TooltipContent className="z-50" side="bottom">
+                  {Number(props.volume).toFixed(token?.decimals)}{" "}
+                  {token?.symbol}
+                </TooltipContent>
+              </TooltipPortal>
             </Tooltip>
           </TooltipProvider>
 

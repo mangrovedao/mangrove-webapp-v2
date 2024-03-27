@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
@@ -35,20 +36,22 @@ export function TokenBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
-                  props.action?.onClick(formatted || "0")
+                  props.action?.onClick(formatted || "")
                 }}
               >
                 <span title={formatted?.toString()}>{formattedWithSymbol}</span>
               </TooltipTrigger>
-              <TooltipContent
-                className="z-50"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                }}
-              >
-                {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
-              </TooltipContent>
+
+              <TooltipPortal>
+                <TooltipContent
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                  }}
+                >
+                  {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
+                </TooltipContent>
+              </TooltipPortal>
             </Tooltip>
           </TooltipProvider>
           {props?.action && props?.action.text && (

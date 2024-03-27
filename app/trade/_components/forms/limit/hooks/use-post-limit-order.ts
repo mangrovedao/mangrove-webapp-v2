@@ -8,6 +8,7 @@ import { useLoadingStore } from "@/stores/loading.store"
 import type { Market } from "@mangrovedao/mangrove.js"
 import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
 import { TradeAction, TradeMode } from "../../enums"
+import { DefaultTradeLogics } from "../../types"
 import { successToast } from "../../utils"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
@@ -46,11 +47,11 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
 
         const takerGivesLogic = logics.find(
           (logic) => logic?.id === form.sendFrom,
-        )
+        ) as DefaultTradeLogics
 
         const takerWantsLogic = logics.find(
           (logic) => logic?.id === form.receiveTo,
-        )
+        ) as DefaultTradeLogics
 
         const restingOrderGasreq = Math.max(
           takerGivesLogic?.gasOverhead || 200_000,

@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react"
 import {
   Tooltip,
   TooltipContent,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
@@ -32,7 +33,9 @@ export default function InfoTooltip({
         >
           <TooltipInfo />
         </TooltipTrigger>
-        <TooltipContent side={side}>{children}</TooltipContent>
+        <TooltipPortal>
+          <TooltipContent side={side}>{children}</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     </TooltipProvider>
   )

@@ -1,11 +1,11 @@
 import { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
-import { DefaultLogics } from "../../types"
+import { DefaultTradeLogics } from "../../types"
 
 type Props = {
   sendFrom: string
   receiveTo: string
-  logics: DefaultLogics[]
+  logics: DefaultTradeLogics[]
   fundOwner?: string
   sendToken?: Token
   receiveToken?: Token
@@ -17,7 +17,7 @@ type BalanceLogic = {
 }
 
 // export function useAbleToken(
-//   logic: DefaultLogics,
+//   logic: DefaultTradeLogics,
 //   token: Token,
 // ) {
 //   return useQuery({
@@ -45,10 +45,11 @@ export default function liquiditySourcing({
     BalanceLogic | undefined
   >()
 
-  const [sendFromLogics, setSendFromLogics] = React.useState<DefaultLogics[]>()
+  const [sendFromLogics, setSendFromLogics] =
+    React.useState<DefaultTradeLogics[]>()
 
   const [receiveToLogics, setReceiveToLogics] =
-    React.useState<DefaultLogics[]>()
+    React.useState<DefaultTradeLogics[]>()
 
   const getSendFromLogics = async (token: Token) => {
     const usableLogics = logics.map(async (logic) => {
