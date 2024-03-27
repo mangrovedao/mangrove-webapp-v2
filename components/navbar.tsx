@@ -38,8 +38,7 @@ import {
 } from "@rainbow-me/rainbowkit"
 
 import useLocalStorage from "@/hooks/use-local-storage"
-import { blast } from "@/providers/wallet-connect"
-import { blastSepolia } from "viem/chains"
+import { blast, blastSepolia } from "viem/chains"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
