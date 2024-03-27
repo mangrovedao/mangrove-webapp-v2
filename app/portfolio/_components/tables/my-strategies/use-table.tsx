@@ -54,6 +54,7 @@ export function useTable({ data }: Params) {
           const { base, quote } = row.original
           return <Market base={base} quote={quote} />
         },
+        enableSorting: true,
       }),
       columnHelper.display({
         id: "return",
@@ -77,6 +78,7 @@ export function useTable({ data }: Params) {
       }),
       columnHelper.display({
         header: "Value",
+        enableSorting: true,
         cell: ({ row }) => {
           const { base, quote, depositedBase, depositedQuote } = row.original
           return (
