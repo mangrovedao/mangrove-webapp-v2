@@ -20,12 +20,14 @@ function formatNFTName(name: string): string {
 
 export default function CurrentBoost({
   className,
-  level = 0,
+  // level = 0,
   boost = 1,
   volume = 0,
   type,
 }: Props) {
-  const { nextIndex } = getLevels(volume)
+  const { nextIndex, currentIndex } = getLevels(volume)
+  const level = currentIndex
+  console.log("nextIndex", nextIndex, currentIndex)
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">

@@ -1,4 +1,5 @@
 import { cn } from "@/utils"
+import { formatNumber } from "@/utils/numbers"
 import { useUserPoints } from "./leaderboard/use-leaderboard"
 
 export default function TotalPoints() {
@@ -33,7 +34,7 @@ export default function TotalPoints() {
       <div className="flex justify-between">
         <div className="text-base text-cloud-200 font-normal">Total</div>
         <div className="text-base text-white font-normal">
-          {totalPoints} points
+          {formatNumber(totalPoints)} points
         </div>
       </div>
       <div className="h-1 w-full rounded-lg overflow-hidden flex mt-2">
@@ -68,7 +69,7 @@ export default function TotalPoints() {
                   ></span>
                   {item.id}
                 </td>
-                <td className="text-right py-1">{item.points}</td>
+                <td className="text-right py-1">{formatNumber(item.points)}</td>
                 <td className="text-right text-cloud-200 py-1">
                   ({percentage.toFixed(0)}%)
                 </td>

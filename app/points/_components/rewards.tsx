@@ -3,6 +3,7 @@ import { addDays, formatDistanceToNow } from "date-fns"
 import InfoTooltip from "@/components/info-tooltip"
 import { MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
+import { formatNumber } from "@/utils/numbers"
 import { useUserPoints } from "./leaderboard/use-leaderboard"
 
 export default function Rewards() {
@@ -34,7 +35,7 @@ export default function Rewards() {
             "text-cloud-00": !totalPoints,
           })}
         >
-          {totalPoints}
+          {formatNumber(totalPoints)}
         </span>
       </div>
       <div className="text-xs text-cloud-200 flex items-center pt-11">

@@ -28,13 +28,19 @@ export const LEVELS = [
 export function getLevels(volume?: number) {
   if (!volume) {
     return {
+      currentIndex: 0,
       nextIndex: 0,
       nextLevel: LEVELS[0],
     }
   }
-  const currentIndex = LEVELS.findIndex((l) => l.amount > volume) - 1
+
+  const currentIndex =
+    LEVELS.findIndex((l) => l.amount > volume) === -1
+      ? LEVELS.length - 1
+      : LEVELS.findIndex((l) => l.amount > volume) - 1
   const nextIndex = currentIndex + 1
   return {
+    currentIndex,
     nextIndex,
     nextLevel: LEVELS[nextIndex],
   }
