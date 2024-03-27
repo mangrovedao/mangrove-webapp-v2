@@ -137,7 +137,6 @@ export default function useForm() {
     requiredQuote,
     requiredBounty,
     offersWithPrices,
-    priceRatio,
     pricePoints: points,
     distribution,
   } = kandelRequirementsQuery.data || {}

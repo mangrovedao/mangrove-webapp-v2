@@ -1,5 +1,4 @@
 import { Token } from "@mangrovedao/mangrove.js"
-import { useRouter } from "next/navigation"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -17,7 +16,6 @@ import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
 import useKandel from "../../_providers/kandel-strategy"
-import { useApproveKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useEditKandelStrategy } from "../_hooks/use-edit-kandel-strategy"
 import { useRetractOffers } from "../_hooks/use-retract-offers"
 
@@ -56,14 +54,6 @@ export default function EditStrategyDialog({
   })
   const { strategyQuery } = useKandel()
   const kandelAddress = strategyQuery.data?.address
-  const router = useRouter()
-
-  const {
-    mutate: approveKandelStrategy,
-    isPending: isApprovingKandelStrategy,
-  } = useApproveKandelStrategy({
-    kandelAddress,
-  })
 
   const approveBaseToken = useInfiniteApproveToken()
   const approveQuoteToken = useInfiniteApproveToken()
@@ -95,7 +85,7 @@ export default function EditStrategyDialog({
 
   let steps = [
     "Summary",
-    strategy?.hasLiveOffers ? "Retract offers" : "",
+    strategy?.hasLiveOffers ? "Reset strategy" : "",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
@@ -183,10 +173,10 @@ export default function EditStrategyDialog({
       body: (
         <div className="bg-[#041010] rounded-lg px-4 pt-4 pb-12 space-y-8">
           <div className="flex justify-center items-center"></div>
-          <h1 className="text-2xl text-white">Retract live offers</h1>
+          <h1 className="text-2xl text-white">Reset strategy</h1>
           <p className="text-base text-gray-scale-300">
             By granting permission, you are allowing the following contract to
-            retract existing offers.
+            reset this strategy.
           </p>
         </div>
       ),

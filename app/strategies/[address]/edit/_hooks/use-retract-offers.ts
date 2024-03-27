@@ -26,7 +26,7 @@ export function useRetractOffers({
           type: "smart",
         })
 
-        const txs = await kandelInstance.retractAndWithdraw()
+        const txs = await kandelInstance.retractOffers()
         await Promise.all(txs.map((x) => x.wait()))
         toast.success("Kandel offers successfully retracted")
         return txs

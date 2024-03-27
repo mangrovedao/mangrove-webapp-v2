@@ -123,7 +123,6 @@ export function useKandelRequirements({
           requiredBounty,
           distribution,
           offersWithPrices,
-          priceRatio: minimumDistribution.getPriceRatio(),
           pricePoints: minimumDistribution.pricePoints,
         }
       } catch (e) {

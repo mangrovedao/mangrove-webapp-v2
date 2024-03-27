@@ -92,7 +92,7 @@ export default function DeployStrategyDialog({
   let steps = [
     "Summary",
     "Create strategy instance",
-    !isBound ? "Activate strategy" : "",
+    !isBound ? "Activate router" : "",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll

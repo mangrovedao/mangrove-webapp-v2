@@ -15,10 +15,8 @@ export default function HistoryTable() {
     () => [
       {
         date: creationDate,
-        spread: "-",
         pricePoints: length,
         amount: `${publishedBase.toFixed(6)} ${baseToken?.symbol} - ${publishedQuote.toFixed(6)} ${quoteToken?.symbol}`,
-        ratio: priceRatio?.toFixed(4),
       },
     ],
     [creationDate, length, publishedBase.toFixed(6), priceRatio],

@@ -220,16 +220,6 @@ export function Form({ className }: { className?: string }) {
           />
         </div>
 
-        {/* <div>
-          <EnhancedNumericInput
-            label="Ratio"
-            value={ratio}
-            onChange={handleRatioChange}
-            disabled={fieldsDisabled}
-            error={isChangingFrom === "ratio" ? errors.ratio : undefined}
-          />
-          <MustBeAtLeastInfo min={MIN_RATIO} onMinClicked={handleRatioChange} />
-        </div> */}
         <div>
           <EnhancedNumericInput
             label="Step size"
