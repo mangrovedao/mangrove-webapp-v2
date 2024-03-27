@@ -36,7 +36,6 @@ const InfoBar = () => {
 
   return (
     <div className=" flex justify-between bg-blend-darken rounded-lg">
-      <InfoLine title="Ratio" value={currentParameter.priceRatio?.toFixed(4)} />
       <InfoLine
         title="No. of offers"
         value={Number(currentParameter?.length) - 1}

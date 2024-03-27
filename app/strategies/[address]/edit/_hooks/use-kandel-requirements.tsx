@@ -15,7 +15,6 @@ export type Params = {
   availableBase?: BigSource
   availableQuote?: BigSource
   numberOfOffers: number | string
-  ratio?: number | string
   isChangingFrom?: ChangingFrom
 }
 
@@ -27,7 +26,6 @@ export function useKandelRequirements({
   availableQuote,
   stepSize,
   numberOfOffers,
-  ratio,
 }: Params) {
   const { market, midPrice } = useMarket()
   const { kandelStrategies, generator, config } = useKandel()
@@ -42,7 +40,6 @@ export function useKandelRequirements({
       onAave,
       market?.base.id,
       market?.quote?.id,
-      ratio,
     ],
     queryFn: async () => {
       if (
@@ -126,7 +123,6 @@ export function useKandelRequirements({
           requiredBounty,
           distribution,
           offersWithPrices,
-          priceRatio: minimumDistribution.getPriceRatio(),
           pricePoints: minimumDistribution.pricePoints,
         }
       } catch (e) {

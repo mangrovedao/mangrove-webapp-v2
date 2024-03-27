@@ -24,7 +24,7 @@ type Params = {
 
 export function useHistoryParams({ data }: Params) {
   const { chain } = useAccount()
-  const { baseToken } = useKandel()
+  const { baseToken, quoteToken } = useKandel()
 
   const columns = React.useMemo(
     () => [
@@ -53,10 +53,14 @@ export function useHistoryParams({ data }: Params) {
         id: "amount",
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
-          const { amount } = row.original
+          const { amount, token } = row.original
+          const amountToken = [baseToken, quoteToken].find(
+            (item) => item?.address === token,
+          )
           return (
             <div className="w-full h-full flex justify-end">
-              {amount} {baseToken?.symbol}
+              {Number(amount).toFixed(amountToken?.displayedDecimals)}{" "}
+              {amountToken?.symbol}
             </div>
           )
         },

@@ -37,7 +37,7 @@ export const useParameters = () => {
     depositsAndWithdraws,
   } = strategyQuery.data ?? {}
 
-  const { maxPrice, minPrice, priceRatio } = offerStatuses ?? {}
+  const { maxPrice, minPrice } = offerStatuses ?? {}
 
   const asks =
     offers
@@ -131,7 +131,6 @@ export const useParameters = () => {
       lockedBounty,
       maxPrice,
       minPrice,
-      priceRatio,
       creationDate,
       strategyAddress,
     },

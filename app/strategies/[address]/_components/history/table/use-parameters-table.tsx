@@ -16,8 +16,6 @@ const DEFAULT_DATA: Parameters[] = []
 
 export type Parameters = {
   date: Date | undefined
-  spread: string
-  ratio: string | undefined
   pricePoints: string | null | undefined
   amount: string | undefined
 }
@@ -35,24 +33,6 @@ export function useParametersTable({ data }: Params) {
           const { date } = row.original
           if (!date) return <div>N/A</div>
           return <div>{formatDate(date)}</div>
-        },
-      }),
-
-      columnHelper.display({
-        id: "spread",
-        header: () => <div className="text-right">Spread</div>,
-        cell: ({ row }) => {
-          const { spread } = row.original
-          return <div className="w-full h-full flex justify-end">{spread}</div>
-        },
-      }),
-
-      columnHelper.display({
-        id: "ratio",
-        header: () => <div className="text-right">Ratio</div>,
-        cell: ({ row }) => {
-          const { ratio } = row.original
-          return <div className="w-full h-full flex justify-end">{ratio}</div>
         },
       }),
 
