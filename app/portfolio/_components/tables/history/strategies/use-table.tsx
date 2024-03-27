@@ -93,14 +93,14 @@ export function useTable({ data, onManage }: Params) {
         header: "Status",
         cell: ({ row }) => {
           const { base, quote, address, offers } = row.original
-          return (
-            <Status
-              base={base}
-              quote={quote}
-              address={address}
-              offers={offers}
-            />
-          )
+          const { data } = useStrategyStatus({
+            address,
+            base,
+            quote,
+            offers,
+          })
+
+          return <Status status={data?.status} />
         },
       }),
       columnHelper.display({

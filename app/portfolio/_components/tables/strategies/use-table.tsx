@@ -19,6 +19,7 @@ import { Market } from "@/app/strategies/(list)/_components/tables/strategies/co
 import { Value } from "@/app/strategies/(list)/_components/tables/strategies/components/value"
 import Status from "@/app/strategies/(shared)/_components/status"
 import { ValueInUSD } from "../history/strategies/value"
+import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 
 const columnHelper = createColumnHelper<Strategy>()
 const DEFAULT_DATA: Strategy[] = []
@@ -92,14 +93,14 @@ export function useTable({ data, onCancel, onManage }: Params) {
         header: "Status",
         cell: ({ row }) => {
           const { base, quote, address, offers } = row.original
-          return (
-            <Status
-              base={base}
-              quote={quote}
-              address={address}
-              offers={offers}
-            />
-          )
+          const { data } = useStrategyStatus({
+            address,
+            base,
+            quote,
+            offers,
+          })
+
+          return <Status status={data?.status} />
         },
       }),
       columnHelper.display({

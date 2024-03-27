@@ -19,6 +19,7 @@ import { shortenAddress } from "@/utils/wallet"
 import Big from "big.js"
 import { Ban, Check, ExternalLinkIcon } from "lucide-react"
 import Link from "next/link"
+import { useAccount } from "wagmi"
 
 const columnHelper = createColumnHelper<Fill>()
 const DEFAULT_DATA: Fill[] = []
@@ -29,6 +30,8 @@ type Params = {
 
 export function useTable({ data }: Params) {
   const { market } = useMarket()
+  const { chain } = useAccount()
+  const blockExplorerUrl = chain?.blockExplorers?.default.url
 
   const columns = React.useMemo(
     () => [
@@ -157,7 +160,7 @@ export function useTable({ data }: Params) {
           const { transactionHash } = row.original
           return (
             <Link
-              href={`https://blastscan.io/tx/${transactionHash}`}
+              href={`${blockExplorerUrl}/tx/${transactionHash}`}
               target="_blank"
               className="underline flex justify-end space-x-2 w-full"
             >

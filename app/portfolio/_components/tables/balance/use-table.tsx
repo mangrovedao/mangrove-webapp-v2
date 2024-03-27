@@ -16,6 +16,7 @@ import { TokenIcon } from "@/components/token-icon"
 import { Button } from "@/components/ui/button"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { Token } from "@mangrovedao/mangrove.js"
+import Link from "next/link"
 
 const columnHelper = createColumnHelper<Balance>()
 const DEFAULT_DATA: Balance[] = []
@@ -98,28 +99,20 @@ export function useTable({ data }: Params) {
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
+          const { address } = row.original
+          const { data } = useTokenFromAddress(address as Address)
           return (
             <div className="w-full h-full flex justify-end items-center space-x-1">
-              <Button
-                variant="primary"
-                className="px-4"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              >
-                Trade
-              </Button>
-              <Button
-                variant="secondary"
-                className="px-4"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }}
-              >
-                Create Stratedy
-              </Button>
+              <Link href={`/trade?market=${data?.symbol}`}>
+                <Button variant="primary" className="px-4">
+                  Trade
+                </Button>
+              </Link>
+              <Link href={`/strategies/new?market=${data?.symbol}`}>
+                <Button variant="secondary" className="px-4">
+                  Create Stratedy
+                </Button>
+              </Link>
             </div>
           )
         },
