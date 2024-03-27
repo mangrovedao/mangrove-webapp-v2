@@ -1,20 +1,19 @@
 import { X } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import React from "react"
 
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Info } from "@/svgs"
 import { cn } from "@/utils"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import useKandel from "../../_providers/kandel-strategy"
 
 export default function InformationBanner() {
   const [bannerOpen, setBannerOpen] = React.useState(true)
   const { push } = useRouter()
-  const { strategyStatusQuery, mergedOffers, baseToken, quoteToken } =
-    useKandel()
-  const { isOutOfRange, stratInstance } = strategyStatusQuery.data ?? {}
+  const { strategyStatusQuery, mergedOffers } = useKandel()
+  const { isOutOfRange } = strategyStatusQuery.data ?? {}
 
   const allOffersAreDead = !mergedOffers || mergedOffers?.length === 0
 
@@ -92,20 +91,7 @@ export default function InformationBanner() {
             )}
           </ul>
 
-          {/* {isInactive ||
-            (!isActive && ( */}
           <div className="space-x-2 mt-2">
-            {/* <Button
-              className="px-5"
-              size={"md"}
-              onClick={() =>
-                push(
-                  `/strategies/${stratInstance?.address}/edit?market=${baseToken?.id},${quoteToken?.id}`,
-                )
-              }
-            >
-              Edit Parameters
-            </Button> */}
             <Button variant={"secondary"} size={"md"} className="px-5" asChild>
               <Link
                 href={
@@ -118,7 +104,6 @@ export default function InformationBanner() {
               </Link>
             </Button>
           </div>
-          {/* ))} */}
         </div>
       </div>
     </aside>

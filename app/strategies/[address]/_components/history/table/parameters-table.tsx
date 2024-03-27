@@ -1,5 +1,6 @@
-import { DataTable } from "@/components/ui/data-table/data-table"
 import { useMemo } from "react"
+
+import { DataTable } from "@/components/ui/data-table/data-table"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useParameters } from "../../parameters/hook/use-parameters"
 import { Parameters, useParametersTable } from "./use-parameters-table"
@@ -9,7 +10,7 @@ export default function HistoryTable() {
     useKandel()
 
   const { currentParameter, publishedBase, publishedQuote } = useParameters()
-  const { creationDate, length, priceRatio } = currentParameter
+  const { creationDate, length } = currentParameter
 
   const data: Parameters[] = useMemo(
     () => [
@@ -19,7 +20,7 @@ export default function HistoryTable() {
         amount: `${publishedBase.toFixed(6)} ${baseToken?.symbol} - ${publishedQuote.toFixed(6)} ${quoteToken?.symbol}`,
       },
     ],
-    [creationDate, length, publishedBase.toFixed(6), priceRatio],
+    [creationDate, length, publishedBase.toFixed(6)],
   )
 
   const table = useParametersTable({
