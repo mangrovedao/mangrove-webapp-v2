@@ -9,6 +9,7 @@ import { useAccount } from "wagmi"
 import { getTokenPriceInUsd } from "@/services/tokens.service"
 import { TickPriceHelper } from "@mangrovedao/mangrove.js"
 import useMangrove from "./mangrove"
+import Big from "big.js"
 
 const useIndexerSdkContext = () => {
   const { mangrove } = useMangrove()
@@ -32,35 +33,33 @@ const useIndexerSdkContext = () => {
               return token.decimals
             },
             createTickHelpers: async (ba, m) => {
-              const base = await mangrove?.tokenFromAddress(m.base.address)
-              const quote = await mangrove?.tokenFromAddress(m.quote.address)
-              if (!(mangrove && base && quote)) {
-                throw new Error("Impossible to determine market tokens")
-              }
+              const outbound = ba === "asks" ? m.base : m.quote
+              const inbound = ba === "asks" ? m.quote : m.base
 
-              const tickPriceHelper = new TickPriceHelper(ba, {
-                base,
-                quote,
-                tickSpacing: m.tickSpacing,
-              })
+              const rawPriceFromTick = (tick: number) => 1.0001 ** tick
 
               return {
                 priceFromTick(tick) {
-                  return tickPriceHelper.priceFromTick(tick, "roundUp")
+                  const rawPrice = rawPriceFromTick(tick)
+                  const decimalsScaling = Big(10).pow(
+                    m.base.decimals - m.quote.decimals,
+                  );
+                  if (ba === "bids") {
+                    return decimalsScaling.div(rawPrice)
+                  }
+                  return decimalsScaling.mul(rawPrice)
                 },
                 inboundFromOutbound(tick, outboundAmount, roundUp) {
-                  return tickPriceHelper.inboundFromOutbound(
-                    tick,
-                    outboundAmount,
-                    roundUp ? "roundUp" : "nearest",
-                  )
+                  const rawOutbound = Big(10).pow(outbound.decimals).mul(outboundAmount)
+                  const price = rawPriceFromTick(tick)
+                  const rawInbound = rawOutbound.mul(price).round(0, roundUp ? 3 : 0)
+                  return rawInbound.div(Big(10).pow(inbound.decimals))
                 },
                 outboundFromInbound(tick, inboundAmount, roundUp) {
-                  return tickPriceHelper.outboundFromInbound(
-                    tick,
-                    inboundAmount,
-                    roundUp ? "roundUp" : "nearest",
-                  )
+                  const rawInbound = Big(10).pow(inbound.decimals).mul(inboundAmount)
+                  const price = rawPriceFromTick(tick)
+                  const rawOutbound = rawInbound.div(price).round(0, roundUp ? 3 : 0)
+                  return rawOutbound.div(Big(10).pow(outbound.decimals))
                 },
               }
             },
@@ -73,7 +72,7 @@ const useIndexerSdkContext = () => {
                     throw new Error(
                       `Impossible to determine token from address: ${tokenAddress}`,
                     )
-                  return getTokenPriceInUsd(token.symbol)
+                  return getTokenPriceInUsd(token.symbol === "USDB" ? "USDC" : token.symbol)
                 },
                 staleTime: 10 * 60 * 1000,
               })
