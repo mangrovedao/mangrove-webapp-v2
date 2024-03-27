@@ -21,7 +21,12 @@ export default function InformationBanner() {
   const isInactive = strategyStatusQuery.data?.status === "inactive"
   const isActive = strategyStatusQuery.data?.status === "active"
 
-  if (!strategyStatusQuery.data || strategyStatusQuery.isLoading || !bannerOpen)
+  if (
+    !strategyStatusQuery.data ||
+    strategyStatusQuery.isLoading ||
+    !bannerOpen ||
+    isActive // FIXME: check if we keep the information when offers are empty
+  )
     return null
 
   return (

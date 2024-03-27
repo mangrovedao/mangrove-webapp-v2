@@ -7,7 +7,7 @@ import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
-import useForm, { MIN_PRICE_POINTS, MIN_STEP_SIZE } from "./use-form"
+import useForm, { MIN_NUMBER_OF_OFFERS, MIN_STEP_SIZE } from "./use-form"
 
 export function Form({ className }: { className?: string }) {
   const {
@@ -26,10 +26,8 @@ export function Form({ className }: { className?: string }) {
     handleQuoteDepositChange,
     kandelRequirementsQuery,
     isChangingFrom,
-    pricePoints,
-    handlePricePointsChange,
-    ratio,
-    handleRatioChange,
+    numberOfOffers,
+    handleNumberOfOffersChange,
     stepSize,
     handleStepSizeChange,
     nativeBalance,
@@ -211,14 +209,14 @@ export function Form({ className }: { className?: string }) {
         <div>
           <EnhancedNumericInput
             label="Number of offers"
-            value={pricePoints}
-            onChange={handlePricePointsChange}
+            value={numberOfOffers}
+            onChange={handleNumberOfOffersChange}
             disabled={fieldsDisabled}
             error={errors.pricePoints}
           />
           <MustBeAtLeastInfo
-            min={MIN_PRICE_POINTS}
-            onMinClicked={handlePricePointsChange}
+            min={MIN_NUMBER_OF_OFFERS}
+            onMinClicked={handleNumberOfOffersChange}
           />
         </div>
 

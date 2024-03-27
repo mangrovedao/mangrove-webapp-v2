@@ -5,7 +5,7 @@ import useMarket from "@/providers/market"
 
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { toast } from "sonner"
-import { NewStratStore } from "../_stores/new-strat.store"
+import { NewStratStore } from "../../../new/_stores/new-strat.store"
 
 type FormValues = Pick<NewStratStore, "baseDeposit" | "quoteDeposit">
 

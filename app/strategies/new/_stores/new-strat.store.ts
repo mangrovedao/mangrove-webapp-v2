@@ -13,8 +13,7 @@ export type ChangingFrom =
   | "chart"
   | "baseDeposit"
   | "quoteDeposit"
-  | "pricePoints"
-  | "ratio"
+  | "numberOfOffers"
   | "stepSize"
   | "bountyDeposit"
   | "sendFrom"
@@ -25,8 +24,7 @@ export type ChangingFrom =
 export type NewStratStore = {
   baseDeposit: string
   quoteDeposit: string
-  pricePoints: string
-  ratio: string
+  numberOfOffers: string
   stepSize: string
   bountyDeposit: string
 
@@ -46,8 +44,7 @@ export type NewStratStore = {
 type NewStratActions = {
   setBaseDeposit: (baseDeposit: string) => void
   setQuoteDeposit: (quoteDeposit: string) => void
-  setPricePoints: (pricePoints: string) => void
-  setRatio: (ratio: string) => void
+  setNumberOfOffers: (numberOfOffers: string) => void
   setStepSize: (stepSize: string) => void
   setBountyDeposit: (bountyDeposit: string) => void
   setSendFrom: (source: string) => void
@@ -68,8 +65,7 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
 ) => ({
   baseDeposit: "",
   quoteDeposit: "",
-  pricePoints: "10",
-  ratio: "",
+  numberOfOffers: "10",
   stepSize: "1",
   bountyDeposit: "",
 
@@ -87,8 +83,7 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
 
   setBaseDeposit: (baseDeposit) => set({ baseDeposit }),
   setQuoteDeposit: (quoteDeposit) => set({ quoteDeposit }),
-  setPricePoints: (pricePoints) => set({ pricePoints }),
-  setRatio: (ratio) => set({ ratio }),
+  setNumberOfOffers: (numberOfOffers) => set({ numberOfOffers }),
   setStepSize: (stepSize) => set({ stepSize }),
   setBountyDeposit: (bountyDeposit) => set({ bountyDeposit }),
 

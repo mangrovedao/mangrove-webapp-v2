@@ -15,11 +15,11 @@ import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allow
 import { useStep } from "@/hooks/use-step"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import { NewStratStore } from "../../../new/_stores/new-strat.store"
 import useKandel from "../../_providers/kandel-strategy"
 import { useApproveKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useEditKandelStrategy } from "../_hooks/use-edit-kandel-strategy"
 import { useRetractOffers } from "../_hooks/use-retract-offers"
-import { NewStratStore } from "../_stores/new-strat.store"
 
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { Steps } from "./form/components/steps"
@@ -231,7 +231,7 @@ export default function EditStrategyDialog({
               distribution,
               bountyDeposit,
               stepSize,
-              pricePoints,
+              numberOfOffers,
             } = strategy
 
             editKandelStrategy(
@@ -242,7 +242,7 @@ export default function EditStrategyDialog({
                 distribution,
                 bountyDeposit,
                 stepSize,
-                pricePoints,
+                numberOfOffers,
               },
               {
                 onSuccess: () => {
@@ -330,8 +330,7 @@ const Summary = ({
   const {
     baseDeposit,
     quoteDeposit,
-    ratio,
-    pricePoints,
+    numberOfOffers,
     stepSize,
     bountyDeposit,
     priceRange,
@@ -417,10 +416,9 @@ const Summary = ({
 
       <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <SummaryLine
-          title={`No. of price points`}
-          value={<Text>{pricePoints}</Text>}
+          title={`No. of offers`}
+          value={<Text>{numberOfOffers}</Text>}
         />
-        <SummaryLine title={`Ratio`} value={<Text>{ratio}</Text>} />
         <SummaryLine title={`Step Size`} value={<Text>{stepSize}</Text>} />
       </div>
 

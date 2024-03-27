@@ -13,7 +13,11 @@ import { NewStratStore } from "../_stores/new-strat.store"
 
 type FormValues = Pick<
   NewStratStore,
-  "baseDeposit" | "quoteDeposit" | "pricePoints" | "stepSize" | "bountyDeposit"
+  | "baseDeposit"
+  | "quoteDeposit"
+  | "numberOfOffers"
+  | "stepSize"
+  | "bountyDeposit"
 > & {
   distribution: GeometricKandelDistribution | undefined
   kandelAddress: string
@@ -35,7 +39,7 @@ export function useLaunchKandelStrategy() {
       distribution,
       bountyDeposit,
       stepSize,
-      pricePoints,
+      numberOfOffers,
       kandelAddress,
       baseLogic,
       quoteLogic,
@@ -67,7 +71,7 @@ export function useLaunchKandelStrategy() {
           // depositQuoteAmount: quoteDeposit,
           funds: bountyDeposit,
           parameters: {
-            pricePoints: Number(pricePoints),
+            pricePoints: Number(numberOfOffers) + 1,
             stepSize: Number(stepSize),
           },
         })
