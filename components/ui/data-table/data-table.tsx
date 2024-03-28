@@ -48,18 +48,33 @@ export function DataTable<TData>({
   return (
     <>
       <Table>
-        <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
+        <TableHeader className="sticky top-[0] bg-background whitespace-nowrap z-40 p-0 text-xs">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const canSort = header.column.getCanSort()
                 return (
-                  <TableHead key={header.id} className="px-2">
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      "px-2",
+                      canSort && "cursor-pointer select-none",
+                    )}
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
+                    {/* {{
+                        asc: <ChevronUpIcon className="w-4 h-4" />,
+                        desc: <ChevronDownIcon className="w-4 h-4" />,
+                      }[header.column.getIsSorted() as string] ??
+                        (canSort ? (
+                          <ChevronsUpDown className="w-3 h-3" />
+                        ) : null)} */}
                   </TableHead>
                 )
               })}

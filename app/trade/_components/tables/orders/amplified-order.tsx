@@ -25,6 +25,7 @@ export function AmplifiedOrders() {
 
   const amplifiedOrdersQuery = useAmplifiedOrders({
     filters: {
+      first: pageSize,
       skip: (page - 1) * pageSize,
     },
   })

@@ -28,6 +28,7 @@ export function Strategies({ type }: Props) {
   })
   const strategiesQuery = useStrategies({
     filters: {
+      first: pageSize,
       skip: (page - 1) * pageSize,
     },
   })

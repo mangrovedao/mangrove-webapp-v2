@@ -7,10 +7,15 @@ import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-net
 import { RootProvider } from "@/providers/root"
 
 import "./globals.css"
+import { Metadata } from "next"
 
 const toastClasses =
   "!border !border-dark-green !text-sm !font-axiforma !text-white !bg-gray-scale-700 !font-normal"
 const titleClasses = "!font-medium"
+
+export const metadata: Metadata = {
+  title: "Mangrove DEX",
+}
 
 export default function RootLayout({
   children,

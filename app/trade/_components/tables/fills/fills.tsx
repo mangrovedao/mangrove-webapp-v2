@@ -17,6 +17,7 @@ export function Fills() {
   })
   const fillsQuery = useFills({
     filters: {
+      first: pageSize,
       skip: (page - 1) * pageSize,
     },
   })
