@@ -27,7 +27,7 @@ export default function CurrentBoost({
 }: Props) {
   const { nextIndex, currentIndex } = getLevels(volume)
   const level = currentIndex
-  console.log("nextIndex", nextIndex, currentIndex)
+  // console.log("nextIndex", nextIndex, currentIndex)
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
