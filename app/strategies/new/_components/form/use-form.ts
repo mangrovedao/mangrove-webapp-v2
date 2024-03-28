@@ -228,6 +228,11 @@ export default function useForm() {
         "Bounty deposit cannot be greater than wallet balance"
     } else if (requiredBounty?.gt(0) && Number(bountyDeposit) === 0) {
       newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
+    } else if (
+      requiredBounty?.gt(0) &&
+      Number(requiredBounty) > Number(bountyDeposit)
+    ) {
+      newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
     } else {
       delete newErrors.bountyDeposit
     }
