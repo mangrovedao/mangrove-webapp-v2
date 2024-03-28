@@ -8,7 +8,7 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import Big from "big.js"
 import { Ban, Check } from "lucide-react"
-import { Fill } from "../tables/history/schema"
+import { Fill } from "@/app/trade/_components/tables/fills/schema"
 
 type SheetLineProps = {
   title: string
