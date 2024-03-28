@@ -14,7 +14,7 @@ export function useTokenBalance(token?: Token) {
     formattedWithSymbol:
       data &&
       `${Number(data?.formatted).toFixed(
-        token?.displayedDecimals ?? 4,
+        token?.displayedDecimals ?? 6,
       )} ${data?.symbol}`,
     ...rest,
   }

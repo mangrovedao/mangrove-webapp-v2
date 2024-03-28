@@ -57,6 +57,14 @@ export function getFormattedTimeToLive(
 }
 
 export const sourceIcons: { [key: string]: JSX.Element } = {
+  pacFinance: (
+    <img
+      src="/assets/liquiditySources/pac.svg"
+      alt="ZeroLend"
+      width="18"
+      height="24"
+    />
+  ),
   zeroLend: (
     <img
       src="/assets/liquiditySources/zerolend.webp"

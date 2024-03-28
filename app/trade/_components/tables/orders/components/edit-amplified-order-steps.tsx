@@ -95,7 +95,7 @@ export default function EditAmplifiedOrderSteps({
   const oldAmount = `${Number(
     formatUnits(
       BigInt(order.offers.find((offer) => offer.gives)?.gives || "0"),
-      form.sendToken?.decimals ?? 4,
+      form.sendToken?.decimals ?? 6,
     ),
   ).toFixed(form.sendToken?.displayedDecimals)}`
 

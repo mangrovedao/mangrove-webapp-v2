@@ -62,7 +62,7 @@ export const useParameters = () => {
       asks,
       bids,
     })
-    .toFixed(nativeBalance?.decimals ?? 4)
+    .toFixed(nativeBalance?.decimals ?? 6)
 
   const publishedBase = getPublished(mergedOffers as MergedOffers, "asks")
   const publishedQuote = getPublished(mergedOffers as MergedOffers, "bids")
@@ -129,6 +129,7 @@ export const useParameters = () => {
     currentParameter: {
       ...currentParameter,
       lockedBounty,
+      nativeSymbol: nativeBalance?.symbol,
       maxPrice,
       minPrice,
       creationDate,

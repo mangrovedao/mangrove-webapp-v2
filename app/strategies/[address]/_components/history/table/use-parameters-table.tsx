@@ -18,6 +18,8 @@ export type Parameters = {
   date: Date | undefined
   pricePoints: string | null | undefined
   amount: string | undefined
+  stepSize: string | null | undefined
+  lockedBounty: string | undefined
 }
 
 type Params = {
@@ -49,12 +51,36 @@ export function useParametersTable({ data }: Params) {
         },
       }),
 
+      columnHelper.display({
+        id: "stepSize",
+        header: () => <div className="text-right">Step size</div>,
+        cell: ({ row }) => {
+          const { stepSize } = row.original
+          return (
+            <div className="w-full h-full flex justify-end">{stepSize}</div>
+          )
+        },
+      }),
+
       columnHelper.accessor("amount", {
         id: "amount",
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount } = row.original
           return <div className="w-full h-full flex justify-end">{amount}</div>
+        },
+      }),
+
+      columnHelper.display({
+        id: "lockedBounty",
+        header: () => <div className="text-right">Bounty</div>,
+        cell: ({ row }) => {
+          const { lockedBounty } = row.original
+          return (
+            <div className="w-full h-full flex justify-end">
+              {Number(lockedBounty).toFixed(6)}
+            </div>
+          )
         },
       }),
     ],

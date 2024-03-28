@@ -12,7 +12,7 @@ import HistoryTable from "./table/history-table"
 import ParametersTable from "./table/parameters-table"
 
 export enum ManageTabs {
-  DEPOSIT_WITHDRAW = "Deposit / Withdraw",
+  DEPOSIT_WITHDRAW = "Published / Unpublished",
   PARAMETERS = "parameters",
 }
 
