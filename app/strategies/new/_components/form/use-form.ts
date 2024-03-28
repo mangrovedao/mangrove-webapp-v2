@@ -177,7 +177,10 @@ export default function useForm() {
     if (Number(baseDeposit) > Number(baseBalance.formatted) && baseDeposit) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
-    } else if (requiredBase?.gt(0) && Number(baseDeposit) === 0) {
+    } else if (
+      requiredBase?.gt(0) &&
+      Number(baseDeposit) < Number(requiredBase)
+    ) {
       newErrors.baseDeposit = "Base deposit must be greater than 0"
     } else {
       delete newErrors.baseDeposit
@@ -213,10 +216,7 @@ export default function useForm() {
       delete newErrors.stepSize
     }
 
-    if (
-      Number(bountyDeposit) > Number(nativeBalance?.formatted) &&
-      bountyDeposit
-    ) {
+    if (Number(bountyDeposit) > Number(nativeBalance?.value) && bountyDeposit) {
       newErrors.bountyDeposit =
         "Bounty deposit cannot be greater than wallet balance"
     } else if (requiredBounty?.gt(0) && Number(bountyDeposit) === 0) {

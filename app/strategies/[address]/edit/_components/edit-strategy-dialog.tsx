@@ -91,7 +91,7 @@ export default function EditStrategyDialog({
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
     !baseTokenApproved ? `Approve ${baseToken?.symbol}` : "",
     !quoteTokenApproved ? `Approve ${quoteToken?.symbol}` : "",
-    "Edit",
+    "Launch strategy",
   ].filter(Boolean)
 
   const [currentStep, helpers] = useStep(steps.length)
@@ -193,7 +193,7 @@ export default function EditStrategyDialog({
             })
           }}
         >
-          Retract
+          Reset
         </Button>
       ),
     },
@@ -244,7 +244,7 @@ export default function EditStrategyDialog({
             )
           }}
         >
-          Proceed
+          Launch strategy
         </Button>
       ),
     },
