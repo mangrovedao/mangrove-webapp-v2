@@ -59,7 +59,7 @@ const LINKS = [
   {
     name: "Strategies",
     href: "/strategies",
-    disabled: false,
+    disabled: true,
     message: "Cooking...",
   },
   {
