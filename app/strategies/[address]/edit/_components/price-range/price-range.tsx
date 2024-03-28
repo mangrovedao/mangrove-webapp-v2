@@ -13,7 +13,6 @@ import {
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
 import { Address } from "viem"
-import { AverageReturn } from "../../../../(shared)/_components/average-return"
 import {
   ChangingFrom,
   useNewStratStore,
@@ -226,7 +225,7 @@ export const PriceRange = withClientOnly(function ({
     <div className={className}>
       <div className="border-b">
         <div className="flex justify-between items-center px-6 pb-8">
-          <AverageReturn />
+          {/* <AverageReturn /> */}
           <RiskAppetiteBadge value={riskAppetite} />
           <LiquiditySource />
         </div>
