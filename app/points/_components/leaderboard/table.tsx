@@ -24,6 +24,7 @@ export function Leaderboard() {
     if (leaderboardQuery.isLoading) return []
     return leaderboardQuery.data?.leaderboard ?? []
   }, [leaderboardQuery.dataUpdatedAt])
+
   const userData = React.useMemo(() => {
     if (userPointsQuery.isLoading) return []
     return [userPointsQuery.data] ?? []

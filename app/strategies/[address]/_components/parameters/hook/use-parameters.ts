@@ -18,14 +18,8 @@ export const useParameters = () => {
     address,
   })
 
-  const {
-    book,
-    market,
-    asksBalance,
-    bidsBalance,
-    offerStatuses,
-    stratInstance,
-  } = strategyStatusQuery.data ?? {}
+  const { book, market, offerStatuses, stratInstance } =
+    strategyStatusQuery.data ?? {}
 
   const {
     depositedBase,
@@ -106,17 +100,17 @@ export const useParameters = () => {
     const fetchUnpublishedBalancesAndBounty = async () => {
       const [base, quote] = await getUnpublishedBalances()
 
-      if (!base || !quote || !asksBalance || !bidsBalance) return
+      if (!base || !quote) return
 
-      const { unallocatedBase, unallocatedQuote } = getUnallocatedInventory(
-        { base: asksBalance, quote: bidsBalance },
-        { base: publishedBase, quote: publishedQuote },
-      )
+      // const { unallocatedBase, unallocatedQuote } = getUnallocatedInventory(
+      //   { base: asksBalance, quote: bidsBalance },
+      //   { base: publishedBase, quote: publishedQuote },
+      // )
 
       setUnpublishedBase(base.toFixed(market?.base?.decimals))
       setUnPublishedQuote(quote.toFixed(market?.base?.decimals))
-      setUnallocatedBase(unallocatedBase.toFixed(market?.base?.decimals))
-      setUnallocatedQuote(unallocatedQuote.toFixed(market?.quote?.decimals))
+      // setUnallocatedBase(unallocatedBase.toFixed(market?.base?.decimals))
+      // setUnallocatedQuote(unallocatedQuote.toFixed(market?.quote?.decimals))
     }
 
     fetchUnpublishedBalancesAndBounty()

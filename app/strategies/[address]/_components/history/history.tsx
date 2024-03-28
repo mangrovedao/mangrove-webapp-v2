@@ -8,17 +8,16 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { renderElement } from "@/utils/render"
-import HistoryTable from "./table/history-table"
 import ParametersTable from "./table/parameters-table"
 
 export enum ManageTabs {
-  DEPOSIT_WITHDRAW = "Published / Unpublished",
   PARAMETERS = "parameters",
+  // DEPOSIT_WITHDRAW = "Published / Unpublished",
 }
 
 const TABS_CONTENT = {
-  [ManageTabs.DEPOSIT_WITHDRAW]: <HistoryTable />,
   [ManageTabs.PARAMETERS]: <ParametersTable />,
+  // [ManageTabs.DEPOSIT_WITHDRAW]: <HistoryTable />,
 }
 
 function Tabs(props: React.ComponentPropsWithoutRef<typeof CustomTabs>) {

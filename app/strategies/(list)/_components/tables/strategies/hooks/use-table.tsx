@@ -130,7 +130,7 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         },
       }),
       columnHelper.display({
-        header: "Return (%)",
+        header: "PnL (%)",
         cell: ({ row }) => {
           const { return: ret } = row.original
           return (

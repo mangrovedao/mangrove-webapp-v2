@@ -77,9 +77,7 @@ export function useParametersTable({ data }: Params) {
         cell: ({ row }) => {
           const { lockedBounty } = row.original
           return (
-            <div className="w-full h-full flex justify-end">
-              {Number(lockedBounty).toFixed(6)}
-            </div>
+            <div className="w-full h-full flex justify-end">{lockedBounty}</div>
           )
         },
       }),

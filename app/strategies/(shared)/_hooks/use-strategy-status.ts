@@ -45,16 +45,13 @@ export default function useStrategyStatus({
           type: "smart",
         })
 
-        const asksBalance = await stratInstance.getBalance("asks") // base
-        const bidsBalance = await stratInstance.getBalance("bids") // quote
-        const hasBalance = asksBalance.gt(0) && bidsBalance.gt(0)
         const anyLiveOffers = offers.some((x) => x?.live === true)
         let isOutOfRange = false
         let unexpectedDeadOffers = false
         let offerStatuses: Statuses | null = null
         let status: Status = "unknown"
         if (!anyLiveOffers) {
-          status = hasBalance ? "inactive" : "closed"
+          status = "closed"
         } else {
           const bids = offers.filter((x) => x.offerType === "bids")
           const asks = offers.filter((x) => x.offerType === "asks")
@@ -97,8 +94,6 @@ export default function useStrategyStatus({
 
         return {
           status,
-          asksBalance,
-          bidsBalance,
           midPrice,
           market,
           book,
