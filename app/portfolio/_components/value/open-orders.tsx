@@ -13,6 +13,7 @@ export default function OpenOrders() {
   })
   const { data, isLoading, error } = useOrders({
     filters: {
+      first: pageSize,
       skip: (page - 1) * pageSize,
     },
   })

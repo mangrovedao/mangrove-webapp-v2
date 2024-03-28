@@ -26,6 +26,7 @@ export default function Page() {
   })
   const fillsQuery = useFills({
     filters: {
+      first: pageSize,
       skip: (page - 1) * pageSize,
     },
   })
@@ -38,6 +39,7 @@ export default function Page() {
   const { data, error, isLoading } = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,
+      first: pageSize,
     },
   })
 

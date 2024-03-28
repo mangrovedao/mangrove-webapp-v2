@@ -15,6 +15,7 @@ export default function Page() {
   const { data, error, isLoading } = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,
+      first: pageSize,
     },
   })
   const { push } = useRouter()

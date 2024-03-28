@@ -11,8 +11,6 @@ import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
 
 export function Orders() {
-  const { marketsInfoQuery } = useMangrove()
-
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
@@ -23,6 +21,7 @@ export function Orders() {
   })
   const ordersQuery = useOrders({
     filters: {
+      first: pageSize,
       skip: (page - 1) * pageSize,
     },
   })

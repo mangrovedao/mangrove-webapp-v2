@@ -24,6 +24,7 @@ export default function Page() {
   })
   const ordersQuery = useOrders({
     filters: {
+      first: pageSize,
       skip: (page - 1) * pageSize,
     },
   })

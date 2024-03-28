@@ -14,6 +14,7 @@ export default function MyStrategies() {
   const { data, isLoading, error } = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,
+      first: pageSize,
     },
   })
 
