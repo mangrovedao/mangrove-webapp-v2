@@ -20,7 +20,7 @@ export default function HistoryTable() {
         pricePoints: length,
         stepSize,
         amount: `${publishedBase.toFixed(6)} ${baseToken?.symbol} - ${publishedQuote.toFixed(6)} ${quoteToken?.symbol}`,
-        lockedBounty: `${Number(lockedBounty).toFixed(6)} ${nativeSymbol}`,
+        lockedBounty: `${Number(lockedBounty || "0").toFixed(6)} ${nativeSymbol}`,
       },
     ],
     [creationDate, length, publishedBase.toFixed(6)],
