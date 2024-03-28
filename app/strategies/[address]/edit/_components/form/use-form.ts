@@ -75,7 +75,7 @@ export default function useForm() {
       asks,
       bids,
     })
-    .toFixed(nativeBalance?.decimals ?? 4)
+    .toFixed(nativeBalance?.decimals ?? 6)
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
@@ -240,11 +240,13 @@ export default function useForm() {
     if (Number(baseDeposit) > Number(baseBalance.formatted) && baseDeposit) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
+    } else if (requiredBase?.gt(0) && Number(baseDeposit) === 0) {
+      newErrors.baseDeposit = "Base deposit must be greater than 0"
     } else if (
       requiredBase?.gt(0) &&
-      Number(baseDeposit) < Number(requiredBase)
+      Number(requiredBase) > Number(baseDeposit)
     ) {
-      newErrors.baseDeposit = "Base deposit must be greater than 0"
+      newErrors.baseDeposit = "Base deposit must be uptated"
     } else {
       delete newErrors.baseDeposit
     }
@@ -255,6 +257,11 @@ export default function useForm() {
         "Quote deposit cannot be greater than wallet balance"
     } else if (requiredQuote?.gt(0) && Number(quoteDeposit) === 0) {
       newErrors.quoteDeposit = "Quote deposit must be greater than 0"
+    } else if (
+      requiredQuote?.gt(0) &&
+      Number(requiredQuote) > Number(quoteDeposit)
+    ) {
+      newErrors.quoteDeposit = "Quote deposit must updated"
     } else {
       delete newErrors.quoteDeposit
     }
