@@ -85,7 +85,7 @@ export function DepthChart() {
       <DataProvider
         theme={theme}
         xScale={{
-          type: "linear",
+          type: "log",
           clamp: false,
           nice: false,
           zero: false,

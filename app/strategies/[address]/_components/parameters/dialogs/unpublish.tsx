@@ -17,6 +17,7 @@ import { useStep } from "@/hooks/use-step"
 import { cn } from "@/utils"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
+import { useParameters } from "../hook/use-parameters"
 import { useUnPublish } from "../mutations/use-unpublish"
 import { SuccessDialog } from "./succes-dialog"
 
@@ -40,40 +41,22 @@ export function UnPublish({ open, onClose }: Props) {
     quote: market?.quote.symbol,
     offers: strategyQuery.data?.offers,
   })
-  const getUnpublishedBalances = async () => {
-    const asks =
-      await strategyStatusQuery.data?.stratInstance.getUnpublished("asks")
-    const bids =
-      await strategyStatusQuery.data?.stratInstance.getUnpublished("bids")
 
-    return { asks, bids }
-  }
-
-  let steps = ["Set", "UnPublish"]
+  let steps = ["Set", "Unpublish"]
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
 
   const [baseAmount, setBaseAmount] = React.useState("")
   const [quoteAmount, setQuoteAmount] = React.useState("")
 
-  const [upublishedBase, setUnpublishedBase] = React.useState("")
-  const [upublishedQuote, setUnpublishedQuote] = React.useState("")
+  const { publishedBase, publishedQuote } = useParameters()
 
-  React.useEffect(() => {
-    const fetchUnpublishedBalances = async () => {
-      try {
-        const { asks, bids } = await getUnpublishedBalances()
-        if (!asks || !bids) return
-
-        setUnpublishedBase(asks.toFixed(market?.base.decimals))
-        setUnpublishedQuote(bids.toFixed(market?.quote.decimals))
-      } catch (error) {
-        console.error("Error fetching unpublished balances:", error)
-      }
-    }
-
-    fetchUnpublishedBalances()
-  }, [strategyStatusQuery.data])
+  const publishBaseFormatted = publishedBase.toFixed(
+    market?.base.displayedDecimals,
+  )
+  const publishQuoteFormatted = publishedQuote.toFixed(
+    market?.base.displayedDecimals,
+  )
 
   const publish = useUnPublish({
     stratInstance: strategy?.stratInstance,
@@ -87,38 +70,36 @@ export function UnPublish({ open, onClose }: Props) {
         <div className="grid gap-4">
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setBaseAmount(upublishedBase),
-              text: "MAX",
+              onClick: () => setBaseAmount(publishBaseFormatted),
             }}
             value={baseAmount}
             label={`${market?.base.symbol} amount`}
-            customBalance={upublishedBase}
+            customBalance={publishBaseFormatted}
             showBalance
             balanceLabel="Unpublished inventory"
             token={market?.base}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
-              Number(baseAmount) > Number(upublishedBase)
-                ? "Invalid amount"
+              Number(baseAmount) > Number(publishedBase)
+                ? "Insufficient balance"
                 : ""
             }
           />
 
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setQuoteAmount(upublishedQuote),
-              text: "MAX",
+              onClick: () => setQuoteAmount(publishQuoteFormatted),
             }}
             value={quoteAmount}
             label={`${market?.quote.symbol} amount`}
-            customBalance={upublishedQuote}
+            customBalance={publishQuoteFormatted}
             showBalance
             balanceLabel="Unpublished inventory"
             token={market?.quote}
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
-              Number(quoteAmount) > Number(upublishedQuote)
-                ? "Invalid amount"
+              Number(quoteAmount) > Number(publishQuoteFormatted)
+                ? "Insufficient balance"
                 : ""
             }
           />
@@ -130,11 +111,12 @@ export function UnPublish({ open, onClose }: Props) {
           disabled={
             !baseAmount ||
             !quoteAmount ||
-            Number(baseAmount) > Number(upublishedBase) ||
-            Number(quoteAmount) > Number(upublishedQuote)
+            Number(baseAmount) > Number(publishedBase) ||
+            Number(quoteAmount) > Number(publishedQuote)
           }
           onClick={goToNextStep}
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Proceed{" "}
           <div
@@ -179,7 +161,9 @@ export function UnPublish({ open, onClose }: Props) {
                 Funds are evenly distributed across the active strategy.
               </Caption>
               <Link href={KANDEL_DOC_URL} target="_blank">
-                <Caption className="text-primary underline">Learn more</Caption>
+                <Caption className="text-green-caribbean underline">
+                  Learn more
+                </Caption>
               </Link>
             </div>
           </div>
@@ -200,6 +184,7 @@ export function UnPublish({ open, onClose }: Props) {
             })
           }
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           UnPublish
           <div
@@ -227,7 +212,7 @@ export function UnPublish({ open, onClose }: Props) {
   return (
     <>
       <SuccessDialog
-        title={"Funds UnPublished"}
+        title={"Funds Unpublished successfully"}
         open={unpublishCompleted}
         onClose={toggleUnPublishCompleted}
       />
@@ -240,7 +225,7 @@ export function UnPublish({ open, onClose }: Props) {
               variant={"header1"}
               className="space-x-3 flex items-center"
             >
-              UnPublish
+              Unpublish
             </Title>
             <InfoIcon className="h-4 w-4 text-muted-foreground" />
           </div>

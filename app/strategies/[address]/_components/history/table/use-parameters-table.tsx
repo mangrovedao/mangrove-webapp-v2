@@ -8,67 +8,56 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
-import { useAccount } from "wagmi"
 
 import { formatDate } from "@/utils/date"
-import useKandel from "../../../_providers/kandel-strategy"
-import BlockExplorer from "../../block-explorer"
 
 const columnHelper = createColumnHelper<Parameters>()
 const DEFAULT_DATA: Parameters[] = []
 
 export type Parameters = {
-  date: Date
-  spread: string
-  ratio: string
-  pricePoints: string
-  amount: string
-  txHash: string
+  date: Date | undefined
+  pricePoints: string | null | undefined
+  amount: string | undefined
+  stepSize: string | null | undefined
+  lockedBounty: string | undefined
 }
 
 type Params = {
   data?: Parameters[]
 }
 
-export function useParametersTables({ data }: Params) {
-  const { chain } = useAccount()
-  const { baseToken } = useKandel()
-
+export function useParametersTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("date", {
-        header: "date",
+        header: "Date",
         cell: ({ row }) => {
           const { date } = row.original
+          if (!date) return <div>N/A</div>
           return <div>{formatDate(date)}</div>
         },
       }),
 
       columnHelper.display({
-        id: "spread",
-        header: () => <div className="text-right">Spread</div>,
-        cell: ({ row }) => {
-          const { spread } = row.original
-          return <div className="w-full h-full flex justify-end">{spread}</div>
-        },
-      }),
-
-      columnHelper.display({
-        id: "ratio",
-        header: () => <div className="text-right">Ratio</div>,
-        cell: ({ row }) => {
-          const { ratio } = row.original
-          return <div className="w-full h-full flex justify-end">{ratio}</div>
-        },
-      }),
-
-      columnHelper.display({
         id: "pricePoints",
-        header: () => <div className="text-right">No. of Price Points</div>,
+        header: () => <div className="text-right">No. of offers</div>,
         cell: ({ row }) => {
           const { pricePoints } = row.original
           return (
-            <div className="w-full h-full flex justify-end">{pricePoints}</div>
+            <div className="w-full h-full flex justify-end">
+              {Number(pricePoints) - 1}
+            </div>
+          )
+        },
+      }),
+
+      columnHelper.display({
+        id: "stepSize",
+        header: () => <div className="text-right">Step size</div>,
+        cell: ({ row }) => {
+          const { stepSize } = row.original
+          return (
+            <div className="w-full h-full flex justify-end">{stepSize}</div>
           )
         },
       }),
@@ -78,27 +67,17 @@ export function useParametersTables({ data }: Params) {
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount } = row.original
-          return (
-            <div className="w-full h-full flex justify-end">
-              {amount} {baseToken?.symbol}
-            </div>
-          )
+          return <div className="w-full h-full flex justify-end">{amount}</div>
         },
       }),
-      columnHelper.accessor("txHash", {
-        id: "txHash",
-        header: () => <div className="text-right">Transaction Hash</div>,
+
+      columnHelper.display({
+        id: "lockedBounty",
+        header: () => <div className="text-right">Bounty</div>,
         cell: ({ row }) => {
-          const { txHash } = row.original
-          const blockExplorerUrl = chain?.blockExplorers?.default.url
+          const { lockedBounty } = row.original
           return (
-            <div className="w-full h-full flex justify-end">
-              <BlockExplorer
-                address={txHash}
-                blockExplorerUrl={blockExplorerUrl}
-                description={false}
-              />
-            </div>
+            <div className="w-full h-full flex justify-end">{lockedBounty}</div>
           )
         },
       }),

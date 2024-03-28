@@ -1,13 +1,11 @@
 import type { Token } from "@mangrovedao/mangrove.js"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
 import Big from "big.js"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
+import { DefaultTradeLogics } from "../../types"
 import { TimeInForce } from "../enums"
 import type { AssetWithInfos, Form } from "../types"
 
@@ -15,7 +13,7 @@ type Props = {
   form: Omit<Form, "assets">
   tokenToAmplify?: Token
   sendAmount: string
-  source: SimpleLogic | SimpleAaveLogic | OrbitLogic
+  source: DefaultTradeLogics
   assetsWithToken?: AssetWithInfos[]
 }
 

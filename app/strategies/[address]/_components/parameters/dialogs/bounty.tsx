@@ -11,12 +11,6 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { useStep } from "@/hooks/use-step"
 import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
@@ -165,26 +159,17 @@ export function Bounty({ open, onClose }: Props) {
               className="space-x-3 flex items-center "
             >
               Bounty
+              <TooltipInfo>
+                <Text className="text-wrap">
+                  Native token used to compensate the taker in case your order
+                  fails.
+                </Text>
+                <Text>
+                  Order might fail in case the liquidity is not on the origin
+                  source anymore.
+                </Text>
+              </TooltipInfo>
             </Title>
-
-            <TooltipProvider>
-              <Tooltip delayDuration={200} defaultOpen={false}>
-                <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                  <TooltipInfo />
-                </TooltipTrigger>
-
-                <TooltipContent>
-                  <Text className="text-wrap">
-                    Native token used to compensate the taker in case your order
-                    fails.
-                  </Text>
-                  <Text>
-                    Order might fail in case the liquidity is not on the origin
-                    source anymore.
-                  </Text>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           </div>
         </Dialog.Title>
         <Steps steps={steps} currentStep={currentStep} />

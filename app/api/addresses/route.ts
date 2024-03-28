@@ -6,7 +6,7 @@ export function GET() {
   if (mangroveConfig) {
     configuration.updateConfiguration(mangroveConfig)
   }
-  const allAddresses = configuration.addresses.getAllAddressesForAllNetworks();
+  const allAddresses = configuration.addresses.getAllAddressesForAllNetworks()
 
   return Response.json(allAddresses)
 }

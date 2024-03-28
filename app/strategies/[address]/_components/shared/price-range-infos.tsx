@@ -1,7 +1,7 @@
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
-import { AverageReturn } from "../../../(shared)/_components/average-return"
 import useKandel from "../../_providers/kandel-strategy"
 import { MergedOffers } from "../../_utils/inventory"
+import { useParameters } from "../parameters/hook/use-parameters"
 import { LegendItem } from "./legend-item"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
@@ -14,20 +14,20 @@ export default function PriceRangeInfos() {
     quoteToken,
     mergedOffers,
   } = useKandel()
-  const { bidsBalance, asksBalance } = strategyStatusQuery.data ?? {}
 
+  const { publishedBase, publishedQuote } = useParameters()
   const bids = strategyStatusQuery.data?.book?.bids ?? []
   const asks = strategyStatusQuery.data?.book?.asks ?? []
 
-  const avgReturnPercentage = strategyQuery.data?.return as number | undefined
+  // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
   const priceRange = !strategyQuery.isLoading
     ? ([Number(strategyQuery.data?.min), Number(strategyQuery.data?.max)] as [
         number,
         number,
       ])
     : undefined
-  const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+  const baseValue = `${publishedBase?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
   const chartIsLoading =
     (strategyStatusQuery.isLoading && strategyQuery.isLoading) ||
@@ -37,7 +37,7 @@ export default function PriceRangeInfos() {
     <div>
       <div className="relative">
         <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 justify-between items-center px-6 pb-8 my-3">
-          <AverageReturn percentage={avgReturnPercentage} />
+          {/* <AverageReturn percentage={avgReturnPercentage} /> */}
           <UnrealizedPnl />
           <TotalInventory
             value={baseValue}

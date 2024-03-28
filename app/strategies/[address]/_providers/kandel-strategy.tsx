@@ -36,9 +36,11 @@ const useKandelStrategyContext = () => {
     const sdkOffers = strategyStatusQuery.data?.offerStatuses
     const market = strategyStatusQuery.data?.market
     if (!(sdkOffers && indexerOffers && market)) return
-    //@ts-expect-error TODO: it's an error type from the indexer SDK
+    // @ts-expect-error TODO: it's an error type from the indexer SDK
     return getMergedOffers(sdkOffers, indexerOffers, market)
   }, [
+    strategyQuery.dataUpdatedAt,
+    strategyStatusQuery.dataUpdatedAt,
     strategyQuery.data?.offers,
     strategyStatusQuery.data?.offerStatuses,
     strategyStatusQuery.data?.market,

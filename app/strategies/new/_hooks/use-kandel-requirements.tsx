@@ -12,8 +12,9 @@ export type Params = {
   stepSize: number | string
   minPrice: BigSource
   maxPrice: BigSource
-  pricePoints: number | string
-  ratio?: number | string
+  availableBase?: BigSource
+  availableQuote?: BigSource
+  numberOfOffers: number | string
   isChangingFrom?: ChangingFrom
 }
 
@@ -21,10 +22,10 @@ export function useKandelRequirements({
   onAave = false,
   minPrice,
   maxPrice,
+  availableBase,
+  availableQuote,
   stepSize,
-  pricePoints,
-  ratio,
-  isChangingFrom,
+  numberOfOffers,
 }: Params) {
   const { market, midPrice } = useMarket()
   const { kandelStrategies, generator, config } = useKandel()
@@ -35,11 +36,10 @@ export function useKandelRequirements({
       maxPrice,
       midPrice,
       stepSize,
-      pricePoints,
+      numberOfOffers,
       onAave,
       market?.base.id,
       market?.quote?.id,
-      ratio,
     ],
     queryFn: async () => {
       if (
@@ -60,14 +60,14 @@ export function useKandelRequirements({
           await kandelStrategies.seeder.getMinimumVolume({
             market,
             offerType: "asks",
-            onAave,
+            type: "smart",
           })
 
         const minimumQuotePerOffer =
           await kandelStrategies.seeder.getMinimumVolume({
             market,
             offerType: "bids",
-            onAave,
+            type: "smart",
           })
 
         const param: Parameters<
@@ -81,9 +81,7 @@ export function useKandelRequirements({
             maxPrice,
             stepSize: Number(stepSize) ?? config.stepSize,
             midPrice,
-            pricePoints:
-              isChangingFrom !== "ratio" ? Number(pricePoints) : undefined,
-            priceRatio: isChangingFrom === "ratio" ? Number(ratio) : undefined,
+            pricePoints: Number(numberOfOffers) + 1, // number of offers = price points - 1
           },
         }
 
@@ -95,14 +93,11 @@ export function useKandelRequirements({
         const { requiredBase, requiredQuote } =
           minimumDistribution.getOfferedVolumeForDistribution()
 
-        const availableBase = requiredBase
-        const availableQuote = requiredQuote
-
         const distribution =
           await generator.recalculateDistributionFromAvailable({
             distribution: minimumDistribution,
-            availableBase,
-            availableQuote,
+            availableBase: availableBase ? availableBase : requiredBase,
+            availableQuote: availableQuote ? availableQuote : requiredQuote,
           })
 
         const offers = distribution.getOffersWithPrices()
@@ -115,7 +110,7 @@ export function useKandelRequirements({
         const requiredBounty =
           await kandelStrategies.seeder.getRequiredProvision(
             {
-              onAave,
+              type: "smart",
               market,
               liquiditySharing: false,
             },
@@ -128,11 +123,11 @@ export function useKandelRequirements({
           requiredBounty,
           distribution,
           offersWithPrices,
-          priceRatio: minimumDistribution.getPriceRatio(),
           pricePoints: minimumDistribution.pricePoints,
         }
       } catch (e) {
         const message = getErrorMessage(e)
+        console.error("Error: ", message)
         if (message.includes("revert")) {
           throw new Error(`Error: one of the parameters is invalid`)
         }

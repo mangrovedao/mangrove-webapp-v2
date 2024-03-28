@@ -18,14 +18,8 @@ export const useParameters = () => {
     address,
   })
 
-  const {
-    book,
-    market,
-    asksBalance,
-    bidsBalance,
-    offerStatuses,
-    stratInstance,
-  } = strategyStatusQuery.data ?? {}
+  const { book, market, offerStatuses, stratInstance } =
+    strategyStatusQuery.data ?? {}
 
   const {
     depositedBase,
@@ -37,7 +31,7 @@ export const useParameters = () => {
     depositsAndWithdraws,
   } = strategyQuery.data ?? {}
 
-  const { maxPrice, minPrice, priceRatio } = offerStatuses ?? {}
+  const { maxPrice, minPrice } = offerStatuses ?? {}
 
   const asks =
     offers
@@ -62,7 +56,7 @@ export const useParameters = () => {
       asks,
       bids,
     })
-    .toFixed(nativeBalance?.decimals ?? 4)
+    .toFixed(nativeBalance?.decimals ?? 6)
 
   const publishedBase = getPublished(mergedOffers as MergedOffers, "asks")
   const publishedQuote = getPublished(mergedOffers as MergedOffers, "bids")
@@ -88,7 +82,7 @@ export const useParameters = () => {
       (acc: Big, offer) =>
         acc.add(
           offer.live && offer.offerType === offerType
-            ? Big(offer[key])
+            ? Big(offer.gives)
             : Big(0),
         ),
       Big(0),
@@ -98,7 +92,7 @@ export const useParameters = () => {
   const getUnpublishedBalances = async () => {
     const asks = await stratInstance?.getUnpublished("asks")
     const bids = await stratInstance?.getUnpublished("bids")
-
+    // TODO: fixe the negative values
     return [asks, bids]
   }
 
@@ -106,17 +100,17 @@ export const useParameters = () => {
     const fetchUnpublishedBalancesAndBounty = async () => {
       const [base, quote] = await getUnpublishedBalances()
 
-      if (!base || !quote || !asksBalance || !bidsBalance) return
+      if (!base || !quote) return
 
-      const { unallocatedBase, unallocatedQuote } = getUnallocatedInventory(
-        { base: asksBalance, quote: bidsBalance },
-        { base: publishedBase, quote: publishedQuote },
-      )
+      // const { unallocatedBase, unallocatedQuote } = getUnallocatedInventory(
+      //   { base: asksBalance, quote: bidsBalance },
+      //   { base: publishedBase, quote: publishedQuote },
+      // )
 
       setUnpublishedBase(base.toFixed(market?.base?.decimals))
       setUnPublishedQuote(quote.toFixed(market?.base?.decimals))
-      setUnallocatedBase(unallocatedBase.toFixed(market?.base?.decimals))
-      setUnallocatedQuote(unallocatedQuote.toFixed(market?.quote?.decimals))
+      // setUnallocatedBase(unallocatedBase.toFixed(market?.base?.decimals))
+      // setUnallocatedQuote(unallocatedQuote.toFixed(market?.quote?.decimals))
     }
 
     fetchUnpublishedBalancesAndBounty()
@@ -129,12 +123,14 @@ export const useParameters = () => {
     currentParameter: {
       ...currentParameter,
       lockedBounty,
+      nativeSymbol: nativeBalance?.symbol,
       maxPrice,
       minPrice,
-      priceRatio,
       creationDate,
       strategyAddress,
     },
+    publishedBase,
+    publishedQuote,
     unallocatedBase,
     unallocatedQuote,
     unPublishedBase,

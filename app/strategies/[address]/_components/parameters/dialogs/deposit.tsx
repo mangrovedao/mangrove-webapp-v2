@@ -61,29 +61,33 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
         <div className="grid gap-4">
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setBaseAmount(baseBalance?.toString() || ""),
-              text: "MAX",
+              onClick: () => setBaseAmount(baseBalance as string),
             }}
+            value={baseAmount}
             label={`${market?.base.symbol} amount`}
             showBalance
             token={market?.base}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
-              Number(baseAmount) > Number(baseBalance) ? "Invalid amount" : ""
+              Number(baseAmount) > Number(baseBalance)
+                ? "Insufficient balance"
+                : ""
             }
           />
 
           <EnhancedNumericInput
+            value={quoteAmount}
             balanceAction={{
-              onClick: () => setQuoteAmount(quoteBalance?.toString() || ""),
-              text: "MAX",
+              onClick: () => setQuoteAmount(quoteBalance as string),
             }}
             label={`${market?.quote.symbol} amount`}
             showBalance
             token={market?.quote}
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
-              Number(quoteAmount) > Number(quoteBalance) ? "Invalid amount" : ""
+              Number(quoteAmount) > Number(quoteBalance)
+                ? "Insufficient balance"
+                : ""
             }
           />
         </div>
@@ -98,6 +102,7 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
           }
           onClick={goToNextStep}
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Proceed{" "}
           <div
@@ -148,6 +153,7 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
             })
           }
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Deposit
           <div
@@ -172,6 +178,13 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
       }
     })
 
+  const closeDialog = () => {
+    setBaseAmount("")
+    setQuoteAmount("")
+    reset()
+    onClose()
+  }
+
   return (
     <>
       <SuccessDialog
@@ -192,7 +205,7 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
         onClose={toggleDepositCompleted}
       />
 
-      <Dialog open={!!open} onClose={onClose} showCloseButton={false}>
+      <Dialog open={!!open} onClose={closeDialog} showCloseButton={false}>
         <Dialog.Title className="text-xl text-left" close>
           <Title
             as={"div"}

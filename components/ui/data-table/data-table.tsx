@@ -25,6 +25,7 @@ interface DataTableProps<TData> {
   onRowClick?: (row: TData | null) => void
   renderExtraRow?: (row: Row<TData>) => React.ReactNode
   tableRowClasses?: string
+  skeletonRows?: number
 }
 
 export function DataTable<TData>({
@@ -34,9 +35,10 @@ export function DataTable<TData>({
   pagination,
   isRowHighlighted = () => false,
   onRowHover = () => {},
-  onRowClick = () => {},
+  onRowClick,
   renderExtraRow = () => null,
   tableRowClasses,
+  skeletonRows = 2,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const leafColumns = table
@@ -66,17 +68,17 @@ export function DataTable<TData>({
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <LoadingBody cells={leafColumns.length} rows={2} />
+            <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
           ) : rows?.length ? (
             rows.map((row) => (
               <>
                 <TableRow
-                  key={row.id}
+                  key={`row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
                     "text-gray-scale-300 hover:text-white transition-colors group/row",
                     {
-                      "cursor-pointer": onRowClick,
+                      "cursor-pointer": !!onRowClick,
                       "text-white hover:opacity-80 transition-all":
                         isRowHighlighted?.(row.original),
                     },

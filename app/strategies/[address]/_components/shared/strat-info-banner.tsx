@@ -1,4 +1,5 @@
-import { AverageReturn } from "../../../(shared)/_components/average-return"
+import { useQuery } from "@tanstack/react-query"
+import Big from "big.js"
 import useKandel from "../../_providers/kandel-strategy"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
@@ -6,9 +7,23 @@ import UnrealizedPnl from "./unrealized-pnl"
 export default function StratInfoBanner() {
   const { strategyQuery, strategyStatusQuery, baseToken, quoteToken } =
     useKandel()
-  const { bidsBalance, asksBalance } = strategyStatusQuery.data ?? {}
 
-  const avgReturnPercentage = strategyQuery.data?.return as number | undefined
+  const { asksBalance, bidsBalance } =
+    useQuery({
+      queryKey: ["strategy-balance", baseToken?.address, quoteToken?.address],
+      queryFn: async () => {
+        if (!strategyStatusQuery.data?.stratInstance) return
+        const [asksBalance, bidsBalance] = await Promise.all([
+          strategyStatusQuery.data.stratInstance.getBalance("asks"),
+          strategyStatusQuery.data.stratInstance.getBalance("bids"),
+        ])
+
+        return { asksBalance, bidsBalance }
+      },
+      initialData: { asksBalance: Big(0), bidsBalance: Big(0) },
+    }).data ?? {}
+
+  // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
 
   const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
   const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
@@ -18,7 +33,7 @@ export default function StratInfoBanner() {
     <div>
       <div className="relative">
         <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 justify-between items-center px-6 pb-8 my-3">
-          <AverageReturn percentage={avgReturnPercentage} />
+          {/* <AverageReturn percentage={avgReturnPercentage} /> */}
           <UnrealizedPnl />
           <TotalInventory
             value={baseValue}

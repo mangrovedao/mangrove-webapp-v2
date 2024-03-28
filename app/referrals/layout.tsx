@@ -1,6 +1,12 @@
+import { Metadata } from "next"
 import React from "react"
 
 import { Navbar } from "@/components/navbar"
+
+export const metadata: Metadata = {
+  title: "Referrals | Mangrove DEX",
+  description: "Referrals on Mangrove DEX",
+}
 
 export default function Layout({ children }: React.PropsWithChildren) {
   return (

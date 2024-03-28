@@ -10,14 +10,15 @@ import {
 import React from "react"
 
 import { Rank1Icon, Rank2Icon, Rank3Icon } from "@/svgs"
+import { formatNumber } from "@/utils/numbers"
+import { LeaderboardEntry } from "../../schemas/leaderboard"
 import Address from "./address"
-import type { Leaderboard } from "./schema"
 
-const columnHelper = createColumnHelper<Leaderboard>()
-const DEFAULT_DATA: Leaderboard[] = []
+const columnHelper = createColumnHelper<LeaderboardEntry>()
+const DEFAULT_DATA: LeaderboardEntry[] = []
 
 type Params = {
-  data?: Leaderboard[]
+  data?: LeaderboardEntry[]
 }
 
 export function useTable({ data }: Params) {
@@ -26,9 +27,9 @@ export function useTable({ data }: Params) {
       columnHelper.accessor("rank", {
         header: "Rank",
         cell: (row) => {
-          const rank = row.getValue()
+          const rank = row?.getValue()
           return (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 font-roboto">
               {rank > 0 ? rank : undefined}{" "}
               {rank === 1 ? (
                 <Rank1Icon className="size-7 ml-2" />
@@ -50,16 +51,22 @@ export function useTable({ data }: Params) {
           return <Address address={address} />
         },
       }),
-      columnHelper.display({
+      columnHelper.accessor("boost", {
         header: "Boost",
-        cell: () => <div className={"text-green-caribbean"}>1x</div>,
+        cell: (row) => {
+          const boost = row.getValue()
+          if (boost === 0) return <div className="font-roboto">1x</div>
+          return <div className="font-roboto">{boost}x</div>
+        },
       }),
       columnHelper.accessor("maker_points", {
         header: () => <div className="text-right">LP points</div>,
         cell: (row) => {
           const makerPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">{makerPoints}</div>
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(makerPoints)}
+            </div>
           )
         },
       }),
@@ -68,8 +75,19 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const tradingPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">
-              {tradingPoints}
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(tradingPoints)}
+            </div>
+          )
+        },
+      }),
+      columnHelper.accessor("community_points", {
+        header: () => <div className="text-right">Community points</div>,
+        cell: (row) => {
+          const communityPoints = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(communityPoints)}
             </div>
           )
         },
@@ -79,8 +97,8 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const refereesPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">
-              {refereesPoints}
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(refereesPoints)}
             </div>
           )
         },
@@ -90,7 +108,9 @@ export function useTable({ data }: Params) {
         cell: (row) => {
           const totalPoints = row.getValue()
           return (
-            <div className="w-full h-full flex justify-end">{totalPoints}</div>
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(totalPoints)}
+            </div>
           )
         },
       }),

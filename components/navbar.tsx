@@ -38,8 +38,7 @@ import {
 } from "@rainbow-me/rainbowkit"
 
 import useLocalStorage from "@/hooks/use-local-storage"
-import { blast } from "@/providers/wallet-connect"
-import { blastSepolia } from "viem/chains"
+import { blast, blastSepolia } from "viem/chains"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
@@ -60,27 +59,27 @@ const LINKS = [
   {
     name: "Strategies",
     href: "/strategies",
-    disabled: true,
+    disabled: false,
     message: "Cooking...",
   },
   {
     name: "Points",
     href: "/points",
-    disabled: true,
-    message: (
-      <div className="z-50">
-        Points program is live! <br />
-        The Points page will be available in the coming days.
-        <br />
-        More info{" "}
-        <Link
-          href={"https://docs.mangrove.exchange/general/points/"}
-          className="text-green-caribbean"
-        >
-          here
-        </Link>
-      </div>
-    ),
+    disabled: false,
+    // message: (
+    //   <div className="z-50">
+    //     Points program is live! <br />
+    //     The Points page will be available in the coming days.
+    //     <br />
+    //     More info{" "}
+    //     <Link
+    //       href={"https://docs.mangrove.exchange/general/points/"}
+    //       className="text-green-caribbean"
+    //     >
+    //       here
+    //     </Link>
+    //   </div>
+    // ),
   },
   {
     name: "Referrals",

@@ -24,12 +24,12 @@ type Params = {
 
 export function useHistoryParams({ data }: Params) {
   const { chain } = useAccount()
-  const { baseToken } = useKandel()
+  const { baseToken, quoteToken } = useKandel()
 
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("date", {
-        header: "date",
+        header: "Date",
         cell: ({ row }) => {
           const { date } = row.original
           return <div>{formatDate(date)}</div>
@@ -43,7 +43,7 @@ export function useHistoryParams({ data }: Params) {
           const { isDeposit } = row.original
           return (
             <div className="w-full h-full flex justify-end">
-              {isDeposit ? "Deposit" : "Withdraw"}
+              {isDeposit ? "Published" : "Unpublished"}
             </div>
           )
         },
@@ -53,10 +53,14 @@ export function useHistoryParams({ data }: Params) {
         id: "amount",
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
-          const { amount } = row.original
+          const { amount, token } = row.original
+          const amountToken = [baseToken, quoteToken].find(
+            (item) => item?.address === token,
+          )
           return (
             <div className="w-full h-full flex justify-end">
-              {amount} {baseToken?.symbol}
+              {Number(amount).toFixed(amountToken?.displayedDecimals)}{" "}
+              {amountToken?.symbol}
             </div>
           )
         },
@@ -69,7 +73,7 @@ export function useHistoryParams({ data }: Params) {
           const { transactionHash } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
           return (
-            <div className="w-full h-full flex justify-end">
+            <div className="flex w-full justify-end">
               <BlockExplorer
                 address={transactionHash}
                 blockExplorerUrl={blockExplorerUrl}
@@ -80,7 +84,7 @@ export function useHistoryParams({ data }: Params) {
         },
       }),
     ],
-    [],
+    [chain?.blockExplorers?.default?.url],
   )
 
   return useReactTable({
