@@ -129,6 +129,7 @@ export const useParameters = () => {
     currentParameter: {
       ...currentParameter,
       lockedBounty,
+      nativeSymbol: nativeBalance?.symbol,
       maxPrice,
       minPrice,
       creationDate,

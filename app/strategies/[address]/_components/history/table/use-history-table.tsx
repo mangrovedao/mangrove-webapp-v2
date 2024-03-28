@@ -43,7 +43,7 @@ export function useHistoryParams({ data }: Params) {
           const { isDeposit } = row.original
           return (
             <div className="w-full h-full flex justify-end">
-              {isDeposit ? "Deposit" : "Withdraw"}
+              {isDeposit ? "Published" : "Unpublished"}
             </div>
           )
         },

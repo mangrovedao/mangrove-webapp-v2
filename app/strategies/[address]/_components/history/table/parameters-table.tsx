@@ -10,7 +10,8 @@ export default function HistoryTable() {
     useKandel()
 
   const { currentParameter, publishedBase, publishedQuote } = useParameters()
-  const { creationDate, length, stepSize, lockedBounty } = currentParameter
+  const { creationDate, length, stepSize, lockedBounty, nativeSymbol } =
+    currentParameter
 
   const data: Parameters[] = useMemo(
     () => [
@@ -19,7 +20,7 @@ export default function HistoryTable() {
         pricePoints: length,
         stepSize,
         amount: `${publishedBase.toFixed(6)} ${baseToken?.symbol} - ${publishedQuote.toFixed(6)} ${quoteToken?.symbol}`,
-        lockedBounty: `${Number(lockedBounty).toFixed(6)}`,
+        lockedBounty: `${Number(lockedBounty).toFixed(6)} ${nativeSymbol}`,
       },
     ],
     [creationDate, length, publishedBase.toFixed(6)],
