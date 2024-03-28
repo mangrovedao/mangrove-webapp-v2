@@ -32,12 +32,8 @@ export default function CloseStrategyDialog({
       </Dialog.Title>
       <Dialog.Description>
         <div className="flex flex-col space-y-2 mt-9">
-          <Title>Are you sure you want to close this strategy</Title>
+          <Title>Are you sure you want to close this strategy ?</Title>
           <Text>You can re-open it at any time.</Text>
-          <Text>
-            Funds will be withdrawn from the strategy and returned to your
-            wallet.
-          </Text>
         </div>
       </Dialog.Description>
       <Dialog.Footer>
