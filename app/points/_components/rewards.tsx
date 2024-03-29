@@ -5,6 +5,7 @@ import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { useUserPoints } from "./leaderboard/use-leaderboard"
 
+import InfoTooltip from "@/components/info-tooltip"
 export default function Rewards() {
   const { data: userPoints } = useUserPoints()
   const totalPoints = Number(userPoints?.total_points ?? 0)
@@ -38,12 +39,12 @@ export default function Rewards() {
         </span>
       </div>
       <div className="text-xs text-cloud-200 flex items-center pt-11">
-        update every 24 hours
-        {/* update in ${timeUntilNextUpdate} */}
+       {/* update every 24 hours*/}
+       update in {timeUntilNextUpdate}
         {/* update in 22h 10m{" "} */}
-        {/* <InfoTooltip>
+         <InfoTooltip>
           Your total points, recalculated every 24 hours.
-        </InfoTooltip> */}
+        </InfoTooltip> 
       </div>
     </div>
   )
