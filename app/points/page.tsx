@@ -6,7 +6,10 @@ import { ConnectWalletBanner } from "./_components/connect-wallet-banner"
 import CurrentBoost from "./_components/current-boost"
 import { JoinProgramBanner } from "./_components/join-program-banner"
 import { Leaderboard } from "./_components/leaderboard/table"
-import { useUserBoosts } from "./_components/leaderboard/use-leaderboard"
+import {
+  useUserBoosts,
+  useUserPoints,
+} from "./_components/leaderboard/use-leaderboard"
 import NextLevel from "./_components/next-level"
 import Rank from "./_components/rank"
 import Rewards from "./_components/rewards"
@@ -15,8 +18,9 @@ import TotalPoints from "./_components/total-points"
 export default function Page() {
   const { isConnected } = useAccount()
   const { data: userBoosts } = useUserBoosts()
+  const { data: userPoints } = useUserPoints()
   const userBoost = userBoosts?.[0]
-  const currentBoost = Number(userBoost?.boost ?? 1)
+  const currentBoost = Number(userPoints?.boost ?? 1)
   const volume = Number(userBoost?.volume ?? 0)
 
   return isConnected ? (
