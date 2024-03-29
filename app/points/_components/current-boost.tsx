@@ -1,6 +1,7 @@
 import InfoTooltip from "@/components/info-tooltip"
 import { cn } from "@/utils"
 import { getLevels } from "../constants"
+import { Boosts } from "../schemas/boosts"
 import { formatNumber } from "../utils"
 import BoxContainer from "./box-container"
 
@@ -8,8 +9,8 @@ type Props = {
   className?: string
   level?: number
   volume?: number
-  type?: string
   boost?: number
+  boosts?: Boosts | null
 }
 
 function formatNFTName(name: string): string {
@@ -23,11 +24,11 @@ export default function CurrentBoost({
   // level = 0,
   boost = 1,
   volume = 0,
-  type,
+  boosts,
 }: Props) {
   const { nextIndex, currentIndex } = getLevels(volume)
   const level = currentIndex
-  // console.log("nextIndex", nextIndex, currentIndex)
+
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
@@ -72,7 +73,20 @@ export default function CurrentBoost({
             >
               Level {nextIndex}
             </span>
-            {type?.includes("NFT") && (
+            {boosts?.map((b) => (
+              <span
+                className={cn(
+                  "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
+                )}
+              >
+                {formatNFTName(b.type)}
+                <InfoTooltip className="text-white">
+                  You've received a {b.boost}x boost for holding the{" "}
+                  {formatNFTName(b.type)}
+                </InfoTooltip>
+              </span>
+            ))}
+            {/* {type ? (
               <span
                 className={cn(
                   "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
@@ -84,7 +98,7 @@ export default function CurrentBoost({
                   {formatNFTName(type)}
                 </InfoTooltip>
               </span>
-            )}
+            ) : undefined} */}
           </div>
           <div className="text-xs text-cloud-200 flex items-center pt-7">
             previous volume {formatNumber(volume)}
