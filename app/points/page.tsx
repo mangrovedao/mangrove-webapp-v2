@@ -32,7 +32,7 @@ export default function Page() {
           className="col-span-full md:col-span-1"
           boost={currentBoost}
           volume={volume}
-          type={userBoost?.type}
+          boosts={userBoosts}
         />
         <Rank className="col-span-full md:col-span-1" />
         <NextLevel

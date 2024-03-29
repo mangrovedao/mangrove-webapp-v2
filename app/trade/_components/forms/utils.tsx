@@ -24,7 +24,7 @@ export function successToast(
   const notFilledOrder =
     tradeMode == TradeMode.LIMIT
       ? "Limit order posted"
-      : "Market order not posted, please increase slippage"
+      : "Market order not filled (slippage too low)"
 
   const fillText = Number(summary.totalGot) > 0 ? filledOrder : notFilledOrder
 
