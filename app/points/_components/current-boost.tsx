@@ -72,19 +72,22 @@ export default function CurrentBoost({
             >
               Level {nextIndex}
             </span>
-            {boosts?.map((b) => (
-              <span
-                className={cn(
-                  "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
-                )}
-              >
-                {formatNFTName(b.type)}
-                <InfoTooltip className="text-white">
-                  You've received a {b.boost}x boost for holding the{" "}
+            {boosts?.map((b) => {
+              if (b.type.toLowerCase() === "volume") return
+              return (
+                <span
+                  className={cn(
+                    "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
+                  )}
+                >
                   {formatNFTName(b.type)}
-                </InfoTooltip>
-              </span>
-            ))}
+                  <InfoTooltip className="text-white">
+                    You've received a {b.boost}x boost for holding the{" "}
+                    {formatNFTName(b.type)}
+                  </InfoTooltip>
+                </span>
+              )
+            })}
             {/* {type ? (
               <span
                 className={cn(
