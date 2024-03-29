@@ -39,7 +39,6 @@ export function Strategies({ type }: Props) {
     type,
     data,
     onManage: (strategy: Strategy) => {
-      console.log(strategy)
       const baseToken = openMarkets?.find(
         (item) =>
           item.base.address.toLowerCase() === strategy.base.toLowerCase(),
