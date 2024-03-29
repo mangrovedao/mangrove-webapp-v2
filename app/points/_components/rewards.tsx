@@ -1,6 +1,5 @@
 import { addDays, formatDistanceToNow } from "date-fns"
 
-import InfoTooltip from "@/components/info-tooltip"
 import { MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
@@ -39,10 +38,12 @@ export default function Rewards() {
         </span>
       </div>
       <div className="text-xs text-cloud-200 flex items-center pt-11">
-        update in {timeUntilNextUpdate} {/* update in 22h 10m{" "} */}
-        <InfoTooltip>
+        update every 24 hours
+        {/* update in ${timeUntilNextUpdate} */}
+        {/* update in 22h 10m{" "} */}
+        {/* <InfoTooltip>
           Your total points, recalculated every 24 hours.
-        </InfoTooltip>
+        </InfoTooltip> */}
       </div>
     </div>
   )
