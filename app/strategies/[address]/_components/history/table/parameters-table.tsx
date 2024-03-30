@@ -16,10 +16,23 @@ export default function HistoryTable() {
   const data: Parameters[] = useMemo(
     () => [
       {
+        priceRange:
+          currentParameter.minPrice && currentParameter.maxPrice && quoteToken
+            ? [
+                `${currentParameter.minPrice?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`,
+                `${currentParameter.maxPrice?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`,
+              ]
+            : undefined,
         date: creationDate,
         pricePoints: length,
         stepSize,
-        amount: `${publishedBase.toFixed(6)} ${baseToken?.symbol} - ${publishedQuote.toFixed(6)} ${quoteToken?.symbol}`,
+        amount:
+          publishedBase && publishedQuote && baseToken && quoteToken
+            ? [
+                `${publishedBase.toFixed(6)} ${baseToken?.symbol}`,
+                `${publishedQuote.toFixed(6)} ${quoteToken?.symbol}`,
+              ]
+            : undefined,
         lockedBounty: `${Number(lockedBounty || "0").toFixed(6)} ${nativeSymbol}`,
       },
     ],

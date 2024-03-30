@@ -17,9 +17,10 @@ const DEFAULT_DATA: Parameters[] = []
 export type Parameters = {
   date: Date | undefined
   pricePoints: string | null | undefined
-  amount: string | undefined
+  amount: string[] | undefined
   stepSize: string | null | undefined
   lockedBounty: string | undefined
+  priceRange: string[] | undefined
 }
 
 type Params = {
@@ -62,12 +63,39 @@ export function useParametersTable({ data }: Params) {
         },
       }),
 
+      columnHelper.accessor("priceRange", {
+        id: "priceRange",
+        header: () => <div className="text-right">Price range (min, max)</div>,
+        cell: ({ row }) => {
+          const { priceRange } = row.original
+          if (!priceRange)
+            return (
+              <div className="w-full h-full flex flex-col items-end">N/A</div>
+            )
+
+          return (
+            <div className="w-full h-full flex flex-col items-end">
+              {priceRange?.map((item, i) => <div>{item}</div>)}
+            </div>
+          )
+        },
+      }),
+
       columnHelper.accessor("amount", {
         id: "amount",
         header: () => <div className="text-right">Amount</div>,
         cell: ({ row }) => {
           const { amount } = row.original
-          return <div className="w-full h-full flex justify-end">{amount}</div>
+          if (!amount)
+            return (
+              <div className="w-full h-full flex flex-col items-end">N/A</div>
+            )
+
+          return (
+            <div className="w-full h-full flex flex-col items-end">
+              {amount?.map((item, i) => <div>{item}</div>)}
+            </div>
+          )
         },
       }),
 

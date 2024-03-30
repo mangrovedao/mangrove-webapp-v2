@@ -14,9 +14,9 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const { address } = useAccount()
-
   const { mangrove } = useMangrove()
   const { market } = useMarket()
+
   const baseToken = market?.base
   const quoteToken = market?.quote
   const baseBalance = useTokenBalance(baseToken)

@@ -1,5 +1,6 @@
 "use client"
 
+import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -137,6 +138,10 @@ export function Form({ className }: { className?: string }) {
           </div>
         </div>
       </Fieldset> */}
+
+      <Fieldset legend="Select market">
+        <MarketSelector disabled={true} />
+      </Fieldset>
 
       <Fieldset className="space-y-4" legend="Edit inventory">
         <div>

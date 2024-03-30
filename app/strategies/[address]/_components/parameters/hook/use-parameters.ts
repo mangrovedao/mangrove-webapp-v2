@@ -8,8 +8,6 @@ import { MergedOffers } from "../../../_utils/inventory"
 export const useParameters = () => {
   const [unPublishedBase, setUnpublishedBase] = React.useState("")
   const [unPublishedQuote, setUnPublishedQuote] = React.useState("")
-  const [unallocatedBase, setUnallocatedBase] = React.useState("")
-  const [unallocatedQuote, setUnallocatedQuote] = React.useState("")
 
   const { strategyStatusQuery, strategyQuery, mergedOffers } = useKandel()
 
@@ -18,7 +16,7 @@ export const useParameters = () => {
     address,
   })
 
-  const { book, market, offerStatuses, stratInstance } =
+  const { market, offerStatuses, stratInstance } =
     strategyStatusQuery.data ?? {}
 
   const {
@@ -102,15 +100,8 @@ export const useParameters = () => {
 
       if (!base || !quote) return
 
-      // const { unallocatedBase, unallocatedQuote } = getUnallocatedInventory(
-      //   { base: asksBalance, quote: bidsBalance },
-      //   { base: publishedBase, quote: publishedQuote },
-      // )
-
       setUnpublishedBase(base.toFixed(market?.base?.decimals))
       setUnPublishedQuote(quote.toFixed(market?.base?.decimals))
-      // setUnallocatedBase(unallocatedBase.toFixed(market?.base?.decimals))
-      // setUnallocatedQuote(unallocatedQuote.toFixed(market?.quote?.decimals))
     }
 
     fetchUnpublishedBalancesAndBounty()
@@ -131,8 +122,6 @@ export const useParameters = () => {
     },
     publishedBase,
     publishedQuote,
-    unallocatedBase,
-    unallocatedQuote,
     unPublishedBase,
     unPublishedQuote,
     depositedBase,
