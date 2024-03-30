@@ -39,11 +39,11 @@ export default function Rewards() {
         </span>
       </div>
       <div className="text-xs text-cloud-200 flex items-center pt-11">
-       {/* update every 24 hours*/}
-       update in {timeUntilNextUpdate}
-         <InfoTooltip>
+        update every 24 hours
+        {/* update in {timeUntilNextUpdate} */}
+        <InfoTooltip>
           Your total points, recalculated every 24 hours.
-        </InfoTooltip> 
+        </InfoTooltip>
       </div>
     </div>
   )

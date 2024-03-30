@@ -171,8 +171,9 @@ export function PricesBar() {
         <Separator orientation="vertical" className="h-4" />
 
         <Item
-          label="Volume"
-          value={totalTakerGave ? Number(totalTakerGave ?? 0) : undefined}
+          label="24h Volume"
+          value={takerGave ? Number(takerGave ?? 0) : undefined}
+          // value={totalTakerGave ? Number(totalTakerGave ?? 0) : undefined}
           token={token}
           skeleton={mangroveTokenPriceLoading}
         />
