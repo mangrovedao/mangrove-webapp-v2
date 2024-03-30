@@ -41,7 +41,6 @@ export default function Rewards() {
       <div className="text-xs text-cloud-200 flex items-center pt-11">
        {/* update every 24 hours*/}
        update in {timeUntilNextUpdate}
-        {/* update in 22h 10m{" "} */}
          <InfoTooltip>
           Your total points, recalculated every 24 hours.
         </InfoTooltip> 

@@ -75,6 +75,7 @@ export function useTable({ data }: Params) {
           if (!market) return null
           const { base, quote } = market
           const [received, sent] = isBid ? [base, quote] : [quote, base]
+
           return (
             <div className={cn("flex flex-col")}>
               <span className="text-sm">
@@ -88,7 +89,6 @@ export function useTable({ data }: Params) {
           )
         },
       }),
-
       columnHelper.accessor("price", {
         header: "Price",
         cell: (row) =>
@@ -105,10 +105,25 @@ export function useTable({ data }: Params) {
             <Skeleton className="w-20 h-6" />
           ),
       }),
+
       columnHelper.accessor("creationDate", {
         header: "Date",
         cell: (row) => <div>{formatDate(row.getValue())}</div>,
       }),
+
+      columnHelper.accessor("status", {
+        header: "Status",
+        cell: ({ row }) =>
+          row.original.status ? (
+            <span className="capitalize">
+              {" "}
+              {row.original.status.toLowerCase()}
+            </span>
+          ) : (
+            <Skeleton className="w-20 h-6" />
+          ),
+      }),
+
       columnHelper.display({
         header: "Explorer",
         cell: ({ row }) => {
