@@ -183,7 +183,7 @@ export default function useForm() {
       requiredBase?.gt(0) &&
       Number(requiredBase) > Number(baseDeposit)
     ) {
-      newErrors.baseDeposit = "Base deposit must be uptated"
+      newErrors.baseDeposit = "Base deposit must be updated"
     } else {
       delete newErrors.baseDeposit
     }
