@@ -87,6 +87,15 @@ export default function useForm() {
     (store) => store.setOffersWithPrices,
   )
 
+  React.useEffect(() => {
+    setBaseDeposit("")
+    setQuoteDeposit("")
+    setBountyDeposit("")
+    setNumberOfOffers("10")
+    setStepSize("1")
+    setErrors({})
+  }, [market])
+
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
     if (kandelRequirementsQuery.error) {
