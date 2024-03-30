@@ -4,7 +4,7 @@ export const boostsSchema = z.array(
   z.object({
     account: z.string(),
     type: z.string(),
-    boost: z.string().transform(parseFloat).transform(Math.floor),
+    boost: z.string().transform(parseFloat),
     volume: z.string().transform(parseFloat).transform(Math.floor),
   }),
 )

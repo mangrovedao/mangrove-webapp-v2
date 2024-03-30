@@ -58,8 +58,6 @@ export function useLaunchKandelStrategy() {
           type: "smart",
         })
 
-        // console.log("setting logic...")
-
         // await kandelInstance.setLogics({
         //   baseLogic: _baseLogic,
         //   quoteLogic: _quoteLogic,
