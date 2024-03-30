@@ -130,7 +130,7 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         },
       }),
       columnHelper.display({
-        header: "PnL (%)",
+        header: "PnL",
         cell: ({ row }) => {
           const { return: ret } = row.original
           return (
@@ -145,15 +145,15 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         header: "Liquidity source",
         cell: () => "Wallet",
       }),
-      // TODO: get from indexer
-      columnHelper.display({
-        header: "Reward",
-        cell: () => "-",
-      }),
+
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
+          const anyLiveOffers = row.original.offers.some(
+            (x) => x?.live === true,
+          )
+
           return (
             <div className="w-full h-full flex justify-end space-x-1">
               <IconButton
@@ -170,6 +170,7 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
               <IconButton
                 tooltip="Cancel strategy"
                 className="aspect-square w-6 rounded-full"
+                disabled={!anyLiveOffers}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
