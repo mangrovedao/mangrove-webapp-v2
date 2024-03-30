@@ -19,10 +19,10 @@ export default function WarningBanner() {
       )}
     >
       <button
-        className="absolute top-1 right-2 hover:opacity-90 transition-opacity"
+        className="absolute top-3 right-2 hover:opacity-90 transition-opacity"
         onClick={() => setStrategyBannerWarning(true)}
       >
-        <X className="text-cloud-300 w-5 h-5 hover:text-primary" />
+        <X className="text-cloud-300 w-5 h-5 hover:text-secondary" />
         <span className="sr-only">Close</span>
       </button>
 
