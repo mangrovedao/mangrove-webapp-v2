@@ -1,6 +1,9 @@
 "use client"
 
+import Big from "big.js"
+import Link from "next/link"
 import React from "react"
+import { useAccount } from "wagmi"
 
 import InfoTooltip from "@/components/info-tooltip"
 import { Caption } from "@/components/typography/caption"
@@ -8,8 +11,7 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import Big from "big.js"
-import { useAccount } from "wagmi"
+
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
 import { Publish } from "./dialogs/publish"
@@ -137,7 +139,17 @@ const PublishedInventory = () => {
       <div className="flex justify-between">
         <div className="flex items-center">
           <Title>Published inventory</Title>
-          <InfoTooltip>TODO:</InfoTooltip>
+          <InfoTooltip side="right">
+            Liquidity in active offers.{" "}
+            <Link
+              href="https://docs.mangrove.exchange/general/kandel/how-does-kandel-work/strategy-reserve"
+              target="_blank"
+              rel="noreferrer"
+              className="text-green-caribbean underline"
+            >
+              Learn more
+            </Link>
+          </InfoTooltip>
         </div>
         <div className="flex gap-2">
           {/* TODO: create dialog for add inventory */}
@@ -200,7 +212,20 @@ const BountyInventory = () => {
       <div className="flex justify-between">
         <div className="flex items-center">
           <Title>Bounty</Title>
-          <InfoTooltip>TODO:</InfoTooltip>
+          <InfoTooltip side="right">
+            <Caption>
+              Amount of native tokens deposited into the strategy to cover
+            </Caption>
+            <Caption>in case your offer fails to deliver. </Caption>
+            <Link
+              href="https://docs.mangrove.exchange/general/kandel/how-does-kandel-work/parameters"
+              target="_blank"
+              rel="noreferrer"
+              className="text-green-caribbean underline text-xs"
+            >
+              Learn more
+            </Link>
+          </InfoTooltip>
         </div>
         <div className="flex gap-2">
           {/* <Button onClick={toggleBounty}>Add</Button> */}
