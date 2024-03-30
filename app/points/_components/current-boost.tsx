@@ -28,6 +28,7 @@ export default function CurrentBoost({
 }: Props) {
   const { nextIndex, currentIndex } = getLevels(volume)
   const level = currentIndex
+
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
@@ -72,6 +73,7 @@ export default function CurrentBoost({
             >
               Level {nextIndex}
             </span>
+
             {boosts?.map((b) => {
               if (b.type.toLowerCase() === "volume") return
               return (
@@ -88,6 +90,7 @@ export default function CurrentBoost({
                 </span>
               )
             })}
+
             {/* {type ? (
               <span
                 className={cn(
