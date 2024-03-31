@@ -19,7 +19,6 @@ export async function getTokenPriceInToken(
     const response = await fetch(
       `${env.NEXT_PUBLIC_PRICE_API_URL}prices/${tokenSymbol}/${priceTokenSymbol}/${interval}`,
     )
-
     if (response.ok) {
       const candleJson = await response.json()
       return mangrovePriceResponseSchema.parse(candleJson)
@@ -40,6 +39,7 @@ export async function getTokenPriceInToken(
       }
     }
   } catch (e) {
+    return 1 // FIXME: return 1 if the price API fails
     throw new Error(`Failed to get token price: ${getErrorMessage(e)}`)
   }
 }
