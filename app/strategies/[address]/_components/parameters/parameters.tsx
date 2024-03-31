@@ -42,11 +42,19 @@ const InfoBar = () => {
       <InfoLine title="Step size" value={currentParameter?.stepSize} />
       <InfoLine
         title="Min price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`}
+        value={
+          currentParameter?.minPrice
+            ? `${currentParameter?.minPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`
+            : "-"
+        }
       />
       <InfoLine
         title="Max price"
-        value={`${currentParameter?.maxPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`}
+        value={
+          currentParameter?.maxPrice
+            ? `${currentParameter?.maxPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`
+            : "-"
+        }
       />
     </div>
   )
@@ -164,14 +172,18 @@ const BountyInventory = () => {
       <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
-            <Caption className="text-muted-foreground">Asset</Caption>
-            <Caption className="text-muted-foreground">Amount</Caption>
+            <Caption as={"td"} className="text-muted-foreground">
+              Asset
+            </Caption>
+            <Caption as={"td"} className="text-muted-foreground">
+              Amount
+            </Caption>
           </tr>
         </thead>
         <tbody className="w-full flex flex-col gap-4">
           <tr className="flex justify-between pt-4">
-            <Text>{chain?.nativeCurrency.symbol}</Text>
-            <Text>
+            <Text as="td">{chain?.nativeCurrency.symbol}</Text>
+            <Text as="td">
               {Big(currentParameter.lockedBounty ?? 0).toString()}{" "}
               {chain?.nativeCurrency.symbol}
             </Text>
@@ -197,7 +209,7 @@ export default function Parameters() {
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
         {/* <UnallocatedInventory /> */}
-        <PublishedInventory />
+        {/* <PublishedInventory /> */}
         <BountyInventory />
       </div>
     </div>

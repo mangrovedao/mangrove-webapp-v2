@@ -1,3 +1,4 @@
+"use client"
 import { useMemo } from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
@@ -36,7 +37,13 @@ export default function HistoryTable() {
         lockedBounty: `${Number(lockedBounty || "0").toFixed(6)} ${nativeSymbol}`,
       },
     ],
-    [creationDate, length, publishedBase.toFixed(6)],
+    [
+      creationDate,
+      length,
+      publishedBase.toFixed(6),
+      baseToken?.symbol,
+      quoteToken?.symbol,
+    ],
   )
 
   const table = useParametersTable({
