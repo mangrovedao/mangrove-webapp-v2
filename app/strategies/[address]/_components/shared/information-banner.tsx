@@ -1,6 +1,5 @@
 import { X } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import React from "react"
 
 import { Title } from "@/components/typography/title"
@@ -11,7 +10,6 @@ import useKandel from "../../_providers/kandel-strategy"
 
 export default function InformationBanner() {
   const [bannerOpen, setBannerOpen] = React.useState(true)
-  const { push } = useRouter()
   const { strategyStatusQuery, mergedOffers } = useKandel()
   const { isOutOfRange } = strategyStatusQuery.data ?? {}
 
@@ -24,7 +22,8 @@ export default function InformationBanner() {
     !strategyStatusQuery.data ||
     strategyStatusQuery.isLoading ||
     !bannerOpen ||
-    isActive // FIXME: check if we keep the information when offers are empty
+    isActive || // FIXME: check if we keep the information when offers are empty
+    strategyStatusQuery.data.status === "closed"
   )
     return null
 
