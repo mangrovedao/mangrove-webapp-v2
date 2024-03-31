@@ -6,14 +6,18 @@ import {
 import { mangrovePriceResponseSchema } from "@/schemas/mangrove-price-api"
 import { getErrorMessage } from "@/utils/errors"
 
-export async function getTokenPriceInUsd(tokenSymbol: string) {
-  return getTokenPriceInToken(tokenSymbol, "USD")
+export async function getTokenPriceInUsd(
+  tokenSymbol: string,
+  returnOneIfError = false,
+) {
+  return getTokenPriceInToken(tokenSymbol, "USD", undefined, returnOneIfError)
 }
 
 export async function getTokenPriceInToken(
   tokenSymbol: string,
   priceTokenSymbol: string,
   interval: "1m" | "1d" = "1m",
+  returnOneIfError = false,
 ) {
   try {
     const response = await fetch(
@@ -39,7 +43,9 @@ export async function getTokenPriceInToken(
       }
     }
   } catch (e) {
-    return 1 // FIXME: return 1 if the price API fails
+    if (returnOneIfError) {
+      return 1 // FIXME: return 1 if the price API fails
+    }
     throw new Error(`Failed to get token price: ${getErrorMessage(e)}`)
   }
 }

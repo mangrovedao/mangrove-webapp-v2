@@ -71,7 +71,6 @@ const useIndexerSdkContext = () => {
               }
             },
             getPrice(tokenAddress) {
-              // return 1
               return queryClient.fetchQuery({
                 queryKey: ["tokenPriceInUsd", tokenAddress],
                 queryFn: async () => {
@@ -82,6 +81,7 @@ const useIndexerSdkContext = () => {
                     )
                   return getTokenPriceInUsd(
                     token.symbol === "USDB" ? "USDC" : token.symbol,
+                    true, // return 1 if the price API fails
                   )
                 },
                 staleTime: 10 * 60 * 1000,
