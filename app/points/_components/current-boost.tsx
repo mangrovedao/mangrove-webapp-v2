@@ -63,7 +63,7 @@ export default function CurrentBoost({
                 "text-cloud-00": !boost,
               })}
             >
-              {boost}x
+              {boost <= 1 ? 1 : boost}x
             </span>
             <span
               className={cn(
