@@ -39,10 +39,8 @@ export default function WarningBanner() {
         </div>
         <div>
           <Caption>
-            Liquidity is not locked in strategies, it stays in your wallet. If
-            all funds are moved and there is no available liquidity to execute
-            the matched offer- strategy offers will start failing and your
-            strategy will become inactive.
+            Strategy liquidity stays in your wallet; removing it while having
+            active offers will mark your strategy as inactive.
           </Caption>
         </div>
       </div>
