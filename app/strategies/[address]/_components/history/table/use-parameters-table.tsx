@@ -41,7 +41,7 @@ export function useParametersTable({ data }: Params) {
 
       columnHelper.display({
         id: "pricePoints",
-        header: () => <div className="text-right">No. of offers</div>,
+        header: () => <div className="text-right">Nb. of offers</div>,
         cell: ({ row }) => {
           const { pricePoints } = row.original
           return (

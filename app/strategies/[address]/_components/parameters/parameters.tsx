@@ -36,7 +36,7 @@ const InfoBar = () => {
   return (
     <div className=" flex justify-between bg-blend-darken rounded-lg">
       <InfoLine
-        title="No. of offers"
+        title="Nb. of offers"
         value={Number(currentParameter?.length) - 1}
       />
       <InfoLine title="Step size" value={currentParameter?.stepSize} />
