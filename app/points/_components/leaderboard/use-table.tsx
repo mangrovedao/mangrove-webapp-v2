@@ -1,5 +1,6 @@
 "use client"
 
+import { useQuery } from "@tanstack/react-query"
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -8,9 +9,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
+import { useAccount } from "wagmi"
 
+import { Skeleton } from "@/components/ui/skeleton"
 import { Rank1Icon, Rank2Icon, Rank3Icon } from "@/svgs"
+import { getErrorMessage } from "@/utils/errors"
 import { formatNumber } from "@/utils/numbers"
+import { parseBoosts } from "../../schemas/boosts"
 import { LeaderboardEntry } from "../../schemas/leaderboard"
 import Address from "./address"
 
@@ -51,12 +56,12 @@ export function useTable({ data }: Params) {
           return <Address address={address} />
         },
       }),
-      columnHelper.accessor("boost", {
+      columnHelper.display({
+        id: "boost",
         header: "Boost",
-        cell: (row) => {
-          const boost = row.getValue()
-          if (boost === 0) return <div className="font-roboto">1x</div>
-          return <div className="font-roboto">{boost}x</div>
+        cell: ({ row }) => {
+          const { boost, account } = row.original
+          return <BoostCell volumeBoost={boost} account={account} />
         },
       }),
       columnHelper.accessor("maker_points", {
@@ -126,4 +131,58 @@ export function useTable({ data }: Params) {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   })
+}
+
+function BoostCell({
+  volumeBoost,
+  account,
+}: {
+  volumeBoost: number
+  account: string
+}) {
+  const { address } = useAccount()
+
+  const { data: userBoosts, isLoading } = useQuery({
+    queryKey: ["user-boosts", address],
+    queryFn: async () => {
+      try {
+        if (!address) return null
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/boosts/${address}`,
+        )
+        const boosts = await res.json()
+        return parseBoosts(boosts)
+      } catch (e) {
+        console.error(getErrorMessage(e))
+        throw new Error()
+      }
+    },
+    meta: {
+      error: "Unable to retrieve user boosts data",
+    },
+    enabled: !!address && address?.toLowerCase() === account?.toLowerCase(),
+    retry: false,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+
+  const highestBoost = Number(
+    userBoosts?.reduce(
+      (prev, current) => {
+        return prev.boost > current.boost ? prev : current
+      },
+      { boost: 1 },
+    )?.boost ?? 1,
+  )
+  // FIXME: workaround to show the highest boost to the user because the API is not handling that for now
+  const currentBoost =
+    address?.toLowerCase() === account.toLocaleLowerCase()
+      ? volumeBoost > highestBoost
+        ? volumeBoost
+        : highestBoost
+      : volumeBoost
+
+  if (isLoading) return <Skeleton className="h-5 w-full" />
+
+  if (currentBoost === 0) return <div className="font-roboto">1x</div>
+  return <div className="font-roboto">{currentBoost}x</div>
 }
