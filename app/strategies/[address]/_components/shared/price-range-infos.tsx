@@ -15,7 +15,8 @@ export default function PriceRangeInfos() {
     mergedOffers,
   } = useKandel()
 
-  const { publishedBase, publishedQuote } = useParameters()
+  const { publishedBase, publishedQuote, currentParameter } = useParameters()
+
   const bids = strategyStatusQuery.data?.book?.bids ?? []
   const asks = strategyStatusQuery.data?.book?.asks ?? []
 
@@ -38,7 +39,7 @@ export default function PriceRangeInfos() {
       <div className="relative">
         <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 justify-between items-center px-6 pb-8 my-3">
           {/* <AverageReturn percentage={avgReturnPercentage} /> */}
-          <UnrealizedPnl />
+          <UnrealizedPnl pnl={currentParameter.pnlQuote} />
           <TotalInventory
             value={baseValue}
             symbol={baseToken?.symbol}

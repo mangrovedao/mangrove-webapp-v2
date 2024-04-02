@@ -172,6 +172,12 @@ export function PriceRangeChart({
     setSelectedPriceRange(priceRange)
   }, [priceRange])
 
+  React.useEffect(() => {
+    setSelectedPriceRange(null)
+    setDragStartPoint(null)
+    setPrevPoint(null)
+  }, [bids, asks])
+
   const svgRef = React.useRef(null)
   return (
     <Zoom

@@ -1,5 +1,6 @@
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/tooltip"
 import { TooltipInfo } from "@/svgs"
 
-export default function UnrealizedPnl() {
+export default function UnrealizedPnl({ pnl }: { pnl: string }) {
   return (
     <div className="flex items-end space-x-2">
       <span className="bg-black-rich rounded-lg p-1 w-8 h-8 flex items-center justify-center">
@@ -44,7 +45,9 @@ export default function UnrealizedPnl() {
             </Tooltip>
           </TooltipProvider>
         </Caption>
-        <Title variant={"title1"}>{"N/A"}</Title>
+        <Title variant={"title1"}>
+          {pnl ? pnl : <Skeleton className="h-6 w-20" />}
+        </Title>
       </span>
     </div>
   )

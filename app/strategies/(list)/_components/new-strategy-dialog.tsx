@@ -18,7 +18,6 @@ import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-info
 import useMangrove from "@/providers/mangrove"
 import { getSymbol, getValue } from "@/utils/market"
 import { useRouter } from "next/navigation"
-import { Badge } from "./badge"
 
 type Props = {
   open: boolean
@@ -56,7 +55,7 @@ export function NewStrategyDialog({ open, onClose }: Props) {
           variant={"header1"}
           className="space-x-3 flex items-center"
         >
-          <span>Create strategy</span> <Badge>Step 1/2</Badge>
+          <span>Create strategy</span>
         </Title>
       </Dialog.Title>
       <Dialog.Description className="text-left !mt-8">

@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
 import useKandel from "../../_providers/kandel-strategy"
+import { useParameters } from "../parameters/hook/use-parameters"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function StratInfoBanner() {
   const { strategyQuery, strategyStatusQuery, baseToken, quoteToken } =
     useKandel()
-
+  const { publishedBase, publishedQuote, currentParameter } = useParameters()
   const { asksBalance, bidsBalance } =
     useQuery({
       queryKey: ["strategy-balance", baseToken?.address, quoteToken?.address],
@@ -25,8 +26,8 @@ export default function StratInfoBanner() {
 
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
 
-  const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+  const baseValue = `${publishedBase?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
 
   return (
@@ -34,7 +35,7 @@ export default function StratInfoBanner() {
       <div className="relative">
         <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 justify-between items-center px-6 pb-8 my-3">
           {/* <AverageReturn percentage={avgReturnPercentage} /> */}
-          <UnrealizedPnl />
+          <UnrealizedPnl pnl={currentParameter.pnlQuote} />
           <TotalInventory
             value={baseValue}
             symbol={baseToken?.symbol}

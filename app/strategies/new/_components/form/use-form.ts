@@ -14,9 +14,9 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const { address } = useAccount()
-
   const { mangrove } = useMangrove()
   const { market } = useMarket()
+
   const baseToken = market?.base
   const quoteToken = market?.quote
   const baseBalance = useTokenBalance(baseToken)
@@ -86,6 +86,15 @@ export default function useForm() {
   const setOffersWithPrices = useNewStratStore(
     (store) => store.setOffersWithPrices,
   )
+
+  React.useEffect(() => {
+    setBaseDeposit("")
+    setQuoteDeposit("")
+    setBountyDeposit("")
+    setNumberOfOffers("10")
+    setStepSize("1")
+    setErrors({})
+  }, [market])
 
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
@@ -183,7 +192,7 @@ export default function useForm() {
       requiredBase?.gt(0) &&
       Number(requiredBase) > Number(baseDeposit)
     ) {
-      newErrors.baseDeposit = "Base deposit must be uptated"
+      newErrors.baseDeposit = "Base deposit must be updated"
     } else {
       delete newErrors.baseDeposit
     }

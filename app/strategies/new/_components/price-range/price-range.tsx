@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
 
@@ -208,6 +207,13 @@ export const PriceRange = withClientOnly(function ({
     debouncedSetPriceRange(minPrice, maxPrice)
   }, [minPrice, maxPrice])
 
+  React.useEffect(() => {
+    setPriceRange("", "")
+    handleFieldChange("chart")
+    setMinPrice("")
+    setMaxPrice("")
+  }, [market])
+
   return (
     <div className={className}>
       <div className="border-b">
@@ -298,14 +304,6 @@ export const PriceRange = withClientOnly(function ({
         )}
 
         <div className="flex justify-between">
-          <Button
-            asChild
-            variant={"secondary"}
-            size={"lg"}
-            className="w-full text-center max-w-32"
-          >
-            <Link href="/strategies">Back</Link>
-          </Button>
           <Button
             size={"lg"}
             rightIcon

@@ -432,7 +432,7 @@ const Summary = ({
 
       <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
         <SummaryLine
-          title={`No. of offers`}
+          title={`Nb. of offers`}
           value={<Text>{numberOfOffers}</Text>}
         />
         <SummaryLine title={`Step Size`} value={<Text>{stepSize}</Text>} />

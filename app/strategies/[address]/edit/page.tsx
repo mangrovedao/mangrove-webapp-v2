@@ -3,8 +3,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Address } from "viem"
+import { InfoBar } from "../../(shared)/_components/info-bar"
 import { Form } from "./_components/form/form"
-import { InfoBar } from "./_components/info-bar"
 import { PriceRange } from "./_components/price-range/price-range"
 
 export default function Page() {
