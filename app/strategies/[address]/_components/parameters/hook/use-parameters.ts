@@ -2,6 +2,7 @@ import Big from "big.js"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
+import { usePnL } from "@/app/strategies/(shared)/_hooks/use-pnl"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
 
@@ -28,6 +29,9 @@ export const useParameters = () => {
     address: strategyAddress,
     depositsAndWithdraws,
   } = strategyQuery.data ?? {}
+
+  const { pnlQuote, returnRate } =
+    usePnL({ kandelAddress: strategyAddress }).data ?? {}
 
   const { maxPrice, minPrice } = offerStatuses ?? {}
 
@@ -119,6 +123,8 @@ export const useParameters = () => {
       minPrice,
       creationDate,
       strategyAddress,
+      pnlQuote: `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`,
+      returnRate: `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`,
     },
     publishedBase,
     publishedQuote,

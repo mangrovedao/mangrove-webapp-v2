@@ -45,8 +45,6 @@ export function useEditKandelStrategy() {
 
         const populateTxs = await kandelInstance.populateGeometricDistribution({
           distribution,
-          // depositBaseAmount: baseDeposit,
-          // depositQuoteAmount: quoteDeposit,
           funds: bountyDeposit,
           parameters: {
             pricePoints: Number(numberOfOffers) + 1,
