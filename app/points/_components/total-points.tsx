@@ -16,11 +16,11 @@ export default function TotalPoints() {
       points: Number(userPoints?.maker_points ?? 0),
       color: "bg-[#8F5AE8]",
     },
-    {
-      id: "Community points",
-      points: Number(userPoints?.community_points ?? 0),
-      color: "bg-white",
-    },
+    // {
+    //   id: "Community points",
+    //   points: Number(userPoints?.community_points ?? 0),
+    //   color: "bg-white",
+    // },
     {
       id: "Referral points",
       points: Number(userPoints?.referees_points ?? 0),
