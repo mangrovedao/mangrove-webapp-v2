@@ -20,7 +20,17 @@ export default function Page() {
   const { data: userBoosts } = useUserBoosts()
   const { data: userPoints } = useUserPoints()
   const userBoost = userBoosts?.[0]
-  const currentBoost = Number(userPoints?.boost ?? 1)
+  const volumeBoost = Number(userPoints?.boost ?? 1)
+  const highestBoost = Number(
+    userBoosts?.reduce(
+      (prev, current) => {
+        return prev.boost > current.boost ? prev : current
+      },
+      { boost: 1 },
+    )?.boost ?? 1,
+  )
+  // FIXME: workaround to show the highest boost to the user because the API is not handling that for now
+  const currentBoost = volumeBoost > highestBoost ? volumeBoost : highestBoost
   const volume = Number(userBoost?.volume ?? 0)
 
   return isConnected ? (
