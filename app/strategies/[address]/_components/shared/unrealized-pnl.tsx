@@ -1,5 +1,6 @@
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
@@ -44,7 +45,9 @@ export default function UnrealizedPnl({ pnl }: { pnl: string }) {
             </Tooltip>
           </TooltipProvider>
         </Caption>
-        <Title variant={"title1"}>{pnl ? pnl : "N/A"}</Title>
+        <Title variant={"title1"}>
+          {pnl ? pnl : <Skeleton className="h-6 w-20" />}
+        </Title>
       </span>
     </div>
   )

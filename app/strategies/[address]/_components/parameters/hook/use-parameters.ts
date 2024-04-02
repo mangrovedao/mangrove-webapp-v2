@@ -123,8 +123,12 @@ export const useParameters = () => {
       minPrice,
       creationDate,
       strategyAddress,
-      pnlQuote: `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`,
-      returnRate: `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`,
+      pnlQuote: pnlQuote
+        ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+        : "",
+      returnRate: returnRate
+        ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+        : "",
     },
     publishedBase,
     publishedQuote,
