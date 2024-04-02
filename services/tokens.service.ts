@@ -44,7 +44,7 @@ export async function getTokenPriceInToken(
     }
   } catch (e) {
     if (returnOneIfError) {
-      return 1 // FIXME: return 1 if the price API fails
+      return { close: 1 } // FIXME: return 1 if the price API fails
     }
     throw new Error(`Failed to get token price: ${getErrorMessage(e)}`)
   }
