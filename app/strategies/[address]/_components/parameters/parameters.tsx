@@ -87,7 +87,7 @@ const Inventory = () => {
           <Button
             onClick={toggleWithdraw}
             variant={"secondary"}
-            disabled={Number(withdrawBase) < 0 || Number(withdrawQuote) < 0}
+            disabled={!Number(withdrawBase) || !Number(withdrawQuote)}
           >
             Withdraw
           </Button>
@@ -286,9 +286,9 @@ export default function Parameters() {
 
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
-        <Inventory />
         {/* <PublishedInventory /> */}
         <BountyInventory />
+        <Inventory />
       </div>
     </div>
   )
