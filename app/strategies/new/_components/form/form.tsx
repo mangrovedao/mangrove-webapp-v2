@@ -172,7 +172,7 @@ export function Form({ className }: { className?: string }) {
         <div>
           <EnhancedNumericInput
             token={baseToken}
-            label={`${baseToken?.symbol} deposit`}
+            label={`${baseToken?.symbol} amount`}
             value={baseDeposit}
             onChange={handleBaseDepositChange}
             disabled={fieldsDisabled}
@@ -205,7 +205,7 @@ export function Form({ className }: { className?: string }) {
         <div>
           <EnhancedNumericInput
             token={quoteToken}
-            label={`${quoteToken?.symbol} deposit`}
+            label={`${quoteToken?.symbol} amount`}
             value={quoteDeposit}
             onChange={handleQuoteDepositChange}
             disabled={fieldsDisabled}
@@ -271,7 +271,7 @@ export function Form({ className }: { className?: string }) {
       <Fieldset legend="Bounty">
         <div>
           <EnhancedNumericInput
-            label={`${nativeBalance?.symbol} deposit`}
+            label={`${nativeBalance?.symbol} amount`}
             token={nativeBalance?.symbol}
             value={bountyDeposit}
             onChange={handleBountyDepositChange}
