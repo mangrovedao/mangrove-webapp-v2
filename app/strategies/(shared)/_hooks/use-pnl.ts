@@ -22,6 +22,7 @@ export function usePnL({ kandelAddress }: Params) {
         throw new Error()
       }
     },
+    enabled: !!kandelAddress,
     meta: {
       error: "Unable to retrieve pnl data",
     },
