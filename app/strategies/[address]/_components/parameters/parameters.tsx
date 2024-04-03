@@ -87,7 +87,9 @@ const Inventory = () => {
           <Button
             onClick={toggleWithdraw}
             variant={"secondary"}
-            disabled={!Number(withdrawBase) || !Number(withdrawQuote)}
+            disabled={
+              Number(withdrawBase ?? 0) <= 0 || Number(withdrawQuote ?? 0) <= 0
+            }
           >
             Withdraw
           </Button>
@@ -106,21 +108,13 @@ const Inventory = () => {
           <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
-              {Big(Number(withdrawBase ?? 0)).toFixed(
-                base?.displayedDecimals,
-                1,
-              )}{" "}
-              {base?.symbol}
+              {withdrawBase} {base?.symbol}
             </Text>
           </tr>
           <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
-              {Big(Number(withdrawQuote ?? 0)).toFixed(
-                quote?.displayedAsPriceDecimals,
-                1,
-              )}{" "}
-              {quote?.symbol}
+              {withdrawQuote} {quote?.symbol}
             </Text>
           </tr>
         </tbody>
