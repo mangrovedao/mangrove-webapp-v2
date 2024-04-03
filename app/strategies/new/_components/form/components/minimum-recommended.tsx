@@ -23,7 +23,7 @@ export function MinimumRecommended({
 
   return (
     <div className="flex justify-between items-center mt-1">
-      <span className="text-xs text-secondary float-left">Min recommended</span>
+      <span className="text-xs text-secondary float-left">Min required</span>
       {loading || !value ? (
         <Skeleton className="w-28 h-4" />
       ) : (
