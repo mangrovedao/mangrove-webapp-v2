@@ -45,7 +45,7 @@ export function useLaunchKandelStrategy() {
       quoteLogic,
     }: FormValues) => {
       try {
-        if (!(market && kandelStrategies && distribution)) return
+        if (!(market && kandelStrategies && distribution && mangrove)) return
 
         // const _baseLogic = mangrove?.getLogicByAddress(baseLogic.address)
         // const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic.address)
@@ -58,10 +58,10 @@ export function useLaunchKandelStrategy() {
           type: "smart",
         })
 
-        // await kandelInstance.setLogics({
-        //   baseLogic: _baseLogic,
-        //   quoteLogic: _quoteLogic,
-        // })
+        await kandelInstance.setLogics({
+          baseLogic: mangrove?.logics.simple,
+          quoteLogic: mangrove?.logics.simple,
+        })
 
         const populateTxs = await kandelInstance.populateGeometricDistribution({
           distribution,

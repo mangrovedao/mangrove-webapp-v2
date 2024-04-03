@@ -4,6 +4,7 @@ import { toast } from "sonner"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
@@ -22,6 +23,8 @@ type FormValues = Pick<
 
 export function useEditKandelStrategy() {
   const { market } = useMarket()
+  const { mangrove } = useMangrove()
+
   const { kandelStrategies } = useKandel()
   const queryClient = useQueryClient()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
@@ -35,13 +38,26 @@ export function useEditKandelStrategy() {
       kandelAddress,
     }: FormValues) => {
       try {
-        if (!(market && kandelStrategies && distribution && kandelAddress))
+        if (
+          !(
+            market &&
+            kandelStrategies &&
+            distribution &&
+            kandelAddress &&
+            mangrove
+          )
+        )
           return
 
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
           market,
           type: "smart",
+        })
+
+        await kandelInstance.setLogics({
+          baseLogic: mangrove?.logics.simple,
+          quoteLogic: mangrove?.logics.simple,
         })
 
         const populateTxs = await kandelInstance.populateGeometricDistribution({

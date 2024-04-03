@@ -6,6 +6,7 @@ import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom } from "../../../new/_stores/new-strat.store"
+import useMangrove from "@/providers/mangrove"
 
 export type Params = {
   onAave?: boolean
@@ -28,6 +29,8 @@ export function useKandelRequirements({
   numberOfOffers,
 }: Params) {
   const { market, midPrice } = useMarket()
+  const {mangrove} = useMangrove()
+
   const { kandelStrategies, generator, config } = useKandel()
   return useQuery({
     queryKey: [
@@ -50,25 +53,28 @@ export function useKandelRequirements({
           midPrice &&
           config &&
           minPrice &&
-          maxPrice
+          maxPrice && 
+          mangrove
         )
       )
         return null
 
       try {
         const minimumBasePerOffer =
-          await kandelStrategies.seeder.getMinimumVolume({
-            market,
-            offerType: "asks",
-            type: "smart",
-          })
+        kandelStrategies.seeder.getMinimumVolumeForGasreq({
+          market,
+          offerType: "asks",
+          factor: 3,
+          gasreq: mangrove?.logics.simple.gasOverhead + 100_000
+        })
 
-        const minimumQuotePerOffer =
-          await kandelStrategies.seeder.getMinimumVolume({
-            market,
-            offerType: "bids",
-            type: "smart",
-          })
+      const minimumQuotePerOffer =
+         kandelStrategies.seeder.getMinimumVolumeForGasreq({
+          market,
+          offerType: "bids",
+          factor: 3,
+          gasreq: mangrove?.logics.simple.gasOverhead + 100_000
+        })
 
         const param: Parameters<
           typeof generator.calculateMinimumDistribution
@@ -115,6 +121,9 @@ export function useKandelRequirements({
               liquiditySharing: false,
             },
             distribution,
+            undefined,
+            undefined,
+            mangrove?.logics.simple.gasOverhead + 100_000
           )
 
         return {

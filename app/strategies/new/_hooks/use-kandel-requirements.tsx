@@ -6,6 +6,7 @@ import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom } from "../_stores/new-strat.store"
+import useMangrove from "@/providers/mangrove"
 
 export type Params = {
   onAave?: boolean
@@ -28,6 +29,7 @@ export function useKandelRequirements({
   numberOfOffers,
 }: Params) {
   const { market, midPrice } = useMarket()
+  const {mangrove} = useMangrove()
   const { kandelStrategies, generator, config } = useKandel()
   return useQuery({
     queryKey: [
@@ -50,24 +52,27 @@ export function useKandelRequirements({
           midPrice &&
           config &&
           minPrice &&
-          maxPrice
+          maxPrice &&
+          mangrove
         )
       )
         return null
 
       try {
         const minimumBasePerOffer =
-          await kandelStrategies.seeder.getMinimumVolume({
+          kandelStrategies.seeder.getMinimumVolumeForGasreq({
             market,
             offerType: "asks",
-            type: "smart",
+            factor: 3,
+            gasreq: mangrove?.logics.simple.gasOverhead + 100_000
           })
 
         const minimumQuotePerOffer =
-          await kandelStrategies.seeder.getMinimumVolume({
+           kandelStrategies.seeder.getMinimumVolumeForGasreq({
             market,
             offerType: "bids",
-            type: "smart",
+            factor: 3,
+            gasreq: mangrove?.logics.simple.gasOverhead + 100_000
           })
 
         const param: Parameters<
@@ -113,8 +118,12 @@ export function useKandelRequirements({
               type: "smart",
               market,
               liquiditySharing: false,
+              
             },
             distribution,
+            undefined,
+            undefined,
+            mangrove?.logics.simple.gasOverhead + 100_000
           )
 
         return {
