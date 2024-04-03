@@ -70,7 +70,7 @@ const Inventory = () => {
     (isOpen) => !isOpen,
     false,
   )
-  console.log(withdrawBase, withdrawQuote)
+
   return (
     <div>
       {/* Header */}
