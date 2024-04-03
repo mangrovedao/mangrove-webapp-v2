@@ -53,7 +53,7 @@ export function parsePnl(data: unknown) {
   try {
     return pnlSchema.parse(data)[0]
   } catch (error) {
-    console.error("Invalid format for leaderboard: ", data, error)
+    console.error("Invalid format for pnl: ", data, error)
     return null
   }
 }
