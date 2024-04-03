@@ -70,7 +70,7 @@ const Inventory = () => {
     (isOpen) => !isOpen,
     false,
   )
-
+  console.log(withdrawBase, withdrawQuote)
   return (
     <div>
       {/* Header */}
@@ -88,7 +88,7 @@ const Inventory = () => {
             onClick={toggleWithdraw}
             variant={"secondary"}
             disabled={
-              Number(withdrawBase ?? 0) <= 0 || Number(withdrawQuote ?? 0) <= 0
+              Number(withdrawBase ?? 0) <= 0 && Number(withdrawQuote ?? 0) <= 0
             }
           >
             Withdraw
