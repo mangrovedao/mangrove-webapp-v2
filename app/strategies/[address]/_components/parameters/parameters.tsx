@@ -11,8 +11,10 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Skeleton } from "@/components/ui/skeleton"
 
+import { Button } from "@/components/ui/button"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
+import { Withdraw } from "./dialogs/withdraw"
 import { useParameters } from "./hook/use-parameters"
 
 const InfoLine = ({
@@ -56,6 +58,82 @@ const InfoBar = () => {
             : "-"
         }
       />
+    </div>
+  )
+}
+
+const Inventory = () => {
+  const { withdrawBase, withdrawQuote, base, quote } = useParameters()
+  const [deposit, toggleDeposit] = React.useReducer((isOpen) => !isOpen, false)
+  const [publish, togglePublish] = React.useReducer((isOpen) => !isOpen, false)
+  const [withdraw, toggleWithdraw] = React.useReducer(
+    (isOpen) => !isOpen,
+    false,
+  )
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="flex justify-between">
+        <div className="flex items-center">
+          <Title>Withdrawable balance</Title>
+          <InfoTooltip>TODO:</InfoTooltip>
+        </div>
+        <div className="flex gap-2">
+          {/* <Button onClick={toggleDeposit}>Deposit</Button> */}
+          {/* <Button onClick={togglePublish} variant={"secondary"}>
+            Publish
+          </Button> */}
+          <Button
+            onClick={toggleWithdraw}
+            variant={"secondary"}
+            disabled={Number(withdrawBase) < 0 || Number(withdrawQuote) < 0}
+          >
+            Withdraw
+          </Button>
+        </div>
+      </div>
+
+      {/* Table */}
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
+        <thead>
+          <tr className="flex justify-between">
+            <Caption className="text-muted-foreground">Asset</Caption>
+            <Caption className="text-muted-foreground">Amount</Caption>
+          </tr>
+        </thead>
+        <tbody className="w-full flex flex-col gap-4 divide-y">
+          <tr className="flex justify-between pt-4">
+            <Text>{base?.symbol}</Text>
+            <Text>
+              {Big(Number(withdrawBase ?? 0)).toFixed(
+                base?.displayedDecimals,
+                1,
+              )}{" "}
+              {base?.symbol}
+            </Text>
+          </tr>
+          <tr className="flex justify-between pt-4">
+            <Text>{quote?.symbol}</Text>
+            <Text>
+              {Big(Number(withdrawQuote ?? 0)).toFixed(
+                quote?.displayedAsPriceDecimals,
+                1,
+              )}{" "}
+              {quote?.symbol}
+            </Text>
+          </tr>
+        </tbody>
+      </table>
+
+      {/* Dialogs */}
+      {/* <Deposit
+        open={deposit}
+        onClose={toggleDeposit}
+        togglePublish={togglePublish}
+      /> */}
+      {/* <Publish open={publish} onClose={togglePublish} /> */}
+      <Withdraw open={withdraw} onClose={toggleWithdraw} />
     </div>
   )
 }
@@ -208,7 +286,7 @@ export default function Parameters() {
 
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
-        {/* <UnallocatedInventory /> */}
+        <Inventory />
         {/* <PublishedInventory /> */}
         <BountyInventory />
       </div>
