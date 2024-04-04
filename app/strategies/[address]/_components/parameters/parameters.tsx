@@ -77,7 +77,17 @@ const Inventory = () => {
       <div className="flex justify-between">
         <div className="flex items-center">
           <Title>Withdrawable balance</Title>
-          <InfoTooltip>TODO:</InfoTooltip>
+          <InfoTooltip>
+            <Caption>
+              These are the funds received by the strategy that were
+              unsuccessfully sent through your router.
+            </Caption>
+
+            <Caption>
+              If you decide to leave the funds in the strategy, they will still
+              be used.
+            </Caption>
+          </InfoTooltip>
         </div>
         <div className="flex gap-2">
           {/* <Button onClick={toggleDeposit}>Deposit</Button> */}

@@ -19,8 +19,8 @@ export function usePnL({ kandelAddress }: Params) {
 
         if (pnl.length <= 0) {
           return {
-            pnlQuote: "closed",
-            returnRate: "closed",
+            pnlQuote: "Upcoming",
+            returnRate: "Upcoming",
           }
         }
         return parsePnl(pnl)
