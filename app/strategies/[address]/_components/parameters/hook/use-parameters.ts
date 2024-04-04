@@ -3,7 +3,7 @@ import React from "react"
 import { useAccount, useBalance, usePublicClient } from "wagmi"
 
 import { usePnL } from "@/app/strategies/(shared)/_hooks/use-pnl"
-import { Address, erc20Abi } from "viem"
+import { Address, erc20Abi, formatUnits } from "viem"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
 
@@ -104,26 +104,36 @@ export const useParameters = () => {
   const publicClient = usePublicClient()
 
   const getWithdawableBalances = async () => {
-    const base = await publicClient?.readContract({
-      address: market?.base.address as Address,
-      abi: erc20Abi,
-      functionName: "balanceOf",
-      args: [strategyAddress as Address],
+    if (!publicClient) return
+
+    const [base, quote] = await publicClient.multicall({
+      contracts: [
+        {
+          address: market?.base.address as Address,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [strategyAddress as Address],
+        },
+        {
+          address: market?.quote.address as Address,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [strategyAddress as Address],
+        },
+      ],
+      allowFailure: false,
     })
 
-    const quote = await publicClient?.readContract({
-      address: market?.quote.address as Address,
-      abi: erc20Abi,
-      functionName: "balanceOf",
-      args: [strategyAddress as Address],
-    })
-    return [base, quote]
+    return [
+      formatUnits(base, (market?.base.decimals as number) ?? 0),
+      formatUnits(quote, (market?.quote.decimals as number) ?? 0),
+    ]
   }
-
   React.useEffect(() => {
     const fetchUnpublishedBalancesAndBounty = async () => {
       const [base, quote] = await getUnpublishedBalances()
-      const [baseWithdraw, quoteWithdraw] = await getWithdawableBalances()
+      const [baseWithdraw, quoteWithdraw] =
+        (await getWithdawableBalances()) ?? []
 
       setWithdrawableBase(
         Number(baseWithdraw ?? 0).toFixed(market?.base.displayedDecimals),
