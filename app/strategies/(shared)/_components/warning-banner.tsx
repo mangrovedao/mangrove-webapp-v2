@@ -15,7 +15,7 @@ export default function WarningBanner() {
   return (
     <aside
       className={cn(
-        "w-full flex justify-between  space-x-4 align-middle rounded-lg mt-2 p-2 bg-mango-300 ",
+        "w-full flex justify-between space-x-4 align-middle rounded-lg mt-2 px-3 py-2 bg-mango-300 ",
       )}
     >
       <div className="flex align-middle items-center space-x-2">
