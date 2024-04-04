@@ -15,17 +15,9 @@ export default function WarningBanner() {
   return (
     <aside
       className={cn(
-        "w-full flex space-x-4 align-middle rounded-lg mt-2 p-2 relative bg-mango-300 ",
+        "w-full flex justify-between space-x-4 align-middle rounded-lg mt-2 px-3 py-2 bg-mango-300 ",
       )}
     >
-      <button
-        className="absolute top-3 right-2 hover:opacity-90 transition-opacity"
-        onClick={() => setStrategyBannerWarning(true)}
-      >
-        <X className="text-cloud-300 w-5 h-5 hover:text-secondary" />
-        <span className="sr-only">Close</span>
-      </button>
-
       <div className="flex align-middle items-center space-x-2">
         <div
           className={cn(
@@ -40,10 +32,19 @@ export default function WarningBanner() {
         <div>
           <Caption>
             Strategy liquidity stays in your wallet; removing it while having
-            active offers will mark your strategy as inactive.
+            active offers will mark your strategy as inactive. Received
+            liquidity may be on your strategy contract, you can withdraw it at
+            anytime from Parameters tab.
           </Caption>
         </div>
       </div>
+      <button
+        className="top-3 right-2 hover:opacity-90 transition-opacity"
+        onClick={() => setStrategyBannerWarning(true)}
+      >
+        <X className="text-cloud-300 w-5 h-5 hover:text-secondary" />
+        <span className="sr-only">Close</span>
+      </button>
     </aside>
   )
 }

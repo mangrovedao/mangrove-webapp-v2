@@ -3,12 +3,12 @@ import { useQuery } from "@tanstack/react-query"
 import { BigSource } from "big.js"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom } from "../../../new/_stores/new-strat.store"
 
 export type Params = {
-  onAave?: boolean
   stepSize: number | string
   minPrice: BigSource
   maxPrice: BigSource
@@ -19,7 +19,6 @@ export type Params = {
 }
 
 export function useKandelRequirements({
-  onAave = false,
   minPrice,
   maxPrice,
   availableBase,
@@ -28,16 +27,19 @@ export function useKandelRequirements({
   numberOfOffers,
 }: Params) {
   const { market, midPrice } = useMarket()
+  const { mangrove } = useMangrove()
   const { kandelStrategies, generator, config } = useKandel()
+
   return useQuery({
     queryKey: [
       "kandel-requirements",
+      availableBase,
+      availableQuote,
       minPrice,
       maxPrice,
       midPrice,
       stepSize,
       numberOfOffers,
-      onAave,
       market?.base.id,
       market?.quote?.id,
     ],
@@ -50,24 +52,27 @@ export function useKandelRequirements({
           midPrice &&
           config &&
           minPrice &&
-          maxPrice
+          maxPrice &&
+          mangrove
         )
       )
         return null
 
       try {
         const minimumBasePerOffer =
-          await kandelStrategies.seeder.getMinimumVolume({
+          kandelStrategies.seeder.getMinimumVolumeForGasreq({
             market,
             offerType: "asks",
-            type: "smart",
+            factor: 3,
+            gasreq: mangrove?.logics.simple.gasOverhead + 100_000,
           })
 
         const minimumQuotePerOffer =
-          await kandelStrategies.seeder.getMinimumVolume({
+          kandelStrategies.seeder.getMinimumVolumeForGasreq({
             market,
             offerType: "bids",
-            type: "smart",
+            factor: 3,
+            gasreq: mangrove?.logics.simple.gasOverhead + 100_000,
           })
 
         const param: Parameters<
@@ -115,6 +120,9 @@ export function useKandelRequirements({
               liquiditySharing: false,
             },
             distribution,
+            undefined,
+            undefined,
+            mangrove?.logics.simple.gasOverhead + 100_000,
           )
 
         return {

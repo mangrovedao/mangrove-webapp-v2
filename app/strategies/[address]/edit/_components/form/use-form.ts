@@ -38,18 +38,17 @@ export default function useForm() {
   })
 
   const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
-  const { depositedBase, depositedQuote, currentParameter, offers } =
-    strategyQuery.data ?? {}
+  const { currentParameter, offers } = strategyQuery.data ?? {}
 
-  const asksOffers = offers?.filter((item) => item.offerType === "asks")
-  const bidsOffers = offers?.filter((item) => item.offerType === "bids")
+  const asksOffers = mergedOffers?.filter((item) => item.offerType === "asks")
+  const bidsOffers = mergedOffers?.filter((item) => item.offerType === "bids")
 
   const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
-    return acc.add(Big(curr.gives))
+    return acc.add(Big(curr.gives ?? 0))
   }, Big(0))
 
   const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
-    return acc.add(Big(curr.gives))
+    return acc.add(Big(curr.gives ?? 0))
   }, Big(0))
 
   const asks =
@@ -70,12 +69,11 @@ export default function useForm() {
         gasprice: Number(gasprice || 0),
       })) || []
 
-  const lockedBounty = strategyStatusQuery.data?.stratInstance
-    ?.getLockedProvisionFromOffers({
+  const lockedBounty =
+    strategyStatusQuery.data?.stratInstance?.getLockedProvisionFromOffers({
       asks,
       bids,
     })
-    .toFixed(nativeBalance?.decimals ?? 6)
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
@@ -122,7 +120,6 @@ export default function useForm() {
   const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
-    onAave: false,
     minPrice,
     maxPrice,
     availableBase: baseDeposit,

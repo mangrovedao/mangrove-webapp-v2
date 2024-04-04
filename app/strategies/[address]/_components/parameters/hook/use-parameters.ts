@@ -1,6 +1,7 @@
 import Big from "big.js"
 import React from "react"
-import { useAccount, useBalance } from "wagmi"
+import { Address, erc20Abi, formatUnits } from "viem"
+import { useAccount, useBalance, usePublicClient } from "wagmi"
 
 import { usePnL } from "@/app/strategies/(shared)/_hooks/use-pnl"
 import useKandel from "../../../_providers/kandel-strategy"
@@ -9,6 +10,8 @@ import { MergedOffers } from "../../../_utils/inventory"
 export const useParameters = () => {
   const [unPublishedBase, setUnpublishedBase] = React.useState("")
   const [unPublishedQuote, setUnPublishedQuote] = React.useState("")
+  const [withdrawBase, setWithdrawableBase] = React.useState("")
+  const [withdrawQuote, setWithdrawableQuote] = React.useState("")
 
   const { strategyStatusQuery, strategyQuery, mergedOffers } = useKandel()
 
@@ -28,6 +31,7 @@ export const useParameters = () => {
     creationDate,
     address: strategyAddress,
     depositsAndWithdraws,
+    parametersHistoric,
   } = strategyQuery.data ?? {}
 
   const { pnlQuote, returnRate } =
@@ -98,14 +102,53 @@ export const useParameters = () => {
     return [asks, bids]
   }
 
+  const publicClient = usePublicClient()
+
+  const getWithdawableBalances = async () => {
+    if (!publicClient) return
+
+    const [base, quote] = await publicClient.multicall({
+      contracts: [
+        {
+          address: market?.base.address as Address,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [strategyAddress as Address],
+        },
+        {
+          address: market?.quote.address as Address,
+          abi: erc20Abi,
+          functionName: "balanceOf",
+          args: [strategyAddress as Address],
+        },
+      ],
+      allowFailure: false,
+    })
+
+    return [
+      formatUnits(base, (market?.base.decimals as number) ?? 0),
+      formatUnits(quote, (market?.quote.decimals as number) ?? 0),
+    ]
+  }
   React.useEffect(() => {
     const fetchUnpublishedBalancesAndBounty = async () => {
       const [base, quote] = await getUnpublishedBalances()
+      const [baseWithdraw, quoteWithdraw] =
+        (await getWithdawableBalances()) ?? []
 
-      if (!base || !quote) return
+      setWithdrawableBase(
+        Number(baseWithdraw ?? 0).toFixed(market?.base.displayedDecimals),
+      )
+      setWithdrawableQuote(
+        Number(quoteWithdraw ?? 0).toFixed(market?.quote.displayedDecimals),
+      )
 
-      setUnpublishedBase(base.toFixed(market?.base?.decimals))
-      setUnPublishedQuote(quote.toFixed(market?.base?.decimals))
+      setUnpublishedBase(
+        Number(base ?? 0).toFixed(market?.base.displayedDecimals),
+      )
+      setUnPublishedQuote(
+        Number(quote ?? 0).toFixed(market?.quote.displayedDecimals),
+      )
     }
 
     fetchUnpublishedBalancesAndBounty()
@@ -113,6 +156,7 @@ export const useParameters = () => {
 
   return {
     depositsAndWithdraws,
+    parametersHistoric,
     quote: market?.quote,
     base: market?.base,
     currentParameter: {
@@ -123,15 +167,21 @@ export const useParameters = () => {
       minPrice,
       creationDate,
       strategyAddress,
-      pnlQuote:
-        pnlQuote && market?.quote.symbol
-          ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
-          : "",
-      returnRate:
-        returnRate && market?.quote.symbol
-          ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
-          : "",
+      pnlQuote: "Upcoming",
+      // pnlQuote === "Upcoming"
+      //   ? "Upcoming"
+      //   : pnlQuote && market?.quote.symbol
+      //     ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+      //     : "",
+      returnRate: "Upcoming",
+      // returnRate === "Upcoming"
+      //   ? "Upcoming"
+      //   : returnRate && market?.quote.symbol
+      //     ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+      //     : "",
     },
+    withdrawBase,
+    withdrawQuote,
     publishedBase,
     publishedQuote,
     unPublishedBase,
