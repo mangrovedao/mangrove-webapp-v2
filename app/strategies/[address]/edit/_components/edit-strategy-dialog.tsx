@@ -85,14 +85,16 @@ export default function EditStrategyDialog({
 
   let steps = [
     "Summary",
-    strategy?.hasLiveOffers ? "Reset strategy" : "",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
     !baseTokenApproved ? `Approve ${baseToken?.symbol}` : "",
     !quoteTokenApproved ? `Approve ${quoteToken?.symbol}` : "",
+    strategy?.hasLiveOffers ? "Reset strategy" : "",
     "Publish",
   ].filter(Boolean)
+
+  console.log(steps)
 
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers

@@ -57,7 +57,7 @@ export function useParametersTable({ data }: Params) {
 
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(numberOfOrders) - 1}
+              {Number(numberOfOrders)}
             </div>
           )
         },
