@@ -94,8 +94,6 @@ export default function EditStrategyDialog({
     "Publish",
   ].filter(Boolean)
 
-  console.log(steps)
-
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
   const stepInfos = [
