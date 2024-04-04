@@ -41,6 +41,13 @@ export const depositsAndWithdraws = z.object({
   isDeposit: z.boolean(),
 })
 
+export const parametersHistory = z.object({
+  date: z.date().nullish(),
+  length: z.string().nullish(),
+  stepSize: z.string().nullish(),
+  transactionHash: z.string().nullish(),
+})
+
 export const strategySchema = z.object({
   transactionHash: z.string(),
   creationDate: z.date(),

@@ -5,6 +5,7 @@ import {
   numberOrNaN,
   offerWithPricesSchema,
   parameterSchema,
+  parametersHistory,
 } from "../../(list)/_schemas/kandels"
 
 export const strategySchema = z.object({
@@ -23,6 +24,7 @@ export const strategySchema = z.object({
   currentParameter: parameterSchema,
   offers: z.array(offerWithPricesSchema),
   depositsAndWithdraws: z.array(depositsAndWithdraws).optional(),
+  parametersHistoric: z.array(parametersHistory).optional(),
 })
 
 export type Strategy = z.infer<typeof strategySchema>

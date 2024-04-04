@@ -1,9 +1,9 @@
 import Big from "big.js"
 import React from "react"
+import { Address, erc20Abi, formatUnits } from "viem"
 import { useAccount, useBalance, usePublicClient } from "wagmi"
 
 import { usePnL } from "@/app/strategies/(shared)/_hooks/use-pnl"
-import { Address, erc20Abi, formatUnits } from "viem"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
 
@@ -31,6 +31,7 @@ export const useParameters = () => {
     creationDate,
     address: strategyAddress,
     depositsAndWithdraws,
+    parametersHistoric,
   } = strategyQuery.data ?? {}
 
   const { pnlQuote, returnRate } =
@@ -155,6 +156,7 @@ export const useParameters = () => {
 
   return {
     depositsAndWithdraws,
+    parametersHistoric,
     quote: market?.quote,
     base: market?.base,
     currentParameter: {
