@@ -38,18 +38,17 @@ export default function useForm() {
   })
 
   const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
-  const { depositedBase, depositedQuote, currentParameter, offers } =
-    strategyQuery.data ?? {}
+  const { currentParameter, offers } = strategyQuery.data ?? {}
 
-  const asksOffers = offers?.filter((item) => item.offerType === "asks")
-  const bidsOffers = offers?.filter((item) => item.offerType === "bids")
+  const asksOffers = mergedOffers?.filter((item) => item.offerType === "asks")
+  const bidsOffers = mergedOffers?.filter((item) => item.offerType === "bids")
 
   const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
-    return acc.add(Big(curr.gives))
+    return acc.add(Big(curr.gives ?? 0))
   }, Big(0))
 
   const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
-    return acc.add(Big(curr.gives))
+    return acc.add(Big(curr.gives ?? 0))
   }, Big(0))
 
   const asks =

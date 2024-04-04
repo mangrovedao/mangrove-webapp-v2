@@ -16,6 +16,13 @@ export function usePnL({ kandelAddress }: Params) {
           `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/pnl/${kandelAddress}`,
         )
         const pnl = await res.json()
+
+        if (pnl.length <= 0) {
+          return {
+            pnlQuote: "closed",
+            returnRate: "closed",
+          }
+        }
         return parsePnl(pnl)
       } catch (e) {
         console.error(getErrorMessage(e))
