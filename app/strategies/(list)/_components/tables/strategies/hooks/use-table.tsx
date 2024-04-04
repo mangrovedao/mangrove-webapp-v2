@@ -94,8 +94,12 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         header: "Value",
         cell: ({ row }) => {
           const { base, quote, offers } = row.original
-          const asksOffers = offers?.filter((item) => item.offerType === "asks")
-          const bidsOffers = offers?.filter((item) => item.offerType === "bids")
+          const asksOffers = offers?.filter(
+            (item) => item.offerType === "asks" && item.live,
+          )
+          const bidsOffers = offers?.filter(
+            (item) => item.offerType === "bids" && item.live,
+          )
 
           const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
             return acc.add(Big(curr.gives))

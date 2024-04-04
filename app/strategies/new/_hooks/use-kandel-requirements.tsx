@@ -3,13 +3,12 @@ import { useQuery } from "@tanstack/react-query"
 import { BigSource } from "big.js"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
+import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom } from "../_stores/new-strat.store"
-import useMangrove from "@/providers/mangrove"
 
 export type Params = {
-  onAave?: boolean
   stepSize: number | string
   minPrice: BigSource
   maxPrice: BigSource
@@ -20,7 +19,6 @@ export type Params = {
 }
 
 export function useKandelRequirements({
-  onAave = false,
   minPrice,
   maxPrice,
   availableBase,
@@ -29,17 +27,18 @@ export function useKandelRequirements({
   numberOfOffers,
 }: Params) {
   const { market, midPrice } = useMarket()
-  const {mangrove} = useMangrove()
+  const { mangrove } = useMangrove()
   const { kandelStrategies, generator, config } = useKandel()
   return useQuery({
     queryKey: [
       "kandel-requirements",
+      availableBase,
+      availableQuote,
       minPrice,
       maxPrice,
       midPrice,
       stepSize,
       numberOfOffers,
-      onAave,
       market?.base.id,
       market?.quote?.id,
     ],
@@ -64,15 +63,15 @@ export function useKandelRequirements({
             market,
             offerType: "asks",
             factor: 3,
-            gasreq: mangrove?.logics.simple.gasOverhead + 100_000
+            gasreq: mangrove?.logics.simple.gasOverhead + 100_000,
           })
 
         const minimumQuotePerOffer =
-           kandelStrategies.seeder.getMinimumVolumeForGasreq({
+          kandelStrategies.seeder.getMinimumVolumeForGasreq({
             market,
             offerType: "bids",
             factor: 3,
-            gasreq: mangrove?.logics.simple.gasOverhead + 100_000
+            gasreq: mangrove?.logics.simple.gasOverhead + 100_000,
           })
 
         const param: Parameters<
@@ -89,7 +88,6 @@ export function useKandelRequirements({
             pricePoints: Number(numberOfOffers) + 1, // number of offers = price points - 1
           },
         }
-
         // Calculate a candidate distribution with the recommended minimum volumes given the price range.
         const minimumDistribution =
           await generator.calculateMinimumDistribution(param)
@@ -118,12 +116,11 @@ export function useKandelRequirements({
               type: "smart",
               market,
               liquiditySharing: false,
-              
             },
             distribution,
             undefined,
             undefined,
-            mangrove?.logics.simple.gasOverhead + 100_000
+            mangrove?.logics.simple.gasOverhead + 100_000,
           )
 
         return {

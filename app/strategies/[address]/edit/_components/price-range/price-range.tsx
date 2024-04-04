@@ -17,7 +17,6 @@ import {
   ChangingFrom,
   useNewStratStore,
 } from "../../../../new/_stores/new-strat.store"
-import { useParameters } from "../../../_components/parameters/hook/use-parameters"
 import useKandel from "../../../_providers/kandel-strategy"
 import EditStrategyDialog from "../edit-strategy-dialog"
 import { LiquiditySource } from "./components/liquidity-source"
@@ -74,7 +73,7 @@ export const PriceRange = withClientOnly(function ({
     !stepSize ||
     !numberOfOffers ||
     !distribution
-  const { currentParameter } = useParameters()
+
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
   const hasLiveOffers = mergedOffers?.some((x) => x.live)

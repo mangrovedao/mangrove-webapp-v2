@@ -55,7 +55,6 @@ export default function useForm() {
   const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
-    onAave: false,
     minPrice,
     maxPrice,
     availableBase: baseDeposit,

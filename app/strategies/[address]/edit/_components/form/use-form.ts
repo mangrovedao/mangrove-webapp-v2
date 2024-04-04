@@ -69,12 +69,11 @@ export default function useForm() {
         gasprice: Number(gasprice || 0),
       })) || []
 
-  const lockedBounty = strategyStatusQuery.data?.stratInstance
-    ?.getLockedProvisionFromOffers({
+  const lockedBounty =
+    strategyStatusQuery.data?.stratInstance?.getLockedProvisionFromOffers({
       asks,
       bids,
     })
-    .toFixed(nativeBalance?.decimals ?? 6)
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
@@ -121,7 +120,6 @@ export default function useForm() {
   const fieldsDisabled = !(minPrice && maxPrice)
 
   const kandelRequirementsQuery = useKandelRequirements({
-    onAave: false,
     minPrice,
     maxPrice,
     availableBase: baseDeposit,
