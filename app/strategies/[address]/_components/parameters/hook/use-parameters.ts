@@ -156,13 +156,17 @@ export const useParameters = () => {
       creationDate,
       strategyAddress,
       pnlQuote:
-        pnlQuote && market?.quote.symbol
-          ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
-          : "",
+        pnlQuote === "closed"
+          ? "Closed"
+          : pnlQuote && market?.quote.symbol
+            ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+            : "",
       returnRate:
-        returnRate && market?.quote.symbol
-          ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
-          : "",
+        returnRate === "closed"
+          ? "Closed"
+          : returnRate && market?.quote.symbol
+            ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+            : "",
     },
     withdrawBase,
     withdrawQuote,
