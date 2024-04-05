@@ -19,7 +19,7 @@ const initialPageDetails = {
 }
 
 export function Leaderboard() {
-  const [epoch, setEpoch] = React.useState<Epoch>("current")
+  const [epoch, setEpoch] = React.useState<Epoch>("total")
   const [{ page, pageSize }, setPageDetails] =
     React.useState<PageDetails>(initialPageDetails)
   const leaderboardQuery = useLeaderboard({
@@ -59,15 +59,15 @@ export function Leaderboard() {
   return (
     <div className="mt-16 !text-white">
       <CustomTabs
-        defaultValue={"current"}
+        defaultValue={"total"}
         className={cn("h-full mb-10")}
         onValueChange={(e) => setEpoch(e as Epoch)}
       >
         <CustomTabsList className="w-full flex justify-start border-b">
-          <CustomTabsTrigger value={"current"} className="capitalize">
+          {/* <CustomTabsTrigger value={"current"} className="capitalize">
             Current Epoch (#2){" "}
             <InfoTooltip className="ml-0">April 2 to April 9</InfoTooltip>
-          </CustomTabsTrigger>
+          </CustomTabsTrigger> */}
           <CustomTabsTrigger value={"total"} className="capitalize">
             Total
             <InfoTooltip className="ml-0">February 28 to today</InfoTooltip>
