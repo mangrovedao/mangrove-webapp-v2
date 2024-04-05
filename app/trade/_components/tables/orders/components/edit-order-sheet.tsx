@@ -228,7 +228,7 @@ export default function EditOrderSheet({
                     item={
                       !toggleEdit ? (
                         <Text>{`${volume} ${
-                          isBid ? base.symbol : quote.symbol
+                          isBid ? quote.symbol : base.symbol
                         }`}</Text>
                       ) : (
                         <form.Field

@@ -16,7 +16,6 @@ export function useStrategyHistory({ kandelAddress }: Params) {
           `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/kandel-history/${kandelAddress}`,
         )
         const history = await res.json()
-        console.log(history)
         return parseHistory(history)
       } catch (e) {
         console.error(getErrorMessage(e))
