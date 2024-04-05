@@ -45,7 +45,7 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const baseDecimals = market?.base.displayedDecimals
   const quoteDecimals = market?.quote.displayedDecimals
 
-  const displayDecimals = isBid ? baseDecimals : quoteDecimals
+  const displayDecimals = isBid ? quoteDecimals : baseDecimals
 
   const volume = Big(initialGives).toFixed(displayDecimals)
 

@@ -8,7 +8,10 @@ import { parseBoosts } from "../../schemas/boosts"
 import { parseLeaderboard } from "../../schemas/leaderboard"
 import { parsePoints } from "../../schemas/points"
 
+export type Epoch = "current" | "total"
+
 type Params = {
+  epoch?: Epoch
   filters?: {
     first?: number
     skip?: number
@@ -16,14 +19,15 @@ type Params = {
 }
 
 export function useLeaderboard({
+  epoch = "current",
   filters: { first = 100, skip = 0 } = {},
 }: Params = {}) {
   return useQuery({
-    queryKey: ["leaderboard", first, skip],
+    queryKey: ["leaderboard", first, skip, epoch],
     queryFn: async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/leaderboard?offset=${skip}&limit=${first}`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/leaderboard?offset=${skip}&limit=${first}&currentEpoch=${epoch === "current" ? "true" : "false"}`,
         )
         const leaderboard = await res.json()
         return parseLeaderboard(leaderboard)
@@ -41,15 +45,15 @@ export function useLeaderboard({
   })
 }
 
-export function useUserPoints() {
+export function useUserPoints({ epoch = "current" }: { epoch?: Epoch } = {}) {
   const { address } = useAccount()
   return useQuery({
-    queryKey: ["user-points", address],
+    queryKey: ["user-points", address, epoch],
     queryFn: async () => {
       try {
         if (!address) return null
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/points/${address}`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/points/${address}?currentEpoch=${epoch === "current" ? "true" : "false"}`,
         )
         const points = await res.json()
         return parsePoints(points)

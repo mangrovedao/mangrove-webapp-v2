@@ -29,17 +29,15 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         if (!mangrove || !market) return
         const { isBid, limitPrice: price, send: volume } = form
 
-        const updateOrder = isBid
-          ? await market.updateRestingOrder("bids", {
-              offerId: Number(offerId),
-              volume,
-              price,
-            })
-          : await market.updateRestingOrder("asks", {
-              offerId: Number(offerId),
-              volume,
-              price,
-            })
+        const updateOrder = await market.updateRestingOrder(
+          isBid ? "bids" : "asks",
+          {
+            offerId: Number(offerId),
+            volume: isBid ? undefined : volume,
+            total: isBid ? volume : undefined,
+            price,
+          },
+        )
 
         await updateOrder.result
 
