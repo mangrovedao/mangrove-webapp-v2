@@ -1,22 +1,37 @@
 "use client"
 import React from "react"
 
+import {
+  CustomTabs,
+  CustomTabsList,
+  CustomTabsTrigger,
+} from "@/components/custom-tabs"
 import { Title } from "@/components/typography/title"
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { useLeaderboard, useUserPoints } from "./use-leaderboard"
+import { cn } from "@/utils"
+import { useLeaderboard, useUserPoints, type Epoch } from "./use-leaderboard"
 import { useTable } from "./use-table"
 
+const initialPageDetails = {
+  page: 1,
+  pageSize: 10,
+}
+
 export function Leaderboard() {
-  const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
-    page: 1,
-    pageSize: 10,
-  })
+  const [epoch, setEpoch] = React.useState<Epoch>("current")
+  const [{ page, pageSize }, setPageDetails] =
+    React.useState<PageDetails>(initialPageDetails)
   const leaderboardQuery = useLeaderboard({
+    epoch,
     filters: {
       skip: (page - 1) * pageSize,
       first: pageSize,
     },
   })
+
+  React.useEffect(() => {
+    setPageDetails(initialPageDetails)
+  }, [epoch])
 
   const userPointsQuery = useUserPoints()
   const currentUser = userPointsQuery.data
@@ -42,6 +57,20 @@ export function Leaderboard() {
 
   return (
     <div className="mt-16 !text-white">
+      <CustomTabs
+        defaultValue={"current"}
+        className={cn("h-full mb-10")}
+        onValueChange={(e) => setEpoch(e as Epoch)}
+      >
+        <CustomTabsList className="w-full flex justify-start border-b">
+          <CustomTabsTrigger value={"current"} className="capitalize">
+            Current Epoch (#2)
+          </CustomTabsTrigger>
+          <CustomTabsTrigger value={"total"} className="capitalize">
+            Total
+          </CustomTabsTrigger>
+        </CustomTabsList>
+      </CustomTabs>
       <Title variant={"title1"} className="mb-5">
         Your points
       </Title>
