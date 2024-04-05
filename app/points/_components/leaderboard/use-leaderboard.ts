@@ -53,7 +53,7 @@ export function useUserPoints({ epoch = "current" }: { epoch?: Epoch } = {}) {
       try {
         if (!address) return null
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/points/${address}&currentEpoch=${epoch === "current" ? "true" : "false"}`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/points/${address}?currentEpoch=${epoch === "current" ? "true" : "false"}`,
         )
         const points = await res.json()
         return parsePoints(points)
