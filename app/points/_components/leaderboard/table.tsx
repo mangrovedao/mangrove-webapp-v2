@@ -6,6 +6,7 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
+import InfoTooltip from "@/components/info-tooltip"
 import { Title } from "@/components/typography/title"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { cn } from "@/utils"
@@ -64,10 +65,12 @@ export function Leaderboard() {
       >
         <CustomTabsList className="w-full flex justify-start border-b">
           <CustomTabsTrigger value={"current"} className="capitalize">
-            Current Epoch (#2)
+            Current Epoch (#2){" "}
+            <InfoTooltip className="ml-0">April 2 to April 9</InfoTooltip>
           </CustomTabsTrigger>
           <CustomTabsTrigger value={"total"} className="capitalize">
             Total
+            <InfoTooltip className="ml-0">February 28 to today</InfoTooltip>
           </CustomTabsTrigger>
         </CustomTabsList>
       </CustomTabs>
