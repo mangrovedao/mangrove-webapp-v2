@@ -19,7 +19,7 @@ type Params = {
 }
 
 export function useLeaderboard({
-  epoch = "current",
+  epoch = "total",
   filters: { first = 100, skip = 0 } = {},
 }: Params = {}) {
   return useQuery({
@@ -27,7 +27,7 @@ export function useLeaderboard({
     queryFn: async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/leaderboard?offset=${skip}&limit=${first}&currentEpoch=${epoch === "current" ? "true" : "false"}`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/leaderboard?offset=${skip}&limit=${first}`,
         )
         const leaderboard = await res.json()
         return parseLeaderboard(leaderboard)
@@ -45,7 +45,7 @@ export function useLeaderboard({
   })
 }
 
-export function useUserPoints({ epoch = "current" }: { epoch?: Epoch } = {}) {
+export function useUserPoints({ epoch = "total" }: { epoch?: Epoch } = {}) {
   const { address } = useAccount()
   return useQuery({
     queryKey: ["user-points", address, epoch],
@@ -53,7 +53,7 @@ export function useUserPoints({ epoch = "current" }: { epoch?: Epoch } = {}) {
       try {
         if (!address) return null
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/points/${address}?currentEpoch=${epoch === "current" ? "true" : "false"}`,
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/incentives/points/${address}`,
         )
         const points = await res.json()
         return parsePoints(points)
