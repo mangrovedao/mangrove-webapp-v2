@@ -68,6 +68,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
           takerGivesLogic,
           takerWantsLogic,
+          gasLowerBound: 20_000_000,
           expiryDate:
             timeInForce === TimeInForce.GOOD_TIL_TIME
               ? estimateTimestamp({

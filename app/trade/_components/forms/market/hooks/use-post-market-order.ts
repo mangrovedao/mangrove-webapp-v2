@@ -36,6 +36,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         wants,
         gives,
         slippage,
+        gasLowerBound: 20_000_000,
       }
 
       const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.market[
