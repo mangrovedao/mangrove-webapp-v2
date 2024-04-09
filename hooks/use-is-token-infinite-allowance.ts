@@ -18,6 +18,7 @@ export const useIsTokenInfiniteAllowance = (
         if (tokenToApprove instanceof Token) {
           return await tokenToApprove.allowanceInfinite({ spender })
         } else {
+          console.log("nft")
           // TODO: erc721 approve for all
           return
         }

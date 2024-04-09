@@ -5,9 +5,6 @@ import useMarket from "@/providers/market"
 
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { toast } from "sonner"
-import { NewStratStore } from "../_stores/new-strat.store"
-
-type FormValues = Pick<NewStratStore, "baseDeposit" | "quoteDeposit">
 
 export function useCreateKandelStrategy({
   setKandelAddress,
@@ -19,7 +16,8 @@ export function useCreateKandelStrategy({
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!(market && kandelStrategies)) return
+        if (!(market && kandelStrategies))
+          throw new Error("Failed to create strategy instance")
 
         const { result } = await kandelStrategies.seeder.sow({
           market,
@@ -37,8 +35,6 @@ export function useCreateKandelStrategy({
         console.error(error)
         throw new Error(description)
       }
-
-      // TODO: invalidate strategies query
     },
     meta: { disableGenericError: true },
   })
