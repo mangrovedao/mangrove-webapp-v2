@@ -134,6 +134,7 @@ export default function useLiquiditySourcing({
       })
 
       const resolvedLogics = await Promise.all(usableLogics)
+      console.log(resolvedLogics)
       return resolvedLogics.filter(
         (logic) => logic !== undefined && logic.approvalType === "ERC20",
       ) as DefaultStrategyLogics[]

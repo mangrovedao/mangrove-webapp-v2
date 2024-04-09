@@ -1,5 +1,6 @@
 import Big from "big.js"
 import React from "react"
+import { useAccount } from "wagmi"
 
 import {
   CustomRadioGroup,
@@ -21,15 +22,14 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
-import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
-import liquiditySourcing from "./hooks/liquidity-sourcing"
 import { useLimit } from "./hooks/use-limit"
+import liquiditySourcing from "./hooks/use-liquidity-sourcing"
 import type { Form } from "./types"
 import { isGreaterThanZeroValidator, sendVolumeValidator } from "./validators"
 
