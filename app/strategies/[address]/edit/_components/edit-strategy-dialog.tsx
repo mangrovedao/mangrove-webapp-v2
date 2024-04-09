@@ -2,6 +2,7 @@ import { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
+import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
@@ -18,8 +19,6 @@ import { NewStratStore } from "../../../new/_stores/new-strat.store"
 import useKandel from "../../_providers/kandel-strategy"
 import { useEditKandelStrategy } from "../_hooks/use-edit-kandel-strategy"
 import { useRetractOffers } from "../_hooks/use-retract-offers"
-
-import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { Steps } from "./form/components/steps"
 
 type StrategyDetails = Omit<
@@ -78,13 +77,14 @@ export default function EditStrategyDialog({
   )
 
   const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
+    quoteToken,
     spender,
     quoteLogic,
   )
 
   let steps = [
     "Summary",
+    // "Set liquidity sourcing",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll

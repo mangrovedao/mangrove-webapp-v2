@@ -1,7 +1,8 @@
-import { DefaultStrategyLogics } from "@/app/strategies/(shared)/type"
-import { DefaultTradeLogics } from "@/app/trade/_components/forms/types"
 import { Token } from "@mangrovedao/mangrove.js"
 import { useMutation } from "@tanstack/react-query"
+
+import { DefaultStrategyLogics } from "@/app/strategies/(shared)/type"
+import { DefaultTradeLogics } from "@/app/trade/_components/forms/types"
 
 export function useInfiniteApproveToken() {
   return useMutation({
@@ -24,10 +25,10 @@ export function useInfiniteApproveToken() {
               return result.wait()
             } else {
               // TODO: implement logic for erc721
-              return
+              return undefined
             }
           } catch (error) {
-            return
+            throw new Error(`Could set approval for ${logic.id} sourcing`)
           }
         } else {
           const result = await token.approve(spender)

@@ -47,17 +47,12 @@ export function useEditKandelStrategy() {
             mangrove
           )
         )
-          return
+          throw new Error("Failed to edit the strategy")
 
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
           market,
           type: "smart",
-        })
-
-        await kandelInstance.setLogics({
-          baseLogic: mangrove?.logics.simple,
-          quoteLogic: mangrove?.logics.simple,
         })
 
         const populateTxs = await kandelInstance.populateGeometricDistribution({

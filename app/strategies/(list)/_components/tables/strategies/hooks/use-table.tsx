@@ -145,10 +145,10 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         },
       }),
       // TODO: get from indexer
-      columnHelper.display({
-        header: "Liquidity source",
-        cell: () => "Wallet",
-      }),
+      // columnHelper.display({
+      //   header: "Liquidity source",
+      //   cell: () => "Wallet",
+      // }),
 
       columnHelper.display({
         id: "actions",

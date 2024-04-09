@@ -16,10 +16,12 @@ import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allow
 import { useStep } from "@/hooks/use-step"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import { SetLiquiditySourcing } from "../../(shared)/_components/set-liquidity-sourcing"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
 import { useStrategySmartRouter } from "../../(shared)/_hooks/use-smart-router"
 import { useCreateKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
+import { useSetLiquiditySourcing } from "../_hooks/use-set-liquidity-sourcing"
 import { NewStratStore } from "../_stores/new-strat.store"
 import { Steps } from "./form/components/steps"
 
@@ -58,12 +60,13 @@ export default function DeployStrategyDialog({
 
   const { mutate: createKandelStrategy, isPending: isCreatingKandelStrategy } =
     useCreateKandelStrategy({
-      setKandelAddress: (address) => setKandelAddress(address),
+      setKandelAddress: (address: string) => setKandelAddress(address),
     })
 
   const approveBaseToken = useInfiniteApproveToken()
   const approveQuoteToken = useInfiniteApproveToken()
   const activateSmartRouter = useActivateStrategySmartRouter(kandelAddress)
+  const setLiquiditySourcing = useSetLiquiditySourcing()
 
   const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
     useLaunchKandelStrategy()
@@ -82,7 +85,7 @@ export default function DeployStrategyDialog({
   )
 
   const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
+    quoteToken,
     spender,
     quoteLogic,
   )
@@ -93,6 +96,7 @@ export default function DeployStrategyDialog({
     "Summary",
     "Create strategy instance",
     !isBound ? "Activate router" : "",
+    "Set liquidity sourcing",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
@@ -161,6 +165,27 @@ export default function DeployStrategyDialog({
             activateSmartRouter.mutate(undefined, {
               onSuccess: goToNextStep,
             })
+          }}
+        >
+          Activate
+        </Button>
+      ),
+    },
+
+    {
+      body: <SetLiquiditySourcing />,
+      button: (
+        <Button
+          {...btnProps}
+          disabled={activateSmartRouter.isPending}
+          loading={activateSmartRouter.isPending}
+          onClick={() => {
+            setLiquiditySourcing.mutate(
+              { baseLogic, quoteLogic, kandelAddress },
+              {
+                onSuccess: goToNextStep,
+              },
+            )
           }}
         >
           Activate

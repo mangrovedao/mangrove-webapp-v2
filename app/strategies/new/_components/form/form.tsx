@@ -1,9 +1,22 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
+import useLiquiditySourcing from "@/app/strategies/(shared)/_hooks/use-liquidity-sourcing"
+import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
+import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Caption } from "@/components/typography/caption"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
@@ -42,25 +55,25 @@ export function Form({ className }: { className?: string }) {
     handleReceiveToChange,
   } = useForm()
 
-  // const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
-  //   useLiquiditySourcing({
-  //     sendToken: baseToken,
-  //     sendFrom,
-  //     receiveTo,
-  //     receiveToken: quoteToken,
-  //     fundOwner: address,
-  //     mangroveLogics,
-  //   })
+  const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
+    useLiquiditySourcing({
+      sendToken: baseToken,
+      sendFrom,
+      receiveTo,
+      receiveToken: quoteToken,
+      fundOwner: address,
+      mangroveLogics,
+    })
 
   const { formatted: baseTokenBalance } = useTokenBalance(baseToken)
   const { formatted: quoteTokenBalance } = useTokenBalance(quoteToken)
 
-  // const baseBalance = sendFromBalance
-  //   ? sendFromBalance.formatted
-  //   : baseTokenBalance
-  // const quoteBalance = receiveToBalance
-  //   ? receiveToBalance.formatted
-  //   : quoteTokenBalance
+  const baseBalance = sendFromBalance
+    ? sendFromBalance.formatted
+    : baseTokenBalance
+  const quoteBalance = receiveToBalance
+    ? receiveToBalance.formatted
+    : quoteTokenBalance
 
   if (!baseToken || !quoteToken)
     return (
@@ -76,7 +89,7 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      {/* <Fieldset legend="Liquidity sourcing">
+      <Fieldset legend="Liquidity sourcing">
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
             <Label className="flex items-center">
@@ -108,7 +121,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -151,7 +166,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -162,7 +179,7 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
-      </Fieldset> */}
+      </Fieldset>
 
       <Fieldset legend="Select market">
         <MarketSelector />
@@ -195,7 +212,7 @@ export function Form({ className }: { className?: string }) {
           <CustomBalance
             label="Wallet balance"
             token={baseToken}
-            balance={baseTokenBalance}
+            balance={baseBalance}
             action={{
               onClick: handleBaseDepositChange,
               text: "MAX",
@@ -229,7 +246,7 @@ export function Form({ className }: { className?: string }) {
           <CustomBalance
             label="Wallet balance"
             token={quoteToken}
-            balance={quoteTokenBalance}
+            balance={quoteBalance}
             action={{
               onClick: handleQuoteDepositChange,
               text: "MAX",

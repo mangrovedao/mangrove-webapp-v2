@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
+import { Address } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
@@ -12,14 +13,12 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { Address } from "viem"
 import {
   ChangingFrom,
   useNewStratStore,
 } from "../../../../new/_stores/new-strat.store"
 import useKandel from "../../../_providers/kandel-strategy"
 import EditStrategyDialog from "../edit-strategy-dialog"
-import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
 
@@ -228,7 +227,7 @@ export const PriceRange = withClientOnly(function ({
           {/* <UnrealizedPnl pnl={currentParameter.pnlQuote} /> */}
           {/* <AverageReturn /> */}
           <RiskAppetiteBadge value={riskAppetite} />
-          <LiquiditySource />
+          {/* <LiquiditySource /> */}
         </div>
       </div>
 
