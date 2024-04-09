@@ -16,7 +16,6 @@ export const useIsTokenInfiniteAllowance = (
         if (!(token && spender)) return null
         if (logic?.id) {
           const tokenToApprove = await logic.overlying(token)
-
           if (tokenToApprove instanceof Token) {
             return await tokenToApprove.allowanceInfinite({ spender })
           } else {

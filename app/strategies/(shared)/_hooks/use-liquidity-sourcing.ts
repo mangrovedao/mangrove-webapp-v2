@@ -103,6 +103,7 @@ export default function useLiquiditySourcing({
             return logic
           }
         } catch (error) {
+          // note: if logic.overlying(token) fails it means the token is not supported by the logic
           return undefined
         }
       })
@@ -129,12 +130,12 @@ export default function useLiquiditySourcing({
             return logic
           }
         } catch (error) {
+          // note: if logic.overlying(token) fails it means the token is not supported by the logic
           return undefined
         }
       })
 
       const resolvedLogics = await Promise.all(usableLogics)
-      console.log(resolvedLogics)
       return resolvedLogics.filter(
         (logic) => logic !== undefined && logic.approvalType === "ERC20",
       ) as DefaultStrategyLogics[]

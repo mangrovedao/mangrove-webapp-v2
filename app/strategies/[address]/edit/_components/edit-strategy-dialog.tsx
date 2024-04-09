@@ -77,7 +77,7 @@ export default function EditStrategyDialog({
   )
 
   const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
+    quoteToken,
     spender,
     quoteLogic,
   )

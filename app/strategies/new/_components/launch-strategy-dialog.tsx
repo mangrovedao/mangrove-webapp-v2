@@ -85,7 +85,7 @@ export default function DeployStrategyDialog({
   )
 
   const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
+    quoteToken,
     spender,
     quoteLogic,
   )
