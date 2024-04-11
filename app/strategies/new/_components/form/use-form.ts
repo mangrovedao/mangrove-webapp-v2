@@ -26,6 +26,11 @@ export default function useForm() {
   })
 
   const mangroveLogics = mangrove ? Object.values(mangrove.logics) : []
+  const v3Logics = mangrove
+    ? Object.values(mangrove.logics).filter(
+        (item) => item?.approvalType === "ERC721",
+      )
+    : []
 
   const {
     priceRange: [minPrice, maxPrice],
@@ -40,6 +45,8 @@ export default function useForm() {
     isChangingFrom,
     sendFrom,
     receiveTo,
+    nftContract,
+    nftPosition,
     setBaseDeposit,
     setQuoteDeposit,
     setNumberOfOffers,
@@ -49,6 +56,8 @@ export default function useForm() {
     setDistribution,
     setSendFrom,
     setReceiveTo,
+    setNftContract,
+    setNftPosition,
   } = useNewStratStore()
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
@@ -124,12 +133,32 @@ export default function useForm() {
     setIsChangingFrom(field)
   }
 
+  const handleNftPositionChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleFieldChange("setNftPosition")
+    const value = typeof e === "string" ? e : e.target.value
+    setNftPosition(value)
+  }
+
   const handleSendFromChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
     handleFieldChange("sendFrom")
     const value = typeof e === "string" ? e : e.target.value
     setSendFrom(value)
+    const isV3Logic = v3Logics.find((item) => item?.id === value)
+    const wasV3Logic = mangroveLogics.find((item) => item?.id === sendFrom)
+
+    if (!isV3Logic && wasV3Logic) {
+      setNftContract("")
+      setReceiveTo("simple")
+    }
+
+    if (isV3Logic) {
+      setNftContract(isV3Logic?.address || "")
+      setReceiveTo(isV3Logic ? value : "")
+    }
   }
 
   const handleReceiveToChange = (
@@ -138,6 +167,18 @@ export default function useForm() {
     handleFieldChange("receiveTo")
     const value = typeof e === "string" ? e : e.target.value
     setReceiveTo(value)
+    const isV3Logic = v3Logics.find((item) => item?.id === value)
+    const wasV3Logic = mangroveLogics.find((item) => item?.id === receiveTo)
+
+    if (!isV3Logic && wasV3Logic) {
+      setNftContract("")
+      setSendFrom("simple")
+    }
+
+    if (isV3Logic) {
+      setNftContract(isV3Logic?.address || "")
+      setSendFrom(isV3Logic ? value : "")
+    }
   }
 
   const handleBaseDepositChange = (
@@ -278,12 +319,16 @@ export default function useForm() {
     sendFrom,
     receiveTo,
     mangroveLogics,
+    nftContract,
+    nftPosition,
+    v3Logics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,
+    handleBountyDepositChange,
+    handleStepSizeChange,
     handleSendFromChange,
     handleReceiveToChange,
-    handleStepSizeChange,
-    handleBountyDepositChange,
+    handleNftPositionChange,
   }
 }

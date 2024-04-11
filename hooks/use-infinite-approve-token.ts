@@ -3,8 +3,14 @@ import { useMutation } from "@tanstack/react-query"
 
 import { DefaultStrategyLogics } from "@/app/strategies/(shared)/type"
 import { DefaultTradeLogics } from "@/app/trade/_components/forms/types"
+import { Address, erc721Abi } from "viem"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 export function useInfiniteApproveToken() {
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const { address: owner } = useAccount()
+
   return useMutation({
     mutationFn: async ({
       token,
@@ -16,7 +22,7 @@ export function useInfiniteApproveToken() {
       spender?: string | null
     }) => {
       try {
-        if (!(token && spender)) return
+        if (!(token && spender && walletClient && publicClient && owner)) return
         if (logic) {
           try {
             const tokenToApprove = await logic.overlying(token)
@@ -24,8 +30,22 @@ export function useInfiniteApproveToken() {
               const result = await tokenToApprove.approve(spender)
               return result.wait()
             } else {
-              // TODO: implement logic for erc721
-              return undefined
+              const { request } = await publicClient.simulateContract({
+                account: owner,
+                address: tokenToApprove as Address,
+                abi: erc721Abi,
+                functionName: "setApprovalForAll",
+                args: [spender as Address, true],
+              })
+
+              const hash = await walletClient.writeContract(request)
+              const transaction = await publicClient.waitForTransactionReceipt({
+                hash,
+              })
+              if (transaction.status === "reverted")
+                throw new Error("Failed the approval")
+
+              return transaction
             }
           } catch (error) {
             throw new Error(`Could set approval for ${logic.id} sourcing`)

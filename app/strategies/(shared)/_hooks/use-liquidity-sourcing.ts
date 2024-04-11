@@ -110,7 +110,7 @@ export default function useLiquiditySourcing({
 
       const resolvedLogics = await Promise.all(usableLogics)
       return resolvedLogics.filter(
-        (logic) => logic !== undefined && logic.approvalType === "ERC20",
+        (logic) => logic !== undefined,
       ) as DefaultStrategyLogics[]
     },
     // staleTime: Infinity,
@@ -137,7 +137,7 @@ export default function useLiquiditySourcing({
 
       const resolvedLogics = await Promise.all(usableLogics)
       return resolvedLogics.filter(
-        (logic) => logic !== undefined && logic.approvalType === "ERC20",
+        (logic) => logic !== undefined,
       ) as DefaultStrategyLogics[]
     },
     // staleTime: Infinity,

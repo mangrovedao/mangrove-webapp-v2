@@ -18,6 +18,7 @@ export type ChangingFrom =
   | "bountyDeposit"
   | "sendFrom"
   | "receiveTo"
+  | "setNftPosition"
   | undefined
   | null
 
@@ -30,6 +31,8 @@ export type NewStratStore = {
 
   sendFrom: string
   receiveTo: string
+  nftContract: string
+  nftPosition: string
 
   priceRange: [string, string]
   offersWithPrices?: OffersWithPrices
@@ -47,8 +50,11 @@ type NewStratActions = {
   setNumberOfOffers: (numberOfOffers: string) => void
   setStepSize: (stepSize: string) => void
   setBountyDeposit: (bountyDeposit: string) => void
+
   setSendFrom: (source: string) => void
   setReceiveTo: (source: string) => void
+  setNftContract: (nftContract: string) => void
+  setNftPosition: (nftPosition: string) => void
 
   setPriceRange: (min: string, max: string) => void
   setOffersWithPrices: (offersWithPrices?: OffersWithPrices) => void
@@ -71,6 +77,8 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
 
   sendFrom: "simple",
   receiveTo: "simple",
+  nftContract: "",
+  nftPosition: "",
 
   priceRange: ["", ""],
   offersWithPrices: undefined,
@@ -89,6 +97,8 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
 
   setSendFrom: (sendFrom) => set({ sendFrom }),
   setReceiveTo: (receiveTo) => set({ receiveTo }),
+  setNftContract: (nftContract) => set({ nftContract }),
+  setNftPosition: (nftPosition) => set({ nftPosition }),
 
   setPriceRange: (min, max) => set({ priceRange: [min, max] }),
   setOffersWithPrices: (offersWithPrices) => set({ offersWithPrices }),

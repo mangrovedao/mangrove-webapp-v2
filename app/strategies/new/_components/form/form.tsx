@@ -2,6 +2,7 @@
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
 import useLiquiditySourcing from "@/app/strategies/(shared)/_hooks/use-liquidity-sourcing"
+import { useNFTPositions } from "@/app/strategies/(shared)/_hooks/use-nft-positions"
 import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
 import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
@@ -46,13 +47,18 @@ export function Form({ className }: { className?: string }) {
     sendFrom,
     receiveTo,
     mangroveLogics,
+    nftContract,
+    nftPosition,
+    v3Logics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,
     handleStepSizeChange,
     handleBountyDepositChange,
     handleSendFromChange,
+
     handleReceiveToChange,
+    handleNftPositionChange,
   } = useForm()
 
   const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
@@ -67,6 +73,7 @@ export function Form({ className }: { className?: string }) {
 
   const { formatted: baseTokenBalance } = useTokenBalance(baseToken)
   const { formatted: quoteTokenBalance } = useTokenBalance(quoteToken)
+  const nfts = useNFTPositions({ nftContract }).data
 
   const baseBalance = sendFromBalance
     ? sendFromBalance.formatted
@@ -81,7 +88,7 @@ export function Form({ className }: { className?: string }) {
         <Skeleton className="w-full h-screen" />
       </div>
     )
-
+  console.log(sendFrom)
   return (
     <form
       className={cn("space-y-6", className)}
@@ -179,6 +186,45 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
+        {v3Logics.find((item) => item?.id === sendFrom || receiveTo) && (
+          <>
+            <Label className="flex items-center">
+              Select NFT Position
+              <InfoTooltip>
+                <Caption>TODO:</Caption>
+              </InfoTooltip>
+            </Label>
+
+            <Select
+              name={"nftPosition"}
+              value={nftPosition}
+              onValueChange={(value: string) => {
+                handleNftPositionChange(value)
+              }}
+              disabled={
+                kandelRequirementsQuery.status !== "success" || fieldsDisabled
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {nfts?.map(
+                    (nftId) =>
+                      nftId && (
+                        <SelectItem key={nftId} value={nftId.toString()}>
+                          <div className="flex gap-2 w-full items-center">
+                            <Caption className="capitalize">{nftId}</Caption>
+                          </div>
+                        </SelectItem>
+                      ),
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </>
+        )}
       </Fieldset>
 
       <Fieldset legend="Select market">
