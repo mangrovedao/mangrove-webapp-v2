@@ -10,6 +10,7 @@ import { DefaultStrategyLogics } from "../../(shared)/type"
 
 type Props = {
   kandelAddress: string
+  nftPosition?: string
   baseLogic: DefaultStrategyLogics
   quoteLogic: DefaultStrategyLogics
 }
@@ -20,7 +21,12 @@ export function useSetLiquiditySourcing() {
   const { mangrove } = useMangrove()
 
   return useMutation({
-    mutationFn: async ({ kandelAddress, baseLogic, quoteLogic }: Props) => {
+    mutationFn: async ({
+      nftPosition,
+      kandelAddress,
+      baseLogic,
+      quoteLogic,
+    }: Props) => {
       try {
         if (
           !(market && kandelStrategies && mangrove && baseLogic && quoteLogic)
@@ -29,7 +35,7 @@ export function useSetLiquiditySourcing() {
 
         const _baseLogic = mangrove?.getLogicByAddress(baseLogic.address)
         const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic.address)
-
+        console.log(baseLogic)
         if (!_quoteLogic || !_baseLogic)
           throw new Error("Could not fetch liquidity source")
 

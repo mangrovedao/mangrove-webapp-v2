@@ -56,7 +56,6 @@ export function Form({ className }: { className?: string }) {
     handleStepSizeChange,
     handleBountyDepositChange,
     handleSendFromChange,
-
     handleReceiveToChange,
     handleNftPositionChange,
   } = useForm()
@@ -69,11 +68,12 @@ export function Form({ className }: { className?: string }) {
       receiveToken: quoteToken,
       fundOwner: address,
       mangroveLogics,
+      nftContract,
     })
 
   const { formatted: baseTokenBalance } = useTokenBalance(baseToken)
   const { formatted: quoteTokenBalance } = useTokenBalance(quoteToken)
-  const nfts = useNFTPositions({ nftContract }).data
+  const nfts = useNFTPositions({ logicId: sendFrom, v3Logics }).data
 
   const baseBalance = sendFromBalance
     ? sendFromBalance.formatted
@@ -88,7 +88,7 @@ export function Form({ className }: { className?: string }) {
         <Skeleton className="w-full h-screen" />
       </div>
     )
-  console.log(sendFrom)
+
   return (
     <form
       className={cn("space-y-6", className)}
@@ -186,7 +186,8 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
-        {v3Logics.find((item) => item?.id === sendFrom || receiveTo) && (
+
+        {v3Logics.find((item) => item?.id === sendFrom) && (
           <>
             <Label className="flex items-center">
               Select NFT Position
@@ -208,7 +209,7 @@ export function Form({ className }: { className?: string }) {
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-40">
                 <SelectGroup>
                   {nfts?.map(
                     (nftId) =>

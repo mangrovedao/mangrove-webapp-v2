@@ -2,7 +2,9 @@ import { Token } from "@mangrovedao/mangrove.js"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
 
+import { Address } from "viem"
 import { DefaultStrategyLogics } from "../type"
+import { getV3PositionBalances } from "./use-v3-balances"
 
 type Props = {
   sendFrom?: string
@@ -11,6 +13,7 @@ type Props = {
   fundOwner?: string
   sendToken?: Token
   receiveToken?: Token
+  nftContract?: string
 }
 
 type BalanceLogic = {
@@ -25,11 +28,12 @@ export default function useLiquiditySourcing({
   receiveTo,
   mangroveLogics,
   fundOwner,
+  nftContract,
 }: Props) {
   const { data: sendFromBalance } = useQuery<BalanceLogic | undefined>({
     queryKey: ["sendFromBalance", sendToken?.symbol, fundOwner, sendFrom],
     queryFn: async () => {
-      if (!sendToken || !fundOwner || sendFrom === "simple") {
+      if (!sendToken || !receiveToken || !fundOwner || sendFrom === "simple") {
         return undefined
       }
 
@@ -37,6 +41,22 @@ export default function useLiquiditySourcing({
         (logic) => logic?.id === sendFrom,
       )
       if (!selectedLogic) return undefined
+
+      if (selectedLogic.approvalType === "ERC721") {
+        const v3Balance = await getV3PositionBalances({
+          base: sendToken.address as Address,
+          quote: receiveToken.address as Address,
+          user: fundOwner as Address,
+          positionManagerNft: nftContract as Address,
+          v3Manager: selectedLogic.address as Address,
+        })
+        const balance = v3Balance?.[0]?.balance.base ?? "0"
+
+        return {
+          formatted: Number(balance).toFixed(sendToken?.displayedDecimals),
+          balance: Number(balance),
+        }
+      }
 
       const logicBalance = await selectedLogic.balanceOfFromLogic(
         sendToken,
@@ -58,7 +78,13 @@ export default function useLiquiditySourcing({
   const { data: receiveToBalance } = useQuery<BalanceLogic | undefined>({
     queryKey: ["receiveToBalance", receiveTo, fundOwner, receiveToken?.symbol],
     queryFn: async () => {
-      if (!receiveToken || !fundOwner || receiveTo === "simple") {
+      if (
+        !nftContract ||
+        !sendToken ||
+        !receiveToken ||
+        !fundOwner ||
+        receiveTo === "simple"
+      ) {
         return undefined
       }
 
@@ -66,6 +92,22 @@ export default function useLiquiditySourcing({
         (logic) => logic?.id === receiveTo,
       )
       if (!selectedLogic) return undefined
+
+      if (selectedLogic.approvalType === "ERC721") {
+        const v3Balance = await getV3PositionBalances({
+          base: sendToken.address as Address,
+          quote: receiveToken.address as Address,
+          user: fundOwner as Address,
+          positionManagerNft: nftContract as Address,
+          v3Manager: selectedLogic.address as Address,
+        })
+        const balance = v3Balance?.[0]?.balance.base ?? "0"
+
+        return {
+          formatted: Number(balance).toFixed(sendToken?.displayedDecimals),
+          balance: Number(balance),
+        }
+      }
 
       let logicBalance = await selectedLogic.balanceOfFromLogic(
         receiveToken,
