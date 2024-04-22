@@ -28,4 +28,6 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
+
+  ignoreErrors: [/User rejected the request/],
 })
