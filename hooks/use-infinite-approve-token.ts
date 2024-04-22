@@ -29,7 +29,15 @@ export function useInfiniteApproveToken() {
 
             if (tokenToApprove instanceof Token) {
               const result = await tokenToApprove.approve(spender)
-              return result.wait()
+              const receipt = await result.wait()
+              const isInfinite = await tokenToApprove.allowanceInfinite({
+                spender,
+              })
+              if (!isInfinite)
+                throw new Error(
+                  "We need atleast twice the amount to be approved.",
+                )
+              return receipt
             } else {
               const { request } = await publicClient.simulateContract({
                 account: owner,
@@ -53,7 +61,14 @@ export function useInfiniteApproveToken() {
           }
         } else {
           const result = await token.approve(spender)
-          return result.wait()
+          const receipt = result.wait()
+          const isInfinite = await token.allowanceInfinite({
+            spender,
+          })
+          if (!isInfinite)
+            throw new Error("We need atleast twice the amount to be approved.")
+
+          return receipt
         }
       } catch (error) {
         console.error(error)

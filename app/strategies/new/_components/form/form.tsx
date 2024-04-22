@@ -192,7 +192,7 @@ export function Form({ className }: { className?: string }) {
             <Label className="flex items-center">
               Select NFT Position
               <InfoTooltip>
-                <Caption>TODO:</Caption>
+                <Caption></Caption>
               </InfoTooltip>
             </Label>
 
@@ -203,11 +203,19 @@ export function Form({ className }: { className?: string }) {
                 handleNftPositionChange(value)
               }}
               disabled={
-                kandelRequirementsQuery.status !== "success" || fieldsDisabled
+                !!(
+                  (nfts && nfts.length <= 0) ||
+                  kandelRequirementsQuery.status !== "success" ||
+                  fieldsDisabled
+                )
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select" />
+                <SelectValue
+                  placeholder={
+                    nfts && nfts.length <= 0 ? "No positions found" : "Select"
+                  }
+                />
               </SelectTrigger>
               <SelectContent className="max-h-40">
                 <SelectGroup>
@@ -223,6 +231,11 @@ export function Form({ className }: { className?: string }) {
                   )}
                 </SelectGroup>
               </SelectContent>
+              {errors.nftPosition ? (
+                <p role="aria-live" className="text-red-100 text-xs leading-4">
+                  {errors.nftPosition}
+                </p>
+              ) : undefined}
             </Select>
           </>
         )}

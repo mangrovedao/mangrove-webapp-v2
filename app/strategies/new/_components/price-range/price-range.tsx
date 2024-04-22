@@ -52,6 +52,8 @@ export const PriceRange = withClientOnly(function ({
     isChangingFrom,
     sendFrom,
     receiveTo,
+    nftContract,
+    nftPosition,
     setPriceRange,
     setOffersWithPrices,
     setErrors,
@@ -325,6 +327,8 @@ export const PriceRange = withClientOnly(function ({
             bountyDeposit,
             sendFrom,
             receiveTo,
+            nftContract,
+            nftPosition,
           }}
           isOpen={summaryDialog}
           onClose={() => setSummaryDialog(false)}

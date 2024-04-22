@@ -33,42 +33,53 @@ export default function useLiquiditySourcing({
   const { data: sendFromBalance } = useQuery<BalanceLogic | undefined>({
     queryKey: ["sendFromBalance", sendToken?.symbol, fundOwner, sendFrom],
     queryFn: async () => {
-      if (!sendToken || !receiveToken || !fundOwner || sendFrom === "simple") {
-        return undefined
-      }
+      try {
+        if (
+          !sendToken ||
+          !receiveToken ||
+          !fundOwner ||
+          sendFrom === "simple"
+        ) {
+          return undefined
+        }
 
-      const selectedLogic = mangroveLogics.find(
-        (logic) => logic?.id === sendFrom,
-      )
-      if (!selectedLogic) return undefined
+        const selectedLogic = mangroveLogics.find(
+          (logic) => logic?.id === sendFrom,
+        )
+        if (!selectedLogic) return undefined
 
-      if (selectedLogic.approvalType === "ERC721") {
-        const v3Balance = await getV3PositionBalances({
-          base: sendToken.address as Address,
-          quote: receiveToken.address as Address,
-          user: fundOwner as Address,
-          positionManagerNft: nftContract as Address,
-          v3Manager: selectedLogic.address as Address,
-        })
-        const balance = v3Balance?.[0]?.balance.base ?? "0"
+        if (selectedLogic.approvalType === "ERC721") {
+          const positionManager = await selectedLogic.overlying(sendToken)
+          const v3Balance = await getV3PositionBalances({
+            type: selectedLogic.id,
+            base: sendToken.address as Address,
+            quote: receiveToken.address as Address,
+            user: fundOwner as Address,
+            positionManagerNft: positionManager as Address,
+            v3Manager: selectedLogic.manager.address as Address,
+          })
+          const balance = v3Balance?.[0]?.balance.base ?? "0"
+          console.log(v3Balance)
+          return {
+            formatted: Number(balance).toFixed(sendToken?.displayedDecimals),
+            balance: Number(balance),
+          }
+        }
+
+        const logicBalance = await selectedLogic.balanceOfFromLogic(
+          sendToken,
+          fundOwner,
+        )
+        if (!logicBalance) return undefined
 
         return {
-          formatted: Number(balance).toFixed(sendToken?.displayedDecimals),
-          balance: Number(balance),
+          formatted: logicBalance
+            .toNumber()
+            .toFixed(sendToken?.displayedDecimals),
+          balance: logicBalance.toNumber(),
         }
-      }
-
-      const logicBalance = await selectedLogic.balanceOfFromLogic(
-        sendToken,
-        fundOwner,
-      )
-      if (!logicBalance) return undefined
-
-      return {
-        formatted: logicBalance
-          .toNumber()
-          .toFixed(sendToken?.displayedDecimals),
-        balance: logicBalance.toNumber(),
+      } catch (error) {
+        console.error(error)
       }
     },
     // staleTime: Infinity,
@@ -94,15 +105,16 @@ export default function useLiquiditySourcing({
       if (!selectedLogic) return undefined
 
       if (selectedLogic.approvalType === "ERC721") {
+        const positionManager = await selectedLogic.overlying(sendToken)
         const v3Balance = await getV3PositionBalances({
+          type: selectedLogic.id,
           base: sendToken.address as Address,
           quote: receiveToken.address as Address,
           user: fundOwner as Address,
-          positionManagerNft: nftContract as Address,
-          v3Manager: selectedLogic.address as Address,
+          positionManagerNft: positionManager as Address,
+          v3Manager: selectedLogic.manager.address as Address,
         })
         const balance = v3Balance?.[0]?.balance.base ?? "0"
-
         return {
           formatted: Number(balance).toFixed(sendToken?.displayedDecimals),
           balance: Number(balance),
@@ -141,8 +153,10 @@ export default function useLiquiditySourcing({
         try {
           if (!logic) return undefined
           const logicToken = await logic.overlying(sendToken)
+          const positionManager =
+            typeof logicToken === "string" ? logicToken : ""
           if (logicToken) {
-            return logic
+            return { ...logic, positionManager }
           }
         } catch (error) {
           // note: if logic.overlying(token) fails it means the token is not supported by the logic
@@ -168,8 +182,10 @@ export default function useLiquiditySourcing({
         try {
           if (!logic) return undefined
           const logicToken = await logic.overlying(receiveToken)
+          const positionManager =
+            typeof logicToken === "string" ? logicToken : ""
           if (logicToken) {
-            return logic
+            return { ...logic, positionManager }
           }
         } catch (error) {
           // note: if logic.overlying(token) fails it means the token is not supported by the logic

@@ -2,6 +2,7 @@ import React from "react"
 import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
 
+import { V3StrategyLogics } from "@/app/strategies/(shared)/type"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
@@ -27,10 +28,10 @@ export default function useForm() {
 
   const mangroveLogics = mangrove ? Object.values(mangrove.logics) : []
   const v3Logics = mangrove
-    ? Object.values(mangrove.logics).filter(
+    ? (Object.values(mangrove.logics).filter(
         (item) => item?.approvalType === "ERC721",
-      )
-    : []
+      ) as unknown as V3StrategyLogics[])
+    : ([] as unknown as V3StrategyLogics[])
 
   const {
     priceRange: [minPrice, maxPrice],
@@ -62,7 +63,7 @@ export default function useForm() {
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
   const fieldsDisabled = !(minPrice && maxPrice)
-
+  const isV3Logic = v3Logics.find((item) => item?.id === sendFrom)
   const kandelRequirementsQuery = useKandelRequirements({
     minPrice,
     maxPrice,
@@ -151,12 +152,13 @@ export default function useForm() {
     const wasV3Logic = mangroveLogics.find((item) => item?.id === sendFrom)
 
     if (!isV3Logic && wasV3Logic) {
-      setNftContract("")
       setReceiveTo("simple")
+      setNftContract("")
+      setNftPosition("")
     }
 
     if (isV3Logic) {
-      setNftContract(isV3Logic?.address || "")
+      setNftContract(isV3Logic?.positionManager || "")
       setReceiveTo(isV3Logic ? value : "")
     }
   }
@@ -171,12 +173,14 @@ export default function useForm() {
     const wasV3Logic = mangroveLogics.find((item) => item?.id === receiveTo)
 
     if (!isV3Logic && wasV3Logic) {
-      setNftContract("")
       setSendFrom("simple")
+      setNftContract("")
+      setNftPosition("")
     }
 
     if (isV3Logic) {
-      setNftContract(isV3Logic?.address || "")
+      console.log(isV3Logic.positionManager)
+      setNftContract(isV3Logic.positionManager || "")
       setSendFrom(isV3Logic ? value : "")
     }
   }
@@ -254,6 +258,12 @@ export default function useForm() {
       delete newErrors.quoteDeposit
     }
 
+    if (!nftPosition && isV3Logic) {
+      newErrors.nftPosition = "Please select a liquidity sourcing position."
+    } else {
+      delete newErrors.nftPosition
+    }
+
     if (
       Number(numberOfOffers) < Number(MIN_NUMBER_OF_OFFERS) &&
       numberOfOffers
@@ -290,6 +300,7 @@ export default function useForm() {
 
     setErrors(newErrors)
   }, [
+    nftPosition,
     baseDeposit,
     quoteDeposit,
     numberOfOffers,

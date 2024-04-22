@@ -5,7 +5,8 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsLiquidityInfiniteAllowance } from "@/hooks/use-liquidity-infinite-allowance"
+
+import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { formatExpiryDate } from "@/utils/date"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { Token } from "@mangrovedao/mangrove.js"
@@ -81,7 +82,7 @@ export default function EditAmplifiedOrderSteps({
   const { chain } = useAccount()
 
   const { data: spender } = useSpenderAddress("amplified")
-  const { data: isInfiniteAllowance } = useIsLiquidityInfiniteAllowance(
+  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
     form.sendToken,
     spender,
     form.sendFrom,

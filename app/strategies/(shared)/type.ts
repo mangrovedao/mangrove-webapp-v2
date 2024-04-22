@@ -11,7 +11,11 @@ export type DefaultStrategyLogics =
   | SimpleAaveLogic
   | OrbitLogic
   | ZeroLendLogic
-  | MonoswapV3Logic
-  | ThrusterV3Logic
+  | (MonoswapV3Logic & { positionManager?: string })
+  | (ThrusterV3Logic & { positionManager?: string })
   | PacFinanceLogic
   | undefined
+
+export type V3StrategyLogics =
+  | (MonoswapV3Logic & { positionManager?: string })
+  | (ThrusterV3Logic & { positionManager?: string })

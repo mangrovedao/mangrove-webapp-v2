@@ -181,7 +181,12 @@ export default function DeployStrategyDialog({
           loading={activateSmartRouter.isPending}
           onClick={() => {
             setLiquiditySourcing.mutate(
-              { baseLogic, quoteLogic, kandelAddress },
+              {
+                nftPosition: strategy?.nftPosition,
+                baseLogic,
+                quoteLogic,
+                kandelAddress,
+              },
               {
                 onSuccess: goToNextStep,
               },

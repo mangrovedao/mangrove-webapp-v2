@@ -5,6 +5,8 @@ import useMarket from "@/providers/market"
 
 import useMangrove from "@/providers/mangrove"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { AbstractRoutingLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AbstractRoutingLogic"
+import { BaseUniV3Logic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/UniV3/BaseUniV3Logic"
 import { toast } from "sonner"
 import { DefaultStrategyLogics } from "../../(shared)/type"
 
@@ -33,8 +35,16 @@ export function useSetLiquiditySourcing() {
         )
           return
 
-        const _baseLogic = mangrove?.getLogicByAddress(baseLogic.address)
-        const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic.address)
+        // note: SDK types needs to match AbstractRoutingLogic and BaseUniV3Logics
+        const _baseLogic = mangrove?.getLogicByAddress(baseLogic.address) as
+          | AbstractRoutingLogic
+          | BaseUniV3Logic<"monoswap">
+          | BaseUniV3Logic<"monoswap">
+        const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic.address) as
+          | AbstractRoutingLogic
+          | BaseUniV3Logic<"monoswap">
+          | BaseUniV3Logic<"thruster">
+
         console.log(baseLogic)
         if (!_quoteLogic || !_baseLogic)
           throw new Error("Could not fetch liquidity source")
@@ -46,9 +56,15 @@ export function useSetLiquiditySourcing() {
         })
 
         await kandelInstance.setLogics({
-          baseLogic: _baseLogic,
-          quoteLogic: _quoteLogic,
+          // note: SDK types needs to match AbstractRoutingLogic and BaseUniV3Logics
+          baseLogic: _baseLogic as AbstractRoutingLogic,
+          quoteLogic: _quoteLogic as AbstractRoutingLogic,
         })
+
+        if (_baseLogic.approvalType === "ERC721") {
+          if (!nftPosition) throw new Error("No position selected.")
+          await _baseLogic.setPositionToUse(Number(nftPosition))
+        }
 
         toast.success("Strategy liquidity sourcing has been set successfully.")
       } catch (error) {

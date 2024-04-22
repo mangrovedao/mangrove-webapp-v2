@@ -16,6 +16,8 @@ const client = createPublicClient({
   chain: blast,
   transport: http(),
 })
+const THRUSTER_FACTORY_ADDRESS = "0x71b08f13B3c3aF35aAdEb3949AFEb1ded1016127"
+const MONOSWAP_FACTORY_ADDRESS = "0x48d0F09710794313f33619c95147F34458BF7C3b"
 
 const INIT_CODE_HASH =
   "0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54" as const
@@ -29,6 +31,10 @@ const positionManagerABI = parseAbi([
   "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
   "function positions(uint256) view returns (Position)",
   "function factory() view returns (address)",
+])
+
+const v3FactoryABI = parseAbi([
+  "function getPool(address tokenA, address tokenB, uint24 fee) external view returns (address pool)",
 ])
 
 const v3ManagerABI = parseAbi([
@@ -50,7 +56,7 @@ type Slot0 = ContractFunctionReturnType<typeof uniV3PoolABI, "view", "slot0">
 
 /**
  *
- * @param params.positionManagerNft the address of the position manager nft
+ * @param params.positionManage, paramsrNft the address of the position manager nft
  * @param params.v3Manager the address of the v3 manager (Mangrove V3 Manager)
  * @param params.user the address of the user
  * @param params.base the address of the base token (tokens to compute balance of)
@@ -171,7 +177,7 @@ async function getPositions(params: {
  * @param params.fee the fee
  * @returns the pool address
  */
-function getPoolAddress(params: {
+async function getPoolAddress(params: {
   factory: Address
   token0: Address
   token1: Address
@@ -183,10 +189,25 @@ function getPoolAddress(params: {
     bytecodeHash: INIT_CODE_HASH,
     salt: keccak256(
       encodePacked(
-        [{ type: "address" }, { type: "address" }, { type: "uint24" }],
+        ["address", "address", "uint24"],
         [params.token0, params.token1, params.fee],
       ),
     ),
+  })
+}
+
+async function getPoolsFromPosition(params: {
+  factory: Address
+  positions: Position[]
+}) {
+  return await client.multicall({
+    contracts: params.positions.map((position) => ({
+      address: params.factory,
+      abi: v3FactoryABI,
+      functionName: "getPool",
+      args: [position.token0, position.token1, position.fee],
+    })),
+    allowFailure: false,
   })
 }
 
@@ -200,9 +221,11 @@ async function getPoolsSlot0FromPositions(params: {
   factory: Address
   positions: Position[]
 }) {
+  const pools = await getPoolsFromPosition(params)
+
   return client.multicall({
-    contracts: params.positions.map((position) => ({
-      address: getPoolAddress({ ...position, ...params }),
+    contracts: params.positions.map((position, i) => ({
+      address: pools[i] as Address,
       abi: uniV3PoolABI,
       functionName: "slot0",
     })),
@@ -298,15 +321,15 @@ function balanceInPosition(params: { slot0: Slot0; position: Position }) {
 }
 
 export async function getV3PositionBalances(params: {
+  type: "thruster" | "monoswap"
   positionManagerNft: Address
   v3Manager: Address
   user: Address
   base: Address
   quote: Address
 }) {
-  console.log(1)
   const isBaseToken0 = BigInt(params.base) < BigInt(params.quote)
-
+  console.log(1, isBaseToken0, params)
   // ========== useUniV3InitialParams ==========
 
   // first call
@@ -314,6 +337,7 @@ export async function getV3PositionBalances(params: {
   // - factory address from non positionManagerNft
   // - base/quote balances in v3Manager
   const initialParams = await getInitialParams(params)
+  console.log(2, initialParams)
 
   // ========== end hook ==========
 
@@ -325,6 +349,7 @@ export async function getV3PositionBalances(params: {
     ...params,
     balance: initialParams.positionNftBalance,
   })
+  console.log(3, ids)
 
   // third call
   // - all positions informations
@@ -332,6 +357,7 @@ export async function getV3PositionBalances(params: {
     ...params,
     ids: ids,
   })
+  console.log(4, positions)
 
   // fourth call
   // - slot0 of each pool
@@ -339,6 +365,7 @@ export async function getV3PositionBalances(params: {
     factory: initialParams.factory,
     positions,
   })
+  console.log(5, poolsSlot0)
 
   // ========== end hook ==========
 
