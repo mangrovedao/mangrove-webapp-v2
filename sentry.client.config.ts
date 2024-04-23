@@ -29,5 +29,8 @@ Sentry.init({
     }),
   ],
 
-  ignoreErrors: [/User rejected the request/],
+  ignoreErrors: [
+    /User rejected the request/,
+    /The provider is disconnected from all chains/,
+  ],
 })
