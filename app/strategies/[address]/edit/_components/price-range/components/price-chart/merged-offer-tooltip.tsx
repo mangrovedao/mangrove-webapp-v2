@@ -71,8 +71,11 @@ export function MergedOfferTooltip({
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {Number(mergedOffer.gives).toFixed(baseToken?.displayedDecimals)}{" "}
-          {baseToken?.symbol}
+          {Number(mergedOffer.gives).toFixed(
+            (mergedOffer.offerType === "bids" ? quoteToken : baseToken)
+              ?.displayedDecimals,
+          )}{" "}
+          {(mergedOffer.offerType === "bids" ? quoteToken : baseToken)?.symbol}
         </div>
       </div>
     </TooltipWithBounds>
