@@ -43,8 +43,14 @@ export function GeometricOfferTooltip({
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {hoveredGeometricOffer.gives.toFixed(baseToken?.displayedDecimals)}{" "}
-          {baseToken?.symbol}
+          {hoveredGeometricOffer.gives.toFixed(
+            (hoveredGeometricOffer.type === "bid" ? quoteToken : baseToken)
+              ?.displayedDecimals,
+          )}{" "}
+          {
+            (hoveredGeometricOffer.type === "bid" ? quoteToken : baseToken)
+              ?.symbol
+          }
         </div>
       </div>
     </TooltipWithBounds>

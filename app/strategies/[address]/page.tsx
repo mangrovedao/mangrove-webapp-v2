@@ -55,7 +55,7 @@ export default function Page() {
           <Button
             onClick={() => toggleCloseStrategy(!closeStrategy)}
             size={"lg"}
-            disabled={data?.status !== "active"}
+            disabled={!data?.status || data?.status === "closed"}
           >
             Close strategy
           </Button>
