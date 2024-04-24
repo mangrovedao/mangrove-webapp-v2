@@ -21,7 +21,6 @@ export function Strategies({ type }: Props) {
   })
   const { market } = useMarket()
   const { marketsInfoQuery } = useMangrove()
-  const { data } = useStrategies()
   const { data: openMarkets } = marketsInfoQuery
   const { data: count } = useStrategies({
     select: (strategies) => strategies.length,
@@ -37,7 +36,7 @@ export function Strategies({ type }: Props) {
 
   const table = useTable({
     type,
-    data,
+    data: strategiesQuery.data,
     onManage: (strategy: Strategy) => {
       const baseToken = openMarkets?.find(
         (item) =>
