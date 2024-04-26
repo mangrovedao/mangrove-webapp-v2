@@ -3,6 +3,7 @@ import React from "react"
 
 import {
   CustomTabs,
+  CustomTabsContent,
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
@@ -35,6 +36,7 @@ export function Leaderboard() {
   }, [epoch])
 
   const userPointsQuery = useUserPoints()
+  // const {  } = useEpochLeaderboard()
   const currentUser = userPointsQuery.data
   const data = React.useMemo(() => {
     if (leaderboardQuery.isLoading) return []
@@ -64,43 +66,46 @@ export function Leaderboard() {
         onValueChange={(e) => setEpoch(e as Epoch)}
       >
         <CustomTabsList className="w-full flex justify-start border-b">
-          {/* <CustomTabsTrigger value={"current"} className="capitalize">
-            Current Epoch (#2){" "}
+          <CustomTabsTrigger value={"current"} className="capitalize">
+            Current Epoch (#1){" "}
             <InfoTooltip className="ml-0">April 2 to April 9</InfoTooltip>
-          </CustomTabsTrigger> */}
+          </CustomTabsTrigger>
           <CustomTabsTrigger value={"total"} className="capitalize">
             Total
             <InfoTooltip className="ml-0">February 28 to today</InfoTooltip>
           </CustomTabsTrigger>
         </CustomTabsList>
+        <Title variant={"title1"} className="mb-5 mt-10">
+          Your points
+        </Title>
+        <CustomTabsContent value="current"></CustomTabsContent>
+        <CustomTabsContent value="total">
+          <DataTable
+            skeletonRows={1}
+            table={userTable}
+            isError={!!userPointsQuery.error}
+            isLoading={userPointsQuery.isLoading}
+            tableRowClasses="text-white"
+            isRowHighlighted={(row) => row.account === currentUser?.account}
+          />
+          <Title variant={"title1"} className="mt-10 mb-5">
+            Leaderboard
+          </Title>
+          <DataTable
+            skeletonRows={10}
+            table={table}
+            isError={!!leaderboardQuery.error}
+            isLoading={leaderboardQuery.isLoading}
+            pagination={{
+              onPageChange: setPageDetails,
+              page,
+              pageSize,
+              count: leaderboardQuery.data?.leaderboard_length ?? 0,
+            }}
+            tableRowClasses="text-white"
+          />
+        </CustomTabsContent>
       </CustomTabs>
-      <Title variant={"title1"} className="mb-5">
-        Your points
-      </Title>
-      <DataTable
-        skeletonRows={1}
-        table={userTable}
-        isError={!!userPointsQuery.error}
-        isLoading={userPointsQuery.isLoading}
-        tableRowClasses="text-white"
-        isRowHighlighted={(row) => row.account === currentUser?.account}
-      />
-      <Title variant={"title1"} className="mt-10 mb-5">
-        Leaderboard
-      </Title>
-      <DataTable
-        skeletonRows={10}
-        table={table}
-        isError={!!leaderboardQuery.error}
-        isLoading={leaderboardQuery.isLoading}
-        pagination={{
-          onPageChange: setPageDetails,
-          page,
-          pageSize,
-          count: leaderboardQuery.data?.leaderboard_length ?? 0,
-        }}
-        tableRowClasses="text-white"
-      />
     </div>
   )
 }
