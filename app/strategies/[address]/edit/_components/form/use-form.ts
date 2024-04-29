@@ -92,17 +92,17 @@ export default function useForm() {
     ) {
       getCurrentLiquiditySourcing()
       setBaseDeposit(
-        baseAmountDeposited?.toFixed(baseToken?.displayedDecimals) || "0",
+        baseAmountDeposited?.toFixed(baseToken?.displayedDecimals) || "",
       )
       setQuoteDeposit(
-        quoteAmountDeposited?.toFixed(quoteToken?.displayedDecimals) || "0",
+        quoteAmountDeposited?.toFixed(quoteToken?.displayedDecimals) || "",
       )
       setNumberOfOffers(
-        (Number(currentParameter?.length) - 1).toString() || "0",
+        (Number(currentParameter?.length) - 1).toString() || "10",
       )
 
-      setStepSize(currentParameter?.stepSize || "0")
-      setBountyDeposit(Number(lockedBounty).toFixed(6) || "0")
+      setStepSize(currentParameter?.stepSize || "")
+      setBountyDeposit(Number(lockedBounty).toFixed(6) || "")
     }
   }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
 
