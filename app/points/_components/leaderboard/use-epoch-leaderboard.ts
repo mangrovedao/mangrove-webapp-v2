@@ -1,15 +1,11 @@
-"use client"
-
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
-
 import { env } from "@/env.mjs"
 import { getErrorMessage } from "@/utils/errors"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { parseEpochLeaderboard } from "../../schemas/epoch-history"
 
-export type Epoch = "1"
-
 type Params = {
-  epoch?: Epoch
+  epoch: string
+  account?: string
   filters?: {
     first?: number
     skip?: number
@@ -17,18 +13,22 @@ type Params = {
 }
 
 export function useEpochLeaderboard({
-  epoch = "1",
+  epoch,
+  account,
   filters: { first = 10, skip = 0 } = {},
-}: Params = {}) {
+}: Params) {
   return useQuery({
-    queryKey: ["epoch-leaderboard", first, skip, epoch],
+    queryKey: ["epoch-leaderboard", first, skip, epoch, account],
     queryFn: async () => {
       try {
-        const res = await fetch(
-          `${env.NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST}/epoch-${epoch}?_start=${skip}&_limit=${first}`,
-        )
+        let url = `${env.NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST}/epoch-${epoch}?_start=${skip}&_limit=${first}`
+        if (account) {
+          url += `&account=${account}`
+        }
+        const res = await fetch(url)
         const leaderboard = await res.json()
-        return parseEpochLeaderboard(leaderboard)
+        const totalCount = res.headers.get("X-Total-Count")
+        return { leaderboard: parseEpochLeaderboard(leaderboard), totalCount }
       } catch (e) {
         console.error(getErrorMessage(e))
         throw new Error()

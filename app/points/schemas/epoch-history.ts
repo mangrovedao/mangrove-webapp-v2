@@ -14,6 +14,8 @@ const epochEntrySchema = z.object({
 
 const epochLeaderboardSchema = z.array(epochEntrySchema)
 
+export type LeaderboardEpochEntry = z.infer<typeof epochEntrySchema>
+
 export function parseEpochLeaderboard(data: unknown) {
   try {
     return epochLeaderboardSchema.parse(data)

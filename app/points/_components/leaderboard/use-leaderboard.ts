@@ -8,10 +8,7 @@ import { parseBoosts } from "../../schemas/boosts"
 import { parseLeaderboard } from "../../schemas/leaderboard"
 import { parsePoints } from "../../schemas/points"
 
-export type Epoch = "current" | "total"
-
 type Params = {
-  epoch?: Epoch
   filters?: {
     first?: number
     skip?: number
@@ -19,11 +16,10 @@ type Params = {
 }
 
 export function useLeaderboard({
-  epoch = "total",
   filters: { first = 100, skip = 0 } = {},
 }: Params = {}) {
   return useQuery({
-    queryKey: ["leaderboard", first, skip, epoch],
+    queryKey: ["leaderboard", first, skip],
     queryFn: async () => {
       try {
         const res = await fetch(
@@ -45,10 +41,10 @@ export function useLeaderboard({
   })
 }
 
-export function useUserPoints({ epoch = "total" }: { epoch?: Epoch } = {}) {
+export function useUserPoints() {
   const { address } = useAccount()
   return useQuery({
-    queryKey: ["user-points", address, epoch],
+    queryKey: ["user-points", address],
     queryFn: async () => {
       try {
         if (!address) return null
