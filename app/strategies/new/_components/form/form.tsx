@@ -105,9 +105,6 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleSendFromChange(value)
               }}
-              disabled={
-                kandelRequirementsQuery.status !== "success" || fieldsDisabled
-              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
@@ -150,9 +147,6 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleReceiveToChange(value)
               }}
-              disabled={
-                kandelRequirementsQuery.status !== "success" || fieldsDisabled
-              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
