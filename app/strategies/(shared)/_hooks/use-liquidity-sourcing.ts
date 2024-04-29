@@ -51,7 +51,6 @@ export default function useLiquiditySourcing({
         balance: logicBalance.toNumber(),
       }
     },
-    // staleTime: Infinity,
     enabled: !!(sendToken && fundOwner && sendFrom && sendFrom !== "simple"),
   })
 
@@ -81,7 +80,6 @@ export default function useLiquiditySourcing({
         balance: logicBalance.toNumber(),
       }
     },
-    // staleTime: Infinity,
     enabled: !!(
       receiveToken &&
       fundOwner &&
@@ -113,7 +111,6 @@ export default function useLiquiditySourcing({
         (logic) => logic !== undefined && logic.approvalType === "ERC20",
       ) as DefaultStrategyLogics[]
     },
-    // staleTime: Infinity,
     enabled: !!sendToken,
   })
 
@@ -140,7 +137,6 @@ export default function useLiquiditySourcing({
         (logic) => logic !== undefined && logic.approvalType === "ERC20",
       ) as DefaultStrategyLogics[]
     },
-    // staleTime: Infinity,
     enabled: !!receiveToken,
   })
 
