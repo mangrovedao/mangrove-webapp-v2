@@ -6,7 +6,7 @@ const epochEntrySchema = z.object({
   maker: z.number(),
   boost: z.number(),
   ref: z.number(),
-  community: z.number(),
+  community: z.number().default(0),
   total: z.number(),
   rank: z.number(),
   share: z.number(),
