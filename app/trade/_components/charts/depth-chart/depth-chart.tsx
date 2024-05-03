@@ -12,7 +12,6 @@ import {
   Tooltip,
   XYChart,
 } from "@visx/xychart"
-import Big from "big.js"
 
 import { lerp } from "@/utils/interpolation"
 import { Skeleton } from "@components/ui/skeleton"
@@ -31,6 +30,7 @@ import {
   getNumTicksBasedOnDecimals,
   toNumberIfBig,
 } from "./utils"
+import { CompleteOffer } from "@mangrovedao/mgv"
 
 const accessors = {
   xAccessor: (offer: Market.Offer) => toNumberIfBig(offer.price),
@@ -129,9 +129,9 @@ export function DepthChart() {
                 dataKey: DataKeyType.BIDS,
                 data: cumulativeBids.length
                   ? [
-                      { ...highestBid, volume: Big(0) },
+                      { ...highestBid, volume: 0 },
                       ...cumulativeBids,
-                      { price: Big(0), volume: Big(0) },
+                      { price: 0, volume: 0 },
                     ].reverse()
                   : [],
                 color: greenColorVar,
@@ -140,7 +140,7 @@ export function DepthChart() {
               {
                 dataKey: DataKeyType.ASKS,
                 data: cumulativeAsks.length
-                  ? [{ ...lowestAsk, volume: Big(0) }, ...cumulativeAsks]
+                  ? [{ ...lowestAsk, volume: 0 }, ...cumulativeAsks]
                   : [],
                 color: redColorVar,
                 curve: curveStepAfter,
@@ -149,11 +149,11 @@ export function DepthChart() {
               <g key={`${props.dataKey}-group`}>
                 <AreaSeries
                   {...props}
-                  xAccessor={(offer: Partial<Market.Offer>) =>
-                    Big(offer?.price ?? 0).toNumber()
+                  xAccessor={(offer: Partial<CompleteOffer>) =>
+                    offer?.price ?? 0
                   }
-                  yAccessor={(offer: Partial<Market.Offer>) =>
-                    Big(offer?.volume ?? 0).toNumber()
+                  yAccessor={(offer: Partial<CompleteOffer>) =>
+                    offer?.volume ?? 0
                   }
                   lineProps={{ strokeWidth: 1 }}
                   fillOpacity={0.15}
@@ -174,7 +174,7 @@ export function DepthChart() {
                 price: midPrice,
                 volume: lerp(...range, volumeMultiplier),
               }))}
-              xAccessor={(x) => x?.price.toNumber()}
+              xAccessor={(x) => x?.price}
               yAccessor={(x) => x?.volume}
               strokeWidth={0.25}
             />

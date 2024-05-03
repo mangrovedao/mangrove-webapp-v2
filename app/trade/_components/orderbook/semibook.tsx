@@ -1,6 +1,5 @@
 "use client"
 import { type Market } from "@mangrovedao/mangrove.js"
-import Big from "big.js"
 import React from "react"
 
 import { TableRow } from "@/components/ui/table"
@@ -11,14 +10,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/utils"
+import { CompleteOffer } from "@mangrovedao/mgv"
 import { OrderBookTableCell } from "./table-cell"
 import { calculateCumulatedVolume } from "./utils"
 
 type SemiBookProps = {
   type: Market.BA
   data?: {
-    asks: Market.Offer[]
-    bids: Market.Offer[]
+    asks: CompleteOffer[]
+    bids: CompleteOffer[]
   } | null
   priceDecimals: number
 }
@@ -32,17 +32,14 @@ export const SemiBook = React.forwardRef<
   SemiBookProps
 >(({ type, data, priceDecimals }, ref) => {
   const { dataWithCumulatedVolume, maxVolume } = calculateCumulatedVolume(data)
-  const offers = dataWithCumulatedVolume?.[type].sort((a, b) =>
-    Big(b.price ?? 0)
-      .minus(a.price ?? 0)
-      .toNumber(),
+  const offers = dataWithCumulatedVolume?.[type].sort(
+    (a, b) => b.price - a.price,
   )
   const refIndex = type === "bids" ? 0 : offers?.length ? offers.length - 1 : 0
 
   return (offers ?? []).map(({ price, id, volume, cumulatedVolume }, i) => {
-    const cumulatedVolumePercentage = Big(cumulatedVolume ?? 0)
-      .mul(100)
-      .div(maxVolume ?? 1)
+    const cumulatedVolumePercentage =
+      ((cumulatedVolume ?? 0) * 100) / (maxVolume ?? 1)
     return (
       <>
         <TableRow
@@ -82,7 +79,7 @@ export const SemiBook = React.forwardRef<
           </OrderBookTableCell>
 
           <OrderBookTableCell className="text-gray">
-            {price?.mul(volume).toFixed(priceDecimals)}
+            {(price * volume).toFixed(priceDecimals)}
           </OrderBookTableCell>
           <td
             className={cn(
@@ -91,7 +88,7 @@ export const SemiBook = React.forwardRef<
           ></td>
           <style jsx>{`
             .order-book-line-bg {
-              width: ${cumulatedVolumePercentage.toNumber()}%;
+              width: ${cumulatedVolumePercentage}%;
               background: ${type === "bids"
                 ? "#021B1A"
                 : "rgba(255, 0, 0, 0.15)"};

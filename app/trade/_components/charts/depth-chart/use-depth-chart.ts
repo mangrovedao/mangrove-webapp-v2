@@ -1,10 +1,11 @@
-import { type Market } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 import React from "react"
 
 import useMarket from "@/providers/market"
 import { clamp } from "@/utils/interpolation"
 import { calculateCumulative } from "./utils"
+import { useBook } from "@/hooks/use-book"
+import type { CompleteOffer } from "@mangrovedao/mgv"
 
 function enablePageScroll() {
   document.body.classList.remove("overflow-hidden")
@@ -15,9 +16,9 @@ function disablePageScroll() {
 }
 
 function removeCrossedOrders(
-  bids: Market.Offer[],
-  asks: Market.Offer[],
-): { bids: Market.Offer[]; asks: Market.Offer[] } {
+  bids: CompleteOffer[],
+  asks: CompleteOffer[],
+): { bids: CompleteOffer[]; asks: CompleteOffer[] } {
   for (let i = 0, j = 0; i < bids.length && j < asks.length; ) {
     const comparison = Big(bids?.[i]?.price ?? 0).cmp(asks?.[j]?.price ?? 0)
 
@@ -35,16 +36,16 @@ function removeCrossedOrders(
 }
 
 export function useDepthChart() {
-  const { requestBookQuery, market } = useMarket()
+  const { market } = useMarket()
+  const { book, isLoading } = useBook({})
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const [isScrolling, setIsScrolling] = React.useState(false)
   const baseDecimals = market?.base.displayedDecimals
   const priceDecimals = market?.quote.displayedAsPriceDecimals
   const { asks, bids } = removeCrossedOrders(
-    requestBookQuery.data?.bids ?? [],
-    requestBookQuery.data?.asks ?? [],
+    book?.bids ?? [],
+    book?.asks ?? [],
   )
-  const isLoading = requestBookQuery.isLoading
   const cumulativeAsks = calculateCumulative(asks, true)
   const cumulativeBids = calculateCumulative(bids)
   const lowestAsk = asks?.[0]
@@ -52,10 +53,9 @@ export function useDepthChart() {
   const lowestBid = bids?.[bids.length - 1]
   const highestAsk = asks?.[asks.length - 1]
   const midPrice = React.useMemo(() => {
-    if (!bids?.length || !asks?.length) return Big(0)
-    return Big(lowestAsk?.price ?? 0)
-      .add(highestBid?.price ?? 0)
-      .div(2)
+    if (!bids?.length || !asks?.length) return 0
+    return ((lowestAsk?.price ?? 0)
+      + (highestBid?.price ?? 0)) / 2
   }, [asks?.length, bids?.length, highestBid?.price, lowestAsk?.price])
 
   function onMouseOut() {
@@ -73,10 +73,9 @@ export function useDepthChart() {
   }
 
   const minZoomDomain = React.useMemo(() => {
-    return Big(midPrice ?? 0)
-      .minus(highestBid?.price ?? 0)
-      .mul(1.15)
-      .toNumber()
+    return ((midPrice ?? 0)
+      - (highestBid?.price ?? 0))
+      * 1.15
   }, [highestBid?.price, midPrice])
 
   React.useEffect(() => {
@@ -84,24 +83,20 @@ export function useDepthChart() {
     if (!asks?.length || !bids?.length) {
       setZoomDomain(
         !asks?.length
-          ? Big(highestBid?.price ?? 0).toNumber()
-          : Big(highestAsk?.price ?? 0).toNumber(),
+          ? (highestBid?.price ?? 0)
+          : (highestAsk?.price ?? 0),
       )
       return
     }
     // set initial zoom domain
-    const midPriceAsBig = Big(midPrice ?? 0)
-    const higestBidAsBig = Big(highestBid?.price ?? 0)
-    const lowestBidAsBig = Big(lowestBid?.price ?? 0)
-    const highestAskAsBig = Big(highestAsk?.price ?? 0)
     const newZoomDomain = Math.max(
-      midPriceAsBig.minus(higestBidAsBig).mul(13).toNumber(),
-      midPriceAsBig.minus(lowestBidAsBig).div(2).toNumber(),
-      Big(highestAskAsBig).minus(midPriceAsBig).div(2).toNumber(),
+      (midPrice - (highestBid?.price || 0)) * 13,
+      (midPrice - (lowestBid?.price || 0)) / 2,
+      ((highestAsk?.price || 0) - midPrice) / 2,
     )
 
     setZoomDomain(
-      newZoomDomain > midPrice.toNumber() ? midPrice.toNumber() : newZoomDomain,
+      newZoomDomain > midPrice ? midPrice : newZoomDomain,
     )
   }, [
     asks?.length,
@@ -125,18 +120,15 @@ export function useDepthChart() {
           ]
         : ([
             clamp(
-              midPrice.minus(zoomDomain ?? 0).toNumber(),
-              Big(lowestBid?.price ?? 0)
-                .times(0.9)
-                .toNumber(), // Subtract 10% from the lowest bid
-              Big(highestBid?.price ?? 0).toNumber(),
+              midPrice - (zoomDomain ?? 0),
+              (lowestBid?.price ?? 0) *0.9
+                , // Subtract 10% from the lowest bid
+              highestBid?.price ?? 0,
             ),
             clamp(
-              midPrice.plus(zoomDomain ?? 0).toNumber(),
-              Big(lowestAsk?.price ?? 0).toNumber(),
-              Big(highestAsk?.price ?? 0)
-                .times(1.1)
-                .toNumber(), // Add 10% to the highest ask
+              midPrice + (zoomDomain ?? 0),
+              lowestAsk?.price ?? 0,
+              (highestAsk?.price ?? 0) * 1.1, // Add 10% to the highest ask
             ),
           ] as const)
 
@@ -148,7 +140,7 @@ export function useDepthChart() {
             Big(offer?.price ?? 0).gte(domain[0]) &&
             Big(offer?.price ?? 0).lte(domain[1]),
         )
-        .map((offer) => offer.volume.toNumber())
+        .map((offer) => offer.volume)
         .reduce((a, b) => Math.max(a, b), 0),
     ] as const
 
@@ -190,7 +182,7 @@ export function useDepthChart() {
           minZoomDomain,
         ),
         0,
-        midPrice.toNumber(),
+        midPrice,
       ),
     )
   }

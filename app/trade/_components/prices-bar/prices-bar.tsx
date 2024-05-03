@@ -1,6 +1,6 @@
 "use client"
 
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 import React from "react"
 
 import { Button } from "@/components/ui/button"
@@ -9,11 +9,12 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
-import { determinePriceDecimalsFromToken, formatNumber } from "@/utils/numbers"
+import { determineDecimals, determinePriceDecimalsFromToken, formatNumber } from "@/utils/numbers"
 import { ArrowLeftRight } from "lucide-react"
+import { useBook } from "@/hooks/use-book"
 
 function Container({ children }: React.PropsWithChildren) {
   return <span className="text-xs font-medium space-y-[2px]">{children}</span>
@@ -42,7 +43,7 @@ function Item({
   token?: Token
   rightElement?: React.ReactElement
 }) {
-  const displayedPriceDecimals = determinePriceDecimalsFromToken(value, token)
+  const displayedPriceDecimals = determineDecimals(value, token?.priceDisplayDecimals)
 
   return (
     <Container>
@@ -69,9 +70,9 @@ function Item({
 }
 
 export function PricesBar() {
-  const { market, requestBookQuery } = useMarket()
-  const base = market?.base
-  const quote = market?.quote
+  const { currentMarket } = useMarket()
+  const base = currentMarket?.base
+  const quote = currentMarket?.quote
   const oneMinutePriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol)
   const { data, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(base?.address, quote?.address)
@@ -85,25 +86,24 @@ export function PricesBar() {
 
   const token = side === "base" ? quote : base
 
-  const { asks, bids } = requestBookQuery.data ?? {}
-  const lowestAskPrice = asks?.[0]?.price
-  const highestBidPrice = bids?.[0]?.price
-  const priceDecimals = determinePriceDecimalsFromToken(
-    lowestAskPrice?.toNumber(),
-    market?.quote,
+  const { book } = useBook({})
+  const lowestAskPrice = book?.asks[0]?.price
+  const highestBidPrice = book?.bids[0]?.price
+  const priceDecimals = determineDecimals(
+    lowestAskPrice,
+    quote?.priceDisplayDecimals,
   )
 
   let spotPrice =
     lowestAskPrice && highestBidPrice
-      ? lowestAskPrice
-          ?.add(highestBidPrice ?? 0)
-          ?.div(2)
-          .toNumber()
+      ? (lowestAskPrice
+         + (highestBidPrice ?? 0))
+          / 2
       : !lowestAskPrice && !highestBidPrice
         ? undefined
         : Math.max(
-            lowestAskPrice?.toNumber() || 0,
-            highestBidPrice?.toNumber() || 0,
+            lowestAskPrice || 0,
+            highestBidPrice || 0,
           )
 
   if (side === "quote") {
