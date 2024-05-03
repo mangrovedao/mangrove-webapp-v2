@@ -9,6 +9,7 @@ import { useLocalStorage } from "usehooks-ts"
 import { ConnectWalletBanner } from "./_components/connect-wallet-banner"
 import CurrentBoost from "./_components/current-boost"
 import { JoinProgramBanner } from "./_components/join-program-banner"
+import { Leaderboard } from "./_components/leaderboard/table"
 import {
   useUserBoosts,
   useUserPoints,
@@ -59,7 +60,7 @@ export default function Page() {
           boost={userBoost?.boost}
         />
       </div>
-      {/* <Leaderboard /> */}
+      <Leaderboard />
     </div>
   ) : (
     <div>
