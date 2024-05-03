@@ -56,14 +56,14 @@ export function useTable({ data }: Params) {
           return <Address address={address} />
         },
       }),
-      columnHelper.display({
-        id: "boost",
-        header: "Boost",
-        cell: ({ row }) => {
-          const { boost, account } = row.original
-          return <BoostCell volumeBoost={boost} account={account} />
-        },
-      }),
+      // columnHelper.display({
+      //   id: "boost",
+      //   header: "Boost",
+      //   cell: ({ row }) => {
+      //     const { boost, account } = row.original
+      //     return <BoostCell volumeBoost={boost} account={account} />
+      //   },
+      // }),
       columnHelper.accessor("maker_points", {
         header: () => <div className="text-right">LP points</div>,
         cell: (row) => {
