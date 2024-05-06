@@ -17,18 +17,22 @@ export default function EpochContent({
   name: string
   account?: string
 }) {
-  const epochNumber = name.split(" ")[1]
+  const epochNumber = name.split(" ")[1] as any
+  const epoch =
+    epochNumber === undefined
+      ? "total"
+      : (`epoch-${epochNumber}` as `epoch-${number}` | "total")
   const [{ page, pageSize }, setPageDetails] =
     React.useState<PageDetails>(initialPageDetails)
   const epochLeaderboardQuery = useEpochLeaderboard({
-    epoch: epochNumber || "1",
+    epoch,
     filters: {
       skip: (page - 1) * pageSize,
       first: pageSize,
     },
   })
   const accountEpochQuery = useEpochLeaderboard({
-    epoch: epochNumber || "1",
+    epoch,
     account,
   })
 
@@ -43,10 +47,12 @@ export default function EpochContent({
   }, [accountEpochQuery.dataUpdatedAt])
 
   const table = useEpochTable({
+    // @ts-ignore
     data: data,
   })
 
   const accountTable = useEpochTable({
+    // @ts-ignore
     data: accountData,
   })
 

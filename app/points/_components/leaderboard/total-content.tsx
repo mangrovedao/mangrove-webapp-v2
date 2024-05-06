@@ -2,7 +2,7 @@ import { DataTable } from "@/components/ui/data-table/data-table"
 import React from "react"
 
 import { Title } from "@/components/typography/title"
-import { useLeaderboard, useUserPoints } from "./use-leaderboard"
+import { useEpochLeaderboard } from "./use-epoch-leaderboard"
 import { useTable } from "./use-table"
 
 const initialPageDetails = {
@@ -10,50 +10,51 @@ const initialPageDetails = {
   pageSize: 10,
 }
 
-export default function TotalContent() {
+export default function TotalContent({ account }: { account?: string }) {
   const [{ page, pageSize }, setPageDetails] =
     React.useState<PageDetails>(initialPageDetails)
-  const leaderboardQuery = useLeaderboard({
+  const epochLeaderboardQuery = useEpochLeaderboard({
+    epoch: "total",
     filters: {
       skip: (page - 1) * pageSize,
       first: pageSize,
     },
   })
-
-  const userPointsQuery = useUserPoints()
-  const currentUser = userPointsQuery.data
-  const data = React.useMemo(() => {
-    if (leaderboardQuery.isLoading) return []
-    return leaderboardQuery.data?.leaderboard ?? []
-  }, [leaderboardQuery.dataUpdatedAt])
-
-  const userData = React.useMemo(() => {
-    if (userPointsQuery.isLoading) return []
-    return [userPointsQuery.data] ?? []
-  }, [userPointsQuery.dataUpdatedAt])
-
-  const userTable = useTable({
-    //@ts-ignore
-    data: userData,
+  const accountEpochQuery = useEpochLeaderboard({
+    epoch: "total",
+    account,
   })
 
+  const data = React.useMemo(() => {
+    if (epochLeaderboardQuery.isLoading) return []
+    return epochLeaderboardQuery.data?.leaderboard ?? []
+  }, [epochLeaderboardQuery.dataUpdatedAt])
+
+  const accountData = React.useMemo(() => {
+    if (accountEpochQuery.isLoading) return []
+    return accountEpochQuery.data?.leaderboard ?? []
+  }, [accountEpochQuery.dataUpdatedAt])
+
   const table = useTable({
-    //@ts-ignore
     data: data,
+  })
+
+  const accountTable = useTable({
+    data: accountData,
   })
 
   return (
     <>
-      <Title variant={"title1"} className="mb-5 mt-10">
+      <Title variant={"title1"} className="mt-10 mb-5">
         Your points
       </Title>
       <DataTable
         skeletonRows={1}
-        table={userTable}
-        isError={!!userPointsQuery.error}
-        isLoading={userPointsQuery.isLoading}
+        table={accountTable}
+        isError={!!accountEpochQuery.error}
+        isLoading={accountEpochQuery.isLoading}
         tableRowClasses="text-white"
-        isRowHighlighted={(row) => row.account === currentUser?.account}
+        isRowHighlighted={(row) => row.account === account}
       />
       <Title variant={"title1"} className="mt-10 mb-5">
         Leaderboard
@@ -61,13 +62,13 @@ export default function TotalContent() {
       <DataTable
         skeletonRows={10}
         table={table}
-        isError={!!leaderboardQuery.error}
-        isLoading={leaderboardQuery.isLoading}
+        isError={!!epochLeaderboardQuery.error}
+        isLoading={epochLeaderboardQuery.isLoading}
         pagination={{
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count: leaderboardQuery.data?.leaderboard_length ?? 0,
+          count: Number(epochLeaderboardQuery.data?.totalCount ?? 0),
         }}
         tableRowClasses="text-white"
       />

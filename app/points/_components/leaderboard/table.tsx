@@ -58,7 +58,7 @@ export function Leaderboard() {
             </CustomTabsContent>
           ))}
         <CustomTabsContent value="total">
-          <TotalContent />
+          <TotalContent account={address?.toLowerCase()} />
         </CustomTabsContent>
       </CustomTabs>
     </div>

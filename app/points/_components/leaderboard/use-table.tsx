@@ -56,6 +56,7 @@ export function useTable({ data }: Params) {
           return <Address address={address} />
         },
       }),
+<<<<<<< Updated upstream
       // columnHelper.display({
       //   id: "boost",
       //   header: "Boost",
@@ -65,6 +66,9 @@ export function useTable({ data }: Params) {
       //   },
       // }),
       columnHelper.accessor("maker_points", {
+=======
+      columnHelper.accessor("maker", {
+>>>>>>> Stashed changes
         header: () => <div className="text-right">LP points</div>,
         cell: (row) => {
           const makerPoints = row.getValue()
@@ -75,7 +79,7 @@ export function useTable({ data }: Params) {
           )
         },
       }),
-      columnHelper.accessor("taker_points", {
+      columnHelper.accessor("taker", {
         header: () => <div className="text-right">Trading points</div>,
         cell: (row) => {
           const tradingPoints = row.getValue()
@@ -86,18 +90,7 @@ export function useTable({ data }: Params) {
           )
         },
       }),
-      columnHelper.accessor("community_points", {
-        header: () => <div className="text-right">Community points</div>,
-        cell: (row) => {
-          const communityPoints = row.getValue()
-          return (
-            <div className="w-full h-full flex justify-end font-roboto">
-              {formatNumber(communityPoints)}
-            </div>
-          )
-        },
-      }),
-      columnHelper.accessor("referees_points", {
+      columnHelper.accessor("ref", {
         header: () => <div className="text-right">Referral points</div>,
         cell: (row) => {
           const refereesPoints = row.getValue()
@@ -108,7 +101,7 @@ export function useTable({ data }: Params) {
           )
         },
       }),
-      columnHelper.accessor("total_points", {
+      columnHelper.accessor("total", {
         header: () => <div className="text-right">Total points</div>,
         cell: (row) => {
           const totalPoints = row.getValue()
