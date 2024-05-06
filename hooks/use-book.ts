@@ -5,7 +5,7 @@ import useMarket from "@/providers/market.new"
 
 export type UseBookParams = BookParams & {}
 
-export function useBook(params: UseBookParams) {
+export function useBook(params?: UseBookParams) {
   const client = useMarketClient()
   const {currentMarket} = useMarket()
   const { data, isLoading, isError } = useQuery({
@@ -13,7 +13,7 @@ export function useBook(params: UseBookParams) {
     queryFn: async () => {
       console.log("client", client)
       if (!client) return undefined
-      return client.getBook(params)
+      return client.getBook(params || {})
     },
     // refetchInterval: 2000,
   })

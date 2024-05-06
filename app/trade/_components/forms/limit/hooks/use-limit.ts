@@ -8,10 +8,11 @@ import { useEventListener } from "usehooks-ts"
 
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import { BS, Order } from "@mangrovedao/mgv/lib"
 import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { DefaultTradeLogics } from "../../types"
-import { TimeInForce, TimeToLiveUnit } from "../enums"
+import { TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
@@ -21,17 +22,19 @@ type Props = {
 export function useLimit(props: Props) {
   const { mangrove } = useMangrove()
   const { market, marketInfo } = useMarket()
+  // const { currentMarket } = useMarket()
+  // const { book } = useBook()
 
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      tradeAction: TradeAction.BUY,
+      tradeAction: BS.buy,
       limitPrice: "",
       send: "",
       sendFrom: "simple",
       receive: "",
       receiveTo: "simple",
-      timeInForce: TimeInForce.GOOD_TIL_TIME,
+      orderType: Order.GTC,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
     },
@@ -43,7 +46,7 @@ export function useLimit(props: Props) {
   const sendFrom = form.useStore((state) => state.values.sendFrom)
   const receiveTo = form.useStore((state) => state.values.receiveTo)
 
-  const timeInForce = form.useStore((state) => state.values.timeInForce)
+  const orderType = form.useStore((state) => state.values.orderType)
   const logics = (
     mangrove
       ? Object.values(mangrove.logics).filter(
@@ -66,9 +69,7 @@ export function useLimit(props: Props) {
     defaultLimitPrice,
   } = useTradeInfos("limit", tradeAction)
 
-  const minAsk = market
-    ?.getSemibook("asks")
-    .getMinimumVolume(selectedSource?.gasOverhead || 200_000)
+  const minAsk = minVolume()
 
   const minBid = market
     ?.getSemibook("bids")
@@ -238,7 +239,7 @@ export function useLimit(props: Props) {
     tickSize,
     feeInPercentageAsString,
     spotPrice,
-    timeInForce,
+    orderType,
     logics,
     selectedSource,
     minVolume,

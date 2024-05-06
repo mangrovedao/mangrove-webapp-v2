@@ -1,12 +1,12 @@
-import type { TradeAction } from "../enums"
-import { type TimeInForce, type TimeToLiveUnit } from "./enums"
+import { BS, Order } from "@mangrovedao/mgv/lib"
+import { type TimeToLiveUnit } from "./enums"
 
 export type Form = {
-  tradeAction: TradeAction
+  tradeAction: BS
   limitPrice: string
   send: string
   receive: string
-  timeInForce: TimeInForce
+  orderType: Order
   timeToLive: string
   timeToLiveUnit: TimeToLiveUnit
   sendFrom: string

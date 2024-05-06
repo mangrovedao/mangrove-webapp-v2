@@ -1,12 +1,9 @@
+import useMarket from "@/providers/market.new"
 import { publicMarketActions } from "@mangrovedao/mgv"
-import { Address } from "viem"
 import { usePublicClient } from "wagmi"
 import { useMangroveAddresses } from "./use-addresses"
-import useMarket from "@/providers/market.new"
 
-export type UseMarketClientParams = {}
-
-export function useMarketClient(params?: UseMarketClientParams) {
+export function useMarketClient() {
   const publicClient = usePublicClient()
   const addresses = useMangroveAddresses()
   const { currentMarket } = useMarket()
