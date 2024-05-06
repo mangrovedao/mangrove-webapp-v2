@@ -56,19 +56,7 @@ export function useTable({ data }: Params) {
           return <Address address={address} />
         },
       }),
-<<<<<<< Updated upstream
-      // columnHelper.display({
-      //   id: "boost",
-      //   header: "Boost",
-      //   cell: ({ row }) => {
-      //     const { boost, account } = row.original
-      //     return <BoostCell volumeBoost={boost} account={account} />
-      //   },
-      // }),
-      columnHelper.accessor("maker_points", {
-=======
       columnHelper.accessor("maker", {
->>>>>>> Stashed changes
         header: () => <div className="text-right">LP points</div>,
         cell: (row) => {
           const makerPoints = row.getValue()
