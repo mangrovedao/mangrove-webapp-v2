@@ -1,13 +1,20 @@
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
+import { useAccount } from "wagmi"
 import BoxContainer from "./box-container"
-import { useLeaderboard, useUserPoints } from "./leaderboard/use-leaderboard"
+import { useEpochLeaderboard } from "./leaderboard/use-epoch-leaderboard"
 
 export default function Rank({ className }: { className?: string }) {
-  const { data } = useUserPoints()
-  const leaderboardQuery = useLeaderboard()
-  const rank = data?.rank ?? -1
-  const rankLabel = rank > 0 ? rank : "Unranked"
+  const { address: account } = useAccount()
+  const totalLeaderboardQuery = useEpochLeaderboard({
+    epoch: "total",
+  })
+  const accountTotalQuery = useEpochLeaderboard({
+    epoch: "total",
+    account,
+  })
+  const rank = accountTotalQuery.data?.leaderboard?.[0]?.rank
+  const rankLabel = rank ? rank : "Unranked"
 
   return (
     <BoxContainer className={cn(className)}>
@@ -38,9 +45,9 @@ export default function Rank({ className }: { className?: string }) {
               {rankLabel}
             </span>
           </div>
-          {leaderboardQuery.data?.leaderboard_length ? (
+          {totalLeaderboardQuery.data?.totalCount ? (
             <div className="text-xs text-cloud-200 flex items-center pt-7">
-              of {formatNumber(leaderboardQuery.data?.leaderboard_length)}{" "}
+              of {formatNumber(Number(totalLeaderboardQuery.data?.totalCount))}{" "}
               traders
             </div>
           ) : undefined}

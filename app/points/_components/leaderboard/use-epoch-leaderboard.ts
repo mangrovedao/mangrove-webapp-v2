@@ -18,13 +18,14 @@ export function useEpochLeaderboard({
   account,
   filters: { first = 10, skip = 0 } = {},
 }: Params) {
+  const lcAccount = account?.toLowerCase()
   return useQuery({
-    queryKey: ["epoch-leaderboard", first, skip, epoch, account],
+    queryKey: ["epoch-leaderboard", first, skip, epoch, lcAccount],
     queryFn: async () => {
       try {
         let url = `${env.NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST}/${epoch}?_start=${skip}&_limit=${first}`
-        if (account) {
-          url += `&account=${account}`
+        if (lcAccount) {
+          url += `&account=${lcAccount}`
         }
         const res = await fetch(url)
         const leaderboard = await res.json()

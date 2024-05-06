@@ -13,27 +13,27 @@ const initialPageDetails = {
 export default function TotalContent({ account }: { account?: string }) {
   const [{ page, pageSize }, setPageDetails] =
     React.useState<PageDetails>(initialPageDetails)
-  const epochLeaderboardQuery = useEpochLeaderboard({
+  const totalLeaderboardQuery = useEpochLeaderboard({
     epoch: "total",
     filters: {
       skip: (page - 1) * pageSize,
       first: pageSize,
     },
   })
-  const accountEpochQuery = useEpochLeaderboard({
+  const accountTotalQuery = useEpochLeaderboard({
     epoch: "total",
     account,
   })
 
   const data = React.useMemo(() => {
-    if (epochLeaderboardQuery.isLoading) return []
-    return epochLeaderboardQuery.data?.leaderboard ?? []
-  }, [epochLeaderboardQuery.dataUpdatedAt])
+    if (totalLeaderboardQuery.isLoading) return []
+    return totalLeaderboardQuery.data?.leaderboard ?? []
+  }, [totalLeaderboardQuery.dataUpdatedAt])
 
   const accountData = React.useMemo(() => {
-    if (accountEpochQuery.isLoading) return []
-    return accountEpochQuery.data?.leaderboard ?? []
-  }, [accountEpochQuery.dataUpdatedAt])
+    if (accountTotalQuery.isLoading) return []
+    return accountTotalQuery.data?.leaderboard ?? []
+  }, [accountTotalQuery.dataUpdatedAt])
 
   const table = useTable({
     data: data,
@@ -51,8 +51,8 @@ export default function TotalContent({ account }: { account?: string }) {
       <DataTable
         skeletonRows={1}
         table={accountTable}
-        isError={!!accountEpochQuery.error}
-        isLoading={accountEpochQuery.isLoading}
+        isError={!!accountTotalQuery.error}
+        isLoading={accountTotalQuery.isLoading}
         tableRowClasses="text-white"
         isRowHighlighted={(row) => row.account === account}
       />
@@ -62,13 +62,13 @@ export default function TotalContent({ account }: { account?: string }) {
       <DataTable
         skeletonRows={10}
         table={table}
-        isError={!!epochLeaderboardQuery.error}
-        isLoading={epochLeaderboardQuery.isLoading}
+        isError={!!totalLeaderboardQuery.error}
+        isLoading={totalLeaderboardQuery.isLoading}
         pagination={{
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count: Number(epochLeaderboardQuery.data?.totalCount ?? 0),
+          count: Number(totalLeaderboardQuery.data?.totalCount ?? 0),
         }}
         tableRowClasses="text-white"
       />
