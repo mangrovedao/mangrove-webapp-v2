@@ -1,5 +1,6 @@
 import { Token } from "@mangrovedao/mangrove.js"
-import React from "react"
+import { useQuery } from "@tanstack/react-query"
+import Big from "big.js"
 import { DefaultTradeLogics } from "../../types"
 
 type Props = {
@@ -16,20 +17,6 @@ type BalanceLogic = {
   balance: number
 }
 
-// export function useAbleToken(
-//   logic: DefaultTradeLogics,
-//   token: Token,
-// ) {
-//   return useQuery({
-//     queryKey: ["availableLogic"],
-//     queryFn: async () => {
-//       return await logic?.overlying(token)
-//     },
-
-//     enabled: !!(logic && token),
-//   })
-// }
-
 export default function liquiditySourcing({
   sendToken,
   receiveToken,
@@ -38,118 +25,115 @@ export default function liquiditySourcing({
   logics,
   fundOwner,
 }: Props) {
-  const [sendFromBalance, setSendFromBalance] = React.useState<
-    BalanceLogic | undefined
-  >()
-  const [receiveToBalance, setReceiveToBalance] = React.useState<
-    BalanceLogic | undefined
-  >()
+  const { data: sendFromLogics } = useQuery<DefaultTradeLogics[]>({
+    queryKey: ["sendFromLogics", sendToken?.symbol],
+    queryFn: async () => {
+      if (!sendToken) return []
 
-  const [sendFromLogics, setSendFromLogics] =
-    React.useState<DefaultTradeLogics[]>()
-
-  const [receiveToLogics, setReceiveToLogics] =
-    React.useState<DefaultTradeLogics[]>()
-
-  const getSendFromLogics = async (token: Token) => {
-    const usableLogics = logics.map(async (logic) => {
-      try {
-        if (!logic) return
-        const logicToken = await logic.overlying(token)
-        // const isUsable = useAbleToken(logic, token).data
-        if (logicToken) {
-          return logic
+      const usableLogics = logics.map(async (logic) => {
+        try {
+          if (!logic) return undefined
+          const logicToken = await logic.overlying(sendToken)
+          if (logicToken) {
+            return logic
+          }
+        } catch (error) {
+          // note: if logic.overlying(token) fails it means the token is not supported by the logic
+          return undefined
         }
-      } catch (error) {
-        // if the logic is not available for the token, we catch the error and return
-        return
-      }
-    })
-    const resolvedLogics = await Promise.all(usableLogics)
-    setSendFromLogics(resolvedLogics)
-  }
+      })
 
-  const getReceiveToLogics = async (token: Token) => {
-    const usableLogics = logics.map(async (logic) => {
-      try {
-        if (!logic) return
-        const logicToken = await logic.overlying(token)
-        if (logicToken) {
-          return logic
+      const resolvedLogics = await Promise.all(usableLogics)
+      return resolvedLogics.filter(
+        (logic) => logic !== undefined && logic.approvalType === "ERC20",
+      ) as DefaultTradeLogics[]
+    },
+    enabled: !!sendToken,
+  })
+
+  const { data: receiveToLogics } = useQuery<DefaultTradeLogics[]>({
+    queryKey: ["receiveToLogics", receiveToken?.symbol],
+    queryFn: async () => {
+      if (!receiveToken) return []
+
+      const usableLogics = logics.map(async (logic) => {
+        try {
+          if (!logic) return undefined
+          const logicToken = await logic.overlying(receiveToken)
+          if (logicToken) {
+            return logic
+          }
+        } catch (error) {
+          // note: if logic.overlying(token) fails it means the token is not supported by the logic
+          return undefined
         }
-      } catch (error) {
-        // if the logic is not available for the token, we catch the error and return
-        return
-      }
-    })
-    const resolvedLogics = await Promise.all(usableLogics)
-    setReceiveToLogics(resolvedLogics)
-  }
+      })
 
-  const getSendBalance = async (token: Token, fundOwner: string) => {
-    try {
-      if (sendFrom === "simple") {
-        setSendFromBalance(undefined)
-        return
+      const resolvedLogics = await Promise.all(usableLogics)
+      return resolvedLogics.filter(
+        (logic) => logic !== undefined && logic.approvalType === "ERC20",
+      ) as DefaultTradeLogics[]
+    },
+    enabled: !!receiveToken,
+  })
+
+  const { data: sendFromBalance } = useQuery<BalanceLogic | undefined>({
+    queryKey: ["sendFromBalance", sendToken?.symbol, fundOwner, sendFrom],
+    queryFn: async () => {
+      if (!sendToken || !fundOwner || sendFrom === "simple") {
+        return undefined
       }
 
       const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
-
-      if (!selectedLogic) return
+      if (!selectedLogic) return undefined
 
       const logicBalance = await selectedLogic.balanceOfFromLogic(
-        token,
+        sendToken,
         fundOwner,
       )
+      if (!logicBalance) return undefined
 
-      setSendFromBalance({
+      return {
         formatted: logicBalance
           .toNumber()
           .toFixed(sendToken?.displayedDecimals),
         balance: logicBalance.toNumber(),
-      })
-    } catch (error) {
-      return
-    }
-  }
-
-  const getReceiveBalance = async (token: Token, fundOwner: string) => {
-    try {
-      if (receiveTo === "simple") {
-        setReceiveToBalance(undefined)
-        return
       }
+    },
+    enabled: !!(sendToken && fundOwner && sendFrom && sendFrom !== "simple"),
+  })
+
+  const { data: receiveToBalance } = useQuery<BalanceLogic | undefined>({
+    queryKey: ["receiveToBalance", receiveTo, fundOwner, receiveToken?.symbol],
+    queryFn: async () => {
+      if (!receiveToken || !fundOwner || receiveTo === "simple") {
+        return undefined
+      }
+
       const selectedLogic = logics.find((logic) => logic?.id === receiveTo)
+      if (!selectedLogic) return undefined
 
-      if (!selectedLogic) return
-
-      const logicBalance = await selectedLogic.balanceOfFromLogic(
-        token,
+      let logicBalance = await selectedLogic.balanceOfFromLogic(
+        receiveToken,
         fundOwner,
       )
 
-      setReceiveToBalance({
+      if (!logicBalance) logicBalance = Big(0)
+
+      return {
         formatted: logicBalance
           .toNumber()
           .toFixed(receiveToken?.displayedDecimals),
         balance: logicBalance.toNumber(),
-      })
-    } catch (error) {
-      return
-    }
-  }
-
-  React.useEffect(() => {
-    if (!receiveToken || !receiveTo || !fundOwner) return
-    getReceiveBalance(receiveToken, fundOwner)
-    getReceiveToLogics(receiveToken)
-  }, [receiveTo, receiveToken, fundOwner])
-
-  React.useEffect(() => {
-    if (!sendFrom || !sendToken || !fundOwner) return
-    getSendBalance(sendToken, fundOwner)
-    getSendFromLogics(sendToken)
-  }, [sendFrom, sendToken, fundOwner])
+      }
+    },
+    enabled: !!(
+      receiveToken &&
+      fundOwner &&
+      receiveTo &&
+      receiveTo !== "simple"
+    ),
+  })
 
   return {
     sendFromLogics,
