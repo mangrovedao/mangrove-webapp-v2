@@ -167,18 +167,21 @@ export const useParameters = () => {
       minPrice,
       creationDate,
       strategyAddress,
-      pnlQuote: "Upcoming",
-      // pnlQuote === "Upcoming"
-      //   ? "Upcoming"
-      //   : pnlQuote && market?.quote.symbol
-      //     ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
-      //     : "",
-      returnRate: "Upcoming",
-      // returnRate === "Upcoming"
-      //   ? "Upcoming"
-      //   : returnRate && market?.quote.symbol
-      //     ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
-      //     : "",
+      pnlQuote:
+        // "Upcoming",
+        pnlQuote === "Upcoming"
+          ? "Upcoming"
+          : pnlQuote && market?.quote.symbol
+            ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+            : "",
+      returnRate:
+        // "Upcoming"
+
+        returnRate === "Upcoming"
+          ? "Upcoming"
+          : returnRate && market?.quote.symbol
+            ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+            : "",
     },
     withdrawBase,
     withdrawQuote,
