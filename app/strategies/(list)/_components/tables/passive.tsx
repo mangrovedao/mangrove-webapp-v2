@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
+import { Flame } from "lucide-react"
 
 enum StrategiesTables {
   ALL_VAULTS = "All Vault",
@@ -54,7 +55,13 @@ export function Passive({
               value={table}
               className="capitalize"
             >
-              {table}
+              {table === StrategiesTables.BOOSTED ? (
+                <span className="flex gap-1 align-middle">
+                  {table} <Flame className="text-red-300 h-4 w-4" />
+                </span>
+              ) : (
+                table
+              )}
             </CustomTabsTrigger>
           ))}
         </CustomTabsList>
