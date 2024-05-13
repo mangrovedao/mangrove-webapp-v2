@@ -14,11 +14,6 @@ import EpochContent from "./epoch-content"
 import TotalContent from "./total-content"
 import { useEpochs } from "./use-epochs"
 
-const initialPageDetails = {
-  page: 1,
-  pageSize: 10,
-}
-
 export function Leaderboard() {
   const epochsQuery = useEpochs()
   const { address } = useAccount()
