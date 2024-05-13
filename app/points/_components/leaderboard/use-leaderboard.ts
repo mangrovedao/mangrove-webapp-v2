@@ -7,6 +7,7 @@ import { getErrorMessage } from "@/utils/errors"
 import { parseBoosts } from "../../schemas/boosts"
 import { parseLeaderboard } from "../../schemas/leaderboard"
 import { parsePoints } from "../../schemas/points"
+import { parseVolume } from "../../schemas/volume"
 
 type Params = {
   filters?: {
@@ -86,6 +87,32 @@ export function useUserBoosts() {
     },
     meta: {
       error: "Unable to retrieve user boosts data",
+    },
+    enabled: !!address,
+    retry: false,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+export function useUserVolume() {
+  const { address } = useAccount()
+  return useQuery({
+    queryKey: ["user-volume", address],
+    queryFn: async () => {
+      try {
+        if (!address) return null
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST}/volumes-per-pair/last-epoch-volume/${address}`,
+        )
+        const volume = await res.json()
+        return parseVolume(volume)
+      } catch (e) {
+        console.error(getErrorMessage(e))
+        throw new Error()
+      }
+    },
+    meta: {
+      error: "Unable to retrieve user volume data",
     },
     enabled: !!address,
     retry: false,
