@@ -10,27 +10,32 @@ import { ConnectWalletBanner } from "./_components/connect-wallet-banner"
 import CurrentBoost from "./_components/current-boost"
 import { JoinProgramBanner } from "./_components/join-program-banner"
 import { Leaderboard } from "./_components/leaderboard/table"
-import { useUserVolume } from "./_components/leaderboard/use-leaderboard"
+import {
+  useUserBoosts,
+  useUserPoints,
+} from "./_components/leaderboard/use-leaderboard"
 import NextLevel from "./_components/next-level"
 import Rank from "./_components/rank"
 import Rewards from "./_components/rewards"
 import TotalPoints from "./_components/total-points"
 
-const boosts = [
-  { threshold: 500_000, boost: 4 },
-  { threshold: 100_000, boost: 3.5 },
-  { threshold: 50_000, boost: 3 },
-  { threshold: 20_000, boost: 2.5 },
-  { threshold: 10_000, boost: 1.75 },
-  { threshold: 0, boost: 1 },
-] as const
-
 export default function Page() {
   const { isConnected } = useAccount()
-  const { data: userVolume } = useUserVolume()
-
-  const volume = Number(userVolume ?? 0)
-  const volumeBoost = boosts.find((b) => volume >= b.threshold)!.boost
+  const { data: userBoosts } = useUserBoosts()
+  const { data: userPoints } = useUserPoints()
+  const userBoost = userBoosts?.[0]
+  const volumeBoost = Number(userPoints?.boost ?? 1)
+  const highestBoost = Number(
+    userBoosts?.reduce(
+      (prev, current) => {
+        return prev.boost > current.boost ? prev : current
+      },
+      { boost: 1 },
+    )?.boost ?? 1,
+  )
+  // FIXME: workaround to show the highest boost to the user because the API is not handling that for now
+  const currentBoost = volumeBoost > highestBoost ? volumeBoost : highestBoost
+  const volume = Number(userBoost?.volume ?? 0)
 
   return isConnected ? (
     <div>
@@ -44,11 +49,16 @@ export default function Page() {
       <div className="grid grid-cols-2 gap-x-2 gap-y-3 mt-8">
         <CurrentBoost
           className="col-span-full md:col-span-1"
-          boost={volumeBoost}
+          boost={currentBoost}
           volume={volume}
+          boosts={userBoosts}
         />
         <Rank className="col-span-full md:col-span-1" />
-        <NextLevel className="col-span-full" volume={volume} />
+        <NextLevel
+          className="col-span-full"
+          volume={volume}
+          boost={userBoost?.boost}
+        />
       </div>
       <Leaderboard />
     </div>

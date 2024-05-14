@@ -3,12 +3,13 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { useUserVolume } from "./leaderboard/use-leaderboard"
+import { useUserPoints } from "./leaderboard/use-leaderboard"
 
 export function JoinProgramBanner() {
-  const { data: volume } = useUserVolume() ?? 0
+  const { data } = useUserPoints()
+  const points = data?.total_points ?? 0
 
-  if (Number(volume) >= 100) return null
+  if (Number(points) >= 100) return null
 
   return (
     <>
