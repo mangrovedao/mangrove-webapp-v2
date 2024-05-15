@@ -1,5 +1,8 @@
-import { blastMangrove, blastMarkets } from "@mangrovedao/mgv/addresses"
-import { blastLogics } from "@mangrovedao/mgv/addresses/logics"
+import {
+  blastLogics,
+  blastMangrove,
+  blastMarkets,
+} from "@mangrovedao/mgv/addresses"
 import { blast } from "viem/chains"
 import { useChainId } from "wagmi"
 

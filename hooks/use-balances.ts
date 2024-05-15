@@ -1,6 +1,6 @@
 import useMarket from "@/providers/market.new"
+import { Logic } from "@mangrovedao/mgv"
 import type { GetBalanceResult } from "@mangrovedao/mgv/actions/balances"
-import { Logic } from "@mangrovedao/mgv/addresses/logics"
 import { useQuery } from "@tanstack/react-query"
 import { isAddressEqual, type Address } from "viem"
 import { useAccount } from "wagmi"
@@ -87,4 +87,18 @@ export function useTokenBalance<
     TToken,
     TLogic
   >
+}
+
+export type UseTokenLogicsParams = {
+  token?: Address
+}
+
+export function useTokenLogics({ token }: UseTokenLogicsParams) {
+  const { balances, ...rest } = useBalances()
+  const logics = token
+    ? balances?.overlying.filter(
+        (b) => b.available && isAddressEqual(b.token.address, token),
+      ) || []
+    : []
+  return { logics, ...rest }
 }

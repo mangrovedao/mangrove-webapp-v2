@@ -11,13 +11,13 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import { useBook } from "@/hooks/use-book"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { SemiBook } from "./semibook"
 import { OrderBookTableCell } from "./table-cell"
 import { OrderBookTableHead } from "./table-head"
 import useScrollToMiddle from "./use-scroll-to-middle"
-import useMarket from "@/providers/market.new"
 
 export function OrderBook({
   className,
@@ -49,7 +49,7 @@ function BookContent() {
   // const market = useMarket()
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
-  const { book, isLoading, isError } = useBook({})
+  const { book, isLoading, isError } = useBook()
   // const { asks, bids } = requestBookQuery.data ?? {}
 
   if (isLoading || !book || !currentMarket) {

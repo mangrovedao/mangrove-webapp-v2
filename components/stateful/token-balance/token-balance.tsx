@@ -1,4 +1,4 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -8,10 +8,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useTokenBalance } from "@/hooks/use-balances"
+import { formatUnits } from "viem"
 
 export function TokenBalance(props: {
-  token?: Token | string
+  token?: Token
   label?: string
   action?: {
     onClick: (value: string) => void
@@ -19,7 +20,10 @@ export function TokenBalance(props: {
   }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
-  const { formattedWithSymbol, formatted, isLoading } = useTokenBalance(token)
+  const { balance, isLoading } = useTokenBalance({
+    token: props.token?.address,
+  })
+  const formatted = formatUnits(balance?.balance ?? 0n, token?.decimals ?? 18)
   return (
     <div className="flex justify-between items-center mt-1">
       <span className="text-xs text-secondary float-left">
@@ -39,7 +43,9 @@ export function TokenBalance(props: {
                   props.action?.onClick(formatted || "")
                 }}
               >
-                <span title={formatted?.toString()}>{formattedWithSymbol}</span>
+                <span title={formatted?.toString()}>
+                  {formatted} {token?.symbol}
+                </span>
               </TooltipTrigger>
 
               <TooltipPortal>
@@ -49,7 +55,8 @@ export function TokenBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
+                  {Number(formatted).toFixed(token?.displayDecimals)}{" "}
+                  {token?.symbol}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>
