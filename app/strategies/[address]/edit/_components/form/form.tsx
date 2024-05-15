@@ -65,7 +65,7 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      <Fieldset legend="Liquidity sourcing">
+      {/* <Fieldset legend="Liquidity sourcing">
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
             <Label className="flex items-center">
@@ -153,7 +153,7 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
-      </Fieldset>
+      </Fieldset> */}
 
       <Fieldset legend="Select market">
         <MarketSelector disabled={true} />
