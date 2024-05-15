@@ -92,10 +92,10 @@ export default function useForm() {
     ) {
       getCurrentLiquiditySourcing()
       setBaseDeposit(
-        baseAmountDeposited?.toFixed(baseToken?.displayedDecimals) || "",
+        baseAmountDeposited?.toFixed(baseToken?.decimals) || "",
       )
       setQuoteDeposit(
-        quoteAmountDeposited?.toFixed(quoteToken?.displayedDecimals) || "",
+        quoteAmountDeposited?.toFixed(quoteToken?.decimals) || "",
       )
       setNumberOfOffers(
         (Number(currentParameter?.length) - 1).toString() || "10",
