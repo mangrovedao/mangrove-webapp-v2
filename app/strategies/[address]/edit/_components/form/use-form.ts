@@ -1,3 +1,4 @@
+import Big from "big.js"
 import React from "react"
 import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
@@ -6,7 +7,6 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
-import Big from "big.js"
 import {
   ChangingFrom,
   useNewStratStore,
@@ -29,19 +29,29 @@ export default function useForm() {
     address,
   })
 
-  const logics = mangrove?.getLogicsList().map((item) => {
-    if (item.id.includes("simple")) {
-      return { ...item, id: "Wallet" }
-    } else {
-      return item
-    }
-  })
+  const logics = mangrove
+    ?.getLogicsList()
+    .filter((logic) => logic.approvalType === "ERC20")
 
   const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
   const { currentParameter, offers } = strategyQuery.data ?? {}
 
   const asksOffers = mergedOffers?.filter((item) => item.offerType === "asks")
   const bidsOffers = mergedOffers?.filter((item) => item.offerType === "bids")
+
+  const getCurrentLiquiditySourcing = async () => {
+    try {
+      const { baseLogic, quoteLogic } =
+        (await strategyStatusQuery.data?.stratInstance.getLogics()) ?? {}
+      const _baseLogic = mangrove?.getLogicByAddress(baseLogic || "")
+      const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic || "")
+
+      setSendFrom(_baseLogic?.id || "")
+      setReceiveTo(_quoteLogic?.id || "")
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
     return acc.add(Big(curr.gives ?? 0))
@@ -76,19 +86,23 @@ export default function useForm() {
     })
 
   React.useEffect(() => {
-    if (strategyQuery.data?.offers.some((x) => x.live)) {
+    if (
+      strategyQuery.data?.offers.some((x) => x.live) &&
+      strategyStatusQuery.isFetched
+    ) {
+      getCurrentLiquiditySourcing()
       setBaseDeposit(
-        baseAmountDeposited?.toFixed(baseToken?.displayedDecimals) || "0",
+        baseAmountDeposited?.toFixed(baseToken?.decimals) || "",
       )
       setQuoteDeposit(
-        quoteAmountDeposited?.toFixed(quoteToken?.displayedDecimals) || "0",
+        quoteAmountDeposited?.toFixed(quoteToken?.decimals) || "",
       )
       setNumberOfOffers(
-        (Number(currentParameter?.length) - 1).toString() || "0",
+        (Number(currentParameter?.length) - 1).toString() || "10",
       )
-      setStepSize(currentParameter?.stepSize || "0")
-      setBountyDeposit(Number(lockedBounty).toFixed(6) || "0")
-      // setDistribution()
+
+      setStepSize(currentParameter?.stepSize || "")
+      setBountyDeposit(Number(lockedBounty).toFixed(6) || "")
     }
   }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
 
@@ -337,5 +351,6 @@ export default function useForm() {
     handleReceiveToChange,
     handleStepSizeChange,
     handleBountyDepositChange,
+    getCurrentLiquiditySourcing,
   }
 }

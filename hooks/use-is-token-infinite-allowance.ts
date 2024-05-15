@@ -12,17 +12,21 @@ export const useIsTokenInfiniteAllowance = (
   return useQuery({
     queryKey: ["isTokenInfiniteAllowance", token?.id, spender, logic?.id],
     queryFn: async () => {
-      if (!(token && spender)) return null
-      if (logic) {
-        const tokenToApprove = await logic.overlying(token)
-        if (tokenToApprove instanceof Token) {
-          return await tokenToApprove.allowanceInfinite({ spender })
+      try {
+        if (!(token && spender)) return null
+        if (logic?.id) {
+          const tokenToApprove = await logic.overlying(token)
+          if (tokenToApprove instanceof Token) {
+            return await tokenToApprove.allowanceInfinite({ spender })
+          } else {
+            // TODO: erc721 approve for all
+            return undefined
+          }
         } else {
-          // TODO: erc721 approve for all
-          return
+          return token.allowanceInfinite({ spender })
         }
-      } else {
-        return token.allowanceInfinite({ spender })
+      } catch (error) {
+        console.error(error)
       }
     },
     enabled: !!(token && spender),

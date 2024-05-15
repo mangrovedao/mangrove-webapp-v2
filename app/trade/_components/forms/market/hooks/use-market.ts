@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 
-import useTokenPriceQuery from "@/hooks/use-token-price-query"
+import { useOrderBookPrice } from "@/hooks/use-orderbook-price-per-block"
 import useMarket from "@/providers/market"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { TradeAction } from "../../enums"
@@ -69,7 +69,7 @@ export function useMarketForm(props: Props) {
   const send = form.useStore((state) => state.values.send)
   const receive = form.useStore((state) => state.values.receive)
 
-  const { market, marketInfo, requestBookQuery: orderBook } = useMarket()
+  const { market, requestBookQuery: orderBook } = useMarket()
   const {
     sendToken,
     quoteToken,
@@ -81,16 +81,20 @@ export function useMarketForm(props: Props) {
     spotPrice,
   } = useTradeInfos("market", tradeAction)
 
-  const { data: marketPrice } = useTokenPriceQuery(
-    market?.base?.symbol,
-    market?.quote?.symbol,
+  const orderBookPriceData = useOrderBookPrice(
+    market?.base?.address,
+    market?.quote?.address,
   )
+  const marketPrice =
+    orderBookPriceData && orderBookPriceData.mid_price
+      ? Number(orderBookPriceData.mid_price)
+      : undefined
 
   const averagePrice = determinePrices(
     tradeAction,
     quoteToken,
     orderBook.data,
-    marketPrice?.close,
+    marketPrice,
   )
 
   const { data: estimatedVolume } = useQuery({

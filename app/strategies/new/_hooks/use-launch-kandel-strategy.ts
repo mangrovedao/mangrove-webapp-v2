@@ -45,12 +45,8 @@ export function useLaunchKandelStrategy() {
       quoteLogic,
     }: FormValues) => {
       try {
-        if (!(market && kandelStrategies && distribution && mangrove)) return
-
-        // const _baseLogic = mangrove?.getLogicByAddress(baseLogic.address)
-        // const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic.address)
-
-        // if (!_quoteLogic || !_baseLogic) return
+        if (!(market && kandelStrategies && distribution && mangrove))
+          throw new Error("Failed to create strategy")
 
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
@@ -58,15 +54,8 @@ export function useLaunchKandelStrategy() {
           type: "smart",
         })
 
-        await kandelInstance.setLogics({
-          baseLogic: mangrove?.logics.simple,
-          quoteLogic: mangrove?.logics.simple,
-        })
-
         const populateTxs = await kandelInstance.populateGeometricDistribution({
           distribution,
-          // depositBaseAmount: baseDeposit,
-          // depositQuoteAmount: quoteDeposit,
           funds: bountyDeposit,
           parameters: {
             pricePoints: Number(numberOfOffers) + 1,

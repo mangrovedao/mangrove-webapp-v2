@@ -1,8 +1,20 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
+import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
+import InfoTooltip from "@/components/info-tooltip"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Caption } from "@/components/typography/caption"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
@@ -23,20 +35,20 @@ export function Form({ className }: { className?: string }) {
     errors,
     sendFrom,
     receiveTo,
-    handleBaseDepositChange,
-    handleQuoteDepositChange,
     kandelRequirementsQuery,
     isChangingFrom,
     numberOfOffers,
-    handleNumberOfOffersChange,
-    stepSize,
-    handleStepSizeChange,
+    logics,
     nativeBalance,
+    stepSize,
     bountyDeposit,
+    handleBaseDepositChange,
+    handleQuoteDepositChange,
+    handleNumberOfOffersChange,
+    handleStepSizeChange,
     handleBountyDepositChange,
     handleSendFromChange,
     handleReceiveToChange,
-    logics,
   } = useForm()
 
   if (!baseToken || !quoteToken)
@@ -69,7 +81,7 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleSendFromChange(value)
               }}
-              // disabled={!market}
+              disabled
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
@@ -83,7 +95,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -112,7 +126,7 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleReceiveToChange(value)
               }}
-              // disabled={!market}
+              disabled
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
@@ -126,7 +140,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>

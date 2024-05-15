@@ -2,22 +2,19 @@
 
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { ChainsIds } from "@mangrovedao/indexer-sdk/dist/src/types/types"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useAccount } from "wagmi"
 
-import { getTokenPriceInUsd } from "@/services/tokens.service"
 import Big from "big.js"
 import useMangrove from "./mangrove"
 
 const useIndexerSdkContext = () => {
-  const { mangrove } = useMangrove()
+  const { mangrove, tokenPricesInUsbQuery } = useMangrove()
   const { chain } = useAccount()
-  const queryClient = useQueryClient()
 
   const indexerSdkQuery = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["indexer-sdk", chain],
+    queryKey: ["indexer-sdk", chain, tokenPricesInUsbQuery.dataUpdatedAt],
     queryFn: () => {
       try {
         if (!chain) return null
@@ -71,21 +68,7 @@ const useIndexerSdkContext = () => {
               }
             },
             getPrice(tokenAddress) {
-              return queryClient.fetchQuery({
-                queryKey: ["tokenPriceInUsd", tokenAddress],
-                queryFn: async () => {
-                  const token = await mangrove?.tokenFromAddress(tokenAddress)
-                  if (!token?.symbol)
-                    throw new Error(
-                      `Impossible to determine token from address: ${tokenAddress}`,
-                    )
-                  return getTokenPriceInUsd(
-                    token.symbol === "USDB" ? "USDC" : token.symbol,
-                    true, // return 1 if the price API fails
-                  )
-                },
-                staleTime: 10 * 60 * 1000,
-              })
+              return tokenPricesInUsbQuery.data?.[tokenAddress] ?? 1
             },
           },
         })
@@ -96,7 +79,7 @@ const useIndexerSdkContext = () => {
     meta: {
       error: "Error when initializing the indexer sdk",
     },
-    enabled: !!mangrove,
+    enabled: !!mangrove && !!tokenPricesInUsbQuery.data, // we need to get usdb prices before initializing the indexer sdk
     staleTime: 15 * 60 * 1000,
   })
   return {

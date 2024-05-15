@@ -1,6 +1,7 @@
 "use client"
 import { debounce } from "radash"
 import React from "react"
+import { Address } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
@@ -11,10 +12,8 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { Address } from "viem"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import DeployStrategyDialog from "../launch-strategy-dialog"
-import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
 
@@ -219,7 +218,7 @@ export const PriceRange = withClientOnly(function ({
       <div className="border-b">
         <div className="flex justify-between items-center px-6 pb-8">
           <RiskAppetiteBadge value={riskAppetite} />
-          <LiquiditySource />
+          {/* <LiquiditySource /> */}
         </div>
       </div>
 
