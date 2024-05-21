@@ -30,8 +30,8 @@ importers:
         specifier: 2.0.5-51
         version: 2.0.5-51(bufferutil@4.0.8)
       '@mangrovedao/mgv':
-        specifier: ^0.6.5
-        version: 0.6.5(typescript@5.3.3)(viem@2.9.31(bufferutil@4.0.8)(typescript@5.3.3)(zod@3.22.4))
+        specifier: ^0.6.7
+        version: 0.6.7(typescript@5.3.3)(viem@2.9.31(bufferutil@4.0.8)(typescript@5.3.3)(zod@3.22.4))
       '@radix-ui/react-alert-dialog':
         specifier: ^1.0.5
         version: 1.0.5(@types/react-dom@18.2.18)(@types/react@18.2.48)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1752,8 +1752,8 @@ packages:
     resolution: {integrity: sha512-2WkWLTMPMa14TtLUu9r/nHQFcZf+ieVvq2ghRkFEoJ8k4LZ3I5jGitQxB9aFwf0nk2e4HzSNSPpzINnTHMV5lQ==}
     hasBin: true
 
-  '@mangrovedao/mgv@0.6.5':
-    resolution: {integrity: sha512-hT0Ow0LY8bpZCloUuvdlg8FwFNlfpUErLW7pRDTgBnLgPYZnIwQJabnR2pSfPbI7mYGucyYeT6sFJCVWjF/NTA==}
+  '@mangrovedao/mgv@0.6.7':
+    resolution: {integrity: sha512-E5P/GBMIYQzUMZE9zrR8SqA8pDzpALfAaJ8c0RuTF4iNI2QN78F61m6kyVXM7oyxt9mqzIuD27Dloydx1ONmvA==}
     peerDependencies:
       typescript: '>=5.0.4'
       viem: ^2.9.29
@@ -11378,7 +11378,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@mangrovedao/mgv@0.6.5(typescript@5.3.3)(viem@2.9.31(bufferutil@4.0.8)(typescript@5.3.3)(zod@3.22.4))':
+  '@mangrovedao/mgv@0.6.7(typescript@5.3.3)(viem@2.9.31(bufferutil@4.0.8)(typescript@5.3.3)(zod@3.22.4))':
     dependencies:
       viem: 2.9.31(bufferutil@4.0.8)(typescript@5.3.3)(zod@3.22.4)
       zod: 3.22.4

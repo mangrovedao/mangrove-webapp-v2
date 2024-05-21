@@ -22,7 +22,7 @@
     "@ark-ui/react": "^1.2.1",
     "@ethersproject/providers": "^5.7.2",
     "@gsap/react": "^2.0.2",
-    "@mangrovedao/mgv": "^0.6.5",
+    "@mangrovedao/mgv": "^0.6.7",
     "@mangrovedao/context-addresses": "^1.3.4",
     "@mangrovedao/indexer-sdk": "0.0.11-44",
     "@mangrovedao/mangrove-deployments": "2.2.4-5",

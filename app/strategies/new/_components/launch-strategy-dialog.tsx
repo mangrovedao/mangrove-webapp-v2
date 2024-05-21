@@ -15,13 +15,14 @@ import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { useStep } from "@/hooks/use-step"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
 import { useStrategySmartRouter } from "../../(shared)/_hooks/use-smart-router"
 import { useCreateKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
 import { NewStratStore } from "../_stores/new-strat.store"
 import { Steps } from "./form/components/steps"
+import { getKandelSteps } from "@mangrovedao/mgv/actions/kandel/steps"
 
 type StrategyDetails = Omit<
   NewStratStore,
@@ -46,9 +47,9 @@ export default function DeployStrategyDialog({
   strategy,
 }: Props) {
   const { address } = useAccount()
-  const { market } = useMarket()
+  const { currentMarket } = useMarket()
   const { mangrove } = useMangrove()
-  const { base: baseToken, quote: quoteToken } = market ?? {}
+  const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -80,6 +81,7 @@ export default function DeployStrategyDialog({
     spender,
     baseLogic,
   )
+
 
   const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
     baseToken,

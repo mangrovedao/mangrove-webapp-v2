@@ -12,7 +12,7 @@ import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits } from "viem"
 
 export function TokenBalance(props: {
-  token?: Token
+  token?: Token | string
   label?: string
   action?: {
     onClick: (value: string) => void
@@ -21,7 +21,7 @@ export function TokenBalance(props: {
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
   const { balance, isLoading } = useTokenBalance({
-    token: props.token?.address,
+    token: token?.address,
   })
   const formatted = formatUnits(balance?.balance ?? 0n, token?.decimals ?? 18)
   return (

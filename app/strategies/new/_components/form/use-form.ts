@@ -4,10 +4,11 @@ import { useAccount, useBalance } from "wagmi"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+
 import { getErrorMessage } from "@/utils/errors"
 import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
+import useMarket from "@/providers/market.new"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
@@ -15,10 +16,10 @@ export const MIN_STEP_SIZE = 1
 export default function useForm() {
   const { address } = useAccount()
   const { mangrove } = useMangrove()
-  const { market } = useMarket()
+  const { currentMarket } = useMarket()
+  const baseToken = currentMarket?.base
+  const quoteToken = currentMarket?.quote
 
-  const baseToken = market?.base
-  const quoteToken = market?.quote
   const baseBalance = useTokenBalance(baseToken)
   const quoteBalance = useTokenBalance(quoteToken)
   const { data: nativeBalance } = useBalance({
@@ -93,7 +94,7 @@ export default function useForm() {
     setNumberOfOffers("10")
     setStepSize("1")
     setErrors({})
-  }, [market])
+  }, [currentMarket])
 
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
