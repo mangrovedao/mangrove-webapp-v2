@@ -1,4 +1,3 @@
-import { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -6,23 +5,23 @@ import { ActivateRouter } from "@/app/trade/_components/forms/components/activat
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
-import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { useStep } from "@/hooks/use-step"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
+import { KandelSteps, Token } from "@mangrovedao/mgv"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
+import { useKandelSeeder } from "../../(shared)/_hooks/use-kandel-seeder"
+import { useKandelSteps } from "../../(shared)/_hooks/use-kandel-steps"
 import { useStrategySmartRouter } from "../../(shared)/_hooks/use-smart-router"
 import { useCreateKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
 import { NewStratStore } from "../_stores/new-strat.store"
 import { Steps } from "./form/components/steps"
-import { getKandelSteps } from "@mangrovedao/mgv/actions/kandel/steps"
 
 type StrategyDetails = Omit<
   NewStratStore,
@@ -50,6 +49,14 @@ export default function DeployStrategyDialog({
   const { currentMarket } = useMarket()
   const { mangrove } = useMangrove()
   const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
+  const { data: kandelSeeder } = useKandelSeeder()
+
+  const { data: kandelSteps } = useKandelSteps({ seeder: kandelSeeder })
+
+  const [sow, deploRouter, bind, setLogics, baseApprove, quoteApprove] =
+    kandelSteps ?? ({} as KandelSteps)
+
+  console.log(sow, deploRouter, bind, setLogics, baseApprove, quoteApprove)
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -76,19 +83,6 @@ export default function DeployStrategyDialog({
 
   const { data: spender } = useSpenderAddress("kandel")
 
-  const { data: baseTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
-    spender,
-    baseLogic,
-  )
-
-
-  const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
-    spender,
-    quoteLogic,
-  )
-
   const { isBound } = useStrategySmartRouter({ kandelAddress }).data ?? {}
 
   let steps = [
@@ -98,8 +92,8 @@ export default function DeployStrategyDialog({
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
-    !baseTokenApproved ? `Approve ${baseToken?.symbol}` : "",
-    !quoteTokenApproved ? `Approve ${quoteToken?.symbol}` : "",
+    !baseApprove.done ? `Approve ${baseToken?.symbol}` : "",
+    !quoteApprove.done ? `Approve ${quoteToken?.symbol}` : "",
     "Launch strategy",
   ].filter(Boolean)
 
@@ -170,7 +164,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !baseTokenApproved && {
+    !baseApprove.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -182,23 +176,23 @@ export default function DeployStrategyDialog({
           disabled={approveBaseToken.isPending}
           loading={approveBaseToken.isPending}
           onClick={() => {
-            approveBaseToken.mutate(
-              {
-                token: baseToken,
-                logic: baseLogic,
-                spender,
-              },
-              {
-                onSuccess: goToNextStep,
-              },
-            )
+            // approveBaseToken.mutate(
+            //   {
+            //     token: baseToken,
+            //     logic: baseLogic,
+            //     spender,
+            //   },
+            //   {
+            //     onSuccess: goToNextStep,
+            //   },
+            // )
           }}
         >
           Approve {baseToken?.symbol}
         </Button>
       ),
     },
-    !quoteTokenApproved && {
+    !quoteApprove.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
@@ -210,16 +204,16 @@ export default function DeployStrategyDialog({
           disabled={approveQuoteToken.isPending}
           loading={approveQuoteToken.isPending}
           onClick={() => {
-            approveQuoteToken.mutate(
-              {
-                token: quoteToken,
-                logic: quoteLogic,
-                spender,
-              },
-              {
-                onSuccess: goToNextStep,
-              },
-            )
+            // approveQuoteToken.mutate(
+            //   {
+            //     token: quoteToken,
+            //     logic: quoteLogic,
+            //     spender,
+            //   },
+            //   {
+            //     onSuccess: goToNextStep,
+            //   },
+            // )
           }}
         >
           Approve {quoteToken?.symbol}
@@ -360,11 +354,11 @@ const Summary = ({
   return (
     <div className="space-y-2">
       <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
-        <TokenPair
+        {/* <TokenPair
           baseToken={baseToken}
           quoteToken={quoteToken}
           tokenClasses="w-[28px] h-[28px]"
-        />
+        /> */}
 
         <Separator className="mt-4" />
 
@@ -378,7 +372,7 @@ const Summary = ({
           value={<Text>{riskAppetite?.toUpperCase()}</Text>}
         />
 
-        <SummaryLine
+        {/* <SummaryLine
           title={`${baseToken?.symbol} deposit`}
           value={
             <div className="flex space-x-1 items-center">
@@ -403,11 +397,11 @@ const Summary = ({
               </Text>
             </div>
           }
-        />
+        /> */}
       </div>
 
       <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
-        <SummaryLine
+        {/* <SummaryLine
           title={`Min price`}
           value={
             <div className="flex space-x-1 items-center">
@@ -429,7 +423,7 @@ const Summary = ({
               </Text>
             </div>
           }
-        />
+        /> */}
       </div>
 
       <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">

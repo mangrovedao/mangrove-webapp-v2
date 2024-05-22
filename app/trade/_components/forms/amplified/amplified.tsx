@@ -41,7 +41,7 @@ export function Amplified() {
     errors,
     sendSource,
     sendAmount,
-    openMarkets,
+    markets,
     sendToken,
     assets,
     assetsWithTokens,
@@ -192,7 +192,7 @@ export function Amplified() {
                   {useAbleTokens.map(
                     (token) =>
                       token && (
-                        <SelectItem key={token.id} value={token.id}>
+                        <SelectItem key={token.address} value={token.address}>
                           <div className="flex space-x-3 items-center">
                             <TokenIcon symbol={token.symbol} />
                             <Text>{token.symbol}</Text>
@@ -320,9 +320,9 @@ export function Amplified() {
                       <SelectGroup>
                         {currentTokens.map((token) => (
                           <SelectItem
-                            key={token.id}
-                            value={token.id}
-                            disabled={selectedTokens.includes(token.id)}
+                            key={token.address}
+                            value={token.address}
+                            disabled={selectedTokens.includes(token.address)}
                           >
                             <div className="flex space-x-3 items-center">
                               <TokenIcon symbol={token.symbol} />
@@ -348,7 +348,7 @@ export function Amplified() {
                       ...assets.slice(i + 1),
                     ])
                   }}
-                  token={getCurrentTokenPrice(asset.token, openMarkets)}
+                  token={getCurrentTokenPrice(asset.token, markets)}
                   label="Limit price"
                   disabled={!asset.token}
                   error={errors[`limitPrice-${i}`]}
@@ -410,12 +410,12 @@ export function Amplified() {
                     <span className="text-xs">
                       {Number(asset.amount).toFixed(
                         availableTokens.find(
-                          (token) => token.id === asset.token,
-                        )?.displayedDecimals,
+                          (token) => token.address === asset.token,
+                        )?.displayDecimals,
                       )}{" "}
                       {
                         availableTokens.find(
-                          (token) => token.id === asset.token,
+                          (token) => token.address === asset.token,
                         )?.symbol
                       }
                     </span>

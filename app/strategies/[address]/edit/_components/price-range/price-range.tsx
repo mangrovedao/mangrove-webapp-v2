@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import useMarket from "@/providers/market"
+import useMarketNew from "@/providers/market.new"
+
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
@@ -28,8 +30,9 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
+  const { requestBookQuery, midPrice, riskAppetite } = useMarket()
   const { mergedOffers, strategyQuery } = useKandel()
+  const { currentMarket: market } = useMarketNew()
 
   const { data: baseToken } = useTokenFromAddress(
     market?.base.address as Address,

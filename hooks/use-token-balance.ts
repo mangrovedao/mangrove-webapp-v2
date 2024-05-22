@@ -1,4 +1,5 @@
 import type { Token } from "@mangrovedao/mgv"
+
 import { useAccount, useBalance } from "wagmi"
 
 export function useTokenBalance(token?: Token) {

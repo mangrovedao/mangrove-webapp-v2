@@ -1,12 +1,12 @@
+import Big from "big.js"
 import React from "react"
 import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
-import Big from "big.js"
 import {
   ChangingFrom,
   useNewStratStore,
@@ -20,7 +20,7 @@ export const MIN_STEP_SIZE = 1
 export default function useForm() {
   const { address } = useAccount()
   const { mangrove } = useMangrove()
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const baseToken = market?.base
   const quoteToken = market?.quote
   const baseBalance = useTokenBalance(baseToken)
@@ -78,10 +78,10 @@ export default function useForm() {
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
       setBaseDeposit(
-        baseAmountDeposited?.toFixed(baseToken?.displayedDecimals) || "0",
+        baseAmountDeposited?.toFixed(baseToken?.displayDecimals) || "0",
       )
       setQuoteDeposit(
-        quoteAmountDeposited?.toFixed(quoteToken?.displayedDecimals) || "0",
+        quoteAmountDeposited?.toFixed(quoteToken?.displayDecimals) || "0",
       )
       setNumberOfOffers(
         (Number(currentParameter?.length) - 1).toString() || "0",

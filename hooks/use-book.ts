@@ -1,6 +1,7 @@
 import useMarket from "@/providers/market.new"
 import type { BookParams } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
+
 import { useMarketClient } from "./use-market"
 
 export type UseBookParams = BookParams & {}

@@ -1,4 +1,4 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 
 import { DefaultTradeLogics } from "../types"
 import { TimeInForce, TimeToLiveUnit } from "./enums"

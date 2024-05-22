@@ -15,6 +15,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import Link from "next/link"
@@ -34,11 +35,11 @@ export function Withdraw({ open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
+  const { strategyQuery, strategyAddress } = useKandel()
   const { withdrawBase, withdrawQuote } = useParameters()
   const { address } = useAccount()
 
-  const { market } = strategyStatusQuery.data ?? {}
+  const { currentMarket: market } = useMarket()
 
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,

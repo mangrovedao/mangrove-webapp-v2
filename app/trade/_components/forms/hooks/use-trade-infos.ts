@@ -17,10 +17,7 @@ export function useTradeInfos(type: "limit" | "market", bs: BS) {
   const receiveTokenBalance = useTokenBalance({ token: receiveToken?.address })
 
   const { data: spender } = useSpenderAddress(type)
-  // const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
-  //   sendToken,
-  //   spender,
-  // )
+
   const { book } = useBook()
   const asks = book?.asks
   const bids = book?.bids

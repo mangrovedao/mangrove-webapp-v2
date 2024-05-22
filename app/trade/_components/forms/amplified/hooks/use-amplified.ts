@@ -1,10 +1,13 @@
-import { Semibook, Token } from "@mangrovedao/mangrove.js"
+import { Semibook } from "@mangrovedao/mangrove.js"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import { useBook } from "@/hooks/use-book"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
+import useMarketNew from "@/providers/market.new"
+import { Token } from "@mangrovedao/mgv"
 import Big from "big.js"
 import { useEventListener } from "usehooks-ts"
 import { DefaultTradeLogics } from "../../types"
@@ -21,7 +24,9 @@ export const MIN_STEP_SIZE = 1
 export default function useAmplifiedForm() {
   const { address } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
-  const { market, marketInfo } = useMarket()
+  const { marketInfo } = useMarket()
+  const { book } = useBook()
+  const { currentMarket: market, markets } = useMarketNew()
 
   const { data: openMarkets } = marketsInfoQuery
 
@@ -61,9 +66,9 @@ export default function useAmplifiedForm() {
     assets.forEach((asset, i) => {
       if (!asset) return
 
-      const tokenPrice = getCurrentTokenPrice(asset.token, openMarkets)
+      const tokenPrice = getCurrentTokenPrice(asset.token, markets)
 
-      if (tokenPrice?.id === market?.quote.id) {
+      if (tokenPrice?.address === market?.quote.address) {
         newAssets[i] = {
           ...asset,
           limitPrice: event.detail.price,
@@ -75,7 +80,7 @@ export default function useAmplifiedForm() {
   }
 
   const availableTokens =
-    openMarkets?.reduce((acc, current) => {
+    markets?.reduce((acc, current) => {
       if (!acc.includes(current.base)) {
         acc.push(current.base)
       }
@@ -98,26 +103,31 @@ export default function useAmplifiedForm() {
     ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
     : ""
 
-  const selectedToken = availableTokens.find((token) => token.id == sendToken)
+  const selectedToken = availableTokens.find(
+    (token) => token.address == sendToken,
+  )
+
   const selectedSource = logics?.find((logic) => logic?.id == sendSource)
 
   const compatibleMarkets = openMarkets?.filter(
     (market) =>
-      market.base.id === selectedToken?.id ||
-      market.quote.id === selectedToken?.id,
+      market.base.address === selectedToken?.address ||
+      market.quote.address === selectedToken?.address,
   )
 
   const currentTokens = availableTokens?.filter((token) => {
-    if (selectedToken?.id === token.id) return false
+    if (selectedToken?.address === token.address) return false
 
     return compatibleMarkets?.some(
-      (market) => market.base.id == token.id || market.quote.id == token.id,
+      (market) =>
+        market.base.address == token.address ||
+        market.quote.address == token.address,
     )
   })
 
   const assetsWithTokens = assets.map((asset) => ({
     ...asset,
-    token: availableTokens.find((tokens) => tokens.id === asset.token),
+    token: availableTokens.find((tokens) => tokens.address === asset.token),
     receiveTo: logics.find((logic) => logic?.id === asset.receiveTo),
   }))
 
@@ -254,10 +264,10 @@ export default function useAmplifiedForm() {
   React.useEffect(() => {
     const selectedSourceGasOverhead = selectedSource?.gasOverhead || 200_000
     const variableCost = Big(60_000).mul(assetsWithTokens.length).add(60_000)
-    const semibookAsks = market?.getSemibook("asks")
-    const semibookBids = market?.getSemibook("bids")
-    const isBid = openMarkets?.find(
-      (market) => market.base.id === sendToken,
+    const semibookAsks = book?.asks
+    const semibookBids = book?.bids
+    const isBid = markets?.find(
+      (market) => market.base.address === sendToken,
     )?.quote
     const priceToken = isBid
 
@@ -278,16 +288,15 @@ export default function useAmplifiedForm() {
 
     const newMinVolume = assetsWithTokens.reduce((acc, asset) => {
       const semibook = isBid ? semibookAsks : semibookBids
-      return acc + calculateMinVolume(asset, semibook)
+      // @ts-ignore
+      return acc + calculateMinVolume(asset, semibook as Semibook)
     }, 0)
 
     setMinVolume({
       total: newMinVolume.toFixed(
-        isBid
-          ? selectedToken?.displayedDecimals
-          : priceToken?.displayedDecimals,
+        isBid ? selectedToken?.displayDecimals : priceToken?.displayDecimals,
       ),
-      volume: newMinVolume.toFixed(selectedToken?.displayedDecimals),
+      volume: newMinVolume.toFixed(selectedToken?.displayDecimals),
     })
   }, [assets, sendToken])
 
@@ -333,7 +342,7 @@ export default function useAmplifiedForm() {
   return {
     errors,
     isChangingFrom,
-    openMarkets,
+    markets,
     sendSource,
     minVolume,
     sendAmount,

@@ -14,6 +14,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
@@ -32,9 +33,8 @@ export function UnPublish({ open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
-    useKandel()
-  const { market } = strategyStatusQuery.data ?? {}
+  const { strategyQuery, strategyAddress, mergedOffers } = useKandel()
+  const { currentMarket: market } = useMarket()
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
     base: market?.base.symbol,
@@ -52,10 +52,10 @@ export function UnPublish({ open, onClose }: Props) {
   const { publishedBase, publishedQuote } = useParameters()
 
   const publishBaseFormatted = publishedBase.toFixed(
-    market?.base.displayedDecimals,
+    market?.base.displayDecimals,
   )
   const publishQuoteFormatted = publishedQuote.toFixed(
-    market?.base.displayedDecimals,
+    market?.base.displayDecimals,
   )
 
   const publish = useUnPublish({

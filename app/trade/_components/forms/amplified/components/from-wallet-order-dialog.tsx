@@ -1,4 +1,4 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount } from "wagmi"
 
@@ -6,7 +6,6 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ActivateRouter } from "../../components/activate-router"
@@ -51,11 +50,11 @@ export default function FromWalletAmplifiedOrderDialog({
 
   const { chain } = useAccount()
   const { data: spender } = useSpenderAddress("amplified")
-  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
-    selectedToken,
-    spender,
-    selectedSource,
-  )
+  // const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
+  //   selectedToken,
+  //   spender,
+  //   selectedSource,
+  // )
 
   const { isDeployed, isBound } = useSmartRouter().data ?? {}
 

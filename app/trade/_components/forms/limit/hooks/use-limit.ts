@@ -8,7 +8,6 @@ import { useEventListener } from "usehooks-ts"
 
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import {
   BS,
@@ -28,8 +27,7 @@ type Props = {
 }
 
 export function useLimitOld(props: Props) {
-  const { mangrove } = useMangrove()
-  const { market, marketInfo } = useMarket()
+  const { currentMarket: market } = useMarket()
   // const { currentMarket } = useMarket()
   // const { book } = useBook()
 
@@ -103,11 +101,11 @@ export function useLimitOld(props: Props) {
         }
       : {
           bid: {
-            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
+            volume: formatUnits(minBid, quoteToken?.displayDecimals || 8),
             token: quoteToken?.symbol,
           },
           ask: {
-            volume: minAsk?.toFixed(sendToken?.displayedDecimals),
+            volume: formatUnits(minAsk, sendToken?.displayDecimals || 8),
             token: sendToken?.symbol,
           },
         }

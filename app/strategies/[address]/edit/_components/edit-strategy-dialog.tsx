@@ -10,7 +10,6 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { useStep } from "@/hooks/use-step"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
@@ -71,17 +70,17 @@ export default function EditStrategyDialog({
 
   const { data: spender } = useSpenderAddress("kandel")
 
-  const { data: baseTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
-    spender,
-    baseLogic,
-  )
+  // const { data: baseTokenApproved } = useIsTokenInfiniteAllowance(
+  //   baseToken,
+  //   spender,
+  //   baseLogic,
+  // )
 
-  const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
-    spender,
-    quoteLogic,
-  )
+  // const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
+  //   baseToken,
+  //   spender,
+  //   quoteLogic,
+  // )
 
   let steps = [
     "Summary",

@@ -12,6 +12,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { useStep } from "@/hooks/use-step"
 import { useTokenBalance } from "@/hooks/use-token-balance"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import useKandel from "../../../_providers/kandel-strategy"
 import { useDeposit } from "../mutations/use-deposit"
@@ -29,8 +30,8 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
-  const { market } = strategyStatusQuery.data ?? {}
+  const { strategyQuery, strategyAddress } = useKandel()
+  const { currentMarket: market } = useMarket()
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
     base: market?.base.symbol,

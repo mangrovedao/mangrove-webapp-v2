@@ -5,7 +5,6 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import useMangrove from "@/providers/mangrove"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
@@ -52,14 +51,15 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     feeInPercentageAsString,
     tickSize,
     spotPrice,
-  } = useTradeInfos("limit", form.tradeAction)
+  } = useTradeInfos("limit", form.bs)
+
   // const { isDeployed, isBound } = useSmartRouter().data ?? {}
 
-  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
-    sendToken,
-    spender,
-    form.selectedSource,
-  )
+  // const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
+  //   sendToken,
+  //   spender,
+  //   form.selectedSource,
+  // )
 
   let steps = [] as string[]
   if (!isInfiniteAllowance) {
