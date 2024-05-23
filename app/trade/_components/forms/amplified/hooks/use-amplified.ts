@@ -1,21 +1,25 @@
-import { Semibook } from "@mangrovedao/mangrove.js"
+import { Logic, Token } from "@mangrovedao/mgv"
+import { minVolume as getMinimumVolume } from "@mangrovedao/mgv/lib"
+import Big from "big.js"
 import React from "react"
 import { useAccount } from "wagmi"
 
 import { useBook } from "@/hooks/use-book"
-import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
-import useMarketNew from "@/providers/market.new"
-import { Token } from "@mangrovedao/mgv"
-import Big from "big.js"
+import {
+  default as useMarket,
+  default as useMarketNew,
+} from "@/providers/market.new"
 import { useEventListener } from "usehooks-ts"
-import { DefaultTradeLogics } from "../../types"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import { Asset, AssetWithInfos } from "../types"
 import { getCurrentTokenPrice } from "../utils"
 import amplifiedLiquiditySourcing from "./amplified-liquidity-sourcing"
 import { ChangingFrom, useNewStratStore } from "./amplified-store"
+
+import { useLogics } from "@/hooks/use-addresses"
+import { LocalConfig } from "@mangrovedao/mgv"
+import { formatUnits } from "viem"
 
 export const MIN_PRICE_POINTS = 2
 export const MIN_RATIO = 1.001
@@ -24,8 +28,10 @@ export const MIN_STEP_SIZE = 1
 export default function useAmplifiedForm() {
   const { address } = useAccount()
   const { mangrove, marketsInfoQuery } = useMangrove()
-  const { marketInfo } = useMarket()
+  const { currentMarket } = useMarket()
   const { book } = useBook()
+  const logics = useLogics()
+
   const { currentMarket: market, markets } = useMarketNew()
 
   const { data: openMarkets } = marketsInfoQuery
@@ -91,23 +97,15 @@ export default function useAmplifiedForm() {
       return acc
     }, [] as Token[]) ?? []
 
-  const logics = (
-    mangrove
-      ? Object.values(mangrove.logics).filter(
-          (item) => item?.approvalType !== "ERC721",
-        )
-      : []
-  ) as DefaultTradeLogics[]
-
-  const tickSize = marketInfo?.tickSpacing
-    ? `${((1.0001 ** marketInfo?.tickSpacing - 1) * 100).toFixed(2)}%`
+  const tickSize = currentMarket?.tickSpacing
+    ? `${((1.0001 ** Number(currentMarket?.tickSpacing) - 1) * 100).toFixed(2)}%`
     : ""
 
   const selectedToken = availableTokens.find(
     (token) => token.address == sendToken,
   )
 
-  const selectedSource = logics?.find((logic) => logic?.id == sendSource)
+  const selectedSource = logics?.find((logic) => logic?.name == sendSource)
 
   const compatibleMarkets = openMarkets?.filter(
     (market) =>
@@ -128,7 +126,7 @@ export default function useAmplifiedForm() {
   const assetsWithTokens = assets.map((asset) => ({
     ...asset,
     token: availableTokens.find((tokens) => tokens.address === asset.token),
-    receiveTo: logics.find((logic) => logic?.id === asset.receiveTo),
+    receiveTo: logics.find((logic) => logic?.name === asset.receiveTo),
   }))
 
   const { useAbleTokens, sendFromBalance } = amplifiedLiquiditySourcing({
@@ -136,15 +134,10 @@ export default function useAmplifiedForm() {
     sendToken: selectedToken,
     sendFrom: sendSource,
     fundOwner: address,
-    logics,
+    logics: logics as Logic[],
   })
 
-  const { formatted } = useTokenBalance(selectedToken)
-
-  const balanceLogic_temporary =
-    selectedSource?.id === "simple" || selectedSource?.id === "aave"
-      ? formatted
-      : sendFromBalance?.formatted
+  const balanceLogic_temporary = sendFromBalance?.formatted
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)
@@ -262,41 +255,55 @@ export default function useAmplifiedForm() {
   }
 
   React.useEffect(() => {
-    const selectedSourceGasOverhead = selectedSource?.gasOverhead || 200_000
-    const variableCost = Big(60_000).mul(assetsWithTokens.length).add(60_000)
+    const selectedSourceGasOverhead = selectedSource?.gasreq || 200_000
     const semibookAsks = book?.asks
     const semibookBids = book?.bids
     const isBid = markets?.find(
       (market) => market.base.address === sendToken,
     )?.quote
     const priceToken = isBid
+    const variableCost = Big(60_000).mul(assetsWithTokens.length).add(60_000)
+
+    // const calculateGasReq = (asset: AssetWithInfos) => {
+    //   return BigInt(
+    //     Math.max(
+    //       Number(asset.receiveTo?.gasreq || 200_000),
+    //       Number(selectedSourceGasOverhead),
+    //     ),
+    //   ) + BigInt(variableCost)
+    // }
 
     const calculateGasReq = (asset: AssetWithInfos) => {
-      return Big(
-        Math.max(asset.receiveTo?.gasOverhead || 0, selectedSourceGasOverhead),
-      ).add(variableCost)
+      const maxGasReq = Math.max(
+        Number(asset.receiveTo?.gasreq || 200_000),
+        Number(selectedSourceGasOverhead),
+      )
+      const totalGasReq = Big(maxGasReq).add(variableCost)
+      return BigInt(totalGasReq.toString())
     }
 
-    const getMinimumVolume = (gasreq: Big, semibook?: Semibook) => {
-      return Number(semibook?.getMinimumVolume(gasreq.toNumber()) || 0)
-    }
-
-    const calculateMinVolume = (asset: AssetWithInfos, semibook?: Semibook) => {
-      if (!asset.token || !asset.limitPrice) return 0
-      return getMinimumVolume(calculateGasReq(asset), semibook)
+    const calculateMinVolume = (
+      asset: AssetWithInfos,
+      localConfig: LocalConfig,
+    ) => {
+      if (!asset.token || !asset.limitPrice || !localConfig) return 0n
+      return getMinimumVolume(localConfig, calculateGasReq(asset))
     }
 
     const newMinVolume = assetsWithTokens.reduce((acc, asset) => {
-      const semibook = isBid ? semibookAsks : semibookBids
-      // @ts-ignore
-      return acc + calculateMinVolume(asset, semibook as Semibook)
-    }, 0)
+      if (!book) return 0n
+      const semibook = isBid ? book?.asksConfig : book?.bidsConfig
+      return acc + calculateMinVolume(asset as AssetWithInfos, semibook)
+    }, 0n)
 
     setMinVolume({
-      total: newMinVolume.toFixed(
-        isBid ? selectedToken?.displayDecimals : priceToken?.displayDecimals,
+      total: formatUnits(
+        newMinVolume,
+        (isBid
+          ? selectedToken?.displayDecimals
+          : priceToken?.displayDecimals) || 8,
       ),
-      volume: newMinVolume.toFixed(selectedToken?.displayDecimals),
+      volume: formatUnits(newMinVolume, selectedToken?.displayDecimals || 8),
     })
   }, [assets, sendToken])
 

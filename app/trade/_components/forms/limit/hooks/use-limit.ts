@@ -6,6 +6,7 @@ import Big from "big.js"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
 
+import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market.new"
@@ -17,9 +18,8 @@ import {
   minVolume,
 } from "@mangrovedao/mgv/lib"
 import { formatUnits, parseUnits } from "viem"
-import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
-import { TimeToLiveUnit } from "../enums"
+import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
@@ -34,20 +34,21 @@ export function useLimitOld(props: Props) {
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      tradeAction: BS.buy,
+      bs: BS.buy,
       limitPrice: "",
       send: "",
       sendFrom: "simple",
       receive: "",
       receiveTo: "simple",
       orderType: Order.GTC,
+      timeInForce: TimeInForce.GOOD_TIL_TIME,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
     },
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const tradeAction = form.useStore((state) => state.values.tradeAction)
+  const tradeAction = form.useStore((state) => state.values.bs)
   const send = form.useStore((state) => state.values.send)
   const sendFrom = form.useStore((state) => state.values.sendFrom)
   const receiveTo = form.useStore((state) => state.values.receiveTo)
@@ -87,52 +88,6 @@ export function useLimitOld(props: Props) {
   )
   const gasreq = selectedSource?.logic.gasreq || getDefaultLimitOrderGasreq()
 
-  const minAsk = book ? minVolume(book.asksConfig, gasreq) : 0n
-  const minBid = book ? minVolume(book.bidsConfig, gasreq) : 0n
-
-  const minCalculatedVolume =
-    tradeAction === BS.buy
-      ? {
-          bid: {
-            volume: Number(
-              formatUnits(minAsk, receiveToken?.decimals || 18),
-            ).toFixed(receiveToken?.displayDecimals),
-          },
-        }
-      : {
-          bid: {
-            volume: formatUnits(minBid, quoteToken?.displayDecimals || 8),
-            token: quoteToken?.symbol,
-          },
-          ask: {
-            volume: formatUnits(minAsk, sendToken?.displayDecimals || 8),
-            token: sendToken?.symbol,
-          },
-        }
-
-  // const minVolume =
-  //   tradeAction === TradeAction.BUY
-  //     ? {
-  //         bid: {
-  //           volume: minAsk?.toFixed(receiveToken?.displayedDecimals),
-  //           token: receiveToken?.symbol,
-  //         },
-  //         ask: {
-  //           volume: minBid?.toFixed(quoteToken?.displayedDecimals),
-  //           token: quoteToken?.symbol,
-  //         },
-  //       }
-  //     : {
-  //         bid: {
-  //           volume: minBid?.toFixed(quoteToken?.displayedDecimals),
-  //           token: quoteToken?.symbol,
-  //         },
-  //         ask: {
-  //           volume: minAsk?.toFixed(sendToken?.displayedDecimals),
-  //           token: sendToken?.symbol,
-  //         },
-  //       }
-
   // TODO: fix TS type for useEventListener
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
@@ -164,7 +119,7 @@ export function useLimitOld(props: Props) {
 
     let limit,
       receive = ""
-    if (tradeAction === TradeAction.SELL) {
+    if (tradeAction === BS.sell) {
       limit = bigLimitPrice
 
       receive = limit.mul(bigSend).toString()
@@ -198,7 +153,7 @@ export function useLimitOld(props: Props) {
 
     if (receive === "") return
     let send = ""
-    if (tradeAction === TradeAction.SELL) {
+    if (tradeAction === BS.sell) {
       send = bigReceive
         .div(Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 1))
         .toString()
@@ -250,7 +205,7 @@ export function useLimitOld(props: Props) {
     setTimeout(() => {
       form?.setFieldValue(
         "limitPrice",
-        defaultLimitPrice.toFixed(sendToken.displayedDecimals),
+        defaultLimitPrice.toFixed(sendToken.displayDecimals),
       )
       form?.validateAllFields("blur")
     }, 0)
@@ -275,7 +230,6 @@ export function useLimitOld(props: Props) {
     feeInPercentageAsString,
     spotPrice,
     orderType,
-    logics,
     selectedSource,
     minVolume,
   }
@@ -292,6 +246,7 @@ export function useLimit(props: Props) {
       receive: "",
       receiveTo: "simple",
       orderType: Order.GTC,
+      timeInForce: TimeInForce.GOOD_TIL_TIME,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
     },
@@ -299,8 +254,13 @@ export function useLimit(props: Props) {
   })
 
   const { currentMarket } = useMarket()
+  const logics = useLogics()
 
   const bs = form.useStore((state) => state.values.bs)
+  const send = form.useStore((state) => state.values.send)
+
+  const timeInForce = form.useStore((state) => state.values.timeInForce)
+
   const { book } = useBook()
 
   const isBid = bs === BS.buy
@@ -487,7 +447,9 @@ export function useLimit(props: Props) {
 
   return {
     form,
+    timeInForce,
     sendFrom,
+    send,
     receiveTo,
     sendToken,
     receiveToken,
@@ -495,7 +457,9 @@ export function useLimit(props: Props) {
     sendTokenBalanceFormatted,
     receiveTokenBalance,
     receiveTokenBalanceFormatted,
+    logics,
     sendLogics,
+    spotPrice,
     receiveLogics,
     feeInPercentageAsString,
     tickSize,

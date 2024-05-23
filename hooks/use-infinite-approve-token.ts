@@ -1,6 +1,4 @@
-import { DefaultStrategyLogics } from "@/app/strategies/(shared)/type"
-import { DefaultTradeLogics } from "@/app/trade/_components/forms/types"
-import { Token } from "@mangrovedao/mangrove.js"
+import { Logic, Token } from "@mangrovedao/mgv"
 import { useMutation } from "@tanstack/react-query"
 
 export function useInfiniteApproveToken() {
@@ -11,28 +9,28 @@ export function useInfiniteApproveToken() {
       logic,
     }: {
       token?: Token
-      logic?: DefaultTradeLogics | DefaultStrategyLogics
+      logic?: Logic
       spender?: string | null
     }) => {
       try {
         if (!(token && spender)) return
-        if (logic) {
-          try {
-            const tokenToApprove = await logic.overlying(token)
-            if (tokenToApprove instanceof Token) {
-              const result = await tokenToApprove.approve(spender)
-              return result.wait()
-            } else {
-              // TODO: implement logic for erc721
-              return
-            }
-          } catch (error) {
-            return
-          }
-        } else {
-          const result = await token.approve(spender)
-          return result.wait()
-        }
+        // if (logic) {
+        //   try {
+        //     const tokenToApprove = await logic.overlying(token)
+        //     if (tokenToApprove instanceof Token) {
+        //       const result = await tokenToApprove.approve(spender)
+        //       return result.wait()
+        //     } else {
+        //       // TODO: implement logic for erc721
+        //       return
+        //     }
+        //   } catch (error) {
+        //     return
+        //   }
+        // } else {
+        //   const result = await token.approve(spender)
+        //   return result.wait()
+        // }
       } catch (error) {
         console.error(error)
         throw new Error("Failed the approval")

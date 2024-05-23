@@ -1,6 +1,4 @@
-import { Token } from "@mangrovedao/mgv"
-
-import { DefaultTradeLogics } from "../types"
+import { Logic, Token } from "@mangrovedao/mgv"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 
 export type Asset = {
@@ -12,7 +10,7 @@ export type Asset = {
 
 export type AssetWithInfos = {
   token: Token | undefined
-  receiveTo: DefaultTradeLogics
+  receiveTo: Logic
   amount: string
   limitPrice: string
 }

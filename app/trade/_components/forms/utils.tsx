@@ -1,14 +1,15 @@
 import { type Market, type Token } from "@mangrovedao/mangrove.js"
+import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { toast } from "sonner"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
-import { TradeAction, TradeMode } from "./enums"
+import { TradeMode } from "./enums"
 
 export function successToast(
   tradeMode: TradeMode,
-  tradeAction: TradeAction,
+  tradeAction: BS,
   baseToken: Token,
   baseValue: string,
   result: Market.OrderResult,
@@ -43,9 +44,7 @@ export function successToast(
         <div className="flex justify-between">
           <span
             className={
-              tradeAction === TradeAction.BUY
-                ? "text-green-500"
-                : "text-red-600"
+              tradeAction === BS.buy ? "text-green-500" : "text-red-600"
             }
           >
             {tradeAction.toUpperCase()}

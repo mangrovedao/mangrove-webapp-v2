@@ -1,10 +1,9 @@
-import { Token } from "@mangrovedao/mgv"
+import { Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
-import { DefaultTradeLogics } from "../../types"
 
 type Props = {
   sendFrom?: string
-  logics: DefaultTradeLogics[]
+  logics: Logic[]
   fundOwner?: string
   sendToken?: Token
   availableTokens?: Token[]
@@ -57,7 +56,7 @@ export default function amplifiedLiquiditySourcing({
         return
       }
 
-      const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
+      const selectedLogic = logics.find((logic) => logic?.name === sendFrom)
 
       if (!selectedLogic) return
 

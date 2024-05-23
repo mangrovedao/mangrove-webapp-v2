@@ -21,11 +21,10 @@ import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
-import { Order } from "@mangrovedao/mgv/lib"
+import { BS, Order } from "@mangrovedao/mgv/lib"
 import { formatUnits } from "viem"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
-import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
@@ -45,7 +44,6 @@ export function Limit() {
     receiveTokenBalance,
     handleSubmit,
     form,
-    quoteToken,
     sendToken,
     receiveToken,
     tickSize,
@@ -54,9 +52,7 @@ export function Limit() {
     send,
     sendFrom,
     receiveTo,
-    spotPrice,
     logics,
-    selectedSource,
     minVolume,
     sendLogics,
     receiveLogics,
@@ -117,19 +113,17 @@ export function Limit() {
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onValueChange={(e: TradeAction) => {
+                onValueChange={(e: BS) => {
                   field.handleChange(e)
                   computeReceiveAmount()
                 }}
               >
-                {Object.values(TradeAction).map((action) => (
+                {Object.values(BS).map((action) => (
                   <CustomRadioGroupItem
                     key={action}
                     value={action}
                     id={action}
-                    variant={
-                      action === TradeAction.SELL ? "secondary" : "primary"
-                    }
+                    variant={action === BS.sell ? "secondary" : "primary"}
                     className="capitalize"
                   >
                     {action}
@@ -150,7 +144,7 @@ export function Limit() {
                     field.handleChange(e.target.value)
                     computeReceiveAmount()
                   }}
-                  token={quoteToken}
+                  token={receiveToken}
                   label="Limit price"
                   disabled={!currentMarket}
                   error={field.state.meta.errors}
@@ -506,7 +500,7 @@ export function Limit() {
 
       {formData && (
         <FromWalletLimitOrderDialog
-          form={{ ...formData, selectedSource: selectedSource, minVolume }}
+          form={{ ...formData, minVolume: minVolumeFormatted }}
           onClose={() => setFormData(undefined)}
         />
       )}
