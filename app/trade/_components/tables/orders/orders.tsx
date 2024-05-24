@@ -2,8 +2,7 @@
 import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import CancelOfferDialog from "./components/cancel-offer-dialog"
 import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"
@@ -11,13 +10,11 @@ import { useTable } from "./hooks/use-table"
 import type { Order } from "./schema"
 
 export function Orders() {
-  const { marketsInfoQuery } = useMangrove()
-
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
   })
-  const { market } = useMarket()
+  const { currentMarket, setMarket, markets } = useMarket()
   const { data: count } = useOrders({
     select: (orders) => orders.length,
   })
@@ -58,12 +55,12 @@ export function Orders() {
       />
       <EditOrderSheet
         orderInfos={orderToEdit}
-        market={market}
+        market={currentMarket}
         onClose={() => setOrderToEdit(undefined)}
       />
       <CancelOfferDialog
         order={orderToDelete}
-        market={market}
+        market={currentMarket}
         onClose={() => setOrderToDelete(undefined)}
       />
     </>

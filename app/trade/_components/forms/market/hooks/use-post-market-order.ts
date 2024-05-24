@@ -1,23 +1,25 @@
-import type { Market } from "@mangrovedao/mangrove.js"
+import { marketOrderResultFromLogs } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { TransactionReceipt, parseEther } from "viem"
+import { usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
+import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
-import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
-import { TradeAction, TradeMode } from "../../enums"
+import { toast } from "sonner"
+import { TradeMode } from "../../enums"
 import { successToast } from "../../utils"
 import type { Form } from "../types"
 
 type Props = {
-  onResult?: (result: Market.OrderResult) => void
+  onResult?: (result: TransactionReceipt) => void
 }
 
 export function usePostMarketOrder({ onResult }: Props = {}) {
-  const { mangrove } = useMangrove()
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -25,50 +27,73 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
     state.stopLoading,
   ])
 
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const marketClient = useMarketClient()
+  const addresses = useMangroveAddresses()
+
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
-      if (!mangrove || !market) return
-      const { base } = market
-      const { tradeAction, send: gives, receive: wants, slippage } = form
-      const isBuy = tradeAction === TradeAction.BUY
+      try {
+        if (
+          !publicClient ||
+          !walletClient ||
+          !addresses ||
+          !market ||
+          !marketClient
+        )
+          throw new Error("Market order post is missing params")
 
-      const orderParams: Market.TradeParams = {
-        wants,
-        gives,
-        slippage,
-        gasLowerBound: 20_000_000,
+        const { base } = market
+        const { bs, send: gives, receive: wants, slippage } = form
+
+        const { takerGot, takerGave, bounty, feePaid, request } =
+          await marketClient.simulateMarketOrderByVolumeAndMarket({
+            baseAmount: parseEther(gives),
+            quoteAmount: parseEther(wants),
+            bs,
+            slippage,
+          })
+
+        const hash = await walletClient.writeContract(request)
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash,
+        })
+        //note:  might need to remove marketOrderResultfromlogs function if simulateMarketOrder returns correct values
+        const result = marketOrderResultFromLogs(
+          { ...addresses, ...market },
+          market,
+          {
+            logs: receipt.logs,
+            taker: walletClient.account.address,
+            bs,
+          },
+        )
+
+        successToast(TradeMode.MARKET, bs, base, gives, result)
+        return { result, receipt }
+      } catch (error) {
+        console.error(error)
+        toast.error("Failed to post the market order")
       }
-
-      const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.market[
-        tradeAction
-      ].sendReceiveToBaseQuote(gives, wants)
-
-      const order = isBuy
-        ? await market.buy(orderParams)
-        : await market.sell(orderParams)
-      const result = await order.result
-
-      successToast(TradeMode.MARKET, tradeAction, base, baseValue, result)
-      return { order, result }
     },
     meta: {
       error: "Failed to post the market order",
     },
     onSuccess: async (data) => {
       if (!data) return
-      const { order, result } = data
+      const { receipt } = data
       /*
        * We use a custom callback to handle the success message once it's ready.
        * This is because the onSuccess callback from the mutation will only be triggered
        * after all the preceding logic has been executed.
        */
-      onResult?.(result)
+      onResult?.(receipt)
       try {
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-        const { blockNumber } = await (await order.response).wait()
         await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber,
+          blockNumber: Number(receipt.blockNumber),
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })

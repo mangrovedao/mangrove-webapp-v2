@@ -1,6 +1,5 @@
 "use client"
 import {
-  Token,
   type GeometricKandelDistribution,
   type Market,
 } from "@mangrovedao/mangrove.js"
@@ -24,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import { cn } from "@/utils"
+import { Token } from "@mangrovedao/mgv"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
 import {

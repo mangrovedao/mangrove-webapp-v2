@@ -27,8 +27,8 @@ export default function PriceRangeInfos() {
         number,
       ])
     : undefined
-  const baseValue = `${publishedBase?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+  const baseValue = `${publishedBase?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
   const chartIsLoading =
     (strategyStatusQuery.isLoading && strategyQuery.isLoading) ||

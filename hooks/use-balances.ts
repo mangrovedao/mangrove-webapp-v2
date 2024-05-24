@@ -4,6 +4,7 @@ import type { GetBalanceResult } from "@mangrovedao/mgv/actions/balances"
 import { useQuery } from "@tanstack/react-query"
 import { isAddressEqual, type Address } from "viem"
 import { useAccount } from "wagmi"
+
 import { useLogics } from "./use-addresses"
 import { useGeneralClient } from "./use-client"
 

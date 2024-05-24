@@ -7,9 +7,11 @@ type Props = {
   base: string
   quote: string
 }
+
 export function Market({ base, quote }: Props) {
   const { data: baseToken } = useTokenFromAddress(base as Address)
   const { data: quoteToken } = useTokenFromAddress(quote as Address)
+
   return (
     <div className="flex items-center space-x-2">
       <TokenPair

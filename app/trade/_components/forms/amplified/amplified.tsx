@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
+import { Logic } from "@mangrovedao/mgv"
 import React from "react"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
@@ -32,6 +33,7 @@ import SourceIcon from "../limit/components/source-icon"
 import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import useAmplifiedForm from "./hooks/use-amplified"
+import { AssetWithInfos } from "./types"
 import { getCurrentTokenPrice } from "./utils"
 
 const sliderValues = [25, 50, 75, 100]
@@ -151,13 +153,13 @@ export function Amplified() {
                   {logics.map(
                     (logic) =>
                       logic && (
-                        <SelectItem key={logic.id} value={logic.id}>
+                        <SelectItem key={logic.name} value={logic.name}>
                           <div className="flex space-x-3">
-                            <SourceIcon sourceId={logic.id} />
+                            <SourceIcon sourceId={logic.name} />
                             <Text className="capitalize">
-                              {logic.id.includes("simple")
+                              {logic.name.includes("simple")
                                 ? "Wallet"
-                                : logic.id.toUpperCase()}
+                                : logic.name.toUpperCase()}
                             </Text>
                           </div>
                         </SelectItem>
@@ -381,13 +383,13 @@ export function Amplified() {
                         {logics.map(
                           (logic) =>
                             logic && (
-                              <SelectItem key={logic.id} value={logic.id}>
+                              <SelectItem key={logic.name} value={logic.name}>
                                 <div className="flex gap-2 w-full items-center">
-                                  <SourceIcon sourceId={logic.id} />
+                                  <SourceIcon sourceId={logic.name} />
                                   <Text className="capitalize">
-                                    {logic.id.includes("simple")
+                                    {logic.name.includes("simple")
                                       ? "Wallet"
-                                      : logic.id.toUpperCase()}
+                                      : logic.name.toUpperCase()}
                                   </Text>
                                 </div>
                               </SelectItem>
@@ -548,12 +550,12 @@ export function Amplified() {
       </form>
       <FromWalletAmplifiedOrderDialog
         form={{
-          assetsWithTokens,
+          assetsWithTokens: assetsWithTokens as AssetWithInfos[],
           sendSource,
           sendToken,
           sendAmount,
           selectedToken,
-          selectedSource,
+          selectedSource: selectedSource as Logic,
           timeInForce,
           timeToLive,
           timeToLiveUnit,

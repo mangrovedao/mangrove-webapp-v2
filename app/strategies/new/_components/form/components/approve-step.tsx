@@ -1,6 +1,6 @@
 import { TokenIcon } from "@/components/token-icon"
 import { TokenPair } from "@/components/token-pair"
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 
 type Props = {
   baseToken?: Token

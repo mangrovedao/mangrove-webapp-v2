@@ -1,3 +1,8 @@
+import { Token } from "@mangrovedao/mgv"
+import { add } from "date-fns"
+import React from "react"
+import { useStep } from "usehooks-ts"
+import { formatUnits } from "viem"
 import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
@@ -8,11 +13,6 @@ import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useIsLiquidityInfiniteAllowance } from "@/hooks/use-liquidity-infinite-allowance"
 import { formatExpiryDate } from "@/utils/date"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { Token } from "@mangrovedao/mangrove.js"
-import { add } from "date-fns"
-import React from "react"
-import { useStep } from "usehooks-ts"
-import { formatUnits } from "viem"
 import { ApproveStep } from "../../../forms/components/approve-step"
 import { Steps } from "../../../forms/components/steps"
 import { useSpenderAddress } from "../../../forms/hooks/use-spender-address"
@@ -97,7 +97,7 @@ export default function EditAmplifiedOrderSteps({
       BigInt(order.offers.find((offer) => offer.gives)?.gives || "0"),
       form.sendToken?.decimals ?? 6,
     ),
-  ).toFixed(form.sendToken?.displayedDecimals)}`
+  ).toFixed(form.sendToken?.displayDecimals)}`
 
   const isDialogOpenRef = React.useRef(false)
   React.useEffect(() => {

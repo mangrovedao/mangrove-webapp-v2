@@ -21,11 +21,10 @@ export function Value({ base, baseValue, quote, quoteValue }: Props) {
   return (
     <div>
       <div>
-        {Big(baseValue).toFixed(baseToken?.displayedDecimals)}{" "}
-        {baseToken?.symbol}
+        {Big(baseValue).toFixed(baseToken?.displayDecimals)} {baseToken?.symbol}
       </div>
       <div>
-        {Big(quoteValue).toFixed(quoteToken?.displayedDecimals)}{" "}
+        {Big(quoteValue).toFixed(quoteToken?.displayDecimals)}{" "}
         {quoteToken?.symbol}
       </div>
     </div>

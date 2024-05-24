@@ -26,8 +26,8 @@ export default function StratInfoBanner() {
 
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
 
-  const baseValue = `${publishedBase?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+  const baseValue = `${publishedBase?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
 
   return (

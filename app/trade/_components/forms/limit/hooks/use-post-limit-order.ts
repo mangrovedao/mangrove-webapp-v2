@@ -1,95 +1,102 @@
+import useMarket from "@/providers/market.new"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { TransactionReceipt, parseEther } from "viem"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
+import { useLogics, useMangroveAddresses } from "@/hooks/use-addresses"
+import { useBook } from "@/hooks/use-book"
+import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import type { Market } from "@mangrovedao/mangrove.js"
+import { limitOrderResultFromLogs } from "@mangrovedao/mgv"
+
 import { BS } from "@mangrovedao/mgv/lib"
-import { TRADEMODE_AND_ACTION_PRESENTATION } from "../../constants"
+import { usePublicClient, useWalletClient } from "wagmi"
 import { TradeMode } from "../../enums"
-import { DefaultTradeLogics } from "../../types"
 import { successToast } from "../../utils"
-import { TimeInForce } from "../enums"
 import type { Form } from "../types"
-import { estimateTimestamp } from "../utils"
 
 type Props = {
-  onResult?: (result: Market.OrderResult) => void
+  onResult?: (result: TransactionReceipt) => void
 }
 
 export function usePostLimitOrder({ onResult }: Props = {}) {
-  const { mangrove } = useMangrove()
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
   ])
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const marketClient = useMarketClient()
+  const { book } = useBook()
+  const logics = useLogics()
+  const addresses = useMangroveAddresses()
 
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
       try {
-        if (!mangrove || !market) return
+        if (
+          !market ||
+          !marketClient ||
+          !book ||
+          !walletClient ||
+          !publicClient ||
+          !addresses
+        )
+          throw new Error("Failed to post limit order")
+
         const {
           bs,
           send: gives,
           receive: wants,
-          timeInForce,
+          orderType,
           timeToLive,
-          timeToLiveUnit,
+          sendFrom,
+          receiveTo,
         } = form
 
-        const logics = Object.values(mangrove.logics)
-        const isBuy = bs === BS.buy
-        const { base } = market
-
         const takerGivesLogic = logics.find(
-          (logic) => logic?.id === form.sendFrom,
-        ) as DefaultTradeLogics
+          (item) => item.name === sendFrom,
+        )?.logic
 
         const takerWantsLogic = logics.find(
-          (logic) => logic?.id === form.receiveTo,
-        ) as DefaultTradeLogics
+          (item) => item.name === receiveTo,
+        )?.logic
 
-        const restingOrderGasreq = Math.max(
-          takerGivesLogic?.gasOverhead || 200_000,
-          takerWantsLogic?.gasOverhead || 200_000,
-        )
-
-        const orderParams: Market.TradeParams = {
-          wants,
-          gives,
-          restingOrder: {
-            restingOrderGasreq,
-          },
-          forceRoutingToMangroveOrder: true,
-          fillOrKill: timeInForce === TimeInForce.FILL_OR_KILL,
+        const { request } = await marketClient.simulateLimitOrder({
+          baseAmount: parseEther(gives),
+          quoteAmount: parseEther(wants),
+          bs,
+          book,
+          orderType,
+          // If expiry date is ignored, then it will not expire
+          expiryDate: BigInt(timeToLive), // 1 hour
+          restingOrderGasreq: 0n,
+          // logics can be left to undefined (meaning no logic)
           takerGivesLogic,
           takerWantsLogic,
-          gasLowerBound: 20_000_000,
-          expiryDate:
-            timeInForce === TimeInForce.GOOD_TIL_TIME
-              ? estimateTimestamp({
-                  timeToLiveUnit,
-                  timeToLive,
-                })
-              : undefined,
-        }
+        })
 
-        const [baseValue] = TRADEMODE_AND_ACTION_PRESENTATION.limit[
-          bs
-        ].sendReceiveToBaseQuote(gives, wants)
+        const hash = await walletClient.writeContract(request)
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash,
+        })
 
-        const order = isBuy
-          ? await market.buy(orderParams)
-          : await market.sell(orderParams)
-        const result = await order.result
+        const result = limitOrderResultFromLogs(
+          { ...addresses, ...market },
+          market,
+          {
+            logs: receipt.logs,
+            user: walletClient.account.address,
+            bs: BS.buy,
+          },
+        )
 
-        successToast(TradeMode.LIMIT, bs, base, baseValue, result)
-        return { order, result }
+        successToast(TradeMode.LIMIT, bs, market.base, gives, result)
+        return { result, receipt }
       } catch (error) {
         console.error(error)
       }
@@ -99,19 +106,19 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
     },
     onSuccess: async (data) => {
       if (!data) return
-      const { order, result } = data
+      const { receipt } = data
       /*
        * We use a custom callback to handle the success message once it's ready.
        * This is because the onSuccess callback from the mutation will only be triggered
        * after all the preceding logic has been executed.
        */
-      onResult?.(result)
+      onResult?.(receipt)
       try {
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-        const { blockNumber } = await (await order.response).wait()
+
         await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber,
+          blockNumber: Number(receipt.blockNumber),
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })

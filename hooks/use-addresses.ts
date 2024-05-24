@@ -2,6 +2,7 @@ import {
   blastLogics,
   blastMangrove,
   blastMarkets,
+  blastTokens,
 } from "@mangrovedao/mgv/addresses"
 import { blast } from "viem/chains"
 import { useChainId } from "wagmi"
@@ -31,6 +32,16 @@ export function useLogics() {
   switch (chain) {
     case blast.id:
       return blastLogics
+    default:
+      return []
+  }
+}
+
+export function useTokens() {
+  const chain = useChainId()
+  switch (chain) {
+    case blast.id:
+      return blastTokens
     default:
       return []
   }

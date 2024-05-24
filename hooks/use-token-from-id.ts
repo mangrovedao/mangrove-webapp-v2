@@ -1,17 +1,17 @@
+import { useQuery } from "@tanstack/react-query"
 import type { Address } from "viem"
 
-import useMangrove from "@/providers/mangrove"
-import { useQuery } from "@tanstack/react-query"
+import { useTokens } from "./use-addresses"
 
 export function useTokenFromId(address: Address) {
-  const { mangrove } = useMangrove()
+  const tokens = useTokens()
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["tokenFromId", address, mangrove?.address],
+    queryKey: ["tokenFromId", address, tokens],
     queryFn: () => {
-      if (!(address && mangrove)) return null
-      return mangrove.tokenFromId(address)
+      if (!(address && tokens)) return null
+      return tokens.find((item) => item.address == address)
     },
-    enabled: !!(address && mangrove),
+    enabled: !!(address && tokens),
   })
 }

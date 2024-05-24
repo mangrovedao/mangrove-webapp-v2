@@ -14,7 +14,6 @@ export function useKandelSteps({ seeder }: { seeder?: KandelSeederActions }) {
       try {
         if (!seeder || !address) return
         const currentSteps = await seeder.getKandelSteps({
-          gasreq: BigInt(9),
           user: address as Address,
           userRouter: address as Address,
         })

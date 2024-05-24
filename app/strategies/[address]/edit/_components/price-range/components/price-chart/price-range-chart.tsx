@@ -1,9 +1,9 @@
 "use client"
 import {
-  Token,
   type GeometricKandelDistribution,
   type Market,
 } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 import { AxisLeft, AxisTop } from "@visx/axis"
 import { curveStep } from "@visx/curve"
 import { localPoint } from "@visx/event"

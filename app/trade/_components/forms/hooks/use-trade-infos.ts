@@ -5,7 +5,7 @@ import { determineDecimals } from "@/utils/numbers"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useSpenderAddress } from "./use-spender-address"
 
-export function useTradeInfos(type: "limit" | "market", bs: BS) {
+export function useTradeInfos(type: "limit" | "market" | "amplified", bs: BS) {
   const { currentMarket } = useMarket()
   const baseToken = currentMarket?.base
   const quoteToken = currentMarket?.quote

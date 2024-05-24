@@ -13,9 +13,9 @@ import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
 import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
-import { useLimitSteps } from "../../hooks/use-steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
+import { useLimitSteps } from "../hooks/use-steps"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
@@ -89,7 +89,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       if (!isDialogOpenRef.current) return
       onClose()
       tradeService.openTxCompletedDialog({
-        address: result.txReceipt.transactionHash ?? "",
+        address: result.transactionHash ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
       })
     },

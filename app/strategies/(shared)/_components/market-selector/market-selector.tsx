@@ -1,8 +1,8 @@
 "use client"
-import { useAccount } from "wagmi"
-import { Address } from "viem"
-import { useRouter } from "next/navigation"
 import { MarketParams } from "@mangrovedao/mgv"
+import { useRouter } from "next/navigation"
+import { Address } from "viem"
+import { useAccount } from "wagmi"
 
 import { TokenIcon } from "@/components/token-icon"
 import {
@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import useMarket from "@/providers/market.new"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import useMarket from "@/providers/market.new"
 
 function getSymbol(market?: MarketParams) {
   if (!market) return
@@ -28,13 +28,17 @@ export default function MarketSelector({ disabled }: { disabled?: boolean }) {
   const router = useRouter()
   const { currentMarket, markets } = useMarket()
   const { isConnected } = useAccount()
-    // note-SDK: add token id in currentMarket tokens
-    const { isLoading: baseLoading, data: baseToken}  = useTokenFromAddress(currentMarket?.base.address || "" as Address)
-    const { isLoading: quoteLoading, data: quoteToken} = useTokenFromAddress(currentMarket?.base.address || "" as Address)
+  // note-SDK: add token id in currentMarket tokens
+  const { isLoading: baseLoading, data: baseToken } = useTokenFromAddress(
+    currentMarket?.base.address || ("" as Address),
+  )
+  const { isLoading: quoteLoading, data: quoteToken } = useTokenFromAddress(
+    currentMarket?.base.address || ("" as Address),
+  )
 
   const onValueChange = (value: string) => {
-    router.push(`?market=${baseToken?.id},${quoteToken?.id}`, {
-    scroll: false,
+    router.push(`?market=${baseToken?.address},${quoteToken?.address}`, {
+      scroll: false,
     })
   }
 
@@ -47,7 +51,11 @@ export default function MarketSelector({ disabled }: { disabled?: boolean }) {
       }
       onValueChange={onValueChange}
       disabled={
-        quoteLoading || baseLoading ||  !currentMarket || !isConnected || disabled
+        quoteLoading ||
+        baseLoading ||
+        !currentMarket ||
+        !isConnected ||
+        disabled
       }
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">

@@ -19,7 +19,7 @@ import { useActivateSmartContract } from "../../hooks/use-router-bind"
 import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
 import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
-import { useLimitSteps } from "../../hooks/use-steps"
+import { useLimitSteps } from "../../limit/hooks/use-steps"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { AssetWithInfos, Form } from "../types"
 import { SummaryStep } from "./summary-step"
@@ -53,11 +53,7 @@ export default function FromWalletAmplifiedOrderDialog({
 
   const { chain, address } = useAccount()
   const { data: spender } = useSpenderAddress("amplified")
-  // const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
-  //   selectedToken,
-  //   spender,
-  //   selectedSource,
-  // )
+
   const { data: limitOrderSteps } = useLimitSteps({
     user: address,
     userRouter: spender as Address,

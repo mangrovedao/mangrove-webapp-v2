@@ -1,4 +1,4 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 import { TooltipWithBounds } from "@visx/tooltip"
 import { ScaleLinear } from "d3-scale"
 
@@ -38,14 +38,14 @@ export function GeometricOfferTooltip({
       >
         <div className="text-white">
           <span className="text-cloud-300">Price:</span>{" "}
-          {hoveredGeometricOffer.price.toFixed(quoteToken?.displayedDecimals)}{" "}
+          {hoveredGeometricOffer.price.toFixed(quoteToken?.displayDecimals)}{" "}
           {quoteToken?.symbol}
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
           {hoveredGeometricOffer.gives.toFixed(
             (hoveredGeometricOffer.type === "bid" ? quoteToken : baseToken)
-              ?.displayedDecimals,
+              ?.displayDecimals,
           )}{" "}
           {
             (hoveredGeometricOffer.type === "bid" ? quoteToken : baseToken)

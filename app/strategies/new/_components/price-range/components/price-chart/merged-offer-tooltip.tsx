@@ -1,10 +1,10 @@
-import { Token } from "@mangrovedao/mangrove.js"
 import { TooltipWithBounds } from "@visx/tooltip"
 import { ScaleLinear } from "d3-scale"
 
 import { MergedOffer } from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
+import { Token } from "@mangrovedao/mgv"
 import { GeometricOffer } from "./geometric-distribution-dots"
 
 type Props = {
@@ -66,14 +66,14 @@ export function MergedOfferTooltip({
         <StatusBadge isLive={isLive} />
         <div className="text-white">
           <span className="text-cloud-300">Price:</span>{" "}
-          {Number(mergedOffer.price).toFixed(quoteToken?.displayedDecimals)}{" "}
+          {Number(mergedOffer.price).toFixed(quoteToken?.displayDecimals)}{" "}
           {quoteToken?.symbol}
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
           {Number(mergedOffer.gives).toFixed(
             (mergedOffer.offerType === "bids" ? quoteToken : baseToken)
-              ?.displayedDecimals,
+              ?.displayDecimals,
           )}{" "}
           {(mergedOffer.offerType === "bids" ? quoteToken : baseToken)?.symbol}
         </div>

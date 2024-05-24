@@ -12,6 +12,7 @@ import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostMarketOrder } from "../hooks/use-post-market-order"
+import { useMarketSteps } from "../hooks/use-steps"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
@@ -27,21 +28,26 @@ const btnProps: ButtonProps = {
 }
 
 export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
-  const { chain } = useAccount()
+  const { chain, address } = useAccount()
   const {
     baseToken,
     quoteToken,
     sendToken,
     receiveToken,
-    isInfiniteAllowance,
     spender,
     feeInPercentageAsString,
     tickSize,
     spotPrice,
-  } = useTradeInfos("market", form.tradeAction)
+  } = useTradeInfos("market", form.bs)
+
+  const { data: marketOrderSteps } = useMarketSteps({
+    user: address,
+    bs: form.bs,
+    sendAmount: form.send,
+  })
 
   let steps = ["Send"]
-  if (!isInfiniteAllowance) {
+  if (!marketOrderSteps?.[0].done) {
     steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
   }
 
@@ -66,7 +72,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
       if (!isDialogOpenRef.current) return
       onClose()
       tradeService.openTxCompletedDialog({
-        address: result.txReceipt.transactionHash ?? "",
+        address: result.transactionHash ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
       })
     },
@@ -77,7 +83,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
   const { goToNextStep } = helpers
 
   const stepInfos = [
-    !isInfiniteAllowance && {
+    !marketOrderSteps?.[0].done && {
       body: (
         <SummaryStep
           form={form}
@@ -93,7 +99,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
         </Button>
       ),
     },
-    !isInfiniteAllowance && {
+    !marketOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
         <Button
@@ -135,6 +141,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
             post.mutate(
               {
                 form,
+                account: address,
               },
               {
                 onError: (error: Error) => {

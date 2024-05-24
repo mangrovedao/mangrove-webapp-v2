@@ -1,6 +1,8 @@
 "use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Market, Token } from "@mangrovedao/mangrove.js"
+import { Market } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
+import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
 import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
@@ -9,7 +11,6 @@ import React from "react"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
-import { TradeAction } from "../../enums"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
@@ -18,7 +19,7 @@ type Props = {
 }
 
 const determinePrices = (
-  tradeAction: TradeAction,
+  tradeAction: BS,
   quoteToken?: Token,
   orderBook?: {
     asks: Market.Offer[]
@@ -40,7 +41,7 @@ const determinePrices = (
   const highestBid = bids?.[0]
 
   const averagePrice =
-    tradeAction === TradeAction.BUY ? lowestAsk?.price : highestBid?.price
+    tradeAction === BS.buy ? lowestAsk?.price : highestBid?.price
 
   return {
     price: averagePrice,
@@ -56,7 +57,7 @@ export function useMarketForm(props: Props) {
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      tradeAction: TradeAction.BUY,
+      bs: BS.buy,
       sliderPercentage: 25,
       slippage: 0.5,
       send: "",
@@ -65,7 +66,7 @@ export function useMarketForm(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const tradeAction = form.useStore((state) => state.values.tradeAction)
+  const tradeAction = form.useStore((state) => state.values.bs)
   const send = form.useStore((state) => state.values.send)
   const receive = form.useStore((state) => state.values.receive)
 
@@ -111,10 +112,10 @@ export function useMarketForm(props: Props) {
       const given = isReceive ? send : receive
 
       const what = isReceive
-        ? tradeAction === TradeAction.BUY
+        ? tradeAction === BS.buy
           ? "quote"
           : "base"
-        : tradeAction === TradeAction.BUY
+        : tradeAction === BS.buy
           ? "base"
           : "quote"
 

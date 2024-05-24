@@ -1,7 +1,10 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
+import { useKandelSeeder } from "@/app/strategies/(shared)/_hooks/use-kandel-seeder"
+import { useKandelSteps } from "@/app/strategies/(shared)/_hooks/use-kandel-steps"
+import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
@@ -9,16 +12,15 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
 import useKandel from "../../_providers/kandel-strategy"
 import { useEditKandelStrategy } from "../_hooks/use-edit-kandel-strategy"
 import { useRetractOffers } from "../_hooks/use-retract-offers"
-
-import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { Steps } from "./form/components/steps"
 
 type StrategyDetails = Omit<
@@ -44,7 +46,7 @@ export default function EditStrategyDialog({
   strategy,
 }: Props) {
   const { address } = useAccount()
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { mangrove } = useMangrove()
   const { base: baseToken, quote: quoteToken } = market ?? {}
 
@@ -63,32 +65,22 @@ export default function EditStrategyDialog({
   const { mutate: editKandelStrategy, isPending: isEditingKandelStrategy } =
     useEditKandelStrategy()
 
-  const logics = mangrove ? Object.values(mangrove.logics) : []
+  const logics = useLogics()
 
-  const baseLogic = logics.find((logic) => logic?.id === strategy?.sendFrom)
-  const quoteLogic = logics.find((logic) => logic?.id === strategy?.receiveTo)
+  const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
+  const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
 
   const { data: spender } = useSpenderAddress("kandel")
-
-  // const { data: baseTokenApproved } = useIsTokenInfiniteAllowance(
-  //   baseToken,
-  //   spender,
-  //   baseLogic,
-  // )
-
-  // const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-  //   baseToken,
-  //   spender,
-  //   quoteLogic,
-  // )
+  const { data: kandelSeeder } = useKandelSeeder()
+  const { data: kandelSteps } = useKandelSteps({ seeder: kandelSeeder })
 
   let steps = [
     "Summary",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
-    !baseTokenApproved ? `Approve ${baseToken?.symbol}` : "",
-    !quoteTokenApproved ? `Approve ${quoteToken?.symbol}` : "",
+    !kandelSteps?.[4].done ? `Approve ${baseToken?.symbol}` : "",
+    !kandelSteps?.[5].done ? `Approve ${quoteToken?.symbol}` : "",
     strategy?.hasLiveOffers ? "Reset strategy" : "",
     "Publish",
   ].filter(Boolean)
@@ -112,7 +104,7 @@ export default function EditStrategyDialog({
       ),
     },
 
-    !baseTokenApproved && {
+    !kandelSteps?.[4].done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -127,7 +119,7 @@ export default function EditStrategyDialog({
             approveBaseToken.mutate(
               {
                 token: baseToken,
-                logic: baseLogic,
+                logic: baseLogic as Logic,
                 spender,
               },
               {
@@ -140,7 +132,7 @@ export default function EditStrategyDialog({
         </Button>
       ),
     },
-    !quoteTokenApproved && {
+    !kandelSteps?.[5].done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
@@ -155,7 +147,7 @@ export default function EditStrategyDialog({
             approveQuoteToken.mutate(
               {
                 token: quoteToken,
-                logic: quoteLogic,
+                logic: quoteLogic as Logic,
                 spender,
               },
               {
@@ -354,7 +346,7 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>
-                {Number(baseDeposit).toFixed(baseToken?.displayedDecimals) || 0}
+                {Number(baseDeposit).toFixed(baseToken?.displayDecimals) || 0}
               </Text>
               <Text className="text-muted-foreground">{baseToken?.symbol}</Text>
             </div>
@@ -366,8 +358,7 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>
-                {Number(quoteDeposit).toFixed(quoteToken?.displayedDecimals) ||
-                  0}
+                {Number(quoteDeposit).toFixed(quoteToken?.displayDecimals) || 0}
               </Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
@@ -382,7 +373,7 @@ const Summary = ({
           title={`Min price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{minPrice?.toFixed(quoteToken?.displayedDecimals)}</Text>
+              <Text>{minPrice?.toFixed(quoteToken?.displayDecimals)}</Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
               </Text>
@@ -394,7 +385,7 @@ const Summary = ({
           title={`Max price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{maxPrice?.toFixed(quoteToken?.displayedDecimals)}</Text>
+              <Text>{maxPrice?.toFixed(quoteToken?.displayDecimals)}</Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
               </Text>

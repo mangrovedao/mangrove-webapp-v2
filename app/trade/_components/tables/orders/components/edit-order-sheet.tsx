@@ -1,4 +1,3 @@
-import { type Market } from "@mangrovedao/mangrove.js"
 import React from "react"
 
 import { EnhancedNumericInput } from "@/components/token-input"
@@ -9,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import * as SheetRoot from "@/components/ui/sheet"
 import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
+import { useMarkets } from "@/hooks/use-addresses"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { TimeInForce } from "../../../forms/limit/enums"
@@ -60,7 +60,7 @@ const Badge = ({
 type EditOrderSheetProps = {
   onClose: () => void
   orderInfos?: { order: Order; mode: "edit" | "view" }
-  market?: Market
+  market?: ReturnType<typeof useMarkets>
 }
 
 export default function EditOrderSheet({
@@ -88,7 +88,7 @@ export default function EditOrderSheet({
     order,
     onSubmit: (formData) => setFormData(formData),
   })
-  const { base, quote } = market
+  const { base, quote } = market.currentMarket ?? {}
 
   const { progress, progressInPercent, volume, filled, amount } =
     getOrderProgress(order, market)
@@ -171,7 +171,7 @@ export default function EditOrderSheet({
                     title={`Filled/Amount`}
                     item={
                       <Text>{`${filled} / ${amount} ${
-                        isBid ? base.symbol : quote.symbol
+                        isBid ? base?.symbol : quote?.symbol
                       }`}</Text>
                     }
                     secondaryItem={
@@ -228,13 +228,13 @@ export default function EditOrderSheet({
                     item={
                       !toggleEdit ? (
                         <Text>{`${volume} ${
-                          isBid ? quote.symbol : base.symbol
+                          isBid ? quote?.symbol : base?.symbol
                         }`}</Text>
                       ) : (
                         <form.Field
                           name="send"
                           onChange={sendValidator(
-                            Number(sendTokenBalance.formatted ?? 0),
+                            Number(sendTokenBalance.balance?.balance ?? 0),
                           )}
                         >
                           {(field) => (
@@ -270,7 +270,7 @@ export default function EditOrderSheet({
                     }
                     item={
                       <Text>{`${amount} ${
-                        isBid ? base.symbol : quote.symbol
+                        isBid ? base?.symbol : quote?.symbol
                       }`}</Text>
                     }
                   />

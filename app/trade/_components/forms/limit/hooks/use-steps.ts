@@ -1,10 +1,11 @@
-import { useLogics, useMangroveAddresses } from "@/hooks/use-addresses"
-import { useBalances } from "@/hooks/use-balances"
-import { useGeneralClient } from "@/hooks/use-client"
-import { useMarketClient } from "@/hooks/use-market"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { Address } from "viem"
+
+import { useBalances } from "@/hooks/use-balances"
+import { useMarketClient } from "@/hooks/use-market"
+
 type Props = {
   bs: BS
   user?: Address
@@ -13,23 +14,20 @@ type Props = {
 }
 
 export const useLimitSteps = ({ bs, user, userRouter, logic }: Props) => {
-  const addresses = useMangroveAddresses()
   const marketClient = useMarketClient()
-  const generalClient = useGeneralClient()
-  const logics = useLogics()
   const balances = useBalances()
+
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["spenderAddress", bs, user, userRouter, marketClient],
     queryFn: async () => {
-      if (!marketClient || !user || !userRouter) return
+      try {
+        if (!marketClient || !user || !userRouter)
+          throw new Error("Limit order steps missing params")
 
-      if (logic && logics && generalClient) {
         const logicToken = balances.balances?.overlying.find(
           (item) => item.logic.name === logic,
         )
-
-        if (!logicToken) return
 
         const steps = await marketClient.getLimitOrderSteps({
           bs,
@@ -37,14 +35,11 @@ export const useLimitSteps = ({ bs, user, userRouter, logic }: Props) => {
           userRouter,
           logic: logicToken,
         })
+
         return steps
-      } else {
-        const steps = await marketClient.getLimitOrderSteps({
-          bs,
-          user,
-          userRouter,
-        })
-        return steps
+      } catch (error) {
+        console.log(error)
+        toast.error("Error while fetching limit order steps")
       }
     },
     enabled: !!marketClient,
