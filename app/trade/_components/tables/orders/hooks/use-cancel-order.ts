@@ -1,13 +1,13 @@
+import { BS } from "@mangrovedao/mgv/lib"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+import { usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
-import { BS } from "@mangrovedao/mgv/lib"
-import { toast } from "sonner"
-import { usePublicClient, useWalletClient } from "wagmi"
 import type { Order } from "../schema"
 
 type Props = {

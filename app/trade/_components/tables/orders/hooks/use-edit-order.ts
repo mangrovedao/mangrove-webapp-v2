@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 
+import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
@@ -9,7 +10,6 @@ import React from "react"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market"
 import { hasExpired } from "@/utils/date"
-import { TradeAction } from "../../../forms/enums"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
 import { Order } from "../schema"
@@ -61,7 +61,7 @@ export function useEditOrder({ order, onSubmit }: Props) {
     onSubmit: (values) => onSubmit(values),
   })
 
-  const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
+  const tradeAction = isBid ? BS.buy : BS.sell
   const { sendTokenBalance } = useTradeInfos("limit", tradeAction)
   const [toggleEdit, setToggleEdit] = React.useState(false)
 

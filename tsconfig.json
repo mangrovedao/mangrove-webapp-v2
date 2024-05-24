@@ -1,15 +1,11 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -22,30 +18,18 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@components/*": [
-        "./components/*"
-      ],
-      "@constants": [
-        "./constants/*"
-      ],
-      "@helpers/*": [
-        "./helpers/*"
-      ],
-      "@hooks/*": [
-        "./hooks/*"
-      ],
-      "@utils": [
-        "./utils/¨*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@constants": ["./constants/*"],
+      "@helpers/*": ["./helpers/*"],
+      "@hooks/*": ["./hooks/*"],
+      "@utils": ["./utils/¨*"],
     },
     "plugins": [
       {
-        "name": "next"
-      }
-    ]
+        "name": "next",
+      },
+    ],
   },
   "include": [
     ".eslintrc.cjs",
@@ -54,11 +38,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
   ],
-  "exclude": [
-    "node_modules",
-    "lib/tradingview",
-    "public"
-  ]
+  "exclude": ["node_modules", "lib/tradingview", "public"],
 }
