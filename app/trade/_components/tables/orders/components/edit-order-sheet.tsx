@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import * as SheetRoot from "@/components/ui/sheet"
 import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
-import { useMarkets } from "@/hooks/use-addresses"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { TimeInForce } from "../../../forms/limit/enums"
@@ -60,7 +60,7 @@ const Badge = ({
 type EditOrderSheetProps = {
   onClose: () => void
   orderInfos?: { order: Order; mode: "edit" | "view" }
-  market?: ReturnType<typeof useMarkets>
+  market?: ReturnType<typeof useMarket>
 }
 
 export default function EditOrderSheet({

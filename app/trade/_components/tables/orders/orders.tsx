@@ -55,12 +55,12 @@ export function Orders() {
       />
       <EditOrderSheet
         orderInfos={orderToEdit}
-        market={currentMarket}
+        market={{ currentMarket, setMarket, markets }}
         onClose={() => setOrderToEdit(undefined)}
       />
       <CancelOfferDialog
         order={orderToDelete}
-        market={currentMarket}
+        market={{ currentMarket, setMarket, markets }}
         onClose={() => setOrderToDelete(undefined)}
       />
     </>

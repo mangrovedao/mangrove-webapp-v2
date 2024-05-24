@@ -141,7 +141,6 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
             post.mutate(
               {
                 form,
-                account: address,
               },
               {
                 onError: (error: Error) => {
