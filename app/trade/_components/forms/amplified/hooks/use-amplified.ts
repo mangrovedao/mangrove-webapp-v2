@@ -1,4 +1,4 @@
-import { Logic, Token } from "@mangrovedao/mgv"
+import { Logic } from "@mangrovedao/mgv"
 import { minVolume as getMinimumVolume } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import React from "react"
@@ -85,17 +85,17 @@ export default function useAmplifiedForm() {
     handleAssetsChange(newAssets)
   }
 
-  const availableTokens =
-    markets?.reduce((acc, current) => {
-      if (!acc.includes(current.base)) {
-        acc.push(current.base)
-      }
-      if (!acc.includes(current.quote)) {
-        acc.push(current.quote)
-      }
+  const availableTokens = []
+  // markets?.reduce((acc, current) => {
+  //   if (!acc.includes(current.base)) {
+  //     acc.push(current.base)
+  //   }
+  //   if (!acc.includes(current.quote)) {
+  //     acc.push(current.quote)
+  //   }
 
-      return acc
-    }, [] as Token[]) ?? []
+  //   return acc
+  // }, [] as Token[]) ?? []
 
   const tickSize = currentMarket?.tickSpacing
     ? `${((1.0001 ** Number(currentMarket?.tickSpacing) - 1) * 100).toFixed(2)}%`

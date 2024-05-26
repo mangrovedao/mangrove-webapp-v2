@@ -1,16 +1,18 @@
 "use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Market } from "@mangrovedao/mangrove.js"
-import { Token } from "@mangrovedao/mgv"
+import { Token, marketOrderSimulation } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
 import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
+import { parseUnits } from "viem"
 
+import { useBook } from "@/hooks/use-book"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
+import { Book } from "@mangrovedao/mgv"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
@@ -19,12 +21,9 @@ type Props = {
 }
 
 const determinePrices = (
-  tradeAction: BS,
+  bs: BS,
   quoteToken?: Token,
-  orderBook?: {
-    asks: Market.Offer[]
-    bids: Market.Offer[]
-  } | null,
+  orderBook?: Book,
   marketPrice?: number,
 ) => {
   if (!orderBook?.bids || !orderBook?.asks) {
@@ -40,8 +39,7 @@ const determinePrices = (
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
 
-  const averagePrice =
-    tradeAction === BS.buy ? lowestAsk?.price : highestBid?.price
+  const averagePrice = bs === BS.buy ? lowestAsk?.price : highestBid?.price
 
   return {
     price: averagePrice,
@@ -66,11 +64,11 @@ export function useMarketForm(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const tradeAction = form.useStore((state) => state.values.bs)
+  const bs = form.useStore((state) => state.values.bs)
   const send = form.useStore((state) => state.values.send)
   const receive = form.useStore((state) => state.values.receive)
 
-  const { market, marketInfo, requestBookQuery: orderBook } = useMarket()
+  const { currentMarket: market } = useMarket()
   const {
     sendToken,
     quoteToken,
@@ -80,19 +78,30 @@ export function useMarketForm(props: Props) {
     tickSize,
     feeInPercentageAsString,
     spotPrice,
-  } = useTradeInfos("market", tradeAction)
+  } = useTradeInfos("market", bs)
 
+  const { book } = useBook()
   const { data: marketPrice } = useTokenPriceQuery(
     market?.base?.symbol,
     market?.quote?.symbol,
   )
 
-  const averagePrice = determinePrices(
-    tradeAction,
-    quoteToken,
-    orderBook.data,
-    marketPrice?.close,
-  )
+  const averagePrice = determinePrices(bs, quoteToken, book, marketPrice?.close)
+
+  const {
+    baseAmount,
+    quoteAmount,
+    gas,
+    feePaid,
+    maxTickEncountered,
+    minSlippage,
+    fillWants,
+    price,
+  } = marketOrderSimulation({
+    book,
+    bs,
+    base: parseUnits(send, market.base.decimals),
+  })
 
   const { data: estimatedVolume } = useQuery({
     queryKey: [
@@ -101,7 +110,7 @@ export function useMarketForm(props: Props) {
       market?.quote.address,
       send,
       receive,
-      tradeAction,
+      bs,
       estimateFrom,
     ],
     queryFn: async () => {
@@ -112,10 +121,10 @@ export function useMarketForm(props: Props) {
       const given = isReceive ? send : receive
 
       const what = isReceive
-        ? tradeAction === BS.buy
+        ? bs === BS.buy
           ? "quote"
           : "base"
-        : tradeAction === BS.buy
+        : bs === BS.buy
           ? "base"
           : "quote"
 
@@ -162,7 +171,7 @@ export function useMarketForm(props: Props) {
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
     form.validateAllFields("submit")
-  }, [form, tradeAction])
+  }, [form, bs])
 
   React.useEffect(() => {
     form?.reset()

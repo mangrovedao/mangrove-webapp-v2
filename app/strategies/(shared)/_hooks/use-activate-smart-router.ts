@@ -18,7 +18,7 @@ const SmartRouterABI = parseAbi([
 ])
 
 export function useActivateStrategySmartRouter(kandelAddress: string) {
-  const { address } = useAccount()
+  const { address, chain } = useAccount()
   const { mangrove } = useMangrove()
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -51,10 +51,12 @@ export function useActivateStrategySmartRouter(kandelAddress: string) {
         })
 
         const tx = await walletClient?.writeContract({
+          account: address,
           address: proxy,
           abi: SmartRouterABI,
           functionName: "bind",
           args: [kandelAddress as Address],
+          chain: chain,
         })
 
         const result = await publicClient.waitForTransactionReceipt({
