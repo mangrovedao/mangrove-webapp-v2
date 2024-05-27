@@ -16,10 +16,10 @@ export const useMarketSteps = ({ bs, user, sendAmount }: Props) => {
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["spenderAddress", bs, user, marketClient],
+    queryKey: ["marketOrderSteps", bs, user, marketClient?.name],
     queryFn: async () => {
       try {
-        if (!marketClient || !user || !sendAmount)
+        if (!marketClient?.name || !user || !sendAmount)
           throw new Error("Market order steps missing params")
 
         const steps = await marketClient.getMarketOrderSteps({
@@ -34,6 +34,6 @@ export const useMarketSteps = ({ bs, user, sendAmount }: Props) => {
         toast.error("Error while fetching market order steps")
       }
     },
-    enabled: !!marketClient,
+    enabled: !!marketClient?.name,
   })
 }

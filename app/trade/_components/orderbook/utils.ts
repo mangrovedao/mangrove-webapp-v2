@@ -1,6 +1,6 @@
 import { CompleteOffer } from "@mangrovedao/mgv"
 
-type Data = {
+export type Data = {
   asks: CompleteOffer[]
   bids: CompleteOffer[]
 }

@@ -64,6 +64,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   // if (!isBound) {
   //   steps = [...steps, "Limit order activation"]
   // }
+
   steps = [...steps, "Send"]
 
   const isDialogOpenRef = React.useRef(false)
@@ -103,7 +104,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   const { goToNextStep } = helpers
 
   const stepInfos = [
-    !!limitOrderSteps?.[0].done && {
+    !limitOrderSteps?.[0].done && {
       body: (
         <SummaryStep
           form={form}
@@ -119,7 +120,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         </Button>
       ),
     },
-    !!limitOrderSteps?.[0].done && {
+    !limitOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
         <Button

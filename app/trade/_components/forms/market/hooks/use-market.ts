@@ -3,7 +3,6 @@
 import { Token, marketOrderSimulation } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
-import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 import { parseUnits } from "viem"
@@ -48,10 +47,6 @@ const determinePrices = (
 }
 
 export function useMarketForm(props: Props) {
-  const [estimateFrom, setEstimateFrom] = React.useState<
-    "send" | "receive" | undefined
-  >()
-
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -88,67 +83,56 @@ export function useMarketForm(props: Props) {
 
   const averagePrice = determinePrices(bs, quoteToken, book, marketPrice?.close)
 
+  const [estimateFrom, setEstimateFrom] = React.useState<
+    "send" | "receive" | undefined
+  >()
+
+  const baseAmount =
+    bs == BS.buy
+      ? parseUnits(receive, market?.base.decimals ?? 18)
+      : parseUnits(send, market?.quote.decimals ?? 18)
+
+  const quoteAmount =
+    bs == BS.buy
+      ? parseUnits(send, market?.quote.decimals ?? 18)
+      : parseUnits(receive, market?.base.decimals ?? 18)
+
   const {
-    baseAmount,
-    quoteAmount,
+    baseAmount: baseEstimation,
+    quoteAmount: quoteEstimation,
     gas,
     feePaid,
     maxTickEncountered,
     minSlippage,
     fillWants,
-    price,
   } = marketOrderSimulation({
-    book,
+    book: book as Book,
     bs,
-    base: parseUnits(send, market.base.decimals),
+    base:
+      (bs === BS.buy && estimateFrom === "receive") ||
+      (bs === BS.sell && estimateFrom === "send")
+        ? baseAmount
+        : 0n,
+    quote:
+      (bs === BS.buy && estimateFrom === "send") ||
+      (bs === BS.sell && estimateFrom === "receive")
+        ? quoteAmount
+        : 0n,
   })
 
-  const { data: estimatedVolume } = useQuery({
-    queryKey: [
-      "estimateVolume",
-      market?.base.address,
-      market?.quote.address,
-      send,
-      receive,
-      bs,
-      estimateFrom,
-    ],
-    queryFn: async () => {
-      if (!market) return
-
-      const isReceive = estimateFrom === "receive"
-
-      const given = isReceive ? send : receive
-
-      const what = isReceive
-        ? bs === BS.buy
-          ? "quote"
-          : "base"
-        : bs === BS.buy
-          ? "base"
-          : "quote"
-
-      const to = isReceive ? "sell" : "buy"
-
-      const { estimatedVolume, estimatedFee } = await market.estimateVolume({
-        given,
-        what,
-        to,
-      })
-
-      isReceive
-        ? form.setFieldValue("receive", estimatedVolume.toString())
-        : form.setFieldValue("send", estimatedVolume.toString())
-
-      form.validateAllFields("submit")
-      return { estimatedVolume, estimatedFee }
-    },
-    enabled: !!(send || receive) && !!market,
+  console.log({
+    baseAmount: baseEstimation,
+    quoteAmount: quoteEstimation,
+    gas,
+    feePaid,
+    maxTickEncountered,
+    minSlippage,
+    fillWants,
   })
 
   const hasEnoughVolume =
     (Number(receive) || Number(send)) != 0 &&
-    Number(estimatedVolume?.estimatedVolume) === 0
+    Number(baseEstimation || quoteEstimation) === 0
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

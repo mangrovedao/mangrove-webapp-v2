@@ -18,7 +18,7 @@ import amplifiedLiquiditySourcing from "./amplified-liquidity-sourcing"
 import { ChangingFrom, useNewStratStore } from "./amplified-store"
 
 import { useLogics } from "@/hooks/use-addresses"
-import { LocalConfig } from "@mangrovedao/mgv"
+import { LocalConfig, Token } from "@mangrovedao/mgv"
 import { formatUnits } from "viem"
 
 export const MIN_PRICE_POINTS = 2
@@ -85,17 +85,17 @@ export default function useAmplifiedForm() {
     handleAssetsChange(newAssets)
   }
 
-  const availableTokens = []
-  // markets?.reduce((acc, current) => {
-  //   if (!acc.includes(current.base)) {
-  //     acc.push(current.base)
-  //   }
-  //   if (!acc.includes(current.quote)) {
-  //     acc.push(current.quote)
-  //   }
+  const availableTokens =
+    markets?.reduce((acc, current) => {
+      if (!acc.includes(current.base)) {
+        acc.push(current.base)
+      }
+      if (!acc.includes(current.quote)) {
+        acc.push(current.quote)
+      }
 
-  //   return acc
-  // }, [] as Token[]) ?? []
+      return acc
+    }, [] as Token[]) ?? []
 
   const tickSize = currentMarket?.tickSpacing
     ? `${((1.0001 ** Number(currentMarket?.tickSpacing) - 1) * 100).toFixed(2)}%`

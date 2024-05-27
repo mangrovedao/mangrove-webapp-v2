@@ -7,7 +7,7 @@ export function useMarketClient() {
   const publicClient = usePublicClient()
   const addresses = useMangroveAddresses()
   const { currentMarket } = useMarket()
-  console.log("market", currentMarket)
+  // console.log("market", currentMarket)
   if (!publicClient || !addresses || !currentMarket) return undefined
   return publicClient.extend(publicMarketActions(addresses, currentMarket))
 }

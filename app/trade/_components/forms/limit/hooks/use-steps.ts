@@ -5,6 +5,7 @@ import { Address } from "viem"
 
 import { useBalances } from "@/hooks/use-balances"
 import { useMarketClient } from "@/hooks/use-market"
+import { useSpenderAddress } from "../../hooks/use-spender-address"
 
 type Props = {
   bs: BS
@@ -13,16 +14,17 @@ type Props = {
   logic?: string
 }
 
-export const useLimitSteps = ({ bs, user, userRouter, logic }: Props) => {
+export const useLimitSteps = ({ bs, user, logic }: Props) => {
   const marketClient = useMarketClient()
   const balances = useBalances()
+  const { data: userRouter } = useSpenderAddress("limit")
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["spenderAddress", bs, user, userRouter, marketClient],
+    queryKey: ["limitOrderSteps", bs, user, userRouter, marketClient?.name],
     queryFn: async () => {
       try {
-        if (!marketClient || !user || !userRouter)
+        if (!marketClient?.name || !user || !userRouter)
           throw new Error("Limit order steps missing params")
 
         const logicToken = balances.balances?.overlying.find(
@@ -42,6 +44,6 @@ export const useLimitSteps = ({ bs, user, userRouter, logic }: Props) => {
         toast.error("Error while fetching limit order steps")
       }
     },
-    enabled: !!marketClient,
+    enabled: !!marketClient?.name,
   })
 }
