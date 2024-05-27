@@ -48,7 +48,7 @@ export function useRefillOffer({ offer, onCancel }: Props) {
         if (!strategy || !strategyQuery)
           throw new Error("Could not refill offer")
 
-        const { stratInstance } = strategy
+        const { kandelInstance } = strategy
 
         const singleOfferDistributionChunk = {
           bids:
@@ -72,7 +72,7 @@ export function useRefillOffer({ offer, onCancel }: Props) {
                 ]
               : [],
         }
-
+        kandelInstance?.simulatePopulateChunk({bidGives:, askGives, firstAskIndex,  })
         const transaction = await stratInstance?.populateGeneralChunks({
           distributionChunks: [singleOfferDistributionChunk],
         })

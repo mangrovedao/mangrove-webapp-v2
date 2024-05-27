@@ -1,5 +1,4 @@
 import React from "react"
-import { Address } from "viem"
 import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
@@ -47,7 +46,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
 
   const { data: limitOrderSteps } = useLimitSteps({
     user: address,
-    userRouter: spender as Address,
     bs: form.bs,
     logic: form.sendFrom,
   })

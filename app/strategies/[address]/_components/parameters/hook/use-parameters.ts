@@ -20,8 +20,14 @@ export const useParameters = () => {
     address,
   })
 
-  const { market, offerStatuses, stratInstance } =
-    strategyStatusQuery.data ?? {}
+  const {
+    market,
+    offerStatuses,
+    kandelInstance,
+    kandelState,
+    maxPrice,
+    minPrice,
+  } = strategyStatusQuery.data ?? {}
 
   const {
     depositedBase,
@@ -36,8 +42,6 @@ export const useParameters = () => {
 
   const { pnlQuote, returnRate } =
     usePnL({ kandelAddress: strategyAddress }).data ?? {}
-
-  const { maxPrice, minPrice } = offerStatuses ?? {}
 
   const asks =
     offers
@@ -57,12 +61,9 @@ export const useParameters = () => {
         gasprice: Number(gasprice || 0),
       })) || []
 
-  const lockedBounty = stratInstance
-    ?.getLockedProvisionFromOffers({
-      asks,
-      bids,
-    })
-    .toFixed(nativeBalance?.decimals ?? 6)
+  const lockedBounty = Number(kandelState?.unlockedProvision ?? 0).toFixed(
+    nativeBalance?.decimals ?? 6,
+  )
 
   const publishedBase = getPublished(mergedOffers as MergedOffers, "asks")
   const publishedQuote = getPublished(mergedOffers as MergedOffers, "bids")
@@ -95,12 +96,12 @@ export const useParameters = () => {
     )
   }
 
-  const getUnpublishedBalances = async () => {
-    const asks = await stratInstance?.getUnpublished("asks")
-    const bids = await stratInstance?.getUnpublished("bids")
-    // TODO: fixe the negative values
-    return [asks, bids]
-  }
+  // const getUnpublishedBalances = async () => {
+  //   const asks = await stratInstance?.getUnpublished("asks")
+  //   const bids = await stratInstance?.getUnpublished("bids")
+  //   // TODO: fixe the negative values
+  //   return [asks, bids]
+  // }
 
   const publicClient = usePublicClient()
 
@@ -132,23 +133,23 @@ export const useParameters = () => {
   }
   React.useEffect(() => {
     const fetchUnpublishedBalancesAndBounty = async () => {
-      const [base, quote] = await getUnpublishedBalances()
+      // const [base, quote] = await getUnpublishedBalances()
       const [baseWithdraw, quoteWithdraw] =
         (await getWithdawableBalances()) ?? []
 
       setWithdrawableBase(
-        Number(baseWithdraw ?? 0).toFixed(market?.base.displayedDecimals),
+        Number(baseWithdraw ?? 0).toFixed(market?.base.displayDecimals),
       )
       setWithdrawableQuote(
-        Number(quoteWithdraw ?? 0).toFixed(market?.quote.displayedDecimals),
+        Number(quoteWithdraw ?? 0).toFixed(market?.quote.displayDecimals),
       )
 
-      setUnpublishedBase(
-        Number(base ?? 0).toFixed(market?.base.displayedDecimals),
-      )
-      setUnPublishedQuote(
-        Number(quote ?? 0).toFixed(market?.quote.displayedDecimals),
-      )
+      // setUnpublishedBase(
+      //   Number(base ?? 0).toFixed(market?.base.displayedDecimals),
+      // )
+      // setUnPublishedQuote(
+      //   Number(quote ?? 0).toFixed(market?.quote.displayedDecimals),
+      // )
     }
 
     fetchUnpublishedBalancesAndBounty()

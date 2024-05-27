@@ -82,7 +82,6 @@ export function useMarketForm(props: Props) {
   )
 
   const averagePrice = determinePrices(bs, quoteToken, book, marketPrice?.close)
-
   const [estimateFrom, setEstimateFrom] = React.useState<
     "send" | "receive" | undefined
   >()
@@ -118,16 +117,6 @@ export function useMarketForm(props: Props) {
       (bs === BS.sell && estimateFrom === "receive")
         ? quoteAmount
         : 0n,
-  })
-
-  console.log({
-    baseAmount: baseEstimation,
-    quoteAmount: quoteEstimation,
-    gas,
-    feePaid,
-    maxTickEncountered,
-    minSlippage,
-    fillWants,
   })
 
   const hasEnoughVolume =

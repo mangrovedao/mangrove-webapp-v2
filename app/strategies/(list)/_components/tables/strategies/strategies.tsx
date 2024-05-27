@@ -5,7 +5,7 @@ import React from "react"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import type { Strategy } from "../../../_schemas/kandels"
 import { useStrategies } from "./hooks/use-strategies"
 import { useTable } from "./hooks/use-table"
@@ -19,7 +19,7 @@ export function Strategies({ type }: Props) {
     page: 1,
     pageSize: 10,
   })
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { marketsInfoQuery } = useMangrove()
   const { data: openMarkets } = marketsInfoQuery
   const { data: count } = useStrategies({
