@@ -5,11 +5,11 @@ import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useBook } from "@/hooks/use-book"
-import { useMarketClient } from "@/hooks/use-market"
 import useMarket from "@/providers/market.new"
 import { getTokenPriceInToken } from "@/services/tokens.service"
 import { kandelActions } from "@mangrovedao/mgv"
 import { Address } from "viem"
+import { useClient } from "wagmi"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
 
@@ -23,9 +23,10 @@ export default function useStrategyStatus({
 }: Params) {
   const { kandelStrategies } = useKandel()
   const { book } = useBook()
-  const client = useMarketClient()
-
+  const client = useClient()
+  const addresses = useMangroveAddresses()
   const { currentMarket: market, markets } = useMarket()
+
   return useQuery({
     queryKey: ["strategy-status", address],
     queryFn: async () => {
@@ -39,7 +40,6 @@ export default function useStrategyStatus({
           )
         })
 
-        const addresses = useMangroveAddresses()
         if (!(kandelStrategies && market && addresses)) return null
 
         let midPrice = Big(book?.midPrice ?? 0)

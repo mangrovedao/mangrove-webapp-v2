@@ -5,9 +5,9 @@ import React from "react"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
+import { useBook } from "@/hooks/use-book"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMarket from "@/providers/market"
-import useMarketNew from "@/providers/market.new"
+import { default as useMarketNew } from "@/providers/market.new"
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
@@ -24,8 +24,10 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { requestBookQuery, midPrice, riskAppetite } = useMarket()
+  const { book, isLoading } = useBook()
   const { currentMarket: market } = useMarketNew()
+  const midPrice = book?.midPrice
+  const riskAppetite = "-"
 
   const { data: baseToken } = useTokenFromAddress(
     market?.base.address as Address,
@@ -228,12 +230,12 @@ export const PriceRange = withClientOnly(function ({
       {/* CHART */}
       <div className="px-6 space-y-6">
         <PriceRangeChart
-          bids={requestBookQuery.data?.bids}
-          asks={requestBookQuery.data?.asks}
+          bids={book?.bids}
+          asks={book?.asks}
           onPriceRangeChange={handleOnPriceRangeChange}
           priceRange={priceRange}
           initialMidPrice={midPrice}
-          isLoading={requestBookQuery.status === "pending"}
+          isLoading={isLoading}
           geometricKandelDistribution={offersWithPrices}
           baseToken={baseToken}
           quoteToken={quoteToken}

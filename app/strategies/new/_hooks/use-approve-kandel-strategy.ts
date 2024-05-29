@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { toast } from "sonner"
@@ -14,22 +14,22 @@ export function useCreateKandelStrategy({
 }: {
   setKandelAddress: (address: string) => void
 }) {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { kandelStrategies } = useKandel()
   return useMutation({
     mutationFn: async () => {
       try {
         if (!(market && kandelStrategies)) return
 
-        const { result } = await kandelStrategies.seeder.sow({
-          market,
-          type: "smart",
-          liquiditySharing: false,
-        })
+        // const { result } = await kandelStrategies.seeder.sow({
+        //   market,
+        //   type: "smart",
+        //   liquiditySharing: false,
+        // })
 
-        const kandelInstance = await result
+        // const kandelInstance = await result
 
-        setKandelAddress(kandelInstance.address)
+        // setKandelAddress(kandelInstance.address)
         toast.success("Kandel strategy instance successfully created")
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)

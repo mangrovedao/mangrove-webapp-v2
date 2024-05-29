@@ -4,8 +4,10 @@ import React from "react"
 
 import { Navbar } from "@/components/navbar"
 import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
-import { MarketProvider } from "@/providers/market"
-import { MarketProvider as NewMarketProvider } from "@/providers/market.new"
+import {
+  MarketProvider,
+  MarketProvider as NewMarketProvider,
+} from "@/providers/market.new"
 
 export const metadata: Metadata = {
   title: "Trade | Mangrove DEX",

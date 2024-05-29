@@ -47,7 +47,7 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
   const [quoteAmount, setQuoteAmount] = React.useState("")
 
   const deposit = useDeposit({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     volumes: { baseAmount, quoteAmount },
   })
 

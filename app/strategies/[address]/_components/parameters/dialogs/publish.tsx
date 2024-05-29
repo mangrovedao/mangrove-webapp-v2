@@ -55,7 +55,7 @@ export function Publish({ open, onClose }: Props) {
   const [quoteAmount, setQuoteAmount] = React.useState("")
 
   const publish = usePublish({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     mergedOffers: mergedOffers as MergedOffers,
     volumes: { baseAmount, quoteAmount },
   })

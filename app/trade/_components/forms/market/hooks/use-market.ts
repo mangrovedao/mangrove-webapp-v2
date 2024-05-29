@@ -1,6 +1,10 @@
 "use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Token, marketOrderSimulation } from "@mangrovedao/mgv"
+import {
+  MarketOrderSimulationParams,
+  Token,
+  marketOrderSimulation,
+} from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
@@ -96,6 +100,21 @@ export function useMarketForm(props: Props) {
       ? parseUnits(send, market?.quote.decimals ?? 18)
       : parseUnits(receive, market?.base.decimals ?? 18)
 
+  const isBasePay = market?.base.address === sendToken?.address
+  const payAmount = parseUnits(send, sendToken?.decimals || 18)
+
+  const params: MarketOrderSimulationParams = isBasePay
+    ? {
+        base: payAmount,
+        bs: BS.sell,
+        book: book as Book,
+      }
+    : {
+        quote: payAmount,
+        bs: BS.buy,
+        book: book as Book,
+      }
+
   const {
     baseAmount: baseEstimation,
     quoteAmount: quoteEstimation,
@@ -104,19 +123,16 @@ export function useMarketForm(props: Props) {
     maxTickEncountered,
     minSlippage,
     fillWants,
-  } = marketOrderSimulation({
-    book: book as Book,
-    bs,
-    base:
-      (bs === BS.buy && estimateFrom === "receive") ||
-      (bs === BS.sell && estimateFrom === "send")
-        ? baseAmount
-        : 0n,
-    quote:
-      (bs === BS.buy && estimateFrom === "send") ||
-      (bs === BS.sell && estimateFrom === "receive")
-        ? quoteAmount
-        : 0n,
+  } = marketOrderSimulation(params)
+
+  console.log({
+    baseAmount: baseEstimation,
+    quoteAmount: quoteEstimation,
+    gas,
+    feePaid,
+    maxTickEncountered,
+    minSlippage,
+    fillWants,
   })
 
   const hasEnoughVolume =

@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
 
@@ -22,7 +22,7 @@ type FormValues = Pick<
 }
 
 export function useEditKandelStrategy() {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { mangrove } = useMangrove()
 
   const { kandelStrategies } = useKandel()
@@ -49,28 +49,28 @@ export function useEditKandelStrategy() {
         )
           return
 
-        const kandelInstance = await kandelStrategies.instance({
-          address: kandelAddress,
-          market,
-          type: "smart",
-        })
+        // const kandelInstance = await kandelStrategies.instance({
+        //   address: kandelAddress,
+        //   market,
+        //   type: "smart",
+        // })
 
-        await kandelInstance.setLogics({
-          baseLogic: mangrove?.logics.simple,
-          quoteLogic: mangrove?.logics.simple,
-        })
+        // await kandelInstance.setLogics({
+        //   baseLogic: mangrove?.logics.simple,
+        //   quoteLogic: mangrove?.logics.simple,
+        // })
 
-        const populateTxs = await kandelInstance.populateGeometricDistribution({
-          distribution,
-          funds: bountyDeposit,
-          parameters: {
-            pricePoints: Number(numberOfOffers) + 1,
-            stepSize: Number(stepSize),
-          },
-        })
+        // const populateTxs = await kandelInstance.populateGeometricDistribution({
+        //   distribution,
+        //   funds: bountyDeposit,
+        //   parameters: {
+        //     pricePoints: Number(numberOfOffers) + 1,
+        //     stepSize: Number(stepSize),
+        //   },
+        // })
 
         toast.success("Kandel strategy successfully edited")
-        return { txs: await Promise.all(populateTxs.map((x) => x.wait())) }
+        // return { txs: await Promise.all(populateTxs.map((x) => x.wait())) }
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
@@ -80,15 +80,15 @@ export function useEditKandelStrategy() {
     },
     onSuccess: async (data) => {
       try {
-        if (!data) return
-        const { txs } = data
-        await Promise.all(
-          txs.map(async (tx) => {
-            await resolveWhenBlockIsIndexed.mutateAsync({
-              blockNumber: tx?.blockNumber,
-            })
-          }),
-        )
+        // if (!data) return
+        // const { txs } = data
+        // await Promise.all(
+        //   txs.map(async (tx) => {
+        //     await resolveWhenBlockIsIndexed.mutateAsync({
+        //       blockNumber: tx?.blockNumber,
+        //     })
+        //   }),
+        // )
         queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
         queryClient.invalidateQueries({ queryKey: ["strategy"] })
       } catch (error) {

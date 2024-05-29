@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { TransactionReceipt } from "@ethersproject/providers"
 
@@ -24,7 +24,7 @@ type Props = {
 
 export function usePostAmplifiedOrder({ onResult }: Props = {}) {
   const { mangrove, marketsInfoQuery } = useMangrove()
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [

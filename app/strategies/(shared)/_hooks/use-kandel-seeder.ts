@@ -11,7 +11,7 @@ export function useKandelSeeder() {
   const client = useMarketClient()
 
   return useQuery({
-    queryKey: ["kandelSeeder", currentMarket],
+    queryKey: ["kandel-seeder", currentMarket],
     queryFn: async () => {
       try {
         if (!currentMarket || !client) return

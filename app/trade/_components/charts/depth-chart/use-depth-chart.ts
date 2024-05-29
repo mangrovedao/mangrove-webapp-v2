@@ -1,11 +1,11 @@
 import Big from "big.js"
 import React from "react"
 
-import useMarket from "@/providers/market"
-import { clamp } from "@/utils/interpolation"
-import { calculateCumulative } from "./utils"
 import { useBook } from "@/hooks/use-book"
+import useMarket from "@/providers/market.new"
+import { clamp } from "@/utils/interpolation"
 import type { CompleteOffer } from "@mangrovedao/mgv"
+import { calculateCumulative } from "./utils"
 
 function enablePageScroll() {
   document.body.classList.remove("overflow-hidden")
@@ -36,16 +36,13 @@ function removeCrossedOrders(
 }
 
 export function useDepthChart() {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { book, isLoading } = useBook({})
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const [isScrolling, setIsScrolling] = React.useState(false)
-  const baseDecimals = market?.base.displayedDecimals
-  const priceDecimals = market?.quote.displayedAsPriceDecimals
-  const { asks, bids } = removeCrossedOrders(
-    book?.bids ?? [],
-    book?.asks ?? [],
-  )
+  const baseDecimals = market?.base.displayDecimals
+  const priceDecimals = market?.quote.priceDisplayDecimals
+  const { asks, bids } = removeCrossedOrders(book?.bids ?? [], book?.asks ?? [])
   const cumulativeAsks = calculateCumulative(asks, true)
   const cumulativeBids = calculateCumulative(bids)
   const lowestAsk = asks?.[0]
@@ -54,8 +51,7 @@ export function useDepthChart() {
   const highestAsk = asks?.[asks.length - 1]
   const midPrice = React.useMemo(() => {
     if (!bids?.length || !asks?.length) return 0
-    return ((lowestAsk?.price ?? 0)
-      + (highestBid?.price ?? 0)) / 2
+    return ((lowestAsk?.price ?? 0) + (highestBid?.price ?? 0)) / 2
   }, [asks?.length, bids?.length, highestBid?.price, lowestAsk?.price])
 
   function onMouseOut() {
@@ -73,18 +69,14 @@ export function useDepthChart() {
   }
 
   const minZoomDomain = React.useMemo(() => {
-    return ((midPrice ?? 0)
-      - (highestBid?.price ?? 0))
-      * 1.15
+    return ((midPrice ?? 0) - (highestBid?.price ?? 0)) * 1.15
   }, [highestBid?.price, midPrice])
 
   React.useEffect(() => {
     // Handle one-side orderbook
     if (!asks?.length || !bids?.length) {
       setZoomDomain(
-        !asks?.length
-          ? (highestBid?.price ?? 0)
-          : (highestAsk?.price ?? 0),
+        !asks?.length ? highestBid?.price ?? 0 : highestAsk?.price ?? 0,
       )
       return
     }
@@ -95,9 +87,7 @@ export function useDepthChart() {
       ((highestAsk?.price || 0) - midPrice) / 2,
     )
 
-    setZoomDomain(
-      newZoomDomain > midPrice ? midPrice : newZoomDomain,
-    )
+    setZoomDomain(newZoomDomain > midPrice ? midPrice : newZoomDomain)
   }, [
     asks?.length,
     bids?.length,
@@ -121,8 +111,7 @@ export function useDepthChart() {
         : ([
             clamp(
               midPrice - (zoomDomain ?? 0),
-              (lowestBid?.price ?? 0) *0.9
-                , // Subtract 10% from the lowest bid
+              (lowestBid?.price ?? 0) * 0.9, // Subtract 10% from the lowest bid
               highestBid?.price ?? 0,
             ),
             clamp(

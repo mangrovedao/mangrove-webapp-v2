@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { toast } from "sonner"
@@ -14,26 +14,26 @@ export function useApproveKandelStrategy({
 }: {
   kandelAddress?: string
 }) {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { kandelStrategies } = useKandel()
   return useMutation({
     mutationFn: async ({ baseDeposit, quoteDeposit }: FormValues) => {
       try {
         if (!(market && kandelStrategies && kandelAddress)) return
 
-        const kandelInstance = await kandelStrategies.instance({
-          address: kandelAddress,
-          market,
-          type: "smart",
-        })
+        // const kandelInstance = await kandelStrategies.instance({
+        //   address: kandelAddress,
+        //   market,
+        //   type: "smart",
+        // })
 
-        const approvalTxs = await kandelInstance.approveIfHigher(
-          Number(baseDeposit),
-          Number(quoteDeposit),
-        )
+        // const approvalTxs = await kandelInstance.approveIfHigher(
+        //   Number(baseDeposit),
+        //   Number(quoteDeposit),
+        // )
 
-        // waiting for all approvals
-        await Promise.all(approvalTxs.map((tx) => tx?.wait()))
+        // // waiting for all approvals
+        // await Promise.all(approvalTxs.map((tx) => tx?.wait()))
 
         toast.success("Kandel strategy successfully approved")
       } catch (error) {

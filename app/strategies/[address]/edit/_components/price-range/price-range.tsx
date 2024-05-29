@@ -7,9 +7,9 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMarket from "@/providers/market"
-import useMarketNew from "@/providers/market.new"
+import { default as useMarketNew } from "@/providers/market.new"
 
+import { useBook } from "@/hooks/use-book"
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
@@ -30,7 +30,9 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { requestBookQuery, midPrice, riskAppetite } = useMarket()
+  const { book, isLoading } = useBook()
+  const midPrice = book?.midPrice
+  const riskAppetite = book?.spreadPercent
   const { mergedOffers, strategyQuery } = useKandel()
   const { currentMarket: market } = useMarketNew()
 
@@ -230,7 +232,7 @@ export const PriceRange = withClientOnly(function ({
         <div className="flex justify-between items-center px-6 pb-8">
           {/* <UnrealizedPnl pnl={currentParameter.pnlQuote} /> */}
           {/* <AverageReturn /> */}
-          <RiskAppetiteBadge value={riskAppetite} />
+          <RiskAppetiteBadge value={"-"} />
           <LiquiditySource />
         </div>
       </div>
@@ -238,12 +240,12 @@ export const PriceRange = withClientOnly(function ({
       {/* CHART */}
       <div className="px-6 space-y-6">
         <PriceRangeChart
-          bids={requestBookQuery.data?.bids}
-          asks={requestBookQuery.data?.asks}
+          bids={book?.bids}
+          asks={book?.asks}
           onPriceRangeChange={handleOnPriceRangeChange}
           priceRange={priceRange}
           initialMidPrice={midPrice}
-          isLoading={requestBookQuery.status === "pending"}
+          isLoading={isLoading}
           geometricKandelDistribution={offersWithPrices}
           baseToken={baseToken}
           quoteToken={quoteToken}
@@ -336,7 +338,7 @@ export const PriceRange = withClientOnly(function ({
         </div>
         <EditStrategyDialog
           strategy={{
-            riskAppetite,
+            riskAppetite: "-",
             distribution,
             baseDeposit,
             quoteDeposit,

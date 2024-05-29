@@ -9,7 +9,7 @@ export function useKandelSteps({ seeder }: { seeder?: KandelSeederActions }) {
   const { address } = useAccount()
 
   return useQuery({
-    queryKey: ["kandelSteps", seeder],
+    queryKey: ["kandel-steps", seeder],
     queryFn: async () => {
       try {
         if (!seeder || !address) return

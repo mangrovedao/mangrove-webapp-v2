@@ -57,7 +57,7 @@ export function Withdraw({ open, onClose }: Props) {
   const [quoteAmount, setQuoteAmount] = React.useState("0")
 
   const withdraw = useWithDraw({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     volumes: { baseAmount, quoteAmount },
   })
 

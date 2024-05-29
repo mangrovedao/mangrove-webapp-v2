@@ -1,8 +1,5 @@
 "use client"
-import {
-  type GeometricKandelDistribution,
-  type Market,
-} from "@mangrovedao/mangrove.js"
+import { type GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
 import { Token } from "@mangrovedao/mgv"
 import { AxisLeft, AxisTop } from "@visx/axis"
 import { curveStep } from "@visx/curve"
@@ -24,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import { cn } from "@/utils"
+import { CompleteOffer } from "@mangrovedao/mgv"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
 import {
@@ -54,8 +52,8 @@ export type PriceRangeChartProps = {
   baseToken?: Token | null
   quoteToken?: Token | null
   initialMidPrice?: number
-  bids?: Market.Offer[]
-  asks?: Market.Offer[]
+  bids?: CompleteOffer[]
+  asks?: CompleteOffer[]
   onPriceRangeChange?: (priceRange: number[]) => void
   priceRange?: [number, number]
   viewOnly?: boolean
@@ -88,7 +86,7 @@ export function PriceRangeChart({
   const offers = [
     ...bids.map((bid) => ({ ...bid, type: "bid" })),
     ...asks.map((ask) => ({ ...ask, type: "ask" })),
-  ].sort((a, b) => a.price.toNumber() - b.price.toNumber())
+  ].sort((a, b) => a.price - b.price)
 
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
@@ -108,7 +106,7 @@ export function PriceRangeChart({
   const xLowerBound = midPrice ? midPrice * 0.7 : 0 // 30% lower than mid price
   const xUpperBound = midPrice ? midPrice * 1.3 : 6000 // 30% higher than mid price
 
-  const maxVolume = Math.max(...offers.map((offer) => offer.volume.toNumber()))
+  const maxVolume = Math.max(...offers.map((offer) => offer.volume))
 
   const [xDomain, setXDomain] = React.useState([xLowerBound, xUpperBound])
   const [dragStartPoint, setDragStartPoint] = React.useState<{
@@ -283,8 +281,8 @@ export function PriceRangeChart({
                 />
                 <AreaClosed
                   data={offers}
-                  x={(d) => xScaleTransformed(d.price.toNumber())}
-                  y={(d) => yScale(d.volume.toNumber())}
+                  x={(d) => xScaleTransformed(d.price)}
+                  y={(d) => yScale(d.volume)}
                   yScale={yScale}
                   strokeWidth={1}
                   curve={curveStep}

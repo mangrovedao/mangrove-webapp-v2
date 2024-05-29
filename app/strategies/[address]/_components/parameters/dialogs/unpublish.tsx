@@ -59,7 +59,7 @@ export function UnPublish({ open, onClose }: Props) {
   )
 
   const publish = useUnPublish({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     mergedOffers: mergedOffers as MergedOffers,
     volumes: { baseAmount, quoteAmount },
   })

@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useLoadingStore } from "@/stores/loading.store"
-import Big from "big.js"
 import { useRefillRequirements } from "../../[address]/_hooks/use-refill-requirements"
 import useKandel from "../../[address]/_providers/kandel-strategy"
 import { MergedOffer } from "../../[address]/_utils/inventory"
@@ -42,7 +41,7 @@ export function useRefillOffer({ offer, onCancel }: Props) {
      * same mutation state. This is crucial for maintaining independent states
      * for each retraction operation.
      */
-    mutationKey: ["refillOffer", offer.index],
+    mutationKey: ["refill-offer", offer.index],
     mutationFn: async () => {
       try {
         if (!strategy || !strategyQuery)
@@ -50,54 +49,62 @@ export function useRefillOffer({ offer, onCancel }: Props) {
 
         const { kandelInstance } = strategy
 
-        const singleOfferDistributionChunk = {
-          bids:
-            offer.offerType === "bids"
-              ? [
-                  {
-                    index: offer.index,
-                    tick: offer.tick,
-                    gives: Big(data?.minimumVolume || 1),
-                  },
-                ]
-              : [],
-          asks:
-            offer.offerType === "asks"
-              ? [
-                  {
-                    index: offer.index,
-                    tick: offer.tick,
-                    gives: Big(data?.minimumVolume || 1),
-                  },
-                ]
-              : [],
-        }
-        kandelInstance?.simulatePopulateChunk({bidGives:, askGives, firstAskIndex,  })
-        const transaction = await stratInstance?.populateGeneralChunks({
-          distributionChunks: [singleOfferDistributionChunk],
-        })
+        // const singleOfferDistributionChunk = {
+        //   bids:
+        //     offer.offerType === "bids"
+        //       ? [
+        //           {
+        //             index: offer.index,
+        //             tick: offer.tick,
+        //             gives: data?.minimumVolume,
+        //           },
+        //         ]
+        //       : [],
+        //   asks:
+        //     offer.offerType === "asks"
+        //       ? [
+        //           {
+        //             index: offer.index,
+        //             tick: offer.tick,
+        //             gives: data?.minimumVolume,
+        //           },
+        //         ]
+        //       : [],
+        // }
 
-        const txs = await Promise.all(transaction.map((tx) => tx?.wait()))
+        //note: to re-implement
+        // kandelInstance?.simulatePopulateChunk({
+        //   bidGives:
+        //     BigInt(singleOfferDistributionChunk.bids[0]?.gives) || BigInt(0n),
+        //   askGives:
+        //     BigInt(singleOfferDistributionChunk.asks[0]?.gives) || BigInt(0n),
+        //   firstAskIndex: BigInt(1),
+        // })
+        // const transaction = await stratInstance?.populateGeneralChunks({
+        //   distributionChunks: [singleOfferDistributionChunk],
+        // })
 
-        return { txs }
+        // const txs = await Promise.all(transaction.map((tx) => tx?.wait()))
+
+        // return { txs }
       } catch (error) {
         console.error(error)
       }
     },
     onSuccess: async (data) => {
       try {
-        if (!data) return
-        const { txs } = data
-        await Promise.all(
-          txs.map(async (tx) => {
-            await resolveWhenBlockIsIndexed.mutateAsync({
-              blockNumber: tx?.blockNumber,
-            })
-          }),
-        )
-        queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
-        queryClient.invalidateQueries({ queryKey: ["strategy"] })
-        onCancel?.()
+        // if (!data) return
+        // const { txs } = data
+        // await Promise.all(
+        //   txs.map(async (tx) => {
+        //     await resolveWhenBlockIsIndexed.mutateAsync({
+        //       blockNumber: tx?.blockNumber,
+        //     })
+        //   }),
+        // )
+        // queryClient.invalidateQueries({ queryKey: ["strategy-status"] })
+        // queryClient.invalidateQueries({ queryKey: ["strategy"] })
+        // onCancel?.()
       } catch (error) {
         console.error(error)
       }

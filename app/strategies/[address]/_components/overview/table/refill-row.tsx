@@ -1,4 +1,4 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 import { Row } from "@tanstack/react-table"
 import Big from "big.js"
 import { Info } from "lucide-react"
@@ -47,7 +47,8 @@ export default function RefillRow({
           {/* <LabelValueItem label="Amount" value={Big(0)} token={quote} /> */}
           <LabelValueItem
             label="Minimum Volume"
-            value={data?.minimumVolume}
+            // note: to re-implementi
+            // value={data?.minimumVolume}
             token={row.original.offerType === "asks" ? base : quote}
           />
           {/* <LabelValueItem label="Min quote" value={Big(0)} token={quote} /> */}
@@ -81,7 +82,7 @@ function LabelValueItem({
       <span className="text-cloud-300">{label}:</span>
       {value && token ? (
         <span className="ml-1 text-white">
-          {value.toFixed(token.displayedDecimals)} {token?.symbol}
+          {value.toFixed(token.displayDecimals)} {token?.symbol}
         </span>
       ) : (
         <Skeleton className="w-10 h-4" />

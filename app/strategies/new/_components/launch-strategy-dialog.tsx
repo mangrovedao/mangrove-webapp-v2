@@ -53,10 +53,10 @@ export default function DeployStrategyDialog({
 
   const { data: kandelSteps } = useKandelSteps({ seeder: kandelSeeder })
 
-  const [sow, deploRouter, bind, setLogics, baseApprove, quoteApprove] =
+  const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
     kandelSteps ?? ({} as KandelSteps)
 
-  console.log(sow, deploRouter, bind, setLogics, baseApprove, quoteApprove)
+  console.log(sow, deployRouter, bind, setLogics, baseApprove, quoteApprove)
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -69,8 +69,7 @@ export default function DeployStrategyDialog({
       setKandelAddress: (address) => setKandelAddress(address),
     })
 
-  const approveBaseToken = useInfiniteApproveToken()
-  const approveQuoteToken = useInfiniteApproveToken()
+  const approveToken = useInfiniteApproveToken()
   const activateSmartRouter = useActivateStrategySmartRouter(kandelAddress)
 
   const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
@@ -88,7 +87,7 @@ export default function DeployStrategyDialog({
   let steps = [
     "Summary",
     "Create strategy instance",
-    !isBound ? "Activate router" : "",
+    !deployRouter.done ? "Activate router" : "",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
@@ -146,7 +145,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !isBound && {
+    !deployRouter.done && {
       body: <ActivateRouter />,
       button: (
         <Button
@@ -173,8 +172,8 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={approveBaseToken.isPending}
-          loading={approveBaseToken.isPending}
+          disabled={approveToken.isPending}
+          loading={approveToken.isPending}
           onClick={() => {
             // approveBaseToken.mutate(
             //   {
@@ -201,8 +200,8 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={approveQuoteToken.isPending}
-          loading={approveQuoteToken.isPending}
+          disabled={approveToken.isPending}
+          loading={approveToken.isPending}
           onClick={() => {
             // approveQuoteToken.mutate(
             //   {

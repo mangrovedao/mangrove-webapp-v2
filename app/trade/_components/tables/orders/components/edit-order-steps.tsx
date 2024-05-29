@@ -9,7 +9,6 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BS } from "@mangrovedao/mgv/lib"
-import { Address } from "viem"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../../forms/components/approve-step"
 import { Steps } from "../../../forms/components/steps"
@@ -99,7 +98,6 @@ export default function EditOrderSteps({
 
   const { data: limitOrderSteps } = useLimitSteps({
     user: address,
-    userRouter: spender as Address,
     bs: BS.buy,
     logic: orderLogic?.name,
   })

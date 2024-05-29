@@ -9,7 +9,6 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BS } from "@mangrovedao/mgv/lib"
-import { Address } from "viem"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ActivateRouter } from "../../components/activate-router"
 import { ApproveStep } from "../../components/approve-step"
@@ -56,7 +55,7 @@ export default function FromWalletAmplifiedOrderDialog({
 
   const { data: limitOrderSteps } = useLimitSteps({
     user: address,
-    userRouter: spender as Address,
+
     bs: BS.buy,
     logic: form.selectedSource?.name,
   })

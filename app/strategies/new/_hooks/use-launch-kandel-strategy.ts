@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { DefaultStrategyLogics } from "../../(shared)/type"
 import { NewStratStore } from "../_stores/new-strat.store"
@@ -26,7 +26,7 @@ type FormValues = Pick<
 }
 
 export function useLaunchKandelStrategy() {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { mangrove } = useMangrove()
 
   const { kandelStrategies } = useKandel()
@@ -52,29 +52,29 @@ export function useLaunchKandelStrategy() {
 
         // if (!_quoteLogic || !_baseLogic) return
 
-        const kandelInstance = await kandelStrategies.instance({
-          address: kandelAddress,
-          market,
-          type: "smart",
-        })
+        // const kandelInstance = await kandelStrategies.instance({
+        //   address: kandelAddress,
+        //   market,
+        //   type: "smart",
+        // })
 
-        await kandelInstance.setLogics({
-          baseLogic: mangrove?.logics.simple,
-          quoteLogic: mangrove?.logics.simple,
-        })
+        // await kandelInstance.setLogics({
+        //   baseLogic: mangrove?.logics.simple,
+        //   quoteLogic: mangrove?.logics.simple,
+        // })
 
-        const populateTxs = await kandelInstance.populateGeometricDistribution({
-          distribution,
-          // depositBaseAmount: baseDeposit,
-          // depositQuoteAmount: quoteDeposit,
-          funds: bountyDeposit,
-          parameters: {
-            pricePoints: Number(numberOfOffers) + 1,
-            stepSize: Number(stepSize),
-          },
-        })
+        // const populateTxs = await kandelInstance.populateGeometricDistribution({
+        //   distribution,
+        //   // depositBaseAmount: baseDeposit,
+        //   // depositQuoteAmount: quoteDeposit,
+        //   funds: bountyDeposit,
+        //   parameters: {
+        //     pricePoints: Number(numberOfOffers) + 1,
+        //     stepSize: Number(stepSize),
+        //   },
+        // })
 
-        await Promise.all(populateTxs.map((x) => x.wait()))
+        // await Promise.all(populateTxs.map((x) => x.wait()))
         toast.success("Kandel strategy successfully launched")
         router.push("/strategies")
       } catch (error) {

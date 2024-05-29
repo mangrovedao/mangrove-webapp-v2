@@ -1,3 +1,4 @@
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
 import useKandel from "../../_providers/kandel-strategy"
@@ -6,17 +7,38 @@ import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function StratInfoBanner() {
-  const { strategyQuery, strategyStatusQuery, baseToken, quoteToken } =
-    useKandel()
+  const {
+    strategyQuery,
+    strategyStatusQuery,
+    strategyAddress,
+    baseToken,
+    quoteToken,
+  } = useKandel()
+
+  const kandelInstance = useKandelInstance({
+    address: strategyAddress,
+    base: baseToken?.address,
+    quote: quoteToken?.address,
+  })
+
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
   const { asksBalance, bidsBalance } =
     useQuery({
       queryKey: ["strategy-balance", baseToken?.address, quoteToken?.address],
       queryFn: async () => {
-        if (!strategyStatusQuery.data?.stratInstance) return
+        if (!kandelInstance) return
+
+        const kandelState = await kandelInstance.getKandelState({})
+
         const [asksBalance, bidsBalance] = await Promise.all([
-          strategyStatusQuery.data.stratInstance.getBalance("asks"),
-          strategyStatusQuery.data.stratInstance.getBalance("bids"),
+          kandelState.asks.reduce(
+            (sum, ask) => sum.plus(Number(ask.gives)),
+            Big(0),
+          ),
+          kandelState.bids.reduce(
+            (sum, bid) => sum.plus(Number(bid.gives)),
+            Big(0),
+          ),
         ])
 
         return { asksBalance, bidsBalance }

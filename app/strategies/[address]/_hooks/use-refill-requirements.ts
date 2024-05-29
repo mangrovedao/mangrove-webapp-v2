@@ -10,24 +10,25 @@ type Params = {
 
 export function useRefillRequirements({ offer }: Params) {
   const { strategyStatusQuery } = useKandel()
-  const { stratInstance, market } = strategyStatusQuery.data ?? {}
+  const { kandelInstance, market } = strategyStatusQuery.data ?? {}
   return useQuery({
     queryKey: ["refill-requirements", offer.offerId, offer.offerType],
     queryFn: async () => {
-      if (!(stratInstance && market)) return null
-      const minimumVolume = await stratInstance.getMinimumVolumeForIndex({
-        offerType: offer.offerType,
-        index: offer.index,
-        tick: offer.tick,
-      })
-      return {
-        minimumVolume,
-      }
+      if (!(kandelInstance && market)) return null
+      // note: to re-implement
+      // const minimumVolume = await kandelInstance.getMinimumVolumeForIndex({
+      //   offerType: offer.offerType,
+      //   index: offer.index,
+      //   tick: offer.tick,
+      // })
+      // return {
+      //   minimumVolume,
+      // }
     },
     meta: {
       error: "Unable to fetch re-fill requirements",
     },
-    enabled: !!(stratInstance && market && offer.offerId && offer.offerType),
+    enabled: !!(kandelInstance && market && offer.offerId && offer.offerType),
     retry: false,
   })
 }
