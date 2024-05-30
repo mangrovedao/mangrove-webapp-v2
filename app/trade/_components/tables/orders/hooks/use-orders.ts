@@ -5,9 +5,11 @@ import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
+import { hash } from "@mangrovedao/mgv"
+import { getSemibooksOLKeys } from "@mangrovedao/mgv/lib"
 import { parseOrders, type Order } from "../schema"
 
 type Params<T> = {
@@ -23,7 +25,7 @@ export function useOrders<T = Order[]>({
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
-  const { olKeys } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { indexerSdk } = useIndexerSdk()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
@@ -32,21 +34,28 @@ export function useOrders<T = Order[]>({
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [
-      "orders",
-      olKeys?.ask.token.address.toLowerCase(),
-      olKeys?.bid.token.address.toLowerCase(),
-      address,
-      first,
-      skip,
-    ],
+    queryKey: ["orders", address, first, skip],
     queryFn: async () => {
-      if (!(indexerSdk && address && olKeys)) return []
+      if (!(indexerSdk && address && market)) return []
       startLoading(TRADE.TABLES.ORDERS)
+
       try {
+        const { asksMarket, bidsMarket } = getSemibooksOLKeys(market)
         const result = await indexerSdk.getOpenLimitOrders({
-          ask: olKeys.ask,
-          bid: olKeys.bid,
+          ask: {
+            token: {
+              address: asksMarket.outbound_tkn,
+              decimals: market.base.decimals,
+            },
+            olKey: hash(asksMarket),
+          },
+          bid: {
+            token: {
+              address: bidsMarket.outbound_tkn,
+              decimals: market.quote.decimals,
+            },
+            olKey: hash(bidsMarket),
+          },
           first,
           skip,
           maker: address.toLowerCase(),
@@ -64,12 +73,7 @@ export function useOrders<T = Order[]>({
     meta: {
       error: "Unable to retrieve orders",
     },
-    enabled: !!(
-      isConnected &&
-      indexerSdk &&
-      olKeys?.bid.token.address.toLowerCase() &&
-      olKeys?.ask.token.address.toLowerCase()
-    ),
+    enabled: !!(isConnected && indexerSdk),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

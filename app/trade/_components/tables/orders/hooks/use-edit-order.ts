@@ -8,7 +8,7 @@ import Big from "big.js"
 import React from "react"
 
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { hasExpired } from "@/utils/date"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
@@ -21,7 +21,7 @@ type Props = {
 }
 
 export function useEditOrder({ order, onSubmit }: Props) {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const {
     initialGives,
     price: currentPrice,
@@ -42,8 +42,8 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const sendFrom = findLogicByAddress(outboundRoute)
   const receiveTo = findLogicByAddress(inboundRoute)
 
-  const baseDecimals = market?.base.displayedDecimals
-  const quoteDecimals = market?.quote.displayedDecimals
+  const baseDecimals = market?.base.displayDecimals
+  const quoteDecimals = market?.quote.displayDecimals
 
   const displayDecimals = isBid ? quoteDecimals : baseDecimals
 

@@ -88,6 +88,8 @@ export default function DeployStrategyDialog({
     "Summary",
     "Create strategy instance",
     !deployRouter.done ? "Activate router" : "",
+    !bind.done ? "Bind router" : "",
+    !setLogics.done ? "Set logics" : "",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
@@ -159,6 +161,42 @@ export default function DeployStrategyDialog({
           }}
         >
           Activate
+        </Button>
+      ),
+    },
+
+    !bind.done && {
+      body: <ActivateRouter />,
+      button: (
+        <Button
+          {...btnProps}
+          disabled={activateSmartRouter.isPending}
+          loading={activateSmartRouter.isPending}
+          onClick={() => {
+            activateSmartRouter.mutate(undefined, {
+              onSuccess: goToNextStep,
+            })
+          }}
+        >
+          Bind
+        </Button>
+      ),
+    },
+
+    !setLogics.done && {
+      body: <ActivateRouter />,
+      button: (
+        <Button
+          {...btnProps}
+          disabled={activateSmartRouter.isPending}
+          loading={activateSmartRouter.isPending}
+          onClick={() => {
+            activateSmartRouter.mutate(undefined, {
+              onSuccess: goToNextStep,
+            })
+          }}
+        >
+          Set sources
         </Button>
       ),
     },
@@ -245,24 +283,24 @@ export default function DeployStrategyDialog({
               numberOfOffers,
             } = strategy
 
-            launchKandelStrategy(
-              {
-                kandelAddress,
-                baseDeposit,
-                quoteDeposit,
-                distribution,
-                bountyDeposit,
-                stepSize,
-                numberOfOffers,
-                baseLogic,
-                quoteLogic,
-              },
-              {
-                onSuccess: () => {
-                  onClose()
-                },
-              },
-            )
+            // launchKandelStrategy(
+            //   {
+            //     kandelAddress,
+            //     baseDeposit,
+            //     quoteDeposit,
+            //     distribution,
+            //     bountyDeposit,
+            //     stepSize,
+            //     numberOfOffers,
+            //     baseLogic,
+            //     quoteLogic,
+            //   },
+            //   {
+            //     onSuccess: () => {
+            //       onClose()
+            //     },
+            //   },
+            // )
           }}
         >
           Proceed

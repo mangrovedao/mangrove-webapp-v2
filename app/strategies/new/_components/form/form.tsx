@@ -17,9 +17,9 @@ export function Form({ className }: { className?: string }) {
     address,
     baseToken,
     quoteToken,
-    requiredBase,
-    requiredQuote,
-    requiredBounty,
+    minBaseAmount,
+    minQuoteAmount,
+    minProvision,
     baseDeposit,
     quoteDeposit,
     fieldsDisabled,
@@ -180,11 +180,11 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={baseToken}
-            value={requiredBase?.toFixed(baseToken.decimals)}
+            value={Number(minBaseAmount)?.toFixed(baseToken.decimals)}
             action={{
               onClick: () =>
-                requiredBase &&
-                handleBaseDepositChange(requiredBase.toString()),
+                minBaseAmount &&
+                handleBaseDepositChange(minBaseAmount.toString()),
               text: "Update",
             }}
             loading={
@@ -214,11 +214,11 @@ export function Form({ className }: { className?: string }) {
 
           <MinimumRecommended
             token={quoteToken}
-            value={requiredQuote?.toFixed(quoteToken.decimals)}
+            value={Number(minQuoteAmount)?.toFixed(quoteToken.decimals)}
             action={{
               onClick: () =>
-                requiredQuote &&
-                handleQuoteDepositChange(requiredQuote.toString()),
+                minQuoteAmount &&
+                handleQuoteDepositChange(minQuoteAmount.toString()),
               text: "Update",
             }}
             loading={
@@ -280,7 +280,7 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={nativeBalance?.symbol}
-            value={requiredBounty}
+            value={minProvision.toString()}
             action={{
               onClick: handleBountyDepositChange,
               text: "Update",

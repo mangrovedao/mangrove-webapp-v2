@@ -215,24 +215,24 @@ export default function EditStrategyDialog({
               numberOfOffers,
             } = strategy
 
-            editKandelStrategy(
-              {
-                kandelAddress,
-                baseDeposit,
-                quoteDeposit,
-                distribution,
-                bountyDeposit,
-                stepSize,
-                numberOfOffers,
-              },
-              {
-                onSuccess: () => {
-                  onClose()
-                  // next/redirect doesn't work in this case...
-                  window.location.href = `/strategies/${kandelAddress}`
-                },
-              },
-            )
+            // editKandelStrategy(
+            //   {
+            //     kandelAddress,
+            //     baseDeposit,
+            //     quoteDeposit,
+            //     distribution,
+            //     bountyDeposit,
+            //     stepSize,
+            //     numberOfOffers,
+            //   },
+            //   {
+            //     onSuccess: () => {
+            //       onClose()
+            //       // next/redirect doesn't work in this case...
+            //       window.location.href = `/strategies/${kandelAddress}`
+            //     },
+            //   },
+            // )
           }}
         >
           Publish strategy
