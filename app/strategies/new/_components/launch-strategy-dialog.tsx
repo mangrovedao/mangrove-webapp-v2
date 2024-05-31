@@ -1,4 +1,4 @@
-import { KandelSteps, Token } from "@mangrovedao/mgv"
+import { Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -54,9 +54,9 @@ export default function DeployStrategyDialog({
   const { data: kandelSteps } = useKandelSteps({ seeder: kandelSeeder })
 
   const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
-    kandelSteps ?? ({} as KandelSteps)
+    kandelSteps ?? [{}]
 
-  console.log(sow, deployRouter, bind, setLogics, baseApprove, quoteApprove)
+  // console.log(sow, deployRouter, bind, setLogics, baseApprove, quoteApprove)
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -87,14 +87,14 @@ export default function DeployStrategyDialog({
   let steps = [
     "Summary",
     "Create strategy instance",
-    !deployRouter.done ? "Activate router" : "",
-    !bind.done ? "Bind router" : "",
-    !setLogics.done ? "Set logics" : "",
+    !deployRouter?.done ? "Activate router" : "",
+    !bind?.done ? "Bind router" : "",
+    !setLogics?.done ? "Set logics" : "",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
-    !baseApprove.done ? `Approve ${baseToken?.symbol}` : "",
-    !quoteApprove.done ? `Approve ${quoteToken?.symbol}` : "",
+    !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
+    !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     "Launch strategy",
   ].filter(Boolean)
 
@@ -147,7 +147,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !deployRouter.done && {
+    !deployRouter?.done && {
       body: <ActivateRouter />,
       button: (
         <Button
@@ -165,7 +165,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !bind.done && {
+    !bind?.done && {
       body: <ActivateRouter />,
       button: (
         <Button
@@ -183,7 +183,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !setLogics.done && {
+    !setLogics?.done && {
       body: <ActivateRouter />,
       button: (
         <Button
@@ -201,7 +201,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !baseApprove.done && {
+    !baseApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -229,7 +229,7 @@ export default function DeployStrategyDialog({
         </Button>
       ),
     },
-    !quoteApprove.done && {
+    !quoteApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />

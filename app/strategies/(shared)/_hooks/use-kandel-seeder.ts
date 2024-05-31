@@ -22,6 +22,7 @@ export function useKandelSeeder() {
         const seeder = kandelSeeder(
           client as Client<Transport, Chain, undefined, any, any>,
         )
+        console.log("seeder", seeder)
         return seeder
       } catch (e) {
         console.error(getErrorMessage(e))

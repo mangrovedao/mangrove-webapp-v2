@@ -8,7 +8,6 @@ import useMangrove from "@/providers/mangrove"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
-import { validateKandelParams } from "@mangrovedao/mgv"
 import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 
@@ -69,28 +68,27 @@ export default function useForm() {
     isChangingFrom,
   })
 
-  const {
-    params,
-    rawParams,
-    minBaseAmount,
-    minQuoteAmount,
-    minProvision,
-    isValid,
-  } = validateKandelParams({
-    gasreq: 250_000n,
-    factor: 3,
-    asksLocalConfig: book?.asksConfig!,
-    bidsLocalConfig: book?.bidsConfig!,
-    minPrice: Number(minPrice),
-    maxPrice: Number(maxPrice),
-    midPrice: book?.midPrice || 0,
-    marketConfig: book?.marketConfig!,
-    market: market!,
-    baseAmount: BigInt(baseDeposit),
-    quoteAmount: BigInt(quoteDeposit),
-    stepSize: BigInt(debouncedStepSize),
-    pricePoints: BigInt(debouncedNumberOfOffers),
-  })
+  // const {
+  //   rawParams,
+  //   minBaseAmount,
+  //   minQuoteAmount,
+  //   minProvision,
+  //   isValid,
+  // } = validateKandelParams({
+  //   gasreq: 250_000n,
+  //   factor: 3,
+  //   asksLocalConfig: book?.asksConfig!,
+  //   bidsLocalConfig: book?.bidsConfig!,
+  //   minPrice: Number(minPrice),
+  //   maxPrice: Number(maxPrice),
+  //   midPrice: book?.midPrice || 0,
+  //   marketConfig: book?.marketConfig!,
+  //   market: market!,
+  //   baseAmount: BigInt(baseDeposit),
+  //   quoteAmount: BigInt(quoteDeposit),
+  //   stepSize: BigInt(debouncedStepSize),
+  //   pricePoints: BigInt(debouncedNumberOfOffers),
+  // })
 
   // I need the distribution to be set in the store to share it with the price range component
   // React.useEffect(() => {
@@ -123,15 +121,18 @@ export default function useForm() {
     setGlobalError(undefined)
   }, [kandelRequirementsQuery.error])
 
-  React.useEffect(() => {
-    if (
-      isChangingFrom === "numberOfOffers" ||
-      !params.pricePoints ||
-      Number(numberOfOffers) === Number(params.pricePoints) - 1
-    )
-      return
-    setNumberOfOffers(params.pricePoints.toString())
-  }, [params.pricePoints])
+  const minBaseAmount = BigInt(0)
+  const minQuoteAmount = BigInt(0)
+  const minProvision = BigInt(0)
+  // React.useEffect(() => {
+  //   if (
+  //     isChangingFrom === "numberOfOffers" ||
+  //     !params.pricePoints ||
+  //     Number(numberOfOffers) === Number(params.pricePoints) - 1
+  //   )
+  //     return
+  //   setNumberOfOffers(params.pricePoints.toString())
+  // }, [params.pricePoints])
 
   // React.useEffect(() => {
   //   setOffersWithPrices(offersWithPrices)
@@ -273,6 +274,7 @@ export default function useForm() {
     bountyDeposit,
     minBaseAmount,
     minQuoteAmount,
+    minProvision,
   ])
 
   return {
