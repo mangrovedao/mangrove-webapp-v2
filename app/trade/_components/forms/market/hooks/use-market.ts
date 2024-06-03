@@ -9,13 +9,14 @@ import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
-import { parseUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 
 import { useBook } from "@/hooks/use-book"
 import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market.new"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { Book } from "@mangrovedao/mgv"
+import { useQuery } from "@tanstack/react-query"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
@@ -90,54 +91,63 @@ export function useMarketForm(props: Props) {
     "send" | "receive" | undefined
   >()
 
-  const baseAmount =
-    bs == BS.buy
-      ? parseUnits(receive, market?.base.decimals ?? 18)
-      : parseUnits(send, market?.quote.decimals ?? 18)
+  const { data } = useQuery({
+    queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
+    queryFn: () => {
+      const baseAmount =
+        bs == BS.buy
+          ? parseUnits(receive, market?.base.decimals ?? 18)
+          : parseUnits(send, market?.quote.decimals ?? 18)
 
-  const quoteAmount =
-    bs == BS.buy
-      ? parseUnits(send, market?.quote.decimals ?? 18)
-      : parseUnits(receive, market?.base.decimals ?? 18)
+      const quoteAmount =
+        bs == BS.buy
+          ? parseUnits(send, market?.quote.decimals ?? 18)
+          : parseUnits(receive, market?.base.decimals ?? 18)
 
-  const isBasePay = market?.base.address === sendToken?.address
-  const payAmount = parseUnits(send, sendToken?.decimals || 18)
+      const isBasePay = market?.base.address === sendToken?.address
 
-  const params: MarketOrderSimulationParams = isBasePay
-    ? {
-        base: payAmount,
-        bs: BS.sell,
-        book: book as Book,
-      }
-    : {
-        quote: payAmount,
-        bs: BS.buy,
-        book: book as Book,
-      }
+      const params: MarketOrderSimulationParams = isBasePay
+        ? {
+            base: baseAmount,
+            bs: BS.sell,
+            book: book as Book,
+          }
+        : {
+            quote: quoteAmount,
+            bs: BS.buy,
+            book: book as Book,
+          }
 
-  const {
-    baseAmount: baseEstimation,
-    quoteAmount: quoteEstimation,
-    gas,
-    feePaid,
-    maxTickEncountered,
-    minSlippage,
-    fillWants,
-  } = marketOrderSimulation(params)
+      const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
+        marketOrderSimulation(params)
 
-  console.log({
-    baseAmount: baseEstimation,
-    quoteAmount: quoteEstimation,
-    gas,
-    feePaid,
-    maxTickEncountered,
-    minSlippage,
-    fillWants,
+      const formattedBaseEstimation = formatUnits(
+        baseEstimation,
+        market?.base.decimals ?? 18,
+      )
+      const formattedQuoteEstimation = formatUnits(
+        quoteEstimation,
+        market?.quote.decimals ?? 18,
+      )
+
+      const estimatedReceive =
+        bs === BS.buy ? formattedBaseEstimation : formattedQuoteEstimation
+      const estimatedSend =
+        bs === BS.buy ? formattedQuoteEstimation : formattedBaseEstimation
+
+      estimateFrom === "receive"
+        ? form.setFieldValue("send", estimatedSend)
+        : form.setFieldValue("receive", estimatedReceive)
+
+      form.validateAllFields("submit")
+
+      return { baseEstimation, quoteEstimation }
+    },
   })
 
   const hasEnoughVolume =
     (Number(receive) || Number(send)) != 0 &&
-    Number(baseEstimation || quoteEstimation) === 0
+    Number(data?.baseEstimation || data?.quoteEstimation) === 0
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -146,11 +156,11 @@ export function useMarketForm(props: Props) {
   }
 
   const computeReceiveAmount = React.useCallback(() => {
-    setEstimateFrom("receive")
+    setEstimateFrom("send")
   }, [])
 
   const computeSendAmount = React.useCallback(() => {
-    setEstimateFrom("send")
+    setEstimateFrom("receive")
   }, [])
 
   React.useEffect(() => {

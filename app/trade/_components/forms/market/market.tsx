@@ -121,7 +121,7 @@ export function Market() {
                       field.handleChange(
                         formatUnits(
                           sendTokenBalance.balance?.balance || 0n,
-                          8,
+                          sendToken?.decimals ?? 18,
                         ) || "0",
                       ),
                         computeReceiveAmount()
@@ -131,8 +131,10 @@ export function Market() {
                   label="Send amount"
                   disabled={
                     !market ||
-                    formatUnits(sendTokenBalance.balance?.balance || 0n, 8) ===
-                      "0"
+                    formatUnits(
+                      sendTokenBalance.balance?.balance ?? 0n,
+                      sendToken?.decimals ?? 18,
+                    ) === "0"
                   }
                   showBalance
                   error={
