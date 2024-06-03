@@ -94,6 +94,7 @@ export function useMarketForm(props: Props) {
   const { data } = useQuery({
     queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
     queryFn: () => {
+      if (!book) return null
       const baseAmount =
         bs == BS.buy
           ? parseUnits(receive, market?.base.decimals ?? 18)
@@ -106,17 +107,41 @@ export function useMarketForm(props: Props) {
 
       const isBasePay = market?.base.address === sendToken?.address
 
-      const params: MarketOrderSimulationParams = isBasePay
-        ? {
-            base: baseAmount,
-            bs: BS.sell,
-            book: book as Book,
-          }
-        : {
-            quote: quoteAmount,
-            bs: BS.buy,
-            book: book as Book,
-          }
+      const params: MarketOrderSimulationParams =
+        estimateFrom === "send"
+          ? isBasePay
+            ? {
+                base: baseAmount,
+                bs: BS.sell,
+                book,
+              }
+            : {
+                quote: quoteAmount,
+                bs: BS.buy,
+                book,
+              }
+          : isBasePay
+            ? {
+                quote: quoteAmount,
+                bs: BS.buy,
+                book,
+              }
+            : {
+                base: baseAmount,
+                bs: BS.buy,
+                book,
+              }
+      // const params: MarketOrderSimulationParams = isBasePay
+      //   ? {
+      //       base: baseAmount,
+      //       bs: BS.sell,
+      //       book: book as Book,
+      //     }
+      //   : {
+      //       quote: quoteAmount,
+      //       bs: BS.buy,
+      //       book: book as Book,
+      //     }
 
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
