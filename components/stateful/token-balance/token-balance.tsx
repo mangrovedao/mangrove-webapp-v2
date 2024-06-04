@@ -44,7 +44,8 @@ export function TokenBalance(props: {
                 }}
               >
                 <span title={formatted?.toString()}>
-                  {formatted} {token?.symbol}
+                  {Number(formatted).toFixed(token?.displayDecimals)}{" "}
+                  {token?.symbol}
                 </span>
               </TooltipTrigger>
 
@@ -55,8 +56,7 @@ export function TokenBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {Number(formatted).toFixed(token?.displayDecimals)}{" "}
-                  {token?.symbol}
+                  {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>

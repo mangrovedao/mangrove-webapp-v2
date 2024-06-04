@@ -1,7 +1,7 @@
 import { marketOrderResultFromLogs } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { TransactionReceipt, parseEther } from "viem"
-import { usePublicClient, useWalletClient } from "wagmi"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
@@ -20,6 +20,7 @@ type Props = {
 
 export function usePostMarketOrder({ onResult }: Props = {}) {
   const { currentMarket: market } = useMarket()
+  const { address } = useAccount()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -40,19 +41,24 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           !walletClient ||
           !addresses ||
           !market ||
-          !marketClient
+          !marketClient ||
+          !address
         )
           throw new Error("Market order post is missing params")
 
         const { base } = market
         const { bs, send: gives, receive: wants, slippage } = form
 
-        const { takerGot, takerGave, bounty, feePaid, request } =
+        const baseAmount = bs === "buy" ? parseEther(wants) : parseEther(gives)
+        const quoteAmount = bs === "buy" ? parseEther(gives) : parseEther(wants)
+        const { request } =
           await marketClient.simulateMarketOrderByVolumeAndMarket({
-            baseAmount: parseEther(gives),
-            quoteAmount: parseEther(wants),
+            baseAmount,
+            quoteAmount,
             bs,
             slippage,
+            gas: 20_000_000n,
+            account: address,
           })
 
         const hash = await walletClient.writeContract(request)
@@ -97,6 +103,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["balances"] })
       } catch (error) {
         console.error(error)
       }

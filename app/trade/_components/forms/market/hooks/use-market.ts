@@ -131,17 +131,6 @@ export function useMarketForm(props: Props) {
                 bs: BS.buy,
                 book,
               }
-      // const params: MarketOrderSimulationParams = isBasePay
-      //   ? {
-      //       base: baseAmount,
-      //       bs: BS.sell,
-      //       book: book as Book,
-      //     }
-      //   : {
-      //       quote: quoteAmount,
-      //       bs: BS.buy,
-      //       book: book as Book,
-      //     }
 
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
