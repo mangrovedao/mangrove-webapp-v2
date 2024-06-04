@@ -50,7 +50,7 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
 
         return steps
       } catch (error) {
-        console.log(error)
+        console.error(error)
         toast.error("Error while fetching limit order steps")
       }
     },

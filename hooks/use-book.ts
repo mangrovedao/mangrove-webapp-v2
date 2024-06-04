@@ -9,6 +9,7 @@ export type UseBookParams = BookParams & {}
 export function useBook(params?: UseBookParams) {
   const client = useMarketClient()
   const { currentMarket } = useMarket()
+
   const { data, isLoading, isError } = useQuery({
     queryKey: [
       "book",
@@ -18,9 +19,10 @@ export function useBook(params?: UseBookParams) {
       currentMarket?.quote,
     ],
     queryFn: async () => {
-      if (!client) return undefined
+      if (!client) return null
       return client.getBook(params || {})
     },
+    enabled: !!client,
     refetchInterval: 3000,
   })
   return {

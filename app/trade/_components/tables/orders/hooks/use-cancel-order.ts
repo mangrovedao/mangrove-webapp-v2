@@ -58,7 +58,7 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
 
         return receipt
       } catch (error) {
-        console.log(error)
+        console.error(error)
         toast.error(`Failed to retract the order ${offerId ?? ""}`)
       }
     },

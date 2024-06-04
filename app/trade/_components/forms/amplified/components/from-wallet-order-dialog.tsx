@@ -81,7 +81,7 @@ export default function FromWalletAmplifiedOrderDialog({
 
   const approve = useInfiniteApproveToken()
   const activate = useActivateSmartContract()
-  const deploy = useDeploySmartRouter()
+  const deploy = useDeploySmartRouter({})
   const post = usePostAmplifiedOrder({
     onResult: (result) => {
       /*

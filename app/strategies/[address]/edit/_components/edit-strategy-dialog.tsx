@@ -2,7 +2,6 @@ import { Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
-import { useKandelSeeder } from "@/app/strategies/(shared)/_hooks/use-kandel-seeder"
 import { useKandelSteps } from "@/app/strategies/(shared)/_hooks/use-kandel-steps"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
@@ -71,8 +70,8 @@ export default function EditStrategyDialog({
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
 
   const { data: spender } = useSpenderAddress("kandel")
-  const { data: kandelSeeder } = useKandelSeeder()
-  const { data: kandelSteps } = useKandelSteps({ seeder: kandelSeeder })
+  // const { data: kandelSeeder } = useKandelSeeder()
+  const { data: kandelSteps } = useKandelSteps()
 
   let steps = [
     "Summary",
