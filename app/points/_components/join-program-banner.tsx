@@ -17,8 +17,7 @@ export function JoinProgramBanner() {
           <Title variant={"header1"}>Join MS1 Points Program!</Title>
           <Title className="text-green-bangladesh" variant={"title3"}>
             Start trading now on Mangrove in order to accumulate boosts and
-            points. You can trade by using market orders, limit orders,
-            amplified orders and more to come.
+            points. You can trade by using market orders and limit orders
           </Title>
 
           <div className="space-x-2">

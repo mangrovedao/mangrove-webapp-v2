@@ -16,13 +16,13 @@ import { Market } from "./market/market"
 enum FormType {
   LIMIT = "Limit",
   MARKET = "Market",
-  AMPLIFIED = "Amplified",
+  // AMPLIFIED = "Amplified",
 }
 
 const TABS_CONTENT = {
   [FormType.LIMIT]: Limit,
   [FormType.MARKET]: Market,
-  [FormType.AMPLIFIED]: Amplified,
+  // [FormType.AMPLIFIED]: Amplified,
 }
 
 export function Forms({
