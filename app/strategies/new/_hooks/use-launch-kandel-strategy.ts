@@ -48,6 +48,31 @@ export function useLaunchKandelStrategy() {
         if (!(market && kandelStrategies && distribution && mangrove))
           throw new Error("Failed to create strategy")
 
+        // const _baseLogic = mangrove?.getLogicByAddress(baseLogic.address)
+        // const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic.address)
+
+        // if (!_quoteLogic || !_baseLogic)
+        //   throw new Error("Could not fetch liquidity source")
+
+        // const gasreq = Math.max(_baseLogic.gasOverhead, _quoteLogic.gasOverhead) + 100_000;
+
+        let gasreq = 350_000
+
+        if (baseLogic || quoteLogic) {
+          const _baseLogic = baseLogic
+            ? mangrove?.getLogicByAddress(baseLogic.address)
+            : undefined
+          const _quoteLogic = quoteLogic
+            ? mangrove?.getLogicByAddress(quoteLogic.address)
+            : undefined
+          gasreq =
+            Math.max(
+              _baseLogic?.gasOverhead || 0,
+              _quoteLogic?.gasOverhead || 0,
+              250_000,
+            ) + 100_000
+        }
+
         const kandelInstance = await kandelStrategies.instance({
           address: kandelAddress,
           market,
@@ -60,6 +85,7 @@ export function useLaunchKandelStrategy() {
           parameters: {
             pricePoints: Number(numberOfOffers) + 1,
             stepSize: Number(stepSize),
+            gasreq,
           },
         })
 
