@@ -2,6 +2,7 @@ import { Logic, Token } from "@mangrovedao/mgv"
 import { useMutation } from "@tanstack/react-query"
 import { Address, erc20Abi, maxUint256 } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+
 import { useBalances } from "./use-balances"
 
 export function useInfiniteApproveToken() {

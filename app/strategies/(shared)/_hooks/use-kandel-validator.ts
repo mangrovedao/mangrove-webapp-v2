@@ -21,27 +21,14 @@ export function useValidateKandel(
       "kandel-seeder",
       kandelParams.maxPrice,
       kandelParams.minPrice,
+      Number(kandelParams.pricePoints),
+      Number(kandelParams.stepSize),
       book?.midPrice,
     ],
     queryFn: async () => {
       try {
         if (!book || !currentMarket)
           throw new Error("Could not validate kandel, missing params")
-        console.log({
-          gasreq: kandelParams.gasreq,
-          factor: kandelParams.factor,
-          asksLocalConfig: book.asksConfig,
-          bidsLocalConfig: book.bidsConfig,
-          minPrice: Number(kandelParams.minPrice),
-          maxPrice: Number(kandelParams.maxPrice),
-          midPrice: book.midPrice,
-          marketConfig: book.marketConfig,
-          market: currentMarket,
-          baseAmount: kandelParams.baseAmount,
-          quoteAmount: kandelParams.quoteAmount,
-          stepSize: kandelParams.stepSize,
-          pricePoints: kandelParams.pricePoints,
-        })
 
         const {
           params,
@@ -66,7 +53,42 @@ export function useValidateKandel(
           stepSize: kandelParams.stepSize,
           pricePoints: kandelParams.pricePoints,
         })
-        
+
+        // BigInt.prototype.toJSON = function () {
+        //   return this.toString()
+        // }
+
+        // console.log(
+        //   "response",
+        //   JSON.stringify({
+        //     params,
+        //     rawParams,
+        //     minBaseAmount,
+        //     minQuoteAmount,
+        //     minProvision,
+        //     distribution,
+        //     isValid,
+        //   }),
+        // )
+        // console.log(
+        //   "sent params",
+        //   JSON.stringify({
+        //     gasreq: kandelParams.gasreq,
+        //     factor: kandelParams.factor,
+        //     asksLocalConfig: book.asksConfig,
+        //     bidsLocalConfig: book.bidsConfig,
+        //     minPrice: Number(kandelParams.minPrice),
+        //     maxPrice: Number(kandelParams.maxPrice),
+        //     midPrice: book.midPrice,
+        //     marketConfig: book.marketConfig,
+        //     market: currentMarket,
+        //     baseAmount: kandelParams.baseAmount,
+        //     quoteAmount: kandelParams.quoteAmount,
+        //     stepSize: kandelParams.stepSize,
+        //     pricePoints: kandelParams.pricePoints,
+        //   }),
+        // )
+
         return {
           params,
           rawParams,

@@ -8,6 +8,9 @@ import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { Address } from "viem"
+import { useAccount } from "wagmi"
+import useKandelInstance from "../../(shared)/_hooks/use-kandel-instance"
 import { DefaultStrategyLogics } from "../../(shared)/type"
 import { NewStratStore } from "../_stores/new-strat.store"
 
@@ -25,12 +28,20 @@ type FormValues = Pick<
   quoteLogic: DefaultStrategyLogics
 }
 
-export function useLaunchKandelStrategy() {
+export function useLaunchKandelStrategy(kandelAddress: string) {
+  const { address } = useAccount()
+
   const { currentMarket: market } = useMarket()
   const { mangrove } = useMangrove()
 
   const { kandelStrategies } = useKandel()
   const router = useRouter()
+
+  const kandelClient = useKandelInstance({
+    address: kandelAddress,
+    base: market?.base.address,
+    quote: market?.quote.address,
+  })
 
   return useMutation({
     mutationFn: async ({
@@ -45,7 +56,30 @@ export function useLaunchKandelStrategy() {
       quoteLogic,
     }: FormValues) => {
       try {
-        if (!(market && kandelStrategies && distribution && mangrove)) return
+        if (
+          !(
+            market &&
+            kandelStrategies &&
+            distribution &&
+            mangrove &&
+            kandelClient
+          )
+        )
+          return
+
+        const { request } = await kandelClient.simulatePopulate({
+          baseQuoteTickIndex0: BigInt(distribution.baseQuoteTickIndex0),
+          baseQuoteTickOffset: BigInt(distribution.baseQuoteTickOffset),
+          firstAskIndex: BigInt(distribution.firstAskIndex),
+          bidGives: BigInt(distribution?.bidGives?.toString() || 0n),
+          askGives: BigInt(distribution.askGives?.toString() || 0n),
+          baseAmount: BigInt(baseDeposit),
+          quoteAmount: BigInt(quoteDeposit),
+          stepSize: BigInt(stepSize),
+          pricePoints: BigInt(numberOfOffers),
+          gasreq: 222n,
+          account: address as Address,
+        })
 
         // const _baseLogic = mangrove?.getLogicByAddress(baseLogic.address)
         // const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic.address)
