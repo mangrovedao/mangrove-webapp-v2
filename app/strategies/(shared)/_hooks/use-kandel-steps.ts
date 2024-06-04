@@ -1,18 +1,33 @@
-import { KandelSeederActions } from "@mangrovedao/mgv"
+import { kandelSeederActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
+import { useSmartKandel } from "@/hooks/use-addresses"
+import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
 import { Address } from "viem"
-import { useAccount } from "wagmi"
+import { useAccount, useClient } from "wagmi"
 
-export function useKandelSteps({ seeder }: { seeder?: KandelSeederActions }) {
+export function useKandelSteps() {
   const { address } = useAccount()
+  const { currentMarket } = useMarket()
+  const client = useClient()
+  const smartKandel = useSmartKandel()
 
   return useQuery({
-    queryKey: ["kandel-steps", seeder],
+    queryKey: ["kandel-steps", client?.account],
     queryFn: async () => {
       try {
-        if (!seeder || !address) return
+        if (
+          !smartKandel ||
+          !address ||
+          !client?.account ||
+          !currentMarket?.tickSpacing
+        )
+          return
+
+        const kandelSeeder = kandelSeederActions(currentMarket, smartKandel)
+        const seeder = kandelSeeder(client)
+
         const currentSteps = await seeder.getKandelSteps({
           user: address as Address,
           userRouter: address as Address,
@@ -23,7 +38,7 @@ export function useKandelSteps({ seeder }: { seeder?: KandelSeederActions }) {
         throw new Error("Unable to retrieve kandel steps")
       }
     },
-    enabled: !!seeder,
+    enabled: !!client?.account,
     meta: {
       error: "Unable to retrieve kandel steps",
     },

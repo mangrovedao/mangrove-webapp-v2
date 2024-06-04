@@ -3,20 +3,22 @@ import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
 
 import { useTokenBalance } from "@/hooks/use-token-balance"
-import useMangrove from "@/providers/mangrove"
 
-import { useBook } from "@/hooks/use-book"
+import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-validator"
+import { useLogics } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
-import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
+import { Logic } from "@mangrovedao/mgv"
+import { formatUnits } from "viem"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
+import { getKandelGasReq } from "@mangrovedao/mgv/lib"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const { address } = useAccount()
-  const { mangrove } = useMangrove()
+  const logics = useLogics()
   const { currentMarket: market } = useMarket()
   const baseToken = market?.base
   const quoteToken = market?.quote
@@ -26,10 +28,6 @@ export default function useForm() {
   const { data: nativeBalance } = useBalance({
     address,
   })
-
-  const { book } = useBook()
-
-  const mangroveLogics = mangrove ? Object.values(mangrove.logics) : []
 
   const {
     priceRange: [minPrice, maxPrice],
@@ -57,51 +55,44 @@ export default function useForm() {
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
   const fieldsDisabled = !(minPrice && maxPrice)
+  const baseLogic = logics.find((logic) => logic.name === sendFrom)
+  const quoteLogic = logics.find((logic) => logic.name === receiveTo)
 
-  const kandelRequirementsQuery = useKandelRequirements({
-    minPrice,
-    maxPrice,
-    availableBase: baseDeposit,
-    availableQuote: quoteDeposit,
-    stepSize: debouncedStepSize,
-    numberOfOffers: debouncedNumberOfOffers,
-    isChangingFrom,
+  const gasreq = getKandelGasReq({
+    baseLogic: baseLogic as Logic,
+    quoteLogic: quoteLogic as Logic,
   })
 
-  // const {
-  //   rawParams,
-  //   minBaseAmount,
-  //   minQuoteAmount,
-  //   minProvision,
-  //   isValid,
-  // } = validateKandelParams({
-  //   gasreq: 250_000n,
-  //   factor: 3,
-  //   asksLocalConfig: book?.asksConfig!,
-  //   bidsLocalConfig: book?.bidsConfig!,
-  //   minPrice: Number(minPrice),
-  //   maxPrice: Number(maxPrice),
-  //   midPrice: book?.midPrice || 0,
-  //   marketConfig: book?.marketConfig!,
-  //   market: market!,
-  //   baseAmount: BigInt(baseDeposit),
-  //   quoteAmount: BigInt(quoteDeposit),
-  //   stepSize: BigInt(debouncedStepSize),
-  //   pricePoints: BigInt(debouncedNumberOfOffers),
-  // })
+  const { data } = useValidateKandel({
+    gasreq,
+    factor: 3,
+    minPrice: Number(minPrice),
+    maxPrice: Number(maxPrice),
+    baseAmount: BigInt(baseDeposit.replace(".", "")),
+    quoteAmount: BigInt(quoteDeposit.replace(".", "")),
+    stepSize: BigInt(debouncedStepSize),
+    pricePoints: BigInt(debouncedNumberOfOffers),
+  })
+
+  const {
+    params,
+    rawParams,
+    minBaseAmount,
+    minQuoteAmount,
+    minProvision,
+    distribution,
+    isValid,
+  } = data ?? {}
+
+  const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
+  const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
+  const minProv = formatUnits(minProvision || 0n, quoteToken?.decimals || 18)
+
 
   // I need the distribution to be set in the store to share it with the price range component
-  // React.useEffect(() => {
-  //   setDistribution(distribution)
-  // }, [distribution])
-
   React.useEffect(() => {
-    kandelRequirementsQuery.refetch()
-  }, [baseDeposit, quoteDeposit])
-
-  const setOffersWithPrices = useNewStratStore(
-    (store) => store.setOffersWithPrices,
-  )
+    setDistribution(distribution)
+  }, [distribution])
 
   React.useEffect(() => {
     setBaseDeposit("")
@@ -114,26 +105,26 @@ export default function useForm() {
 
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (kandelRequirementsQuery.error) {
-      setGlobalError(getErrorMessage(kandelRequirementsQuery.error))
+    if (isValid) {
+      setGlobalError(getErrorMessage(isValid))
       return
     }
     setGlobalError(undefined)
-  }, [kandelRequirementsQuery.error])
+  }, [isValid])
 
-  const minBaseAmount = BigInt(0)
-  const minQuoteAmount = BigInt(0)
-  const minProvision = BigInt(0)
-  // React.useEffect(() => {
-  //   if (
-  //     isChangingFrom === "numberOfOffers" ||
-  //     !params.pricePoints ||
-  //     Number(numberOfOffers) === Number(params.pricePoints) - 1
-  //   )
-  //     return
-  //   setNumberOfOffers(params.pricePoints.toString())
-  // }, [params.pricePoints])
+  React.useEffect(() => {
+    if (
+      isChangingFrom === "numberOfOffers" ||
+      !params?.pricePoints ||
+      Number(numberOfOffers) === Number(params.pricePoints) - 1
+    )
+      return
+    setNumberOfOffers(params.pricePoints.toString())
+  }, [params?.pricePoints])
 
+  const setOffersWithPrices = useNewStratStore(
+    (store) => store.setOffersWithPrices,
+  )
   // React.useEffect(() => {
   //   setOffersWithPrices(offersWithPrices)
   // }, [offersWithPrices])
@@ -205,11 +196,15 @@ export default function useForm() {
     if (Number(baseDeposit) > Number(baseBalance.formatted) && baseDeposit) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
-    } else if (minBaseAmount > 0 && Number(baseDeposit) === 0) {
+    } else if (
+      
+      Number(minBase) > 0 &&
+      Number(baseDeposit) === 0
+    ) {
       newErrors.baseDeposit = "Base deposit must be greater than 0"
     } else if (
-      minBaseAmount > 0 &&
-      Number(minBaseAmount) > Number(baseDeposit)
+      Number(minBase) > 0 &&
+      Number(minBase) > Number(baseDeposit)
     ) {
       newErrors.baseDeposit = "Base deposit must be updated"
     } else {
@@ -220,11 +215,16 @@ export default function useForm() {
     if (Number(quoteDeposit) > Number(quoteBalance.formatted) && quoteDeposit) {
       newErrors.quoteDeposit =
         "Quote deposit cannot be greater than wallet balance"
-    } else if (minQuoteAmount > 0 && Number(quoteDeposit) === 0) {
+    } else if (
+      minQuote &&
+      Number(minQuote) > 0 &&
+      Number(quoteDeposit) === 0
+    ) {
       newErrors.quoteDeposit = "Quote deposit must be greater than 0"
     } else if (
-      minQuoteAmount > 0 &&
-      Number(minQuoteAmount) > Number(quoteDeposit)
+      minQuote &&
+      Number(minQuote) > 0 &&
+      Number(minQuote) > Number(quoteDeposit)
     ) {
       newErrors.quoteDeposit = "Quote deposit must updated"
     } else {
@@ -254,11 +254,16 @@ export default function useForm() {
     if (Number(bountyDeposit) > Number(nativeBalance?.value) && bountyDeposit) {
       newErrors.bountyDeposit =
         "Bounty deposit cannot be greater than wallet balance"
-    } else if (minProvision > 0 && Number(bountyDeposit) === 0) {
+    } else if (
+      minProv &&
+      Number(minProv) > 0 &&
+      Number(bountyDeposit) === 0
+    ) {
       newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
     } else if (
-      minProvision > 0 &&
-      Number(minProvision) > Number(bountyDeposit)
+      minProv &&
+      Number(minProv) > 0 &&
+      Number(minProv) > Number(bountyDeposit)
     ) {
       newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
     } else {
@@ -281,9 +286,9 @@ export default function useForm() {
     address,
     baseToken,
     quoteToken,
-    minBaseAmount,
-    minQuoteAmount,
-    minProvision,
+    minBaseAmount: minBase,
+    minQuoteAmount: minQuote,
+    minProvision: minProv,
     isChangingFrom,
     numberOfOffers,
     baseDeposit,
@@ -291,12 +296,12 @@ export default function useForm() {
     nativeBalance,
     bountyDeposit,
     fieldsDisabled,
+    isValid,
     errors,
-    kandelRequirementsQuery,
     stepSize,
     sendFrom,
     receiveTo,
-    mangroveLogics,
+    logics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,

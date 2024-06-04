@@ -10,12 +10,11 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
-import { useKandelSeeder } from "../../(shared)/_hooks/use-kandel-seeder"
 import { useKandelSteps } from "../../(shared)/_hooks/use-kandel-steps"
 import { useStrategySmartRouter } from "../../(shared)/_hooks/use-smart-router"
 import { useCreateKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
@@ -47,11 +46,9 @@ export default function DeployStrategyDialog({
 }: Props) {
   const { address } = useAccount()
   const { currentMarket } = useMarket()
-  const { mangrove } = useMangrove()
   const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
-  const { data: kandelSeeder } = useKandelSeeder()
-
-  const { data: kandelSteps } = useKandelSteps({ seeder: kandelSeeder })
+  const { data: kandelSteps } = useKandelSteps()
+  const logics = useLogics()
 
   const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
     kandelSteps ?? [{}]
@@ -75,13 +72,10 @@ export default function DeployStrategyDialog({
   const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
     useLaunchKandelStrategy()
 
-  const logics = mangrove ? Object.values(mangrove.logics) : []
-
-  const baseLogic = logics.find((logic) => logic?.id === strategy?.sendFrom)
-  const quoteLogic = logics.find((logic) => logic?.id === strategy?.receiveTo)
+  const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
+  const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
 
   const { data: spender } = useSpenderAddress("kandel")
-
   const { isBound } = useStrategySmartRouter({ kandelAddress }).data ?? {}
 
   let steps = [

@@ -2,6 +2,7 @@ import {
   blastLogics,
   blastMangrove,
   blastMarkets,
+  blastSmartKandel,
   blastTokens,
 } from "@mangrovedao/mgv/addresses"
 import { blast } from "viem/chains"
@@ -12,6 +13,16 @@ export function useMangroveAddresses() {
   switch (chain) {
     case blast.id:
       return blastMangrove
+    default:
+      return undefined
+  }
+}
+
+export function useSmartKandel() {
+  const chain = useChainId()
+  switch (chain) {
+    case blast.id:
+      return blastSmartKandel
     default:
       return undefined
   }

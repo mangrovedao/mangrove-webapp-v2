@@ -1,5 +1,5 @@
 import { GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
-import { KandelParams } from "@mangrovedao/mgv"
+import { Distribution } from "@mangrovedao/mgv"
 import { create, type StateCreator } from "zustand"
 
 type OffersWithPrices = ReturnType<
@@ -39,7 +39,7 @@ export type NewStratStore = {
   globalError?: string
   errors: Record<string, string>
 
-  distribution?: KandelParams
+  distribution?: Distribution
 }
 
 type NewStratActions = {
@@ -58,7 +58,7 @@ type NewStratActions = {
   setErrors: (errors: Record<string, string>) => void
   setIsChangingFrom: (isChangingFrom: ChangingFrom) => void
 
-  setDistribution: (distribution?: KandelParams) => void
+  setDistribution: (distribution?: Distribution) => void
 }
 
 const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (

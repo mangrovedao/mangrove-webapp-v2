@@ -24,7 +24,7 @@ export function Form({ className }: { className?: string }) {
     quoteDeposit,
     fieldsDisabled,
     errors,
-    kandelRequirementsQuery,
+    isValid,
     isChangingFrom,
     numberOfOffers,
     stepSize,
@@ -32,7 +32,7 @@ export function Form({ className }: { className?: string }) {
     bountyDeposit,
     sendFrom,
     receiveTo,
-    mangroveLogics,
+    logics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,
@@ -93,7 +93,7 @@ export function Form({ className }: { className?: string }) {
                 handleSendFromChange(value)
               }}
               disabled={
-                kandelRequirementsQuery.status !== "success" || fieldsDisabled
+                isValid || fieldsDisabled
               }
             >
               <SelectTrigger>
@@ -136,7 +136,7 @@ export function Form({ className }: { className?: string }) {
                 handleReceiveToChange(value)
               }}
               disabled={
-                kandelRequirementsQuery.status !== "success" || fieldsDisabled
+                isValid || fieldsDisabled
               }
             >
               <SelectTrigger>
@@ -180,16 +180,14 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={baseToken}
-            value={Number(minBaseAmount)?.toFixed(baseToken.decimals)}
+            value={Number(minBaseAmount || 0)?.toFixed(baseToken.decimals)}
             action={{
               onClick: () =>
                 minBaseAmount &&
                 handleBaseDepositChange(minBaseAmount.toString()),
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={isValid || fieldsDisabled}
           />
 
           <CustomBalance
@@ -214,16 +212,14 @@ export function Form({ className }: { className?: string }) {
 
           <MinimumRecommended
             token={quoteToken}
-            value={Number(minQuoteAmount)?.toFixed(quoteToken.decimals)}
+            value={Number(minQuoteAmount || 0)?.toFixed(quoteToken.decimals)}
             action={{
               onClick: () =>
                 minQuoteAmount &&
                 handleQuoteDepositChange(minQuoteAmount.toString()),
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={isValid || fieldsDisabled}
           />
 
           <CustomBalance
@@ -280,14 +276,12 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={nativeBalance?.symbol}
-            value={minProvision.toString()}
+            value={minProvision?.toString()}
             action={{
               onClick: handleBountyDepositChange,
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={isValid || fieldsDisabled}
           />
 
           <TokenBalance

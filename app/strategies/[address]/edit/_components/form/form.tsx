@@ -155,7 +155,7 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={baseToken}
-            value={Number(minBaseAmount)?.toFixed(baseToken.decimals)}
+            value={Number(minBaseAmount || 0)?.toFixed(baseToken.decimals)}
             action={{
               onClick: () =>
                 minBaseAmount &&
@@ -188,7 +188,7 @@ export function Form({ className }: { className?: string }) {
 
           <MinimumRecommended
             token={quoteToken}
-            value={Number(minQuoteAmount)?.toFixed(quoteToken.decimals)}
+            value={Number(minQuoteAmount || 0)?.toFixed(quoteToken.decimals)}
             action={{
               onClick: () =>
                 minQuoteAmount &&

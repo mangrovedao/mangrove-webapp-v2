@@ -2,22 +2,19 @@
 
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
-import useMangrove from "@/providers/mangrove"
-import { getValue } from "@/utils/market"
+import { useMarkets } from "@/hooks/use-addresses"
 import { useRouter } from "next/navigation"
 import { InfoBanner } from "./_components/info-banner"
 import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
   const router = useRouter()
-  const { mangrove } = useMangrove()
-  const marketsInfosQuery = useWhitelistedMarketsInfos(mangrove)
+  const markets = useMarkets()
 
   function handleNext() {
-    if (!marketsInfosQuery?.data?.[0]) return
+    if (!markets[0]) return
     router.push(
-      `/strategies/new?market=${getValue(marketsInfosQuery?.data?.[0])}`,
+      `/strategies/new?market=${markets[0].base.address},${markets[0].quote.address},${markets[0].tickSpacing}`,
       {
         scroll: false,
       },
