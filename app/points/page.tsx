@@ -27,10 +27,9 @@ const boosts = [
 
 export default function Page() {
   const { isConnected } = useAccount()
-  const { data: userVolume } = useUserVolume()
-
-  const volume = Number(userVolume ?? 0)
-  const volumeBoost = boosts.find((b) => volume >= b.threshold)!.boost
+  const { data: volume } = useUserVolume()
+  const userVolume = Number(volume ?? 0)
+  const volumeBoost = boosts.find((b) => userVolume >= b.threshold)?.boost ?? 1
 
   return isConnected ? (
     <div>
@@ -45,10 +44,10 @@ export default function Page() {
         <CurrentBoost
           className="col-span-full md:col-span-1"
           boost={volumeBoost}
-          volume={volume}
+          volume={userVolume}
         />
         <Rank className="col-span-full md:col-span-1" />
-        <NextLevel className="col-span-full" volume={volume} />
+        <NextLevel className="col-span-full" volume={userVolume} />
       </div>
       <Leaderboard />
     </div>
