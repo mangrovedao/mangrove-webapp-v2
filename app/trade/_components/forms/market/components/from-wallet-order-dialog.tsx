@@ -44,6 +44,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     user: address,
     bs: form.bs,
     sendAmount: form.send,
+    sendToken,
   })
 
   let steps = ["Send"]

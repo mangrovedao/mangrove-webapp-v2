@@ -19,7 +19,7 @@ export function useUserBalances(params: UseUserBalancesParams) {
   const { data, isLoading, isError } = useQuery({
     queryKey: [
       "balances",
-      generalClient,
+      generalClient?.chain.id,
       params.user,
       markets.map((m) => `${m.base.address}-${m.quote.address}`),
       logics.map((l) => l.logic),

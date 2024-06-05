@@ -79,10 +79,12 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
 
         const restingOrderGasreq = getDefaultLimitOrderGasreq()
 
+        const baseAmount = bs === "buy" ? parseEther(wants) : parseEther(gives)
+        const quoteAmount = bs === "buy" ? parseEther(gives) : parseEther(wants)
         const { request } = await marketClient.simulateLimitOrder({
           account,
-          baseAmount: parseEther(gives),
-          quoteAmount: parseEther(wants),
+          baseAmount,
+          quoteAmount,
           bs,
           book,
           orderType,
@@ -94,6 +96,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           // logics can be left to undefined (meaning no logic)
           takerGivesLogic,
           takerWantsLogic,
+          gas: 20_000_000n,
         })
 
         const hash = await walletClient.writeContract(request)

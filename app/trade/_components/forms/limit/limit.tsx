@@ -46,6 +46,7 @@ export function Limit() {
     form,
     sendToken,
     receiveToken,
+    quoteToken,
     tickSize,
     feeInPercentageAsString,
     timeInForce,
@@ -144,7 +145,7 @@ export function Limit() {
                     field.handleChange(e.target.value)
                     computeReceiveAmount()
                   }}
-                  token={receiveToken}
+                  token={quoteToken}
                   label="Limit price"
                   disabled={!currentMarket}
                   error={field.state.meta.errors}

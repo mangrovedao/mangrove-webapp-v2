@@ -46,9 +46,11 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         )
           throw new Error("Market order post is missing params")
 
-        const { base } = market
+        const { base, quote } = market
         const { bs, send: gives, receive: wants, slippage } = form
 
+        const receiveToken = bs === "buy" ? base : quote
+        const sendToken = bs === "buy" ? quote : base
         const baseAmount = bs === "buy" ? parseEther(wants) : parseEther(gives)
         const quoteAmount = bs === "buy" ? parseEther(gives) : parseEther(wants)
         const { request } =
@@ -76,7 +78,15 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           },
         )
 
-        successToast(TradeMode.MARKET, bs, base, gives, result)
+        successToast(
+          TradeMode.MARKET,
+          bs,
+          base,
+          quote,
+          result,
+          receiveToken,
+          sendToken,
+        )
         return { result, receipt }
       } catch (error) {
         console.error(error)

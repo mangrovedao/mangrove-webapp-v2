@@ -198,19 +198,6 @@ export function useLimitOld(props: Props) {
     form?.reset()
   }, [form, market?.base, market?.quote])
 
-  React.useEffect(() => {
-    if (!defaultLimitPrice || !form || !sendToken) return
-
-    //what is this x)
-    setTimeout(() => {
-      form?.setFieldValue(
-        "limitPrice",
-        defaultLimitPrice.toFixed(sendToken.displayDecimals),
-      )
-      form?.validateAllFields("blur")
-    }, 0)
-  }, [form, defaultLimitPrice])
-
   return {
     tradeAction,
     computeReceiveAmount,
@@ -267,6 +254,7 @@ export function useLimit(props: Props) {
   const sendToken = bs === BS.buy ? currentMarket?.quote : currentMarket?.base
   const receiveToken =
     bs === BS.buy ? currentMarket?.base : currentMarket?.quote
+  const quoteToken = currentMarket?.quote
 
   const { logics: sendLogics } = useTokenLogics({ token: sendToken?.address })
   const { logics: receiveLogics } = useTokenLogics({
@@ -438,12 +426,42 @@ export function useLimit(props: Props) {
   }, [form, bs])
 
   React.useEffect(() => {
-    const defaultLimitPrice =
-      bs === BS.buy ? book?.bids[0]?.price : book?.asks[0]?.price
-    const currentLimitPrice = form.getFieldValue("limitPrice")
-    if (currentLimitPrice !== "" && defaultLimitPrice)
-      form.setFieldValue("limitPrice", defaultLimitPrice?.toString())
-  }, [form])
+    // if (!defaultLimitPrice || !form || !sendToken) return
+    // if (!form) return
+    //what is this x)
+    // setTimeout(() => {
+    // console.log(form)
+    // const lo = form.getFieldValue("limitPrice")
+    // console.log("lo", lo)
+    setTimeout(() => {
+      form.setFieldValue("limitPrice", "12345")
+      form.validateAllFields("blur")
+    }, 0)
+  }, [])
+
+  // useQuery({
+  //   queryKey: ["defaultLimitPrice", bs, book?.midPrice],
+  //   queryFn: async () => {
+  //     form.setFieldValue("limitPrice", "1234")
+  //     if (!book?.bids || !book?.asks) return null
+  //     const limitPrice =
+  //       bs === BS.buy ? book?.bids[0]?.price : book?.asks[0]?.price
+  //     if (!limitPrice) return null
+  //     form.setFieldValue("limitPrice", limitPrice?.toString())
+  //     return null
+  //   },
+  //   enabled: !!book?.bids || !!book?.asks,
+  // })
+
+  // React.useEffect(() => {
+  //   const defaultLimitPrice =
+  //     bs === BS.buy ? book?.bids[0]?.price : book?.asks[0]?.price
+  //   console.log("defaultLimitPrice", defaultLimitPrice)
+  //   const currentLimitPrice = form.getFieldValue("limitPrice")
+  //   console.log("currentLimitPrice", currentLimitPrice)
+  //   if (currentLimitPrice !== "" && defaultLimitPrice)
+  //     form.setFieldValue("limitPrice", defaultLimitPrice?.toString())
+  // }, [])
 
   return {
     form,
@@ -468,5 +486,6 @@ export function useLimit(props: Props) {
     computeSendAmount,
     computeReceiveAmount,
     handleSubmit,
+    quoteToken,
   }
 }

@@ -17,7 +17,7 @@ const useIndexerSdkContext = () => {
 
   const indexerSdkQuery = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["indexer-sdk", chain],
+    queryKey: ["indexer-sdk", chain?.id],
     queryFn: () => {
       try {
         if (!chain) return null
@@ -96,7 +96,7 @@ const useIndexerSdkContext = () => {
     meta: {
       error: "Error when initializing the indexer sdk",
     },
-    enabled: !!mangrove,
+    enabled: !!mangrove && !!chain?.id,
     staleTime: 15 * 60 * 1000,
   })
   return {

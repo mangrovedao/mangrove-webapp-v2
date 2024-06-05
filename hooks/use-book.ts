@@ -14,9 +14,10 @@ export function useBook(params?: UseBookParams) {
     queryKey: [
       "book",
       params,
-      client,
-      currentMarket?.base,
-      currentMarket?.quote,
+      client?.chain.id,
+      currentMarket?.base.address,
+      currentMarket?.quote.address,
+      currentMarket?.tickSpacing.toString(),
     ],
     queryFn: async () => {
       if (!client) return null

@@ -1,7 +1,7 @@
 import { LimitOrderResult, type Token } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
-import Big from "big.js"
 import { toast } from "sonner"
+import { formatUnits } from "viem"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
@@ -11,10 +11,14 @@ export function successToast(
   tradeMode: TradeMode,
   tradeAction: BS,
   baseToken: Token,
-  baseValue: string,
+  quoteToken: Token,
   result: LimitOrderResult,
+  receiveToken: Token,
+  sendToken: Token,
 ) {
-  const filledOrder = `Filled with ${Number(result.takerGot).toFixed(baseToken.displayDecimals)} `
+  const baseValue = tradeAction === BS.buy ? result.takerGot : result.takerGave
+  const quoteValue = tradeAction === BS.buy ? result.takerGave : result.takerGot
+  const filledOrder = `Filled with ${Number(formatUnits(quoteValue, quoteToken.decimals)).toFixed(quoteToken.displayDecimals)} ${quoteToken.symbol}`
   const notFilledOrder =
     tradeMode == TradeMode.LIMIT
       ? "Limit order posted"
@@ -25,7 +29,7 @@ export function successToast(
   toast(
     <div className="grid gap-2 w-full">
       <div className="flex space-x-2 items-center">
-        <TokenIcon symbol={baseToken.symbol} />
+        <TokenIcon symbol={sendToken.symbol} />
         <div className="grid">
           <span>{tradeMode.toUpperCase()} Order</span>
           <span className="text-muted-foreground">{fillText}</span>
@@ -43,13 +47,20 @@ export function successToast(
             {tradeAction.toUpperCase()}
           </span>
           <span>
-            {Big(baseValue).toFixed(baseToken.priceDisplayDecimals)}{" "}
+            {Number(formatUnits(baseValue, baseToken.decimals)).toFixed(
+              baseToken.priceDisplayDecimals,
+            )}{" "}
             {baseToken.symbol}
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">FEE</span>
-          <span>{Number(result.feePaid).toFixed(8)}</span>
+          <span>
+            {Number(formatUnits(result.feePaid, receiveToken.decimals)).toFixed(
+              receiveToken.displayDecimals + 2,
+            )}{" "}
+            {receiveToken.symbol}
+          </span>
         </div>
       </div>
     </div>,

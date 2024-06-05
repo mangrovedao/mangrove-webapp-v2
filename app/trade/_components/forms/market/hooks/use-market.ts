@@ -27,7 +27,7 @@ type Props = {
 const determinePrices = (
   bs: BS,
   quoteToken?: Token,
-  orderBook?: Book,
+  orderBook?: Book | null,
   marketPrice?: number,
 ) => {
   if (!orderBook?.bids || !orderBook?.asks) {
