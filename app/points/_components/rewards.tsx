@@ -1,25 +1,23 @@
-import { addDays, formatDistanceToNow } from "date-fns"
+import { useAccount } from "wagmi"
 
+import InfoTooltip from "@/components/info-tooltip"
 import { MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
-import { useUserPoints } from "./leaderboard/use-leaderboard"
+import { useEpochLeaderboard } from "./leaderboard/use-epoch-leaderboard"
 
-import InfoTooltip from "@/components/info-tooltip"
 export default function Rewards() {
-  const { data: userPoints } = useUserPoints()
-  const totalPoints = Number(userPoints?.total_points ?? 0)
-
-  const latestUpdatedDate = userPoints
-    ? new Date(userPoints.last_updated_timestamp)
-    : undefined
-  const nextUpdateDate = latestUpdatedDate
-    ? addDays(latestUpdatedDate, 1)
-    : undefined
-
-  const timeUntilNextUpdate = nextUpdateDate
-    ? formatDistanceToNow(nextUpdateDate, { includeSeconds: true })
-    : ""
+  const { address: account } = useAccount()
+  const totalLeaderboardQuery = useEpochLeaderboard({
+    epoch: "total",
+  })
+  const accountTotalQuery = useEpochLeaderboard({
+    epoch: "total",
+    account,
+  })
+  const totalPoints = Number(
+    accountTotalQuery.data?.leaderboard?.[0]?.total ?? 0,
+  )
 
   return (
     <div className="space-y-1">

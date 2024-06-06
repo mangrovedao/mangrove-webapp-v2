@@ -1,4 +1,4 @@
-import { Logic, Token } from "@mangrovedao/mgv"
+import { KandelParams, Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -15,7 +15,6 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import useMarket from "@/providers/market.new"
-import { KandelParams } from "@mangrovedao/mgv"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
 import { useCloseStrategy } from "../../_hooks/use-close-strategy"
 import useKandel from "../../_providers/kandel-strategy"
@@ -75,10 +74,9 @@ export default function EditStrategyDialog({
   const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
 
-  // const { data: kandelSeeder } = useKandelSeeder()
-
   let steps = [
     "Summary",
+    // "Set liquidity sourcing",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll

@@ -2,7 +2,14 @@
 
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useMarkets } from "@/hooks/use-addresses"
+import { getFeatureFlagConfig } from "@/schemas/feature-flag"
 import { useRouter } from "next/navigation"
 import { InfoBanner } from "./_components/info-banner"
 import { Tables } from "./_components/tables/tables"
@@ -10,6 +17,9 @@ import { Tables } from "./_components/tables/tables"
 export default function Page() {
   const router = useRouter()
   const markets = useMarkets()
+
+  const featureFlagConfig = getFeatureFlagConfig()
+  console.log("featureFlagConfig", featureFlagConfig)
 
   function handleNext() {
     if (!markets[0]) return
@@ -26,14 +36,34 @@ export default function Page() {
       <InfoBanner />
       <div className="mt-[56px] flex justify-between items-center">
         <Title>Strategies</Title>
-        <Button
-          size={"lg"}
-          rightIcon
-          onClick={handleNext}
-          suppressHydrationWarning
-        >
-          Create strategy
-        </Button>
+        {featureFlagConfig?.strategy.create.enabled ? (
+          <Button
+            size={"lg"}
+            rightIcon
+            onClick={handleNext}
+            suppressHydrationWarning
+          >
+            Create strategy
+          </Button>
+        ) : (
+          <TooltipProvider>
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                <Button
+                  size={"lg"}
+                  rightIcon
+                  suppressHydrationWarning
+                  disabled={true}
+                >
+                  Create strategy
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {featureFlagConfig?.strategy.create.message}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
       <Tables />
       {/* <NewStrategyDialog

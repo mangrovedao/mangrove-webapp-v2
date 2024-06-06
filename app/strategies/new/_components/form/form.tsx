@@ -85,7 +85,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -128,7 +130,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>

@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
+import { Address } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
@@ -14,7 +15,6 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { Address } from "viem"
 import {
   ChangingFrom,
   useNewStratStore,

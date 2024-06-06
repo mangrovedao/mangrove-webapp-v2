@@ -11,17 +11,17 @@ import React from "react"
 
 import { Rank1Icon, Rank2Icon, Rank3Icon } from "@/svgs"
 import { formatNumber } from "@/utils/numbers"
-import { LeaderboardEntry } from "../../schemas/leaderboard"
+import { LeaderboardEpochEntry } from "../../schemas/epoch-history"
 import Address from "./address"
 
-const columnHelper = createColumnHelper<LeaderboardEntry>()
-const DEFAULT_DATA: LeaderboardEntry[] = []
+const columnHelper = createColumnHelper<LeaderboardEpochEntry>()
+const DEFAULT_DATA: LeaderboardEpochEntry[] = []
 
 type Params = {
-  data?: LeaderboardEntry[]
+  data?: LeaderboardEpochEntry[]
 }
 
-export function useTable({ data }: Params) {
+export function useEpochTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.accessor("rank", {
@@ -51,6 +51,14 @@ export function useTable({ data }: Params) {
           return <Address address={address} />
         },
       }),
+      columnHelper.display({
+        id: "boost",
+        header: "Boost",
+        cell: ({ row }) => {
+          const { boost } = row.original
+          return <div>{boost === 0 ? 1 : boost}x</div>
+        },
+      }),
       columnHelper.accessor("maker", {
         header: () => <div className="text-right">LP points</div>,
         cell: (row) => {
@@ -69,6 +77,17 @@ export function useTable({ data }: Params) {
           return (
             <div className="w-full h-full flex justify-end font-roboto">
               {formatNumber(tradingPoints)}
+            </div>
+          )
+        },
+      }),
+      columnHelper.accessor("community", {
+        header: () => <div className="text-right">Community points</div>,
+        cell: (row) => {
+          const communityPoints = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(communityPoints)}
             </div>
           )
         },

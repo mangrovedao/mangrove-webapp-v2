@@ -12,8 +12,9 @@ import React from "react"
 import { formatUnits, parseUnits } from "viem"
 
 import { useBook } from "@/hooks/use-book"
-import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market.new"
+
+import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { Book } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
@@ -81,12 +82,21 @@ export function useMarketForm(props: Props) {
   } = useTradeInfos("market", bs)
 
   const { book } = useBook()
-  const { data: marketPrice } = useTokenPriceQuery(
-    market?.base?.symbol,
-    market?.quote?.symbol,
-  )
 
-  const averagePrice = determinePrices(bs, quoteToken, book, marketPrice?.close)
+  const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
+    useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
+
+  // const marketPrice =
+  //   orderBookPriceData && orderBookPriceData.mid_price
+  //     ? Number(orderBookPriceData.mid_price)
+  //     : undefined
+
+  const averagePrice = determinePrices(
+    bs,
+    quoteToken,
+    book,
+    Number(marketPrice?.close),
+  )
   const [estimateFrom, setEstimateFrom] = React.useState<
     "send" | "receive" | undefined
   >()

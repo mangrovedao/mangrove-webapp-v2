@@ -7,14 +7,13 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useBook } from "@/hooks/use-book"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
-import useTokenPriceQuery from "@/hooks/use-token-price-query"
 import useMarket from "@/providers/market.new"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
-import { determineDecimals, determinePriceDecimalsFromToken, formatNumber } from "@/utils/numbers"
+import { determineDecimals, formatNumber } from "@/utils/numbers"
 import { ArrowLeftRight } from "lucide-react"
-import { useBook } from "@/hooks/use-book"
 
 function Container({ children }: React.PropsWithChildren) {
   return <span className="text-xs font-medium space-y-[2px]">{children}</span>
@@ -43,7 +42,10 @@ function Item({
   token?: Token
   rightElement?: React.ReactElement
 }) {
-  const displayedPriceDecimals = determineDecimals(value, token?.priceDisplayDecimals)
+  const displayedPriceDecimals = determineDecimals(
+    value,
+    token?.priceDisplayDecimals,
+  )
 
   return (
     <Container>
@@ -73,7 +75,6 @@ export function PricesBar() {
   const { currentMarket } = useMarket()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
-  const oneMinutePriceQuery = useTokenPriceQuery(base?.symbol, quote?.symbol)
   const { data, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(base?.address, quote?.address)
 
@@ -96,15 +97,10 @@ export function PricesBar() {
 
   let spotPrice =
     lowestAskPrice && highestBidPrice
-      ? (lowestAskPrice
-         + (highestBidPrice ?? 0))
-          / 2
+      ? (lowestAskPrice + (highestBidPrice ?? 0)) / 2
       : !lowestAskPrice && !highestBidPrice
         ? undefined
-        : Math.max(
-            lowestAskPrice || 0,
-            highestBidPrice || 0,
-          )
+        : Math.max(lowestAskPrice || 0, highestBidPrice || 0)
 
   if (side === "quote") {
     spotPrice = 1 / (spotPrice ?? 1)
@@ -120,8 +116,8 @@ export function PricesBar() {
         <Item
           label={"Price"}
           value={fixedSpotPrice ? Number(fixedSpotPrice ?? 0) : undefined}
-          skeleton={oneMinutePriceQuery?.isLoading}
           token={side === "quote" ? base : quote}
+          skeleton={false}
         />
 
         <Separator orientation="vertical" className="h-4" />

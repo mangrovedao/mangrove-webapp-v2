@@ -1,4 +1,7 @@
+import { BS, Order } from "@mangrovedao/mgv/lib"
 import React from "react"
+import { formatUnits } from "viem"
+import { useAccount } from "wagmi"
 
 import {
   CustomRadioGroup,
@@ -21,9 +24,6 @@ import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
-import { BS, Order } from "@mangrovedao/mgv/lib"
-import { formatUnits } from "viem"
-import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"

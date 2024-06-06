@@ -3,29 +3,20 @@ import { z } from "zod"
 const leaderboardEntrySchema = z.object({
   rank: z.number(),
   account: z.string(),
-  taker_points: z.string().transform(parseFloat).transform(Math.floor),
-  maker_points: z.string().transform(parseFloat).transform(Math.floor),
-  referees_points: z.string().transform(parseFloat).transform(Math.floor),
-  total_points: z.string().transform(parseFloat).transform(Math.floor),
-  boost: z.string().transform(parseFloat),
-  community_points: z.string().transform(parseFloat),
+  taker: z.number(),
+  maker: z.number(),
+  ref: z.number(),
+  total: z.number(),
 })
 
-export const leaderboardSchema = z.object({
-  leaderboard: z.array(leaderboardEntrySchema),
-  last_updated_timestamp: z.number(),
-  last_updated_block: z.number(),
-  leaderboard_length: z.number(),
-})
-
-export type Leaderboard = z.infer<typeof leaderboardSchema>
+const epochLeaderboardSchema = z.array(leaderboardEntrySchema)
 export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>
 
 export function parseLeaderboard(data: unknown) {
   try {
-    return leaderboardSchema.parse(data)
+    return epochLeaderboardSchema.parse(data)
   } catch (error) {
-    console.error("Invalid format for leaderboard: ", data, error)
+    console.error("Invalid format for total leaderboard: ", data, error)
     return null
   }
 }

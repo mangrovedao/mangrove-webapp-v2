@@ -93,7 +93,9 @@ export default function useForm() {
     setNumberOfOffers("10")
     setStepSize("1")
     setErrors({})
-  }, [market])
+    setSendFrom("simple")
+    setReceiveTo("simple")
+  }, [market?.base, market?.quote])
 
   // if kandelRequirementsQuery has error
   React.useEffect(() => {

@@ -28,15 +28,15 @@ export function Form({ className }: { className?: string }) {
     handleQuoteDepositChange,
     isChangingFrom,
     numberOfOffers,
-    handleNumberOfOffersChange,
-    stepSize,
-    handleStepSizeChange,
+    logics,
     nativeBalance,
+    stepSize,
     bountyDeposit,
+    handleNumberOfOffersChange,
+    handleStepSizeChange,
     handleBountyDepositChange,
     handleSendFromChange,
     handleReceiveToChange,
-    logics,
   } = useForm()
 
   if (!baseToken || !quoteToken)
@@ -69,7 +69,7 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleSendFromChange(value)
               }}
-              // disabled={!market}
+              disabled
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
@@ -83,7 +83,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -112,7 +114,7 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleReceiveToChange(value)
               }}
-              // disabled={!market}
+              disabled
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
@@ -126,7 +128,9 @@ export function Form({ className }: { className?: string }) {
                           <div className="flex gap-2 w-full items-center">
                             <SourceIcon sourceId={logic.id} />
                             <Caption className="capitalize">
-                              {logic.id.toUpperCase()}
+                              {logic.id.includes("simple")
+                                ? "Wallet"
+                                : logic.id}
                             </Caption>
                           </div>
                         </SelectItem>

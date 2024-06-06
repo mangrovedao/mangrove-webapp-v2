@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Form } from "./_components/form/form"
 
+import { getFeatureFlagConfig } from "@/schemas/feature-flag"
 import { InfoBar } from "../(shared)/_components/info-bar"
 import { PriceRange } from "./_components/price-range/price-range"
 
@@ -11,7 +12,8 @@ export default function Page() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const market = searchParams.get("market")
-  if (!market) {
+  const featureFlagConfig = getFeatureFlagConfig()
+  if (!market || !featureFlagConfig?.strategy.create.enabled) {
     router.push("/strategies")
   }
 

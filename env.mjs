@@ -28,6 +28,8 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
     NEXT_PUBLIC_BLAST_DATA_SERVICE: z.string().url(),
     NEXT_PUBLIC_MANGROVE_DATA_API_HOST: z.string().url(),
+    NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST: z.string().url(),
+    NEXT_PUBLIC_FEATURE_FLAG: z.string(),
   },
 
   /**
@@ -50,6 +52,9 @@ export const env = createEnv({
     NEXT_PUBLIC_BLAST_DATA_SERVICE: process.env.NEXT_PUBLIC_BLAST_DATA_SERVICE,
     NEXT_PUBLIC_MANGROVE_DATA_API_HOST:
       process.env.NEXT_PUBLIC_MANGROVE_DATA_API_HOST,
+    NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST:
+      process.env.NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST,
+    NEXT_PUBLIC_FEATURE_FLAG: process.env.NEXT_PUBLIC_FEATURE_FLAG,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

@@ -1,4 +1,4 @@
-import { Token } from "@mangrovedao/mgv"
+import { KandelParams, Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -16,7 +16,6 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import useMarket from "@/providers/market.new"
-import { KandelParams, Logic } from "@mangrovedao/mgv"
 import { useActivateKandelLogics } from "../../(shared)/_hooks/use-activate-kandel-logics"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
 import { useKandelSteps } from "../../(shared)/_hooks/use-kandel-steps"

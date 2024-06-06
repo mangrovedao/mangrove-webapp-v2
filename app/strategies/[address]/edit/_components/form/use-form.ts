@@ -1,19 +1,18 @@
+import { Logic } from "@mangrovedao/mgv"
+import { getKandelGasReq } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import React from "react"
 import { useDebounce } from "usehooks-ts"
+import { formatUnits } from "viem"
 import { useAccount, useBalance } from "wagmi"
 
 import { useKandelState } from "@/app/strategies/(shared)/_hooks/use-kandel-state"
 import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-validator"
 import { useLogics } from "@/hooks/use-addresses"
-import { useBook } from "@/hooks/use-book"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
-import { Logic } from "@mangrovedao/mgv"
-import { getKandelGasReq } from "@mangrovedao/mgv/lib"
-import { formatUnits } from "viem"
 import {
   ChangingFrom,
   useNewStratStore,
@@ -35,7 +34,6 @@ export default function useForm() {
     address,
   })
   const { data: kandelState } = useKandelState()
-  const { book } = useBook()
   const logics = useLogics()
 
   const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
@@ -43,6 +41,20 @@ export default function useForm() {
 
   const asksOffers = mergedOffers?.filter((item) => item.offerType === "asks")
   const bidsOffers = mergedOffers?.filter((item) => item.offerType === "bids")
+
+  // const getCurrentLiquiditySourcing = async () => {
+  //   try {
+  //     const { baseLogic, quoteLogic } =
+  //       (await strategyStatusQuery.data?.stratInstance.getLogics()) ?? {}
+  //     const _baseLogic = mangrove?.getLogicByAddress(baseLogic || "")
+  //     const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic || "")
+
+  //     setSendFrom(_baseLogic?.id || "")
+  //     setReceiveTo(_quoteLogic?.id || "")
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
     return acc.add(Big(curr.gives ?? 0))
@@ -73,19 +85,19 @@ export default function useForm() {
   const lockedBounty = kandelState?.unlockedProvision
 
   React.useEffect(() => {
-    if (strategyQuery.data?.offers.some((x) => x.live)) {
-      setBaseDeposit(
-        baseAmountDeposited?.toFixed(baseToken?.displayDecimals) || "0",
-      )
-      setQuoteDeposit(
-        quoteAmountDeposited?.toFixed(quoteToken?.displayDecimals) || "0",
-      )
+    if (
+      strategyQuery.data?.offers.some((x) => x.live) &&
+      strategyStatusQuery.isFetched
+    ) {
+      //   getCurrentLiquiditySourcing()
+      setBaseDeposit(baseAmountDeposited?.toFixed(baseToken?.decimals) || "")
+      setQuoteDeposit(quoteAmountDeposited?.toFixed(quoteToken?.decimals) || "")
       setNumberOfOffers(
-        (Number(currentParameter?.length) - 1).toString() || "0",
+        (Number(currentParameter?.length) - 1).toString() || "10",
       )
-      setStepSize(currentParameter?.stepSize || "0")
-      setBountyDeposit(Number(lockedBounty).toFixed(6) || "0")
-      // setDistribution()
+
+      setStepSize(currentParameter?.stepSize || "")
+      setBountyDeposit(Number(lockedBounty).toFixed(6) || "")
     }
   }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
 
@@ -339,5 +351,6 @@ export default function useForm() {
     handleReceiveToChange,
     handleStepSizeChange,
     handleBountyDepositChange,
+    // getCurrentLiquiditySourcing,
   }
 }
