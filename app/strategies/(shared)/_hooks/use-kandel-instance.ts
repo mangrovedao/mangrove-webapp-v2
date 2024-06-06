@@ -11,6 +11,7 @@ type Params = Partial<Pick<Strategy, "address" | "base" | "quote">>
 export default function useKandelInstance({ address, base, quote }: Params) {
   const client = useClient()
   const { markets } = useMarket()
+  const addresses = useMangroveAddresses()
 
   try {
     if (!address || !base || !quote) return null
@@ -22,7 +23,6 @@ export default function useKandelInstance({ address, base, quote }: Params) {
       )
     })
 
-    const addresses = useMangroveAddresses()
     if (!(market && addresses)) return null
 
     const kandelInstance = client?.extend(

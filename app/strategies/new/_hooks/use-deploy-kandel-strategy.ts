@@ -8,11 +8,7 @@ import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BaseError, ContractFunctionExecutionError } from "viem"
 
-export function useCreateKandelStrategy({
-  setKandelAddress,
-}: {
-  setKandelAddress: (address: string) => void
-}) {
+export function useCreateKandelStrategy() {
   const { address } = useAccount()
   const { currentMarket } = useMarket()
   const client = useClient()
@@ -43,9 +39,8 @@ export function useCreateKandelStrategy({
           hash,
         })
 
-        setKandelAddress(result)
         toast.success("Kandel strategy instance successfully created")
-        return { address: result, receipt }
+        return { kandelAddress: result, receipt }
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)

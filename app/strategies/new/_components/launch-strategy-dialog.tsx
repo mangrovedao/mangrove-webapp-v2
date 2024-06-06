@@ -16,7 +16,7 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import useMarket from "@/providers/market.new"
-import { Logic } from "@mangrovedao/mgv"
+import { KandelParams, Logic } from "@mangrovedao/mgv"
 import { useActivateKandelLogics } from "../../(shared)/_hooks/use-activate-kandel-logics"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
 import { useKandelSteps } from "../../(shared)/_hooks/use-kandel-steps"
@@ -28,7 +28,11 @@ import { Steps } from "./form/components/steps"
 type StrategyDetails = Omit<
   NewStratStore,
   "isChangingFrom" | "globalError" | "errors" | "priceRange"
-> & { riskAppetite?: string; priceRange?: [number, number] }
+> & {
+  riskAppetite?: string
+  priceRange?: [number, number]
+  kandelParams?: KandelParams
+}
 
 type Props = {
   strategy?: StrategyDetails
@@ -59,25 +63,30 @@ export default function DeployStrategyDialog({
   const { data: nativeBalance } = useBalance({
     address,
   })
+  const { data: spender } = useSpenderAddress("kandel")
 
-  const [kandelAddress, setKandelAddress] = React.useState("")
+  const {
+    mutate: createKandelStrategy,
+    isPending: createKandelStrategyPending,
+    data,
+  } = useCreateKandelStrategy()
 
-  const createKandelStrategy = useCreateKandelStrategy({
-    setKandelAddress: (address) => setKandelAddress(address),
-  })
-  const approveToken = useInfiniteApproveToken()
   const deploySmartRouter = useDeploySmartRouter({
     owner: deployRouter?.params.owner,
   })
 
-  const activateSmartRouter = useActivateStrategySmartRouter(kandelAddress)
-  const activateLogics = useActivateKandelLogics(kandelAddress)
-  const launchKandelStrategy = useLaunchKandelStrategy(kandelAddress)
+  const activateSmartRouter = useActivateStrategySmartRouter(
+    data?.kandelAddress,
+  )
+
+  const activateLogics = useActivateKandelLogics(data?.kandelAddress)
+
+  const approveToken = useInfiniteApproveToken()
+
+  const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
   const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
   const logicGasReq = Number(baseLogic?.gasreq || 0) + 100_000
-
-  const { data: spender } = useSpenderAddress("kandel")
 
   let steps = [
     "Summary",
@@ -85,9 +94,6 @@ export default function DeployStrategyDialog({
     !deployRouter?.done ? "Activate router" : "",
     !bind?.done ? "Bind router" : "",
     baseLogic?.logic && !setLogics?.done ? "Set logics" : "",
-    // TODO: apply liquidity sourcing with setLogics
-    // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
-    // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
     !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
     !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     "Launch strategy",
@@ -129,10 +135,10 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={createKandelStrategy.isPending}
-          loading={createKandelStrategy.isPending}
+          disabled={createKandelStrategyPending}
+          loading={createKandelStrategyPending}
           onClick={() => {
-            createKandelStrategy.mutate(undefined, {
+            createKandelStrategy(undefined, {
               onSuccess: goToNextStep,
             })
           }}
@@ -273,26 +279,12 @@ export default function DeployStrategyDialog({
           onClick={() => {
             if (!strategy) return
 
-            const {
-              baseDeposit,
-              quoteDeposit,
-              distribution,
-              bountyDeposit,
-              stepSize,
-              numberOfOffers,
-            } = strategy
+            const { kandelParams, bountyDeposit } = strategy
 
             launchKandelStrategy.mutate(
               {
-                kandelAddress,
-                baseDeposit,
-                quoteDeposit,
-                distribution,
+                kandelParams,
                 bountyDeposit,
-                stepSize,
-                numberOfOffers,
-                baseLogic,
-                quoteLogic,
               },
               {
                 onSuccess: () => {

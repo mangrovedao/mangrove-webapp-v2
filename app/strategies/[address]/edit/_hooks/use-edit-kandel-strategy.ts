@@ -1,76 +1,53 @@
-import { GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
-import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { NewStratStore } from "../../../new/_stores/new-strat.store"
+import { KandelParams } from "@mangrovedao/mgv"
+import { Address, parseEther } from "viem"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
-type FormValues = Pick<
-  NewStratStore,
-  | "baseDeposit"
-  | "quoteDeposit"
-  | "numberOfOffers"
-  | "stepSize"
-  | "bountyDeposit"
-> & {
-  distribution: GeometricKandelDistribution | undefined
-  kandelAddress?: string
+type FormValues = {
+  kandelParams?: KandelParams
+  bountyDeposit: string
 }
 
-export function useEditKandelStrategy() {
+export function useEditKandelStrategy(kandelAddress?: string) {
   const { currentMarket: market } = useMarket()
-  const { mangrove } = useMangrove()
-
-  const { kandelStrategies } = useKandel()
   const queryClient = useQueryClient()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
 
+  const { address } = useAccount()
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+
+  const kandelClient = useKandelInstance({
+    address: kandelAddress,
+    base: market?.base.address,
+    quote: market?.quote.address,
+  })
+
   return useMutation({
-    mutationFn: async ({
-      distribution,
-      bountyDeposit,
-      stepSize,
-      numberOfOffers,
-      kandelAddress,
-    }: FormValues) => {
+    mutationFn: async ({ kandelParams, bountyDeposit }: FormValues) => {
       try {
-        if (
-          !(
-            market &&
-            kandelStrategies &&
-            distribution &&
-            kandelAddress &&
-            mangrove
-          )
-        )
-          return
+        if (!(kandelParams && kandelClient && walletClient && publicClient))
+          throw new Error("Could not launch strategy, missing params")
 
-        // const kandelInstance = await kandelStrategies.instance({
-        //   address: kandelAddress,
-        //   market,
-        //   type: "smart",
-        // })
+        const { request } = await kandelClient.simulatePopulate({
+          ...kandelParams,
+          account: address as Address,
+          value: parseEther(bountyDeposit),
+        })
 
-        // await kandelInstance.setLogics({
-        //   baseLogic: mangrove?.logics.simple,
-        //   quoteLogic: mangrove?.logics.simple,
-        // })
-
-        // const populateTxs = await kandelInstance.populateGeometricDistribution({
-        //   distribution,
-        //   funds: bountyDeposit,
-        //   parameters: {
-        //     pricePoints: Number(numberOfOffers) + 1,
-        //     stepSize: Number(stepSize),
-        //   },
-        // })
+        const hash = await walletClient.writeContract(request)
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash,
+        })
 
         toast.success("Kandel strategy successfully edited")
-        // return { txs: await Promise.all(populateTxs.map((x) => x.wait())) }
+        return receipt
       } catch (error) {
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)

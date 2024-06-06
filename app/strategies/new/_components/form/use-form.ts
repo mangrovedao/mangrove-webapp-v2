@@ -9,9 +9,9 @@ import { useLogics } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
 import { Logic } from "@mangrovedao/mgv"
+import { getKandelGasReq } from "@mangrovedao/mgv/lib"
 import { formatUnits } from "viem"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
-import { getKandelGasReq } from "@mangrovedao/mgv/lib"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
@@ -50,6 +50,7 @@ export default function useForm() {
     setIsChangingFrom,
     setDistribution,
     setSendFrom,
+    setKandelParams,
     setReceiveTo,
   } = useNewStratStore()
   const debouncedStepSize = useDebounce(stepSize, 300)
@@ -73,26 +74,17 @@ export default function useForm() {
     stepSize: BigInt(debouncedStepSize),
     pricePoints: BigInt(debouncedNumberOfOffers),
   })
-
-  const {
-    params,
-    rawParams,
-    minBaseAmount,
-    minQuoteAmount,
-    minProvision,
-    distribution,
-    isValid,
-  } = data ?? {}
+  const { params, minBaseAmount, minQuoteAmount, minProvision, isValid } =
+    data ?? {}
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
   const minProv = formatUnits(minProvision || 0n, quoteToken?.decimals || 18)
 
-
-  // I need the distribution to be set in the store to share it with the price range component
+  // I need the params to be set in the store to share it with the price range component
   React.useEffect(() => {
-    setDistribution(distribution)
-  }, [distribution])
+    setKandelParams(params)
+  }, [params])
 
   React.useEffect(() => {
     setBaseDeposit("")
@@ -105,8 +97,10 @@ export default function useForm() {
 
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (isValid) {
-      setGlobalError(getErrorMessage(isValid))
+    if (!isValid) {
+      setGlobalError(
+        getErrorMessage("An error occured, please verify your kandel params"),
+      )
       return
     }
     setGlobalError(undefined)
@@ -196,16 +190,9 @@ export default function useForm() {
     if (Number(baseDeposit) > Number(baseBalance.formatted) && baseDeposit) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
-    } else if (
-      
-      Number(minBase) > 0 &&
-      Number(baseDeposit) === 0
-    ) {
+    } else if (Number(minBase) > 0 && Number(baseDeposit) === 0) {
       newErrors.baseDeposit = "Base deposit must be greater than 0"
-    } else if (
-      Number(minBase) > 0 &&
-      Number(minBase) > Number(baseDeposit)
-    ) {
+    } else if (Number(minBase) > 0 && Number(minBase) > Number(baseDeposit)) {
       newErrors.baseDeposit = "Base deposit must be updated"
     } else {
       delete newErrors.baseDeposit
@@ -215,11 +202,7 @@ export default function useForm() {
     if (Number(quoteDeposit) > Number(quoteBalance.formatted) && quoteDeposit) {
       newErrors.quoteDeposit =
         "Quote deposit cannot be greater than wallet balance"
-    } else if (
-      minQuote &&
-      Number(minQuote) > 0 &&
-      Number(quoteDeposit) === 0
-    ) {
+    } else if (minQuote && Number(minQuote) > 0 && Number(quoteDeposit) === 0) {
       newErrors.quoteDeposit = "Quote deposit must be greater than 0"
     } else if (
       minQuote &&
@@ -254,11 +237,7 @@ export default function useForm() {
     if (Number(bountyDeposit) > Number(nativeBalance?.value) && bountyDeposit) {
       newErrors.bountyDeposit =
         "Bounty deposit cannot be greater than wallet balance"
-    } else if (
-      minProv &&
-      Number(minProv) > 0 &&
-      Number(bountyDeposit) === 0
-    ) {
+    } else if (minProv && Number(minProv) > 0 && Number(bountyDeposit) === 0) {
       newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
     } else if (
       minProv &&
@@ -283,6 +262,7 @@ export default function useForm() {
   ])
 
   return {
+    params,
     address,
     baseToken,
     quoteToken,

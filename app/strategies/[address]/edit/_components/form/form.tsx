@@ -22,10 +22,10 @@ export function Form({ className }: { className?: string }) {
     fieldsDisabled,
     errors,
     sendFrom,
+    isValid,
     receiveTo,
     handleBaseDepositChange,
     handleQuoteDepositChange,
-    kandelRequirementsQuery,
     isChangingFrom,
     numberOfOffers,
     handleNumberOfOffersChange,
@@ -162,9 +162,7 @@ export function Form({ className }: { className?: string }) {
                 handleBaseDepositChange(minBaseAmount.toString()),
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={!isValid || fieldsDisabled}
           />
 
           <TokenBalance
@@ -195,9 +193,7 @@ export function Form({ className }: { className?: string }) {
                 handleQuoteDepositChange(minQuoteAmount.toString()),
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={!isValid || fieldsDisabled}
           />
           <TokenBalance
             label="Wallet balance"
@@ -252,14 +248,12 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={nativeBalance?.symbol}
-            value={minProvision.toString()}
+            value={minProvision?.toString()}
             action={{
               onClick: handleBountyDepositChange,
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={!isValid || fieldsDisabled}
           />
 
           <TokenBalance

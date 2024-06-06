@@ -14,12 +14,12 @@ import { Separator } from "@/components/ui/separator"
 import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
+import { KandelParams } from "@mangrovedao/mgv"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
+import { useCloseStrategy } from "../../_hooks/use-close-strategy"
 import useKandel from "../../_providers/kandel-strategy"
 import { useEditKandelStrategy } from "../_hooks/use-edit-kandel-strategy"
-import { useRetractOffers } from "../_hooks/use-retract-offers"
 import { Steps } from "./form/components/steps"
 
 type StrategyDetails = Omit<
@@ -28,7 +28,10 @@ type StrategyDetails = Omit<
 > & { onAave?: boolean; riskAppetite?: string; priceRange?: [number, number] }
 
 type Props = {
-  strategy?: StrategyDetails & { hasLiveOffers?: boolean }
+  strategy?: StrategyDetails & {
+    hasLiveOffers?: boolean
+    kandelParams?: KandelParams
+  }
   isOpen: boolean
   onClose: () => void
 }
@@ -45,13 +48,18 @@ export default function EditStrategyDialog({
   strategy,
 }: Props) {
   const { address } = useAccount()
-  const { currentMarket: market } = useMarket()
-  const { mangrove } = useMangrove()
-  const { base: baseToken, quote: quoteToken } = market ?? {}
+  const { currentMarket } = useMarket()
+  const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
+  const { data: kandelSteps } = useKandelSteps()
+  const logics = useLogics()
+
+  const [sow, baseApprove, quoteApprove] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
   })
+  const { data: spender } = useSpenderAddress("kandel")
+
   const { strategyQuery } = useKandel()
   const kandelAddress = strategyQuery.data?.address
 
@@ -59,27 +67,23 @@ export default function EditStrategyDialog({
   const approveQuoteToken = useInfiniteApproveToken()
 
   const { mutate: retractOffers, isPending: isRetractingOffers } =
-    useRetractOffers({ kandelAddress })
+    useCloseStrategy({ strategyAddress: kandelAddress })
 
   const { mutate: editKandelStrategy, isPending: isEditingKandelStrategy } =
     useEditKandelStrategy()
 
-  const logics = useLogics()
-
   const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
 
-  const { data: spender } = useSpenderAddress("kandel")
   // const { data: kandelSeeder } = useKandelSeeder()
-  const { data: kandelSteps } = useKandelSteps()
 
   let steps = [
     "Summary",
     // TODO: apply liquidity sourcing with setLogics
     // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
     // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
-    !kandelSteps?.[4].done ? `Approve ${baseToken?.symbol}` : "",
-    !kandelSteps?.[5].done ? `Approve ${quoteToken?.symbol}` : "",
+    !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
+    !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     strategy?.hasLiveOffers ? "Reset strategy" : "",
     "Publish",
   ].filter(Boolean)
@@ -103,7 +107,7 @@ export default function EditStrategyDialog({
       ),
     },
 
-    !kandelSteps?.[4].done && {
+    !baseApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -131,7 +135,7 @@ export default function EditStrategyDialog({
         </Button>
       ),
     },
-    !kandelSteps?.[5].done && {
+    !quoteApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
@@ -205,33 +209,21 @@ export default function EditStrategyDialog({
           onClick={() => {
             if (!strategy) return
 
-            const {
-              baseDeposit,
-              quoteDeposit,
-              distribution,
-              bountyDeposit,
-              stepSize,
-              numberOfOffers,
-            } = strategy
+            const { kandelParams, bountyDeposit } = strategy
 
-            // editKandelStrategy(
-            //   {
-            //     kandelAddress,
-            //     baseDeposit,
-            //     quoteDeposit,
-            //     distribution,
-            //     bountyDeposit,
-            //     stepSize,
-            //     numberOfOffers,
-            //   },
-            //   {
-            //     onSuccess: () => {
-            //       onClose()
-            //       // next/redirect doesn't work in this case...
-            //       window.location.href = `/strategies/${kandelAddress}`
-            //     },
-            //   },
-            // )
+            editKandelStrategy(
+              {
+                bountyDeposit,
+                kandelParams,
+              },
+              {
+                onSuccess: () => {
+                  onClose()
+                  // next/redirect doesn't work in this case...
+                  window.location.href = `/strategies/${kandelAddress}`
+                },
+              },
+            )
           }}
         >
           Publish strategy

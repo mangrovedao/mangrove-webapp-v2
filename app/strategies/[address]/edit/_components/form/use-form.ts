@@ -4,18 +4,21 @@ import { useDebounce } from "usehooks-ts"
 import { useAccount, useBalance } from "wagmi"
 
 import { useKandelState } from "@/app/strategies/(shared)/_hooks/use-kandel-state"
+import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-validator"
+import { useLogics } from "@/hooks/use-addresses"
 import { useBook } from "@/hooks/use-book"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
-import { validateKandelParams } from "@mangrovedao/mgv"
+import { Logic } from "@mangrovedao/mgv"
+import { getKandelGasReq } from "@mangrovedao/mgv/lib"
+import { formatUnits } from "viem"
 import {
   ChangingFrom,
   useNewStratStore,
 } from "../../../../new/_stores/new-strat.store"
 import useKandel from "../../../_providers/kandel-strategy"
-import { useKandelRequirements } from "../../_hooks/use-kandel-requirements"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
@@ -33,13 +36,7 @@ export default function useForm() {
   })
   const { data: kandelState } = useKandelState()
   const { book } = useBook()
-  const logics = mangrove?.getLogicsList().map((item) => {
-    if (item.id.includes("simple")) {
-      return { ...item, id: "Wallet" }
-    } else {
-      return item
-    }
-  })
+  const logics = useLogics()
 
   const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
   const { currentParameter, offers } = strategyQuery.data ?? {}
@@ -112,6 +109,7 @@ export default function useForm() {
     setBountyDeposit,
     setIsChangingFrom,
     setDistribution,
+    setKandelParams,
     setSendFrom,
     setReceiveTo,
   } = useNewStratStore()
@@ -119,45 +117,35 @@ export default function useForm() {
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
   const fieldsDisabled = !(minPrice && maxPrice)
+  const baseLogic = logics.find((logic) => logic.name === sendFrom)
+  const quoteLogic = logics.find((logic) => logic.name === receiveTo)
 
-  const kandelRequirementsQuery = useKandelRequirements({
-    minPrice,
-    maxPrice,
-    availableBase: baseDeposit,
-    availableQuote: quoteDeposit,
-    stepSize: debouncedStepSize,
-    numberOfOffers: debouncedNumberOfOffers,
-    isChangingFrom,
+  const gasreq = getKandelGasReq({
+    baseLogic: baseLogic as Logic,
+    quoteLogic: quoteLogic as Logic,
   })
 
-  const {
-    params,
-    rawParams,
-    minBaseAmount,
-    minQuoteAmount,
-    minProvision,
-    isValid,
-  } = validateKandelParams({
-    gasreq: 250_000n,
+  const { data } = useValidateKandel({
+    gasreq,
     factor: 3,
-    asksLocalConfig: book?.asksConfig!,
-    bidsLocalConfig: book?.bidsConfig!,
     minPrice: Number(minPrice),
     maxPrice: Number(maxPrice),
-    midPrice: book?.midPrice || 0,
-    marketConfig: book?.marketConfig!,
-    market: market!,
-    baseAmount: BigInt(baseDeposit),
-    quoteAmount: BigInt(quoteDeposit),
+    baseAmount: BigInt(baseDeposit.replace(".", "")),
+    quoteAmount: BigInt(quoteDeposit.replace(".", "")),
     stepSize: BigInt(debouncedStepSize),
     pricePoints: BigInt(debouncedNumberOfOffers),
   })
 
-  // const {} = kandelRequirementsQuery.data || {}
+  const { params, minBaseAmount, minQuoteAmount, minProvision, isValid } =
+    data ?? {}
+
+  const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
+  const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
+  const minProv = formatUnits(minProvision || 0n, quoteToken?.decimals || 18)
 
   // I need the distribution to be set in the store to share it with the price range component
   React.useEffect(() => {
-    setDistribution(params)
+    setKandelParams(params)
   }, [params])
 
   const setOffersWithPrices = useNewStratStore(
@@ -166,22 +154,24 @@ export default function useForm() {
 
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (kandelRequirementsQuery.error) {
-      setGlobalError(getErrorMessage(kandelRequirementsQuery.error))
+    if (!isValid) {
+      setGlobalError(
+        getErrorMessage("An error occured, please verify your kandel params"),
+      )
       return
     }
     setGlobalError(undefined)
-  }, [kandelRequirementsQuery.error])
+  }, [isValid])
 
   React.useEffect(() => {
     if (
       isChangingFrom === "numberOfOffers" ||
-      !params.pricePoints ||
-      Number(numberOfOffers) === Number(params.pricePoints) - 1
+      !params?.pricePoints ||
+      Number(numberOfOffers) === Number(params?.pricePoints) - 1
     )
       return
-    setNumberOfOffers(params.pricePoints.toString())
-  }, [params.pricePoints])
+    setNumberOfOffers(params?.pricePoints.toString())
+  }, [params?.pricePoints])
 
   // React.useEffect(() => {
   //   setOffersWithPrices(offersWithPrices)
@@ -254,12 +244,9 @@ export default function useForm() {
     if (Number(baseDeposit) > Number(baseBalance.formatted) && baseDeposit) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
-    } else if (minBaseAmount > 0 && Number(baseDeposit) === 0) {
+    } else if (Number(minBase) > 0 && Number(baseDeposit) === 0) {
       newErrors.baseDeposit = "Base deposit must be greater than 0"
-    } else if (
-      minBaseAmount > 0 &&
-      Number(minBaseAmount) > Number(baseDeposit)
-    ) {
+    } else if (Number(minBase) > 0 && Number(minBase) > Number(baseDeposit)) {
       newErrors.baseDeposit = "Base deposit must be updated"
     } else {
       delete newErrors.baseDeposit
@@ -269,11 +256,12 @@ export default function useForm() {
     if (Number(quoteDeposit) > Number(quoteBalance.formatted) && quoteDeposit) {
       newErrors.quoteDeposit =
         "Quote deposit cannot be greater than wallet balance"
-    } else if (minQuoteAmount > 0 && Number(quoteDeposit) === 0) {
+    } else if (minQuote && Number(minQuote) > 0 && Number(quoteDeposit) === 0) {
       newErrors.quoteDeposit = "Quote deposit must be greater than 0"
     } else if (
-      minQuoteAmount > 0 &&
-      Number(minQuoteAmount) > Number(quoteDeposit)
+      minQuote &&
+      Number(minQuote) > 0 &&
+      Number(minQuote) > Number(quoteDeposit)
     ) {
       newErrors.quoteDeposit = "Quote deposit must updated"
     } else {
@@ -300,20 +288,20 @@ export default function useForm() {
       delete newErrors.stepSize
     }
 
-    if (
-      Number(bountyDeposit) > Number(nativeBalance?.formatted) &&
-      bountyDeposit
-    ) {
+    if (Number(bountyDeposit) > Number(nativeBalance?.value) && bountyDeposit) {
       newErrors.bountyDeposit =
         "Bounty deposit cannot be greater than wallet balance"
-    } else if (minProvision > 0 && Number(bountyDeposit) === 0) {
+    } else if (minProv && Number(minProv) > 0 && Number(bountyDeposit) === 0) {
       newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
-    } else if (bountyDeposit && Number(minProvision) > Number(bountyDeposit)) {
-      newErrors.bountyDeposit = "Bounty deposit must be updated"
+    } else if (
+      minProv &&
+      Number(minProv) > 0 &&
+      Number(minProv) > Number(bountyDeposit)
+    ) {
+      newErrors.bountyDeposit = "Bounty deposit must be greater than 0"
     } else {
       delete newErrors.bountyDeposit
     }
-
     setErrors(newErrors)
   }, [
     baseDeposit,
@@ -339,7 +327,7 @@ export default function useForm() {
     bountyDeposit,
     fieldsDisabled,
     errors,
-    kandelRequirementsQuery,
+    isValid,
     stepSize,
     sendFrom,
     receiveTo,

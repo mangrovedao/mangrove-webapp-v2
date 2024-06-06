@@ -17,7 +17,7 @@ const SmartRouterABI = parseAbi([
   "function bind(address makerContract) public",
 ])
 
-export function useActivateStrategySmartRouter(kandelAddress: string) {
+export function useActivateStrategySmartRouter(kandelAddress?: string) {
   const { address, chain } = useAccount()
   const { mangrove } = useMangrove()
   const publicClient = usePublicClient()
@@ -27,7 +27,14 @@ export function useActivateStrategySmartRouter(kandelAddress: string) {
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!publicClient || !address || !orderContract || !walletClient) return
+        if (
+          !publicClient ||
+          !address ||
+          !orderContract ||
+          !walletClient ||
+          !kandelAddress
+        )
+          throw new Error("Could not bind router, missing params")
 
         const ROUTER_FACTORY = await publicClient.readContract({
           address: orderContract as Address,

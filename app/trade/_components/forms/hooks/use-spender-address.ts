@@ -1,7 +1,6 @@
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
 import { useQuery } from "@tanstack/react-query"
-import { Client } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
 
 export const useSpenderAddress = (
@@ -19,7 +18,7 @@ export const useSpenderAddress = (
         return addresses.mgv
       }
       if (!publicClient || !address) return null
-      return await getUserRouter(publicClient as Client, addresses, {
+      return await getUserRouter(publicClient, addresses, {
         user: address,
       })
     },

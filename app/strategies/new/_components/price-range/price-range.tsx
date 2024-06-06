@@ -50,7 +50,7 @@ export const PriceRange = withClientOnly(function ({
     bountyDeposit,
     stepSize,
     numberOfOffers,
-    distribution,
+    kandelParams,
     offersWithPrices,
     globalError,
     errors,
@@ -70,7 +70,7 @@ export const PriceRange = withClientOnly(function ({
     !maxPrice ||
     !stepSize ||
     !numberOfOffers ||
-    !distribution
+    !kandelParams
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
@@ -321,7 +321,7 @@ export const PriceRange = withClientOnly(function ({
         <DeployStrategyDialog
           strategy={{
             riskAppetite,
-            distribution,
+            kandelParams,
             baseDeposit,
             quoteDeposit,
             priceRange,

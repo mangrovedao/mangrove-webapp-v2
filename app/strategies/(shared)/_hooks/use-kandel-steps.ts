@@ -1,11 +1,11 @@
 import { kandelSeederActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
-import { useSmartKandel } from "@/hooks/use-addresses"
+import { useMangroveAddresses, useSmartKandel } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
-import { Address } from "viem"
-import { useAccount, useClient } from "wagmi"
+import { getUserRouter } from "@mangrovedao/mgv/actions"
+import { useAccount, useClient, usePublicClient } from "wagmi"
 
 export function useKandelSteps() {
   const { address } = useAccount()
@@ -13,32 +13,48 @@ export function useKandelSteps() {
   const client = useClient()
   const smartKandel = useSmartKandel()
 
+  const addresses = useMangroveAddresses()
+  const publicClient = usePublicClient()
+  console.log(1)
   return useQuery({
-    queryKey: ["kandel-steps", client?.account],
+    queryKey: ["kandel-steps", smartKandel, address],
     queryFn: async () => {
       try {
+        console.log(1)
+
         if (
           !smartKandel ||
           !address ||
-          !client?.account ||
+          !publicClient ||
+          !addresses ||
+          !client ||
           !currentMarket?.tickSpacing
         )
-          return
+          throw new Error("Could not fetch kandel steps, missing params")
 
+        console.log(2)
+        const userRouter = await getUserRouter(publicClient, addresses, {
+          user: address,
+        })
         const kandelSeeder = kandelSeederActions(currentMarket, smartKandel)
         const seeder = kandelSeeder(client)
+        console.log(3)
 
         const currentSteps = await seeder.getKandelSteps({
-          user: address as Address,
-          userRouter: address as Address,
+          user: address,
+          userRouter: userRouter,
         })
+
+        console.log(5)
+
+        console.log({ currentSteps })
         return currentSteps
       } catch (e) {
         console.error(getErrorMessage(e))
         throw new Error("Unable to retrieve kandel steps")
       }
     },
-    enabled: !!client?.account,
+    enabled: !!smartKandel && !!address,
     meta: {
       error: "Unable to retrieve kandel steps",
     },

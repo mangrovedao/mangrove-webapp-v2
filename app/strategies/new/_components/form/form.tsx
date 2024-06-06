@@ -14,7 +14,6 @@ import useForm, { MIN_NUMBER_OF_OFFERS, MIN_STEP_SIZE } from "./use-form"
 
 export function Form({ className }: { className?: string }) {
   const {
-    address,
     baseToken,
     quoteToken,
     minBaseAmount,
@@ -30,37 +29,15 @@ export function Form({ className }: { className?: string }) {
     stepSize,
     nativeBalance,
     bountyDeposit,
-    sendFrom,
-    receiveTo,
-    logics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,
     handleStepSizeChange,
     handleBountyDepositChange,
-    handleSendFromChange,
-    handleReceiveToChange,
   } = useForm()
-
-  // const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
-  //   useLiquiditySourcing({
-  //     sendToken: baseToken,
-  //     sendFrom,
-  //     receiveTo,
-  //     receiveToken: quoteToken,
-  //     fundOwner: address,
-  //     mangroveLogics,
-  //   })
 
   const { formatted: baseTokenBalance } = useTokenBalance(baseToken)
   const { formatted: quoteTokenBalance } = useTokenBalance(quoteToken)
-
-  // const baseBalance = sendFromBalance
-  //   ? sendFromBalance.formatted
-  //   : baseTokenBalance
-  // const quoteBalance = receiveToBalance
-  //   ? receiveToBalance.formatted
-  //   : quoteTokenBalance
 
   if (!baseToken || !quoteToken)
     return (

@@ -5,7 +5,6 @@ import { useLoadingStore } from "@/stores/loading.store"
 import { useRefillRequirements } from "../../[address]/_hooks/use-refill-requirements"
 import useKandel from "../../[address]/_providers/kandel-strategy"
 import { MergedOffer } from "../../[address]/_utils/inventory"
-import useStrategyStatus from "./use-strategy-status"
 
 type Props = {
   offer: MergedOffer
@@ -20,12 +19,12 @@ export function useRefillOffer({ offer, onCancel }: Props) {
 
   const { market } = strategyStatusQuery.data ?? {}
 
-  const { data: strategy } = useStrategyStatus({
-    address: strategyAddress,
-    base: market?.base.symbol,
-    quote: market?.quote.symbol,
-    offers: strategyQuery.data?.offers,
-  })
+  // const { data: strategy } = useStrategyStatus({
+  //   address: strategyAddress,
+  //   base: market?.base.symbol,
+  //   quote: market?.quote.symbol,
+  //   offers: strategyQuery.data?.offers,
+  // })
 
   const queryClient = useQueryClient()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
@@ -44,11 +43,9 @@ export function useRefillOffer({ offer, onCancel }: Props) {
     mutationKey: ["refill-offer", offer.index],
     mutationFn: async () => {
       try {
-        if (!strategy || !strategyQuery)
-          throw new Error("Could not refill offer")
-
-        const { kandelInstance } = strategy
-
+        // if (!strategy || !strategyQuery)
+        //   throw new Error("Could not refill offer")
+        // const { kandelInstance } = strategy
         // const singleOfferDistributionChunk = {
         //   bids:
         //     offer.offerType === "bids"
@@ -71,7 +68,6 @@ export function useRefillOffer({ offer, onCancel }: Props) {
         //         ]
         //       : [],
         // }
-
         //note: to re-implement
         // kandelInstance?.simulatePopulateChunk({
         //   bidGives:
@@ -83,9 +79,7 @@ export function useRefillOffer({ offer, onCancel }: Props) {
         // const transaction = await stratInstance?.populateGeneralChunks({
         //   distributionChunks: [singleOfferDistributionChunk],
         // })
-
         // const txs = await Promise.all(transaction.map((tx) => tx?.wait()))
-
         // return { txs }
       } catch (error) {
         console.error(error)
