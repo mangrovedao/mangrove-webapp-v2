@@ -24,6 +24,8 @@ const useKandelStrategyContext = () => {
     strategyQuery.data?.quote as Address,
   )
 
+  console.log({ baseToken, quoteToken })
+
   const strategyStatusQuery = useStrategyStatus({
     address: params.address,
     base: strategyQuery.data?.base,
