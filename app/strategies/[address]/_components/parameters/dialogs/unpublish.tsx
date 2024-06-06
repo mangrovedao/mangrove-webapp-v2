@@ -14,7 +14,6 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
-import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import useKandel from "../../../_providers/kandel-strategy"
 import { MergedOffers } from "../../../_utils/inventory"
@@ -33,12 +32,17 @@ export function UnPublish({ open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyAddress, mergedOffers } = useKandel()
-  const { currentMarket: market } = useMarket()
+  const {
+    strategyQuery,
+    strategyAddress,
+    mergedOffers,
+    baseToken,
+    quoteToken,
+  } = useKandel()
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
-    base: market?.base.symbol,
-    quote: market?.quote.symbol,
+    base: baseToken?.symbol,
+    quote: quoteToken?.symbol,
     offers: strategyQuery.data?.offers,
   })
 
@@ -51,11 +55,9 @@ export function UnPublish({ open, onClose }: Props) {
 
   const { publishedBase, publishedQuote } = useParameters()
 
-  const publishBaseFormatted = publishedBase.toFixed(
-    market?.base.displayDecimals,
-  )
+  const publishBaseFormatted = publishedBase.toFixed(baseToken?.displayDecimals)
   const publishQuoteFormatted = publishedQuote.toFixed(
-    market?.base.displayDecimals,
+    baseToken?.displayDecimals,
   )
 
   const publish = useUnPublish({
@@ -73,11 +75,11 @@ export function UnPublish({ open, onClose }: Props) {
               onClick: () => setBaseAmount(publishBaseFormatted),
             }}
             value={baseAmount}
-            label={`${market?.base.symbol} amount`}
+            label={`${baseToken?.symbol} amount`}
             customBalance={publishBaseFormatted}
             showBalance
             balanceLabel="Unpublished inventory"
-            token={market?.base}
+            token={baseToken}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
               Number(baseAmount) > Number(publishedBase)
@@ -91,11 +93,11 @@ export function UnPublish({ open, onClose }: Props) {
               onClick: () => setQuoteAmount(publishQuoteFormatted),
             }}
             value={quoteAmount}
-            label={`${market?.quote.symbol} amount`}
+            label={`${quoteToken?.symbol} amount`}
             customBalance={publishQuoteFormatted}
             showBalance
             balanceLabel="Unpublished inventory"
-            token={market?.quote}
+            token={quoteToken}
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
               Number(quoteAmount) > Number(publishQuoteFormatted)
@@ -139,15 +141,15 @@ export function UnPublish({ open, onClose }: Props) {
           <div className="grid gap-2 p-5 bg-primary-dark-green rounded-lg">
             <Title>Review</Title>
             <div className="flex justify-between">
-              <Text>{market?.base.symbol} amount</Text>
+              <Text>{baseToken?.symbol} amount</Text>
               <Text className="text-primary">
-                {baseAmount} {market?.base.symbol}
+                {baseAmount} {baseToken?.symbol}
               </Text>
             </div>
             <div className="flex justify-between">
-              <Text>{market?.quote.symbol} amount</Text>
+              <Text>{quoteToken?.symbol} amount</Text>
               <Text className="text-primary">
-                {quoteAmount} {market?.quote.symbol}
+                {quoteAmount} {quoteToken?.symbol}
               </Text>
             </div>
           </div>

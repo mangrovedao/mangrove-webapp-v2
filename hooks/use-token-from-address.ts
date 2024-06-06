@@ -10,7 +10,7 @@ export function useTokenFromAddress(address: Address) {
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["tokenFromAddress", address, tokens],
     queryFn: () => {
-      if (!(address && tokens)) return null
+      if (!(address && tokens)) return undefined
       return tokens.find((item) => item.address == address)
     },
     enabled: !!(address && tokens),

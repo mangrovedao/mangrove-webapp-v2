@@ -2,6 +2,7 @@ import { KandelParams, Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import { useKandelSteps } from "@/app/strategies/(shared)/_hooks/use-kandel-steps"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
@@ -14,7 +15,6 @@ import { Separator } from "@/components/ui/separator"
 import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
-import useMarket from "@/providers/market.new"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
 import { useCloseStrategy } from "../../_hooks/use-close-strategy"
 import useKandel from "../../_providers/kandel-strategy"
@@ -47,8 +47,6 @@ export default function EditStrategyDialog({
   strategy,
 }: Props) {
   const { address } = useAccount()
-  const { currentMarket } = useMarket()
-  const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
   const { data: kandelSteps } = useKandelSteps()
   const logics = useLogics()
 
@@ -59,7 +57,7 @@ export default function EditStrategyDialog({
   })
   const { data: spender } = useSpenderAddress("kandel")
 
-  const { strategyQuery } = useKandel()
+  const { strategyQuery, baseToken, quoteToken } = useKandel()
   const kandelAddress = strategyQuery.data?.address
 
   const approveBaseToken = useInfiniteApproveToken()
@@ -68,8 +66,14 @@ export default function EditStrategyDialog({
   const { mutate: retractOffers, isPending: isRetractingOffers } =
     useCloseStrategy({ strategyAddress: kandelAddress })
 
+  const kandelClient = useKandelInstance({
+    address: kandelAddress,
+    base: baseToken?.address,
+    quote: quoteToken?.address,
+  })
+
   const { mutate: editKandelStrategy, isPending: isEditingKandelStrategy } =
-    useEditKandelStrategy()
+    useEditKandelStrategy(kandelClient)
 
   const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)

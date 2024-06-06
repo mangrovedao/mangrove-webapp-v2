@@ -3,7 +3,6 @@ import { toast } from "sonner"
 
 import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
-import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { KandelParams } from "@mangrovedao/mgv"
 import { Address, parseEther } from "viem"
@@ -14,20 +13,15 @@ type FormValues = {
   bountyDeposit: string
 }
 
-export function useEditKandelStrategy(kandelAddress?: string) {
-  const { currentMarket: market } = useMarket()
+export function useEditKandelStrategy(
+  kandelClient?: ReturnType<typeof useKandelInstance>,
+) {
   const queryClient = useQueryClient()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
 
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
-
-  const kandelClient = useKandelInstance({
-    address: kandelAddress,
-    base: market?.base.address,
-    quote: market?.quote.address,
-  })
 
   return useMutation({
     mutationFn: async ({ kandelParams, bountyDeposit }: FormValues) => {

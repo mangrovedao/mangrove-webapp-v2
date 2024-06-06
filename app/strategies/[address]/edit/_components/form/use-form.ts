@@ -11,7 +11,6 @@ import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-v
 import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
 import {
   ChangingFrom,
@@ -25,9 +24,14 @@ export const MIN_STEP_SIZE = 1
 export default function useForm() {
   const { address } = useAccount()
   const { mangrove } = useMangrove()
-  const { currentMarket: market } = useMarket()
-  const baseToken = market?.base
-  const quoteToken = market?.quote
+  const {
+    strategyStatusQuery,
+    mergedOffers,
+    strategyQuery,
+    baseToken,
+    quoteToken,
+  } = useKandel()
+
   const baseBalance = useTokenBalance(baseToken)
   const quoteBalance = useTokenBalance(quoteToken)
   const { data: nativeBalance } = useBalance({
@@ -36,7 +40,6 @@ export default function useForm() {
   const { data: kandelState } = useKandelState()
   const logics = useLogics()
 
-  const { strategyStatusQuery, mergedOffers, strategyQuery } = useKandel()
   const { currentParameter, offers } = strategyQuery.data ?? {}
 
   const asksOffers = mergedOffers?.filter((item) => item.offerType === "asks")

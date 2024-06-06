@@ -2,13 +2,10 @@
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
-import { Address } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
-import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import { default as useMarketNew } from "@/providers/market.new"
 
 import { useBook } from "@/hooks/use-book"
 import {
@@ -33,17 +30,9 @@ export const PriceRange = withClientOnly(function ({
   const { book, isLoading } = useBook()
   const midPrice = book?.midPrice
   const riskAppetite = book?.spreadPercent
-  const { mergedOffers, strategyQuery } = useKandel()
-  const { currentMarket: market } = useMarketNew()
+  const { mergedOffers, strategyQuery, baseToken, quoteToken } = useKandel()
 
-  const { data: baseToken } = useTokenFromAddress(
-    market?.base.address as Address,
-  )
-  const { data: quoteToken } = useTokenFromAddress(
-    market?.quote.address as Address,
-  )
-
-  const priceDecimals = market?.quote.decimals
+  const priceDecimals = quoteToken?.decimals
 
   const [summaryDialog, setSummaryDialog] = React.useState(false)
   const [minPrice, setMinPrice] = React.useState("")
@@ -252,13 +241,13 @@ export const PriceRange = withClientOnly(function ({
         />
 
         <div className="gap-6 xl:gap-4 flex flex-col xl:flex-row w-full justify-center items-start border-b pb-6 mb-6">
-          {market?.quote && (
+          {quoteToken && (
             <div className="flex space-x-4 xl:flex-1 w-full">
               <EnhancedNumericInput
                 label="Min Price"
                 value={minPrice}
                 onChange={handleMinPriceChange}
-                token={market.quote}
+                token={quoteToken}
                 className="w-full"
                 error={
                   isChangingFrom === "minPrice" ? errors.minPrice : undefined
@@ -281,13 +270,13 @@ export const PriceRange = withClientOnly(function ({
           <div className="h-20 w-4 xl:flex items-center hidden">
             <span className="h-px w-4 bg-cloud-400"></span>
           </div>
-          {market?.quote && (
+          {quoteToken && (
             <div className="flex space-x-4 xl:flex-1 w-full">
               <EnhancedNumericInput
                 label="Max Price"
                 value={maxPrice}
                 onChange={handleMaxPriceChange}
-                token={market.quote}
+                token={quoteToken}
                 className="w-full"
                 error={
                   isChangingFrom === "maxPrice" ? errors.minPrice : undefined

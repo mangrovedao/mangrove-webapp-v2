@@ -131,6 +131,7 @@ export const useParameters = () => {
       formatUnits(quote, (market?.quote.decimals as number) ?? 0),
     ]
   }
+
   React.useEffect(() => {
     const fetchUnpublishedBalancesAndBounty = async () => {
       // const [base, quote] = await getUnpublishedBalances()
@@ -173,7 +174,7 @@ export const useParameters = () => {
         pnlQuote === "Upcoming"
           ? "Upcoming"
           : pnlQuote && market?.quote.symbol
-            ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+            ? `${Number(pnlQuote ?? 0).toFixed(market?.quote.displayDecimals)} ${market?.quote.symbol}`
             : "",
       returnRate:
         // "Upcoming"
@@ -181,7 +182,7 @@ export const useParameters = () => {
         returnRate === "Upcoming"
           ? "Upcoming"
           : returnRate && market?.quote.symbol
-            ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayedDecimals)} ${market?.quote.symbol}`
+            ? `${Number(returnRate ?? 0).toFixed(market?.quote.displayDecimals)} ${market?.quote.symbol}`
             : "",
     },
     withdrawBase,

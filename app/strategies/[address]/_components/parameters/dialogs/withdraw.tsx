@@ -15,7 +15,6 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
-import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import Link from "next/link"
@@ -35,16 +34,14 @@ export function Withdraw({ open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyAddress } = useKandel()
+  const { strategyQuery, strategyAddress, baseToken, quoteToken } = useKandel()
   const { withdrawBase, withdrawQuote } = useParameters()
   const { address } = useAccount()
 
-  const { currentMarket: market } = useMarket()
-
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
-    base: market?.base.symbol,
-    quote: market?.quote.symbol,
+    base: baseToken?.symbol,
+    quote: quoteToken?.symbol,
     offers: strategyQuery.data?.offers,
   })
 
@@ -70,11 +67,11 @@ export function Withdraw({ open, onClose }: Props) {
               onClick: () => setBaseAmount(withdrawBase),
             }}
             value={baseAmount}
-            label={`${market?.base.symbol} amount`}
+            label={`${baseToken?.symbol} amount`}
             customBalance={withdrawBase}
             showBalance
             balanceLabel="Withdrawable inventory"
-            token={market?.base}
+            token={baseToken}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
               Number(baseAmount) > Number(withdrawBase) ? "Invalid amount" : ""
@@ -86,7 +83,7 @@ export function Withdraw({ open, onClose }: Props) {
               onClick: () => setQuoteAmount(withdrawQuote),
             }}
             value={quoteAmount}
-            label={`${market?.quote.symbol} amount`}
+            label={`${quoteToken?.symbol} amount`}
             customBalance={withdrawQuote}
             balanceLabel="Withdrawable inventory"
             onChange={(e) => setQuoteAmount(e.target.value)}
@@ -95,7 +92,7 @@ export function Withdraw({ open, onClose }: Props) {
                 ? "Invalid amount"
                 : ""
             }
-            token={market?.quote}
+            token={quoteToken}
             showBalance
           />
         </div>
@@ -130,15 +127,15 @@ export function Withdraw({ open, onClose }: Props) {
         <div className="grid gap-2 p-5 bg-primary-dark-green rounded-lg">
           <Title>Review</Title>
           <div className="flex justify-between">
-            <Text>{market?.base.symbol} amount</Text>
+            <Text>{baseToken?.symbol} amount</Text>
             <Text className="text-primary">
-              {baseAmount} {market?.base.symbol}
+              {baseAmount} {baseToken?.symbol}
             </Text>
           </div>
           <div className="flex justify-between">
-            <Text>{market?.quote.symbol} amount</Text>
+            <Text>{quoteToken?.symbol} amount</Text>
             <Text className="text-primary">
-              {quoteAmount} {market?.quote.symbol}
+              {quoteAmount} {quoteToken?.symbol}
             </Text>
           </div>
           <div className="flex justify-between">

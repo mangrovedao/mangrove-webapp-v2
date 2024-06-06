@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
-import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { useLoadingStore } from "@/stores/loading.store"
@@ -22,7 +21,6 @@ export function useCloseStrategy({ strategyAddress }: Props) {
   const queryClient = useQueryClient()
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
-  const marketClient = useMarketClient()
   const strategyQuery = useStrategy({
     strategyAddress: strategyAddress as string,
   })
