@@ -69,6 +69,10 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           receiveTo,
         } = form
 
+        const { base, quote } = market
+        const receiveToken = bs === "buy" ? base : quote
+        const sendToken = bs === "buy" ? quote : base
+
         const takerGivesLogic = logics.find(
           (item) => item.name === sendFrom,
         )?.logic
@@ -114,7 +118,16 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           },
         )
 
-        successToast(TradeMode.LIMIT, bs, market.base, gives, result)
+        successToast(
+          TradeMode.LIMIT,
+          bs,
+          base,
+          quote,
+          result,
+          receiveToken,
+          sendToken,
+        )
+
         return { result, receipt }
       } catch (error) {
         if (error instanceof BaseError) {
