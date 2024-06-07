@@ -15,13 +15,11 @@ export function useKandelSteps() {
 
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
-  console.log(1)
+
   return useQuery({
     queryKey: ["kandel-steps", smartKandel, address],
     queryFn: async () => {
       try {
-        console.log(1)
-
         if (
           !smartKandel ||
           !address ||
@@ -32,22 +30,17 @@ export function useKandelSteps() {
         )
           throw new Error("Could not fetch kandel steps, missing params")
 
-        console.log(2)
         const userRouter = await getUserRouter(publicClient, addresses, {
           user: address,
         })
         const kandelSeeder = kandelSeederActions(currentMarket, smartKandel)
         const seeder = kandelSeeder(client)
-        console.log(3)
 
         const currentSteps = await seeder.getKandelSteps({
           user: address,
           userRouter: userRouter,
         })
 
-        console.log(5)
-
-        console.log({ currentSteps })
         return currentSteps
       } catch (e) {
         console.error(getErrorMessage(e))

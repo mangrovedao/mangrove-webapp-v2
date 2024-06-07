@@ -206,6 +206,7 @@ export default function Parameters() {
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
         {/* <PublishedInventory /> */}
+
         <BountyInventory />
         <Inventory />
       </div>
