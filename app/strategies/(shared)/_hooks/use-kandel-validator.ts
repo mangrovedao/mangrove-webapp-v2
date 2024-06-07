@@ -29,15 +29,6 @@ export function useValidateKandel(
       try {
         if (!book || !currentMarket)
           throw new Error("Could not validate kandel, missing params")
-        console.log(kandelParams)
-
-        if (
-          !kandelParams.minPrice ||
-          !kandelParams.maxPrice ||
-          !kandelParams.baseAmount ||
-          !kandelParams.quoteAmount
-        )
-          return null
 
         const {
           params,
