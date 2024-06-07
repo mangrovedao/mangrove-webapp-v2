@@ -37,9 +37,14 @@ export default function MarketSelector({ disabled }: { disabled?: boolean }) {
   )
 
   const onValueChange = (value: string) => {
-    router.push(`?market=${baseToken?.address},${quoteToken?.address}`, {
-      scroll: false,
-    })
+    console.log(value)
+    const urlInfo = value.split("/")
+    router.push(
+      `?market=${urlInfo[0]},${urlInfo[1]},${currentMarket?.tickSpacing}`,
+      {
+        scroll: false,
+      },
+    )
   }
 
   return (
