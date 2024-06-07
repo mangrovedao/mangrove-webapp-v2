@@ -55,8 +55,10 @@ export function UnPublish({ open, onClose }: Props) {
 
   const { publishedBase, publishedQuote } = useParameters()
 
-  const publishBaseFormatted = publishedBase.toFixed(baseToken?.displayDecimals)
-  const publishQuoteFormatted = publishedQuote.toFixed(
+  const publishBaseFormatted = publishedBase?.toFixed(
+    baseToken?.displayDecimals,
+  )
+  const publishQuoteFormatted = publishedQuote?.toFixed(
     baseToken?.displayDecimals,
   )
 
@@ -72,7 +74,7 @@ export function UnPublish({ open, onClose }: Props) {
         <div className="grid gap-4">
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setBaseAmount(publishBaseFormatted),
+              onClick: () => setBaseAmount(publishBaseFormatted || ""),
             }}
             value={baseAmount}
             label={`${baseToken?.symbol} amount`}
@@ -90,7 +92,7 @@ export function UnPublish({ open, onClose }: Props) {
 
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setQuoteAmount(publishQuoteFormatted),
+              onClick: () => setQuoteAmount(publishQuoteFormatted || ""),
             }}
             value={quoteAmount}
             label={`${quoteToken?.symbol} amount`}
