@@ -166,10 +166,10 @@ export default function useForm() {
   const setOffersWithPrices = useNewStratStore(
     (store) => store.setOffersWithPrices,
   )
-
+  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (!isValid) {
+    if (!isValid && !isMissingField) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )

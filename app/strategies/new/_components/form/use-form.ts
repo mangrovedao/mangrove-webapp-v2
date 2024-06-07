@@ -74,6 +74,7 @@ export default function useForm() {
     stepSize: BigInt(debouncedStepSize),
     pricePoints: BigInt(debouncedNumberOfOffers),
   })
+
   const { params, minBaseAmount, minQuoteAmount, minProvision, isValid } =
     data ?? {}
 
@@ -97,9 +98,10 @@ export default function useForm() {
     setReceiveTo("simple")
   }, [market?.base, market?.quote])
 
+  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (!isValid) {
+    if (!isValid && !isMissingField) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )
