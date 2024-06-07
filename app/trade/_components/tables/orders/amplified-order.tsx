@@ -3,7 +3,7 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import CancelAmplifiedOfferDialog from "./components/cancel-amplified-offer-dialog"
 import EditAmplifiedOrderSheet from "./components/edit-amplified-order-sheet"
 import { useAmplifiedOrders } from "./hooks/use-amplified-orders"
@@ -16,7 +16,7 @@ export function AmplifiedOrders() {
     page: 1,
     pageSize: 10,
   })
-  const { market } = useMarket()
+  const { currentMarket, setMarket, markets } = useMarket()
   const { marketsInfoQuery, mangrove } = useMangrove()
   const { data: openMarkets } = marketsInfoQuery
   const { data: count } = useOrders({
@@ -47,7 +47,7 @@ export function AmplifiedOrders() {
       <DataTable
         table={table}
         isError={!!amplifiedOrdersQuery.error}
-        isLoading={amplifiedOrdersQuery.isLoading || !market}
+        isLoading={amplifiedOrdersQuery.isLoading || !currentMarket}
         onRowClick={(order) =>
           setOrderToEdit({ order: order as AmplifiedOrder, mode: "view" })
         }
@@ -65,7 +65,7 @@ export function AmplifiedOrders() {
       />
       <CancelAmplifiedOfferDialog
         order={orderToDelete}
-        market={market}
+        market={{ currentMarket, setMarket, markets }}
         onClose={() => setOrderToDelete(undefined)}
       />
     </>

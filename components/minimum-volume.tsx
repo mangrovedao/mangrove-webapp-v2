@@ -1,4 +1,4 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -59,7 +59,7 @@ export function MinimumVolume(props: {
                 }}
               >
                 <span>
-                  {Number(props.volume).toFixed(token?.displayedDecimals)}{" "}
+                  {Number(props.volume).toFixed(token?.displayDecimals)}{" "}
                   {token?.symbol}
                 </span>
               </TooltipTrigger>

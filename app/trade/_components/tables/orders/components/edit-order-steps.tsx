@@ -5,13 +5,15 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { BS } from "@mangrovedao/mgv/lib"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../../forms/components/approve-step"
 import { Steps } from "../../../forms/components/steps"
-import { TradeAction } from "../../../forms/enums"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
+import { useLimitSteps } from "../../../forms/limit/hooks/use-steps"
 import { useUpdateOrder } from "../hooks/use-update-order"
 import { Order } from "../schema"
 import { Form } from "../types"
@@ -85,14 +87,23 @@ export default function EditOrderSteps({
 
   displayDecimals,
 }: Props) {
-  const { chain } = useAccount()
-  const { sendToken, isInfiniteAllowance, spender } = useTradeInfos(
+  const { chain, address } = useAccount()
+  const logics = useLogics()
+
+  const { sendToken, spender } = useTradeInfos(
     "limit",
-    order.isBid ? TradeAction.BUY : TradeAction.SELL,
+    order.isBid ? BS.buy : BS.sell,
   )
+  const orderLogic = logics.find((item) => item.logic == order.outboundRoute)
+
+  const { data: limitOrderSteps } = useLimitSteps({
+    user: address,
+    bs: BS.buy,
+    logic: orderLogic?.name,
+  })
 
   let steps = ["Update order"]
-  if (!isInfiniteAllowance) {
+  if (!limitOrderSteps?.[0].done) {
     steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
   }
 
@@ -131,7 +142,7 @@ export default function EditOrderSteps({
   const { goToNextStep } = helpers
 
   const stepInfos = [
-    !isInfiniteAllowance && {
+    !limitOrderSteps?.[0].done && {
       body: (
         <Summary
           displayDecimals={displayDecimals}
@@ -153,7 +164,7 @@ export default function EditOrderSteps({
         </>
       ),
     },
-    !isInfiniteAllowance && {
+    !limitOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
         <Button

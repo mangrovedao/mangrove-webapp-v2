@@ -1,10 +1,16 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Logic, Token } from "@mangrovedao/mgv"
 import { useMutation } from "@tanstack/react-query"
+import { Address, erc20Abi, maxUint256 } from "viem"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
-import { DefaultStrategyLogics } from "@/app/strategies/(shared)/type"
-import { DefaultTradeLogics } from "@/app/trade/_components/forms/types"
+import { useBalances } from "./use-balances"
 
 export function useInfiniteApproveToken() {
+  const { address: userAddress } = useAccount()
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const balances = useBalances()
+
   return useMutation({
     mutationFn: async ({
       token,
@@ -12,28 +18,35 @@ export function useInfiniteApproveToken() {
       logic,
     }: {
       token?: Token
-      logic?: DefaultTradeLogics | DefaultStrategyLogics
+      logic?: Logic
       spender?: string | null
     }) => {
       try {
-        if (!(token && spender)) return
-        if (logic) {
-          try {
-            const tokenToApprove = await logic.overlying(token)
-            if (tokenToApprove instanceof Token) {
-              const result = await tokenToApprove.approve(spender)
-              return result.wait()
-            } else {
-              // TODO: implement logic for erc721
-              return undefined
-            }
-          } catch (error) {
-            throw new Error(`Could set approval for ${logic.id} sourcing`)
-          }
-        } else {
-          const result = await token.approve(spender)
-          return result.wait()
-        }
+        if (!(token && spender && publicClient && walletClient)) return
+
+        const logicToken = balances.balances?.overlying.find(
+          (item) => item.logic.name === logic?.name,
+        )
+
+        const tokenToApprove =
+          logic && logicToken?.overlying
+            ? logicToken?.overlying?.address
+            : token.address
+
+        const { request } = await publicClient.simulateContract({
+          address: tokenToApprove,
+          abi: erc20Abi,
+          functionName: "approve",
+          args: [spender as Address, maxUint256],
+          account: userAddress,
+        })
+
+        const hash = await walletClient.writeContract(request)
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash,
+        })
+
+        return receipt
       } catch (error) {
         console.error(error)
         throw new Error("Failed the approval")

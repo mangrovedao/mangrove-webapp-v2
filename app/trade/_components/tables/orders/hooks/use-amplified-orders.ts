@@ -70,7 +70,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
         return parseAmplifiedOrders(filteredResult)
       } catch (e) {
         console.error(e)
-        throw new Error("")
+        throw new Error("Unable to retrieve amplified orders")
       } finally {
         stopLoading(TRADE.TABLES.ORDERS)
       }

@@ -33,16 +33,21 @@ export function Publish({ open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyStatusQuery, strategyAddress, mergedOffers } =
-    useKandel()
+  const {
+    baseToken,
+    quoteToken,
+    strategyQuery,
+    strategyStatusQuery,
+    strategyAddress,
+    mergedOffers,
+  } = useKandel()
 
   const { unPublishedBase, unPublishedQuote } = useParameters()
 
-  const { market } = strategyStatusQuery.data ?? {}
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
-    base: market?.base.symbol,
-    quote: market?.quote.symbol,
+    base: baseToken?.address,
+    quote: quoteToken?.address,
     offers: strategyQuery.data?.offers,
   })
 
@@ -54,7 +59,7 @@ export function Publish({ open, onClose }: Props) {
   const [quoteAmount, setQuoteAmount] = React.useState("")
 
   const publish = usePublish({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     mergedOffers: mergedOffers as MergedOffers,
     volumes: { baseAmount, quoteAmount },
   })
@@ -68,11 +73,11 @@ export function Publish({ open, onClose }: Props) {
               onClick: () => setBaseAmount(unPublishedBase),
             }}
             value={baseAmount}
-            label={`${market?.base.symbol} amount`}
+            label={`${baseToken?.symbol} amount`}
             customBalance={unPublishedBase}
             showBalance
             balanceLabel="Unpublished inventory"
-            token={market?.base}
+            token={baseToken}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
               Number(baseAmount) > Number(unPublishedBase)
@@ -86,11 +91,11 @@ export function Publish({ open, onClose }: Props) {
               onClick: () => setQuoteAmount(unPublishedQuote),
             }}
             value={quoteAmount}
-            label={`${market?.quote.symbol} amount`}
+            label={`${quoteToken?.symbol} amount`}
             customBalance={unPublishedQuote}
             showBalance
             balanceLabel="Unpublished inventory"
-            token={market?.quote}
+            token={quoteToken}
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
               Number(quoteAmount) > Number(unPublishedQuote)
@@ -134,15 +139,15 @@ export function Publish({ open, onClose }: Props) {
           <div className="grid gap-2 p-5 bg-primary-dark-green rounded-lg">
             <Title>Review</Title>
             <div className="flex justify-between">
-              <Text>{market?.base.symbol} amount</Text>
+              <Text>{baseToken?.symbol} amount</Text>
               <Text className="text-primary">
-                {baseAmount} {market?.base.symbol}
+                {baseAmount} {baseToken?.symbol}
               </Text>
             </div>
             <div className="flex justify-between">
-              <Text>{market?.quote.symbol} amount</Text>
+              <Text>{quoteToken?.symbol} amount</Text>
               <Text className="text-primary">
-                {quoteAmount} {market?.quote.symbol}
+                {quoteAmount} {quoteToken?.symbol}
               </Text>
             </div>
           </div>

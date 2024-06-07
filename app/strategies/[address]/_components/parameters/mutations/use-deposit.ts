@@ -1,12 +1,12 @@
-import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 export function useDeposit({
-  stratInstance,
+  kandelInstance,
   volumes,
 }: {
-  stratInstance?: GeometricKandelInstance
+  kandelInstance?: ReturnType<typeof useKandelInstance>
   volumes: { baseAmount?: string; quoteAmount?: string }
 }) {
   const queryClient = useQueryClient()
@@ -14,31 +14,31 @@ export function useDeposit({
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!stratInstance) {
+        if (!kandelInstance) {
           throw new Error("Strategy Instance could not be fetched")
         }
         const { baseAmount, quoteAmount } = volumes
+        // note: to re-implement
+        // const approvalTxs = await kandelInstance?.approveIfHigher(
+        //   baseAmount,
+        //   quoteAmount,
+        // )
 
-        const approvalTxs = await stratInstance?.approveIfHigher(
-          baseAmount,
-          quoteAmount,
-        )
+        // // Wait for all the transactions to be approved
+        // await Promise.all(approvalTxs.map((tx) => tx?.wait()))
 
-        // Wait for all the transactions to be approved
-        await Promise.all(approvalTxs.map((tx) => tx?.wait()))
+        // // Deposit
+        // const depositRes = await kandelInstance?.deposit({
+        //   baseAmount,
+        //   quoteAmount,
+        // })
 
-        // Deposit
-        const depositRes = await stratInstance?.deposit({
-          baseAmount,
-          quoteAmount,
-        })
+        // await depositRes.wait()
 
-        await depositRes.wait()
-
-        const res = await depositRes.wait()
+        // const res = await depositRes.wait()
 
         toast.success("Deposited successfully")
-        return res.blockNumber
+        // return res.blockNumber
         // TODO: refetch historic data and overview/params data
       } catch (err) {
         console.error(err)

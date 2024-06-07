@@ -53,10 +53,10 @@ export function useTable({ data }: Params) {
       columnHelper.display({
         header: "Wallet balance",
         cell: ({ row }) => {
-          const { address } = row.original
+          const { address, symbol } = row.original
           return (
             <div className="flex flex-col">
-              {address && <TokenBalance address={address} />}
+              {address && <TokenBalance address={address} symbol={symbol} />}
             </div>
           )
         },

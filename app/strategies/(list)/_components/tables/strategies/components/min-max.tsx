@@ -11,7 +11,7 @@ type Props = {
 }
 export function MinMax({ min, max, quote }: Props) {
   const { data: quoteToken } = useTokenFromAddress(quote as Address)
-  const displayedDecimals = quoteToken?.displayedDecimals ?? 2
+  const displayedDecimals = quoteToken?.displayDecimals ?? 2
   const symbol = quoteToken?.symbol
 
   if (!quoteToken) {

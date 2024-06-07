@@ -1,8 +1,12 @@
-import type { Market } from "@mangrovedao/mangrove.js"
+import { BS } from "@mangrovedao/mgv/lib"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+import { usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
+import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
+import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import type { Order } from "../schema"
 
@@ -18,6 +22,9 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
     state.startLoading,
     state.stopLoading,
   ])
+  const { data: walletClient } = useWalletClient()
+  const marketClient = useMarketClient()
+  const publicClient = usePublicClient()
 
   return useMutation({
     /*
@@ -27,25 +34,43 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
      * for each retraction operation.
      */
     mutationKey: ["retractOrder", offerId],
-    mutationFn: async ({ order, market }: { order: Order; market: Market }) => {
-      const retract = await market.retractRestingOrder(
-        order.isBid ? "bids" : "asks",
-        Number(order.offerId),
-        true,
-      )
-      // wait the transaction to be mined
-      await retract.result
-      return { retract }
+    mutationFn: async ({
+      order,
+      market,
+    }: {
+      order: Order
+      market: ReturnType<typeof useMarket>
+    }) => {
+      try {
+        if (!offerId || !walletClient || !publicClient || !marketClient)
+          throw new Error("Retract order missing params")
+
+        const { request } = await marketClient.simulateRemoveOrder({
+          offerId: BigInt(offerId),
+          bs: order.isBid ? BS.buy : BS.sell,
+        })
+
+        const tx = await walletClient.writeContract(request)
+
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: tx,
+        })
+
+        return receipt
+      } catch (error) {
+        console.error(error)
+        toast.error(`Failed to retract the order ${offerId ?? ""}`)
+      }
     },
     onSuccess: async (data) => {
       if (!data) return
-      const { retract } = data
+      const { blockNumber } = data
       onCancel?.()
       try {
         startLoading(TRADE.TABLES.ORDERS)
-        const { blockNumber } = await (await retract.response).wait()
+
         await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber,
+          blockNumber: Number(blockNumber),
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
       } catch (error) {

@@ -1,6 +1,6 @@
 "use client"
 
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 import getUserLocale from "get-user-locale"
 
 export function formatNumber(
@@ -60,7 +60,7 @@ export function determinePriceDecimalsFromToken(
   value: number | bigint | undefined,
   token?: Token,
 ) {
-  return determineDecimals(value, token?.displayedAsPriceDecimals)
+  return determineDecimals(value, token?.priceDisplayDecimals)
 }
 
 export function getSeparator() {

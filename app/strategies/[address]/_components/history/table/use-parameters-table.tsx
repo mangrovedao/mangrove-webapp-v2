@@ -27,8 +27,8 @@ type Params = {
 export function useParametersTable({ data }: Params) {
   const { strategyStatusQuery } = useKandel()
   const { market } = strategyStatusQuery.data ?? {}
-  const baseDecimals = market?.base.displayedDecimals
-  const quoteDecimals = market?.quote.displayedDecimals
+  const baseDecimals = market?.base.displayDecimals
+  const quoteDecimals = market?.quote.displayDecimals
   const { address, chain } = useAccount()
   const { data: nativeBalance } = useBalance({
     address,

@@ -46,7 +46,7 @@ export function useOffersTable({ data }: Params) {
           const { price } = row.original
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(price).toFixed(market?.quote.displayedDecimals)}{" "}
+              {Number(price).toFixed(market?.quote.displayDecimals)}{" "}
               {market?.quote.symbol}
             </div>
           )
@@ -61,7 +61,7 @@ export function useOffersTable({ data }: Params) {
           const { base } = row.original
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(base).toFixed(market?.base.displayedDecimals)}{" "}
+              {Number(base).toFixed(market?.base.displayDecimals)}{" "}
               {market?.base.symbol}
             </div>
           )
@@ -76,7 +76,7 @@ export function useOffersTable({ data }: Params) {
           const { quote } = row.original
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(quote).toFixed(market?.quote.displayedDecimals)}{" "}
+              {Number(quote).toFixed(market?.quote.displayDecimals)}{" "}
               {market?.quote.symbol}
             </div>
           )

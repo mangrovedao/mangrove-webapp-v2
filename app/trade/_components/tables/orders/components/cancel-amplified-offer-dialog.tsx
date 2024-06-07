@@ -1,13 +1,12 @@
-import type { Market } from "@mangrovedao/mangrove.js"
-
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
+import useMarket from "@/providers/market.new"
 import { useCancelAmplifiedOrder } from "../hooks/use-cancel-amplified-order"
 import type { AmplifiedOrder } from "../schema"
 
 type Props = {
   order?: AmplifiedOrder
-  market?: Market
+  market?: ReturnType<typeof useMarket>
   onClose: () => void
 }
 

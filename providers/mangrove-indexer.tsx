@@ -79,7 +79,7 @@ const useIndexerSdkContext = () => {
     meta: {
       error: "Error when initializing the indexer sdk",
     },
-    enabled: !!mangrove && !!tokenPricesInUsbQuery.data, // we need to get usdb prices before initializing the indexer sdk
+    enabled: !!mangrove && !!chain?.id,
     staleTime: 15 * 60 * 1000,
   })
   return {

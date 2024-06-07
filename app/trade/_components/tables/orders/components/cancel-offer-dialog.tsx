@@ -1,13 +1,12 @@
-import type { Market } from "@mangrovedao/mangrove.js"
-
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
+import useMarket from "@/providers/market.new"
 import { useCancelOrder } from "../hooks/use-cancel-order"
 import type { Order } from "../schema"
 
 type Props = {
   order?: Order
-  market?: Market
+  market?: ReturnType<typeof useMarket>
   onClose: () => void
 }
 
@@ -29,10 +28,9 @@ export default function CancelOfferDialog({ order, market, onClose }: Props) {
             disabled={retract.isPending}
             loading={retract.isPending}
             onClick={() => {
-              if (!(order && market)) return
               retract.mutate({
                 order,
-                market,
+                market: { ...market },
               })
             }}
           >

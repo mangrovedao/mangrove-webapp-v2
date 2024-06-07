@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 import useMangrove from "@/providers/mangrove"
-import { Token } from "@mangrovedao/mangrove.js"
+import { Logic } from "@mangrovedao/mgv"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
 import { Address, formatUnits } from "viem"
 
-import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useLogics } from "@/hooks/use-addresses"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { formatExpiryDate } from "@/utils/date"
 import { TimeInForce, TimeToLiveUnit } from "../../../forms/amplified/enums"
 import amplifiedLiquiditySourcing from "../../../forms/amplified/hooks/amplified-liquidity-sourcing"
 import { getCurrentTokenPriceFromAddress } from "../../../forms/amplified/utils"
-import { DefaultTradeLogics } from "../../../forms/types"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm, AmplifiedOrderStatus } from "../types"
 
@@ -28,16 +27,8 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
 
   const {
     marketsInfoQuery: { data: openMarkets },
-    mangrove,
   } = useMangrove()
-
-  const logics = (
-    mangrove
-      ? Object.values(mangrove.logics).filter(
-          (item) => item?.approvalType !== "ERC721",
-        )
-      : []
-  ) as DefaultTradeLogics[]
+  const logics = useLogics()
 
   const sendToken = useTokenFromAddress(
     offers.find((offer) => offer?.market.outbound_tkn as Address)?.market
@@ -46,24 +37,22 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
 
   const isClosed = offers.find((offer) => !offer?.isOpen)
   const sendFrom = logics.find(
-    (logic) => logic?.address == offers[0]?.outboundRoute,
+    (logic) => logic?.logic == offers[0]?.outboundRoute,
   )
+
   const { sendFromBalance } = amplifiedLiquiditySourcing({
-    logics,
-    sendFrom: sendFrom?.id,
+    logics: logics as Logic[],
+    sendFrom: sendFrom?.name,
   })
 
-  const { formatted } = useTokenBalance(sendToken as Token)
-
-  const sendTokenBalance =
-    sendFrom?.id === "simple" ? formatted : sendFromBalance?.formatted
+  const sendTokenBalance = sendFromBalance?.formatted
 
   const gives = `${Number(
     formatUnits(
       BigInt(offers.find((offer) => offer.gives)?.gives || "0"),
       sendToken?.decimals || 4,
     ),
-  ).toFixed(sendToken?.displayedDecimals)}`
+  ).toFixed(sendToken?.displayDecimals)}`
 
   // get assets infos
   const assets = offers.map((offer) => {
@@ -106,7 +95,7 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     }
 
     //TODO: check this when not tired
-    let receiveAmount = `${(Number(wants) / 10 ** (sendToken?.decimals ?? 1)).toFixed(receiveToken?.displayedDecimals)} ${receiveToken?.symbol}`
+    let receiveAmount = `${(Number(wants) / 10 ** (sendToken?.decimals ?? 1)).toFixed(receiveToken?.displayDecimals)} ${receiveToken?.symbol}`
 
     return {
       status: offer.isFilled
@@ -133,7 +122,7 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
     defaultValues: {
       assets,
       send: gives,
-      sendFrom,
+      sendFrom: sendFrom as Logic,
       timeInForce: orderTimeInForce,
       timeToLive: orderTimeToLive,
       timeToLiveUnit: TimeToLiveUnit.DAY,

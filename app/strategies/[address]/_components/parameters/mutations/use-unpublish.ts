@@ -1,15 +1,15 @@
-import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import { MergedOffer, MergedOffers } from "../../../_utils/inventory"
 
 export function useUnPublish({
-  stratInstance,
+  kandelInstance,
   mergedOffers,
   volumes,
 }: {
-  stratInstance?: GeometricKandelInstance
+  kandelInstance?: ReturnType<typeof useKandelInstance>
   mergedOffers: MergedOffers
   volumes: { baseAmount: string; quoteAmount: string }
 }) {
@@ -18,7 +18,7 @@ export function useUnPublish({
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!stratInstance || !mergedOffers) {
+        if (!kandelInstance || !mergedOffers) {
           throw new Error("Strategy Instance could not be fetched")
         }
 
@@ -39,21 +39,21 @@ export function useUnPublish({
             index: offer.index,
             gives: offer.gives,
           }))
+        //note: to re-implement
+        // const newDistribution =
+        //   await kandelInstance.calculateDistributionWithUniformlyChangedVolume({
+        //     explicitOffers: { asks, bids },
+        //     baseDelta: baseAmount,
+        //     quoteDelta: quoteAmount,
+        //   })
 
-        const newDistribution =
-          await stratInstance.calculateDistributionWithUniformlyChangedVolume({
-            explicitOffers: { asks, bids },
-            baseDelta: baseAmount,
-            quoteDelta: quoteAmount,
-          })
+        // if (!newDistribution) {
+        //   throw new Error("Error calculating new distribution")
+        // }
 
-        if (!newDistribution) {
-          throw new Error("Error calculating new distribution")
-        }
+        // const txs = await kandelInstance.populateGeneralChunks(newDistribution)
 
-        const txs = await stratInstance.populateGeneralChunks(newDistribution)
-
-        const res = txs && (await Promise.all(txs.map((tx) => tx.wait())))
+        // const res = txs && (await Promise.all(txs.map((tx) => tx.wait())))
 
         toast.success("UnPublished successfully")
       } catch (err) {

@@ -46,7 +46,7 @@ const InfoBar = () => {
         title="Min price"
         value={
           currentParameter?.minPrice
-            ? `${currentParameter?.minPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`
+            ? `${currentParameter?.minPrice?.toFixed(quote?.priceDisplayDecimals)} ${quote?.symbol}`
             : "-"
         }
       />
@@ -54,7 +54,7 @@ const InfoBar = () => {
         title="Max price"
         value={
           currentParameter?.maxPrice
-            ? `${currentParameter?.maxPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`
+            ? `${currentParameter?.maxPrice?.toFixed(quote?.priceDisplayDecimals)} ${quote?.symbol}`
             : "-"
         }
       />
