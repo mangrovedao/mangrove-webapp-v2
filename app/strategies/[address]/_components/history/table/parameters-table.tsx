@@ -20,5 +20,4 @@ export default function HistoryTable() {
   const isError = strategyQuery.isError || strategyStatusQuery.isError
 
   return <DataTable table={table} isLoading={isLoading} isError={isError} />
-  // return <DataTable table={table} isLoading={isLoading} isError={isError} />
 }
