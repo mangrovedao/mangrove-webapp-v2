@@ -44,7 +44,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           !marketClient ||
           !address
         )
-          throw new Error("Market order post is missing params")
+          throw new Error("Market order post, is missing params")
 
         const { base, quote } = market
         const { bs, send: gives, receive: wants, slippage } = form
