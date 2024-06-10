@@ -21,12 +21,12 @@ import { Badge } from "../(list)/_components/badge"
 import { AddForm } from "./form/addForm"
 import { RemoveForm } from "./form/removeForm"
 
-export enum Tabs {
+enum Tabs {
   Details = "Details",
   Positions = "Positions",
 }
 
-export enum Action {
+enum Action {
   Add = "Add",
   Remove = "Remove",
 }
@@ -65,7 +65,6 @@ export default function Page() {
           </div>
 
           <Separator className="w-full my-6" />
-
           {/* Holding card */}
           <div>
             <HoldingCard base={markets[0].base} quote={markets[0].quote} />
@@ -74,7 +73,6 @@ export default function Page() {
           </div>
 
           <Separator className="my-6" />
-
           {/* Details & Positions */}
           <div className="grid gap-8">
             <div className="w-80">
