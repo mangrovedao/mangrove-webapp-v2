@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useAccount, useConfig } from "wagmi"
 
+import { useTokenPricesInUsb } from "@/hooks/use-orderbook-price-per-block"
 import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
 import { mangroveConfig } from "@/schemas/mangrove-config"
 import { useEthersSigner } from "@/utils/adapters"
@@ -14,6 +15,7 @@ const useMangroveContext = () => {
   const signer = useEthersSigner()
   const { isConnected, chain } = useAccount()
   const { chains } = useConfig()
+  const tokenPricesInUsbQuery = useTokenPricesInUsb()
   const isNetworkSupported = chains.find((c) => c.id === chain?.id)
 
   const mangroveQuery = useQuery({
@@ -42,7 +44,7 @@ const useMangroveContext = () => {
 
   const marketsInfoQuery = useWhitelistedMarketsInfos(mangrove)
 
-  return { mangroveQuery, mangrove, marketsInfoQuery }
+  return { mangroveQuery, mangrove, marketsInfoQuery, tokenPricesInUsbQuery }
 }
 
 const MangroveContext = React.createContext<

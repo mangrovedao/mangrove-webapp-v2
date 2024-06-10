@@ -1,4 +1,4 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 import Big from "big.js"
 
 import { TokenIcon } from "@/components/token-icon"
@@ -36,11 +36,11 @@ export function SummaryStep({
       <Separator />
       <div className="space-y-4">
         <Line title="Send from wallet">
-          {Big(form.send ?? 0).toFixed(sendToken?.displayedDecimals)}{" "}
+          {Big(form.send ?? 0).toFixed(sendToken?.displayDecimals)}{" "}
           <Unit>{sendToken?.symbol}</Unit>
         </Line>
         <Line title="Receive to wallet">
-          {Big(form.receive ?? 0).toFixed(receiveToken?.displayedDecimals)}{" "}
+          {Big(form.receive ?? 0).toFixed(receiveToken?.displayDecimals)}{" "}
           <Unit>{receiveToken?.symbol}</Unit>
         </Line>
         {/* TODO: estimated provision */}

@@ -3,13 +3,12 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { useUserPoints } from "./leaderboard/use-leaderboard"
+import { useUserVolume } from "./leaderboard/use-leaderboard"
 
 export function JoinProgramBanner() {
-  const { data } = useUserPoints()
-  const points = data?.total_points ?? 0
+  const { data: volume } = useUserVolume() ?? 0
 
-  if (Number(points) >= 100) return null
+  if (Number(volume) >= 100) return null
 
   return (
     <>
@@ -18,8 +17,7 @@ export function JoinProgramBanner() {
           <Title variant={"header1"}>Join MS1 Points Program!</Title>
           <Title className="text-green-bangladesh" variant={"title3"}>
             Start trading now on Mangrove in order to accumulate boosts and
-            points. You can trade by using market orders, limit orders,
-            amplified orders and more to come.
+            points. You can trade by using market orders and limit orders.
           </Title>
 
           <div className="space-x-2">

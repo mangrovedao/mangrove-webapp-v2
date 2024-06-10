@@ -1,4 +1,4 @@
-import Mangrove, { Token } from "@mangrovedao/mangrove.js"
+import Mangrove from "@mangrovedao/mangrove.js"
 import React from "react"
 import { Address } from "viem"
 
@@ -21,6 +21,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
+import { Token } from "@mangrovedao/mgv"
 import { TimeInForce, TimeToLiveUnit } from "../../../forms/amplified/enums"
 import {
   isGreaterThanZeroValidator,

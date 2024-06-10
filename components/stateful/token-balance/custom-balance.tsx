@@ -1,4 +1,4 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -45,7 +45,7 @@ export function CustomBalance(props: {
                     `${props.balance} ${props.token}`
                   ) : (
                     <>
-                      {Number(props.balance).toFixed(token?.displayedDecimals)}{" "}
+                      {Number(props.balance).toFixed(token?.displayDecimals)}{" "}
                       {token?.symbol}
                     </>
                   )}

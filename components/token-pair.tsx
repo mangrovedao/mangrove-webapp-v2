@@ -1,4 +1,4 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 
 import { cn } from "@/utils"
 import { TokenIcon } from "./token-icon"

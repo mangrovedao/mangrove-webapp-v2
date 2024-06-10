@@ -13,6 +13,8 @@ import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
 import { EnhancedNumericInput } from "@components/token-input"
+import { BS } from "@mangrovedao/mgv/lib"
+import { formatUnits } from "viem"
 import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
@@ -47,14 +49,14 @@ export function Market() {
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
   const handleSliderChange = (value: number) => {
-    const amount = (value * Number(sendTokenBalance.formatted)) / 100
+    const amount = (value * Number(sendTokenBalance.balance?.balance)) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
     computeReceiveAmount()
   }
 
-  const sendTokenBalanceAsBig = sendTokenBalance.formatted
-    ? Big(Number(sendTokenBalance.formatted))
+  const sendTokenBalanceAsBig = sendTokenBalance.balance?.balance
+    ? Big(Number(sendTokenBalance.balance.balance))
     : Big(0)
 
   const sliderValue = Math.min(
@@ -69,13 +71,13 @@ export function Market() {
     <>
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <form.Field name="tradeAction">
+          <form.Field name="bs">
             {(field) => (
               <CustomRadioGroup
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onValueChange={(e: TradeAction) => {
+                onValueChange={(e: BS) => {
                   field.handleChange(e)
                   computeReceiveAmount()
                 }}
@@ -101,7 +103,9 @@ export function Market() {
           <div className="space-y-4 !mt-6">
             <form.Field
               name="send"
-              onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
+              onChange={sendValidator(
+                Number(sendTokenBalance.balance?.balance ?? 0),
+              )}
             >
               {(field) => (
                 <EnhancedNumericInput
@@ -114,13 +118,24 @@ export function Market() {
                   }}
                   balanceAction={{
                     onClick: () => {
-                      field.handleChange(sendTokenBalance.formatted || "0"),
+                      field.handleChange(
+                        formatUnits(
+                          sendTokenBalance.balance?.balance || 0n,
+                          sendToken?.decimals ?? 18,
+                        ) || "0",
+                      ),
                         computeReceiveAmount()
                     },
                   }}
                   token={sendToken}
                   label="Send amount"
-                  disabled={!market || sendTokenBalance.formatted === "0"}
+                  disabled={
+                    !market ||
+                    formatUnits(
+                      sendTokenBalance.balance?.balance ?? 0n,
+                      sendToken?.decimals ?? 18,
+                    ) === "0"
+                  }
                   showBalance
                   error={
                     field.state.value === "0" && hasEnoughVolume
@@ -268,7 +283,7 @@ export function Market() {
               selector={(state) => [
                 state.canSubmit,
                 state.isSubmitting,
-                state.values.tradeAction,
+                state.values.bs,
               ]}
             >
               {([canSubmit, isSubmitting, tradeAction]) => {

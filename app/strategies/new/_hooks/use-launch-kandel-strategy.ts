@@ -1,72 +1,74 @@
-import { GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
-import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
-
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { DefaultStrategyLogics } from "../../(shared)/type"
-import { NewStratStore } from "../_stores/new-strat.store"
+import { KandelParams } from "@mangrovedao/mgv"
+import {
+  Address,
+  BaseError,
+  ContractFunctionExecutionError,
+  parseEther,
+} from "viem"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import useKandelInstance from "../../(shared)/_hooks/use-kandel-instance"
 
-type FormValues = Pick<
-  NewStratStore,
-  | "baseDeposit"
-  | "quoteDeposit"
-  | "numberOfOffers"
-  | "stepSize"
-  | "bountyDeposit"
-> & {
-  distribution: GeometricKandelDistribution | undefined
-  kandelAddress: string
-  baseLogic: DefaultStrategyLogics
-  quoteLogic: DefaultStrategyLogics
+type FormValues = {
+  kandelParams?: KandelParams
+  bountyDeposit: string
 }
 
-export function useLaunchKandelStrategy() {
-  const { market } = useMarket()
-  const { mangrove } = useMangrove()
-
-  const { kandelStrategies } = useKandel()
+export function useLaunchKandelStrategy(kandelAddress?: string) {
   const router = useRouter()
+  const { address } = useAccount()
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
+  const { currentMarket: market } = useMarket()
+
+  const kandelClient = useKandelInstance({
+    address: kandelAddress,
+    base: market?.base.address,
+    quote: market?.quote.address,
+  })
 
   return useMutation({
-    mutationFn: async ({
-      baseDeposit,
-      quoteDeposit,
-      distribution,
-      bountyDeposit,
-      stepSize,
-      numberOfOffers,
-      kandelAddress,
-      baseLogic,
-      quoteLogic,
-    }: FormValues) => {
+    mutationFn: async ({ kandelParams, bountyDeposit }: FormValues) => {
+      console.log({ bountyDeposit })
       try {
-        if (!(market && kandelStrategies && distribution && mangrove))
-          throw new Error("Failed to create strategy")
+        if (!(kandelParams && kandelClient && walletClient && publicClient))
+          throw new Error("Could not launch strategy, missing params")
 
-        const kandelInstance = await kandelStrategies.instance({
-          address: kandelAddress,
-          market,
-          type: "smart",
+        const { request } = await kandelClient.simulatePopulate({
+          ...kandelParams,
+          account: address as Address,
+          value: parseEther(bountyDeposit),
         })
 
-        const populateTxs = await kandelInstance.populateGeometricDistribution({
-          distribution,
-          funds: bountyDeposit,
-          parameters: {
-            pricePoints: Number(numberOfOffers) + 1,
-            stepSize: Number(stepSize),
-          },
+        const hash = await walletClient.writeContract(request)
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash,
         })
 
-        await Promise.all(populateTxs.map((x) => x.wait()))
         toast.success("Kandel strategy successfully launched")
         router.push("/strategies")
+        return receipt
       } catch (error) {
+        if (error instanceof BaseError) {
+          const revertError = error.walk(
+            (error) => error instanceof ContractFunctionExecutionError,
+          )
+
+          if (revertError instanceof ContractFunctionExecutionError) {
+            console.log(
+              revertError.cause,
+              revertError.message,
+              revertError.functionName,
+              revertError.formattedArgs,
+              revertError.details,
+            )
+          }
+        }
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
         console.error(error)

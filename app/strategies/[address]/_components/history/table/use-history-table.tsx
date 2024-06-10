@@ -59,7 +59,7 @@ export function useHistoryParams({ data }: Params) {
           )
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(amount).toFixed(amountToken?.displayedDecimals)}{" "}
+              {Number(amount).toFixed(amountToken?.displayDecimals)}{" "}
               {amountToken?.symbol}
             </div>
           )

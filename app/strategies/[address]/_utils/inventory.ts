@@ -52,7 +52,7 @@ export function getMergedOffers(
   indexedOffers: OfferWithPrices[] | undefined,
   market: Market | undefined,
 ) {
-  if (!market) return []
+  if (!market || !indexedOffers || !sdkOffers) return []
   const asksPriceHelper = new TickPriceHelper("asks", market)
   const bidsPriceHelper = new TickPriceHelper("bids", market)
 

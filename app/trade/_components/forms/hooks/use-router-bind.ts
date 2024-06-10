@@ -19,7 +19,7 @@ const SmartRouterABI = parseAbi([
 ])
 
 export function useActivateSmartContract() {
-  const { address } = useAccount()
+  const { address, chain } = useAccount()
   const { mangrove } = useMangrove()
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
@@ -53,6 +53,8 @@ export function useActivateSmartContract() {
         })
 
         const tx = await walletClient?.writeContract({
+          account: address,
+          chain,
           address: proxy,
           abi: SmartRouterABI,
           functionName: "bind",

@@ -1,10 +1,9 @@
+import type { Token } from "@mangrovedao/mgv"
+import Big from "big.js"
+
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
-import type { Token } from "@mangrovedao/mangrove.js"
-import Big from "big.js"
-
-import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
@@ -43,17 +42,15 @@ export function SummaryStep({
       <Separator />
       <div className="space-y-4">
         <Line title="Limit Price">
-          {Big(form.limitPrice ?? 0).toFixed(
-            quoteToken?.displayedAsPriceDecimals,
-          )}{" "}
+          {Big(form.limitPrice ?? 0).toFixed(quoteToken?.priceDisplayDecimals)}{" "}
           <Unit>{quoteToken?.symbol}</Unit>
         </Line>
         <Line title={`Send from ${sendFrom}`}>
-          {Big(form.send ?? 0).toFixed(sendToken?.displayedDecimals)}{" "}
+          {Big(form.send ?? 0).toFixed(sendToken?.displayDecimals)}{" "}
           <Unit>{sendToken?.symbol}</Unit>
         </Line>
         <Line title={`Receive to ${receiveTo}`}>
-          {Big(form.receive ?? 0).toFixed(receiveToken?.displayedDecimals)}{" "}
+          {Big(form.receive ?? 0).toFixed(receiveToken?.displayDecimals)}{" "}
           <Unit>{receiveToken?.symbol}</Unit>
         </Line>
         {/* TODO: estimated provision */}
@@ -62,8 +59,8 @@ export function SummaryStep({
         </Line> */}
         <Line title="Time in force">
           <div className="flex flex-col items-end">
-            {form.timeInForce}{" "}
-            {form.timeInForce === TimeInForce.GOOD_TIL_TIME && (
+            {form.timeToLive}{" "}
+            {form.timeToLive && (
               <Unit>
                 {form.timeToLive}{" "}
                 <span className="lowercase">

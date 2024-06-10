@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 import Big, { BigSource } from "big.js"
 
 type Props = {
@@ -19,7 +19,7 @@ export function MinimumRecommended({
   action,
 }: Props) {
   const tokenSymbol = typeof token === "string" ? token : token?.symbol
-  const decimals = typeof token === "string" ? 6 : token?.displayedDecimals
+  const decimals = typeof token === "string" ? 6 : token?.displayDecimals
 
   return (
     <div className="flex justify-between items-center mt-1">

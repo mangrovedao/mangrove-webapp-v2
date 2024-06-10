@@ -4,7 +4,10 @@ import React from "react"
 
 import { Navbar } from "@/components/navbar"
 import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
-import { MarketProvider } from "@/providers/market"
+import {
+  MarketProvider,
+  MarketProvider as NewMarketProvider,
+} from "@/providers/market.new"
 
 export const metadata: Metadata = {
   title: "Trade | Mangrove DEX",
@@ -14,12 +17,14 @@ export const metadata: Metadata = {
 export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <MarketProvider>
-      <IndexerSdkProvider>
-        {/* TODO: remove once we got our datafeed */}
-        <Script src="/datafeeds/udf/dist/bundle.js" async />
-        <Navbar />
-        {children}
-      </IndexerSdkProvider>
+      <NewMarketProvider>
+        <IndexerSdkProvider>
+          {/* TODO: remove once we got our datafeed */}
+          <Script src="/datafeeds/udf/dist/bundle.js" async />
+          <Navbar />
+          {children}
+        </IndexerSdkProvider>
+      </NewMarketProvider>
     </MarketProvider>
   )
 }

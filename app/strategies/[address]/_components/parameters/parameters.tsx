@@ -46,7 +46,7 @@ const InfoBar = () => {
         title="Min price"
         value={
           currentParameter?.minPrice
-            ? `${currentParameter?.minPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`
+            ? `${currentParameter?.minPrice?.toFixed(quote?.priceDisplayDecimals)} ${quote?.symbol}`
             : "-"
         }
       />
@@ -54,7 +54,7 @@ const InfoBar = () => {
         title="Max price"
         value={
           currentParameter?.maxPrice
-            ? `${currentParameter?.maxPrice?.toFixed(quote?.displayedAsPriceDecimals)} ${quote?.symbol}`
+            ? `${currentParameter?.maxPrice?.toFixed(quote?.priceDisplayDecimals)} ${quote?.symbol}`
             : "-"
         }
       />
@@ -206,6 +206,7 @@ export default function Parameters() {
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
         {/* <PublishedInventory /> */}
+
         <BountyInventory />
         <Inventory />
       </div>

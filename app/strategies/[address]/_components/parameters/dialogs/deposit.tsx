@@ -29,12 +29,12 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
-  const { market } = strategyStatusQuery.data ?? {}
+  const { strategyQuery, strategyAddress, baseToken, quoteToken } = useKandel()
+
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
-    base: market?.base.symbol,
-    quote: market?.quote.symbol,
+    base: baseToken?.symbol,
+    quote: quoteToken?.symbol,
     offers: strategyQuery.data?.offers,
   })
 
@@ -46,14 +46,12 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
   const [quoteAmount, setQuoteAmount] = React.useState("")
 
   const deposit = useDeposit({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     volumes: { baseAmount, quoteAmount },
   })
 
-  const { formatted: baseBalance } = useTokenBalance(market?.base ?? undefined)
-  const { formatted: quoteBalance } = useTokenBalance(
-    market?.quote ?? undefined,
-  )
+  const { formatted: baseBalance } = useTokenBalance(baseToken ?? undefined)
+  const { formatted: quoteBalance } = useTokenBalance(quoteToken ?? undefined)
 
   const stepInfos = [
     {
@@ -64,9 +62,9 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
               onClick: () => setBaseAmount(baseBalance as string),
             }}
             value={baseAmount}
-            label={`${market?.base.symbol} amount`}
+            label={`${baseToken?.symbol} amount`}
             showBalance
-            token={market?.base}
+            token={baseToken}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
               Number(baseAmount) > Number(baseBalance)
@@ -80,9 +78,9 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
             balanceAction={{
               onClick: () => setQuoteAmount(quoteBalance as string),
             }}
-            label={`${market?.quote.symbol} amount`}
+            label={`${quoteToken?.symbol} amount`}
             showBalance
-            token={market?.quote}
+            token={quoteToken}
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
               Number(quoteAmount) > Number(quoteBalance)
@@ -124,15 +122,15 @@ export function Deposit({ togglePublish, open, onClose }: Props) {
         <div className="grid gap-2 p-5 bg-primary-dark-green rounded-lg">
           <Title>Review</Title>
           <div className="flex justify-between">
-            <Text>{market?.base.symbol} deposit</Text>
+            <Text>{baseToken?.symbol} deposit</Text>
             <Text className="text-primary">
-              {baseAmount} {market?.base.symbol}
+              {baseAmount} {baseToken?.symbol}
             </Text>
           </div>
           <div className="flex justify-between">
-            <Text>{market?.quote.symbol} deposit</Text>
+            <Text>{quoteToken?.symbol} deposit</Text>
             <Text className="text-primary">
-              {quoteAmount} {market?.quote.symbol}
+              {quoteAmount} {quoteToken?.symbol}
             </Text>
           </div>
         </div>

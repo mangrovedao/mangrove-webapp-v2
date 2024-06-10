@@ -1,5 +1,4 @@
 "use client"
-import Big from "big.js"
 import React from "react"
 
 import {
@@ -11,7 +10,8 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
-import useMarket from "@/providers/market"
+import { useBook } from "@/hooks/use-book"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { SemiBook } from "./semibook"
@@ -45,40 +45,20 @@ export function OrderBook({
 }
 
 function BookContent() {
-  const { requestBookQuery, market } = useMarket()
+  // const { requestBookQuery, market } = useMarket()
+  // const market = useMarket()
+  const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
-  const { asks, bids } = requestBookQuery.data ?? {}
-  const highestAskPrice = asks?.[asks.length - 1]?.price
-  const lowestAskPrice = asks?.[0]?.price
-  const highestBidPrice = bids?.[0]?.price
-  const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
-  const spread = lowestAskPrice?.sub(highestBidPrice ?? 0).abs()
-  const spreadPercent =
-    spread
-      ?.mul(100)
-      .div(highestBidPrice ?? 1)
-      .toNumber() ?? 0
-  const spreadPercentString = new Intl.NumberFormat("en-US", {
-    style: "percent",
-    maximumFractionDigits: 2,
-  }).format(spreadPercent / 100)
-  const priceDecimals = determinePriceDecimalsFromToken(
-    bigestPrice.toNumber(),
-    market?.quote,
-  )
+  const { book, isLoading, isError } = useBook()
+  // const { asks, bids } = requestBookQuery.data ?? {}
 
-  if (requestBookQuery.isLoading || !market) {
+  if (isLoading || !book || !currentMarket) {
     return (
       <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean" />
     )
   }
 
-  if (
-    requestBookQuery.data?.asks?.length === 0 &&
-    requestBookQuery.data?.bids?.length === 0 &&
-    !requestBookQuery.isLoading &&
-    !!market
-  ) {
+  if (book.asks.length === 0 && book.bids.length === 0) {
     return (
       <div className="w-full h-full flex justify-center items-center">
         Empty market
@@ -86,16 +66,36 @@ function BookContent() {
     )
   }
 
+  const highestAskPrice = book.asks[book.asks.length - 1]?.price
+  const lowestAskPrice = book.asks[0]?.price
+  const highestBidPrice = book.bids[0]?.price
+  const bigestPrice = highestAskPrice ?? highestBidPrice ?? 0
+  const spread = Math.abs((lowestAskPrice ?? 0) - (highestBidPrice ?? 0))
+  const spreadPercent = (spread / (highestBidPrice ?? 1)) * 100
+
+  // const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
+  // const spread = lowestAskPrice?.sub(highestBidPrice ?? 0).abs()
+  // const spreadPercent =
+  //   spread
+  //     ?.mul(100)
+  //     .div(highestBidPrice ?? 1)
+  //     .toNumber() ?? 0
+  const spreadPercentString = new Intl.NumberFormat("en-US", {
+    style: "percent",
+    maximumFractionDigits: 2,
+  }).format(spreadPercent / 100)
+  const priceDecimals = determinePriceDecimalsFromToken(bigestPrice)
+
   return (
     <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
       <Table className="text-sm leading-5 h-full select-none relative">
         <TableHeader className="sticky top-0 bg-background z-40 py-2 text-xs h-[var(--bar-height)]">
           <TableRow className="border-none">
             <OrderBookTableHead className="text-left">
-              Size ({market?.base.symbol})
+              Size ({currentMarket.base.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>
-              Price ({market?.quote.symbol})
+              Price ({currentMarket.quote.symbol})
             </OrderBookTableHead>
             <OrderBookTableHead>Total</OrderBookTableHead>
           </TableRow>
@@ -104,16 +104,16 @@ function BookContent() {
         <TableBody className="overflow-scroll" ref={bodyRef}>
           <SemiBook
             type="asks"
-            data={requestBookQuery.data}
-            priceDecimals={market?.quote.displayedDecimals}
+            data={book}
+            priceDecimals={currentMarket.quote.priceDisplayDecimals}
           />
-          {bids?.length && asks?.length ? (
+          {book.bids.length && book.asks.length ? (
             <TableRow className="border-none" ref={spreadRef}>
               <OrderBookTableCell className="text-gray">
                 Spread
               </OrderBookTableCell>
               <OrderBookTableCell>
-                {spread?.toFixed(market.quote.displayedDecimals)}
+                {spread?.toFixed(currentMarket.quote.displayDecimals)}
               </OrderBookTableCell>
               <OrderBookTableCell className="text-gray">
                 {spreadPercentString}
@@ -122,8 +122,8 @@ function BookContent() {
           ) : undefined}
           <SemiBook
             type="bids"
-            data={requestBookQuery.data}
-            priceDecimals={market?.quote.displayedDecimals}
+            data={book}
+            priceDecimals={currentMarket.quote.priceDisplayDecimals}
           />
         </TableBody>
       </Table>

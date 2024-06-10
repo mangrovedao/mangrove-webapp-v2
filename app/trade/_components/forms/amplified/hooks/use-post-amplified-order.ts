@@ -1,18 +1,14 @@
-import {
-  MangroveAmplifier,
-  TickPriceHelper,
-  Token,
-} from "@mangrovedao/mangrove.js"
+import { MangroveAmplifier } from "@mangrovedao/mangrove.js"
 import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
+import { Logic, Token } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { parseUnits } from "viem"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { TransactionReceipt } from "@ethersproject/providers"
 
@@ -20,9 +16,7 @@ import { PacFinanceLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/Aav
 import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/SimpleAaveLogic"
 import { ZeroLendLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/AaveV3/ZeroLendLogic"
 import { DefaultTradeLogics } from "../../types"
-import { TimeInForce } from "../enums"
 import type { AssetWithInfos, Form } from "../types"
-import { estimateTimestamp } from "../utils"
 
 type Props = {
   onResult?: (result: TransactionReceipt) => void
@@ -30,7 +24,7 @@ type Props = {
 
 export function usePostAmplifiedOrder({ onResult }: Props = {}) {
   const { mangrove, marketsInfoQuery } = useMangrove()
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -43,11 +37,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
     }: {
       form: Omit<Form, "assets"> & {
         selectedToken?: Token
-        selectedSource?:
-          | SimpleLogic
-          | SimpleAaveLogic
-          | OrbitLogic
-          | ZeroLendLogic
+        selectedSource?: Logic
         sendAmount: string
         assetsWithTokens: AssetWithInfos[]
       }
@@ -62,7 +52,7 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
         const assets = form.assetsWithTokens.map((asset) => {
           return {
             inboundTokenAddress: asset.token?.address,
-            inboundTokenId: asset.token?.id,
+            inboundTokenId: asset.token?.address,
             inboundLogic: asset.receiveTo,
             tickspacing: market.tickSpacing,
             limitPrice: asset.limitPrice,
@@ -92,57 +82,57 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
           )
         }
 
-        const inboundTokens = assets
-          .map((asset) => {
-            const market = openMarkets?.find((market) => {
-              return (
-                (market.base.id === asset.inboundTokenId &&
-                  market.quote.id === form.selectedToken?.id) ||
-                (market.quote.id === asset.inboundTokenId &&
-                  market.base.id === form.selectedToken?.id)
-              )
-            })
+        // const inboundTokens = assets
+        //   .map((asset) => {
+        //     const market = openMarkets?.find((market) => {
+        //       return (
+        //         (market.base.id === asset.inboundTokenId &&
+        //           market.quote.id === form.selectedToken?.address) ||
+        //         (market.quote.id === asset.inboundTokenId &&
+        //           market.base.id === form.selectedToken?.address)
+        //       )
+        //     })
 
-            const ba =
-              market?.base.id === asset.inboundTokenId ? "bids" : "asks"
-            const priceHelper = new TickPriceHelper(ba, market!)
-            const tick = priceHelper.tickFromPrice(
-              asset?.limitPrice || "0",
-              "nearest",
-            )
+        //     const ba =
+        //       market?.base.id === asset.inboundTokenId ? "bids" : "asks"
+        //     const priceHelper = new TickPriceHelper(ba, market!)
+        //     const tick = priceHelper.tickFromPrice(
+        //       asset?.limitPrice || "0",
+        //       "nearest",
+        //     )
 
-            return {
-              inboundToken: asset.inboundTokenAddress,
-              inboundLogic: asset.inboundLogic,
-              tickSpacing: asset.tickspacing,
-              tick,
-            }
-          })
-          .filter(hasLogic)
+        //     return {
+        //       inboundToken: asset.inboundTokenAddress,
+        //       inboundLogic: asset.inboundLogic,
+        //       tickSpacing: asset.tickspacing,
+        //       tick,
+        //     }
+        //   })
+        //   .filter(hasLogic)
 
-        //TODO: check why we don't have tx hash
-        const bundle = await amp.addBundle({
-          outboundToken: form.selectedToken.address,
-          outboundVolume: parseUnits(
-            form.sendAmount,
-            form.selectedToken.decimals,
-          ),
-          outboundLogic: form.selectedSource,
-          expiryDate:
-            form.timeInForce === TimeInForce.GOOD_TIL_TIME
-              ? estimateTimestamp({
-                  timeToLiveUnit: form.timeToLiveUnit,
-                  timeToLive: form.timeToLive,
-                })
-              : 0,
-          inboundTokens,
-        })
+        // //TODO: check why we don't have tx hash
+        // const bundle = await amp.addBundle({
+        //   outboundToken: form.selectedToken.address,
+        //   outboundVolume: parseUnits(
+        //     form.sendAmount,
+        //     form.selectedToken.decimals,
+        //   ),
+        //   outboundLogic: form.selectedSource,
+        //   expiryDate:
+        //     form.timeInForce === TimeInForce.GOOD_TIL_TIME
+        //       ? estimateTimestamp({
+        //           timeToLiveUnit: form.timeToLiveUnit,
+        //           timeToLive: form.timeToLive,
+        //         })
+        //       : 0,
+        //   inboundTokens,
+        // })
 
-        const tx = (await bundle.response).wait()
-        const hash = await tx
+        // const tx = (await bundle.response).wait()
+        // const hash = await tx
 
         toast.success("Amplified order posted successfully")
-        return { tx: hash }
+        return { tx: "hash" }
       } catch (error) {
         console.error(error)
         toast.error(`Failed to post the amplified order`)
@@ -160,14 +150,14 @@ export function usePostAmplifiedOrder({ onResult }: Props = {}) {
 
       const { tx } = data ?? {}
       try {
-        if (!tx) return
-        onResult?.(tx)
-        // Start showing loading state indicator on parts of the UI that depend on
-        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-        const blockNumber = tx.blockNumber
-        await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber,
-        })
+        // if (!tx) return
+        // onResult?.(tx)
+        // // Start showing loading state indicator on parts of the UI that depend on
+        // startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+        // const blockNumber = tx.blockNumber
+        // await resolveWhenBlockIsIndexed.mutateAsync({
+        //   blockNumber,
+        // })
 
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })

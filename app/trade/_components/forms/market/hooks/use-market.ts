@@ -1,15 +1,23 @@
 "use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Market, Token } from "@mangrovedao/mangrove.js"
+import {
+  MarketOrderSimulationParams,
+  Token,
+  marketOrderSimulation,
+} from "@mangrovedao/mgv"
+import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
-import { useQuery } from "@tanstack/react-query"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
+import { formatUnits, parseUnits } from "viem"
 
-import useTokenPriceQuery from "@/hooks/use-token-price-query"
-import useMarket from "@/providers/market"
+import { useBook } from "@/hooks/use-book"
+import useMarket from "@/providers/market.new"
+
+import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
-import { TradeAction } from "../../enums"
+import { Book } from "@mangrovedao/mgv"
+import { useQuery } from "@tanstack/react-query"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
@@ -18,12 +26,9 @@ type Props = {
 }
 
 const determinePrices = (
-  tradeAction: TradeAction,
+  bs: BS,
   quoteToken?: Token,
-  orderBook?: {
-    asks: Market.Offer[]
-    bids: Market.Offer[]
-  } | null,
+  orderBook?: Book | null,
   marketPrice?: number,
 ) => {
   if (!orderBook?.bids || !orderBook?.asks) {
@@ -39,8 +44,7 @@ const determinePrices = (
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
 
-  const averagePrice =
-    tradeAction === TradeAction.BUY ? lowestAsk?.price : highestBid?.price
+  const averagePrice = bs === BS.buy ? lowestAsk?.price : highestBid?.price
 
   return {
     price: averagePrice,
@@ -49,14 +53,10 @@ const determinePrices = (
 }
 
 export function useMarketForm(props: Props) {
-  const [estimateFrom, setEstimateFrom] = React.useState<
-    "send" | "receive" | undefined
-  >()
-
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      tradeAction: TradeAction.BUY,
+      bs: BS.buy,
       sliderPercentage: 25,
       slippage: 0.5,
       send: "",
@@ -65,11 +65,11 @@ export function useMarketForm(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const tradeAction = form.useStore((state) => state.values.tradeAction)
+  const bs = form.useStore((state) => state.values.bs)
   const send = form.useStore((state) => state.values.send)
   const receive = form.useStore((state) => state.values.receive)
 
-  const { market, marketInfo, requestBookQuery: orderBook } = useMarket()
+  const { currentMarket: market } = useMarket()
   const {
     sendToken,
     quoteToken,
@@ -79,66 +79,99 @@ export function useMarketForm(props: Props) {
     tickSize,
     feeInPercentageAsString,
     spotPrice,
-  } = useTradeInfos("market", tradeAction)
+  } = useTradeInfos("market", bs)
 
-  const { data: marketPrice } = useTokenPriceQuery(
-    market?.base?.symbol,
-    market?.quote?.symbol,
-  )
+  const { book } = useBook()
+
+  const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
+    useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
+
+  // const marketPrice =
+  //   orderBookPriceData && orderBookPriceData.mid_price
+  //     ? Number(orderBookPriceData.mid_price)
+  //     : undefined
 
   const averagePrice = determinePrices(
-    tradeAction,
+    bs,
     quoteToken,
-    orderBook.data,
-    marketPrice?.close,
+    book,
+    Number(marketPrice?.close),
   )
+  const [estimateFrom, setEstimateFrom] = React.useState<
+    "send" | "receive" | undefined
+  >()
 
-  const { data: estimatedVolume } = useQuery({
-    queryKey: [
-      "estimateVolume",
-      market?.base.address,
-      market?.quote.address,
-      send,
-      receive,
-      tradeAction,
-      estimateFrom,
-    ],
-    queryFn: async () => {
-      if (!market) return
+  const { data } = useQuery({
+    queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
+    queryFn: () => {
+      if (!book) return null
+      const baseAmount =
+        bs == BS.buy
+          ? parseUnits(receive, market?.base.decimals ?? 18)
+          : parseUnits(send, market?.quote.decimals ?? 18)
 
-      const isReceive = estimateFrom === "receive"
+      const quoteAmount =
+        bs == BS.buy
+          ? parseUnits(send, market?.quote.decimals ?? 18)
+          : parseUnits(receive, market?.base.decimals ?? 18)
 
-      const given = isReceive ? send : receive
+      const isBasePay = market?.base.address === sendToken?.address
 
-      const what = isReceive
-        ? tradeAction === TradeAction.BUY
-          ? "quote"
-          : "base"
-        : tradeAction === TradeAction.BUY
-          ? "base"
-          : "quote"
+      const params: MarketOrderSimulationParams =
+        estimateFrom === "send"
+          ? isBasePay
+            ? {
+                base: baseAmount,
+                bs: BS.sell,
+                book,
+              }
+            : {
+                quote: quoteAmount,
+                bs: BS.buy,
+                book,
+              }
+          : isBasePay
+            ? {
+                quote: quoteAmount,
+                bs: BS.buy,
+                book,
+              }
+            : {
+                base: baseAmount,
+                bs: BS.buy,
+                book,
+              }
 
-      const to = isReceive ? "sell" : "buy"
+      const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
+        marketOrderSimulation(params)
 
-      const { estimatedVolume, estimatedFee } = await market.estimateVolume({
-        given,
-        what,
-        to,
-      })
+      const formattedBaseEstimation = formatUnits(
+        baseEstimation,
+        market?.base.decimals ?? 18,
+      )
+      const formattedQuoteEstimation = formatUnits(
+        quoteEstimation,
+        market?.quote.decimals ?? 18,
+      )
 
-      isReceive
-        ? form.setFieldValue("receive", estimatedVolume.toString())
-        : form.setFieldValue("send", estimatedVolume.toString())
+      const estimatedReceive =
+        bs === BS.buy ? formattedBaseEstimation : formattedQuoteEstimation
+      const estimatedSend =
+        bs === BS.buy ? formattedQuoteEstimation : formattedBaseEstimation
+
+      estimateFrom === "receive"
+        ? form.setFieldValue("send", estimatedSend)
+        : form.setFieldValue("receive", estimatedReceive)
 
       form.validateAllFields("submit")
-      return { estimatedVolume, estimatedFee }
+
+      return { baseEstimation, quoteEstimation }
     },
-    enabled: !!(send || receive) && !!market,
   })
 
   const hasEnoughVolume =
     (Number(receive) || Number(send)) != 0 &&
-    Number(estimatedVolume?.estimatedVolume) === 0
+    Number(data?.baseEstimation || data?.quoteEstimation) === 0
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -147,11 +180,11 @@ export function useMarketForm(props: Props) {
   }
 
   const computeReceiveAmount = React.useCallback(() => {
-    setEstimateFrom("receive")
+    setEstimateFrom("send")
   }, [])
 
   const computeSendAmount = React.useCallback(() => {
-    setEstimateFrom("send")
+    setEstimateFrom("receive")
   }, [])
 
   React.useEffect(() => {
@@ -161,7 +194,7 @@ export function useMarketForm(props: Props) {
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
     form.validateAllFields("submit")
-  }, [form, tradeAction])
+  }, [form, bs])
 
   React.useEffect(() => {
     form?.reset()

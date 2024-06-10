@@ -1,37 +1,35 @@
-import { type Market, type Token } from "@mangrovedao/mangrove.js"
-import Big from "big.js"
+import { LimitOrderResult, type Token } from "@mangrovedao/mgv"
+import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
+import { formatUnits } from "viem"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
-import { TradeAction, TradeMode } from "./enums"
+import { TradeMode } from "./enums"
 
 export function successToast(
   tradeMode: TradeMode,
-  tradeAction: TradeAction,
+  tradeAction: BS,
   baseToken: Token,
-  baseValue: string,
-  result: Market.OrderResult,
+  quoteToken: Token,
+  result: LimitOrderResult,
+  receiveToken: Token,
+  sendToken: Token,
 ) {
-  const summary = result.summary
-  const price = result.offerWrites[0]?.offer.price.toFixed(4)
-
-  const filledOrder =
-    tradeMode == TradeMode.LIMIT
-      ? `Filled with ${summary.totalGot.toFixed(baseToken.displayedDecimals)} ${summary.restingOrder ? ", remaining volume is posted" : ""} `
-      : `Filled with ${summary.totalGot.toFixed(baseToken.displayedDecimals)}`
-
+  const baseValue = tradeAction === BS.buy ? result.takerGot : result.takerGave
+  const quoteValue = tradeAction === BS.buy ? result.takerGave : result.takerGot
+  const filledOrder = `Filled with ${Number(formatUnits(quoteValue, quoteToken.decimals)).toFixed(quoteToken.displayDecimals)} ${quoteToken.symbol}`
   const notFilledOrder =
     tradeMode == TradeMode.LIMIT
       ? "Limit order posted"
       : "Market order not filled (slippage too low)"
 
-  const fillText = Number(summary.totalGot) > 0 ? filledOrder : notFilledOrder
+  const fillText = Number(result.takerGot) > 0 ? filledOrder : notFilledOrder
 
   toast(
     <div className="grid gap-2 w-full">
       <div className="flex space-x-2 items-center">
-        <TokenIcon symbol={baseToken.symbol} />
+        <TokenIcon symbol={sendToken.symbol} />
         <div className="grid">
           <span>{tradeMode.toUpperCase()} Order</span>
           <span className="text-muted-foreground">{fillText}</span>
@@ -43,21 +41,26 @@ export function successToast(
         <div className="flex justify-between">
           <span
             className={
-              tradeAction === TradeAction.BUY
-                ? "text-green-500"
-                : "text-red-600"
+              tradeAction === BS.buy ? "text-green-500" : "text-red-600"
             }
           >
             {tradeAction.toUpperCase()}
           </span>
           <span>
-            {Big(baseValue).toFixed(baseToken.displayedAsPriceDecimals)}{" "}
+            {Number(formatUnits(baseValue, baseToken.decimals)).toFixed(
+              baseToken.priceDisplayDecimals,
+            )}{" "}
             {baseToken.symbol}
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-muted-foreground">PRICE</span>
-          <span>{price}</span>
+          <span className="text-muted-foreground">FEE</span>
+          <span>
+            {Number(formatUnits(result.feePaid, receiveToken.decimals)).toFixed(
+              receiveToken.displayDecimals + 2,
+            )}{" "}
+            {receiveToken.symbol}
+          </span>
         </div>
       </div>
     </div>,

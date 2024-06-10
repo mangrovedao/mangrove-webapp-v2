@@ -45,7 +45,7 @@ export function Bounty({ open, onClose }: Props) {
   const [bounty, setBounty] = React.useState("")
 
   const addBounty = useBounty({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     bounty,
   })
 

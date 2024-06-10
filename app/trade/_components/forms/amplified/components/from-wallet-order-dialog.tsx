@@ -1,4 +1,5 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
+import { Logic } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount } from "wagmi"
 
@@ -6,8 +7,8 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { BS } from "@mangrovedao/mgv/lib"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ActivateRouter } from "../../components/activate-router"
 import { ApproveStep } from "../../components/approve-step"
@@ -17,7 +18,7 @@ import { useActivateSmartContract } from "../../hooks/use-router-bind"
 import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
 import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
-import { DefaultTradeLogics } from "../../types"
+import { useLimitSteps } from "../../limit/hooks/use-steps"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
 import type { AssetWithInfos, Form } from "../types"
 import { SummaryStep } from "./summary-step"
@@ -28,7 +29,7 @@ import { SummaryStep } from "./summary-step"
 type Props = {
   form: Omit<Form, "assets"> & {
     selectedToken?: Token
-    selectedSource?: DefaultTradeLogics
+    selectedSource?: Logic
     sendAmount: string
     assetsWithTokens: AssetWithInfos[]
   }
@@ -49,19 +50,21 @@ export default function FromWalletAmplifiedOrderDialog({
 }: Props) {
   const { selectedToken, selectedSource, sendAmount } = form
 
-  const { chain } = useAccount()
+  const { chain, address } = useAccount()
   const { data: spender } = useSpenderAddress("amplified")
-  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
-    selectedToken,
-    spender,
-    selectedSource,
-  )
+
+  const { data: limitOrderSteps } = useLimitSteps({
+    user: address,
+
+    bs: BS.buy,
+    logic: form.selectedSource?.name,
+  })
 
   const { isDeployed, isBound } = useSmartRouter().data ?? {}
 
   let steps = [
     "Summary",
-    !isInfiniteAllowance ? `Approve ${selectedToken?.symbol}` : "",
+    !limitOrderSteps?.[0].done ? `Approve ${selectedToken?.symbol}` : "",
     isDeployed ? "Amplified order deployment" : "",
     !isBound ? "Amplified order activation" : "",
     "Send",
@@ -78,7 +81,7 @@ export default function FromWalletAmplifiedOrderDialog({
 
   const approve = useInfiniteApproveToken()
   const activate = useActivateSmartContract()
-  const deploy = useDeploySmartRouter()
+  const deploy = useDeploySmartRouter({})
   const post = usePostAmplifiedOrder({
     onResult: (result) => {
       /*
@@ -101,7 +104,7 @@ export default function FromWalletAmplifiedOrderDialog({
   const { goToNextStep } = helpers
 
   const stepInfos = [
-    !isInfiniteAllowance && {
+    !limitOrderSteps?.[0].done && {
       body: (
         <SummaryStep
           form={form}
@@ -117,7 +120,7 @@ export default function FromWalletAmplifiedOrderDialog({
         </Button>
       ),
     },
-    !isInfiniteAllowance && {
+    !limitOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={selectedToken?.symbol ?? ""} />,
       button: (
         <Button
