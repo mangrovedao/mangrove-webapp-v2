@@ -41,7 +41,7 @@ export default function Page() {
   const market = searchParams.get("market")
 
   return (
-    <div className="max-w-full mx-auto px-20">
+    <div className="max-w-full mx-auto px-20 pb-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4 mt-8">
           <TokenPair
@@ -56,9 +56,9 @@ export default function Page() {
       <Separator className="mt-6" />
 
       <div className="grid grid-flow-col">
-        <div className="col-span-2 w-full p-6">
+        <div className="col-span-2 w-full ">
           {/* Infos Cards */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 p-6">
             <InfoCard icon={<Gauge />} title="TVL" value="4.689.12" />
             <InfoCard icon={<Percent />} title="APY" value="63.23%" />
             <InfoCard icon={<Gauge />} title="Total Earned" value="$98.09" />
@@ -66,7 +66,7 @@ export default function Page() {
 
           <Separator className="w-full my-6" />
           {/* Holding card */}
-          <div>
+          <div className="p-6">
             <HoldingCard base={markets[0].base} quote={markets[0].quote} />
             <Line title="Entry/Exit Fee" value="5%" />
             <Line title="Performance Fee" value="5%" />
@@ -74,7 +74,7 @@ export default function Page() {
 
           <Separator className="my-6" />
           {/* Details & Positions */}
-          <div className="grid gap-8">
+          <div className="grid gap-8 px-6">
             <div className="w-80">
               <CustomRadioGroup
                 name={"tab"}
@@ -99,8 +99,8 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="row-span-4 border-l-2 p-6">
-          <div className="grid gap-8">
+        <div className="row-span-4 border-l-2">
+          <div className="grid gap-8 p-6">
             <div className="w-80">
               <CustomRadioGroup
                 name={"action"}
@@ -127,7 +127,7 @@ export default function Page() {
 
           <Separator className="my-6" />
 
-          <div className="grid gap-4">
+          <div className="grid gap-4 px-6">
             <div className="flex gap-2 items-center">
               <div className="rounded-lg bg-primary-dark-green w-8 h-8 flex justify-center items-center">
                 <Coins className="h-4 w-4" />

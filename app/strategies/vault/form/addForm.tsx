@@ -43,6 +43,7 @@ export function AddForm({ className }: { className?: string }) {
           onChange={handleBaseDepositChange}
           error={errors.baseDeposit}
           showBalance
+          balanceAction={{ onClick: handleBaseDepositChange, text: "MAX" }}
         />
       </div>
 
@@ -54,6 +55,7 @@ export function AddForm({ className }: { className?: string }) {
           onChange={handleQuoteDepositChange}
           error={errors.quoteDeposit}
           showBalance
+          balanceAction={{ onClick: handleQuoteDepositChange, text: "MAX" }}
         />
       </div>
       <Button rightIcon className="w-full">
