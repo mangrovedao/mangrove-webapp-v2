@@ -1,7 +1,6 @@
 import { BS, Order } from "@mangrovedao/mgv/lib"
 import React from "react"
 import { formatUnits } from "viem"
-import { useAccount } from "wagmi"
 
 import {
   CustomRadioGroup,
@@ -41,19 +40,13 @@ export function Limit() {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
-    receiveTokenBalance,
     handleSubmit,
     form,
     sendToken,
     receiveToken,
     quoteToken,
-    tickSize,
-    feeInPercentageAsString,
     timeInForce,
     send,
-    sendFrom,
-    receiveTo,
-    logics,
     minVolume,
     sendLogics,
     receiveLogics,
@@ -63,18 +56,6 @@ export function Limit() {
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
-
-  const { address } = useAccount()
-
-  // const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
-  //   liquiditySourcing({
-  //     sendToken,
-  //     sendFrom,
-  //     receiveTo,
-  //     receiveToken,
-  //     fundOwner: address,
-  //     logics,
-  //   })
 
   const handleSliderChange = (value: number) => {
     if (!sendTokenBalance) return
