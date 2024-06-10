@@ -18,6 +18,7 @@ import {
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 import { Flame } from "lucide-react"
+import { Vaults } from "./vaults/vaults"
 
 enum StrategiesTables {
   ALL_VAULTS = "All Vault",
@@ -32,9 +33,9 @@ enum SortValues {
 }
 
 const TABS_CONTENT = {
-  [StrategiesTables.ALL_VAULTS]: <div>TODO</div>,
+  [StrategiesTables.ALL_VAULTS]: <Vaults type="all" />,
   [StrategiesTables.BOOSTED]: <div>TODO</div>,
-  [StrategiesTables.MY_VAULTS]: <div>TODO</div>,
+  [StrategiesTables.MY_VAULTS]: <Vaults type="user" />,
 }
 
 export function Passive({

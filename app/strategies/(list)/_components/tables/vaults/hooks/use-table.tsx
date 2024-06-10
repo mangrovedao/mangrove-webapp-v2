@@ -8,18 +8,14 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import Big from "big.js"
-import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
-import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
-import { shortenAddress } from "@/utils/wallet"
-import Status from "../../../../../(shared)/_components/status"
+import { ArrowBigDownDashIcon } from "lucide-react"
 import type { Strategy } from "../../../../_schemas/kandels"
 import { Market } from "../components/market"
-import { MinMax } from "../components/min-max"
 import { Value } from "../components/value"
 
 const columnHelper = createColumnHelper<Strategy>()
@@ -38,60 +34,30 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.display({
-        id: "addresses",
-        header: () => (
-          <div className="text-left">
-            <div>Strategy address</div>
-            <div>Wallet address</div>
-          </div>
-        ),
-        cell: ({ row }) => {
-          const { address, owner } = row.original
-          const blockExplorerUrl = chain?.blockExplorers?.default.url
-          return (
-            <div className="flex flex-col underline">
-              <Link
-                className="hover:opacity-80 transition-opacity"
-                href={`${blockExplorerUrl}/address/${address}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortenAddress(address)}
-              </Link>
-              <Link
-                className="hover:opacity-80 transition-opacity"
-                href={`${blockExplorerUrl}/address/${owner}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortenAddress(owner)}
-              </Link>
-            </div>
-          )
-        },
-      }),
-      columnHelper.display({
-        id: "min-max",
-        header: () => (
-          <div>
-            <div>Min</div>
-            <div>Max</div>
-          </div>
-        ),
-        cell: ({ row }) => {
-          const { min, max, quote } = row.original
-          return <MinMax min={min} max={max} quote={quote} />
-        },
-      }),
-      columnHelper.display({
-        header: "Market",
+        header: "Pair",
         cell: ({ row }) => {
           const { base, quote } = row.original
           return <Market base={base} quote={quote} />
         },
       }),
+      // TODO: get from indexer
       columnHelper.display({
-        header: "Value",
+        header: "Vault fee",
+        cell: ({ row }) => {
+          const {} = row.original
+          return <div className="flex flex-col">0.5%</div>
+        },
+      }),
+      // TODO: get from indexer
+      columnHelper.display({
+        header: "TVL",
+        cell: ({ row }) => {
+          const {} = row.original
+          return <div className="flex flex-col">$1 2345 678</div>
+        },
+      }),
+      columnHelper.display({
+        header: "Balance",
         cell: ({ row }) => {
           const { base, quote, offers } = row.original
           const asksOffers = offers?.filter(
@@ -120,36 +86,29 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         },
       }),
       columnHelper.display({
-        header: "Status",
-        cell: ({ row }) => {
-          const { base, quote, address, offers } = row.original
-          const { data } = useStrategyStatus({
-            address,
-            base,
-            quote,
-            offers,
-          })
-
-          return <Status status={data?.status} />
-        },
-      }),
-      columnHelper.display({
         header: "PnL",
         cell: ({ row }) => {
           const { return: ret } = row.original
           return (
             <div className="flex flex-col">
-              <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+              <div style={{ color: Number(ret) > 0 ? "green" : "red" }}>
+                {isNaN(ret as number) ? "-" : Number(ret).toFixed(6)}
+              </div>
             </div>
           )
         },
       }),
+
       // TODO: get from indexer
       columnHelper.display({
-        header: "Liquidity sourcing",
+        header: "Strategist",
         cell: ({ row }) => {
           const {} = row.original
-          return <div className="flex flex-col">Wallet</div>
+          return (
+            <div className="flex flex-col">
+              <ArrowBigDownDashIcon />
+            </div>
+          )
         },
       }),
       columnHelper.display({
