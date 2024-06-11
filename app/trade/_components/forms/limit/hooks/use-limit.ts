@@ -426,42 +426,15 @@ export function useLimit(props: Props) {
   }, [form, bs])
 
   React.useEffect(() => {
-    // if (!defaultLimitPrice || !form || !sendToken) return
-    // if (!form) return
-    //what is this x)
-    // setTimeout(() => {
-    // console.log(form)
-    // const lo = form.getFieldValue("limitPrice")
-    // console.log("lo", lo)
-    setTimeout(() => {
-      form.setFieldValue("limitPrice", "12345")
-      form.validateAllFields("blur")
-    }, 0)
-  }, [])
-
-  // useQuery({
-  //   queryKey: ["defaultLimitPrice", bs, book?.midPrice],
-  //   queryFn: async () => {
-  //     form.setFieldValue("limitPrice", "1234")
-  //     if (!book?.bids || !book?.asks) return null
-  //     const limitPrice =
-  //       bs === BS.buy ? book?.bids[0]?.price : book?.asks[0]?.price
-  //     if (!limitPrice) return null
-  //     form.setFieldValue("limitPrice", limitPrice?.toString())
-  //     return null
-  //   },
-  //   enabled: !!book?.bids || !!book?.asks,
-  // })
-
-  // React.useEffect(() => {
-  //   const defaultLimitPrice =
-  //     bs === BS.buy ? book?.bids[0]?.price : book?.asks[0]?.price
-  //   console.log("defaultLimitPrice", defaultLimitPrice)
-  //   const currentLimitPrice = form.getFieldValue("limitPrice")
-  //   console.log("currentLimitPrice", currentLimitPrice)
-  //   if (currentLimitPrice !== "" && defaultLimitPrice)
-  //     form.setFieldValue("limitPrice", defaultLimitPrice?.toString())
-  // }, [])
+    const limitPrice =
+      bs === BS.buy ? book?.asks[0]?.price : book?.bids[0]?.price
+    if (!limitPrice) return
+    form.setFieldValue(
+      "limitPrice",
+      limitPrice.toFixed(quoteToken?.displayDecimals),
+    )
+    form.validateAllFields("blur")
+  }, [book?.bids[0]?.price, book?.asks[0]?.price, bs])
 
   return {
     form,
