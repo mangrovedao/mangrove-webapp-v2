@@ -44,6 +44,7 @@ export const PriceRange = withClientOnly(function ({
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
   const {
+    distribution,
     baseDeposit,
     quoteDeposit,
     bountyDeposit,
@@ -235,7 +236,7 @@ export const PriceRange = withClientOnly(function ({
           priceRange={priceRange}
           initialMidPrice={midPrice}
           isLoading={isLoading}
-          geometricKandelDistribution={offersWithPrices}
+          geometricKandelDistribution={distribution}
           baseToken={baseToken}
           quoteToken={quoteToken}
         />

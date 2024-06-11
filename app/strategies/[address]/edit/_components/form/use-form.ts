@@ -10,7 +10,6 @@ import { useKandelState } from "@/app/strategies/(shared)/_hooks/use-kandel-stat
 import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-validator"
 import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
-import useMangrove from "@/providers/mangrove"
 import { getErrorMessage } from "@/utils/errors"
 import {
   ChangingFrom,
@@ -23,7 +22,6 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const { address } = useAccount()
-  const { mangrove } = useMangrove()
   const {
     strategyStatusQuery,
     mergedOffers,
@@ -163,20 +161,17 @@ export default function useForm() {
     setKandelParams(params)
   }, [params])
 
-  const setOffersWithPrices = useNewStratStore(
-    (store) => store.setOffersWithPrices,
-  )
   const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (!isValid && !isMissingField) {
+    if (!isValid && isMissingField) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )
       return
     }
     setGlobalError(undefined)
-  }, [isValid])
+  }, [isValid, isMissingField])
 
   React.useEffect(() => {
     if (
@@ -187,10 +182,6 @@ export default function useForm() {
       return
     setNumberOfOffers(params?.pricePoints.toString())
   }, [params?.pricePoints])
-
-  // React.useEffect(() => {
-  //   setOffersWithPrices(offersWithPrices)
-  // }, [offersWithPrices])
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)

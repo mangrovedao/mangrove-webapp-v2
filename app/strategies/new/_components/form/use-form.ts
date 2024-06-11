@@ -75,8 +75,14 @@ export default function useForm() {
     pricePoints: BigInt(debouncedNumberOfOffers),
   })
 
-  const { params, minBaseAmount, minQuoteAmount, minProvision, isValid } =
-    data ?? {}
+  const {
+    params,
+    minBaseAmount,
+    distribution,
+    minQuoteAmount,
+    minProvision,
+    isValid,
+  } = data ?? {}
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
@@ -86,6 +92,10 @@ export default function useForm() {
   React.useEffect(() => {
     setKandelParams(params)
   }, [params])
+
+  React.useEffect(() => {
+    setDistribution(distribution)
+  }, [distribution])
 
   React.useEffect(() => {
     setBaseDeposit("")
@@ -99,16 +109,17 @@ export default function useForm() {
   }, [market?.base, market?.quote])
 
   const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
+
   // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (!isValid && !isMissingField) {
+    if (!isValid && isMissingField) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )
       return
     }
     setGlobalError(undefined)
-  }, [isValid])
+  }, [isValid, isMissingField])
 
   React.useEffect(() => {
     if (
@@ -119,13 +130,6 @@ export default function useForm() {
       return
     setNumberOfOffers(params.pricePoints.toString())
   }, [params?.pricePoints])
-
-  const setOffersWithPrices = useNewStratStore(
-    (store) => store.setOffersWithPrices,
-  )
-  // React.useEffect(() => {
-  //   setOffersWithPrices(offersWithPrices)
-  // }, [offersWithPrices])
 
   const handleFieldChange = (field: ChangingFrom) => {
     setIsChangingFrom(field)

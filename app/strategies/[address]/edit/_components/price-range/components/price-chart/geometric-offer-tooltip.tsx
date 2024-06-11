@@ -27,7 +27,7 @@ export function GeometricOfferTooltip({
   return (
     <TooltipWithBounds
       top={height - paddingBottom}
-      left={xScaleTransformed(hoveredGeometricOffer.price.toNumber())}
+      left={xScaleTransformed(hoveredGeometricOffer.price)}
       className="!bg-transparent"
     >
       <div
@@ -43,7 +43,7 @@ export function GeometricOfferTooltip({
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {hoveredGeometricOffer.gives.toFixed(
+          {Number(hoveredGeometricOffer.gives).toFixed(
             (hoveredGeometricOffer.type === "bid" ? quoteToken : baseToken)
               ?.displayDecimals,
           )}{" "}

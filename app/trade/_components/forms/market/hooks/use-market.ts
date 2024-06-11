@@ -86,11 +86,6 @@ export function useMarketForm(props: Props) {
   const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
 
-  // const marketPrice =
-  //   orderBookPriceData && orderBookPriceData.mid_price
-  //     ? Number(orderBookPriceData.mid_price)
-  //     : undefined
-
   const averagePrice = determinePrices(
     bs,
     quoteToken,
