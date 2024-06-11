@@ -5,12 +5,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import React from "react"
+import { Vault } from "../../(list)/_schemas/vaults"
+import RemoveFromVaultDialog from "./dialogs/remove-dialog"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75, 100]
 
 export function RemoveForm({ className }: { className?: string }) {
   const [sliderValue, setSliderValue] = React.useState<number | undefined>(0)
+  const [removeDialog, setRemoveDialog] = React.useState(false)
 
   const {
     address,
@@ -73,9 +76,19 @@ export function RemoveForm({ className }: { className?: string }) {
         </div>
       </div>
 
-      <Button rightIcon className="w-full">
+      <Button
+        rightIcon
+        className="w-full"
+        onClick={() => setRemoveDialog(!removeDialog)}
+      >
         Remove
       </Button>
+      <RemoveFromVaultDialog
+        vault={{} as Vault}
+        amount={""}
+        onClose={() => setRemoveDialog(false)}
+        isOpen={removeDialog}
+      />
     </form>
   )
 }

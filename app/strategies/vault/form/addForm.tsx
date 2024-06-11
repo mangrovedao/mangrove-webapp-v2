@@ -4,9 +4,13 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
+import React from "react"
+import AddToVaultDialog from "./dialogs/add-dialog"
 import useForm from "./use-form"
 
 export function AddForm({ className }: { className?: string }) {
+  const [addDialog, setAddDialog] = React.useState(false)
+
   const {
     address,
     baseToken,
@@ -58,9 +62,19 @@ export function AddForm({ className }: { className?: string }) {
           balanceAction={{ onClick: handleQuoteDepositChange, text: "MAX" }}
         />
       </div>
-      <Button rightIcon className="w-full">
+      <Button
+        rightIcon
+        className="w-full"
+        onClick={() => setAddDialog(!addDialog)}
+      >
         Add
       </Button>
+      <AddToVaultDialog
+        isOpen={addDialog}
+        baseAmount={baseDeposit}
+        quoteAmount={quoteDeposit}
+        onClose={() => setAddDialog(false)}
+      />
     </form>
   )
 }
