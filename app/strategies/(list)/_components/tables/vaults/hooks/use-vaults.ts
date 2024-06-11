@@ -20,14 +20,18 @@ export function useVaults<T = Vault[]>({
   const publicClient = usePublicClient()
   const { address: user } = useAccount()
   const { data, ...rest } = useQuery({
-    queryKey: ["vaults", user, chainId, first, skip, publicClient],
+    queryKey: ["vaults", publicClient, user, chainId, first, skip],
     queryFn: async (): Promise<Vault[]> => {
-      if (!publicClient) throw new Error("Public client is not enabled")
-      const plainVaults = getChainVaults(chainId).slice(skip, skip + first)
-      console.log("plainVaultzs", plainVaults)
-      return getVaultsInformation(publicClient, plainVaults, user)
+      try {
+        if (!publicClient) throw new Error("Public client is not enabled")
+        const plainVaults = getChainVaults(chainId).slice(skip, skip + first)
+        return getVaultsInformation(publicClient, plainVaults, user)
+      } catch (error) {
+        console.error(error)
+        return []
+      }
     },
-    // enabled: !!publicClient,
+    enabled: !!publicClient,
     initialData: [],
   })
   return {

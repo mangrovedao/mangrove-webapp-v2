@@ -25,7 +25,6 @@ export function Tables({
         name={"strategy-type"}
         value={strategiesType}
         onValueChange={(e: StrategyType) => {
-          console.log(e)
           setStrategiesType(e)
         }}
         className="max-w-96"

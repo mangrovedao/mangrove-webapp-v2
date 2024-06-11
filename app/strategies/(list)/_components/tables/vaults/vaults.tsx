@@ -19,14 +19,21 @@ export function Vaults({ type }: Props) {
     pageSize: 10,
   })
   const { currentMarket: market } = useMarket()
-  const { data: count } = useVaults({
-    select: (strategies) => strategies.length,
-  })
-  const { data, isLoading, error } = useVaults({
+
+  const { data, isLoading, error, refetch } = useVaults({
     filters: {
       skip: (page - 1) * pageSize,
     },
   })
+
+  const { data: count } = useVaults({
+    select: (strategies) => strategies.length,
+  })
+
+  // temporary fix
+  React.useEffect(() => {
+    refetch?.()
+  }, [])
 
   // selected strategy to cancel
   const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
