@@ -138,6 +138,7 @@ export async function getVaultsInformation(
       balanceBase,
       balanceQuote,
       pnl: 0,
+      baseIsToken0: isBaseToken0,
     }
   })
 }

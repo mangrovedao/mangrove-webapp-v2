@@ -1,5 +1,5 @@
 import type { MarketParams } from "@mangrovedao/mgv"
-import { Address } from "viem"
+import type { Address } from "viem"
 
 export type VaultInfos = {
   address: Address
@@ -19,4 +19,5 @@ export type Vault = {
   balanceQuote: bigint
   pnl: number
   strategist: string
+  baseIsToken0: boolean
 }
