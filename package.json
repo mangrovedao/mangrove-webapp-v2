@@ -124,5 +124,8 @@
   "ct3aMetadata": {
     "initVersion": "7.20.2"
   },
-  "packageManager": "pnpm@9.1.0"
+  "packageManager": "pnpm@9.1.0",
+  "volta": {
+    "node": "18.20.3"
+  }
 }

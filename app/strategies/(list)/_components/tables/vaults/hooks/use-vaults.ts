@@ -1,62 +1,37 @@
 "use client"
-
+import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount, useChainId } from "wagmi"
-
-import { useWhitelistedMarketsInfos } from "@/hooks/use-whitelisted-markets-infos"
-import useMangrove from "@/providers/mangrove"
-import useIndexerSdk from "@/providers/mangrove-indexer"
-import { parseStrategies, type Strategy } from "../../../../_schemas/kandels"
+import { useAccount, useChainId, usePublicClient } from "wagmi"
+import { getChainVaults, getVaultsInformation } from "../services/skate-vaults"
 
 type Params<T> = {
   filters?: {
     first?: number
     skip?: number
   }
-  select?: (data: Strategy[]) => T
+  select?: (data: Vault[]) => T
 }
 
-export function useVaults<T = Strategy[]>({
+export function useVaults<T = Vault[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const { mangrove } = useMangrove()
   const chainId = useChainId()
-  const { address, isConnected } = useAccount()
-  const { indexerSdk } = useIndexerSdk()
-  const { data: knownTokens } = useWhitelistedMarketsInfos(mangrove, {
-    select: (whitelistedMarkets) => {
-      const newData = whitelistedMarkets.flatMap(({ base, quote }) => [
-        base.address?.toLowerCase(),
-        quote.address?.toLowerCase(),
-      ])
-      return Array.from(new Set(newData))
+  const publicClient = usePublicClient()
+  const { address: user } = useAccount()
+  const { data, ...rest } = useQuery({
+    queryKey: ["vaults", user, chainId, first, skip],
+    queryFn: async (): Promise<Vault[]> => {
+      if (!publicClient) throw new Error("Public client is not enabled")
+      const plainVaults = getChainVaults(chainId).slice(skip, skip + first)
+      console.log("plainVaults", plainVaults)
+      return getVaultsInformation(publicClient, plainVaults, user)
     },
+    enabled: !!publicClient,
+    initialData: [],
   })
-
-  return useQuery({
-    queryKey: ["strategies", chainId, address, first, skip],
-    queryFn: async () => {
-      try {
-        if (!(indexerSdk && address && knownTokens && chainId)) return []
-        const result = await indexerSdk.getKandels({
-          owner: address.toLowerCase(),
-          first,
-          skip,
-          knownTokens,
-        })
-
-        return parseStrategies(result)
-      } catch (error) {
-        console.error(error)
-        return []
-      }
-    },
-    select,
-    meta: {
-      error: "Unable to retrieve all strategies",
-    },
-    enabled: !!(isConnected && indexerSdk && address && knownTokens && chainId),
-    retry: false,
-  })
+  return {
+    data: (select ? select(data) : data) as unknown as T,
+    ...rest,
+  }
 }

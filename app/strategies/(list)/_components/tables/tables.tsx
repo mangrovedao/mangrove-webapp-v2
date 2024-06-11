@@ -5,8 +5,8 @@ import {
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
 import { CustomTabs } from "@/components/custom-tabs"
-import { Passive } from "./passive"
-import { Pro } from "./pro"
+import { Strategies } from "./strategies/strategies"
+import { Vaults } from "./vaults/vaults"
 
 enum StrategyType {
   PASSIVE = "Passive",
@@ -41,7 +41,11 @@ export function Tables({
           </CustomRadioGroupItem>
         ))}
       </CustomRadioGroup>
-      {strategiesType === StrategyType.PASSIVE ? <Passive /> : <Pro />}
+      {strategiesType === StrategyType.PASSIVE ? (
+        <Vaults type="all" />
+      ) : (
+        <Strategies type="user" />
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -7,36 +8,31 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import Big from "big.js"
 import React from "react"
-import { useAccount } from "wagmi"
-
-import { IconButton } from "@/components/icon-button"
-import { Close, Pen } from "@/svgs"
-import { ArrowBigDownDashIcon } from "lucide-react"
-import type { Strategy } from "../../../../_schemas/kandels"
+import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
-const columnHelper = createColumnHelper<Strategy>()
-const DEFAULT_DATA: Strategy[] = []
+const columnHelper = createColumnHelper<Vault>()
+const DEFAULT_DATA: Vault[] = []
 
 type Params = {
   type: "user" | "all"
-  data?: Strategy[]
-  onCancel: (strategy: Strategy) => void
-  onManage: (strategy: Strategy) => void
+  data?: Vault[]
 }
 
-export function useTable({ type, data, onCancel, onManage }: Params) {
-  const { chain } = useAccount()
-
+export function useTable({ type, data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.display({
         header: "Pair",
         cell: ({ row }) => {
-          const { base, quote } = row.original
+          const {
+            market: {
+              base: { address: base },
+              quote: { address: quote },
+            },
+          } = row.original
           return <Market base={base} quote={quote} />
         },
       }),
@@ -44,43 +40,61 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Vault fee",
         cell: ({ row }) => {
-          const {} = row.original
-          return <div className="flex flex-col">0.5%</div>
+          const { fees } = row.original
+          return <div className="flex flex-col">{(fees * 100).toFixed(2)}%</div>
         },
       }),
       // TODO: get from indexer
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const {} = row.original
-          return <div className="flex flex-col">$1 2345 678</div>
+          const {
+            totalBase,
+            totalQuote,
+            market: { base, quote },
+          } = row.original
+          // return <div className="flex flex-col">$1 2345 678</div>
+          return (
+            <Value
+              base={base.address}
+              baseValue={Number(
+                formatUnits(totalBase, base.decimals),
+              ).toLocaleString(undefined, {
+                maximumFractionDigits: base.displayDecimals,
+              })}
+              quote={quote.address}
+              quoteValue={Number(
+                formatUnits(totalQuote, quote.decimals),
+              ).toLocaleString(undefined, {
+                maximumFractionDigits: quote.displayDecimals,
+              })}
+            />
+          )
         },
       }),
       columnHelper.display({
         header: "Balance",
         cell: ({ row }) => {
-          const { base, quote, offers } = row.original
-          const asksOffers = offers?.filter(
-            (item) => item.offerType === "asks" && item.live,
-          )
-          const bidsOffers = offers?.filter(
-            (item) => item.offerType === "bids" && item.live,
-          )
-
-          const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
-            return acc.add(Big(curr.gives))
-          }, Big(0))
-
-          const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
-            return acc.add(Big(curr.gives))
-          }, Big(0))
-
+          const {
+            balanceBase,
+            balanceQuote,
+            market: { base, quote },
+          } = row.original
+          // return <div className="flex flex-col">$1 2345 678</div>
           return (
             <Value
-              base={base}
-              baseValue={baseAmountDeposited.toFixed(6)}
-              quote={quote}
-              quoteValue={quoteAmountDeposited.toFixed(6)}
+              base={base.address}
+              baseValue={Number(
+                formatUnits(balanceBase, base.decimals),
+              ).toLocaleString(undefined, {
+                maximumFractionDigits: base.displayDecimals,
+              })}
+              quote={quote.address}
+              quoteValue={Number(
+                formatUnits(balanceQuote, quote.decimals),
+              ).toLocaleString(undefined, {
+                maximumFractionDigits: quote.displayDecimals,
+              })}
             />
           )
         },
@@ -88,11 +102,11 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "PnL",
         cell: ({ row }) => {
-          const { return: ret } = row.original
+          const { pnl: ret } = row.original
           return (
             <div className="flex flex-col">
-              <div style={{ color: Number(ret) > 0 ? "green" : "red" }}>
-                {isNaN(ret as number) ? "-" : Number(ret).toFixed(6)}
+              <div style={{ color: Number(ret) >= 0 ? "green" : "red" }}>
+                {Number.isNaN(ret as number) ? "-" : Number(ret).toFixed(6)}
               </div>
             </div>
           )
@@ -103,53 +117,17 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Strategist",
         cell: ({ row }) => {
-          const {} = row.original
+          const { strategist } = row.original
           return (
             <div className="flex flex-col">
-              <ArrowBigDownDashIcon />
-            </div>
-          )
-        },
-      }),
-      columnHelper.display({
-        id: "actions",
-        header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => {
-          const anyLiveOffers = row.original.offers.some(
-            (x) => x?.live === true,
-          )
-
-          return (
-            <div className="w-full h-full flex justify-end space-x-1">
-              <IconButton
-                tooltip="Manage"
-                className="aspect-square w-6 rounded-full"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  onManage(row.original)
-                }}
-              >
-                <Pen />
-              </IconButton>
-              <IconButton
-                tooltip="Cancel strategy"
-                className="aspect-square w-6 rounded-full"
-                disabled={!anyLiveOffers}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  onCancel(row.original)
-                }}
-              >
-                <Close />
-              </IconButton>
+              {/* <ArrowBigDownDashIcon /> */}
+              {strategist}
             </div>
           )
         },
       }),
     ],
-    [onManage, onCancel],
+    [],
   )
 
   return useReactTable({
