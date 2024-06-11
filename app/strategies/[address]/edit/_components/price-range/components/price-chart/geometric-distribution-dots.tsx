@@ -39,7 +39,9 @@ export function GeometricKandelDistributionDots({
     })),
   ]
 
-  return dots.map((geometricOffer) => (
+  const filteredDots = dots.filter((dot) => dot.gives > 0)
+
+  return filteredDots.map((geometricOffer) => (
     <g
       className="group/circle cursor-pointer"
       onMouseOver={() => onHover?.(geometricOffer)}
