@@ -5,10 +5,10 @@ import { type PriceRangeChartProps } from "./price-range-chart"
 
 export type GeometricOffer = {
   type: string
-  price: Big.Big
-  index: number
-  gives: Big.Big
-  tick: number
+  price: number
+  index: bigint
+  gives: bigint
+  tick: bigint
 }
 
 type Props = {
@@ -28,6 +28,7 @@ export function GeometricKandelDistributionDots({
   onHoverOut,
 }: Props) {
   if (!geometricKandelDistribution) return null
+
   const dots = [
     ...geometricKandelDistribution?.bids.map((bid) => ({
       ...bid,
@@ -47,7 +48,7 @@ export function GeometricKandelDistributionDots({
       key={`${geometricOffer.type}-${geometricOffer.index}`}
     >
       <circle
-        cx={xScale(geometricOffer.price.toNumber())}
+        cx={xScale(geometricOffer.price)}
         cy={height - paddingBottom}
         r={8}
         className={cn(
@@ -60,7 +61,7 @@ export function GeometricKandelDistributionDots({
       />
 
       <circle
-        cx={xScale(geometricOffer.price.toNumber())}
+        cx={xScale(geometricOffer.price)}
         cy={height - paddingBottom}
         r={3}
         className={cn({

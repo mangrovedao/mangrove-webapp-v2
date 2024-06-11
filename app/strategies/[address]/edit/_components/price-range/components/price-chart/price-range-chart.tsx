@@ -1,5 +1,4 @@
 "use client"
-import { type GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
 import { Token } from "@mangrovedao/mgv"
 import { AxisLeft, AxisTop } from "@visx/axis"
 import { curveStep } from "@visx/curve"
@@ -21,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import { cn } from "@/utils"
-import { CompleteOffer } from "@mangrovedao/mgv"
+import { CompleteOffer, Distribution } from "@mangrovedao/mgv"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
 import {
@@ -58,9 +57,7 @@ export type PriceRangeChartProps = {
   priceRange?: [number, number]
   viewOnly?: boolean
   isLoading?: boolean
-  geometricKandelDistribution?: ReturnType<
-    typeof GeometricKandelDistribution.prototype.getOffersWithPrices
-  >
+  geometricKandelDistribution?: Distribution
   mergedOffers?: MergedOffers
 }
 

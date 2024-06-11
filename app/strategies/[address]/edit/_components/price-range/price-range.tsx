@@ -53,6 +53,7 @@ export const PriceRange = withClientOnly(function ({
     isChangingFrom,
     sendFrom,
     receiveTo,
+    distribution,
     setPriceRange,
     setOffersWithPrices,
     setErrors,
@@ -235,7 +236,7 @@ export const PriceRange = withClientOnly(function ({
           priceRange={priceRange}
           initialMidPrice={midPrice}
           isLoading={isLoading}
-          geometricKandelDistribution={offersWithPrices}
+          geometricKandelDistribution={distribution}
           baseToken={baseToken}
           quoteToken={quoteToken}
         />
