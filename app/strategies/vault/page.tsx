@@ -42,7 +42,12 @@ export default function Page() {
   const vaultId = searchParams.get("id")
   const {
     data: { vault, kandelState },
+    refetch,
   } = useVault(vaultId)
+
+  React.useEffect(() => {
+    refetch?.()
+  }, [])
 
   console.log(vault)
   console.log(kandelState)
