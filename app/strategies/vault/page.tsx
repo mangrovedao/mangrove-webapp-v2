@@ -14,10 +14,11 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Separator } from "@/components/ui/separator"
-import { useMarkets } from "@/hooks/use-addresses"
-import { Token } from "@mangrovedao/mgv"
+import type { Token } from "@mangrovedao/mgv"
 import React, { ReactNode } from "react"
+import { formatUnits } from "viem"
 import { Badge } from "../(list)/_components/badge"
+import { useVault } from "./_hooks/useVault"
 import { AddForm } from "./form/addForm"
 import { RemoveForm } from "./form/removeForm"
 
@@ -35,21 +36,28 @@ export default function Page() {
   const [tab, setTab] = React.useState(Tabs.Details)
   const [action, setAction] = React.useState(Action.Add)
 
-  const { push } = useRouter()
-  const markets = useMarkets()
   const searchParams = useSearchParams()
-  const market = searchParams.get("market")
+  const vaultId = searchParams.get("id")
+  const {
+    data: { vault, kandelState },
+  } = useVault(vaultId)
+
+  console.log(vault)
+  console.log(kandelState)
+
+  const { push } = useRouter()
+  // const markets = useMarkets()
 
   return (
     <div className="max-w-full mx-auto px-20 pb-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4 mt-8">
           <TokenPair
-            baseToken={markets[0].base}
-            quoteToken={markets[0].quote}
+            baseToken={vault?.market.base}
+            quoteToken={vault?.market.quote}
             tokenClasses="h-7 w-7"
           />
-          <Badge>0.04%</Badge>
+          <Badge>4.00%</Badge>
         </div>
       </div>
 
@@ -59,15 +67,22 @@ export default function Page() {
         <div className="col-span-2 w-full ">
           {/* Infos Cards */}
           <div className="flex gap-3 p-6">
-            <InfoCard icon={<Gauge />} title="TVL" value="4.689.12" />
-            <InfoCard icon={<Percent />} title="APY" value="63.23%" />
-            <InfoCard icon={<Gauge />} title="Total Earned" value="$98.09" />
+            {/* <InfoCard icon={<Gauge />} title="TVL" value="4.689.12" /> */}
+            <InfoCard icon={<Percent />} title="Estimated APY" value="4.00%" />
+            <InfoCard
+              icon={<Gauge />}
+              title="Strategist"
+              value={vault?.strategist}
+            />
           </div>
 
           <Separator className="w-full my-6" />
           {/* Holding card */}
           <div className="p-6">
-            <HoldingCard base={markets[0].base} quote={markets[0].quote} />
+            <HoldingCard
+              base={vault?.market.base}
+              quote={vault?.market.quote}
+            />
             <Line title="Entry/Exit Fee" value="5%" />
             <Line title="Performance Fee" value="5%" />
           </div>
@@ -143,11 +158,11 @@ export default function Page() {
                 title={
                   <div className="flex gap-2">
                     <TokenIcon
-                      symbol={markets[0].base.symbol}
+                      symbol={vault?.market.base.symbol}
                       className="h-4 w-4"
                     />
                     <Caption className="text-gray text-xs">
-                      {markets[0].base.symbol}
+                      {vault?.market.base.symbol}
                     </Caption>
                   </div>
                 }
@@ -157,11 +172,11 @@ export default function Page() {
                 title={
                   <div className="flex gap-2">
                     <TokenIcon
-                      symbol={markets[0].quote.symbol}
+                      symbol={vault?.market.quote.symbol}
                       className="h-4 w-4"
                     />
                     <Caption className="text-gray text-xs">
-                      {markets[0].quote.symbol}
+                      {vault?.market.quote.symbol}
                     </Caption>
                   </div>
                 }
@@ -177,11 +192,11 @@ export default function Page() {
                 title={
                   <div className="flex gap-2">
                     <TokenIcon
-                      symbol={markets[0].base.symbol}
+                      symbol={vault?.market.base.symbol}
                       className="h-4 w-4"
                     />
                     <Caption className="text-gray text-xs">
-                      {markets[0].base.symbol}
+                      {vault?.market.base.symbol}
                     </Caption>
                   </div>
                 }
@@ -191,11 +206,11 @@ export default function Page() {
                 title={
                   <div className="flex gap-2">
                     <TokenIcon
-                      symbol={markets[0].base.symbol}
+                      symbol={vault?.market.base.symbol}
                       className="h-4 w-4"
                     />
                     <Caption className="text-gray text-xs">
-                      {markets[0].base.symbol}
+                      {vault?.market.base.symbol}
                     </Caption>
                   </div>
                 }
@@ -267,7 +282,24 @@ const Line = ({ title, value }: { title: ReactNode; value: ReactNode }) => {
   )
 }
 
-const HoldingCard = ({ base, quote }: { base: Token; quote: Token }) => {
+const HoldingCard = ({
+  base,
+  quote,
+  baseAmount = 0n,
+  quoteAmount = 0n,
+}: {
+  base?: Token
+  quote?: Token
+  baseAmount?: bigint
+  quoteAmount?: bigint
+}) => {
+  const numberBase = Number(formatUnits(baseAmount, base?.decimals || 18))
+  const numberQuote = Number(formatUnits(quoteAmount, quote?.decimals || 18))
+  const total = numberBase + numberQuote
+
+  const basePercent = total === 0 ? 50 : (numberBase * 100) / total
+  const quotePercent = 100 - basePercent
+
   return (
     <div className="bg-primary-bush-green rounded-lg w-full p-4">
       <Title variant="title2">Vault holdings</Title>
@@ -275,31 +307,41 @@ const HoldingCard = ({ base, quote }: { base: Token; quote: Token }) => {
       <div className="grid gap-2">
         <div className="flex justify-between">
           <div className="flex gap-2">
-            <TokenIcon symbol={base.symbol} />
+            <TokenIcon symbol={base?.symbol} />
             <Text variant={"text1"} className="text-gray text-xs">
-              {base.symbol}
+              {base?.symbol}
             </Text>
           </div>
           <div className="flex gap-5">
-            <Text>0.5600453453</Text>
+            <Text>
+              {numberBase.toLocaleString(undefined, {
+                maximumFractionDigits: base?.displayDecimals || 3,
+              })}
+            </Text>
             <div className="bg-primary-dark-green rounded-md w-14 h-7 flex justify-center items-center">
               <Text variant={"text2"} className="text-gray text-xs">
-                61.23%
+                {basePercent.toFixed(2)}%
               </Text>
             </div>
           </div>
         </div>
         <div className="flex justify-between">
           <div className="flex gap-2">
-            <TokenIcon symbol={quote.symbol} />
+            <TokenIcon symbol={quote?.symbol} />
             <Text variant={"text1"} className="text-gray text-xs">
-              {quote.symbol}
+              {quote?.symbol}
             </Text>
           </div>
           <div className="flex gap-5">
-            <Text>1250.0000</Text>
+            <Text>
+              {numberQuote.toLocaleString(undefined, {
+                maximumFractionDigits: quote?.displayDecimals || 3,
+              })}
+            </Text>
             <div className="bg-primary-dark-green rounded-md w-14 h-7 flex justify-center items-center">
-              <Caption className="text-gray text-xs">38.77%</Caption>
+              <Caption className="text-gray text-xs">
+                {quotePercent.toFixed(2)}%
+              </Caption>
             </div>
           </div>
         </div>

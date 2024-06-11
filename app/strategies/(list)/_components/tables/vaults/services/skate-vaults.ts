@@ -11,7 +11,7 @@ import {
 } from "viem"
 import { blast } from "viem/chains"
 import * as z from "zod"
-const skateVaultABI = parseAbi([
+export const skateVaultABI = parseAbi([
   "function getUnderlyingBalances() public view returns (uint256 amount0Current, uint256 amount1Current)",
   "function totalSupply() public view returns (uint)",
   "function balanceOf(address account) public view returns (uint)",
