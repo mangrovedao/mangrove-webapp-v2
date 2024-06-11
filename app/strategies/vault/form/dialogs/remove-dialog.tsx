@@ -16,7 +16,7 @@ export default function RemoveFromVaultDialog({
 }: Props) {
   return (
     <Dialog open={!!isOpen} onClose={onClose} type="info">
-      <Dialog.Title>Are you sure you want to cancel this order? </Dialog.Title>
+      <Dialog.Title>Are you sure you want to remove liquidity ? </Dialog.Title>
       <Dialog.Footer>
         <div className="flex flex-col gap-4 flex-1">
           <Button
@@ -31,7 +31,7 @@ export default function RemoveFromVaultDialog({
             //   })
             // }}
           >
-            Yes, cancel order
+            Yes, remove liquidity
           </Button>
           <Dialog.Close>
             <Button variant={"secondary"} className="w-full" size="lg">
