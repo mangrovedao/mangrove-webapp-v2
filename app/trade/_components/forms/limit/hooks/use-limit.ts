@@ -428,13 +428,17 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     const limitPrice =
       bs === BS.buy ? book?.asks[0]?.price : book?.bids[0]?.price
-    if (!limitPrice) return
-    form.setFieldValue(
-      "limitPrice",
-      limitPrice.toFixed(quoteToken?.displayDecimals),
-    )
-    form.validateAllFields("blur")
-  }, [book?.bids[0]?.price, book?.asks[0]?.price, bs])
+    if (!limitPrice || !form || !sendToken) return
+
+    //what is this x)
+    setTimeout(() => {
+      form?.setFieldValue(
+        "limitPrice",
+        limitPrice.toFixed(sendToken.displayDecimals),
+      )
+      form?.validateAllFields("blur")
+    }, 0)
+  }, [form, book?.bids, book?.asks, bs])
 
   return {
     form,
