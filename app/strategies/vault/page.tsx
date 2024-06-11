@@ -15,9 +15,11 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Separator } from "@/components/ui/separator"
 import type { Token } from "@mangrovedao/mgv"
+import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
 import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
 import { Badge } from "../(list)/_components/badge"
+import { Vault } from "../(list)/_schemas/vaults"
 import { useVault } from "./_hooks/useVault"
 import { AddForm } from "./form/addForm"
 import { RemoveForm } from "./form/removeForm"
@@ -72,7 +74,7 @@ export default function Page() {
             <InfoCard
               icon={<Gauge />}
               title="Strategist"
-              value={vault?.strategist}
+              value={vault?.strategist || ""}
             />
           </div>
 
@@ -83,14 +85,17 @@ export default function Page() {
               base={vault?.market.base}
               quote={vault?.market.quote}
             />
-            <Line title="Entry/Exit Fee" value="5%" />
-            <Line title="Performance Fee" value="5%" />
+            <Line
+              title="Exit Fee"
+              value={`${((vault?.fees || 0) * 100).toFixed(2)}%`}
+            />
+            <Line title="Performance Fee" value="0.00%" />
           </div>
 
           <Separator className="my-6" />
           {/* Details & Positions */}
           <div className="grid gap-8 px-6">
-            <div className="w-80">
+            {/* <div className="w-80">
               <CustomRadioGroup
                 name={"tab"}
                 value={tab}
@@ -109,8 +114,9 @@ export default function Page() {
                   </CustomRadioGroupItem>
                 ))}
               </CustomRadioGroup>
-            </div>
-            {tab === Tabs.Details ? <Details /> : <Details />}
+            </div> */}
+            {/* {tab === Tabs.Details ? <Details /> : <Details />} */}
+            <Details vault={vault} kandel={kandelState} />
           </div>
         </div>
 
@@ -152,7 +158,7 @@ export default function Page() {
 
             <Separator />
 
-            <div>
+            {/* <div>
               <Title>Initial Deposit</Title>
               <Line
                 title={
@@ -184,7 +190,7 @@ export default function Page() {
               />
             </div>
 
-            <Separator />
+            <Separator /> */}
 
             <div>
               <Title>Current Balance</Title>
@@ -200,21 +206,39 @@ export default function Page() {
                     </Caption>
                   </div>
                 }
-                value="0.0123569"
+                value={Number(
+                  formatUnits(
+                    vault?.balanceBase || 0n,
+                    vault?.market.base.decimals || 18,
+                  ),
+                ).toLocaleString(undefined, {
+                  maximumFractionDigits:
+                    vault?.market.base.displayDecimals || 3,
+                })}
               />
               <Line
                 title={
                   <div className="flex gap-2">
                     <TokenIcon
-                      symbol={vault?.market.base.symbol}
+                      symbol={vault?.market.quote.symbol}
                       className="h-4 w-4"
                     />
                     <Caption className="text-gray text-xs">
-                      {vault?.market.base.symbol}
+                      {vault?.market.quote.symbol}
                     </Caption>
                   </div>
                 }
-                value="0.0123569"
+                value={
+                  Number(
+                    formatUnits(
+                      vault?.balanceQuote || 0n,
+                      vault?.market.quote.decimals || 18,
+                    ),
+                  ).toLocaleString(undefined, {
+                    maximumFractionDigits:
+                      vault?.market.quote.displayDecimals || 3,
+                  }) || "0"
+                }
               />
             </div>
           </div>
@@ -224,7 +248,40 @@ export default function Page() {
   )
 }
 
-const Details = () => {
+const Details = ({
+  kandel,
+  vault,
+}: {
+  kandel?: GetKandelStateResult
+  vault?: Vault
+}) => {
+  const firstAskPrice = kandel?.asks[0]?.price
+  const lastBidPrice = kandel?.bids[0]?.price
+  const price =
+    (firstAskPrice
+      ? lastBidPrice
+        ? (firstAskPrice + lastBidPrice) / 2
+        : firstAskPrice
+      : lastBidPrice) || 0
+
+  const minBidPrice = kandel?.bids.at(-1)?.price
+  const maxBidPrice = kandel?.bids[0]?.price
+  const minAskPrice = kandel?.asks[0]?.price
+  const maxAskPrice = kandel?.asks.at(-1)?.price
+
+  const minPrice =
+    minBidPrice === undefined
+      ? minAskPrice === undefined
+        ? 0
+        : minAskPrice
+      : minBidPrice
+  const maxPrice =
+    maxAskPrice === undefined
+      ? maxBidPrice === undefined
+        ? 0
+        : maxBidPrice
+      : maxAskPrice
+
   return (
     <>
       <div className="flex gap-2 items-center">
@@ -237,27 +294,63 @@ const Details = () => {
       <div className="bg-primary-bush-green rounded-lg flex justify-between px-8 py-4">
         <div className="grid justify-center ">
           <Caption className="text-gray">Price</Caption>
-          <Caption>$1 234.12</Caption>
+          <Caption>
+            {price.toLocaleString(undefined, {
+              maximumFractionDigits:
+                vault?.market.quote.priceDisplayDecimals || 4,
+            })}{" "}
+            {vault?.market.quote.symbol}
+          </Caption>
         </div>
         <Separator orientation="vertical" className="h-4 self-center" />
         <div className="grid">
           <Caption className="text-gray">Price Range</Caption>
-          <Caption>1 431.59 / 1 759.00</Caption>
+          <Caption>
+            {minPrice.toLocaleString(undefined, {
+              maximumFractionDigits:
+                vault?.market.quote.priceDisplayDecimals || 4,
+            })}{" "}
+            /{" "}
+            {maxPrice.toLocaleString(undefined, {
+              maximumFractionDigits:
+                vault?.market.quote.priceDisplayDecimals || 4,
+            })}
+          </Caption>
         </div>
         <Separator orientation="vertical" className="h-4 self-center" />
         <div className="grid">
           <Caption className="text-gray">Offers</Caption>
-          <Caption>4</Caption>
+          <Caption>{kandel?.pricePoints || 0}</Caption>
         </div>
         <Separator orientation="vertical" className="h-4 self-center" />
         <div className="grid">
           <Caption className="text-gray">Asks Volume</Caption>
-          <Caption>$1 234.12</Caption>
+          <Caption>
+            {Number(
+              formatUnits(
+                kandel?.baseAmount || 0n,
+                vault?.market.base.decimals || 18,
+              ),
+            ).toLocaleString(undefined, {
+              maximumFractionDigits: vault?.market.base.displayDecimals || 3,
+            })}{" "}
+            {vault?.market.base.symbol}
+          </Caption>
         </div>
         <Separator orientation="vertical" className="h-4 self-center" />
         <div className="grid">
           <Caption className="text-gray">Bids Volume</Caption>
-          <Caption>$1 234.12</Caption>
+          <Caption>
+            {Number(
+              formatUnits(
+                kandel?.quoteAmount || 0n,
+                vault?.market.quote.decimals || 18,
+              ),
+            ).toLocaleString(undefined, {
+              maximumFractionDigits: vault?.market.quote.displayDecimals || 3,
+            })}{" "}
+            {vault?.market.quote.symbol}
+          </Caption>
         </div>
       </div>
       <div className="bg-primary-bush-green rounded-lg p-4">
