@@ -5,6 +5,7 @@ import React from "react"
 import { useDebounceCallback } from "usehooks-ts"
 import { usePublicClient } from "wagmi"
 import type { Vault } from "../../(list)/_schemas/vaults"
+import { getMintAmount } from "../_service/skate-vault"
 
 export type MintAmountsArgs = {
   vault?: Vault
@@ -49,32 +50,32 @@ export function useMintAmounts({ vault }: MintAmountsArgs) {
       if (!amountAndSide || !baseBalance || !quoteBalance || !vault)
         throw new Error("Invalid state")
       if (!client) return undefined
-      // let baseAmount =
-      //   amountAndSide.side === "base"
-      //     ? amountAndSide.amount
-      //     : baseBalance.balance
-      // let quoteAmount =
-      //   amountAndSide.side === "quote"
-      //     ? amountAndSide.amount
-      //     : quoteBalance.balance
-      // const { amount0, amount1, mintAmount } = await getMintAmount(client, {
-      //   vault: vault.address,
-      //   amount0: vault.baseIsToken0 ? baseAmount : quoteAmount,
-      //   amount1: vault.baseIsToken0 ? quoteAmount : baseAmount,
-      // })
-      //
-      // Mock impl
       let baseAmount =
         amountAndSide.side === "base"
           ? amountAndSide.amount
-          : amountAndSide.amount / 3000n
+          : baseBalance.balance
       let quoteAmount =
         amountAndSide.side === "quote"
           ? amountAndSide.amount
-          : amountAndSide.amount * 3000n
-      const amount0 = vault.baseIsToken0 ? baseAmount : quoteAmount
-      const amount1 = vault.baseIsToken0 ? quoteAmount : baseAmount
-      const mintAmount = amount0
+          : quoteBalance.balance
+      const { amount0, amount1, mintAmount } = await getMintAmount(client, {
+        vault: vault.address,
+        amount0: vault.baseIsToken0 ? baseAmount : quoteAmount,
+        amount1: vault.baseIsToken0 ? quoteAmount : baseAmount,
+      })
+      //
+      // Mock impl
+      // let baseAmount =
+      //   amountAndSide.side === "base"
+      //     ? amountAndSide.amount
+      //     : amountAndSide.amount / 3000n
+      // let quoteAmount =
+      //   amountAndSide.side === "quote"
+      //     ? amountAndSide.amount
+      //     : amountAndSide.amount * 3000n
+      // const amount0 = vault.baseIsToken0 ? baseAmount : quoteAmount
+      // const amount1 = vault.baseIsToken0 ? quoteAmount : baseAmount
+      // const mintAmount = amount0
       // end mock impl
 
       baseAmount = vault.baseIsToken0 ? amount0 : amount1

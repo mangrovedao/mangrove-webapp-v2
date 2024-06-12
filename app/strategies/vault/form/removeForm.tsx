@@ -5,7 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import React from "react"
-import { Vault } from "../../(list)/_schemas/vaults"
+import { erc20Abi, type Address } from "viem"
+import { useAccount, useReadContract } from "wagmi"
 import RemoveFromVaultDialog from "./dialogs/remove-dialog"
 import useForm from "./use-form"
 
@@ -15,21 +16,23 @@ export function RemoveForm({ className }: { className?: string }) {
   const [sliderValue, setSliderValue] = React.useState<number | undefined>(0)
   const [removeDialog, setRemoveDialog] = React.useState(false)
 
-  const {
-    address,
-    baseToken,
-    quoteToken,
-    baseDeposit,
-    quoteDeposit,
-    nativeBalance,
-    baseBalance,
-    quoteBalance,
-    errors,
-    handleBaseDepositChange,
-    handleQuoteDepositChange,
-  } = useForm()
+  const { vault, baseToken, quoteToken } = useForm()
 
-  if (!baseToken || !quoteToken)
+  const { address } = useAccount()
+
+  const { data: balance, isLoading } = useReadContract({
+    address: vault?.address as Address,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [address as Address],
+    query: {
+      enabled: !!address || !!vault,
+    },
+  })
+
+  const amount = balance ? (balance * BigInt(sliderValue || 0)) / 100n : 0n
+
+  if (!baseToken || !quoteToken || !vault || !address)
     return (
       <div className={"p-0.5"}>
         <Skeleton className="w-full h-screen" />
@@ -80,12 +83,13 @@ export function RemoveForm({ className }: { className?: string }) {
         rightIcon
         className="w-full"
         onClick={() => setRemoveDialog(!removeDialog)}
+        disabled={amount === 0n || isLoading}
       >
         Remove
       </Button>
       <RemoveFromVaultDialog
-        vault={{} as Vault}
-        amount={""}
+        vault={vault}
+        amount={amount}
         onClose={() => setRemoveDialog(false)}
         isOpen={removeDialog}
       />

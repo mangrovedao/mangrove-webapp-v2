@@ -1,19 +1,39 @@
-import { Vault } from "@/app/strategies/(list)/_schemas/vaults"
+import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
+import { useEffect } from "react"
+import { parseAbi } from "viem"
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 
 type Props = {
   isOpen: boolean
   vault: Vault
-  amount: string
+  amount: bigint
   onClose: () => void
 }
+
+const burnABI = parseAbi([
+  "function burn(uint256 burnAmount,uint256[2] calldata minAmountsOut) external returns (uint256 amount0, uint256 amount1)",
+])
 
 export default function RemoveFromVaultDialog({
   isOpen,
   vault,
+  amount,
   onClose,
 }: Props) {
+  const { data: hash, isPending, writeContract } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    })
+
+  useEffect(() => {
+    if (isConfirmed) {
+      onClose()
+    }
+  }, [isConfirmed, onClose])
+
   return (
     <Dialog open={!!isOpen} onClose={onClose} type="info">
       <Dialog.Title>Are you sure you want to remove liquidity ? </Dialog.Title>
@@ -22,14 +42,17 @@ export default function RemoveFromVaultDialog({
           <Button
             className="w-full"
             size="lg"
-            // disabled={cancel.isPending}
-            // loading={cancel.isPending}
-            // onClick={() => {
-            //   if (!(order && market)) return
-            //   cancel.mutate({
-            //     order,
-            //   })
-            // }}
+            disabled={isPending || isConfirming}
+            loading={isPending || isConfirming}
+            onClick={() => {
+              if (!vault) return
+              writeContract({
+                address: vault.address,
+                abi: burnABI,
+                functionName: "burn",
+                args: [amount, [0n, 0n]],
+              })
+            }}
           >
             Yes, remove liquidity
           </Button>
