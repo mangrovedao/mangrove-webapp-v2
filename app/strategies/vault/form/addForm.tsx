@@ -12,17 +12,16 @@ export function AddForm({ className }: { className?: string }) {
   const [addDialog, setAddDialog] = React.useState(false)
 
   const {
-    address,
     baseToken,
     quoteToken,
     baseDeposit,
     quoteDeposit,
-    nativeBalance,
-    baseBalance,
-    quoteBalance,
+    mintAmount,
+    vault,
     errors,
     handleBaseDepositChange,
     handleQuoteDepositChange,
+    isLoading,
   } = useForm()
 
   if (!baseToken || !quoteToken)
@@ -66,6 +65,7 @@ export function AddForm({ className }: { className?: string }) {
         rightIcon
         className="w-full"
         onClick={() => setAddDialog(!addDialog)}
+        disabled={isLoading || mintAmount === 0n}
       >
         Add
       </Button>
@@ -73,6 +73,10 @@ export function AddForm({ className }: { className?: string }) {
         isOpen={addDialog}
         baseAmount={baseDeposit}
         quoteAmount={quoteDeposit}
+        vault={vault}
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        mintAmount={mintAmount}
         onClose={() => setAddDialog(false)}
       />
     </form>
