@@ -438,7 +438,7 @@ export function useLimit(props: Props) {
       )
       form?.validateAllFields("blur")
     }, 0)
-  }, [form, book?.bids, book?.asks, bs])
+  }, [bs])
 
   return {
     form,
