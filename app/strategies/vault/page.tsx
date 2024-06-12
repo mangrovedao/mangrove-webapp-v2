@@ -46,7 +46,7 @@ export default function Page() {
   } = useVault(vaultId)
 
   React.useEffect(() => {
-    refetch?.()
+    setTimeout(() => refetch?.(), 1)
   }, [])
 
   console.log(vault)

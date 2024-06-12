@@ -1,48 +1,81 @@
-import React from "react"
-import { useAccount, useBalance } from "wagmi"
+import React, { useMemo } from "react"
+import { useAccount } from "wagmi"
 
-import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useSearchParams } from "next/navigation"
 
-import useMarket from "@/providers/market.new"
+import { useTokenBalance } from "@/hooks/use-balances"
+import { formatUnits, parseUnits } from "viem"
+import { useMintAmounts } from "../_hooks/use-mint-amounts"
+import { useVault } from "../_hooks/useVault"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
-  const { address } = useAccount()
-  const { currentMarket: market } = useMarket()
-  const baseToken = market?.base
-  const quoteToken = market?.quote
+  const searchParams = useSearchParams()
+  const vaultId = searchParams.get("id")
+  const {
+    data: { vault },
+  } = useVault(vaultId)
 
-  const [baseDeposit, setBaseDeposit] = React.useState("")
-  const [quoteDeposit, setQuoteDeposit] = React.useState("")
+  const { data, isLoading, isError, setBaseAmount, setQuoteAmount } =
+    useMintAmounts({ vault })
+
+  const { address } = useAccount()
+  // const { currentMarket: market } = useMarket()
+  // const baseToken = market?.base
+  // const quoteToken = market?.quote
+
+  // const [baseDeposit, setBaseDeposit] = React.useState("")
+  // const [quoteDeposit, setQuoteDeposit] = React.useState("")
   const [errors, setErrors] = React.useState<Record<string, string>>({})
 
-  const baseBalance = useTokenBalance(baseToken)
-  const quoteBalance = useTokenBalance(quoteToken)
-  const { data: nativeBalance } = useBalance({
-    address,
+  // const baseBalance = useTokenBalance(baseToken)
+  // const quoteBalance = useTokenBalance(quoteToken)
+  // const { data: nativeBalance } = useBalance({
+  //   address,
+  // })
+
+  const baseToken = vault?.market.base
+  const quoteToken = vault?.market.quote
+
+  const { balance: baseBalance } = useTokenBalance({
+    token: baseToken?.address,
   })
+  const { balance: quoteBalance } = useTokenBalance({
+    token: quoteToken?.address,
+  })
+
+  const baseDeposit = useMemo(() => {
+    return formatUnits(data.baseAmount, baseToken?.decimals || 18)
+  }, [data.baseAmount, baseToken?.decimals])
+  const quoteDeposit = useMemo(() => {
+    return formatUnits(data.quoteAmount, quoteToken?.decimals || 18)
+  }, [data.quoteAmount, quoteToken?.decimals])
 
   const handleBaseDepositChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
     const value = typeof e === "string" ? e : e.target.value
-    setBaseDeposit(value)
+    setBaseAmount(parseUnits(value, baseToken?.decimals || 18))
   }
 
   const handleQuoteDepositChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
     const value = typeof e === "string" ? e : e.target.value
-    setQuoteDeposit(value)
+    setQuoteAmount(parseUnits(value, quoteToken?.decimals || 18))
   }
 
   React.useEffect(() => {
     const newErrors = { ...errors }
 
     // Base Deposit Validation
-    if (Number(baseDeposit) > Number(baseBalance.formatted) && baseDeposit) {
+    if (
+      baseBalance?.balance &&
+      data.baseAmount > baseBalance?.balance &&
+      baseDeposit
+    ) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
     } else if (Number(baseDeposit) > 0 && Number(baseDeposit) === 0) {
@@ -52,7 +85,11 @@ export default function useForm() {
     }
 
     // Quote Deposit Validation
-    if (Number(quoteDeposit) > Number(quoteBalance.formatted) && quoteDeposit) {
+    if (
+      quoteBalance?.balance &&
+      data.quoteAmount > quoteBalance?.balance &&
+      quoteDeposit
+    ) {
       newErrors.quoteDeposit =
         "Quote deposit cannot be greater than wallet balance"
     } else if (
@@ -74,7 +111,6 @@ export default function useForm() {
     quoteToken,
     baseDeposit,
     quoteDeposit,
-    nativeBalance,
     baseBalance,
     quoteBalance,
     errors,
