@@ -66,10 +66,6 @@ export default function Page() {
         )}
       </div>
       <Tables />
-      {/* <NewStrategyDialog
-        open={isNewDialogOpen}
-        onClose={toggleIsNewDialogOpen}
-      /> */}
     </main>
   )
 }

@@ -8,7 +8,7 @@ import {
   getDefaultConfig,
 } from "@rainbow-me/rainbowkit"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { blast, blastSepolia, polygonMumbai } from "viem/chains"
+import { base, blast, blastSepolia } from "viem/chains"
 import { WagmiProvider, http } from "wagmi"
 
 import { env } from "@/env.mjs"
@@ -24,7 +24,7 @@ const config = getDefaultConfig({
   chains: getWhitelistedChainObjects(),
   ssr: true,
   transports: {
-    [polygonMumbai.id]: http(),
+    [base.id]: http(),
     [blastSepolia.id]: http(),
     [blast.id]: http(),
   },

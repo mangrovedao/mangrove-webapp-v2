@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
-import useMangrove from "@/providers/mangrove"
 
 export function useBounty({
   kandelInstance,
@@ -11,7 +10,6 @@ export function useBounty({
   kandelInstance?: ReturnType<typeof useKandelInstance>
   bounty: string
 }) {
-  const { mangrove } = useMangrove()
   const queryClient = useQueryClient()
 
   return useMutation({

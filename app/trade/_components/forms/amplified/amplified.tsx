@@ -25,15 +25,13 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
-import { Logic } from "@mangrovedao/mgv"
 import React from "react"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import SourceIcon from "../limit/components/source-icon"
-import FromWalletAmplifiedOrderDialog from "./components/from-wallet-order-dialog"
+
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import useAmplifiedForm from "./hooks/use-amplified"
-import { AssetWithInfos } from "./types"
 import { getCurrentTokenPrice } from "./utils"
 
 const sliderValues = [25, 50, 75, 100]
@@ -548,7 +546,7 @@ export function Amplified() {
           Buy
         </Button>
       </form>
-      <FromWalletAmplifiedOrderDialog
+      {/* <FromWalletAmplifiedOrderDialog
         form={{
           assetsWithTokens: assetsWithTokens as AssetWithInfos[],
           sendSource,
@@ -564,7 +562,7 @@ export function Amplified() {
           setSummaryDialog(!summaryDialog)
         }}
         isOpen={summaryDialog}
-      />
+      /> */}
     </div>
   )
 }

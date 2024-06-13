@@ -1,4 +1,6 @@
+import { Token } from "@mangrovedao/mgv"
 import Link from "next/link"
+import { toast } from "sonner"
 import { parseUnits, type Address } from "viem"
 import {
   useChainId,
@@ -11,18 +13,16 @@ import * as wagmiChains from "wagmi/chains"
 import { Button } from "@/components/ui/button"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 
-import { toast } from "sonner"
 import TestTokenAbi from "../../../_abis/test-token.json"
 import { useMintLimit } from "../hooks/use-mint-limit"
-import { type FaucetToken } from "../schema"
 
 type Props = {
-  faucetToken: FaucetToken
+  faucetToken: Token
 }
 
 export function Actions({ faucetToken }: Props) {
   const chainId = useChainId()
-  const isMgv = faucetToken.id.includes("MGV")
+  const isMgv = faucetToken.mgvTestToken
   const tokenQuery = useTokenFromAddress(faucetToken.address as Address)
   const mintLimit = useMintLimit(faucetToken.address as Address, !!isMgv)
   const { data: prepareMint } = useSimulateContract({
@@ -36,11 +36,7 @@ export function Actions({ faucetToken }: Props) {
       ),
     ],
     query: {
-      enabled: !!(
-        tokenQuery.data?.decimals &&
-        mintLimit.data &&
-        faucetToken.id.includes("MGV")
-      ),
+      enabled: !!(tokenQuery.data?.decimals && mintLimit.data && isMgv),
     },
   })
 

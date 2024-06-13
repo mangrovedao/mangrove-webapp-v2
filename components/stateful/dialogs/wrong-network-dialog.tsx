@@ -5,11 +5,9 @@ import { useAccount, useConfig } from "wagmi"
 
 import Dialog from "@/components/dialogs/alert-dialog"
 import { Button } from "@/components/ui/button"
-import useMangrove from "@/providers/mangrove"
 import { cn } from "@/utils"
 
 export function WrongNetworkAlertDialog() {
-  const { mangroveQuery } = useMangrove()
   const { openChainModal, chainModalOpen } = useChainModal()
   const { chain, isConnected } = useAccount()
   const { chains } = useConfig()
@@ -18,16 +16,12 @@ export function WrongNetworkAlertDialog() {
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
-    if (
-      !chainModalOpen &&
-      isConnected &&
-      (!isNetworkSupported || !!mangroveQuery.error === true)
-    ) {
+    if (!chainModalOpen && isConnected && !isNetworkSupported) {
       setOpen(true)
     } else {
       setOpen(false)
     }
-  }, [chain, isNetworkSupported, chainModalOpen, mangroveQuery.error])
+  }, [chain, isNetworkSupported, chainModalOpen])
 
   function handleChangeNetwork() {
     setOpen(false)

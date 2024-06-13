@@ -1,13 +1,7 @@
 "use client"
 import React from "react"
 
-import { DataTable } from "@/components/ui/data-table/data-table"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
-import CancelAmplifiedOfferDialog from "./components/cancel-amplified-offer-dialog"
-import EditAmplifiedOrderSheet from "./components/edit-amplified-order-sheet"
-import { useAmplifiedOrders } from "./hooks/use-amplified-orders"
-import { useAmplifiedTable } from "./hooks/use-amplified-table"
 import { useOrders } from "./hooks/use-orders"
 import type { AmplifiedOrder } from "./schema"
 
@@ -17,17 +11,15 @@ export function AmplifiedOrders() {
     pageSize: 10,
   })
   const { currentMarket, setMarket, markets } = useMarket()
-  const { marketsInfoQuery, mangrove } = useMangrove()
-  const { data: openMarkets } = marketsInfoQuery
   const { data: count } = useOrders({
     select: (orders) => orders.length,
   })
 
-  const amplifiedOrdersQuery = useAmplifiedOrders({
-    filters: {
-      skip: (page - 1) * pageSize,
-    },
-  })
+  // const amplifiedOrdersQuery = useAmplifiedOrders({
+  //   filters: {
+  //     skip: (page - 1) * pageSize,
+  //   },
+  // })
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<AmplifiedOrder>()
@@ -36,15 +28,15 @@ export function AmplifiedOrders() {
     mode: "view" | "edit"
   }>()
 
-  const table = useAmplifiedTable({
-    data: amplifiedOrdersQuery.data,
-    onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
-    onCancel: setOrderToDelete,
-  })
+  // const table = useAmplifiedTable({
+  //   data: amplifiedOrdersQuery.data,
+  //   onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
+  //   onCancel: setOrderToDelete,
+  // })
 
   return (
     <>
-      <DataTable
+      {/* <DataTable
         table={table}
         isError={!!amplifiedOrdersQuery.error}
         isLoading={amplifiedOrdersQuery.isLoading || !currentMarket}
@@ -60,14 +52,14 @@ export function AmplifiedOrders() {
       />
       <EditAmplifiedOrderSheet
         orderInfos={orderToEdit}
-        openMarkets={openMarkets}
+        openMarkets={markets}
         onClose={() => setOrderToEdit(undefined)}
       />
       <CancelAmplifiedOfferDialog
         order={orderToDelete}
         market={{ currentMarket, setMarket, markets }}
         onClose={() => setOrderToDelete(undefined)}
-      />
+      /> */}
     </>
   )
 }

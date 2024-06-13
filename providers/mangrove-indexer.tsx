@@ -6,15 +6,17 @@ import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import { useTokenPricesInUsb } from "@/hooks/use-orderbook-price-per-block"
+import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import Big from "big.js"
-import useMangrove from "./mangrove"
+import { Address } from "viem"
 
 const useIndexerSdkContext = () => {
-  const { mangrove, tokenPricesInUsbQuery } = useMangrove()
+  const tokenPrices = useTokenPricesInUsb()
   const { chain } = useAccount()
 
   const indexerSdkQuery = useQuery({
-    queryKey: ["indexer-sdk", chain, tokenPricesInUsbQuery.dataUpdatedAt],
+    queryKey: ["indexer-sdk", chain, tokenPrices.dataUpdatedAt],
     queryFn: () => {
       try {
         if (!chain) return null
@@ -23,10 +25,10 @@ const useIndexerSdkContext = () => {
           chainId: chain.id as ChainsIds,
           helpers: {
             getTokenDecimals: async (address) => {
-              const token = await mangrove?.tokenFromAddress(address)
+              const token = useTokenFromAddress(address as Address)
               if (!token)
                 throw new Error("Impossible to determine token decimals")
-              return token.decimals
+              return token.data?.decimals || 18
             },
             createTickHelpers: async (ba, m) => {
               const outbound = ba === "asks" ? m.base : m.quote
@@ -68,7 +70,7 @@ const useIndexerSdkContext = () => {
               }
             },
             getPrice(tokenAddress) {
-              return tokenPricesInUsbQuery.data?.[tokenAddress] ?? 1
+              return tokenPrices.data?.[tokenAddress] ?? 1
             },
           },
         })
@@ -79,7 +81,7 @@ const useIndexerSdkContext = () => {
     meta: {
       error: "Error when initializing the indexer sdk",
     },
-    enabled: !!mangrove && !!chain?.id,
+    enabled: !!chain?.id,
     staleTime: 15 * 60 * 1000,
   })
   return {

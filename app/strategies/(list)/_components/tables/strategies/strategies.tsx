@@ -9,6 +9,7 @@ import useMarket from "@/providers/market.new"
 import type { Strategy } from "../../../_schemas/kandels"
 import { useStrategies } from "./hooks/use-strategies"
 import { useTable } from "./hooks/use-table"
+import { useMarkets } from "@/hooks/use-addresses"
 
 type Props = {
   type: "user" | "all"
@@ -19,9 +20,7 @@ export function Strategies({ type }: Props) {
     page: 1,
     pageSize: 10,
   })
-  const { currentMarket: market } = useMarket()
-  const { marketsInfoQuery } = useMangrove()
-  const { data: openMarkets } = marketsInfoQuery
+  const { currentMarket: market, markets} = useMarket()
   const { data: count } = useStrategies({
     select: (strategies) => strategies.length,
   })
@@ -38,17 +37,17 @@ export function Strategies({ type }: Props) {
     type,
     data: strategiesQuery.data,
     onManage: (strategy: Strategy) => {
-      const baseToken = openMarkets?.find(
+      const baseToken = markets?.find(
         (item) =>
           item.base.address.toLowerCase() === strategy.base.toLowerCase(),
       )?.base
-      const quoteToken = openMarkets?.find(
+      const quoteToken = markets?.find(
         (item) =>
           item.quote.address.toLowerCase() === strategy.quote.toLowerCase(),
       )?.quote
 
       push(
-        `/strategies/${strategy.address}/edit?market=${baseToken?.id},${quoteToken?.id}`,
+        `/strategies/${strategy.address}/edit?market=${baseToken?.address},${quoteToken?.address}`,
       )
     },
     onCancel: (strategy: Strategy) => setCloseStrategy(strategy),

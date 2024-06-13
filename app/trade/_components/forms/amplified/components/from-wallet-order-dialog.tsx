@@ -16,7 +16,6 @@ import { DeployRouter } from "../../components/deploy-router"
 import { Steps } from "../../components/steps"
 import { useActivateSmartContract } from "../../hooks/use-router-bind"
 import { useDeploySmartRouter } from "../../hooks/use-router-deploy"
-import { useSmartRouter } from "../../hooks/use-smart-router"
 import { useSpenderAddress } from "../../hooks/use-spender-address"
 import { useLimitSteps } from "../../limit/hooks/use-steps"
 import { usePostAmplifiedOrder } from "../hooks/use-post-amplified-order"
@@ -60,13 +59,13 @@ export default function FromWalletAmplifiedOrderDialog({
     logic: form.selectedSource?.name,
   })
 
-  const { isDeployed, isBound } = useSmartRouter().data ?? {}
+  // const { isDeployed, isBound } = useSmartRouter().data ?? {}
 
   let steps = [
     "Summary",
     !limitOrderSteps?.[0].done ? `Approve ${selectedToken?.symbol}` : "",
-    isDeployed ? "Amplified order deployment" : "",
-    !isBound ? "Amplified order activation" : "",
+    false ? "Amplified order deployment" : "",
+    !true ? "Amplified order activation" : "",
     "Send",
   ].filter(Boolean)
 
@@ -144,7 +143,7 @@ export default function FromWalletAmplifiedOrderDialog({
         </Button>
       ),
     },
-    isDeployed && {
+    true && {
       body: <DeployRouter />,
       button: (
         <Button
@@ -161,7 +160,7 @@ export default function FromWalletAmplifiedOrderDialog({
         </Button>
       ),
     },
-    !isBound && {
+    true && {
       body: <ActivateRouter />,
       button: (
         <Button
