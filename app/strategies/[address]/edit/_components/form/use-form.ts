@@ -162,9 +162,9 @@ export default function useForm() {
   }, [params])
 
   const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
-  // if kandelRequirementsQuery has error
+
   React.useEffect(() => {
-    if (!isValid && isMissingField) {
+    if (!isValid && !isMissingField) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )

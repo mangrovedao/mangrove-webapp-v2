@@ -3,13 +3,13 @@
 import { getSdk } from "@mangrovedao/indexer-sdk"
 import type { ChainsIds } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import { useQuery } from "@tanstack/react-query"
+import Big from "big.js"
 import React from "react"
+import { Address } from "viem"
 import { useAccount } from "wagmi"
 
 import { useTokenPricesInUsb } from "@/hooks/use-orderbook-price-per-block"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import Big from "big.js"
-import { Address } from "viem"
 
 const useIndexerSdkContext = () => {
   const tokenPrices = useTokenPricesInUsb()

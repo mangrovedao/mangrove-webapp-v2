@@ -4,12 +4,10 @@ import React from "react"
 
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table/data-table"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import type { Strategy } from "../../../_schemas/kandels"
 import { useStrategies } from "./hooks/use-strategies"
 import { useTable } from "./hooks/use-table"
-import { useMarkets } from "@/hooks/use-addresses"
 
 type Props = {
   type: "user" | "all"
@@ -20,7 +18,7 @@ export function Strategies({ type }: Props) {
     page: 1,
     pageSize: 10,
   })
-  const { currentMarket: market, markets} = useMarket()
+  const { currentMarket: market, markets } = useMarket()
   const { data: count } = useStrategies({
     select: (strategies) => strategies.length,
   })

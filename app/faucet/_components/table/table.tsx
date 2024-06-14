@@ -2,7 +2,6 @@
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { useTokens } from "@/hooks/use-addresses"
-import useMangrove from "@/providers/mangrove"
 import { Token } from "@mangrovedao/mgv"
 import { useTable } from "./hooks/use-table"
 

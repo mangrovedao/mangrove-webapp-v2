@@ -5,7 +5,6 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { useBook } from "@/hooks/use-book"
-import useMangrove from "@/providers/mangrove"
 import {
   default as useMarket,
   default as useMarketNew,
@@ -27,14 +26,12 @@ export const MIN_STEP_SIZE = 1
 
 export default function useAmplifiedForm() {
   const { address } = useAccount()
-  const { mangrove, marketsInfoQuery } = useMangrove()
+  // const { mangrove, marketsInfoQuery } = useMangrove()
   const { currentMarket } = useMarket()
   const { book } = useBook()
   const logics = useLogics()
 
   const { currentMarket: market, markets } = useMarketNew()
-
-  const { data: openMarkets } = marketsInfoQuery
 
   const {
     setGlobalError,
@@ -107,7 +104,7 @@ export default function useAmplifiedForm() {
 
   const selectedSource = logics?.find((logic) => logic?.name == sendSource)
 
-  const compatibleMarkets = openMarkets?.filter(
+  const compatibleMarkets = markets?.filter(
     (market) =>
       market.base.address === selectedToken?.address ||
       market.quote.address === selectedToken?.address,
@@ -157,7 +154,7 @@ export default function useAmplifiedForm() {
     tokenId: string,
   ) => {
     if (!limitPrice || !amount) return "0"
-    if (openMarkets?.find((market) => market.base.id === tokenId)) {
+    if (markets?.find((market) => market.base.address === tokenId)) {
       return Big(!isNaN(Number(amount)) ? Number(amount) : 0)
         .div(
           Big(

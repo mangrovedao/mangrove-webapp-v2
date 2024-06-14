@@ -26,7 +26,7 @@ export function Actions({ faucetToken }: Props) {
   const tokenQuery = useTokenFromAddress(faucetToken.address as Address)
   const mintLimit = useMintLimit(faucetToken.address as Address, !!isMgv)
   const { data: prepareMint } = useSimulateContract({
-    address: tokenQuery?.data?.address as Address,
+    address: faucetToken.address as Address,
     abi: TestTokenAbi,
     functionName: "mint",
     args: [

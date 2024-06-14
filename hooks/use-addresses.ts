@@ -10,7 +10,7 @@ import {
   blastSmartKandel,
   blastTokens,
 } from "@mangrovedao/mgv/addresses"
-import { base, blast } from "viem/chains"
+import { baseSepolia, blast } from "viem/chains"
 import { useChainId } from "wagmi"
 
 export function useMangroveAddresses() {
@@ -18,7 +18,7 @@ export function useMangroveAddresses() {
   switch (chain) {
     case blast.id:
       return blastMangrove
-    case base.id:
+    case baseSepolia.id:
       return baseSepoliaMangrove
     default:
       return undefined
@@ -30,7 +30,7 @@ export function useSmartKandel() {
   switch (chain) {
     case blast.id:
       return blastSmartKandel
-    case base.id:
+    case baseSepolia.id:
       return baseSepoliaSmartKandel
     default:
       return undefined
@@ -42,7 +42,7 @@ export function useMarkets() {
   switch (chain) {
     case blast.id:
       return blastMarkets
-    case base.id:
+    case baseSepolia.id:
       return baseSepoliaMarkets
     default:
       return []
@@ -54,7 +54,7 @@ export function useLogics() {
   switch (chain) {
     case blast.id:
       return blastLogics
-    case base.id:
+    case baseSepolia.id:
       return baseSepoliaLogics
     default:
       return []
@@ -66,7 +66,7 @@ export function useTokens() {
   switch (chain) {
     case blast.id:
       return blastTokens
-    case base.id:
+    case baseSepolia.id:
       return baseSepoliaTokens
     default:
       return []

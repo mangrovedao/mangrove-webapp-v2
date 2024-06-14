@@ -8,7 +8,7 @@ import {
   getDefaultConfig,
 } from "@rainbow-me/rainbowkit"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { base, blast, blastSepolia } from "viem/chains"
+import { baseSepolia, blast } from "viem/chains"
 import { WagmiProvider, http } from "wagmi"
 
 import { env } from "@/env.mjs"
@@ -16,7 +16,7 @@ import { getWhitelistedChainObjects } from "@/utils/chains"
 
 const queryClient = new QueryClient()
 const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
-
+console.log(baseSepolia)
 const config = getDefaultConfig({
   appName: "Mangrove dApp",
   projectId,
@@ -24,8 +24,7 @@ const config = getDefaultConfig({
   chains: getWhitelistedChainObjects(),
   ssr: true,
   transports: {
-    [base.id]: http(),
-    [blastSepolia.id]: http(),
+    [baseSepolia.id]: http(),
     [blast.id]: http(),
   },
 })

@@ -87,6 +87,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
         const quoteAmount = bs === "buy" ? parseEther(gives) : parseEther(wants)
         const { request } = await marketClient.simulateLimitOrder({
           account,
+          fillWants: false,
           baseAmount,
           quoteAmount,
           bs,
