@@ -72,7 +72,7 @@ function BookContent() {
   const bigestPrice = highestAskPrice ?? highestBidPrice ?? 0
   const spread = Math.abs((lowestAskPrice ?? 0) - (highestBidPrice ?? 0))
   const spreadPercent = (spread / (highestBidPrice ?? 1)) * 100
-
+  console.log(book)
   // const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
   // const spread = lowestAskPrice?.sub(highestBidPrice ?? 0).abs()
   // const spreadPercent =

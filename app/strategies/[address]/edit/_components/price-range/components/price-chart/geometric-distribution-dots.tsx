@@ -1,21 +1,14 @@
+import { OfferParsed } from "@mangrovedao/mgv"
 import type { ScaleLinear } from "d3-scale"
 
 import { cn } from "@/utils"
 import { type PriceRangeChartProps } from "./price-range-chart"
 
-export type GeometricOffer = {
-  type: string
-  price: number
-  index: bigint
-  gives: bigint
-  tick: bigint
-}
-
 type Props = {
   height: number
   paddingBottom: number
   xScale: ScaleLinear<number, number>
-  onHover?: (offer: GeometricOffer) => void
+  onHover?: (offer: OfferParsed) => void
   onHoverOut?: () => void
 } & Pick<PriceRangeChartProps, "geometricKandelDistribution">
 

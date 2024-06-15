@@ -22,6 +22,7 @@ export function Strategies({ type }: Props) {
   const { data: count } = useStrategies({
     select: (strategies) => strategies.length,
   })
+
   const strategiesQuery = useStrategies({
     filters: {
       skip: (page - 1) * pageSize,

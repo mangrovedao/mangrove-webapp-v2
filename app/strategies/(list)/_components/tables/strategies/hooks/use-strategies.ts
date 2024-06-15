@@ -36,7 +36,7 @@ export function useStrategies<T = Strategy[]>({
           skip,
           knownTokens: tokensList,
         })
-
+        console.log(result, 11)
         return parseStrategies(result)
       } catch (error) {
         console.error(error)
@@ -48,6 +48,6 @@ export function useStrategies<T = Strategy[]>({
       error: "Unable to retrieve all strategies",
     },
     enabled: !!(isConnected && indexerSdk && address && tokensList && chainId),
-    retry: false,
+    retry: true,
   })
 }

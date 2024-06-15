@@ -1,14 +1,14 @@
+import { kandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
+import { Address } from "viem"
+import { useClient } from "wagmi"
 
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market.new"
 import { getTokenPriceInToken } from "@/services/tokens.service"
-import { kandelActions } from "@mangrovedao/mgv"
-import { Address } from "viem"
-import { useClient } from "wagmi"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
 

@@ -4,7 +4,7 @@ import {
   BaseError,
   ContractFunctionExecutionError,
   TransactionReceipt,
-  parseEther,
+  parseUnits,
 } from "viem"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -83,8 +83,15 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
 
         const restingOrderGasreq = getDefaultLimitOrderGasreq()
 
-        const baseAmount = bs === "buy" ? parseEther(wants) : parseEther(gives)
-        const quoteAmount = bs === "buy" ? parseEther(gives) : parseEther(wants)
+        const baseAmount =
+          bs === "buy"
+            ? parseUnits(wants, base.decimals)
+            : parseUnits(gives, base.decimals)
+        const quoteAmount =
+          bs === "buy"
+            ? parseUnits(gives, quote.decimals)
+            : parseUnits(wants, quote.decimals)
+
         const { request } = await marketClient.simulateLimitOrder({
           account,
           fillWants: false,
@@ -135,15 +142,9 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           const revertError = error.walk(
             (error) => error instanceof ContractFunctionExecutionError,
           )
-
+          console.log(revertError)
           if (revertError instanceof ContractFunctionExecutionError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-            )
+            console.log({ ...revertError.args })
           }
         }
         console.error(error)

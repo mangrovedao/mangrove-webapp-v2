@@ -10,7 +10,7 @@ import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
 import { Logic } from "@mangrovedao/mgv"
 import { getKandelGasReq } from "@mangrovedao/mgv/lib"
-import { formatUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 
 export const MIN_NUMBER_OF_OFFERS = 1
@@ -63,17 +63,21 @@ export default function useForm() {
     baseLogic: baseLogic as Logic,
     quoteLogic: quoteLogic as Logic,
   })
+  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
 
-  const { data } = useValidateKandel({
-    gasreq,
-    factor: 3,
-    minPrice: Number(minPrice),
-    maxPrice: Number(maxPrice),
-    baseAmount: BigInt(baseDeposit.replace(".", "")),
-    quoteAmount: BigInt(quoteDeposit.replace(".", "")),
-    stepSize: BigInt(debouncedStepSize),
-    pricePoints: BigInt(debouncedNumberOfOffers),
-  })
+  const { data } = useValidateKandel(
+    {
+      gasreq,
+      factor: 3,
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+      baseAmount: parseUnits(baseDeposit, baseToken?.decimals || 18),
+      quoteAmount: parseUnits(quoteDeposit, quoteToken?.decimals || 18),
+      stepSize: BigInt(debouncedStepSize),
+      pricePoints: BigInt(debouncedNumberOfOffers),
+    },
+    isMissingField,
+  )
 
   const {
     params,
@@ -108,10 +112,8 @@ export default function useForm() {
     setReceiveTo("simple")
   }, [market?.base, market?.quote])
 
-  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
-
   React.useEffect(() => {
-    if (!isValid && !isMissingField) {
+    if (!isValid) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )

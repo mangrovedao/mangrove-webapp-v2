@@ -5,15 +5,15 @@ import type { ChainsIds } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
 import React from "react"
-import { Address } from "viem"
 import { useAccount } from "wagmi"
 
+import { useTokens } from "@/hooks/use-addresses"
 import { useTokenPricesInUsb } from "@/hooks/use-orderbook-price-per-block"
-import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 
 const useIndexerSdkContext = () => {
   const tokenPrices = useTokenPricesInUsb()
   const { chain } = useAccount()
+  const tokens = useTokens()
 
   const indexerSdkQuery = useQuery({
     queryKey: ["indexer-sdk", chain, tokenPrices.dataUpdatedAt],
@@ -25,10 +25,10 @@ const useIndexerSdkContext = () => {
           chainId: chain.id as ChainsIds,
           helpers: {
             getTokenDecimals: async (address) => {
-              const token = useTokenFromAddress(address as Address)
-              if (!token)
+              if (!tokens)
                 throw new Error("Impossible to determine token decimals")
-              return token.data?.decimals || 18
+              const token = tokens.find((item) => item.address == address)
+              return token?.decimals || 18
             },
             createTickHelpers: async (ba, m) => {
               const outbound = ba === "asks" ? m.base : m.quote

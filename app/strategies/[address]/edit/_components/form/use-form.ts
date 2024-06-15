@@ -137,17 +137,21 @@ export default function useForm() {
     baseLogic: baseLogic as Logic,
     quoteLogic: quoteLogic as Logic,
   })
+  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
 
-  const { data } = useValidateKandel({
-    gasreq,
-    factor: 3,
-    minPrice: Number(minPrice),
-    maxPrice: Number(maxPrice),
-    baseAmount: BigInt(baseDeposit.replace(".", "")),
-    quoteAmount: BigInt(quoteDeposit.replace(".", "")),
-    stepSize: BigInt(debouncedStepSize),
-    pricePoints: BigInt(debouncedNumberOfOffers),
-  })
+  const { data } = useValidateKandel(
+    {
+      gasreq,
+      factor: 3,
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+      baseAmount: BigInt(baseDeposit.replace(".", "")),
+      quoteAmount: BigInt(quoteDeposit.replace(".", "")),
+      stepSize: BigInt(debouncedStepSize),
+      pricePoints: BigInt(debouncedNumberOfOffers),
+    },
+    isMissingField,
+  )
 
   const { params, minBaseAmount, minQuoteAmount, minProvision, isValid } =
     data ?? {}
@@ -161,10 +165,8 @@ export default function useForm() {
     setKandelParams(params)
   }, [params])
 
-  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
-
   React.useEffect(() => {
-    if (!isValid && !isMissingField) {
+    if (!isValid) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )

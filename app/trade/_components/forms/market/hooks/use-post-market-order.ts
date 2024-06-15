@@ -1,6 +1,6 @@
 import { marketOrderResultFromLogs } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { TransactionReceipt, parseEther } from "viem"
+import { TransactionReceipt } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -10,6 +10,7 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { toast } from "sonner"
+import { parseUnits } from "viem"
 import { TradeMode } from "../../enums"
 import { successToast } from "../../utils"
 import type { Form } from "../types"
@@ -51,8 +52,14 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
 
         const receiveToken = bs === "buy" ? base : quote
         const sendToken = bs === "buy" ? quote : base
-        const baseAmount = bs === "buy" ? parseEther(wants) : parseEther(gives)
-        const quoteAmount = bs === "buy" ? parseEther(gives) : parseEther(wants)
+        const baseAmount =
+          bs === "buy"
+            ? parseUnits(wants, base.decimals)
+            : parseUnits(gives, base.decimals)
+        const quoteAmount =
+          bs === "buy"
+            ? parseUnits(gives, quote.decimals)
+            : parseUnits(wants, quote.decimals)
         const { request } =
           await marketClient.simulateMarketOrderByVolumeAndMarket({
             baseAmount,
