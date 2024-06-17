@@ -4,12 +4,12 @@ import type { Token } from "@mangrovedao/mgv"
 import getUserLocale from "get-user-locale"
 
 export function formatNumber(
-  value: number | bigint,
+  value: number | bigint | null,
   options?: Intl.NumberFormatOptions | undefined,
 ) {
   return Intl.NumberFormat(getUserLocale(), {
     ...options,
-  }).format(value)
+  }).format(value ?? 0)
 }
 
 export function determineDecimals(
