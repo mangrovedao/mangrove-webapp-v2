@@ -16,7 +16,7 @@ import { getWhitelistedChainObjects } from "@/utils/chains"
 
 const queryClient = new QueryClient()
 const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
-console.log(baseSepolia)
+
 const config = getDefaultConfig({
   appName: "Mangrove dApp",
   projectId,

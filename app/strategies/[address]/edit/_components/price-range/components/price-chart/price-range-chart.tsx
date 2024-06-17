@@ -22,7 +22,10 @@ import { cn } from "@/utils"
 import { CompleteOffer, Distribution, OfferParsed } from "@mangrovedao/mgv"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
-import { GeometricKandelDistributionDots } from "./geometric-distribution-dots"
+import {
+  GeometricKandelDistributionDots,
+  TypedDistrubutionOffer,
+} from "./geometric-distribution-dots"
 import { GeometricOfferTooltip } from "./geometric-offer-tooltip"
 import { MergedOfferTooltip } from "./merged-offer-tooltip"
 import { MergedOffersDots } from "./merged-offers-dots"
@@ -54,7 +57,7 @@ export type PriceRangeChartProps = {
   viewOnly?: boolean
   isLoading?: boolean
   geometricKandelDistribution?: Distribution
-  mergedOffers?: OfferParsed
+  mergedOffers?: OfferParsed[]
 }
 
 export function PriceRangeChart({
@@ -71,7 +74,7 @@ export function PriceRangeChart({
   quoteToken,
 }: PriceRangeChartProps) {
   const [hoveredGeometricOffer, setHoveredGeometricOffer] =
-    React.useState<OfferParsed>()
+    React.useState<TypedDistrubutionOffer>()
   const { hoveredOffer, setHoveredOffer } = useHoveredOfferStore()
   const { isConnected } = useAccount()
   const { ref, width = 0, height = 0 } = useResizeObserver()
@@ -355,7 +358,7 @@ export function PriceRangeChart({
                     height={height}
                     paddingBottom={paddingBottom}
                     xScale={xScaleTransformed}
-                    geometricKandelDistribution={geometricKandelDistribution}
+                    distribution={geometricKandelDistribution}
                     onHover={setHoveredGeometricOffer}
                     onHoverOut={() => setHoveredGeometricOffer(undefined)}
                   />
@@ -365,7 +368,7 @@ export function PriceRangeChart({
                     height={height}
                     paddingBottom={paddingBottom}
                     xScale={xScaleTransformed}
-                    mergedOffers={mergedOffers}
+                    distribution={mergedOffers}
                     onHover={(offer) => {
                       setHoveredOffer(offer)
                     }}

@@ -92,7 +92,7 @@ export default function EditOrderSheet({
 
   const { progress, progressInPercent, volume, filled, amount } =
     getOrderProgress(order, market)
-  console.log(amount, filled)
+
   React.useEffect(() => {
     if (mode === "edit") setToggleEdit(true)
   }, [])

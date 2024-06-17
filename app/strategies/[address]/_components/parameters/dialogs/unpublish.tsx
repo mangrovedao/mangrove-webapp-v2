@@ -16,7 +16,6 @@ import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
 import { cn } from "@/utils"
 import useKandel from "../../../_providers/kandel-strategy"
-import { MergedOffers } from "../../../_utils/inventory"
 import { useParameters } from "../hook/use-parameters"
 import { useUnPublish } from "../mutations/use-unpublish"
 import { SuccessDialog } from "./succes-dialog"
@@ -64,7 +63,7 @@ export function UnPublish({ open, onClose }: Props) {
 
   const publish = useUnPublish({
     kandelInstance: strategy?.kandelInstance,
-    mergedOffers: mergedOffers as MergedOffers,
+    mergedOffers: mergedOffers,
     volumes: { baseAmount, quoteAmount },
   })
 
