@@ -41,6 +41,12 @@ export function getChainVaults(chainId: number): VaultInfos[] {
           market: blastMarkets[0],
           strategist: "Skate.fi",
         },
+        {
+          address: "0xbC766847aB3b36F7012037f11Cd05B187F51Fc23",
+          kandel: "0x2341561eaC01D79e184eaCF09f380EB8A0e3408b",
+          market: blastMarkets[0],
+          strategist: "Skate.fi test",
+        },
       ]
     default:
       return []

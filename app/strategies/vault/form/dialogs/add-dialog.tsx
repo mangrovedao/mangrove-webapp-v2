@@ -1,5 +1,5 @@
 import type { Token } from "@mangrovedao/mgv"
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 
 import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
@@ -13,6 +13,7 @@ import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 import {
   useAccount,
   useReadContracts,
+  useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi"
@@ -36,7 +37,23 @@ const btnProps: ButtonProps = {
 }
 
 const mintABI = parseAbi([
-  "function mint(uint256 mintAmount,uint256[2] calldata maxAmountsIn) external returns (uint256 amount0, uint256 amount1)",
+  "function mint(uint mintAmount,uint[2] calldata maxAmountsIn) external returns (uint amount0, uint amount1)",
+  "error MintHasAlreadyStarted()",
+  "error MintHasNotStarted()",
+  "error MintNotAllowed()",
+  "error NotInPosition()",
+  "error AlreadyInPosition()",
+  "error ZeroUnderlyingBalance()",
+  "error MaxFeeExceeded()",
+  "error SlippageExceedThreshold()",
+  "error OnlyFactoryAllowed()",
+  "error ZeroMintAmount()",
+  "error ZeroBurnAmount()",
+  "error SwapRouterIsWhitelisted()",
+  "error SwapRouterIsNotWhitelisted()",
+  "error OnlyFactoryOwnerAllowed()",
+  "error ManagerBalanceCannotBeSwapped()",
+  "error InvalidSwap()",
 ])
 
 export default function AddToVaultDialog({
@@ -85,7 +102,7 @@ export default function AddToVaultDialog({
   const missingQuoteAllowance =
     (data?.[1] || 0n) > quoteAmount ? 0n : quoteAmount - (data?.[1] || 0n)
 
-  const { data: hash, isPending, writeContract } = useWriteContract()
+  const { data: hash, isPending, writeContract, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
       hash,
@@ -110,16 +127,41 @@ export default function AddToVaultDialog({
       : 2
     : 1
 
+  const amount0 = useMemo(() => {
+    return vault?.baseIsToken0 ? baseAmount : quoteAmount
+  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+  const amount1 = useMemo(() => {
+    return vault?.baseIsToken0 ? quoteAmount : baseAmount
+  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+
+  const result = useSimulateContract({
+    address: vault?.address,
+    abi: mintABI,
+    functionName: "mint",
+    args: [mintAmount, [amount0, amount1]],
+  })
+
+  // console.log(
+  //   `cast call ${vault?.address} ${encodeFunctionData({
+  //     abi: mintABI,
+  //     functionName: "mint",
+  //     args: [mintAmount, [amount0, amount1]],
+  //   })} --from ${address} --rpc-url https://rpc.blast.io --trace`,
+  // )
+
+  // console.log(result)
+
   useEffect(() => {
     if (isConfirmed) {
       if (currentStep === 4) {
         setStarted(false)
         onClose()
       } else {
+        reset()
         refetch()
       }
     }
-  }, [isConfirmed, currentStep, refetch, onClose])
+  }, [isConfirmed, currentStep, refetch, onClose, reset])
 
   const stepInfos = [
     {
@@ -199,15 +241,15 @@ export default function AddToVaultDialog({
       button: (
         <Button
           {...btnProps}
-          loading={false}
-          disabled={false}
+          loading={result.isLoading}
+          disabled={result.isLoading || result.isError}
           onClick={() => {
             if (!vault) return
             writeContract({
               address: vault.address,
               abi: mintABI,
               functionName: "mint",
-              args: [mintAmount, [baseAmount, quoteAmount]],
+              args: [mintAmount, [amount0, amount1]],
             })
           }}
         >
