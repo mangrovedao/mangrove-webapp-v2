@@ -1,5 +1,5 @@
 "use client"
-import { type Market } from "@mangrovedao/mangrove.js"
+
 import { curveStepAfter, curveStepBefore } from "@visx/curve"
 import { LinearGradient } from "@visx/gradient"
 import {
@@ -15,6 +15,7 @@ import {
 
 import { lerp } from "@/utils/interpolation"
 import { Skeleton } from "@components/ui/skeleton"
+import { CompleteOffer } from "@mangrovedao/mgv"
 import { DataKeyType } from "./enums"
 import {
   borderVar,
@@ -30,11 +31,10 @@ import {
   getNumTicksBasedOnDecimals,
   toNumberIfBig,
 } from "./utils"
-import { CompleteOffer } from "@mangrovedao/mgv"
 
 const accessors = {
-  xAccessor: (offer: Market.Offer) => toNumberIfBig(offer.price),
-  yAccessor: (offer: Market.Offer) => toNumberIfBig(offer.volume),
+  xAccessor: (offer: CompleteOffer) => toNumberIfBig(offer.price),
+  yAccessor: (offer: CompleteOffer) => toNumberIfBig(offer.volume),
 }
 
 export function DepthChart() {
@@ -179,7 +179,7 @@ export function DepthChart() {
               strokeWidth={0.25}
             />
             {!isScrolling && (
-              <Tooltip<Market.Offer>
+              <Tooltip<CompleteOffer>
                 detectBounds={true}
                 applyPositionStyle
                 snapTooltipToDatumX

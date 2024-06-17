@@ -54,15 +54,6 @@ export function useLimitOld(props: Props) {
   const receiveTo = form.useStore((state) => state.values.receiveTo)
 
   const orderType = form.useStore((state) => state.values.orderType)
-  // const logics = (
-  //   mangrove
-  //     ? Object.values(mangrove.logics).filter(
-  //         (item) => item?.approvalType !== "ERC721",
-  //       )
-  //     : []
-  // ) as DefaultTradeLogics[]
-
-  // const selectedSource = logics.find((logic) => logic?.id === sendFrom)
 
   const {
     quoteToken,
