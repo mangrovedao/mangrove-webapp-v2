@@ -5,6 +5,7 @@ import { useMangroveAddresses, useSmartKandel } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
+import { useRouter } from "next/navigation"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 
 export function useKandelSteps() {
@@ -15,11 +16,14 @@ export function useKandelSteps() {
 
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
+  const router = useRouter()
 
   return useQuery({
     queryKey: ["kandel-steps", smartKandel, address],
     queryFn: async () => {
       try {
+        if (!currentMarket) router.push("/strategies")
+
         if (
           !smartKandel ||
           !address ||

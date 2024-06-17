@@ -51,14 +51,12 @@ export const PriceRange = withClientOnly(function ({
     stepSize,
     numberOfOffers,
     kandelParams,
-    offersWithPrices,
     globalError,
     errors,
     isChangingFrom,
     sendFrom,
     receiveTo,
     setPriceRange,
-    setOffersWithPrices,
     setErrors,
     setIsChangingFrom,
   } = useNewStratStore()
@@ -206,7 +204,6 @@ export const PriceRange = withClientOnly(function ({
   )
 
   React.useEffect(() => {
-    if (offersWithPrices) setOffersWithPrices(undefined)
     if (!minPrice || !maxPrice) return
     debouncedSetPriceRange(minPrice, maxPrice)
   }, [minPrice, maxPrice])

@@ -1,19 +1,22 @@
-import type { Mangrove, Market } from "@mangrovedao/mangrove.js"
+import { CompleteOffer } from "@mangrovedao/mgv"
+import { BA, BS } from "@mangrovedao/mgv/lib"
 
-export function baToBs(ba: Market.BA): Market.BS {
-  return ba === "asks" ? "buy" : "sell"
+import useMarket from "@/providers/market.new"
+
+export function baToBs(ba: BA): BS {
+  return ba === BA.asks ? BS.buy : BS.sell
 }
 
-export function bsToBa(bs: Market.BS): Market.BA {
-  return bs === "buy" ? "asks" : "bids"
+export function bsToBa(bs: BS): BA {
+  return bs === BS.buy ? BA.asks : BA.bids
 }
 
 export function calculateMidPriceFromOrderBook({
   asks,
   bids,
 }: {
-  asks: Market.Offer[]
-  bids: Market.Offer[]
+  asks: CompleteOffer[]
+  bids: CompleteOffer[]
 }) {
   if (bids.length === 0 || asks.length === 0) {
     return null
@@ -25,11 +28,14 @@ export function calculateMidPriceFromOrderBook({
   return (highestBid + lowestAsk) / 2
 }
 
-export function getSymbol(market?: Mangrove.OpenMarketInfo) {
+export function getSymbol(market?: ReturnType<typeof useMarket>) {
   if (!market) return
-  return `${market?.base?.symbol}/${market?.quote?.symbol}`
+  const { currentMarket } = market
+  return `${currentMarket?.base?.symbol}/${currentMarket?.quote?.symbol}`
 }
 
-export function getValue(market: Mangrove.OpenMarketInfo) {
-  return `${market.base.id},${market.quote.id}`
+export function getValue(market: ReturnType<typeof useMarket>) {
+  if (!market) return
+  const { currentMarket } = market
+  return `${currentMarket?.base.address},${currentMarket?.quote.address}`
 }

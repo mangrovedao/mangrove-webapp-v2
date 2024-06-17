@@ -14,6 +14,7 @@ import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
+import { BA } from "@mangrovedao/mgv/lib"
 import { SemiBook } from "./semibook"
 import { OrderBookTableCell } from "./table-cell"
 import { OrderBookTableHead } from "./table-head"
@@ -103,7 +104,7 @@ function BookContent() {
         </TableHeader>
         <TableBody className="overflow-scroll" ref={bodyRef}>
           <SemiBook
-            type="asks"
+            type={BA.asks}
             data={book}
             priceDecimals={currentMarket.quote.priceDisplayDecimals}
           />
@@ -121,7 +122,7 @@ function BookContent() {
             </TableRow>
           ) : undefined}
           <SemiBook
-            type="bids"
+            type={BA.bids}
             data={book}
             priceDecimals={currentMarket.quote.priceDisplayDecimals}
           />

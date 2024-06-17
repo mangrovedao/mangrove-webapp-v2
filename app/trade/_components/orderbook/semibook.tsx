@@ -1,5 +1,7 @@
 "use client"
-import { type Market } from "@mangrovedao/mangrove.js"
+
+import { CompleteOffer } from "@mangrovedao/mgv"
+import { BA } from "@mangrovedao/mgv/lib"
 import React from "react"
 
 import { TableRow } from "@/components/ui/table"
@@ -10,12 +12,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/utils"
-import { CompleteOffer } from "@mangrovedao/mgv"
 import { OrderBookTableCell } from "./table-cell"
 import { calculateCumulatedVolume } from "./utils"
 
 type SemiBookProps = {
-  type: Market.BA
+  type: BA
   data?: {
     asks: CompleteOffer[]
     bids: CompleteOffer[]
