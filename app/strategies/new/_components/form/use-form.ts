@@ -113,6 +113,7 @@ export default function useForm() {
   }, [market?.base, market?.quote])
 
   React.useEffect(() => {
+    if (isMissingField) return
     if (!isValid) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),

@@ -166,6 +166,7 @@ export default function useForm() {
   }, [params])
 
   React.useEffect(() => {
+    if (isMissingField) return
     if (!isValid) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
