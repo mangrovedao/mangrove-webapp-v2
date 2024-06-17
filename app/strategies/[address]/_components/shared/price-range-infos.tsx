@@ -1,6 +1,5 @@
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
 import useKandel from "../../_providers/kandel-strategy"
-import { MergedOffers } from "../../_utils/inventory"
 import { useParameters } from "../parameters/hook/use-parameters"
 import { LegendItem } from "./legend-item"
 import TotalInventory from "./total-inventory"
@@ -63,7 +62,7 @@ export default function PriceRangeInfos() {
           initialMidPrice={strategyStatusQuery.data?.midPrice?.toNumber()}
           priceRange={priceRange}
           viewOnly
-          mergedOffers={mergedOffers as MergedOffers}
+          mergedOffers={mergedOffers}
           baseToken={baseToken}
           quoteToken={quoteToken}
         />

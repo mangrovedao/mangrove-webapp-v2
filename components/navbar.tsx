@@ -38,7 +38,7 @@ import {
 } from "@rainbow-me/rainbowkit"
 
 import useLocalStorage from "@/hooks/use-local-storage"
-import { blast, blastSepolia } from "viem/chains"
+import { baseSepolia, blast, blastSepolia } from "viem/chains"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
@@ -322,7 +322,9 @@ const RightPart = withClientOnly(() => {
             </DropdownMenuItem>
           )}
 
-          {(chain?.id == blastSepolia.id || chain?.id == blast.id) && (
+          {(chain?.id == blastSepolia.id ||
+            chain?.id == blast.id ||
+            chain?.id == baseSepolia.id) && (
             <>
               <DropdownMenuItem asChild onClick={() => setWrapETH(!wrapETH)}>
                 <div>

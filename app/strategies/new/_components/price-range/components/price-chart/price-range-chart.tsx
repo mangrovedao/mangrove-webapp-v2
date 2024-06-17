@@ -12,19 +12,23 @@ import React from "react"
 import useResizeObserver from "use-resize-observer"
 import { useAccount } from "wagmi"
 
-import { MergedOffers } from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
 import { cn } from "@/utils"
-import { CompleteOffer, Distribution, Token } from "@mangrovedao/mgv"
+import {
+  CompleteOffer,
+  Distribution,
+  OfferParsed,
+  Token,
+} from "@mangrovedao/mgv"
 import { BackgroundRectangles } from "./background-rectangles"
 import CustomBrush from "./custom-brush"
 import {
   GeometricKandelDistributionDots,
-  GeometricOffer,
+  TypedDistrubutionOffer,
 } from "./geometric-distribution-dots"
 import { GeometricOfferTooltip } from "./geometric-offer-tooltip"
 import { MergedOfferTooltip } from "./merged-offer-tooltip"
@@ -57,7 +61,7 @@ export type PriceRangeChartProps = {
   viewOnly?: boolean
   isLoading?: boolean
   geometricKandelDistribution?: Distribution
-  mergedOffers?: MergedOffers
+  mergedOffers?: OfferParsed[]
 }
 
 export function PriceRangeChart({
@@ -74,7 +78,7 @@ export function PriceRangeChart({
   quoteToken,
 }: PriceRangeChartProps) {
   const [hoveredGeometricOffer, setHoveredGeometricOffer] =
-    React.useState<GeometricOffer>()
+    React.useState<TypedDistrubutionOffer>()
   const { hoveredOffer, setHoveredOffer } = useHoveredOfferStore()
   const { isConnected } = useAccount()
   const { ref, width = 0, height = 0 } = useResizeObserver()
@@ -364,7 +368,7 @@ export function PriceRangeChart({
                     height={height}
                     paddingBottom={paddingBottom}
                     xScale={xScaleTransformed}
-                    geometricKandelDistribution={geometricKandelDistribution}
+                    distribution={geometricKandelDistribution}
                     onHover={setHoveredGeometricOffer}
                     onHoverOut={() => setHoveredGeometricOffer(undefined)}
                   />
@@ -374,7 +378,7 @@ export function PriceRangeChart({
                     height={height}
                     paddingBottom={paddingBottom}
                     xScale={xScaleTransformed}
-                    mergedOffers={mergedOffers}
+                    distribution={mergedOffers}
                     onHover={(offer) => {
                       setHoveredOffer(offer)
                     }}

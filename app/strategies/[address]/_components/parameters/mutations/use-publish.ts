@@ -1,8 +1,9 @@
+import { OfferParsed } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
-import { MergedOffer, MergedOffers } from "../../../_utils/inventory"
+import { BA } from "@mangrovedao/mgv/lib"
 
 export function usePublish({
   kandelInstance,
@@ -10,7 +11,7 @@ export function usePublish({
   volumes,
 }: {
   kandelInstance?: ReturnType<typeof useKandelInstance>
-  mergedOffers: MergedOffers
+  mergedOffers: OfferParsed[]
   volumes: { baseAmount: string; quoteAmount: string }
 }) {
   const queryClient = useQueryClient()
@@ -25,7 +26,7 @@ export function usePublish({
         const { baseAmount, quoteAmount } = volumes
 
         const bids = mergedOffers
-          .filter((x: MergedOffer) => x.offerType === "bids")
+          .filter((x: OfferParsed) => x.ba === BA.bids)
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,
@@ -33,7 +34,7 @@ export function usePublish({
           }))
 
         const asks = mergedOffers
-          .filter((x: MergedOffer) => x.offerType === "asks")
+          .filter((x: OfferParsed) => x.ba === BA.asks)
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,

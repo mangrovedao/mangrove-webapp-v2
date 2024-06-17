@@ -7,7 +7,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
 
-import useMangrove from "@/providers/mangrove"
+import { useLogics } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { hasExpired } from "@/utils/date"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
@@ -31,13 +31,9 @@ export function useEditOrder({ order, onSubmit }: Props) {
     inboundRoute,
   } = order
 
-  const { mangrove } = useMangrove()
-  const logics = mangrove?.getLogicsList()
-
+  const logics = useLogics()
   const findLogicByAddress = (address: string) =>
-    logics?.find(
-      (logic) => logic.address.toLowerCase() === address.toLowerCase(),
-    )
+    logics?.find((logic) => logic.logic.toLowerCase() === address.toLowerCase())
 
   const sendFrom = findLogicByAddress(outboundRoute)
   const receiveTo = findLogicByAddress(inboundRoute)

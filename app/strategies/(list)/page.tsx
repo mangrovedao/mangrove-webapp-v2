@@ -19,7 +19,6 @@ export default function Page() {
   const markets = useMarkets()
 
   const featureFlagConfig = getFeatureFlagConfig()
-  console.log("featureFlagConfig", featureFlagConfig)
 
   function handleNext() {
     if (!markets[0]) return
@@ -66,10 +65,6 @@ export default function Page() {
         )}
       </div>
       <Tables />
-      {/* <NewStrategyDialog
-        open={isNewDialogOpen}
-        onClose={toggleIsNewDialogOpen}
-      /> */}
     </main>
   )
 }

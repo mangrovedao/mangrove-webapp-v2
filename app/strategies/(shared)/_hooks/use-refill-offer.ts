@@ -2,12 +2,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useLoadingStore } from "@/stores/loading.store"
+import { OfferParsed } from "@mangrovedao/mgv"
 import { useRefillRequirements } from "../../[address]/_hooks/use-refill-requirements"
 import useKandel from "../../[address]/_providers/kandel-strategy"
-import { MergedOffer } from "../../[address]/_utils/inventory"
 
 type Props = {
-  offer: MergedOffer
+  offer: OfferParsed
   onCancel?: () => void
 }
 

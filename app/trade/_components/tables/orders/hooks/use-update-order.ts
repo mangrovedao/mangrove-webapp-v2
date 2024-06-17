@@ -4,7 +4,6 @@ import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useBook } from "@/hooks/use-book"
 import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
-import useMangrove from "@/providers/mangrove"
 import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { BS } from "@mangrovedao/mgv/lib"
@@ -19,7 +18,6 @@ type useUpdateOrderProps = {
 }
 
 export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
-  const { mangrove } = useMangrove()
   const { currentMarket: market } = useMarket()
   const { book } = useBook()
 
@@ -41,7 +39,6 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
           !offerId ||
           !walletClient ||
           !publicClient ||
-          !mangrove ||
           !market ||
           !marketClient ||
           !book
@@ -75,29 +72,27 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
       error: "Failed to update the limit order",
     },
     onSuccess: async (data) => {
-      // if (!data) return
-      // const { updateOrder } = data
-      // /*
-      //  * We use a custom callback to handle the success message once it's ready.
-      //  * This is because the onSuccess callback from the mutation will only be triggered
-      //  * after all the preceding logic has been executed.
-      //  */
-      // try {
-      //   // Start showing loading state indicator on parts of the UI that depend on
-      //   startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
-      //   const { blockNumber, transactionHash } = await (
-      //     await updateOrder.response
-      //   ).wait()
-      //   onResult?.(transactionHash)
-      //   await resolveWhenBlockIsIndexed.mutateAsync({
-      //     blockNumber,
-      //   })
-      //   queryClient.invalidateQueries({ queryKey: ["orders"] })
-      //   queryClient.invalidateQueries({ queryKey: ["fills"] })
-      //   queryClient.invalidateQueries({ queryKey: ["amplified"] })
-      // } catch (error) {
-      //   console.error(error)
-      // }
+      if (!data) return
+      const { receipt } = data
+      /*
+       * We use a custom callback to handle the success message once it's ready.
+       * This is because the onSuccess callback from the mutation will only be triggered
+       * after all the preceding logic has been executed.
+       */
+      try {
+        // Start showing loading state indicator on parts of the UI that depend on
+        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+        const { blockNumber, transactionHash } = receipt
+        onResult?.(transactionHash)
+        await resolveWhenBlockIsIndexed.mutateAsync({
+          blockNumber: Number(blockNumber),
+        })
+        queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["amplified"] })
+      } catch (error) {
+        console.error(error)
+      }
     },
     onSettled: () => {
       stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])

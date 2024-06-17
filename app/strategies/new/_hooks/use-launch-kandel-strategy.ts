@@ -34,7 +34,6 @@ export function useLaunchKandelStrategy(kandelAddress?: string) {
 
   return useMutation({
     mutationFn: async ({ kandelParams, bountyDeposit }: FormValues) => {
-      console.log({ bountyDeposit })
       try {
         if (!(kandelParams && kandelClient && walletClient && publicClient))
           throw new Error("Could not launch strategy, missing params")

@@ -1,18 +1,16 @@
 "use client"
-import { KandelStrategies } from "@mangrovedao/mangrove.js"
 import React from "react"
 
-import useMangrove from "../../../../providers/mangrove"
 import useMarket from "../../../../providers/market.new"
 
 const useKandelStrategiesContext = () => {
-  const { mangrove } = useMangrove()
+  // const { mangrove } = useMangrove()
   const { currentMarket: market } = useMarket()
 
-  const kandelStrategies = React.useMemo(() => {
-    if (!mangrove) return
-    return new KandelStrategies(mangrove)
-  }, [mangrove])
+  // const kandelStrategies = React.useMemo(() => {
+  //   if (!mangrove) return
+  //   return new KandelStrategies(mangrove)
+  // }, [mangrove])
 
   // const generator = React.useMemo(() => {
   //   if (!kandelStrategies || !market) return
@@ -25,7 +23,7 @@ const useKandelStrategiesContext = () => {
   // }, [kandelStrategies, market])
 
   return {
-    kandelStrategies,
+    // kandelStrategies,
     // generator,
     // config,
   }

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
-import useMangrove from "@/providers/mangrove"
 import { Logic } from "@mangrovedao/mgv"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
@@ -8,7 +7,7 @@ import Big from "big.js"
 import React from "react"
 import { Address, formatUnits } from "viem"
 
-import { useLogics } from "@/hooks/use-addresses"
+import { useLogics, useMarkets } from "@/hooks/use-addresses"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { formatExpiryDate } from "@/utils/date"
 import { TimeInForce, TimeToLiveUnit } from "../../../forms/amplified/enums"
@@ -24,10 +23,7 @@ type Props = {
 
 export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
   const { offers } = order
-
-  const {
-    marketsInfoQuery: { data: openMarkets },
-  } = useMangrove()
+  const markets = useMarkets()
   const logics = useLogics()
 
   const sendToken = useTokenFromAddress(
@@ -56,20 +52,20 @@ export function useEditAmplifiedOrder({ order, onSubmit }: Props) {
 
   // get assets infos
   const assets = offers.map((offer) => {
-    const isBid = openMarkets?.find(
+    const isBid = markets?.find(
       (market) => market.base.address === offer.market.inbound_tkn,
     )
 
     const quoteToken = getCurrentTokenPriceFromAddress(
       offer.market.inbound_tkn,
-      openMarkets,
+      markets,
     )
 
     const receiveToken = useTokenFromAddress(
       offer.market.inbound_tkn as Address,
     ).data
 
-    const limitPrice = `${Number(offer.price).toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+    const limitPrice = `${Number(offer.price).toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
     let wants
 
     if (isBid) {

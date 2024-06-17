@@ -334,6 +334,7 @@ export function useLimit(props: Props) {
 
   const minAsk = book ? minVolume(book.asksConfig, gasreq) : 0n
   const minBid = book ? minVolume(book.bidsConfig, gasreq) : 0n
+
   const minComputedVolume = bs === BS.buy ? minBid : minAsk
   const minVolumeFormatted = formatUnits(
     minComputedVolume,

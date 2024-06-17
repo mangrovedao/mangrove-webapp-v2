@@ -219,10 +219,7 @@ export default function EditOrderSheet({
                   <SheetLine
                     title={
                       <Text className="text-wrap">
-                        Send from{" "}
-                        {sendFrom?.id.includes("simple")
-                          ? "Wallet"
-                          : sendFrom?.id.toUpperCase()}
+                        Send from {sendFrom?.name}
                       </Text>
                     }
                     item={
@@ -262,10 +259,7 @@ export default function EditOrderSheet({
                   <SheetLine
                     title={
                       <Text className="text-wrap">
-                        Receive to{" "}
-                        {receiveTo?.id.includes("simple")
-                          ? "Wallet"
-                          : receiveTo?.id.toUpperCase()}
+                        Receive to {receiveTo?.name}
                       </Text>
                     }
                     item={

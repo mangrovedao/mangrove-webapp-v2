@@ -11,17 +11,17 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { TokenIcon } from "@/components/token-icon"
+import { Token } from "@mangrovedao/mgv"
 import Link from "next/link"
 import { Actions } from "../components/actions"
 import { MintLimit } from "../components/mint-limit"
 import { TokenBalance } from "../components/token-balance"
-import type { FaucetToken } from "../schema"
 
-const columnHelper = createColumnHelper<FaucetToken>()
-const DEFAULT_DATA: FaucetToken[] = []
+const columnHelper = createColumnHelper<Token>()
+const DEFAULT_DATA: Token[] = []
 
 type Params = {
-  data?: FaucetToken[]
+  data?: Token[]
 }
 
 export function useTable({ data }: Params) {
@@ -33,7 +33,7 @@ export function useTable({ data }: Params) {
       columnHelper.display({
         header: "Asset",
         cell: ({ row }) => {
-          const { id, symbol, address } = row.original
+          const { symbol, address } = row.original
           return (
             <Link
               href={`${blockExplorerUrl}/address/${address}`}
@@ -43,7 +43,7 @@ export function useTable({ data }: Params) {
             >
               <TokenIcon symbol={symbol} className="h-8 w-8" />
               <span>
-                <div className="text-base font-bold">{id}</div>
+                <div className="text-base font-bold">{address}</div>
                 <div>{symbol}</div>
               </span>
             </Link>
@@ -64,9 +64,8 @@ export function useTable({ data }: Params) {
       columnHelper.display({
         header: "Mint limit",
         cell: ({ row }) => {
-          const { address, id } = row.original
-          const isMgv = id.includes("MGV")
-          if (!isMgv) return null
+          const { address, mgvTestToken } = row.original
+          if (!mgvTestToken) return null
           return (
             <div className="flex flex-col">
               {address && <MintLimit address={address} />}

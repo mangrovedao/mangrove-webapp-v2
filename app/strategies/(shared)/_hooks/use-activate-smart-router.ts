@@ -1,4 +1,4 @@
-import useMangrove from "@/providers/mangrove"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMutation } from "@tanstack/react-query"
 import { Address, parseAbi } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
@@ -19,10 +19,10 @@ const SmartRouterABI = parseAbi([
 
 export function useActivateStrategySmartRouter(kandelAddress?: string) {
   const { address, chain } = useAccount()
-  const { mangrove } = useMangrove()
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
-  const orderContract = mangrove?.orderContract.address
+  const mangrove = useMangroveAddresses()
+  const orderContract = mangrove?.mgvOrder
 
   return useMutation({
     mutationFn: async () => {

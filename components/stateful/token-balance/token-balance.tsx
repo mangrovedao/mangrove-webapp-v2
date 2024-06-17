@@ -8,8 +8,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useTokens } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits } from "viem"
+import { useBalance } from "wagmi"
 
 export function TokenBalance(props: {
   token?: Token | string
@@ -19,11 +21,18 @@ export function TokenBalance(props: {
     text?: string
   }
 }) {
+  const tokens = useTokens()
   const token = typeof props.token === "string" ? undefined : props.token
+  const { data: nativeBalance } = useBalance()
+
   const { balance, isLoading } = useTokenBalance({
     token: token?.address,
   })
-  const formatted = formatUnits(balance?.balance ?? 0n, token?.decimals ?? 18)
+
+  const formatted = formatUnits(
+    (!token ? nativeBalance?.value : balance?.balance) || 0n,
+    token?.decimals ?? 18,
+  )
   return (
     <div className="flex justify-between items-center mt-1">
       <span className="text-xs text-secondary float-left">
