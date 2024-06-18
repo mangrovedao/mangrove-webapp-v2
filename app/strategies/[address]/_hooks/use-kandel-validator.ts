@@ -1,7 +1,7 @@
-import { useBook } from "@/hooks/use-book"
-import useMarket from "@/providers/market.new"
 import { RawKandelParams, validateKandelParams } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
+import { useKandelBook } from "./use-kandel-book"
+import useKandelMarket from "./use-kandel-market"
 
 export function useValidateKandel(
   kandelParams: Omit<
@@ -14,8 +14,8 @@ export function useValidateKandel(
   >,
   isMissingField: boolean,
 ) {
-  const { currentMarket } = useMarket()
-  const { book } = useBook()
+  const currentMarket = useKandelMarket()
+  const { book } = useKandelBook({})
 
   return useQuery({
     queryKey: [
@@ -32,8 +32,6 @@ export function useValidateKandel(
       try {
         if (!book || !currentMarket)
           throw new Error("Could not validate kandel, missing params")
-
-        console.log(kandelParams)
 
         const {
           params,

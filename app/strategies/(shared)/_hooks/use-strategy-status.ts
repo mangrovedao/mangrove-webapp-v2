@@ -1,12 +1,11 @@
-import { kandelActions } from "@mangrovedao/mgv"
+import { kandelActions, publicMarketActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
 import { Address } from "viem"
-import { useClient } from "wagmi"
+import { useClient, usePublicClient } from "wagmi"
 
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
-import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market.new"
 import { getTokenPriceInToken } from "@/services/tokens.service"
 
@@ -20,25 +19,37 @@ export default function useStrategyStatus({
   quote,
   offers,
 }: Params) {
-  const { book } = useBook()
   const client = useClient()
   const addresses = useMangroveAddresses()
-  const { currentMarket: market, markets } = useMarket()
+  const publicClient = usePublicClient()
+  const { markets } = useMarket()
+  const market = markets?.find((market) => {
+    return (
+      market.base.address?.toLowerCase() === base?.toLowerCase() &&
+      market.quote.address?.toLowerCase() === quote?.toLowerCase()
+    )
+  })
+
+  const kandelClient = publicClient?.extend(
+    publicMarketActions(addresses!, market!),
+  )
 
   return useQuery({
     queryKey: ["strategy-status", address],
     queryFn: async () => {
       try {
-        if (!address || !base || !quote || !offers) return null
+        if (
+          !publicClient ||
+          !market ||
+          !addresses ||
+          !address ||
+          !base ||
+          !quote ||
+          !offers
+        )
+          return null
 
-        const market = markets?.find((market) => {
-          return (
-            market.base.address?.toLowerCase() === base?.toLowerCase() &&
-            market.quote.address?.toLowerCase() === quote?.toLowerCase()
-          )
-        })
-
-        if (!(market && addresses)) return null
+        const book = await kandelClient?.getBook({})
 
         let midPrice = Big(book?.midPrice ?? 0)
         if (!midPrice && market.base.symbol && market.quote.symbol) {

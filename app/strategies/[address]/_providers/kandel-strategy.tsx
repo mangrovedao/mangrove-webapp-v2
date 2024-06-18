@@ -1,10 +1,11 @@
 "use client"
 import { useParams } from "next/navigation"
 import React from "react"
-import { Address } from "viem"
+import { Address, formatUnits } from "viem"
 import { useAccount } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import { BA } from "@mangrovedao/mgv/lib"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
 
@@ -33,6 +34,16 @@ const useKandelStrategyContext = () => {
   const offers = [...(kandelState?.asks || []), ...(kandelState?.bids || [])]
 
   const filteredOffers = offers.filter((offer) => offer.gives > 0)
+  const formattedOffers = filteredOffers.map((item) => {
+    return {
+      ...item,
+      formattedGives: formatUnits(
+        item.gives,
+        (item.ba === BA.asks ? baseToken?.decimals : quoteToken?.decimals) ||
+          18,
+      ),
+    }
+  })
 
   return {
     strategyQuery,
@@ -41,7 +52,7 @@ const useKandelStrategyContext = () => {
     quoteToken,
     blockExplorerUrl: chain?.blockExplorers?.default.url,
     strategyStatusQuery,
-    mergedOffers: filteredOffers,
+    mergedOffers: formattedOffers,
   }
 }
 

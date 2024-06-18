@@ -7,22 +7,31 @@ import { getErrorMessage } from "@/utils/errors"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
 import { useRouter } from "next/navigation"
 import { useAccount, useClient, usePublicClient } from "wagmi"
+import useKandel from "../_providers/kandel-strategy"
 
 export function useKandelSteps() {
   const { address } = useAccount()
-  const { currentMarket } = useMarket()
+  const { markets } = useMarket()
+  const { baseToken, quoteToken } = useKandel()
   const client = useClient()
   const smartKandel = useSmartKandel()
 
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
   const router = useRouter()
+  const currentMarket = markets.find(
+    (market) =>
+      market.base.address.toLocaleLowerCase() ===
+        baseToken?.address.toLocaleLowerCase() &&
+      market.quote.address.toLocaleLowerCase() ===
+        quoteToken?.address.toLocaleLowerCase(),
+  )
 
   return useQuery({
     queryKey: ["kandel-steps", smartKandel, address],
     queryFn: async () => {
       try {
-        if (!currentMarket) router.push("/strategies")
+        if (!baseToken || !quoteToken) router.push("/strategies")
 
         if (
           !smartKandel ||
@@ -30,7 +39,7 @@ export function useKandelSteps() {
           !publicClient ||
           !addresses ||
           !client ||
-          !currentMarket?.tickSpacing
+          !currentMarket
         )
           throw new Error("Could not fetch kandel steps, missing params")
 

@@ -1,19 +1,20 @@
-import useMarket from "@/providers/market.new"
 import { useMutation } from "@tanstack/react-query"
 import { Address } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
-import useKandelInstance from "./use-kandel-instance"
+import useKandelInstance from "../../(shared)/_hooks/use-kandel-instance"
+import useKandel from "../_providers/kandel-strategy"
 
 export function useActivateKandelLogics(kandelAddress?: string) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
-  const { currentMarket } = useMarket()
+
+  const { baseToken, quoteToken } = useKandel()
   const { data: walletClient } = useWalletClient()
 
   const kandelClient = useKandelInstance({
     address: kandelAddress,
-    base: currentMarket?.base.address,
-    quote: currentMarket?.quote.address,
+    base: baseToken?.address,
+    quote: quoteToken?.address,
   })
 
   return useMutation({

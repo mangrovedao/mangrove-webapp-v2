@@ -13,24 +13,18 @@ export const useParameters = () => {
 
   const { strategyStatusQuery, strategyQuery, baseToken, quoteToken } =
     useKandel()
+  const publicClient = usePublicClient()
 
   const { address } = useAccount()
   const { data: nativeBalance } = useBalance({
     address,
   })
 
-  const {
-    market,
-    offerStatuses,
-    kandelInstance,
-    kandelState,
-    maxPrice,
-    minPrice,
-  } = strategyStatusQuery.data ?? {}
+  const { kandelInstance, kandelState, maxPrice, minPrice } =
+    strategyStatusQuery.data ?? {}
 
   const {
     depositedBase,
-    offers,
     depositedQuote,
     currentParameter,
     creationDate,
@@ -44,24 +38,35 @@ export const useParameters = () => {
 
   const { asksBalance, bidsBalance } =
     useQuery({
-      queryKey: ["strategy-balance", baseToken?.address, quoteToken?.address],
+      queryKey: [
+        "strategy-balance",
+        kandelInstance,
+        baseToken?.address,
+        quoteToken?.address,
+      ],
       queryFn: async () => {
-        if (!kandelInstance) return
+        try {
+          if (!kandelInstance) throw new Error("Could fetch balances")
 
-        const kandelState = await kandelInstance.getKandelState({})
+          const kandelState = await kandelInstance.getKandelState({})
 
-        const [asksBalance, bidsBalance] = await Promise.all([
-          kandelState.asks.reduce(
-            (sum, ask) => sum.plus(Number(ask.gives)),
-            Big(0),
-          ),
-          kandelState.bids.reduce(
-            (sum, bid) => sum.plus(Number(bid.gives)),
-            Big(0),
-          ),
-        ])
+          const [asksBalance, bidsBalance] = await Promise.all([
+            kandelState.asks.reduce(
+              (sum, ask) =>
+                sum.plus(formatUnits(ask.gives, baseToken?.decimals || 18)),
+              Big(0),
+            ),
+            kandelState.bids.reduce(
+              (sum, bid) =>
+                sum.plus(formatUnits(bid.gives, quoteToken?.decimals || 18)),
+              Big(0),
+            ),
+          ])
 
-        return { asksBalance, bidsBalance }
+          return { asksBalance, bidsBalance }
+        } catch (error) {
+          console.log(error)
+        }
       },
       initialData: { asksBalance: Big(0), bidsBalance: Big(0) },
     }).data ?? {}
@@ -69,8 +74,6 @@ export const useParameters = () => {
   const lockedBounty = Number(kandelState?.unlockedProvision ?? 0).toFixed(
     nativeBalance?.decimals ?? 18,
   )
-
-  const publicClient = usePublicClient()
 
   const getWithdawableBalances = async () => {
     if (!publicClient || !baseToken?.address || !quoteToken?.address) return

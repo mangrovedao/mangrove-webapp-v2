@@ -6,31 +6,24 @@ import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function PriceRangeInfos() {
-  const {
-    strategyQuery,
-    strategyStatusQuery,
-    baseToken,
-    quoteToken,
-    mergedOffers,
-  } = useKandel()
-
+  const { strategyStatusQuery, baseToken, quoteToken, mergedOffers } =
+    useKandel()
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
 
   const bids = strategyStatusQuery.data?.book?.bids ?? []
   const asks = strategyStatusQuery.data?.book?.asks ?? []
+  const offerPrices = mergedOffers.map((item) => item.price)
+  const minPrice = Math.min(...offerPrices)
+  const maxPrice = Math.max(...offerPrices)
 
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
-  const priceRange = !strategyQuery.isLoading
-    ? ([Number(strategyQuery.data?.min), Number(strategyQuery.data?.max)] as [
-        number,
-        number,
-      ])
-    : undefined
+  const priceRange = [minPrice, maxPrice] as [number, number]
+
   const baseValue = `${publishedBase?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
   const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
   const chartIsLoading =
-    (strategyStatusQuery.isLoading && strategyQuery.isLoading) ||
+    strategyStatusQuery.isLoading ||
     !(baseToken && quoteToken && strategyStatusQuery.data?.midPrice)
 
   return (
@@ -42,13 +35,13 @@ export default function PriceRangeInfos() {
           <TotalInventory
             value={baseValue}
             symbol={baseToken?.symbol}
-            loading={isLoading}
+            loading={isLoading || baseValue === "0"}
             label="Total base inventory"
           />
           <TotalInventory
             value={quoteValue}
             symbol={quoteToken?.symbol}
-            loading={isLoading}
+            loading={isLoading || quoteValue === "0"}
             label="Total quote inventory"
           />
         </div>
