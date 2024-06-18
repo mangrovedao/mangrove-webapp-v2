@@ -73,16 +73,13 @@ export default function DeployStrategyDialog({
   const deploySmartRouter = useDeploySmartRouter({
     owner: deployRouter?.params.owner,
   })
-
   const activateSmartRouter = useActivateStrategySmartRouter(
     data?.kandelAddress,
   )
-
   const activateLogics = useActivateKandelLogics(data?.kandelAddress)
-
   const approveToken = useInfiniteApproveToken()
-
   const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
+
   const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
   const logicGasReq = Number(baseLogic?.gasreq || 0) + 100_000
