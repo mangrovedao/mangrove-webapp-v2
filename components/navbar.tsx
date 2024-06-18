@@ -10,7 +10,6 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import posthog from "posthog-js"
-import { useFeatureFlagEnabled } from "posthog-js/react"
 import React from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { toast } from "sonner"
@@ -94,10 +93,6 @@ type Props = React.ComponentProps<"nav"> & {
 export function Navbar({ className, innerClasses, ...props }: Props) {
   const currentRoute = usePathname()
   const clipPathId = React.useId()
-  const showStrategy = useFeatureFlagEnabled("strategies")
-  const links = LINKS.filter(
-    (link) => link.href !== "/strategies" || showStrategy,
-  )
 
   return (
     <nav
@@ -135,7 +130,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
           <Separator orientation="vertical" className="hidden lg:block" />
 
           <div className="space-x-4 lg:space-x-10">
-            {links.map(({ name, href, disabled, message }) => (
+            {LINKS.map(({ name, href, disabled, message }) => (
               <Link
                 key={href}
                 href={disabled ? "#" : href}
