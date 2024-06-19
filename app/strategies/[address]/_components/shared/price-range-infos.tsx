@@ -1,4 +1,5 @@
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
+import { useKandelBook } from "../../_hooks/use-kandel-book"
 import useKandel from "../../_providers/kandel-strategy"
 import { useParameters } from "../parameters/hook/use-parameters"
 import { LegendItem } from "./legend-item"
@@ -6,12 +7,12 @@ import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function PriceRangeInfos() {
-  const { strategyStatusQuery, baseToken, quoteToken, mergedOffers } =
-    useKandel()
+  const { baseToken, quoteToken, mergedOffers } = useKandel()
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
+  const { book } = useKandelBook()
 
-  const bids = strategyStatusQuery.data?.book?.bids ?? []
-  const asks = strategyStatusQuery.data?.book?.asks ?? []
+  const bids = book?.bids ?? []
+  const asks = book?.asks ?? []
   const offerPrices = mergedOffers.map((item) => item.price)
   const minPrice = Math.min(...offerPrices)
   const maxPrice = Math.max(...offerPrices)
@@ -21,10 +22,8 @@ export default function PriceRangeInfos() {
 
   const baseValue = `${publishedBase?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
   const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
-  const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
-  const chartIsLoading =
-    strategyStatusQuery.isLoading ||
-    !(baseToken && quoteToken && strategyStatusQuery.data?.midPrice)
+  const isLoading = !baseToken || !quoteToken
+  const chartIsLoading = !(baseToken && quoteToken)
 
   return (
     <div>
@@ -52,7 +51,7 @@ export default function PriceRangeInfos() {
           isLoading={chartIsLoading}
           bids={bids}
           asks={asks}
-          initialMidPrice={strategyStatusQuery.data?.midPrice?.toNumber()}
+          initialMidPrice={book?.midPrice}
           priceRange={priceRange}
           viewOnly
           mergedOffers={mergedOffers}
