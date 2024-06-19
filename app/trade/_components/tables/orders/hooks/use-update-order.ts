@@ -8,7 +8,7 @@ import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { BS } from "@mangrovedao/mgv/lib"
 import { parseEther } from "viem"
-import { usePublicClient, useWalletClient } from "wagmi"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import { Form } from "../types"
 
 type useUpdateOrderProps = {
@@ -20,6 +20,7 @@ type useUpdateOrderProps = {
 export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
   const { currentMarket: market } = useMarket()
   const { book } = useBook()
+  const { address } = useAccount()
 
   const marketClient = useMarketClient()
   const { data: walletClient } = useWalletClient()
@@ -45,15 +46,16 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         )
           throw new Error("Could not update order, missing params")
 
-        const { isBid, limitPrice: price, send: volume } = form
+        const { isBid, limitPrice: price, send, receive } = form
 
         const { request } = await marketClient.simulateUpdateOrder({
           offerId: BigInt(Number(offerId)),
-          baseAmount: isBid ? parseEther("0") : parseEther(volume),
-          quoteAmount: isBid ? parseEther(volume) : parseEther("0"),
+          baseAmount: isBid ? parseEther(receive) : parseEther(send),
+          quoteAmount: isBid ? parseEther(send) : parseEther(receive),
           bs: isBid ? BS.buy : BS.sell,
           book: book,
           restingOrderGasreq: 250_000n,
+          account: address,
         })
 
         const tx = await walletClient.writeContract(request)
