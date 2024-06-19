@@ -109,12 +109,18 @@ export function useLimit(props: Props) {
 
   const [baseAmount, quoteAmount, humanPrice, sendAmount, receiveAmount] =
     form.useStore((state) => {
+      const sendIsValid =
+        !isNaN(Number(state.values.send)) && isFinite(Number(state.values.send))
+      const receiveIsValid =
+        !isNaN(Number(state.values.receive)) &&
+        isFinite(Number(state.values.receive))
+
       const sendAmount = parseUnits(
-        state.values.send,
+        sendIsValid ? state.values.send : "0",
         sendToken?.decimals || 18,
       )
       const receiveAmount = parseUnits(
-        state.values.receive,
+        receiveIsValid ? state.values.receive : "0",
         receiveToken?.decimals || 18,
       )
       const base =
@@ -164,6 +170,11 @@ export function useLimit(props: Props) {
     if (!currentMarket) return
     const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
     const send = Number(form?.getFieldValue("send") ?? 0)
+
+    console.log({
+      limit,
+      send,
+    })
 
     form.setFieldValue(
       "receive",
