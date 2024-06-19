@@ -9,9 +9,12 @@ export function useKandelBook(params?: UseBookParams) {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["book-kandel", params, kandelClient?.chain.id],
     queryFn: async () => {
-      if (!kandelClient) return null
-
-      return kandelClient.getBook(params || {})
+      try {
+        if (!kandelClient) return null
+        return kandelClient.getBook(params || {})
+      } catch (error) {
+        console.log(error)
+      }
     },
     enabled: !!kandelClient,
     refetchInterval: 3000,

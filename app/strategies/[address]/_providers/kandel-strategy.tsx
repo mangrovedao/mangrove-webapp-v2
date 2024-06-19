@@ -1,5 +1,5 @@
 "use client"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import React from "react"
 import { Address, formatUnits } from "viem"
 import { useAccount } from "wagmi"
@@ -12,15 +12,22 @@ import { useStrategy } from "../_hooks/use-strategy"
 const useKandelStrategyContext = () => {
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()
+
+  //note: in case this context is used in strategy creation, get the market from the params
+  const searchParams = useSearchParams()
+  const marketParam = searchParams.get("market")
+  const [baseParam, quoteParam, tickSpacingParam] =
+    marketParam?.split(",") ?? ""
+
   const strategyQuery = useStrategy({
     strategyAddress: params.address,
   })
 
   const { data: baseToken } = useTokenFromAddress(
-    strategyQuery.data?.base as Address,
+    (strategyQuery.data?.base as Address) || baseParam,
   )
   const { data: quoteToken } = useTokenFromAddress(
-    strategyQuery.data?.quote as Address,
+    (strategyQuery.data?.quote as Address) || quoteParam,
   )
 
   const strategyStatusQuery = useStrategyStatus({
