@@ -331,10 +331,7 @@ const Summary = ({
           value={<Text>{false ? "Aave" : "Wallet"}</Text>}
         />
 
-        <SummaryLine
-          title="Risk appetite"
-          value={<Text>{riskAppetite?.toUpperCase()}</Text>}
-        />
+        <SummaryLine title="Risk appetite" value={<Text>Medium</Text>} />
 
         <SummaryLine
           title={`${baseToken?.symbol} deposit`}

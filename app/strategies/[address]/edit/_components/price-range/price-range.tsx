@@ -77,14 +77,12 @@ export const PriceRange = withClientOnly(function ({
   const hasLiveOffers = mergedOffers?.some((x) => x.gives > 0)
 
   React.useEffect(() => {
-    if (strategyQuery.data?.offers.some((x) => x.live)) {
-      setMinPrice(
-        strategyStatusQuery.data?.minPrice.toFixed(priceDecimals) || "0",
-      )
-      setMaxPrice(
-        strategyStatusQuery.data?.maxPrice.toFixed(priceDecimals) || "0",
-      )
-    }
+    setMinPrice(
+      strategyStatusQuery.data?.minPrice.toFixed(priceDecimals) || "0",
+    )
+    setMaxPrice(
+      strategyStatusQuery.data?.maxPrice.toFixed(priceDecimals) || "0",
+    )
   }, [
     strategyQuery.data?.offers,
     strategyStatusQuery.data?.minPrice,

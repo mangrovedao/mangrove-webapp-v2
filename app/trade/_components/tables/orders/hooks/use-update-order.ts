@@ -57,7 +57,6 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         })
 
         const tx = await walletClient.writeContract(request)
-
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: tx,
         })

@@ -157,7 +157,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
                 <Pen />
               </IconButton>
               <IconButton
-                tooltip="Retract offer"
+                tooltip="Cancel offer"
                 className="aspect-square w-6 rounded-full"
                 onClick={(e) => {
                   e.preventDefault()
