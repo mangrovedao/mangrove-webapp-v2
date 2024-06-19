@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import type { Address } from "viem"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { useLoadingStore } from "@/stores/loading.store"
-import { Address, BaseError, ContractFunctionExecutionError } from "viem"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "./use-strategy"
 
@@ -45,49 +45,26 @@ export function useCloseStrategy({ strategyAddress }: Props) {
 
   return useMutation({
     mutationFn: async () => {
-      try {
-        if (!strategyAddress || !strategy) return
+      if (!strategyAddress || !strategy) return
+      const { kandelInstance } = strategy
+      if (!kandelInstance || !account || !walletClient || !publicClient) return
 
-        const { kandelInstance, kandelState } = strategy
-        if (!kandelInstance || !account || !walletClient || !publicClient)
-          return
-        console.log(kandelState, account)
-        const { request } = await kandelInstance.simulateRetract({
-          to: BigInt(kandelState?.pricePoints || 0),
-          baseAmount: kandelState?.baseAmount,
-          quoteAmount: kandelState?.quoteAmount,
-          // both of these addresses are suppoesedly the same
-          recipient: account,
-          //@ts-ignore
-          // from: strategyAddress,
-          account: account,
-        })
+      const { request } = await kandelInstance.simulateRetract({
+        to: BigInt(strategy.kandelState?.pricePoints || 0n),
+        baseAmount: strategy.kandelState?.baseAmount,
+        quoteAmount: strategy.kandelState?.quoteAmount,
+        // both of these addresses are suppoesedly the same
+        recipient: account,
+        account: account,
+      })
 
-        const hash = await walletClient.writeContract(request)
-        const receipt = await publicClient.waitForTransactionReceipt({
-          hash,
-        })
+      const hash = await walletClient.writeContract(request)
+      const receipt = await publicClient.waitForTransactionReceipt({
+        hash,
+      })
 
-        toast.success("Strategy has reset with success")
-        return { receipt }
-      } catch (error) {
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
-          )
-          console.log(revertError)
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log({ ...revertError.args })
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-            )
-          }
-        }
-      }
+      toast.success("Strategy closed with success")
+      return { receipt }
     },
     meta: {
       error: "Failed to close strategy",
