@@ -71,9 +71,6 @@ export default function useStrategyStatus({
 
         const kandelState = await kandelInstance?.getKandelState({})
 
-        const anyLiveOffers = offers.some((x) => x?.live === true)
-        let isOutOfRange = false
-        let unexpectedDeadOffers = false
         let offerStatuses
         const bids = kandelState?.bids || []
         const asks = kandelState?.asks || []
@@ -82,8 +79,13 @@ export default function useStrategyStatus({
         const maxPrice = Math.max(...offersStatuses.map((item) => item.price))
         const minPrice = Math.min(...offersStatuses.map((item) => item.price))
 
+        let isOutOfRange = midPrice.gt(maxPrice) || midPrice.lt(minPrice)
+        let hasLiveOffers = offersStatuses.some((x) => x.gives > 0)
         let status: Status = "unknown"
-        if (!anyLiveOffers) {
+
+        if (isOutOfRange) {
+          status = "inactive"
+        } else if (!hasLiveOffers) {
           status = "closed"
         } else {
           offerStatuses = {
@@ -107,15 +109,7 @@ export default function useStrategyStatus({
             },
             midPrice,
           }
-
-          isOutOfRange = midPrice.gt(maxPrice) || midPrice.lt(minPrice)
-
-          unexpectedDeadOffers = [...bids, ...asks].some((x) => x.gives < 0)
-
           status = "active"
-          if (isOutOfRange || unexpectedDeadOffers) {
-            status = "inactive"
-          }
         }
 
         return {
@@ -126,7 +120,7 @@ export default function useStrategyStatus({
           market,
           book,
           offerStatuses,
-          unexpectedDeadOffers,
+          hasLiveOffers,
           isOutOfRange,
           kandelInstance,
           kandelState,

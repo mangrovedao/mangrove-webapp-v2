@@ -17,6 +17,16 @@ export function useValidateKandel(
   const currentMarket = useKandelMarket()
   const { book } = useKandelBook()
 
+  console.log(
+    Number(kandelParams.baseAmount),
+    Number(kandelParams.quoteAmount),
+    kandelParams.maxPrice,
+    kandelParams.minPrice,
+    Number(kandelParams.stepSize),
+    Number(kandelParams.pricePoints),
+    book?.midPrice,
+  )
+
   return useQuery({
     queryKey: [
       "kandel-validation",

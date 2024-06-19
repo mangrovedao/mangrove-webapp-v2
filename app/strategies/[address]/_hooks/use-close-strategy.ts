@@ -50,7 +50,7 @@ export function useCloseStrategy({ strategyAddress }: Props) {
       if (!kandelInstance || !account || !walletClient || !publicClient) return
 
       const { request } = await kandelInstance.simulateRetract({
-        to: BigInt(strategy.kandelState?.pricePoints || 0n),
+        toIndex: BigInt(strategy.kandelState?.pricePoints || 0n),
         baseAmount: strategy.kandelState?.baseAmount,
         quoteAmount: strategy.kandelState?.quoteAmount,
         // both of these addresses are suppoesedly the same

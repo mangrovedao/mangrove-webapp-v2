@@ -92,6 +92,7 @@ export default function useForm() {
     baseLogic: baseLogic as Logic,
     quoteLogic: quoteLogic as Logic,
   })
+
   const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
 
   const { data } = useValidateKandel(
@@ -116,6 +117,15 @@ export default function useForm() {
     minProvision,
     isValid,
   } = data ?? {}
+
+  console.log(
+    params,
+    distribution,
+    minBaseAmount,
+    minQuoteAmount,
+    minProvision,
+    isValid,
+  )
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
