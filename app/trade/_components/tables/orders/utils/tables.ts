@@ -1,4 +1,3 @@
-import { type Market } from "@mangrovedao/mangrove.js"
 import Big from "big.js"
 
 import useMarket from "@/providers/market.new"
@@ -33,7 +32,7 @@ export function getOrderProgress(
 
 export function getAmplifiedOrderProgress(
   order: AmplifiedOrder,
-  market?: Market,
+  market?: ReturnType<typeof useMarket>,
 ) {
   // const { takerGot, initialGives, initialWants } = order
   // const displayDecimals = market?.base.displayedDecimals

@@ -168,7 +168,7 @@ export function Form({ className }: { className?: string }) {
                 handleBaseDepositChange(minBaseAmount.toString()),
               text: "Update",
             }}
-            loading={isValid || fieldsDisabled}
+            loading={fieldsDisabled}
           />
 
           <CustomBalance
@@ -200,7 +200,7 @@ export function Form({ className }: { className?: string }) {
                 handleQuoteDepositChange(minQuoteAmount.toString()),
               text: "Update",
             }}
-            loading={isValid || fieldsDisabled}
+            loading={fieldsDisabled}
           />
 
           <CustomBalance
@@ -262,7 +262,7 @@ export function Form({ className }: { className?: string }) {
               onClick: handleBountyDepositChange,
               text: "Update",
             }}
-            loading={isValid || fieldsDisabled}
+            loading={fieldsDisabled}
           />
 
           <TokenBalance

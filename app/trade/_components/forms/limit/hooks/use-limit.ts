@@ -54,15 +54,6 @@ export function useLimitOld(props: Props) {
   const receiveTo = form.useStore((state) => state.values.receiveTo)
 
   const orderType = form.useStore((state) => state.values.orderType)
-  // const logics = (
-  //   mangrove
-  //     ? Object.values(mangrove.logics).filter(
-  //         (item) => item?.approvalType !== "ERC721",
-  //       )
-  //     : []
-  // ) as DefaultTradeLogics[]
-
-  // const selectedSource = logics.find((logic) => logic?.id === sendFrom)
 
   const {
     quoteToken,
@@ -334,6 +325,7 @@ export function useLimit(props: Props) {
 
   const minAsk = book ? minVolume(book.asksConfig, gasreq) : 0n
   const minBid = book ? minVolume(book.bidsConfig, gasreq) : 0n
+
   const minComputedVolume = bs === BS.buy ? minBid : minAsk
   const minVolumeFormatted = formatUnits(
     minComputedVolume,
@@ -438,7 +430,7 @@ export function useLimit(props: Props) {
       )
       form?.validateAllFields("blur")
     }, 0)
-  }, [form, book?.bids, book?.asks, bs])
+  }, [bs])
 
   return {
     form,

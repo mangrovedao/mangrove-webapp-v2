@@ -1,15 +1,14 @@
+import { kandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
+import { Address } from "viem"
+import { useClient } from "wagmi"
 
-import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market.new"
 import { getTokenPriceInToken } from "@/services/tokens.service"
-import { kandelActions } from "@mangrovedao/mgv"
-import { Address } from "viem"
-import { useClient } from "wagmi"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
 
@@ -21,7 +20,6 @@ export default function useStrategyStatus({
   quote,
   offers,
 }: Params) {
-  const { kandelStrategies } = useKandel()
   const { book } = useBook()
   const client = useClient()
   const addresses = useMangroveAddresses()
@@ -40,7 +38,7 @@ export default function useStrategyStatus({
           )
         })
 
-        if (!(kandelStrategies && market && addresses)) return null
+        if (!(market && addresses)) return null
 
         let midPrice = Big(book?.midPrice ?? 0)
         if (!midPrice && market.base.symbol && market.quote.symbol) {

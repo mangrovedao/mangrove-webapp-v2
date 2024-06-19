@@ -1,10 +1,11 @@
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
-import { MergedOffer } from "../../[address]/_utils/inventory"
+
+import { OfferParsed } from "@mangrovedao/mgv"
 import { useRefillOffer } from "../_hooks/use-refill-offer"
 
 type Props = {
-  offer?: MergedOffer
+  offer?: OfferParsed
   onClose: () => void
 }
 

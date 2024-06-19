@@ -1,6 +1,5 @@
 import Big from "big.js"
 
-import { type Market } from "@mangrovedao/mangrove.js"
 import { CompleteOffer } from "@mangrovedao/mgv"
 
 export function calculateCumulative(
@@ -10,7 +9,7 @@ export function calculateCumulative(
   let cumulativeVolume = 0
   const calculatedOffers =
     offers?.map((offer) => {
-      cumulativeVolume = cumulativeVolume +offer.volume
+      cumulativeVolume = cumulativeVolume + offer.volume
       return {
         ...offer,
         volume: cumulativeVolume,

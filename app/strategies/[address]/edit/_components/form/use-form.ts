@@ -1,5 +1,5 @@
 import { Logic } from "@mangrovedao/mgv"
-import { getKandelGasReq } from "@mangrovedao/mgv/lib"
+import { BA, getKandelGasReq } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import React from "react"
 import { useDebounce } from "usehooks-ts"
@@ -40,8 +40,8 @@ export default function useForm() {
 
   const { currentParameter, offers } = strategyQuery.data ?? {}
 
-  const asksOffers = mergedOffers?.filter((item) => item.offerType === "asks")
-  const bidsOffers = mergedOffers?.filter((item) => item.offerType === "bids")
+  const asksOffers = mergedOffers?.filter((item) => item.ba === BA.asks)
+  const bidsOffers = mergedOffers?.filter((item) => item.ba === BA.bids)
 
   // const getCurrentLiquiditySourcing = async () => {
   //   try {
@@ -58,11 +58,11 @@ export default function useForm() {
   // }
 
   const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
-    return acc.add(Big(curr.gives ?? 0))
+    return acc.add(Big(Number(curr.gives ?? 0)))
   }, Big(0))
 
   const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
-    return acc.add(Big(curr.gives ?? 0))
+    return acc.add(Big(Number(curr.gives ?? 0)))
   }, Big(0))
 
   const asks =
@@ -137,17 +137,21 @@ export default function useForm() {
     baseLogic: baseLogic as Logic,
     quoteLogic: quoteLogic as Logic,
   })
+  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
 
-  const { data } = useValidateKandel({
-    gasreq,
-    factor: 3,
-    minPrice: Number(minPrice),
-    maxPrice: Number(maxPrice),
-    baseAmount: BigInt(baseDeposit.replace(".", "")),
-    quoteAmount: BigInt(quoteDeposit.replace(".", "")),
-    stepSize: BigInt(debouncedStepSize),
-    pricePoints: BigInt(debouncedNumberOfOffers),
-  })
+  const { data } = useValidateKandel(
+    {
+      gasreq,
+      factor: 3,
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+      baseAmount: BigInt(baseDeposit.replace(".", "")),
+      quoteAmount: BigInt(quoteDeposit.replace(".", "")),
+      stepSize: BigInt(debouncedStepSize),
+      pricePoints: BigInt(debouncedNumberOfOffers),
+    },
+    isMissingField,
+  )
 
   const { params, minBaseAmount, minQuoteAmount, minProvision, isValid } =
     data ?? {}
@@ -161,10 +165,9 @@ export default function useForm() {
     setKandelParams(params)
   }, [params])
 
-  const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
-  // if kandelRequirementsQuery has error
   React.useEffect(() => {
-    if (!isValid && isMissingField) {
+    if (isMissingField) return
+    if (!isValid) {
       setGlobalError(
         getErrorMessage("An error occured, please verify your kandel params"),
       )

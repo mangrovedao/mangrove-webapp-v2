@@ -9,20 +9,17 @@ import {
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { renderElement } from "@/utils/render"
-import { Amplified } from "./amplified/amplified"
 import { Limit } from "./limit/limit"
 import { Market } from "./market/market"
 
 enum FormType {
   LIMIT = "Limit",
   MARKET = "Market",
-  // AMPLIFIED = "Amplified",
 }
 
 const TABS_CONTENT = {
   [FormType.LIMIT]: Limit,
   [FormType.MARKET]: Market,
-  // [FormType.AMPLIFIED]: Amplified,
 }
 
 export function Forms({

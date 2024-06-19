@@ -1,13 +1,14 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { usePublicClient, useWalletClient } from "wagmi"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
+import { BaseError, ContractFunctionExecutionError } from "viem"
 import type { Order } from "../schema"
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
 
 export function useCancelOrder({ offerId, onCancel }: Props = {}) {
   const queryClient = useQueryClient()
+  const { address } = useAccount()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const [startLoading] = useLoadingStore((state) => [
     state.startLoading,
@@ -48,10 +50,10 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
         const { request } = await marketClient.simulateRemoveOrder({
           offerId: BigInt(offerId),
           bs: order.isBid ? BS.buy : BS.sell,
+          account: address,
         })
 
         const tx = await walletClient.writeContract(request)
-
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: tx,
         })
@@ -59,6 +61,21 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
         return receipt
       } catch (error) {
         console.error(error)
+        if (error instanceof BaseError) {
+          const revertError = error.walk(
+            (error) => error instanceof ContractFunctionExecutionError,
+          )
+
+          if (revertError instanceof ContractFunctionExecutionError) {
+            console.log(
+              revertError.cause,
+              revertError.message,
+              revertError.functionName,
+              revertError.formattedArgs,
+              revertError.details,
+            )
+          }
+        }
         toast.error(`Failed to retract the order ${offerId ?? ""}`)
       }
     },
@@ -79,7 +96,7 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
     },
     meta: {
       error: `Failed to retract the order ${offerId ?? ""}`,
-      success: `The order ${offerId ?? ""} has been successfully retracted`,
+      // success: `The order ${offerId ?? ""} has been successfully retracted`,
     },
   })
 }
