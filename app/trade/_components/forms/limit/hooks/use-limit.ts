@@ -163,25 +163,12 @@ export function useLimit(props: Props) {
 
   function computeReceiveAmount() {
     if (!currentMarket) return
-    const humanPrice = Number(form.state.values.limitPrice)
-    const result = amounts(
-      bs === BS.buy
-        ? {
-            humanPrice,
-            quoteAmount,
-          }
-        : {
-            humanPrice,
-            baseAmount,
-          },
-      currentMarket,
-    )
+    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+    const send = Number(form?.getFieldValue("send") ?? 0)
+
     form.setFieldValue(
       "receive",
-      formatUnits(
-        bs === BS.buy ? result.baseAmount : result.quoteAmount,
-        receiveToken?.decimals || 18,
-      ),
+      (bs === BS.buy ? send / limit : send * limit).toString(),
     )
     form.validateAllFields("submit")
   }
