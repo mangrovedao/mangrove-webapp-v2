@@ -87,7 +87,6 @@ export default function useForm() {
     minProvision,
     isValid,
   } = data ?? {}
-  console.log(isValid, fieldsDisabled)
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)

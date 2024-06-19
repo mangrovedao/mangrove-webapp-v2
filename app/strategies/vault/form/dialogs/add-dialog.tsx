@@ -162,7 +162,6 @@ export default function AddToVaultDialog({
   useEffect(() => {
     if (isConfirmed) {
       if (currentStep === 4) {
-        console.log("invalidates")
         queryClient.refetchQueries({
           queryKey: ["vault"],
         })

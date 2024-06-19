@@ -134,7 +134,6 @@ export default function Page() {
                 name={"action"}
                 value={action}
                 onValueChange={(e: Action) => {
-                  console.log(e)
                   setAction(e)
                 }}
               >
