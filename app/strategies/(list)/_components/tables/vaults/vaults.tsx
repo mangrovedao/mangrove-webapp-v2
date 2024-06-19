@@ -51,7 +51,6 @@ export function Vaults({ type }: Props) {
         isLoading={isLoading || !market}
         onRowClick={
           (vault) => {
-            // console.log("vault", vault)
             if (vault) {
               push(`/strategies/vault?id=${vault.address}`)
             }

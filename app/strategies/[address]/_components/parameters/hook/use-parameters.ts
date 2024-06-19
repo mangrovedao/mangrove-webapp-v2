@@ -75,7 +75,7 @@ export const useParameters = () => {
 
   //         return { asksBalance, bidsBalance }
   //       } catch (error) {
-  //         console.log(error)
+  //         console.error(error)
   //       }
   //     },
   //     initialData: { asksBalance: Big(0), bidsBalance: Big(0) },
