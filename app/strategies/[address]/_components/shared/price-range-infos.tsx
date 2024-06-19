@@ -7,8 +7,10 @@ import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function PriceRangeInfos() {
+
   const { strategyStatusQuery, baseToken, quoteToken, mergedOffers } =
     useKandel()
+
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
   const { book } = useKandelBook()
   const bids = book?.bids ?? []
@@ -18,6 +20,7 @@ export default function PriceRangeInfos() {
   const offerPrices = mergedOffers.map((item) => item.price)
   const minPrice = Math.min(...offerPrices)
   const maxPrice = Math.max(...offerPrices)
+
 
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
   const priceRange = isActive
