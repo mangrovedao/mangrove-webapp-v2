@@ -208,6 +208,7 @@ export default function EditOrderSheet({
                               onBlur={field.handleBlur}
                               onChange={(e) => {
                                 field.handleChange(e.target.value)
+                                computeReceiveAmount()
                               }}
                               error={field.state.meta.touchedErrors}
                               token={quote}
