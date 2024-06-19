@@ -32,6 +32,8 @@ export function Strategies({ type }: Props) {
   // selected strategy to cancel
   const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
 
+  console.log(strategiesQuery.data)
+
   const table = useTable({
     type,
     data: strategiesQuery.data,
@@ -46,7 +48,7 @@ export function Strategies({ type }: Props) {
       )?.quote
 
       push(
-        `/strategies/${strategy.address}/edit?market=${baseToken?.address},${quoteToken?.address}`,
+        `/strategies/${strategy.address}/edit?market=${baseToken?.address},${quoteToken?.address},1`,
       )
     },
     onCancel: (strategy: Strategy) => setCloseStrategy(strategy),

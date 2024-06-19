@@ -1,16 +1,15 @@
-import React from "react"
-import { useDebounce } from "usehooks-ts"
-import { useAccount, useBalance } from "wagmi"
-
-import { useTokenBalance } from "@/hooks/use-token-balance"
-
-import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-validator"
-import { useLogics } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
-import { getErrorMessage } from "@/utils/errors"
 import { Logic } from "@mangrovedao/mgv"
 import { getKandelGasReq } from "@mangrovedao/mgv/lib"
+import React from "react"
+import { useDebounce } from "usehooks-ts"
 import { formatUnits, parseUnits } from "viem"
+import { useAccount, useBalance } from "wagmi"
+
+import { useValidateKandel } from "@/app/strategies/[address]/_hooks/use-kandel-validator"
+import { useLogics } from "@/hooks/use-addresses"
+import { useTokenBalance } from "@/hooks/use-token-balance"
+import useMarket from "@/providers/market.new"
+import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 
 export const MIN_NUMBER_OF_OFFERS = 1
@@ -63,6 +62,7 @@ export default function useForm() {
     baseLogic: baseLogic as Logic,
     quoteLogic: quoteLogic as Logic,
   })
+
   const isMissingField = !minPrice || !maxPrice || !baseDeposit || !quoteDeposit
 
   const { data } = useValidateKandel(
@@ -87,6 +87,7 @@ export default function useForm() {
     minProvision,
     isValid,
   } = data ?? {}
+  console.log(isValid, fieldsDisabled)
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)

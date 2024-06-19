@@ -65,7 +65,7 @@ export default function Page() {
             rightIcon
             onClick={() =>
               push(
-                `/strategies/${strategyAddress}/edit?market=${baseToken?.address},${quoteToken?.address}`,
+                `/strategies/${strategyAddress}/edit?market=${baseToken?.address},${quoteToken?.address},1`,
               )
             }
           >

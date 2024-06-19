@@ -79,8 +79,8 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
           </div>
         ),
         cell: ({ row }) => {
-          const { min, max, quote } = row.original
-          return <MinMax min={min} max={max} quote={quote} />
+          const { min, max, quote, base } = row.original
+          return <MinMax min={min} max={max} quote={quote} base={base} />
         },
       }),
       columnHelper.display({

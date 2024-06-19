@@ -1,9 +1,21 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
+import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
+import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Caption } from "@/components/typography/caption"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
@@ -28,7 +40,12 @@ export function Form({ className }: { className?: string }) {
     numberOfOffers,
     stepSize,
     nativeBalance,
+    logics,
     bountyDeposit,
+    sendFrom,
+    receiveTo,
+    handleReceiveToChange,
+    handleSendFromChange,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,
@@ -53,7 +70,11 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      {/* <Fieldset legend="Liquidity sourcing">
+      <Fieldset legend="Select market">
+        <MarketSelector />
+      </Fieldset>
+
+      <Fieldset legend="Liquidity sourcing">
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
             <Label className="flex items-center">
@@ -69,25 +90,27 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleSendFromChange(value)
               }}
-              disabled={
-                isValid || fieldsDisabled
-              }
+              disabled={fieldsDisabled}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {sendFromLogics?.map(
+                  <SelectItem key={"simple"} value={"simple"}>
+                    <div className="flex gap-2 w-full items-center">
+                      <SourceIcon sourceId={"simple"} />
+                      <Caption className="capitalize">{"Wallet"}</Caption>
+                    </div>
+                  </SelectItem>
+                  {logics?.map(
                     (logic) =>
                       logic && (
-                        <SelectItem key={logic.id} value={logic.id}>
+                        <SelectItem key={logic.name} value={logic.name}>
                           <div className="flex gap-2 w-full items-center">
-                            <SourceIcon sourceId={logic.id} />
+                            <SourceIcon sourceId={logic.name} />
                             <Caption className="capitalize">
-                              {logic.id.includes("simple")
-                                ? "Wallet"
-                                : logic.id}
+                              {logic.name}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -114,25 +137,27 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleReceiveToChange(value)
               }}
-              disabled={
-                isValid || fieldsDisabled
-              }
+              disabled={fieldsDisabled}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {receiveToLogics?.map(
+                  <SelectItem key={"simple"} value={"simple"}>
+                    <div className="flex gap-2 w-full items-center">
+                      <SourceIcon sourceId={"simple"} />
+                      <Caption className="capitalize">{"Wallet"}</Caption>
+                    </div>
+                  </SelectItem>
+                  {logics?.map(
                     (logic) =>
                       logic && (
-                        <SelectItem key={logic.id} value={logic.id}>
+                        <SelectItem key={logic.name} value={logic.name}>
                           <div className="flex gap-2 w-full items-center">
-                            <SourceIcon sourceId={logic.id} />
+                            <SourceIcon sourceId={logic.name} />
                             <Caption className="capitalize">
-                              {logic.id.includes("simple")
-                                ? "Wallet"
-                                : logic.id}
+                              {logic.name}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -143,10 +168,6 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
-      </Fieldset> */}
-
-      <Fieldset legend="Select market">
-        <MarketSelector />
       </Fieldset>
 
       <Fieldset className="space-y-4" legend="Set initial inventory">
