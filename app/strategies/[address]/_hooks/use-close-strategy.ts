@@ -4,7 +4,6 @@ import { toast } from "sonner"
 import type { Address } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
-import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { useLoadingStore } from "@/stores/loading.store"
@@ -92,7 +91,7 @@ export function useCloseStrategy({ strategyAddress }: Props) {
       console.error(error)
     },
     onSettled: () => {
-      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+      queryClient.fetchQuery({ queryKey: ["strategies"] })
     },
   })
 }

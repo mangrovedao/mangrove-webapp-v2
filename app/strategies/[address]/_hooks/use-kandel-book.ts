@@ -13,7 +13,7 @@ export function useKandelBook(params?: UseBookParams) {
         if (!kandelClient) return null
         return kandelClient.getBook(params || {})
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     },
     enabled: !!kandelClient,
