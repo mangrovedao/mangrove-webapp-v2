@@ -47,6 +47,7 @@ const useKandelStrategyContext = () => {
 
   return {
     strategyQuery,
+    kandelState,
     strategyAddress: params.address,
     baseToken,
     quoteToken,

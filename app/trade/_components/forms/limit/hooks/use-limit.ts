@@ -2,7 +2,6 @@
 "use client"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
-import Big from "big.js"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
 
@@ -18,199 +17,11 @@ import {
   minVolume,
 } from "@mangrovedao/mgv/lib"
 import { formatUnits, parseUnits } from "viem"
-import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
   onSubmit: (data: Form) => void
-}
-
-export function useLimitOld(props: Props) {
-  const { currentMarket: market } = useMarket()
-  // const { currentMarket } = useMarket()
-  // const { book } = useBook()
-
-  const form = useForm({
-    validator: zodValidator,
-    defaultValues: {
-      bs: BS.buy,
-      limitPrice: "",
-      send: "",
-      sendFrom: "simple",
-      receive: "",
-      receiveTo: "simple",
-      orderType: Order.GTC,
-      timeInForce: TimeInForce.GOOD_TIL_TIME,
-      timeToLive: "28",
-      timeToLiveUnit: TimeToLiveUnit.DAY,
-    },
-    onSubmit: (values) => props.onSubmit(values),
-  })
-
-  const tradeAction = form.useStore((state) => state.values.bs)
-  const send = form.useStore((state) => state.values.send)
-  const sendFrom = form.useStore((state) => state.values.sendFrom)
-  const receiveTo = form.useStore((state) => state.values.receiveTo)
-
-  const orderType = form.useStore((state) => state.values.orderType)
-
-  const {
-    quoteToken,
-    sendToken,
-    receiveToken,
-    feeInPercentageAsString,
-    sendTokenBalance,
-    receiveTokenBalance,
-    tickSize,
-    spotPrice,
-    defaultLimitPrice,
-  } = useTradeInfos("limit", tradeAction)
-
-  const { book } = useBook()
-
-  const { logics: sendLogics } = useTokenLogics({ token: sendToken?.address })
-  const { logics: receiveLogics } = useTokenLogics({
-    token: receiveToken?.address,
-  })
-
-  const selectedSource = sendLogics.find(
-    (logic) => logic.logic.name === sendFrom,
-  )
-  const gasreq = selectedSource?.logic.gasreq || getDefaultLimitOrderGasreq()
-
-  // TODO: fix TS type for useEventListener
-  // @ts-expect-error
-  useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
-
-  function handleOnOrderbookOfferClicked(
-    event: CustomEvent<{ price: string }>,
-  ) {
-    form.setFieldValue("limitPrice", event.detail.price)
-    form.validateAllFields("blur")
-    if (send === "") return
-    computeReceiveAmount()
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    e.stopPropagation()
-    void form.handleSubmit()
-  }
-
-  function computeReceiveAmount() {
-    const limitPrice = form.state.values.limitPrice
-    const send = form.state.values.send
-    const bigSend = Big(!isNaN(Number(send)) ? Number(send) : 0)
-    const bigLimitPrice = Big(
-      !isNaN(Number(limitPrice)) ? Number(limitPrice) : 0,
-    )
-
-    if (send === "") return
-
-    let limit,
-      receive = ""
-    if (tradeAction === BS.sell) {
-      limit = bigLimitPrice
-
-      receive = limit.mul(bigSend).toString()
-    } else {
-      limit = Number(limitPrice) !== 0 ? Number(limitPrice) : 1
-      receive = bigSend.div(limit).toString()
-    }
-
-    form.store.setState(
-      (state) => {
-        return {
-          ...state,
-          values: {
-            ...state.values,
-            receive,
-          },
-        }
-      },
-      {
-        priority: "high",
-      },
-    )
-    if (!(limitPrice && send)) return
-    form.validateAllFields("submit")
-  }
-
-  function computeSendAmount() {
-    const limitPrice = form.state.values.limitPrice
-    const receive = form.state.values.receive
-    const bigReceive = Big(!isNaN(Number(receive)) ? Number(receive) : 0)
-
-    if (receive === "") return
-    let send = ""
-    if (tradeAction === BS.sell) {
-      send = bigReceive
-        .div(Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 1))
-        .toString()
-    } else {
-      send = Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 0)
-        .mul(bigReceive)
-        .toString()
-    }
-
-    form.store.setState(
-      (state) => {
-        return {
-          ...state,
-          values: {
-            ...state.values,
-            send,
-          },
-        }
-      },
-      {
-        priority: "high",
-      },
-    )
-    if (!(limitPrice && receive)) return
-    form.validateAllFields("submit")
-  }
-
-  React.useEffect(() => {
-    const send = form?.getFieldValue("send")
-    const receive = form?.getFieldValue("receive")
-
-    form.setFieldValue("sendFrom", "simple")
-    form.setFieldValue("receiveTo", "simple")
-
-    if (!(send && receive)) return
-    form.setFieldValue("send", receive)
-    form.setFieldValue("receive", send)
-    form.validateAllFields("submit")
-  }, [form, tradeAction])
-
-  React.useEffect(() => {
-    form?.reset()
-  }, [form, market?.base, market?.quote])
-
-  return {
-    tradeAction,
-    computeReceiveAmount,
-    computeSendAmount,
-    sendTokenBalance,
-    receiveTokenBalance,
-    handleSubmit,
-    form,
-    quoteToken,
-    market,
-    sendToken,
-    send,
-    sendFrom,
-    receiveTo,
-    receiveToken,
-    tickSize,
-    feeInPercentageAsString,
-    spotPrice,
-    orderType,
-    selectedSource,
-    minVolume,
-  }
 }
 
 export function useLimit(props: Props) {
@@ -420,6 +231,7 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     const limitPrice =
       bs === BS.buy ? book?.asks[0]?.price : book?.bids[0]?.price
+    console.log(limitPrice)
     if (!limitPrice || !form || !sendToken) return
 
     //what is this x)
@@ -430,7 +242,7 @@ export function useLimit(props: Props) {
       )
       form?.validateAllFields("blur")
     }, 0)
-  }, [bs])
+  }, [bs, book?.midPrice])
 
   return {
     form,

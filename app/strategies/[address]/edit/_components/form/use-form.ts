@@ -6,8 +6,6 @@ import { useDebounce } from "usehooks-ts"
 import { formatUnits } from "viem"
 import { useAccount, useBalance } from "wagmi"
 
-import { useKandelState } from "@/app/strategies/(shared)/_hooks/use-kandel-state"
-import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-validator"
 import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { getErrorMessage } from "@/utils/errors"
@@ -15,6 +13,7 @@ import {
   ChangingFrom,
   useNewStratStore,
 } from "../../../../new/_stores/new-strat.store"
+import { useValidateKandel } from "../../../_hooks/use-kandel-validator"
 import useKandel from "../../../_providers/kandel-strategy"
 
 export const MIN_NUMBER_OF_OFFERS = 1
@@ -28,6 +27,7 @@ export default function useForm() {
     strategyQuery,
     baseToken,
     quoteToken,
+    kandelState,
   } = useKandel()
 
   const baseBalance = useTokenBalance(baseToken)
@@ -35,7 +35,7 @@ export default function useForm() {
   const { data: nativeBalance } = useBalance({
     address,
   })
-  const { data: kandelState } = useKandelState()
+
   const logics = useLogics()
 
   const { currentParameter, offers } = strategyQuery.data ?? {}
@@ -91,8 +91,19 @@ export default function useForm() {
       strategyStatusQuery.isFetched
     ) {
       //   getCurrentLiquiditySourcing()
-      setBaseDeposit(baseAmountDeposited?.toFixed(baseToken?.decimals) || "")
-      setQuoteDeposit(quoteAmountDeposited?.toFixed(quoteToken?.decimals) || "")
+      setBaseDeposit(
+        formatUnits(
+          kandelState?.baseAmount || 0n,
+          baseToken?.displayDecimals || 18,
+        ),
+      )
+      setQuoteDeposit(
+        formatUnits(
+          kandelState?.quoteAmount || 0n,
+          quoteToken?.displayDecimals || 18,
+        ),
+      )
+
       setNumberOfOffers(
         (Number(currentParameter?.length) - 1).toString() || "10",
       )

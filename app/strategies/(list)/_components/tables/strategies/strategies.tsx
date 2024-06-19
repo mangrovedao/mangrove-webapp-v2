@@ -46,7 +46,7 @@ export function Strategies({ type }: Props) {
       )?.quote
 
       push(
-        `/strategies/${strategy.address}/edit?market=${baseToken?.address},${quoteToken?.address}`,
+        `/strategies/${strategy.address}/edit?market=${baseToken?.address},${quoteToken?.address},1`,
       )
     },
     onCancel: (strategy: Strategy) => setCloseStrategy(strategy),
