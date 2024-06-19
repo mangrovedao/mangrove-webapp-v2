@@ -33,7 +33,14 @@ export function useFills<T = Fill[]>({
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["fills", address, first, skip],
+    queryKey: [
+      "fills",
+      market?.base.address,
+      market?.quote.address,
+      address,
+      first,
+      skip,
+    ],
     queryFn: async () => {
       try {
         if (!(indexerSdk && address && market)) return []

@@ -1,4 +1,5 @@
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
+import { useBook } from "@/hooks/use-book"
 import useKandel from "../../_providers/kandel-strategy"
 import { useParameters } from "../parameters/hook/use-parameters"
 import { LegendItem } from "./legend-item"
@@ -13,11 +14,11 @@ export default function PriceRangeInfos() {
     quoteToken,
     mergedOffers,
   } = useKandel()
-
+  const { book } = useBook()
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
 
-  const bids = strategyStatusQuery.data?.book?.bids ?? []
-  const asks = strategyStatusQuery.data?.book?.asks ?? []
+  const bids = book?.bids ?? []
+  const asks = book?.asks ?? []
 
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
   const priceRange = !strategyQuery.isLoading

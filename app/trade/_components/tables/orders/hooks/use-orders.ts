@@ -34,7 +34,14 @@ export function useOrders<T = Order[]>({
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["orders", address, first, skip],
+    queryKey: [
+      "orders",
+      market?.base.address,
+      market?.quote.address,
+      address,
+      first,
+      skip,
+    ],
     queryFn: async () => {
       if (!(indexerSdk && address && market)) return []
       startLoading(TRADE.TABLES.ORDERS)
