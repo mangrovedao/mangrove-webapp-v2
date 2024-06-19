@@ -47,10 +47,10 @@ export default function Page() {
 
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
-  }, [])
+  }, [refetch])
 
-  console.log(vault)
-  console.log(kandelState)
+  // console.log(vault)
+  // console.log(kandelState)
 
   const { push } = useRouter()
   // const markets = useMarkets()
@@ -89,6 +89,8 @@ export default function Page() {
             <HoldingCard
               base={vault?.market.base}
               quote={vault?.market.quote}
+              baseAmount={vault?.totalBase}
+              quoteAmount={vault?.totalQuote}
             />
             <Line
               title="Exit Fee"

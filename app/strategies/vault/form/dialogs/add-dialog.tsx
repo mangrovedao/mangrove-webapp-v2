@@ -9,6 +9,7 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useQueryClient } from "@tanstack/react-query"
 import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 import {
   useAccount,
@@ -54,6 +55,8 @@ const mintABI = parseAbi([
   "error OnlyFactoryOwnerAllowed()",
   "error ManagerBalanceCannotBeSwapped()",
   "error InvalidSwap()",
+  "error MinDensityRequirementIsNotMet()",
+  "error NotEnoughBountyForThePricePoints()",
 ])
 
 export default function AddToVaultDialog({
@@ -70,6 +73,7 @@ export default function AddToVaultDialog({
 
   const baseAmount = parseUnits(baseAmountRaw, baseToken.decimals)
   const quoteAmount = parseUnits(quoteAmountRaw, quoteToken.decimals)
+  const queryClient = useQueryClient()
 
   const {
     data,
@@ -117,6 +121,10 @@ export default function AddToVaultDialog({
     "Mint",
   ].filter(Boolean)
 
+  // BigInt.prototype.toJSON = function () {
+  //   return this.toString()
+  // }
+
   const currentStep = started
     ? isFetched
       ? missingBaseAllowance === 0n
@@ -154,6 +162,10 @@ export default function AddToVaultDialog({
   useEffect(() => {
     if (isConfirmed) {
       if (currentStep === 4) {
+        console.log("invalidates")
+        queryClient.refetchQueries({
+          queryKey: ["vault"],
+        })
         setStarted(false)
         onClose()
       } else {
@@ -161,7 +173,7 @@ export default function AddToVaultDialog({
         refetch()
       }
     }
-  }, [isConfirmed, currentStep, refetch, onClose, reset])
+  }, [isConfirmed, currentStep, refetch, onClose, reset, queryClient])
 
   const stepInfos = [
     {
@@ -241,8 +253,8 @@ export default function AddToVaultDialog({
       button: (
         <Button
           {...btnProps}
-          loading={result.isLoading}
-          disabled={result.isLoading || result.isError}
+          loading={isPending || isConfirming || result.isLoading}
+          disabled={isPending || isConfirming || result.isLoading}
           onClick={() => {
             if (!vault) return
             writeContract({

@@ -1,6 +1,7 @@
 import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
+import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { parseAbi } from "viem"
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
@@ -23,6 +24,7 @@ export default function RemoveFromVaultDialog({
   onClose,
 }: Props) {
   const { data: hash, isPending, writeContract } = useWriteContract()
+  const queryClient = useQueryClient()
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
       hash,
@@ -30,9 +32,12 @@ export default function RemoveFromVaultDialog({
 
   useEffect(() => {
     if (isConfirmed) {
+      queryClient.refetchQueries({
+        queryKey: ["vault"],
+      })
       onClose()
     }
-  }, [isConfirmed, onClose])
+  }, [isConfirmed, onClose, queryClient])
 
   return (
     <Dialog open={!!isOpen} onClose={onClose} type="info">
