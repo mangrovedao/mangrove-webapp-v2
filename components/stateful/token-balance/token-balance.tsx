@@ -28,10 +28,11 @@ export function TokenBalance(props: {
   })
 
   const symbol = !token ? nativeBalance?.symbol : token.symbol
-  const amount = !token ? nativeBalance?.value : balance?.balance
+  const amount = !token
+    ? formatUnits(nativeBalance?.value || 0n, nativeBalance?.decimals || 18)
+    : formatUnits(balance?.balance || 0n, token?.decimals || 18)
   const decimals = !token ? nativeBalance?.decimals : token.symbol
-
-  const formatted = formatUnits(amount ?? 0n, Number(decimals || 18))
+  const formatted = amount
 
   return (
     <div className="flex justify-between items-center mt-1">

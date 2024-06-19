@@ -133,17 +133,17 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
           return <Status status={data?.status} />
         },
       }),
-      columnHelper.display({
-        header: "PnL",
-        cell: ({ row }) => {
-          const { return: ret } = row.original
-          return (
-            <div className="flex flex-col">
-              <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
-            </div>
-          )
-        },
-      }),
+      // columnHelper.display({
+      //   header: "PnL",
+      //   cell: ({ row }) => {
+      //     const { return: ret } = row.original
+      //     return (
+      //       <div className="flex flex-col">
+      //         <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+      //       </div>
+      //     )
+      //   },
+      // }),
       // TODO: get from indexer
       columnHelper.display({
         header: "Liquidity sourcing",

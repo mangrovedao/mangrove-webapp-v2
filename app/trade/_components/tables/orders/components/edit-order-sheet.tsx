@@ -219,7 +219,7 @@ export default function EditOrderSheet({
                   <SheetLine
                     title={
                       <Text className="text-wrap">
-                        Send from {sendFrom?.name}
+                        Send from {sendFrom?.name || "Wallet"}
                       </Text>
                     }
                     item={
@@ -259,13 +259,40 @@ export default function EditOrderSheet({
                   <SheetLine
                     title={
                       <Text className="text-wrap">
-                        Receive to {receiveTo?.name}
+                        Receive to {receiveTo?.name || "Wallet"}
                       </Text>
                     }
                     item={
-                      <Text>{`${amount} ${
-                        isBid ? base?.symbol : quote?.symbol
-                      }`}</Text>
+                      !toggleEdit ? (
+                        <Text>{`${amount} ${
+                          isBid ? base?.symbol : quote?.symbol
+                        }`}</Text>
+                      ) : (
+                        <form.Field
+                          name="send"
+                          onChange={sendValidator(
+                            Number(sendTokenBalance.balance?.balance ?? 0),
+                          )}
+                        >
+                          {(field) => (
+                            <EnhancedNumericInput
+                              className="h-10"
+                              inputClassName="h-10"
+                              name={field.name}
+                              value={field.state.value}
+                              placeholder={volume}
+                              onBlur={field.handleBlur}
+                              onChange={(e) => {
+                                field.handleChange(e.target.value)
+                              }}
+                              error={field.state.meta.touchedErrors}
+                              token={isBid ? base : quote}
+                              disabled={!market}
+                              showBalance
+                            />
+                          )}
+                        </form.Field>
+                      )
                     }
                   />
 
