@@ -7,12 +7,13 @@ import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function PriceRangeInfos() {
-  const { baseToken, quoteToken, mergedOffers } = useKandel()
+  const { strategyStatusQuery, baseToken, quoteToken, mergedOffers } =
+    useKandel()
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
   const { book } = useKandelBook()
-
   const bids = book?.bids ?? []
   const asks = book?.asks ?? []
+
   const offerPrices = mergedOffers.map((item) => item.price)
   const minPrice = Math.min(...offerPrices)
   const maxPrice = Math.max(...offerPrices)
@@ -20,10 +21,20 @@ export default function PriceRangeInfos() {
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
   const priceRange = [minPrice, maxPrice] as [number, number]
 
-  const baseValue = `${publishedBase?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
-  const isLoading = !baseToken || !quoteToken
-  const chartIsLoading = !(baseToken && quoteToken)
+  const baseValue = `${Number(publishedBase)?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${Number(publishedQuote)?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
+  const isLoading = !baseToken || !quoteToken || strategyStatusQuery.isLoading
+
+  const chartIsLoading = !(
+    mergedOffers &&
+    bids &&
+    asks &&
+    minPrice &&
+    maxPrice &&
+    book?.midPrice &&
+    baseToken &&
+    quoteToken
+  )
 
   return (
     <div>

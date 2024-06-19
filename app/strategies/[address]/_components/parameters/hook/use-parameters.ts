@@ -1,10 +1,8 @@
-import Big from "big.js"
 import React from "react"
 import { Address, erc20Abi, formatUnits } from "viem"
 import { useAccount, useBalance, usePublicClient } from "wagmi"
 
 import { usePnL } from "@/app/strategies/(shared)/_hooks/use-pnl"
-import { useQuery } from "@tanstack/react-query"
 import useKandel from "../../../_providers/kandel-strategy"
 
 export const useParameters = () => {
@@ -36,40 +34,52 @@ export const useParameters = () => {
   const { pnlQuote, returnRate } =
     usePnL({ kandelAddress: strategyAddress }).data ?? {}
 
-  const { asksBalance, bidsBalance } =
-    useQuery({
-      queryKey: [
-        "strategy-balance",
-        kandelInstance,
-        baseToken?.address,
-        quoteToken?.address,
-      ],
-      queryFn: async () => {
-        try {
-          if (!kandelInstance) throw new Error("Could fetch balances")
+  // const { asksBalance, bidsBalance } =
+  //   useQuery({
+  //     queryKey: [
+  //       "strategy-balance",
+  //       strategyAddress,
+  //       baseToken?.address,
+  //       quoteToken?.address,
+  //     ],
+  //     queryFn: async () => {
+  //       try {
+  //         if (!kandelInstance) throw new Error("Could fetch balances")
 
-          const kandelState = await kandelInstance.getKandelState({})
+  //         const kandelState = await kandelInstance.getKandelState({})
+  //         const [asksBalance, bidsBalance] = await Promise.all([
+  //           kandelState.asks.reduce(
+  //             (sum, ask) =>
+  //               sum.plus(formatUnits(ask.gives, baseToken?.decimals || 18)),
+  //             Big(0),
+  //           ),
+  //           kandelState.bids.reduce(
+  //             (sum, bid) =>
+  //               sum.plus(formatUnits(bid.gives, quoteToken?.decimals || 18)),
+  //             Big(0),
+  //           ),
+  //         ])
 
-          const [asksBalance, bidsBalance] = await Promise.all([
-            kandelState.asks.reduce(
-              (sum, ask) =>
-                sum.plus(formatUnits(ask.gives, baseToken?.decimals || 18)),
-              Big(0),
-            ),
-            kandelState.bids.reduce(
-              (sum, bid) =>
-                sum.plus(formatUnits(bid.gives, quoteToken?.decimals || 18)),
-              Big(0),
-            ),
-          ])
+  //         // const asks = kandelState.asks.map((item) =>
+  //         //   Number(formatUnits(item.gives, baseToken?.decimals || 18)),
+  //         // )
+  //         // const bids = kandelState.bids.map((item) =>
+  //         //   Number(formatUnits(item.gives, quoteToken?.decimals || 18)),
+  //         // )
+  //         // const asksBalance = asks.reduce(function (prev, cur) {
+  //         //   return prev + cur
+  //         // })
+  //         // const bidsBalance = bids.reduce(function (prev, cur) {
+  //         //   return prev + cur
+  //         // })
 
-          return { asksBalance, bidsBalance }
-        } catch (error) {
-          console.log(error)
-        }
-      },
-      initialData: { asksBalance: Big(0), bidsBalance: Big(0) },
-    }).data ?? {}
+  //         return { asksBalance, bidsBalance }
+  //       } catch (error) {
+  //         console.log(error)
+  //       }
+  //     },
+  //     initialData: { asksBalance: Big(0), bidsBalance: Big(0) },
+  //   }).data ?? {}
 
   const lockedBounty = Number(kandelState?.unlockedProvision ?? 0).toFixed(
     nativeBalance?.decimals ?? 18,
@@ -150,8 +160,14 @@ export const useParameters = () => {
     },
     withdrawBase,
     withdrawQuote,
-    publishedBase: asksBalance,
-    publishedQuote: bidsBalance,
+    publishedBase: formatUnits(
+      kandelState?.baseAmount || 0n,
+      baseToken?.decimals || 18,
+    ),
+    publishedQuote: formatUnits(
+      kandelState?.quoteAmount || 0n,
+      quoteToken?.decimals || 18,
+    ),
     depositedBase,
     depositedQuote,
   }

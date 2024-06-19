@@ -1,4 +1,3 @@
-import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import useKandel from "../../_providers/kandel-strategy"
 import { useParameters } from "../parameters/hook/use-parameters"
 import TotalInventory from "./total-inventory"
@@ -8,18 +7,12 @@ export default function StratInfoBanner() {
   const { strategyStatusQuery, strategyAddress, baseToken, quoteToken } =
     useKandel()
 
-  const kandelInstance = useKandelInstance({
-    address: strategyAddress,
-    base: baseToken?.address,
-    quote: quoteToken?.address,
-  })
-
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
 
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
 
-  const baseValue = `${publishedBase?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${publishedQuote?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
+  const baseValue = `${Number(publishedBase)?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${Number(publishedQuote)?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
 
   return (
