@@ -32,6 +32,8 @@ export function Strategies({ type }: Props) {
   // selected strategy to cancel
   const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
 
+  console.log(strategiesQuery.data)
+
   const table = useTable({
     type,
     data: strategiesQuery.data,

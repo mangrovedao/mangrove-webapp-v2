@@ -13,13 +13,16 @@ export default function PriceRangeInfos() {
   const { book } = useKandelBook()
   const bids = book?.bids ?? []
   const asks = book?.asks ?? []
+  const isActive = strategyStatusQuery.data?.status !== "active"
 
   const offerPrices = mergedOffers.map((item) => item.price)
   const minPrice = Math.min(...offerPrices)
   const maxPrice = Math.max(...offerPrices)
 
   // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
-  const priceRange = [minPrice, maxPrice] as [number, number]
+  const priceRange = isActive
+    ? ([0, 0] as [number, number])
+    : ([minPrice, maxPrice] as [number, number])
 
   const baseValue = `${Number(publishedBase)?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
   const quoteValue = `${Number(publishedQuote)?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
@@ -33,7 +36,8 @@ export default function PriceRangeInfos() {
     maxPrice &&
     book?.midPrice &&
     baseToken &&
-    quoteToken
+    quoteToken &&
+    !isActive
   )
 
   return (
