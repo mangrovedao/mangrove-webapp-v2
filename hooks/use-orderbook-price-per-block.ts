@@ -69,9 +69,13 @@ export function useTokenPricesInUsb() {
   return useQuery({
     queryKey: ["token-usdb-prices", blockStr],
     queryFn: async () => {
-      if (!blockStr) return null
-      const res = await fetchOrderbookPricePerBlock(blockStr)
-      return transformData(res)
+      try {
+        if (!blockStr) return null
+        const res = await fetchOrderbookPricePerBlock(blockStr)
+        return transformData(res)
+      } catch (error) {
+        return null
+      }
     },
     enabled: !!blockStr,
   })

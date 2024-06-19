@@ -7,7 +7,6 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
 
-import { useBook } from "@/hooks/use-book"
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
@@ -16,6 +15,7 @@ import {
   ChangingFrom,
   useNewStratStore,
 } from "../../../../new/_stores/new-strat.store"
+import { useKandelBook } from "../../../_hooks/use-kandel-book"
 import useKandel from "../../../_providers/kandel-strategy"
 import EditStrategyDialog from "../edit-strategy-dialog"
 import { LiquiditySource } from "./components/liquidity-source"
@@ -27,11 +27,16 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { book, isLoading } = useBook()
+  const { book, isLoading } = useKandelBook()
   const midPrice = book?.midPrice
-  const riskAppetite = book?.spreadPercent
-  const { mergedOffers, strategyQuery, baseToken, quoteToken } = useKandel()
-
+  const {
+    mergedOffers,
+    strategyQuery,
+    strategyStatusQuery,
+    baseToken,
+    quoteToken,
+    kandelState,
+  } = useKandel()
   const priceDecimals = quoteToken?.decimals
 
   const [summaryDialog, setSummaryDialog] = React.useState(false)
@@ -73,10 +78,18 @@ export const PriceRange = withClientOnly(function ({
 
   React.useEffect(() => {
     if (strategyQuery.data?.offers.some((x) => x.live)) {
-      setMinPrice(strategyQuery.data?.min || "0")
-      setMaxPrice(strategyQuery.data?.max || "0")
+      setMinPrice(
+        strategyStatusQuery.data?.minPrice.toFixed(priceDecimals) || "0",
+      )
+      setMaxPrice(
+        strategyStatusQuery.data?.maxPrice.toFixed(priceDecimals) || "0",
+      )
     }
-  }, [strategyQuery.data?.max, strategyQuery.data?.min])
+  }, [
+    strategyQuery.data?.offers,
+    strategyStatusQuery.data?.minPrice,
+    strategyStatusQuery.data?.maxPrice,
+  ])
 
   React.useEffect(() => {
     if (isChangingFrom !== "minPercentage" && minPrice && midPrice) {

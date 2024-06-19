@@ -8,10 +8,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTokens } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits } from "viem"
-import { useBalance } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
 
 export function TokenBalance(props: {
   token?: Token | string
@@ -21,18 +20,19 @@ export function TokenBalance(props: {
     text?: string
   }
 }) {
-  const tokens = useTokens()
   const token = typeof props.token === "string" ? undefined : props.token
-  const { data: nativeBalance } = useBalance()
-
+  const { address } = useAccount()
+  const { data: nativeBalance } = useBalance({ address })
   const { balance, isLoading } = useTokenBalance({
     token: token?.address,
   })
 
-  const formatted = formatUnits(
-    (!token ? nativeBalance?.value : balance?.balance) || 0n,
-    token?.decimals ?? 18,
-  )
+  const symbol = !token ? nativeBalance?.symbol : token.symbol
+  const amount = !token ? nativeBalance?.value : balance?.balance
+  const decimals = !token ? nativeBalance?.decimals : token.symbol
+
+  const formatted = formatUnits(amount ?? 0n, Number(decimals || 18))
+
   return (
     <div className="flex justify-between items-center mt-1">
       <span className="text-xs text-secondary float-left">
@@ -53,8 +53,8 @@ export function TokenBalance(props: {
                 }}
               >
                 <span title={formatted?.toString()}>
-                  {Number(formatted).toFixed(token?.displayDecimals)}{" "}
-                  {token?.symbol}
+                  {Number(formatted).toFixed(token?.displayDecimals ?? 8)}{" "}
+                  {symbol}
                 </span>
               </TooltipTrigger>
 
@@ -65,7 +65,7 @@ export function TokenBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
+                  {Number(formatted).toFixed(Number(decimals))} {symbol}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>

@@ -54,10 +54,10 @@ export function UnPublish({ open, onClose }: Props) {
 
   const { publishedBase, publishedQuote } = useParameters()
 
-  const publishBaseFormatted = publishedBase?.toFixed(
+  const publishBaseFormatted = Number(publishedBase)?.toFixed(
     baseToken?.displayDecimals,
   )
-  const publishQuoteFormatted = publishedQuote?.toFixed(
+  const publishQuoteFormatted = Number(publishedQuote)?.toFixed(
     baseToken?.displayDecimals,
   )
 

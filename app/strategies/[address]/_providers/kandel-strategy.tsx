@@ -1,25 +1,33 @@
 "use client"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import React from "react"
-import { Address } from "viem"
+import { Address, formatUnits } from "viem"
 import { useAccount } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import { BA } from "@mangrovedao/mgv/lib"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
 
 const useKandelStrategyContext = () => {
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()
+
+  //note: in case this context is used in strategy creation, get the market from the params
+  const searchParams = useSearchParams()
+  const marketParam = searchParams.get("market")
+  const [baseParam, quoteParam, tickSpacingParam] =
+    marketParam?.split(",") ?? ""
+
   const strategyQuery = useStrategy({
     strategyAddress: params.address,
   })
 
   const { data: baseToken } = useTokenFromAddress(
-    strategyQuery.data?.base as Address,
+    (strategyQuery.data?.base as Address) || baseParam,
   )
   const { data: quoteToken } = useTokenFromAddress(
-    strategyQuery.data?.quote as Address,
+    (strategyQuery.data?.quote as Address) || quoteParam,
   )
 
   const strategyStatusQuery = useStrategyStatus({
@@ -33,15 +41,26 @@ const useKandelStrategyContext = () => {
   const offers = [...(kandelState?.asks || []), ...(kandelState?.bids || [])]
 
   const filteredOffers = offers.filter((offer) => offer.gives > 0)
+  const formattedOffers = filteredOffers.map((item) => {
+    return {
+      ...item,
+      formattedGives: formatUnits(
+        item.gives,
+        (item.ba === BA.asks ? baseToken?.decimals : quoteToken?.decimals) ||
+          18,
+      ),
+    }
+  })
 
   return {
     strategyQuery,
+    kandelState,
     strategyAddress: params.address,
     baseToken,
     quoteToken,
     blockExplorerUrl: chain?.blockExplorers?.default.url,
     strategyStatusQuery,
-    mergedOffers: filteredOffers,
+    mergedOffers: formattedOffers,
   }
 }
 

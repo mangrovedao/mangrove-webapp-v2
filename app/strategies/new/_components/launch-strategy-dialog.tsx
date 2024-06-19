@@ -16,9 +16,9 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import useMarket from "@/providers/market.new"
-import { useActivateKandelLogics } from "../../(shared)/_hooks/use-activate-kandel-logics"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
-import { useKandelSteps } from "../../(shared)/_hooks/use-kandel-steps"
+import { useActivateKandelLogics } from "../../[address]/_hooks/use-activate-kandel-logics"
+import { useKandelSteps } from "../../[address]/_hooks/use-kandel-steps"
 import { useCreateKandelStrategy } from "../_hooks/use-deploy-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
 import { NewStratStore } from "../_stores/new-strat.store"
@@ -73,16 +73,13 @@ export default function DeployStrategyDialog({
   const deploySmartRouter = useDeploySmartRouter({
     owner: deployRouter?.params.owner,
   })
-
   const activateSmartRouter = useActivateStrategySmartRouter(
     data?.kandelAddress,
   )
-
   const activateLogics = useActivateKandelLogics(data?.kandelAddress)
-
   const approveToken = useInfiniteApproveToken()
-
   const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
+
   const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
   const logicGasReq = Number(baseLogic?.gasreq || 0) + 100_000

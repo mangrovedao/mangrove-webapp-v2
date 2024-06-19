@@ -9,7 +9,7 @@ import { useOffersTable } from "./use-offers-table"
 
 export default function OffersTable() {
   const [refillOffer, setRefillOffer] = React.useState<
-    OfferParsed | undefined
+    (OfferParsed & { formattedGives: string }) | undefined
   >()
 
   const { mergedOffers, strategyQuery, strategyStatusQuery } = useKandel()

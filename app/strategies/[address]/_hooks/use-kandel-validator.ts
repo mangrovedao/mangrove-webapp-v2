@@ -1,7 +1,7 @@
-import { useBook } from "@/hooks/use-book"
-import useMarket from "@/providers/market.new"
 import { RawKandelParams, validateKandelParams } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
+import { useKandelBook } from "./use-kandel-book"
+import useKandelMarket from "./use-kandel-market"
 
 export function useValidateKandel(
   kandelParams: Omit<
@@ -14,8 +14,8 @@ export function useValidateKandel(
   >,
   isMissingField: boolean,
 ) {
-  const { currentMarket } = useMarket()
-  const { book } = useBook()
+  const currentMarket = useKandelMarket()
+  const { book } = useKandelBook()
 
   return useQuery({
     queryKey: [
@@ -32,8 +32,6 @@ export function useValidateKandel(
       try {
         if (!book || !currentMarket)
           throw new Error("Could not validate kandel, missing params")
-
-        console.log(kandelParams)
 
         const {
           params,
@@ -60,41 +58,41 @@ export function useValidateKandel(
         })
 
         // @ts-ignore
-        // BigInt.prototype.toJSON = function () {
-        //   return this.toString()
-        // }
+        BigInt.prototype.toJSON = function () {
+          return this.toString()
+        }
 
-        // console.log(
-        //   "response",
-        //   JSON.stringify({
-        //     params,
-        //     rawParams,
-        //     minBaseAmount,
-        //     minQuoteAmount,
-        //     minProvision,
-        //     distribution,
-        //     isValid,
-        //   }),
-        // )
+        console.log(
+          "response",
+          JSON.stringify({
+            params,
+            rawParams,
+            minBaseAmount,
+            minQuoteAmount,
+            minProvision,
+            distribution,
+            isValid,
+          }),
+        )
 
-        // console.log(
-        //   "sent params",
-        //   JSON.stringify({
-        //     gasreq: kandelParams.gasreq,
-        //     factor: kandelParams.factor,
-        //     asksLocalConfig: book.asksConfig,
-        //     bidsLocalConfig: book.bidsConfig,
-        //     minPrice: Number(kandelParams.minPrice),
-        //     maxPrice: Number(kandelParams.maxPrice),
-        //     midPrice: book.midPrice,
-        //     marketConfig: book.marketConfig,
-        //     market: currentMarket,
-        //     baseAmount: kandelParams.baseAmount,
-        //     quoteAmount: kandelParams.quoteAmount,
-        //     stepSize: kandelParams.stepSize,
-        //     pricePoints: kandelParams.pricePoints,
-        //   }),
-        // )
+        console.log(
+          "sent params",
+          JSON.stringify({
+            gasreq: kandelParams.gasreq,
+            factor: kandelParams.factor,
+            asksLocalConfig: book.asksConfig,
+            bidsLocalConfig: book.bidsConfig,
+            minPrice: Number(kandelParams.minPrice),
+            maxPrice: Number(kandelParams.maxPrice),
+            midPrice: book.midPrice,
+            marketConfig: book.marketConfig,
+            market: currentMarket,
+            baseAmount: kandelParams.baseAmount,
+            quoteAmount: kandelParams.quoteAmount,
+            stepSize: kandelParams.stepSize,
+            pricePoints: kandelParams.pricePoints,
+          }),
+        )
 
         return {
           params,

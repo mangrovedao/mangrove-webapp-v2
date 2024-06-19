@@ -3,7 +3,7 @@ import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
 import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
-import { useKandelSteps } from "@/app/strategies/(shared)/_hooks/use-kandel-steps"
+
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
@@ -17,6 +17,7 @@ import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
 import { useCloseStrategy } from "../../_hooks/use-close-strategy"
+import { useKandelSteps } from "../../_hooks/use-kandel-steps"
 import useKandel from "../../_providers/kandel-strategy"
 import { useEditKandelStrategy } from "../_hooks/use-edit-kandel-strategy"
 import { Steps } from "./form/components/steps"
@@ -50,7 +51,8 @@ export default function EditStrategyDialog({
   const { data: kandelSteps } = useKandelSteps()
   const logics = useLogics()
 
-  const [sow, baseApprove, quoteApprove] = kandelSteps ?? [{}]
+  const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
+    kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,

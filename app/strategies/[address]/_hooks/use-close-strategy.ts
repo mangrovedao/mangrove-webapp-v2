@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import type { Address } from "viem"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { useLoadingStore } from "@/stores/loading.store"
-import { Address } from "viem"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "./use-strategy"
 
@@ -50,7 +50,7 @@ export function useCloseStrategy({ strategyAddress }: Props) {
       if (!kandelInstance || !account || !walletClient || !publicClient) return
 
       const { request } = await kandelInstance.simulateRetract({
-        to: BigInt(strategy.kandelState?.pricePoints || 0n),
+        toIndex: BigInt(strategy.kandelState?.pricePoints || 0n),
         baseAmount: strategy.kandelState?.baseAmount,
         quoteAmount: strategy.kandelState?.quoteAmount,
         // both of these addresses are suppoesedly the same
