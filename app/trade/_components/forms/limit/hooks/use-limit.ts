@@ -12,7 +12,6 @@ import useMarket from "@/providers/market.new"
 import {
   BS,
   Order,
-  amounts,
   getDefaultLimitOrderGasreq,
   minVolume,
 } from "@mangrovedao/mgv/lib"
@@ -175,25 +174,11 @@ export function useLimit(props: Props) {
 
   function computeSendAmount() {
     if (!currentMarket) return
-    const humanPrice = Number(form.state.values.limitPrice)
-    const result = amounts(
-      bs === BS.buy
-        ? {
-            humanPrice,
-            baseAmount,
-          }
-        : {
-            humanPrice,
-            quoteAmount,
-          },
-      currentMarket,
-    )
+    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+    const receive = Number(form?.getFieldValue("receive") ?? 0)
     form.setFieldValue(
       "send",
-      formatUnits(
-        bs === BS.buy ? result.quoteAmount : result.baseAmount,
-        sendToken?.decimals || 18,
-      ),
+      (bs === BS.buy ? receive * limit : receive / limit).toString(),
     )
     form.validateAllFields("submit")
   }
