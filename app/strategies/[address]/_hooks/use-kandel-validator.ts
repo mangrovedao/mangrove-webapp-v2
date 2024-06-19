@@ -15,7 +15,7 @@ export function useValidateKandel(
   isMissingField: boolean,
 ) {
   const currentMarket = useKandelMarket()
-  const { book } = useKandelBook({})
+  const { book } = useKandelBook()
 
   return useQuery({
     queryKey: [

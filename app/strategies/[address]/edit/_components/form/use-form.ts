@@ -1,9 +1,8 @@
 import { Logic } from "@mangrovedao/mgv"
-import { BA, getKandelGasReq } from "@mangrovedao/mgv/lib"
-import Big from "big.js"
+import { getKandelGasReq } from "@mangrovedao/mgv/lib"
 import React from "react"
 import { useDebounce } from "usehooks-ts"
-import { formatUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 import { useAccount, useBalance } from "wagmi"
 
 import { useLogics } from "@/hooks/use-addresses"
@@ -23,7 +22,6 @@ export default function useForm() {
   const { address } = useAccount()
   const {
     strategyStatusQuery,
-    mergedOffers,
     strategyQuery,
     baseToken,
     quoteToken,
@@ -35,84 +33,10 @@ export default function useForm() {
   const { data: nativeBalance } = useBalance({
     address,
   })
-
   const logics = useLogics()
-
-  const { currentParameter, offers } = strategyQuery.data ?? {}
-
-  const asksOffers = mergedOffers?.filter((item) => item.ba === BA.asks)
-  const bidsOffers = mergedOffers?.filter((item) => item.ba === BA.bids)
-
-  // const getCurrentLiquiditySourcing = async () => {
-  //   try {
-  //     const { baseLogic, quoteLogic } =
-  //       (await strategyStatusQuery.data?.stratInstance.getLogics()) ?? {}
-  //     const _baseLogic = mangrove?.getLogicByAddress(baseLogic || "")
-  //     const _quoteLogic = mangrove?.getLogicByAddress(quoteLogic || "")
-
-  //     setSendFrom(_baseLogic?.id || "")
-  //     setReceiveTo(_quoteLogic?.id || "")
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
-    return acc.add(Big(Number(curr.gives ?? 0)))
-  }, Big(0))
-
-  const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
-    return acc.add(Big(Number(curr.gives ?? 0)))
-  }, Big(0))
-
-  const asks =
-    offers
-      ?.filter((item) => item.offerType === "asks")
-      .map(({ gasbase, gasreq, gasprice }) => ({
-        gasbase: Number(gasbase || 0),
-        gasreq: Number(gasreq || 0),
-        gasprice: Number(gasprice || 0),
-      })) || []
-
-  const bids =
-    offers
-      ?.filter((item) => item.offerType === "bids")
-      .map(({ gasbase, gasreq, gasprice }) => ({
-        gasbase: Number(gasbase || 0),
-        gasreq: Number(gasreq || 0),
-        gasprice: Number(gasprice || 0),
-      })) || []
+  const { currentParameter } = strategyQuery.data ?? {}
 
   const lockedBounty = kandelState?.unlockedProvision
-
-  React.useEffect(() => {
-    if (
-      strategyQuery.data?.offers.some((x) => x.live) &&
-      strategyStatusQuery.isFetched
-    ) {
-      //   getCurrentLiquiditySourcing()
-      setBaseDeposit(
-        formatUnits(
-          kandelState?.baseAmount || 0n,
-          baseToken?.displayDecimals || 18,
-        ),
-      )
-      setQuoteDeposit(
-        formatUnits(
-          kandelState?.quoteAmount || 0n,
-          quoteToken?.displayDecimals || 18,
-        ),
-      )
-
-      setNumberOfOffers(
-        (Number(currentParameter?.length) - 1).toString() || "10",
-      )
-
-      setStepSize(currentParameter?.stepSize || "")
-      setBountyDeposit(Number(lockedBounty).toFixed(6) || "")
-    }
-  }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
-
   const {
     priceRange: [minPrice, maxPrice],
     setGlobalError,
@@ -138,6 +62,26 @@ export default function useForm() {
     setReceiveTo,
   } = useNewStratStore()
 
+  React.useEffect(() => {
+    if (
+      strategyQuery.data?.offers.some((x) => x.live) &&
+      strategyStatusQuery.isFetched
+    ) {
+      //   getCurrentLiquiditySourcing()
+      setBaseDeposit(
+        formatUnits(kandelState?.baseAmount || 0n, baseToken?.decimals || 18),
+      )
+      setQuoteDeposit(
+        formatUnits(kandelState?.quoteAmount || 0n, quoteToken?.decimals || 18),
+      )
+      setNumberOfOffers(
+        (Number(currentParameter?.length) - 1).toString() || "10",
+      )
+      setStepSize(currentParameter?.stepSize || "")
+      setBountyDeposit(formatUnits(lockedBounty || 0n, 8))
+    }
+  }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
+
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
   const fieldsDisabled = !(minPrice && maxPrice)
@@ -156,16 +100,22 @@ export default function useForm() {
       factor: 3,
       minPrice: Number(minPrice),
       maxPrice: Number(maxPrice),
-      baseAmount: BigInt(baseDeposit.replace(".", "")),
-      quoteAmount: BigInt(quoteDeposit.replace(".", "")),
+      baseAmount: parseUnits(baseDeposit, baseToken?.decimals || 18),
+      quoteAmount: parseUnits(quoteDeposit, quoteToken?.decimals || 18),
       stepSize: BigInt(debouncedStepSize),
       pricePoints: BigInt(debouncedNumberOfOffers),
     },
     isMissingField,
   )
 
-  const { params, minBaseAmount, minQuoteAmount, minProvision, isValid } =
-    data ?? {}
+  const {
+    params,
+    distribution,
+    minBaseAmount,
+    minQuoteAmount,
+    minProvision,
+    isValid,
+  } = data ?? {}
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
@@ -175,6 +125,10 @@ export default function useForm() {
   React.useEffect(() => {
     setKandelParams(params)
   }, [params])
+
+  React.useEffect(() => {
+    setDistribution(distribution)
+  }, [distribution])
 
   React.useEffect(() => {
     if (isMissingField) return
@@ -336,9 +290,9 @@ export default function useForm() {
   return {
     baseToken,
     quoteToken,
-    minBaseAmount,
-    minQuoteAmount,
-    minProvision,
+    minBaseAmount: minBase,
+    minQuoteAmount: minQuote,
+    minProvision: minProv,
     isChangingFrom,
     numberOfOffers,
     baseDeposit,

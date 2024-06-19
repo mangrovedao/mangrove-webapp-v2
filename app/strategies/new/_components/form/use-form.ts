@@ -1,16 +1,15 @@
-import React from "react"
-import { useDebounce } from "usehooks-ts"
-import { useAccount, useBalance } from "wagmi"
-
-import { useTokenBalance } from "@/hooks/use-token-balance"
-
-import { useValidateKandel } from "@/app/strategies/(shared)/_hooks/use-kandel-validator"
-import { useLogics } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
-import { getErrorMessage } from "@/utils/errors"
 import { Logic } from "@mangrovedao/mgv"
 import { getKandelGasReq } from "@mangrovedao/mgv/lib"
+import React from "react"
+import { useDebounce } from "usehooks-ts"
 import { formatUnits, parseUnits } from "viem"
+import { useAccount, useBalance } from "wagmi"
+
+import { useValidateKandel } from "@/app/strategies/[address]/_hooks/use-kandel-validator"
+import { useLogics } from "@/hooks/use-addresses"
+import { useTokenBalance } from "@/hooks/use-token-balance"
+import useMarket from "@/providers/market.new"
+import { getErrorMessage } from "@/utils/errors"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 
 export const MIN_NUMBER_OF_OFFERS = 1

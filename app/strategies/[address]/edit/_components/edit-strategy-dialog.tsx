@@ -51,7 +51,8 @@ export default function EditStrategyDialog({
   const { data: kandelSteps } = useKandelSteps()
   const logics = useLogics()
 
-  const [sow, baseApprove, quoteApprove] = kandelSteps ?? [{}]
+  const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
+    kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,

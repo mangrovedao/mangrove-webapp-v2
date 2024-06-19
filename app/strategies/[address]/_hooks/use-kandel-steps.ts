@@ -5,7 +5,6 @@ import { useMangroveAddresses, useSmartKandel } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
-import { useRouter } from "next/navigation"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
 
@@ -18,7 +17,7 @@ export function useKandelSteps() {
 
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
-  const router = useRouter()
+
   const currentMarket = markets.find(
     (market) =>
       market.base.address.toLocaleLowerCase() ===
@@ -28,11 +27,16 @@ export function useKandelSteps() {
   )
 
   return useQuery({
-    queryKey: ["kandel-steps", smartKandel, address],
+    queryKey: [
+      "kandel-steps",
+      smartKandel,
+      address,
+      baseToken?.address,
+      quoteToken?.address,
+    ],
     queryFn: async () => {
       try {
-        if (!baseToken || !quoteToken) router.push("/strategies")
-
+        if (!baseToken || !quoteToken) return null
         if (
           !smartKandel ||
           !address ||

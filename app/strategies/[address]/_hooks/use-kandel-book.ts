@@ -7,7 +7,7 @@ export type UseBookParams = BookParams & {}
 export function useKandelBook(params?: UseBookParams) {
   const kandelClient = useKandelClient()
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["book", params, kandelClient?.chain.id],
+    queryKey: ["book-kandel", params, kandelClient?.chain.id],
     queryFn: async () => {
       if (!kandelClient) return null
 

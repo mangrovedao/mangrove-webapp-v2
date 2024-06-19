@@ -231,7 +231,7 @@ export function useLimit(props: Props) {
   React.useEffect(() => {
     const limitPrice =
       bs === BS.buy ? book?.asks[0]?.price : book?.bids[0]?.price
-    console.log(limitPrice)
+
     if (!limitPrice || !form || !sendToken) return
 
     //what is this x)
