@@ -1,6 +1,8 @@
+import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { LucideChevronRight } from "lucide-react"
 import React from "react"
+import { formatUnits } from "viem"
 
 import {
   CustomRadioGroup,
@@ -13,8 +15,6 @@ import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
 import { EnhancedNumericInput } from "@components/token-input"
-import { BS } from "@mangrovedao/mgv/lib"
-import { formatUnits } from "viem"
 import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
