@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Token } from "@mangrovedao/mgv"
 
-import Big, { BigSource } from "big.js"
+import { BigSource } from "big.js"
 
 type Props = {
   loading?: boolean
@@ -30,7 +30,7 @@ export function MinimumRecommended({
       ) : (
         <span className="text-xs space-x-1">
           <span title={value.toString()}>
-            {Big(value).toFixed(decimals)} {tokenSymbol}
+            {Number(value).toFixed(decimals)} {tokenSymbol}
           </span>
           <button
             className="text-xs underline"
