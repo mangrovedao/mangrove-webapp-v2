@@ -1,13 +1,13 @@
 import { create, type StateCreator } from "zustand"
 
-import { MergedOffer } from "../app/strategies/[address]/_utils/inventory"
+import { OfferParsed } from "@mangrovedao/mgv"
 
 type Store = {
-  hoveredOffer?: MergedOffer
+  hoveredOffer?: OfferParsed
 }
 
 type Actions = {
-  setHoveredOffer: (offer?: MergedOffer) => void
+  setHoveredOffer: (offer?: OfferParsed) => void
 }
 
 const stateCreator: StateCreator<Store & Actions> = (set, get) => ({
@@ -16,7 +16,7 @@ const stateCreator: StateCreator<Store & Actions> = (set, get) => ({
   /**
    * Actions
    */
-  setHoveredOffer: (offer?: MergedOffer) => {
+  setHoveredOffer: (offer?: OfferParsed) => {
     set({ hoveredOffer: offer })
   },
 })

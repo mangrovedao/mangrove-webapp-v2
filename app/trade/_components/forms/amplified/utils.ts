@@ -1,4 +1,4 @@
-import Mangrove from "@mangrovedao/mangrove.js"
+import { useMarkets } from "@/hooks/use-addresses"
 import { TimeToLiveUnit } from "./enums"
 
 function getNumberOfSeconds(timeToLiveUnit: `${TimeToLiveUnit}`) {
@@ -58,18 +58,20 @@ export function getFormattedTimeToLive(
 }
 
 export const getCurrentTokenPrice = (
-  tokenId: string,
-  openMarkets?: Mangrove.OpenMarketInfo[],
+  tokenAddress: string,
+  markets?: ReturnType<typeof useMarkets>,
 ) => {
-  const market = openMarkets?.find(
-    (market) => market.base.id === tokenId || market.quote.id === tokenId,
+  const market = markets?.find(
+    (market) =>
+      market.base.address === tokenAddress ||
+      market.quote.address === tokenAddress,
   )
   return market?.quote || market?.base
 }
 
 export const getCurrentTokenPriceFromAddress = (
   tokenAddress: string,
-  openMarkets?: Mangrove.OpenMarketInfo[],
+  openMarkets?: ReturnType<typeof useMarkets>,
 ) => {
   const market = openMarkets?.find(
     (market) =>

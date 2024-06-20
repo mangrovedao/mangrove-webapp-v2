@@ -1,27 +1,33 @@
 "use client"
-import Big from "big.js"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import React from "react"
-import { Address } from "viem"
+import { Address, formatUnits } from "viem"
 import { useAccount } from "wagmi"
 
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import { BA } from "@mangrovedao/mgv/lib"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
-import { getMergedOffers } from "../_utils/inventory"
 
 const useKandelStrategyContext = () => {
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()
+
+  //note: in case this context is used in strategy creation, get the market from the params
+  const searchParams = useSearchParams()
+  const marketParam = searchParams.get("market")
+  const [baseParam, quoteParam, tickSpacingParam] =
+    marketParam?.split(",") ?? ""
+
   const strategyQuery = useStrategy({
     strategyAddress: params.address,
   })
 
   const { data: baseToken } = useTokenFromAddress(
-    strategyQuery.data?.base as Address,
+    (strategyQuery.data?.base as Address) || baseParam,
   )
   const { data: quoteToken } = useTokenFromAddress(
-    strategyQuery.data?.quote as Address,
+    (strategyQuery.data?.quote as Address) || quoteParam,
   )
 
   const strategyStatusQuery = useStrategyStatus({
@@ -30,57 +36,31 @@ const useKandelStrategyContext = () => {
     quote: strategyQuery.data?.quote,
     offers: strategyQuery.data?.offers,
   })
+  const { kandelState } = strategyStatusQuery.data ?? {}
 
-  const mergedOffers = React.useMemo(() => {
-    const indexerOffers = strategyQuery.data?.offers
-    const sdkOffers = strategyStatusQuery.data?.offerStatuses
-    const market = strategyStatusQuery.data?.market
-    if (!(sdkOffers && indexerOffers && market)) return
-    // @ts-expect-error TODO: it's an error type from the indexer SDK
-    return getMergedOffers(sdkOffers, indexerOffers, market)
-  }, [
-    strategyQuery.dataUpdatedAt,
-    strategyStatusQuery.dataUpdatedAt,
-    strategyQuery.data?.offers,
-    strategyStatusQuery.data?.offerStatuses,
-    strategyStatusQuery.data?.market,
-  ])
+  const offers = [...(kandelState?.asks || []), ...(kandelState?.bids || [])]
 
-  const geometricKandelDistribution = React.useMemo(() => {
-    if (!mergedOffers) return
+  const filteredOffers = offers.filter((offer) => offer.gives > 0)
+  const formattedOffers = filteredOffers.map((item) => {
     return {
-      bids: mergedOffers?.length
-        ? mergedOffers
-            .filter((offer) => offer.offerType === "bids")
-            .map((offer) => ({
-              price: Big(offer.price ?? 0),
-              gives: Big(offer.gives ?? 0),
-              index: offer.index,
-              tick: Number(offer.tick),
-            }))
-        : [],
-      asks: mergedOffers?.length
-        ? mergedOffers
-            .filter((offer) => offer.offerType === "asks")
-            .map((offer) => ({
-              price: Big(offer.price ?? 0),
-              gives: Big(offer.gives ?? 0),
-              index: offer.index,
-              tick: Number(offer.tick),
-            }))
-        : [],
+      ...item,
+      formattedGives: formatUnits(
+        item.gives,
+        (item.ba === BA.asks ? baseToken?.decimals : quoteToken?.decimals) ||
+          18,
+      ),
     }
-  }, [mergedOffers])
+  })
 
   return {
     strategyQuery,
+    kandelState,
     strategyAddress: params.address,
     baseToken,
     quoteToken,
     blockExplorerUrl: chain?.blockExplorers?.default.url,
     strategyStatusQuery,
-    geometricKandelDistribution,
-    mergedOffers,
+    mergedOffers: formattedOffers,
   }
 }
 

@@ -57,7 +57,7 @@ export function getFormattedTimeToLive(
 }
 
 export const sourceIcons: { [key: string]: JSX.Element } = {
-  monoswap: (
+  MonoSwap: (
     <img
       src="/assets/liquiditySources/monoswap.webp"
       alt="monoswap-icon"
@@ -65,7 +65,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
       height="15"
     />
   ),
-  thruster: (
+  Thruster: (
     <img
       src="/assets/liquiditySources/thruster.svg"
       alt="thruster-icon"
@@ -73,7 +73,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
       height="24"
     />
   ),
-  pacFinance: (
+  PacFinance: (
     <img
       src="/assets/liquiditySources/pac.svg"
       alt="pac-finance-icon"
@@ -81,7 +81,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
       height="24"
     />
   ),
-  zeroLend: (
+  ZeroLend: (
     <img
       src="/assets/liquiditySources/zerolend.webp"
       alt="zero-lend-icon"
@@ -89,7 +89,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
       height="24"
     />
   ),
-  orbit: (
+  Orbit: (
     <img
       src="/assets/liquiditySources/orbit.webp"
       alt="orbit-icon"
@@ -97,7 +97,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
       height="24"
     />
   ),
-  aave: (
+  Aave: (
     <img
       src="/assets/liquiditySources/aave.svg"
       alt="aave-icon"
@@ -105,7 +105,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
       height="24"
     />
   ),
-  stargate: (
+  Stargate: (
     <img
       src="/assets/liquiditySources/stargate.svg"
       alt="stargate-icon"
@@ -113,7 +113,7 @@ export const sourceIcons: { [key: string]: JSX.Element } = {
       height="24"
     />
   ),
-  beefy: (
+  Beefy: (
     <img
       src="/assets/liquiditySources/beefy.svg"
       alt="beefy-icon"

@@ -1,33 +1,31 @@
 "use client"
-import { KandelStrategies } from "@mangrovedao/mangrove.js"
 import React from "react"
 
-import useMangrove from "../../../../providers/mangrove"
-import useMarket from "../../../../providers/market"
+import useMarket from "../../../../providers/market.new"
 
 const useKandelStrategiesContext = () => {
-  const { mangrove } = useMangrove()
-  const { market } = useMarket()
+  // const { mangrove } = useMangrove()
+  const { currentMarket: market } = useMarket()
 
-  const kandelStrategies = React.useMemo(() => {
-    if (!mangrove) return
-    return new KandelStrategies(mangrove)
-  }, [mangrove])
+  // const kandelStrategies = React.useMemo(() => {
+  //   if (!mangrove) return
+  //   return new KandelStrategies(mangrove)
+  // }, [mangrove])
 
-  const generator = React.useMemo(() => {
-    if (!kandelStrategies || !market) return
-    return kandelStrategies.generator(market)
-  }, [kandelStrategies, market])
+  // const generator = React.useMemo(() => {
+  //   if (!kandelStrategies || !market) return
+  //   return kandelStrategies.generator(market)
+  // }, [kandelStrategies, market])
 
-  const config = React.useMemo(() => {
-    if (!kandelStrategies || !market) return
-    return kandelStrategies.configuration.getConfig(market)
-  }, [kandelStrategies, market])
+  // const config = React.useMemo(() => {
+  //   if (!kandelStrategies || !market) return
+  //   return kandelStrategies.configuration.getConfig(market)
+  // }, [kandelStrategies, market])
 
   return {
-    kandelStrategies,
-    generator,
-    config,
+    // kandelStrategies,
+    // generator,
+    // config,
   }
 }
 

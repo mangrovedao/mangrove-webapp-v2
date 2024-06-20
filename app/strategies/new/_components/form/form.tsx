@@ -1,7 +1,6 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
-import useLiquiditySourcing from "@/app/strategies/(shared)/_hooks/use-liquidity-sourcing"
 import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
 import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
@@ -27,53 +26,35 @@ import useForm, { MIN_NUMBER_OF_OFFERS, MIN_STEP_SIZE } from "./use-form"
 
 export function Form({ className }: { className?: string }) {
   const {
-    address,
     baseToken,
     quoteToken,
-    requiredBase,
-    requiredQuote,
-    requiredBounty,
+    minBaseAmount,
+    minQuoteAmount,
+    minProvision,
     baseDeposit,
     quoteDeposit,
     fieldsDisabled,
     errors,
-    kandelRequirementsQuery,
+    isValid,
     isChangingFrom,
     numberOfOffers,
     stepSize,
     nativeBalance,
+    logics,
     bountyDeposit,
     sendFrom,
     receiveTo,
-    mangroveLogics,
+    handleReceiveToChange,
+    handleSendFromChange,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,
     handleStepSizeChange,
     handleBountyDepositChange,
-    handleSendFromChange,
-    handleReceiveToChange,
   } = useForm()
-
-  const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
-    useLiquiditySourcing({
-      sendToken: baseToken,
-      sendFrom,
-      receiveTo,
-      receiveToken: quoteToken,
-      fundOwner: address,
-      mangroveLogics,
-    })
 
   const { formatted: baseTokenBalance } = useTokenBalance(baseToken)
   const { formatted: quoteTokenBalance } = useTokenBalance(quoteToken)
-
-  const baseBalance = sendFromBalance
-    ? sendFromBalance.formatted
-    : baseTokenBalance
-  const quoteBalance = receiveToBalance
-    ? receiveToBalance.formatted
-    : quoteTokenBalance
 
   if (!baseToken || !quoteToken)
     return (
@@ -89,7 +70,11 @@ export function Form({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      {/* <Fieldset legend="Liquidity sourcing">
+      <Fieldset legend="Select market">
+        <MarketSelector />
+      </Fieldset>
+
+      <Fieldset legend="Liquidity sourcing">
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
             <Label className="flex items-center">
@@ -105,22 +90,27 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleSendFromChange(value)
               }}
+              disabled={fieldsDisabled}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {sendFromLogics?.map(
+                  <SelectItem key={"simple"} value={"simple"}>
+                    <div className="flex gap-2 w-full items-center">
+                      <SourceIcon sourceId={"simple"} />
+                      <Caption className="capitalize">{"Wallet"}</Caption>
+                    </div>
+                  </SelectItem>
+                  {logics?.map(
                     (logic) =>
                       logic && (
-                        <SelectItem key={logic.id} value={logic.id}>
+                        <SelectItem key={logic.name} value={logic.name}>
                           <div className="flex gap-2 w-full items-center">
-                            <SourceIcon sourceId={logic.id} />
+                            <SourceIcon sourceId={logic.name} />
                             <Caption className="capitalize">
-                              {logic.id.includes("simple")
-                                ? "Wallet"
-                                : logic.id}
+                              {logic.name}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -147,22 +137,27 @@ export function Form({ className }: { className?: string }) {
               onValueChange={(value: string) => {
                 handleReceiveToChange(value)
               }}
+              disabled={fieldsDisabled}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {receiveToLogics?.map(
+                  <SelectItem key={"simple"} value={"simple"}>
+                    <div className="flex gap-2 w-full items-center">
+                      <SourceIcon sourceId={"simple"} />
+                      <Caption className="capitalize">{"Wallet"}</Caption>
+                    </div>
+                  </SelectItem>
+                  {logics?.map(
                     (logic) =>
                       logic && (
-                        <SelectItem key={logic.id} value={logic.id}>
+                        <SelectItem key={logic.name} value={logic.name}>
                           <div className="flex gap-2 w-full items-center">
-                            <SourceIcon sourceId={logic.id} />
+                            <SourceIcon sourceId={logic.name} />
                             <Caption className="capitalize">
-                              {logic.id.includes("simple")
-                                ? "Wallet"
-                                : logic.id}
+                              {logic.name}
                             </Caption>
                           </div>
                         </SelectItem>
@@ -173,10 +168,6 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
-      </Fieldset> */}
-
-      <Fieldset legend="Select market">
-        <MarketSelector />
       </Fieldset>
 
       <Fieldset className="space-y-4" legend="Set initial inventory">
@@ -191,22 +182,20 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={baseToken}
-            value={requiredBase?.toFixed(baseToken.decimals)}
+            value={Number(minBaseAmount || 0)?.toFixed(baseToken.decimals)}
             action={{
               onClick: () =>
-                requiredBase &&
-                handleBaseDepositChange(requiredBase.toString()),
+                minBaseAmount &&
+                handleBaseDepositChange(minBaseAmount.toString()),
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={fieldsDisabled}
           />
 
           <CustomBalance
             label="Wallet balance"
             token={baseToken}
-            balance={baseBalance}
+            balance={baseTokenBalance}
             action={{
               onClick: handleBaseDepositChange,
               text: "MAX",
@@ -225,22 +214,20 @@ export function Form({ className }: { className?: string }) {
 
           <MinimumRecommended
             token={quoteToken}
-            value={requiredQuote?.toFixed(quoteToken.decimals)}
+            value={Number(minQuoteAmount || 0)?.toFixed(quoteToken.decimals)}
             action={{
               onClick: () =>
-                requiredQuote &&
-                handleQuoteDepositChange(requiredQuote.toString()),
+                minQuoteAmount &&
+                handleQuoteDepositChange(minQuoteAmount.toString()),
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={fieldsDisabled}
           />
 
           <CustomBalance
             label="Wallet balance"
             token={quoteToken}
-            balance={quoteBalance}
+            balance={quoteTokenBalance}
             action={{
               onClick: handleQuoteDepositChange,
               text: "MAX",
@@ -291,14 +278,12 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={nativeBalance?.symbol}
-            value={requiredBounty}
+            value={minProvision?.toString()}
             action={{
               onClick: handleBountyDepositChange,
               text: "Update",
             }}
-            loading={
-              kandelRequirementsQuery.status !== "success" || fieldsDisabled
-            }
+            loading={fieldsDisabled}
           />
 
           <TokenBalance

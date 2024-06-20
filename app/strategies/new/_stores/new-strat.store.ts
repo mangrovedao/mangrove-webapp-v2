@@ -1,9 +1,5 @@
-import { GeometricKandelDistribution } from "@mangrovedao/mangrove.js"
+import { Distribution, KandelParams } from "@mangrovedao/mgv"
 import { create, type StateCreator } from "zustand"
-
-type OffersWithPrices = ReturnType<
-  typeof GeometricKandelDistribution.prototype.getOffersWithPrices
->
 
 export type ChangingFrom =
   | "minPrice"
@@ -32,13 +28,13 @@ export type NewStratStore = {
   receiveTo: string
 
   priceRange: [string, string]
-  offersWithPrices?: OffersWithPrices
 
   isChangingFrom: ChangingFrom
   globalError?: string
   errors: Record<string, string>
 
-  distribution?: GeometricKandelDistribution
+  distribution?: Distribution
+  kandelParams?: KandelParams
 }
 
 type NewStratActions = {
@@ -51,13 +47,13 @@ type NewStratActions = {
   setReceiveTo: (source: string) => void
 
   setPriceRange: (min: string, max: string) => void
-  setOffersWithPrices: (offersWithPrices?: OffersWithPrices) => void
 
   setGlobalError: (error?: string) => void
   setErrors: (errors: Record<string, string>) => void
   setIsChangingFrom: (isChangingFrom: ChangingFrom) => void
 
-  setDistribution: (distribution?: GeometricKandelDistribution) => void
+  setDistribution: (distribution?: Distribution) => void
+  setKandelParams: (params?: KandelParams) => void
 }
 
 const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
@@ -73,13 +69,13 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   receiveTo: "simple",
 
   priceRange: ["", ""],
-  offersWithPrices: undefined,
 
   isChangingFrom: null,
   globalError: undefined,
   errors: {},
 
   distribution: undefined,
+  kandelParams: undefined,
 
   setBaseDeposit: (baseDeposit) => set({ baseDeposit }),
   setQuoteDeposit: (quoteDeposit) => set({ quoteDeposit }),
@@ -91,12 +87,12 @@ const newStratStateCreator: StateCreator<NewStratStore & NewStratActions> = (
   setReceiveTo: (receiveTo) => set({ receiveTo }),
 
   setPriceRange: (min, max) => set({ priceRange: [min, max] }),
-  setOffersWithPrices: (offersWithPrices) => set({ offersWithPrices }),
 
   setGlobalError: (globalError) => set({ globalError }),
   setErrors: (errors) => set({ errors }),
   setIsChangingFrom: (isChangingFrom) => set({ isChangingFrom }),
   setDistribution: (distribution) => set({ distribution }),
+  setKandelParams: (kandelParams) => set({ kandelParams }),
 })
 
 export const useNewStratStore = create(newStratStateCreator)

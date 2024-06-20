@@ -1,5 +1,6 @@
 "use client"
 
+import { OfferParsed } from "@mangrovedao/mgv"
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -8,17 +9,18 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
+import { formatUnits } from "viem"
 
 import { StatusBadge } from "@/app/strategies/new/_components/price-range/components/price-chart/merged-offer-tooltip"
 import { cn } from "@/utils"
+import { BA, inboundFromOutbound } from "@mangrovedao/mgv/lib"
 import useKandel from "../../../_providers/kandel-strategy"
-import { MergedOffer, MergedOffers } from "../../../_utils/inventory"
 
-const columnHelper = createColumnHelper<MergedOffer>()
-const DEFAULT_DATA: MergedOffers = []
+const columnHelper = createColumnHelper<OfferParsed>()
+const DEFAULT_DATA: OfferParsed[] = []
 
 type Params = {
-  data?: MergedOffers
+  data?: OfferParsed[]
 }
 
 export function useOffersTable({ data }: Params) {
@@ -26,10 +28,11 @@ export function useOffersTable({ data }: Params) {
   const market = strategyStatusQuery.data?.market
   const columns = React.useMemo(
     () => [
-      columnHelper.accessor("offerType", {
+      columnHelper.accessor("ba", {
         header: "Side",
-        cell: (row) => {
-          const isBid = row.getValue() === "bids"
+        cell: ({ row }) => {
+          const { ba } = row.original
+          const isBid = ba === BA.bids
           return (
             <div
               className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
@@ -46,7 +49,7 @@ export function useOffersTable({ data }: Params) {
           const { price } = row.original
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(price).toFixed(market?.quote.displayedDecimals)}{" "}
+              {Number(price).toFixed(market?.quote.displayDecimals)}{" "}
               {market?.quote.symbol}
             </div>
           )
@@ -58,10 +61,14 @@ export function useOffersTable({ data }: Params) {
           <div className="flex justify-end text-right items-center">Base</div>
         ),
         cell: ({ row }) => {
-          const { base } = row.original
+          const { gives, tick, ba } = row.original
+          const wants = inboundFromOutbound(tick, gives)
+          const base = ba === BA.bids ? wants : gives
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(base).toFixed(market?.base.displayedDecimals)}{" "}
+              {Number(formatUnits(base, market?.base.decimals || 18)).toFixed(
+                market?.base.displayDecimals,
+              )}{" "}
               {market?.base.symbol}
             </div>
           )
@@ -73,23 +80,28 @@ export function useOffersTable({ data }: Params) {
           <div className="flex justify-end text-right items-center">Quote</div>
         ),
         cell: ({ row }) => {
-          const { quote } = row.original
+          const { gives, tick, ba } = row.original
+          const wants = inboundFromOutbound(tick, gives)
+          const quote = ba === BA.bids ? gives : wants
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(quote).toFixed(market?.quote.displayedDecimals)}{" "}
+              {Number(formatUnits(quote, market?.base.decimals || 18)).toFixed(
+                market?.quote.displayDecimals,
+              )}{" "}
               {market?.quote.symbol}
             </div>
           )
         },
       }),
-      columnHelper.accessor("live", {
+      columnHelper.accessor("gives", {
         id: "status",
         header: () => <div className="text-right">Status</div>,
-        cell: (row) => {
-          const isLive = row.getValue()
+        cell: ({ row }) => {
+          const { gives } = row.original
+
           return (
             <div className="w-full h-full flex justify-end">
-              <StatusBadge isLive={isLive} />
+              <StatusBadge isLive={gives > 0} />
             </div>
           )
         },

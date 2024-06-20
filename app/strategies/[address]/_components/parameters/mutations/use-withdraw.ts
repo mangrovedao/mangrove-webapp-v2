@@ -1,13 +1,13 @@
-import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 export function useWithDraw({
-  stratInstance,
+  kandelInstance,
 
   volumes,
 }: {
-  stratInstance?: GeometricKandelInstance
+  kandelInstance?: ReturnType<typeof useKandelInstance>
   volumes: { baseAmount: string; quoteAmount: string }
 }) {
   const queryClient = useQueryClient()
@@ -15,21 +15,21 @@ export function useWithDraw({
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!stratInstance) {
+        if (!kandelInstance) {
           throw new Error("Strategy Instance could not be fetched")
         }
 
         const { baseAmount, quoteAmount } = volumes
 
-        const res = await (
-          await stratInstance.withdraw({
-            baseAmount,
-            quoteAmount,
-          })
-        ).wait()
+        // const res = await (
+        //   await kandelInstance.withdraw({
+        //     baseAmount,
+        //     quoteAmount,
+        //   })
+        // ).wait()
 
         toast.success("Withdraw completed")
-        return res.blockNumber
+        // return res.blockNumber
       } catch (err) {
         console.error(err)
         toast.error("Failed to withdraw")

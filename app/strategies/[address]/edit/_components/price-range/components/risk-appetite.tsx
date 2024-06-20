@@ -40,7 +40,7 @@ export function RiskAppetiteBadge({ value }: { value?: RiskAppetite }) {
           <Skeleton className="h-7 w-20" />
         ) : (
           <Title variant={"title1"} className="capitalize">
-            {value}
+            {/* {value} */} Medium
           </Title>
         )}
       </span>

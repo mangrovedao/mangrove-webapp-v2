@@ -1,6 +1,6 @@
-import Big from "big.js"
+import { BS, Order } from "@mangrovedao/mgv/lib"
 import React from "react"
-import { useAccount } from "wagmi"
+import { formatUnits } from "viem"
 
 import {
   CustomRadioGroup,
@@ -21,15 +21,13 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
-import { MarketDetails } from "../components/market-details"
-import { TradeAction } from "../enums"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./hooks/use-limit"
-import liquiditySourcing from "./hooks/use-liquidity-sourcing"
 import type { Form } from "./types"
 import { isGreaterThanZeroValidator, sendVolumeValidator } from "./validators"
 
@@ -37,52 +35,35 @@ const sliderValues = [25, 50, 75, 100]
 
 export function Limit() {
   const [formData, setFormData] = React.useState<Form>()
+  const { currentMarket } = useMarket()
   const {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
-    receiveTokenBalance,
     handleSubmit,
     form,
-    quoteToken,
-    market,
     sendToken,
     receiveToken,
-    tickSize,
-    feeInPercentageAsString,
+    quoteToken,
     timeInForce,
     send,
-    sendFrom,
-    receiveTo,
-    spotPrice,
-    logics,
-    selectedSource,
     minVolume,
+    sendLogics,
+    receiveLogics,
+    sendTokenBalanceFormatted,
+    receiveTokenBalanceFormatted,
+    minVolumeFormatted,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
   })
 
-  const { address } = useAccount()
-
-  const { sendFromLogics, receiveToLogics, sendFromBalance, receiveToBalance } =
-    liquiditySourcing({
-      sendToken,
-      sendFrom,
-      receiveTo,
-      receiveToken,
-      fundOwner: address,
-      logics,
-    })
-
-  const currentBalance = sendFromBalance ? sendFromBalance : sendTokenBalance
-
-  const currentReceiveBalance = receiveToBalance
-    ? receiveToBalance
-    : receiveTokenBalance
-
   const handleSliderChange = (value: number) => {
-    const amount = (value * Number(currentBalance.formatted)) / 100
-    form.setFieldValue("send", amount.toString())
+    if (!sendTokenBalance) return
+    const amount = (BigInt(value * 100) * sendTokenBalance.balance) / 10_000n
+    form.setFieldValue(
+      "send",
+      formatUnits(amount, sendTokenBalance.token.decimals),
+    )
     form.validateAllFields("change")
     if (!form.state.values.limitPrice) {
       form.setFieldValue("receive", "")
@@ -91,43 +72,40 @@ export function Limit() {
     computeReceiveAmount()
   }
 
-  const sendTokenBalanceAsBig = currentBalance.formatted
-    ? Big(Number(currentBalance.formatted))
-    : Big(0)
-
   const sliderValue = Math.min(
-    Big(!isNaN(Number(send)) ? Number(send) : 0)
-      .mul(100)
-      .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
-      .toNumber(),
+    Number(send) /
+      (sendTokenBalance
+        ? Number(
+            formatUnits(
+              sendTokenBalance?.balance,
+              sendTokenBalance?.token.decimals,
+            ),
+          )
+        : 1),
     100,
   ).toFixed(0)
-
-  const sendVolume = minVolume.ask.volume
 
   return (
     <>
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <form.Field name="tradeAction">
+          <form.Field name="bs">
             {(field) => (
               <CustomRadioGroup
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onValueChange={(e: TradeAction) => {
+                onValueChange={(e: BS) => {
                   field.handleChange(e)
                   computeReceiveAmount()
                 }}
               >
-                {Object.values(TradeAction).map((action) => (
+                {Object.values(BS).map((action) => (
                   <CustomRadioGroupItem
                     key={action}
                     value={action}
                     id={action}
-                    variant={
-                      action === TradeAction.SELL ? "secondary" : "primary"
-                    }
+                    variant={action === BS.sell ? "secondary" : "primary"}
                     className="capitalize"
                   >
                     {action}
@@ -150,7 +128,7 @@ export function Limit() {
                   }}
                   token={quoteToken}
                   label="Limit price"
-                  disabled={!market}
+                  disabled={!currentMarket}
                   error={field.state.meta.errors}
                 />
               )}
@@ -172,28 +150,36 @@ export function Limit() {
                       onValueChange={(value: string) => {
                         field.handleChange(value)
                       }}
-                      disabled={!market}
+                      disabled={!currentMarket}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {sendFromLogics?.map(
+                          {sendLogics?.map(
                             (source) =>
                               source && (
-                                <SelectItem key={source.id} value={source.id}>
+                                <SelectItem
+                                  key={source.logic.name}
+                                  value={source.logic.name}
+                                >
                                   <div className="flex gap-2 w-full items-center">
-                                    <SourceIcon sourceId={source.id} />
+                                    <SourceIcon sourceId={source.logic.name} />
                                     <Caption className="capitalize">
-                                      {source.id.includes("simple")
-                                        ? "Wallet"
-                                        : source.id.toUpperCase()}
+                                      {source.logic.name.toUpperCase()}
                                     </Caption>
                                   </div>
                                 </SelectItem>
                               ),
                           )}
+                          {/* Wallet */}
+                          <SelectItem key="simple" value="simple">
+                            <div className="flex gap-2 w-full items-center">
+                              <SourceIcon sourceId={"simple"} />
+                              <Caption className="capitalize">Wallet</Caption>
+                            </div>
+                          </SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -223,28 +209,36 @@ export function Limit() {
                       onValueChange={(value: string) => {
                         field.handleChange(value)
                       }}
-                      disabled={!market}
+                      disabled={!currentMarket}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {receiveToLogics?.map(
+                          {receiveLogics?.map(
                             (source) =>
                               source && (
-                                <SelectItem key={source.id} value={source.id}>
+                                <SelectItem
+                                  key={source.logic.name}
+                                  value={source.logic.name}
+                                >
                                   <div className="flex gap-2 w-full items-center">
-                                    <SourceIcon sourceId={source.id} />
+                                    <SourceIcon sourceId={source.logic.name} />
                                     <Caption className="capitalize">
-                                      {source.id.includes("simple")
-                                        ? "Wallet"
-                                        : source.id.toUpperCase()}
+                                      {source.logic.name.toUpperCase()}
                                     </Caption>
                                   </div>
                                 </SelectItem>
                               ),
                           )}
+                          {/* Wallet */}
+                          <SelectItem key="simple" value="simple">
+                            <div className="flex gap-2 w-full items-center">
+                              <SourceIcon sourceId={"simple"} />
+                              <Caption className="capitalize">Wallet</Caption>
+                            </div>
+                          </SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -255,8 +249,18 @@ export function Limit() {
             <form.Field
               name="send"
               onChange={sendVolumeValidator(
-                Number(currentBalance.formatted ?? 0),
-                Number(sendVolume ?? 0),
+                Number(
+                  formatUnits(
+                    sendTokenBalance?.balance || 0n,
+                    sendTokenBalance?.token.decimals || 18,
+                  ),
+                ),
+                Number(
+                  formatUnits(
+                    minVolume ?? 0n,
+                    sendTokenBalance?.token.decimals || 18,
+                  ),
+                ),
               )}
             >
               {(field) => (
@@ -268,23 +272,26 @@ export function Limit() {
                     field.handleChange(value)
                     computeReceiveAmount()
                   }}
-                  minimumVolume={sendVolume}
+                  minimumVolume={formatUnits(
+                    minVolume,
+                    sendToken?.decimals || 18,
+                  )}
                   volumeAction={{
                     onClick: () => {
-                      field.handleChange(sendVolume || "0"),
+                      field.handleChange(minVolumeFormatted),
                         computeReceiveAmount()
                     },
                   }}
                   balanceAction={{
                     onClick: () => {
-                      field.handleChange(currentBalance.formatted || "0"),
+                      field.handleChange(sendTokenBalanceFormatted),
                         computeReceiveAmount()
                     },
                   }}
                   token={sendToken}
-                  customBalance={currentBalance.formatted}
+                  customBalance={sendTokenBalanceFormatted}
                   label="Send amount"
-                  disabled={!market || currentBalance.formatted === "0"}
+                  disabled={!currentMarket || sendTokenBalanceFormatted === "0"}
                   showBalance
                   error={field.state.meta.touchedErrors}
                 />
@@ -303,10 +310,10 @@ export function Limit() {
                   }}
                   token={receiveToken}
                   label="Receive amount"
-                  disabled={!(market && form.state.isFormValid)}
+                  disabled={!(currentMarket && form.state.isFormValid)}
                   error={field.state.meta.touchedErrors}
                   showBalance
-                  customBalance={currentReceiveBalance.formatted}
+                  customBalance={receiveTokenBalanceFormatted}
                 />
               )}
             </form.Field>
@@ -322,7 +329,7 @@ export function Limit() {
                 onValueChange={([value]) => {
                   handleSliderChange(Number(value))
                 }}
-                disabled={!(market && form.state.isFormValid)}
+                disabled={!(currentMarket && form.state.isFormValid)}
               />
               <div className="flex justify-center space-x-3">
                 {sliderValues.map((value) => (
@@ -337,7 +344,7 @@ export function Limit() {
                       e.preventDefault()
                       handleSliderChange(Number(value))
                     }}
-                    disabled={!market}
+                    disabled={!currentMarket}
                   >
                     {value}%
                   </Button>
@@ -347,26 +354,29 @@ export function Limit() {
             <Separator className="!my-6" />
 
             <Accordion title="Advanced">
-              <form.Field name="timeInForce">
+              <form.Field name="orderType">
                 {(field) => {
                   return (
                     <div className="grid text-md space-y-2">
                       <Label>Time in force</Label>
                       <Select
                         name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: TimeInForce) => {
-                          field.handleChange(value)
+                        value={field.state.value.toString()}
+                        onValueChange={(value) => {
+                          field.handleChange(Number(value))
                         }}
-                        disabled={!market}
+                        disabled={!currentMarket}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select time in force" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {Object.values(TimeInForce).map((timeInForce) => (
-                              <SelectItem key={timeInForce} value={timeInForce}>
+                            {Object.values(Order).map((timeInForce) => (
+                              <SelectItem
+                                key={timeInForce}
+                                value={timeInForce.toString()}
+                              >
                                 {timeInForce}
                               </SelectItem>
                             ))}
@@ -397,7 +407,7 @@ export function Limit() {
                         if (!value) return
                         field.handleChange(value)
                       }}
-                      disabled={!(market && form.state.isFormValid)}
+                      disabled={!(currentMarket && form.state.isFormValid)}
                       error={field.state.meta.touchedErrors}
                     />
                   )}
@@ -411,7 +421,7 @@ export function Limit() {
                       onValueChange={(value: TimeToLiveUnit) => {
                         field.handleChange(value)
                       }}
-                      disabled={!market}
+                      disabled={!currentMarket}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select time unit" />
@@ -438,18 +448,18 @@ export function Limit() {
 
             <Separator className="!my-6" />
 
-            <MarketDetails
+            {/* <MarketDetails
               minVolume={minVolume}
               takerFee={feeInPercentageAsString}
               tickSize={tickSize}
               spotPrice={spotPrice}
-            />
+            /> */}
 
             <form.Subscribe
               selector={(state) => [
                 state.canSubmit,
                 state.isSubmitting,
-                state.values.tradeAction,
+                state.values.bs,
               ]}
             >
               {([canSubmit, isSubmitting, tradeAction]) => {
@@ -457,7 +467,7 @@ export function Limit() {
                   <Button
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
-                    disabled={!canSubmit || !market}
+                    disabled={!canSubmit || !currentMarket}
                     rightIcon
                     loading={!!isSubmitting}
                   >
@@ -472,7 +482,7 @@ export function Limit() {
 
       {formData && (
         <FromWalletLimitOrderDialog
-          form={{ ...formData, selectedSource: selectedSource, minVolume }}
+          form={{ ...formData, minVolume: minVolumeFormatted }}
           onClose={() => setFormData(undefined)}
         />
       )}

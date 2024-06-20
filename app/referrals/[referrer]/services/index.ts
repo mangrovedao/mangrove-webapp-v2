@@ -21,6 +21,7 @@ export function useSignReferral() {
         return
 
       return walletClient.signTypedData({
+        account: referee,
         domain,
         types,
         primaryType: "Referral",

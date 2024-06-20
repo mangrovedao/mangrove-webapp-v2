@@ -3,20 +3,20 @@ import React from "react"
 import RefillOfferDialog from "@/app/strategies/(shared)/_components/refill-dialog"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { useHoveredOfferStore } from "@/stores/hovered-offer.store"
+import { OfferParsed } from "@mangrovedao/mgv"
 import useKandel from "../../../_providers/kandel-strategy"
-import { MergedOffer, type MergedOffers } from "../../../_utils/inventory"
 import { useOffersTable } from "./use-offers-table"
 
 export default function OffersTable() {
   const [refillOffer, setRefillOffer] = React.useState<
-    MergedOffer | undefined
+    (OfferParsed & { formattedGives: string }) | undefined
   >()
 
   const { mergedOffers, strategyQuery, strategyStatusQuery } = useKandel()
   const { hoveredOffer, setHoveredOffer } = useHoveredOfferStore()
 
   const table = useOffersTable({
-    data: mergedOffers as MergedOffers,
+    data: mergedOffers,
   })
 
   const isLoading = strategyQuery.isLoading || strategyStatusQuery.isLoading
@@ -29,10 +29,9 @@ export default function OffersTable() {
         isLoading={isLoading}
         isError={isError}
         isRowHighlighted={(offer) =>
-          offer.offerId === hoveredOffer?.offerId &&
-          offer.offerType === hoveredOffer?.offerType
+          offer.id === hoveredOffer?.id && offer.ba === hoveredOffer?.ba
         }
-        onRowHover={(offer) => setHoveredOffer(offer as MergedOffer)}
+        onRowHover={(offer) => setHoveredOffer(offer as OfferParsed)}
         // renderExtraRow={(row) => {
         //   if (row.original.live) return null
         //   return <RefillRow row={row} openRefill={setRefillOffer} />

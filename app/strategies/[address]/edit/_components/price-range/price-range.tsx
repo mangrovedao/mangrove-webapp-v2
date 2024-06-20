@@ -2,13 +2,11 @@
 import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
-import { Address } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
-import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMarket from "@/providers/market"
+
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
@@ -17,8 +15,10 @@ import {
   ChangingFrom,
   useNewStratStore,
 } from "../../../../new/_stores/new-strat.store"
+import { useKandelBook } from "../../../_hooks/use-kandel-book"
 import useKandel from "../../../_providers/kandel-strategy"
 import EditStrategyDialog from "../edit-strategy-dialog"
+import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
 
@@ -27,17 +27,17 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
-  const { mergedOffers, strategyQuery } = useKandel()
-
-  const { data: baseToken } = useTokenFromAddress(
-    market?.base.address as Address,
-  )
-  const { data: quoteToken } = useTokenFromAddress(
-    market?.quote.address as Address,
-  )
-
-  const priceDecimals = market?.quote.decimals
+  const { book, isLoading } = useKandelBook()
+  const midPrice = book?.midPrice
+  const {
+    mergedOffers,
+    strategyQuery,
+    strategyStatusQuery,
+    baseToken,
+    quoteToken,
+    kandelState,
+  } = useKandel()
+  const priceDecimals = quoteToken?.decimals
 
   const [summaryDialog, setSummaryDialog] = React.useState(false)
   const [minPrice, setMinPrice] = React.useState("")
@@ -51,15 +51,14 @@ export const PriceRange = withClientOnly(function ({
     bountyDeposit,
     stepSize,
     numberOfOffers,
-    distribution,
-    offersWithPrices,
+    kandelParams,
     globalError,
     errors,
     isChangingFrom,
     sendFrom,
     receiveTo,
+    distribution,
     setPriceRange,
-    setOffersWithPrices,
     setErrors,
     setIsChangingFrom,
   } = useNewStratStore()
@@ -71,18 +70,24 @@ export const PriceRange = withClientOnly(function ({
     !maxPrice ||
     !stepSize ||
     !numberOfOffers ||
-    !distribution
+    !kandelParams
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
-  const hasLiveOffers = mergedOffers?.some((x) => x.live)
+  const hasLiveOffers = mergedOffers?.some((x) => x.gives > 0)
 
   React.useEffect(() => {
-    if (strategyQuery.data?.offers.some((x) => x.live)) {
-      setMinPrice(strategyQuery.data?.min || "0")
-      setMaxPrice(strategyQuery.data?.max || "0")
-    }
-  }, [strategyQuery.data?.max, strategyQuery.data?.min])
+    setMinPrice(
+      strategyStatusQuery.data?.minPrice.toFixed(priceDecimals) || "0",
+    )
+    setMaxPrice(
+      strategyStatusQuery.data?.maxPrice.toFixed(priceDecimals) || "0",
+    )
+  }, [
+    strategyQuery.data?.offers,
+    strategyStatusQuery.data?.minPrice,
+    strategyStatusQuery.data?.maxPrice,
+  ])
 
   React.useEffect(() => {
     if (isChangingFrom !== "minPercentage" && minPrice && midPrice) {
@@ -215,7 +220,6 @@ export const PriceRange = withClientOnly(function ({
   )
 
   React.useEffect(() => {
-    if (offersWithPrices) setOffersWithPrices(undefined)
     if (!minPrice || !maxPrice) return
     debouncedSetPriceRange(minPrice, maxPrice)
   }, [minPrice, maxPrice])
@@ -226,33 +230,33 @@ export const PriceRange = withClientOnly(function ({
         <div className="flex justify-between items-center px-6 pb-8">
           {/* <UnrealizedPnl pnl={currentParameter.pnlQuote} /> */}
           {/* <AverageReturn /> */}
-          <RiskAppetiteBadge value={riskAppetite} />
-          {/* <LiquiditySource /> */}
+          <RiskAppetiteBadge value={"-"} />
+          <LiquiditySource />
         </div>
       </div>
 
       {/* CHART */}
       <div className="px-6 space-y-6">
         <PriceRangeChart
-          bids={requestBookQuery.data?.bids}
-          asks={requestBookQuery.data?.asks}
+          bids={book?.bids}
+          asks={book?.asks}
           onPriceRangeChange={handleOnPriceRangeChange}
           priceRange={priceRange}
           initialMidPrice={midPrice}
-          isLoading={requestBookQuery.status === "pending"}
-          geometricKandelDistribution={offersWithPrices}
+          isLoading={isLoading}
+          geometricKandelDistribution={distribution}
           baseToken={baseToken}
           quoteToken={quoteToken}
         />
 
         <div className="gap-6 xl:gap-4 flex flex-col xl:flex-row w-full justify-center items-start border-b pb-6 mb-6">
-          {market?.quote && (
+          {quoteToken && (
             <div className="flex space-x-4 xl:flex-1 w-full">
               <EnhancedNumericInput
                 label="Min Price"
                 value={minPrice}
                 onChange={handleMinPriceChange}
-                token={market.quote}
+                token={quoteToken}
                 className="w-full"
                 error={
                   isChangingFrom === "minPrice" ? errors.minPrice : undefined
@@ -275,13 +279,13 @@ export const PriceRange = withClientOnly(function ({
           <div className="h-20 w-4 xl:flex items-center hidden">
             <span className="h-px w-4 bg-cloud-400"></span>
           </div>
-          {market?.quote && (
+          {quoteToken && (
             <div className="flex space-x-4 xl:flex-1 w-full">
               <EnhancedNumericInput
                 label="Max Price"
                 value={maxPrice}
                 onChange={handleMaxPriceChange}
-                token={market.quote}
+                token={quoteToken}
                 className="w-full"
                 error={
                   isChangingFrom === "maxPrice" ? errors.minPrice : undefined
@@ -332,8 +336,8 @@ export const PriceRange = withClientOnly(function ({
         </div>
         <EditStrategyDialog
           strategy={{
-            riskAppetite,
-            distribution,
+            riskAppetite: "-",
+            kandelParams,
             baseDeposit,
             quoteDeposit,
             priceRange,

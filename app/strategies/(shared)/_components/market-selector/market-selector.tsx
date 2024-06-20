@@ -1,5 +1,7 @@
 "use client"
-import type { Mangrove } from "@mangrovedao/mangrove.js"
+import { MarketParams } from "@mangrovedao/mgv"
+import { useRouter } from "next/navigation"
+import { Address } from "viem"
 import { useAccount } from "wagmi"
 
 import { TokenIcon } from "@/components/token-icon"
@@ -10,56 +12,64 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
-import { useRouter } from "next/navigation"
+import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import useMarket from "@/providers/market.new"
 
-function getSymbol(market?: Mangrove.OpenMarketInfo) {
+function getSymbol(market?: MarketParams) {
   if (!market) return
   return `${market?.base?.symbol}/${market?.quote?.symbol}`
 }
 
-function getValue(market: Mangrove.OpenMarketInfo) {
+function getValue(market: MarketParams) {
   return `${market.base.address}/${market.quote.address}`
 }
 
 export default function MarketSelector({ disabled }: { disabled?: boolean }) {
   const router = useRouter()
-  const { marketsInfoQuery } = useMangrove()
-  const { marketInfo } = useMarket()
+  const { currentMarket, markets } = useMarket()
   const { isConnected } = useAccount()
+  // note-SDK: add token id in currentMarket tokens
+  const { isLoading: baseLoading, data: baseToken } = useTokenFromAddress(
+    currentMarket?.base.address || ("" as Address),
+  )
+  const { isLoading: quoteLoading, data: quoteToken } = useTokenFromAddress(
+    currentMarket?.base.address || ("" as Address),
+  )
 
   const onValueChange = (value: string) => {
-    const [baseAddress, quoteAddress] = value.split("/")
-    const marketInfo = marketsInfoQuery.data?.find(
-      ({ base, quote }) =>
-        base.address === baseAddress && quote.address === quoteAddress,
+    const urlInfo = value.split("/")
+    router.push(
+      `?market=${urlInfo[0]},${urlInfo[1]},${currentMarket?.tickSpacing}`,
+      {
+        scroll: false,
+      },
     )
-    router.push(`?market=${marketInfo?.base.id},${marketInfo?.quote.id}`, {
-      scroll: false,
-    })
   }
 
   return (
     <Select
       value={
-        marketInfo
-          ? `${marketInfo?.base.address}/${marketInfo?.quote.address}`
+        currentMarket
+          ? `${currentMarket?.base.address}/${currentMarket?.quote.address}`
           : undefined
       }
       onValueChange={onValueChange}
       disabled={
-        marketsInfoQuery.isLoading || !marketInfo || !isConnected || disabled
+        quoteLoading ||
+        baseLoading ||
+        !currentMarket ||
+        !isConnected ||
+        disabled
       }
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
         <SelectValue
-          placeholder={!marketInfo ? "Select a market" : "No markets"}
+          placeholder={!currentMarket ? "Select a market" : "No markets"}
           suppressHydrationWarning
         />
       </SelectTrigger>
       <SelectContent>
-        {marketsInfoQuery.data?.map((m) => (
+        {markets?.map((m) => (
           <SelectItem
             key={`${m.base.address}/${m.quote.address}`}
             value={getValue(m)}

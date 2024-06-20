@@ -1,4 +1,5 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
+
 import { useAccount, useBalance } from "wagmi"
 
 export function useTokenBalance(token?: Token) {
@@ -14,7 +15,7 @@ export function useTokenBalance(token?: Token) {
     formattedWithSymbol:
       data &&
       `${Number(data?.formatted).toFixed(
-        token?.displayedDecimals ?? 6,
+        token?.displayDecimals ?? 6,
       )} ${data?.symbol}`,
     ...rest,
   }

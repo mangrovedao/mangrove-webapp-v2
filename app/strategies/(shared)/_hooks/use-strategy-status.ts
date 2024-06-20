@@ -1,12 +1,13 @@
-import { Statuses } from "@mangrovedao/mangrove.js/dist/nodejs/kandel/geometricKandel/geometricKandelStatus"
+import { kandelActions, publicMarketActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
+import { Address } from "viem"
+import { useClient, usePublicClient } from "wagmi"
 
-import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
-import useMarket from "@/providers/market"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
+import useMarket from "@/providers/market.new"
 import { getTokenPriceInToken } from "@/services/tokens.service"
-import { calculateMidPriceFromOrderBook } from "@/utils/market"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
 
@@ -18,19 +19,40 @@ export default function useStrategyStatus({
   quote,
   offers,
 }: Params) {
-  const { kandelStrategies } = useKandel()
-  const { getMarketFromAddresses } = useMarket()
+  const client = useClient()
+  const addresses = useMangroveAddresses()
+  const publicClient = usePublicClient()
+  const { markets } = useMarket()
+  const market = markets?.find((market) => {
+    return (
+      market.base.address?.toLowerCase() === base?.toLowerCase() &&
+      market.quote.address?.toLowerCase() === quote?.toLowerCase()
+    )
+  })
+
+  const kandelClient = publicClient?.extend(
+    publicMarketActions(addresses!, market!),
+  )
+
   return useQuery({
     queryKey: ["strategy-status", address],
     queryFn: async () => {
       try {
-        if (!address || !base || !quote || !offers) return null
-        const market = await getMarketFromAddresses(base, quote)
-        if (!(kandelStrategies && market)) return null
-        const book = await market.requestBook()
-        const mid = calculateMidPriceFromOrderBook(book)
-        let midPrice = Big(mid ?? 1)
-        if (!mid && market.base.symbol && market.quote.symbol) {
+        if (
+          !publicClient ||
+          !market ||
+          !addresses ||
+          !address ||
+          !base ||
+          !quote ||
+          !offers
+        )
+          return null
+
+        const book = await kandelClient?.getBook({})
+
+        let midPrice = Big(book?.midPrice ?? 0)
+        if (!midPrice && market.base.symbol && market.quote.symbol) {
           const { close } = await getTokenPriceInToken(
             market.base.symbol,
             market.quote.symbol,
@@ -39,68 +61,69 @@ export default function useStrategyStatus({
           midPrice = Big(close)
         }
 
-        const stratInstance = await kandelStrategies.instance({
-          address: address,
-          market,
-          type: "smart",
-        })
+        const kandelInstance = client?.extend(
+          kandelActions(
+            addresses,
+            market, // the market object
+            address as Address, // the kandel seeder address
+          ),
+        )
 
-        const anyLiveOffers = offers.some((x) => x?.live === true)
-        let isOutOfRange = false
-        let unexpectedDeadOffers = false
-        let offerStatuses: Statuses | null = null
+        const kandelState = await kandelInstance?.getKandelState({})
+
+        let offerStatuses
+        const bids = kandelState?.bids || []
+        const asks = kandelState?.asks || []
+        const offersStatuses = [...bids, ...asks]
+
+        const maxPrice = Math.max(...offersStatuses.map((item) => item.price))
+        const minPrice = Math.min(...offersStatuses.map((item) => item.price))
+
+        let isOutOfRange = midPrice.gt(maxPrice) || midPrice.lt(minPrice)
+        let hasLiveOffers = offersStatuses.some((x) => x.gives > 0)
         let status: Status = "unknown"
-        if (!anyLiveOffers) {
+
+        if (isOutOfRange) {
+          status = "inactive"
+        } else if (!hasLiveOffers) {
           status = "closed"
         } else {
-          const bids = offers.filter((x) => x.offerType === "bids")
-          const asks = offers.filter((x) => x.offerType === "asks")
-          offerStatuses = await stratInstance.getOfferStatusFromOffers({
+          offerStatuses = {
             offers: {
               bids: bids.length
-                ? bids.map(({ offerId, index, live, tick }) => ({
-                    id: offerId,
+                ? bids.map(({ id, gives, index, tick, price, ba }) => ({
+                    id,
                     index,
-                    live,
-                    tick: Number(tick),
+                    live: gives > 0,
+                    tick,
                   }))
                 : [],
               asks: asks.length
-                ? asks.map(({ offerId, index, live, tick }) => ({
-                    id: offerId,
+                ? asks.map(({ id, gives, index, tick, price, ba }) => ({
+                    id,
                     index,
-                    live,
+                    live: gives > 0,
                     tick: Number(tick),
                   }))
                 : [],
             },
             midPrice,
-          })
-
-          isOutOfRange =
-            midPrice.gt(offerStatuses.maxPrice) ||
-            midPrice.lt(offerStatuses.minPrice)
-
-          unexpectedDeadOffers = offerStatuses.statuses.some(
-            (x) =>
-              (x.expectedLiveAsk && !x.asks?.live) ||
-              (x.expectedLiveBid && !x.bids?.live),
-          )
-          status = "active"
-          if (isOutOfRange || unexpectedDeadOffers) {
-            status = "inactive"
           }
+          status = "active"
         }
 
         return {
           status,
           midPrice,
+          maxPrice,
+          minPrice,
           market,
           book,
           offerStatuses,
-          unexpectedDeadOffers,
+          hasLiveOffers,
           isOutOfRange,
-          stratInstance,
+          kandelInstance,
+          kandelState,
         }
       } catch (error) {
         console.error(error)

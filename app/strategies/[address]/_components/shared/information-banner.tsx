@@ -16,21 +16,21 @@ export default function InformationBanner() {
   const allOffersAreDead = !mergedOffers || mergedOffers?.length === 0
 
   const isInactive = strategyStatusQuery.data?.status === "inactive"
+  const isClosed = strategyStatusQuery.data?.status === "closed"
   const isActive = strategyStatusQuery.data?.status === "active"
 
   if (
     !strategyStatusQuery.data ||
     strategyStatusQuery.isLoading ||
     !bannerOpen ||
-    isActive || // FIXME: check if we keep the information when offers are empty
-    strategyStatusQuery.data.status === "closed"
+    isActive // FIXME: check if we keep the information when offers are empty
   )
     return null
 
   return (
     <aside
       className={cn("border rounded-lg px-4 pt-4 pb-6 my-6 relative", {
-        "border-cherry-400": isInactive,
+        "border-cherry-400": isInactive || isClosed,
         "border-mango-200": isActive,
       })}
     >
@@ -47,25 +47,29 @@ export default function InformationBanner() {
           className={cn(
             "h-8 aspect-square rounded-lg flex items-center justify-center text-red-100 p-1",
             {
-              "bg-cherry-400": isInactive,
+              "bg-cherry-400": isInactive || isClosed,
               "bg-mango-300": isActive,
             },
           )}
         >
           <Info
             className={
-              isInactive ? "text-cherry-100 rotate-180" : "text-mango-100"
+              isInactive || isClosed
+                ? "text-cherry-100 rotate-180"
+                : "text-mango-100"
             }
           />
         </div>
 
         <div>
           <Title>
-            {isInactive ? "Strategy is inactive" : "Strategy has empty offer"}
+            {isInactive || isClosed
+              ? "Strategy is inactive"
+              : "Strategy has empty offer"}
           </Title>
           <ul
             className={cn("list-none text-sm font-normal mt-4 text-cloud-300", {
-              "mb-6": isInactive,
+              "mb-6": isInactive || isClosed,
             })}
           >
             {isOutOfRange && (

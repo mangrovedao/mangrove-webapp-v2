@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 
+import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import Big from "big.js"
 import React from "react"
 
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
+import { useLogics } from "@/hooks/use-addresses"
+import useMarket from "@/providers/market.new"
 import { hasExpired } from "@/utils/date"
-import { TradeAction } from "../../../forms/enums"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
 import { Order } from "../schema"
@@ -21,7 +21,7 @@ type Props = {
 }
 
 export function useEditOrder({ order, onSubmit }: Props) {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const {
     initialGives,
     price: currentPrice,
@@ -31,19 +31,15 @@ export function useEditOrder({ order, onSubmit }: Props) {
     inboundRoute,
   } = order
 
-  const { mangrove } = useMangrove()
-  const logics = mangrove?.getLogicsList()
-
+  const logics = useLogics()
   const findLogicByAddress = (address: string) =>
-    logics?.find(
-      (logic) => logic.address.toLowerCase() === address.toLowerCase(),
-    )
+    logics?.find((logic) => logic.logic.toLowerCase() === address.toLowerCase())
 
   const sendFrom = findLogicByAddress(outboundRoute)
   const receiveTo = findLogicByAddress(inboundRoute)
 
-  const baseDecimals = market?.base.displayedDecimals
-  const quoteDecimals = market?.quote.displayedDecimals
+  const baseDecimals = market?.base.displayDecimals
+  const quoteDecimals = market?.quote.displayDecimals
 
   const displayDecimals = isBid ? quoteDecimals : baseDecimals
 
@@ -61,7 +57,7 @@ export function useEditOrder({ order, onSubmit }: Props) {
     onSubmit: (values) => onSubmit(values),
   })
 
-  const tradeAction = isBid ? TradeAction.BUY : TradeAction.SELL
+  const tradeAction = isBid ? BS.buy : BS.sell
   const { sendTokenBalance } = useTradeInfos("limit", tradeAction)
   const [toggleEdit, setToggleEdit] = React.useState(false)
 

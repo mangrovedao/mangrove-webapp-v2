@@ -1,4 +1,3 @@
-import Mangrove, { Token } from "@mangrovedao/mangrove.js"
 import React from "react"
 import { Address } from "viem"
 
@@ -18,6 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import * as SheetRoot from "@/components/ui/sheet"
 import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
+import { useMarkets } from "@/hooks/use-addresses"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
@@ -29,7 +29,6 @@ import {
 import { useEditAmplifiedOrder } from "../hooks/use-edit-amplified-order"
 import { AmplifiedOrder } from "../schema"
 import { AmplifiedForm } from "../types"
-import EditAmplifiedOrderSteps from "./edit-amplified-order-steps"
 import { Timer } from "./timer"
 
 type SheetLineProps = {
@@ -73,7 +72,7 @@ const Badge = ({
 type EditAmplifiedOrderSheetProps = {
   onClose: () => void
   orderInfos?: { order: AmplifiedOrder; mode: "edit" | "view" }
-  openMarkets?: Mangrove.OpenMarketInfo[]
+  openMarkets?: ReturnType<typeof useMarkets>
 }
 
 export default function EditAmplifiedOrderSheet({
@@ -122,16 +121,17 @@ export default function EditAmplifiedOrderSheet({
         <form.Provider>
           <ScrollArea scrollHideDelay={200}>
             {formData ? (
-              <EditAmplifiedOrderSteps
-                order={order}
-                form={{ ...formData, sendToken: sendToken as Token }}
-                onClose={onClose}
-                onCloseForm={() => {
-                  setToggleEdit(false)
-                  setFormData(undefined)
-                }}
-              />
+              <></>
             ) : (
+              // <EditAmplifiedOrderSteps
+              //   order={order}
+              //   form={{ ...formData, sendToken: sendToken as Token }}
+              //   onClose={onClose}
+              //   onCloseForm={() => {
+              //     setToggleEdit(false)
+              //     setFormData(undefined)
+              //   }}
+              // />
               <form
                 onSubmit={handleSubmit}
                 autoComplete="off"

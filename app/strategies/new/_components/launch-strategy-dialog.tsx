@@ -1,9 +1,10 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { KandelParams, Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
 import { ActivateRouter } from "@/app/trade/_components/forms/components/activate-router"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
+import { useDeploySmartRouter } from "@/app/trade/_components/forms/hooks/use-router-deploy"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
@@ -11,24 +12,26 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
 import { useStep } from "@/hooks/use-step"
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
-import { SetLiquiditySourcing } from "../../(shared)/_components/set-liquidity-sourcing"
+import useMarket from "@/providers/market.new"
 import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
-import { useStrategySmartRouter } from "../../(shared)/_hooks/use-smart-router"
-import { useCreateKandelStrategy } from "../_hooks/use-approve-kandel-strategy"
+import { useActivateKandelLogics } from "../../[address]/_hooks/use-activate-kandel-logics"
+import { useKandelSteps } from "../../[address]/_hooks/use-kandel-steps"
+import { useCreateKandelStrategy } from "../_hooks/use-deploy-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
-import { useSetLiquiditySourcing } from "../_hooks/use-set-liquidity-sourcing"
 import { NewStratStore } from "../_stores/new-strat.store"
 import { Steps } from "./form/components/steps"
 
 type StrategyDetails = Omit<
   NewStratStore,
   "isChangingFrom" | "globalError" | "errors" | "priceRange"
-> & { riskAppetite?: string; priceRange?: [number, number] }
+> & {
+  riskAppetite?: string
+  priceRange?: [number, number]
+  kandelParams?: KandelParams
+}
 
 type Props = {
   strategy?: StrategyDetails
@@ -48,60 +51,47 @@ export default function DeployStrategyDialog({
   strategy,
 }: Props) {
   const { address } = useAccount()
-  const { market } = useMarket()
-  const { mangrove } = useMangrove()
-  const { base: baseToken, quote: quoteToken } = market ?? {}
+  const { currentMarket } = useMarket()
+  const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
+  const { data: kandelSteps } = useKandelSteps()
+  const logics = useLogics()
+
+  const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
+    kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
   })
-
-  const [kandelAddress, setKandelAddress] = React.useState("")
-
-  const { mutate: createKandelStrategy, isPending: isCreatingKandelStrategy } =
-    useCreateKandelStrategy({
-      setKandelAddress: (address: string) => setKandelAddress(address),
-    })
-
-  const approveBaseToken = useInfiniteApproveToken()
-  const approveQuoteToken = useInfiniteApproveToken()
-  const activateSmartRouter = useActivateStrategySmartRouter(kandelAddress)
-  const setLiquiditySourcing = useSetLiquiditySourcing()
-
-  const { mutate: launchKandelStrategy, isPending: isLaunchingKandelStrategy } =
-    useLaunchKandelStrategy()
-
-  const logics = mangrove ? Object.values(mangrove.logics) : []
-
-  const baseLogic = logics.find((logic) => logic?.id === strategy?.sendFrom)
-  const quoteLogic = logics.find((logic) => logic?.id === strategy?.receiveTo)
-
   const { data: spender } = useSpenderAddress("kandel")
 
-  const { data: baseTokenApproved } = useIsTokenInfiniteAllowance(
-    baseToken,
-    spender,
-    baseLogic,
-  )
+  const {
+    mutate: createKandelStrategy,
+    isPending: createKandelStrategyPending,
+    data,
+  } = useCreateKandelStrategy()
 
-  const { data: quoteTokenApproved } = useIsTokenInfiniteAllowance(
-    quoteToken,
-    spender,
-    quoteLogic,
+  const deploySmartRouter = useDeploySmartRouter({
+    owner: deployRouter?.params.owner,
+  })
+  const activateSmartRouter = useActivateStrategySmartRouter(
+    data?.kandelAddress,
   )
+  const activateLogics = useActivateKandelLogics(data?.kandelAddress)
+  const approveToken = useInfiniteApproveToken()
+  const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
 
-  const { isBound } = useStrategySmartRouter({ kandelAddress }).data ?? {}
+  const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
+  const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
+  const logicGasReq = Number(baseLogic?.gasreq || 0) + 100_000
 
   let steps = [
     "Summary",
     "Create strategy instance",
-    !isBound ? "Activate router" : "",
-    "Set liquidity sourcing",
-    // TODO: apply liquidity sourcing with setLogics
-    // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
-    // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
-    !baseTokenApproved ? `Approve ${baseToken?.symbol}` : "",
-    !quoteTokenApproved ? `Approve ${quoteToken?.symbol}` : "",
+    !deployRouter?.done ? "Activate router" : "",
+    !bind?.done ? "Bind router" : "",
+    baseLogic?.logic && !setLogics?.done ? "Set logics" : "",
+    !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
+    !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     "Launch strategy",
   ].filter(Boolean)
 
@@ -141,8 +131,8 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={isCreatingKandelStrategy}
-          loading={isCreatingKandelStrategy}
+          disabled={createKandelStrategyPending}
+          loading={createKandelStrategyPending}
           onClick={() => {
             createKandelStrategy(undefined, {
               onSuccess: goToNextStep,
@@ -154,7 +144,25 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !isBound && {
+    !deployRouter?.done && {
+      body: <ActivateRouter />,
+      button: (
+        <Button
+          {...btnProps}
+          disabled={deploySmartRouter.isPending}
+          loading={deploySmartRouter.isPending}
+          onClick={() => {
+            deploySmartRouter.mutate(undefined, {
+              onSuccess: goToNextStep,
+            })
+          }}
+        >
+          Activate
+        </Button>
+      ),
+    },
+
+    !bind?.done && {
       body: <ActivateRouter />,
       button: (
         <Button
@@ -167,33 +175,34 @@ export default function DeployStrategyDialog({
             })
           }}
         >
-          Activate
+          Bind
         </Button>
       ),
     },
 
-    {
-      body: <SetLiquiditySourcing />,
-      button: (
-        <Button
-          {...btnProps}
-          disabled={activateSmartRouter.isPending}
-          loading={activateSmartRouter.isPending}
-          onClick={() => {
-            setLiquiditySourcing.mutate(
-              { baseLogic, quoteLogic, kandelAddress },
-              {
-                onSuccess: goToNextStep,
-              },
-            )
-          }}
-        >
-          Activate
-        </Button>
-      ),
-    },
+    baseLogic?.logic &&
+      !setLogics?.done && {
+        body: <ActivateRouter />,
+        button: (
+          <Button
+            {...btnProps}
+            disabled={activateLogics.isPending}
+            loading={activateLogics.isPending}
+            onClick={() => {
+              activateLogics.mutate(
+                { logic: baseLogic.logic, gasreq: logicGasReq },
+                {
+                  onSuccess: goToNextStep,
+                },
+              )
+            }}
+          >
+            Set sources
+          </Button>
+        ),
+      },
 
-    !baseTokenApproved && {
+    !baseApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -202,13 +211,13 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={approveBaseToken.isPending}
-          loading={approveBaseToken.isPending}
+          disabled={approveToken.isPending}
+          loading={approveToken.isPending}
           onClick={() => {
-            approveBaseToken.mutate(
+            approveToken.mutate(
               {
                 token: baseToken,
-                logic: baseLogic,
+                logic: baseLogic as Logic,
                 spender,
               },
               {
@@ -221,7 +230,7 @@ export default function DeployStrategyDialog({
         </Button>
       ),
     },
-    !quoteTokenApproved && {
+    !quoteApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
@@ -230,13 +239,13 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={approveQuoteToken.isPending}
-          loading={approveQuoteToken.isPending}
+          disabled={approveToken.isPending}
+          loading={approveToken.isPending}
           onClick={() => {
-            approveQuoteToken.mutate(
+            approveToken.mutate(
               {
                 token: quoteToken,
-                logic: quoteLogic,
+                logic: quoteLogic as Logic,
                 spender,
               },
               {
@@ -261,31 +270,17 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          loading={isLaunchingKandelStrategy}
-          disabled={isLaunchingKandelStrategy}
+          loading={launchKandelStrategy.isPending}
+          disabled={launchKandelStrategy.isPending}
           onClick={() => {
             if (!strategy) return
 
-            const {
-              baseDeposit,
-              quoteDeposit,
-              distribution,
-              bountyDeposit,
-              stepSize,
-              numberOfOffers,
-            } = strategy
+            const { kandelParams, bountyDeposit } = strategy
 
-            launchKandelStrategy(
+            launchKandelStrategy.mutate(
               {
-                kandelAddress,
-                baseDeposit,
-                quoteDeposit,
-                distribution,
+                kandelParams,
                 bountyDeposit,
-                stepSize,
-                numberOfOffers,
-                baseLogic,
-                quoteLogic,
               },
               {
                 onSuccess: () => {
@@ -396,17 +391,14 @@ const Summary = ({
           value={<Text>{false ? "Aave" : "Wallet"}</Text>}
         />
 
-        <SummaryLine
-          title="Risk appetite"
-          value={<Text>{riskAppetite?.toUpperCase()}</Text>}
-        />
+        <SummaryLine title="Risk appetite" value={<Text>Medium</Text>} />
 
         <SummaryLine
           title={`${baseToken?.symbol} deposit`}
           value={
             <div className="flex space-x-1 items-center">
               <Text>
-                {Number(baseDeposit).toFixed(baseToken?.displayedDecimals) || 0}
+                {Number(baseDeposit).toFixed(baseToken?.displayDecimals) || 0}
               </Text>
               <Text className="text-muted-foreground">{baseToken?.symbol}</Text>
             </div>
@@ -418,8 +410,7 @@ const Summary = ({
           value={
             <div className="flex space-x-1 items-center">
               <Text>
-                {Number(quoteDeposit).toFixed(quoteToken?.displayedDecimals) ||
-                  0}
+                {Number(quoteDeposit).toFixed(quoteToken?.displayDecimals) || 0}
               </Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
@@ -434,7 +425,7 @@ const Summary = ({
           title={`Min price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{minPrice?.toFixed(quoteToken?.displayedDecimals)}</Text>
+              <Text>{minPrice?.toFixed(quoteToken?.displayDecimals)}</Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
               </Text>
@@ -446,7 +437,7 @@ const Summary = ({
           title={`Max price`}
           value={
             <div className="flex space-x-1 items-center">
-              <Text>{maxPrice?.toFixed(quoteToken?.displayedDecimals)}</Text>
+              <Text>{maxPrice?.toFixed(quoteToken?.displayDecimals)}</Text>
               <Text className="text-muted-foreground">
                 {quoteToken?.symbol}
               </Text>

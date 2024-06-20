@@ -1,4 +1,4 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 import { Row } from "@tanstack/react-table"
 import Big from "big.js"
 import { Info } from "lucide-react"
@@ -8,16 +8,17 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell } from "@/components/ui/table"
 import { cn } from "@/utils"
+import { OfferParsed } from "@mangrovedao/mgv"
+import { BA } from "@mangrovedao/mgv/_types/lib"
 import { useRefillRequirements } from "../../../_hooks/use-refill-requirements"
 import useKandel from "../../../_providers/kandel-strategy"
-import { MergedOffer } from "../../../_utils/inventory"
 
 export default function RefillRow({
   row,
   openRefill,
 }: {
-  row: Row<MergedOffer>
-  openRefill: (offer: MergedOffer) => void
+  row: Row<OfferParsed>
+  openRefill: (offer: OfferParsed) => void
 }) {
   const { strategyStatusQuery } = useKandel()
   const { data } = useRefillRequirements({
@@ -47,8 +48,9 @@ export default function RefillRow({
           {/* <LabelValueItem label="Amount" value={Big(0)} token={quote} /> */}
           <LabelValueItem
             label="Minimum Volume"
-            value={data?.minimumVolume}
-            token={row.original.offerType === "asks" ? base : quote}
+            // note: to re-implementi
+            // value={data?.minimumVolume}
+            token={row.original.ba === BA.asks ? base : quote}
           />
           {/* <LabelValueItem label="Min quote" value={Big(0)} token={quote} /> */}
         </div>
@@ -81,7 +83,7 @@ function LabelValueItem({
       <span className="text-cloud-300">{label}:</span>
       {value && token ? (
         <span className="ml-1 text-white">
-          {value.toFixed(token.displayedDecimals)} {token?.symbol}
+          {value.toFixed(token.displayDecimals)} {token?.symbol}
         </span>
       ) : (
         <Skeleton className="w-10 h-4" />

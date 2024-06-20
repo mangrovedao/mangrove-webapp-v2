@@ -1,4 +1,4 @@
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -8,7 +8,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useTokenBalance } from "@/hooks/use-balances"
+import { formatUnits } from "viem"
+import { useAccount, useBalance } from "wagmi"
 
 export function TokenBalance(props: {
   token?: Token | string
@@ -19,7 +21,19 @@ export function TokenBalance(props: {
   }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
-  const { formattedWithSymbol, formatted, isLoading } = useTokenBalance(token)
+  const { address } = useAccount()
+  const { data: nativeBalance } = useBalance({ address })
+  const { balance, isLoading } = useTokenBalance({
+    token: token?.address,
+  })
+
+  const symbol = !token ? nativeBalance?.symbol : token.symbol
+  const amount = !token
+    ? formatUnits(nativeBalance?.value || 0n, nativeBalance?.decimals || 18)
+    : formatUnits(balance?.balance || 0n, token?.decimals || 18)
+  const decimals = !token ? nativeBalance?.decimals : token.symbol
+  const formatted = amount
+
   return (
     <div className="flex justify-between items-center mt-1">
       <span className="text-xs text-secondary float-left">
@@ -39,7 +53,10 @@ export function TokenBalance(props: {
                   props.action?.onClick(formatted || "")
                 }}
               >
-                <span title={formatted?.toString()}>{formattedWithSymbol}</span>
+                <span title={formatted?.toString()}>
+                  {Number(formatted).toFixed(token?.displayDecimals ?? 8)}{" "}
+                  {symbol}
+                </span>
               </TooltipTrigger>
 
               <TooltipPortal>
@@ -49,7 +66,7 @@ export function TokenBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {Number(formatted).toFixed(token?.decimals)} {token?.symbol}
+                  {Number(formatted).toFixed(Number(decimals))} {symbol}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>

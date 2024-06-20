@@ -1,20 +1,20 @@
 import type { ScaleLinear } from "d3-scale"
 
-import { MergedOffer } from "@/app/strategies/[address]/_utils/inventory"
 import { cn } from "@/utils"
-import { type PriceRangeChartProps } from "./price-range-chart"
+import { OfferParsed } from "@mangrovedao/mgv"
+import { BA } from "@mangrovedao/mgv/lib"
 
 type Props = {
   height: number
   paddingBottom: number
   xScale: ScaleLinear<number, number>
-  onHover?: (offer: MergedOffer) => void
+  onHover?: (offer: OfferParsed) => void
   onHoverOut?: () => void
-  hoveredOffer?: MergedOffer
-} & Pick<PriceRangeChartProps, "mergedOffers">
+  hoveredOffer?: OfferParsed
+} & { distribution: OfferParsed[] }
 
 export function MergedOffersDots({
-  mergedOffers,
+  distribution,
   xScale,
   height,
   paddingBottom,
@@ -22,40 +22,39 @@ export function MergedOffersDots({
   onHoverOut,
   hoveredOffer,
 }: Props) {
-  if (!mergedOffers) return null
+  if (!distribution) return null
 
-  return mergedOffers.map((mergedOffer) => (
+  return distribution.map((offer) => (
     <g
       className="group/circle cursor-pointer"
-      onMouseOver={() => onHover?.(mergedOffer)}
+      onMouseOver={() => onHover?.(offer)}
       onMouseOut={onHoverOut}
-      key={`${mergedOffer.offerType}-${mergedOffer.index}-${mergedOffer.offerId}`}
+      key={`${offer.ba}-${offer.index}-${offer.id}`}
     >
       <circle
-        cx={xScale(Number(mergedOffer.price))}
+        cx={xScale(Number(offer.price))}
         cy={height - paddingBottom}
         r={8}
         className={cn(
           "opacity-0 transition-opacity group-hover/circle:opacity-100",
           {
-            "fill-green-bangladesh": mergedOffer.offerType === "bids",
-            "fill-cherry-400": mergedOffer.offerType === "asks",
-            "fill-cloud-300": !mergedOffer.live,
+            "fill-green-bangladesh": offer.ba === BA.bids,
+            "fill-cherry-400": offer.ba === BA.asks,
+            "fill-cloud-300": !(offer.gives > 0),
             "opacity-100":
-              hoveredOffer?.offerId === mergedOffer.offerId &&
-              hoveredOffer?.offerType === mergedOffer.offerType,
+              hoveredOffer?.id === offer.id && hoveredOffer?.ba === offer.ba,
           },
         )}
       />
 
       <circle
-        cx={xScale(Number(mergedOffer.price))}
+        cx={xScale(Number(offer.price))}
         cy={height - paddingBottom}
         r={3}
         className={cn({
-          "fill-green-caribbean": mergedOffer.offerType === "bids",
-          "fill-cherry-100": mergedOffer.offerType === "asks",
-          "fill-cloud-00": !mergedOffer.live,
+          "fill-green-caribbean": offer.ba === BA.bids,
+          "fill-cherry-100": offer.ba === BA.asks,
+          "fill-cloud-00": !(offer.gives > 0),
         })}
       />
     </g>

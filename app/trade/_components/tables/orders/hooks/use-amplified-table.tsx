@@ -14,11 +14,11 @@ import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { Close, Pen } from "@/svgs"
 import { Address } from "viem"
-import type { AmplifiedOrder } from "../schema"
 import { Timer } from "../components/timer"
+import type { AmplifiedOrder } from "../schema"
 
 const columnHelper = createColumnHelper<AmplifiedOrder>()
 const DEFAULT_DATA: AmplifiedOrder[] = []
@@ -30,7 +30,7 @@ type Params = {
 }
 
 export function useAmplifiedTable({ data, onCancel, onEdit }: Params) {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
 
   const columns = React.useMemo(
     () => [

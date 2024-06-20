@@ -25,7 +25,6 @@ const useMangroveTokenPricesQuery = (
   baseAddress?: string,
   quoteAddress?: string,
 ) => {
-  const { isConnected } = useAccount()
   const chainId = useChainId()
   return useQuery({
     queryKey: ["mangroveTokenPrice", baseAddress, quoteAddress, chainId],
@@ -37,7 +36,7 @@ const useMangroveTokenPricesQuery = (
       const mangroveTokenPrices = await res.json()
       return mangrovePriceSchema.parse(mangroveTokenPrices)
     },
-    enabled: !!baseAddress && !!quoteAddress && isConnected && !!chainId,
+    enabled: !!baseAddress && !!quoteAddress && !!chainId,
     refetchInterval: 1000 * 60, // every minute
     staleTime: 1000 * 60, // 1 minute for 1m interval
   })

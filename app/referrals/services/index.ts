@@ -42,6 +42,7 @@ export function useSignReferral() {
     mutationFn: async () => {
       if (!address || !walletClient || data?.success === false) return
       return walletClient.signTypedData({
+        account: address,
         domain,
         types,
         primaryType: "RefLink",

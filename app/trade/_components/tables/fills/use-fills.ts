@@ -5,9 +5,10 @@ import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
+import { getSemibooksOLKeys, hash } from "@mangrovedao/mgv/lib"
 import { parseFills, type Fill } from "./schema"
 
 type Params<T> = {
@@ -23,7 +24,7 @@ export function useFills<T = Fill[]>({
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
-  const { olKeys } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { indexerSdk } = useIndexerSdk()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
@@ -34,19 +35,32 @@ export function useFills<T = Fill[]>({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "fills",
-      olKeys?.ask.token.address.toLowerCase(),
-      olKeys?.bid.token.address.toLowerCase(),
+      market?.base.address,
+      market?.quote.address,
       address,
       first,
       skip,
     ],
     queryFn: async () => {
-      if (!(indexerSdk && address && olKeys)) return []
-      startLoading(TRADE.TABLES.ORDERS)
       try {
+        if (!(indexerSdk && address && market)) return []
+        startLoading(TRADE.TABLES.ORDERS)
+        const { asksMarket, bidsMarket } = getSemibooksOLKeys(market)
         const result = await indexerSdk.getOrdersHistory({
-          ask: olKeys.ask,
-          bid: olKeys.bid,
+          ask: {
+            token: {
+              address: asksMarket.outbound_tkn,
+              decimals: market.base.decimals,
+            },
+            olKey: hash(asksMarket),
+          },
+          bid: {
+            token: {
+              address: bidsMarket.outbound_tkn,
+              decimals: market.quote.decimals,
+            },
+            olKey: hash(bidsMarket),
+          },
           first,
           skip,
           maker: address.toLowerCase(),
@@ -63,13 +77,7 @@ export function useFills<T = Fill[]>({
     meta: {
       error: "Unable to retrieve fills",
     },
-
-    enabled: !!(
-      isConnected &&
-      indexerSdk &&
-      olKeys?.bid.token.address.toLowerCase() &&
-      olKeys?.ask.token.address.toLowerCase()
-    ),
+    enabled: !!(isConnected && indexerSdk),
     retry: false,
     staleTime: 1 * 60 * 1000, // 1 minute
   })

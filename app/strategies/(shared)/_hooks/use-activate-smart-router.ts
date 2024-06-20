@@ -1,4 +1,4 @@
-import useMangrove from "@/providers/mangrove"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMutation } from "@tanstack/react-query"
 import { Address, parseAbi } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
@@ -17,17 +17,24 @@ const SmartRouterABI = parseAbi([
   "function bind(address makerContract) public",
 ])
 
-export function useActivateStrategySmartRouter(kandelAddress: string) {
-  const { address } = useAccount()
-  const { mangrove } = useMangrove()
+export function useActivateStrategySmartRouter(kandelAddress?: string) {
+  const { address, chain } = useAccount()
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
-  const orderContract = mangrove?.orderContract.address
+  const mangrove = useMangroveAddresses()
+  const orderContract = mangrove?.mgvOrder
 
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!publicClient || !address || !orderContract || !walletClient) return
+        if (
+          !publicClient ||
+          !address ||
+          !orderContract ||
+          !walletClient ||
+          !kandelAddress
+        )
+          throw new Error("Could not bind router, missing params")
 
         const ROUTER_FACTORY = await publicClient.readContract({
           address: orderContract as Address,
@@ -51,10 +58,12 @@ export function useActivateStrategySmartRouter(kandelAddress: string) {
         })
 
         const tx = await walletClient?.writeContract({
+          account: address,
           address: proxy,
           abi: SmartRouterABI,
           functionName: "bind",
           args: [kandelAddress as Address],
+          chain: chain,
         })
 
         const result = await publicClient.waitForTransactionReceipt({

@@ -79,8 +79,8 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
           </div>
         ),
         cell: ({ row }) => {
-          const { min, max, quote } = row.original
-          return <MinMax min={min} max={max} quote={quote} />
+          const { min, max, quote, base } = row.original
+          return <MinMax min={min} max={max} quote={quote} base={base} />
         },
       }),
       columnHelper.display({
@@ -133,23 +133,25 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
           return <Status status={data?.status} />
         },
       }),
+      // columnHelper.display({
+      //   header: "PnL",
+      //   cell: ({ row }) => {
+      //     const { return: ret } = row.original
+      //     return (
+      //       <div className="flex flex-col">
+      //         <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+      //       </div>
+      //     )
+      //   },
+      // }),
+      // TODO: get from indexer
       columnHelper.display({
-        header: "PnL",
+        header: "Liquidity sourcing",
         cell: ({ row }) => {
-          const { return: ret } = row.original
-          return (
-            <div className="flex flex-col">
-              <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
-            </div>
-          )
+          const {} = row.original
+          return <div className="flex flex-col">Wallet</div>
         },
       }),
-      // TODO: get from indexer
-      // columnHelper.display({
-      //   header: "Liquidity source",
-      //   cell: () => "Wallet",
-      // }),
-
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
