@@ -14,10 +14,13 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Separator } from "@/components/ui/separator"
-import type { Token } from "@mangrovedao/mgv"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
+import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
 import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
+import { useQuery } from "@tanstack/react-query"
 import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
+import { useClient } from "wagmi"
 import { Badge } from "../(list)/_components/badge"
 import { Vault } from "../(list)/_schemas/vaults"
 import { useVault } from "./_hooks/useVault"
@@ -87,8 +90,7 @@ export default function Page() {
           {/* Holding card */}
           <div className="p-6">
             <HoldingCard
-              base={vault?.market.base}
-              quote={vault?.market.quote}
+              market={vault?.market}
               baseAmount={vault?.totalBase}
               quoteAmount={vault?.totalQuote}
             />
@@ -134,6 +136,7 @@ export default function Page() {
                 name={"action"}
                 value={action}
                 onValueChange={(e: Action) => {
+                  console.log(e)
                   setAction(e)
                 }}
               >
@@ -382,21 +385,45 @@ const Line = ({ title, value }: { title: ReactNode; value: ReactNode }) => {
 }
 
 const HoldingCard = ({
-  base,
-  quote,
+  market,
   baseAmount = 0n,
   quoteAmount = 0n,
 }: {
-  base?: Token
-  quote?: Token
+  market?: MarketParams
   baseAmount?: bigint
   quoteAmount?: bigint
 }) => {
+  const base = market?.base
+  const quote = market?.quote
   const numberBase = Number(formatUnits(baseAmount, base?.decimals || 18))
   const numberQuote = Number(formatUnits(quoteAmount, quote?.decimals || 18))
-  const total = numberBase + numberQuote
 
-  const basePercent = total === 0 ? 50 : (numberBase * 100) / total
+  const client = useClient()
+  const mangrove = useMangroveAddresses()
+
+  const { data: midPrice } = useQuery({
+    queryKey: [
+      "vault-market-mid-price",
+      base?.address,
+      quote?.address,
+      mangrove?.mgv,
+      mangrove?.mgvReader,
+    ],
+    enabled: !!market && !!client && !!mangrove,
+    queryFn: async () => {
+      if (!market || !client || !mangrove)
+        throw new Error("Missing dependencies")
+      const book = await client
+        .extend(publicMarketActions(mangrove, market))
+        .getBook({ depth: 1n })
+      return book.midPrice
+    },
+    initialData: 1,
+  })
+
+  const total = numberBase * midPrice + numberQuote
+
+  const basePercent = total === 0 ? 50 : (numberBase * 100 * midPrice) / total
   const quotePercent = 100 - basePercent
 
   return (
