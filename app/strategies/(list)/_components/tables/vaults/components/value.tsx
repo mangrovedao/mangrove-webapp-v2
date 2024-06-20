@@ -2,7 +2,6 @@ import type { Address } from "viem"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import Big from "big.js"
 
 type Props = {
   base: string
@@ -21,10 +20,11 @@ export function Value({ base, baseValue, quote, quoteValue }: Props) {
   return (
     <div>
       <div>
-        {Big(baseValue).toFixed(baseToken?.displayDecimals)} {baseToken?.symbol}
+        {Number(baseValue).toFixed(baseToken?.displayDecimals)}{" "}
+        {baseToken?.symbol}
       </div>
       <div>
-        {Big(quoteValue).toFixed(quoteToken?.displayDecimals)}{" "}
+        {Number(quoteValue).toFixed(quoteToken?.displayDecimals)}{" "}
         {quoteToken?.symbol}
       </div>
     </div>
