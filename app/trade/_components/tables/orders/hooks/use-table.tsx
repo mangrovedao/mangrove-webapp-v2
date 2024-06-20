@@ -15,7 +15,7 @@ import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market.new"
-import { Close } from "@/svgs"
+import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
@@ -144,7 +144,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
 
           return (
             <div className="w-full h-full flex justify-end space-x-1">
-              {/* <IconButton
+              <IconButton
                 tooltip="Modify"
                 className="aspect-square w-6 rounded-full"
                 disabled={isExpired}
@@ -155,7 +155,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
                 }}
               >
                 <Pen />
-              </IconButton> */}
+              </IconButton>
               <IconButton
                 tooltip="Cancel offer"
                 className="aspect-square w-6 rounded-full"
