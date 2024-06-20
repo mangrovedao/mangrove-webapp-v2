@@ -479,16 +479,15 @@ const InfoCard = ({
           {icon}
         </div>
         {link ? (
-          <div className="flex space-x-2 items-center">
-            <Link
-              href={"https://app.rangeprotocol.com/"}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {value}
-            </Link>
-            <ExternalLink />
-          </div>
+          <Link
+            href={"https://app.rangeprotocol.com/"}
+            target="_blank"
+            rel="noreferrer"
+            className="flex gap-2 items-center"
+          >
+            {value}
+            <ExternalLink className="h-5 w-5" />
+          </Link>
         ) : (
           <Text>{value}</Text>
         )}
