@@ -413,17 +413,20 @@ const HoldingCard = ({
       quote?.address,
       mangrove?.mgv,
       mangrove?.mgvReader,
+      client,
     ],
     enabled: !!market && !!client && !!mangrove,
     queryFn: async () => {
       if (!market || !client || !mangrove)
         throw new Error("Missing dependencies")
+
       const book = await client
         .extend(publicMarketActions(mangrove, market))
         .getBook({ depth: 1n })
       return book.midPrice
     },
-    initialData: 1,
+    initialData: 3500,
+    staleTime: Infinity,
   })
 
   const total = numberBase * midPrice + numberQuote
