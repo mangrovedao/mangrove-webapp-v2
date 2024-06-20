@@ -1,6 +1,5 @@
 import { kandelActions, publicMarketActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
-import Big from "big.js"
 import { Address } from "viem"
 import { useClient, usePublicClient } from "wagmi"
 
@@ -51,14 +50,14 @@ export default function useStrategyStatus({
 
         const book = await kandelClient?.getBook({})
 
-        let midPrice = Big(book?.midPrice ?? 0)
+        let midPrice = Number(book?.midPrice ?? 0)
         if (!midPrice && market.base.symbol && market.quote.symbol) {
           const { close } = await getTokenPriceInToken(
             market.base.symbol,
             market.quote.symbol,
             "1d",
           )
-          midPrice = Big(close)
+          midPrice = Number(close)
         }
 
         const kandelInstance = client?.extend(
@@ -79,7 +78,7 @@ export default function useStrategyStatus({
         const maxPrice = Math.max(...offersStatuses.map((item) => item.price))
         const minPrice = Math.min(...offersStatuses.map((item) => item.price))
 
-        let isOutOfRange = midPrice.gt(maxPrice) || midPrice.lt(minPrice)
+        let isOutOfRange = midPrice > maxPrice || midPrice < minPrice
         let hasLiveOffers = offersStatuses.some((x) => x.gives > 0)
         let status: Status = "unknown"
 

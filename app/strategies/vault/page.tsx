@@ -1,6 +1,6 @@
 "use client"
 
-import { Coins, Gauge, Percent } from "lucide-react"
+import { Coins, ExternalLink, Gauge, Percent } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import {
@@ -18,6 +18,7 @@ import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
 import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
 import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
 import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
 import { useClient } from "wagmi"
@@ -83,6 +84,7 @@ export default function Page() {
               icon={<Gauge />}
               title="Strategist"
               value={vault?.strategist || ""}
+              link={true}
             />
           </div>
 
@@ -363,12 +365,15 @@ const Details = ({
         </div>
       </div>
       <div className="bg-primary-bush-green rounded-lg p-4">
-        <Title>Liquid Staking Strategy</Title>
+        <Title>Passive strategies</Title>
         <Caption className="text-gray">
-          Suitable for those looking to optimize yield on liquid staked
-          derivatives (LSDs). These strategies generate yield from the LSDs
-          themselves and are further enhanced through both trading fees and
-          external rewards (such as boosted liquidity pools).
+          Passive strategies on Mangrove are managed by third-party active
+          liquidity managers. This strategy is managed by SkateFi (formerly
+          known as Range protocol). SkateFi quantitative strategies
+          strategically deploy liquidity within narrow price bandwidths, with
+          liquidity actively monitored and rebalanced in real-time. Positions
+          are quickly adjusted based on volatile market conditions or trending
+          markets, with rebalancing spread minimized to optimize yield.{" "}
         </Caption>
       </div>
     </>
@@ -481,11 +486,13 @@ const InfoCard = ({
   value,
   icon,
   info,
+  link,
 }: {
   title: string
   value: string
   icon: ReactNode
   info?: string
+  link?: boolean
 }) => {
   return (
     <div className="bg-primary-bush-green rounded-lg p-4 w-full">
@@ -498,7 +505,19 @@ const InfoCard = ({
         <div className="bg-primary-dark-green rounded-md w-8 h-8 flex justify-center items-center">
           {icon}
         </div>
-        <Text>{value}</Text>
+        {link ? (
+          <Link
+            href={"https://app.rangeprotocol.com/"}
+            target="_blank"
+            rel="noreferrer"
+            className="flex gap-2 items-center"
+          >
+            {value}
+            <ExternalLink className="h-5 w-5" />
+          </Link>
+        ) : (
+          <Text>{value}</Text>
+        )}
       </div>
     </div>
   )
