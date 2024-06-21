@@ -48,21 +48,24 @@ export function Market() {
     spotPrice,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
+  const sendBalance = formatUnits(
+    sendTokenBalance.balance?.balance || 0n,
+    sendToken?.decimals || 18,
+  )
+
   const handleSliderChange = (value: number) => {
-    const amount = (value * Number(sendTokenBalance.balance?.balance)) / 100
+    const amount = (value * Number(sendBalance)) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
     computeReceiveAmount()
   }
 
-  const sendTokenBalanceAsBig = sendTokenBalance.balance?.balance
-    ? Big(Number(sendTokenBalance.balance.balance))
-    : Big(0)
+  const sendTokenBalanceAsNumber = sendBalance ? Number(sendBalance) : 0
 
   const sliderValue = Math.min(
     Big(!isNaN(Number(send)) ? Number(send) : 0)
       .mul(100)
-      .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
+      .div(sendTokenBalanceAsNumber === 0 ? 1 : sendTokenBalanceAsNumber)
       .toNumber(),
     100,
   ).toFixed(0)
