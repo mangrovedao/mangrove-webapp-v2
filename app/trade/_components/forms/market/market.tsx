@@ -52,15 +52,14 @@ export function Market() {
     sendTokenBalance.balance?.balance || 0n,
     sendToken?.decimals || 18,
   )
+  const sendTokenBalanceAsNumber = sendBalance ? Number(sendBalance) : 0
 
   const handleSliderChange = (value: number) => {
-    const amount = (value * Number(sendBalance)) / 100
+    const amount = (value * sendTokenBalanceAsNumber) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
     computeReceiveAmount()
   }
-
-  const sendTokenBalanceAsNumber = sendBalance ? Number(sendBalance) : 0
 
   const sliderValue = Math.min(
     Big(!isNaN(Number(send)) ? Number(send) : 0)
