@@ -339,7 +339,7 @@ const Details = ({
           <Caption>
             {Number(
               formatUnits(
-                kandel?.baseAmount || 0n,
+                kandel?.quoteAmount || 0n,
                 vault?.market.base.decimals || 18,
               ),
             ).toLocaleString(undefined, {
@@ -354,7 +354,7 @@ const Details = ({
           <Caption>
             {Number(
               formatUnits(
-                kandel?.quoteAmount || 0n,
+                kandel?.baseAmount || 0n,
                 vault?.market.quote.decimals || 18,
               ),
             ).toLocaleString(undefined, {
