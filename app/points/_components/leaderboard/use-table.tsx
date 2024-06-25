@@ -95,6 +95,17 @@ export function useTable({ data }: Params) {
           )
         },
       }),
+      columnHelper.accessor("share", {
+        header: () => <div className="text-right">Share</div>,
+        cell: (row) => {
+          const share = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(share, { maximumFractionDigits: 2 })}%
+            </div>
+          )
+        },
+      }),
     ],
     [],
   )

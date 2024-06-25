@@ -7,6 +7,7 @@ const leaderboardEntrySchema = z.object({
   maker: z.number(),
   ref: z.number(),
   total: z.number().nullable(),
+  share: z.number().nullable(),
 })
 
 const epochLeaderboardSchema = z.array(leaderboardEntrySchema)
