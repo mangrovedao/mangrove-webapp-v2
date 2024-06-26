@@ -54,6 +54,7 @@ export function useTable({ type, data }: Params) {
             market: { base, quote },
           } = row.original
           // return <div className="flex flex-col">$1 2345 678</div>
+          if (!base || !quote || !totalBase || !totalQuote) return "-"
           return (
             <Value
               base={base.address}
