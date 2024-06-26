@@ -1,7 +1,12 @@
 "use client"
 
-import { Bridge } from "@synapsecns/widget"
+import { Bridge, CustomRpcs } from "@synapsecns/widget"
 import { useEthereumWallet } from "./_hooks/use-ethereum-wallet"
+
+const customRpcs: CustomRpcs = {
+  1: "https://eth.llamarpc.com",
+  42161: "https://arbitrum.llamarpc.com",
+}
 
 export default function Page() {
   const { web3Provider } = useEthereumWallet()
