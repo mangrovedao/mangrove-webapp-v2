@@ -84,6 +84,17 @@ export function useTable({ data }: Params) {
           )
         },
       }),
+      columnHelper.accessor("community", {
+        header: () => <div className="text-right">Community points</div>,
+        cell: (row) => {
+          const communityPoints = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(communityPoints)}
+            </div>
+          )
+        },
+      }),
       columnHelper.accessor("total", {
         header: () => <div className="text-right">Total points</div>,
         cell: (row) => {

@@ -6,6 +6,7 @@ const leaderboardEntrySchema = z.object({
   taker: z.number(),
   maker: z.number(),
   ref: z.number(),
+  community: z.number().nullable(),
   total: z.number().nullable(),
   share: z.number().nullable(),
 })
