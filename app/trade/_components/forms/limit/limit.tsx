@@ -72,18 +72,18 @@ export function Limit() {
     computeReceiveAmount()
   }
 
-  const sliderValue = Math.min(
-    Number(send) /
-      (sendTokenBalance
-        ? Number(
-            formatUnits(
-              sendTokenBalance?.balance,
-              sendTokenBalance?.token.decimals,
-            ),
-          )
-        : 1),
-    100,
-  ).toFixed(0)
+  const sendBalanceAsNumber = Number(
+    formatUnits(
+      sendTokenBalance?.balance || 0n,
+      sendTokenBalance?.token.decimals || 18,
+    ),
+  )
+  const sendAsNumber = Number(send)
+
+  const sliderValue =
+    sendBalanceAsNumber !== 0
+      ? ((sendAsNumber / sendBalanceAsNumber) * 100).toFixed(0)
+      : 0
 
   return (
     <>
