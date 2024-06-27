@@ -7,7 +7,7 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { BS } from "@mangrovedao/mgv/lib"
-import { parseEther } from "viem"
+import { BaseError, ContractFunctionExecutionError, parseEther } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import { Form } from "../types"
 
@@ -47,11 +47,15 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
           throw new Error("Could not update order, missing params")
 
         const { isBid, limitPrice: price, send, receive } = form
+        console.log({
+          baseAmount: isBid ? send : receive,
+          quoteAmount: isBid ? receive : send,
+        })
 
         const { request } = await marketClient.simulateUpdateOrder({
           offerId: BigInt(Number(offerId)),
-          baseAmount: isBid ? parseEther(receive) : parseEther(send),
-          quoteAmount: isBid ? parseEther(send) : parseEther(receive),
+          baseAmount: isBid ? parseEther(send) : parseEther(receive),
+          quoteAmount: isBid ? parseEther(receive) : parseEther(send),
           bs: isBid ? BS.buy : BS.sell,
           book: book,
           restingOrderGasreq: 250_000n,
@@ -66,6 +70,22 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         return { receipt }
       } catch (error) {
         console.error(error)
+
+        if (error instanceof BaseError) {
+          const revertError = error.walk(
+            (error) => error instanceof ContractFunctionExecutionError,
+          )
+
+          if (revertError instanceof ContractFunctionExecutionError) {
+            console.log(
+              revertError.cause,
+              revertError.message,
+              revertError.functionName,
+              revertError.formattedArgs,
+              revertError.details,
+            )
+          }
+        }
         throw new Error("Failed to update the limit order")
       }
     },

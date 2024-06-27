@@ -10,12 +10,17 @@ export function getOrderProgress(
   const { takerGot, initialGives, initialWants } = order
 
   const displayDecimals = market?.currentMarket?.base.displayDecimals
-  const volume = Big(initialGives).toFixed(
-    market?.currentMarket?.quote.displayDecimals,
-  )
-  const amount = Big(initialWants).toFixed(
-    market?.currentMarket?.base.displayDecimals,
-  )
+
+  const volumeDecimals = order.isBid
+    ? market?.currentMarket?.quote.displayDecimals
+    : market?.currentMarket?.base.displayDecimals
+
+  const amountDecimals = order.isBid
+    ? market?.currentMarket?.base.displayDecimals
+    : market?.currentMarket?.quote.displayDecimals
+
+  const volume = Big(initialGives).toFixed(volumeDecimals)
+  const amount = Big(initialWants).toFixed(amountDecimals)
 
   const filled = Big(takerGot).toFixed(displayDecimals)
 

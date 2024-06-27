@@ -38,12 +38,19 @@ export function useEditOrder({ order, onSubmit }: Props) {
 
   const sendFrom = findLogicByAddress(outboundRoute)
   const receiveTo = findLogicByAddress(inboundRoute)
-
-  const baseDecimals = market?.base.displayDecimals
   const quoteDecimals = market?.quote.displayDecimals
+  const baseDecimals = market?.base.displayDecimals
 
-  const volume = Big(initialGives).toFixed(quoteDecimals)
-  const amount = Big(initialWants).toFixed(baseDecimals)
+  const volumeDecimals = order.isBid
+    ? market?.quote.displayDecimals
+    : market?.base.displayDecimals
+
+  const amountDecimals = order.isBid
+    ? market?.base.displayDecimals
+    : market?.quote.displayDecimals
+
+  const volume = Big(initialGives).toFixed(volumeDecimals)
+  const amount = Big(initialWants).toFixed(amountDecimals)
 
   const form = useForm({
     validator: zodValidator,
