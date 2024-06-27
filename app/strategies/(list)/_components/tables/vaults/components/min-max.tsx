@@ -2,7 +2,6 @@ import type { Address } from "viem"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import Big from "big.js"
 
 type Props = {
   min: string
@@ -21,10 +20,10 @@ export function MinMax({ min, max, quote }: Props) {
   return (
     <div>
       <div>
-        {Big(min).toFixed(displayedDecimals)} {symbol}
+        {Number(min).toFixed(displayedDecimals)} {symbol}
       </div>
       <div>
-        {Big(max).toFixed(displayedDecimals)} {symbol}
+        {Number(max).toFixed(displayedDecimals)} {symbol}
       </div>
     </div>
   )

@@ -36,16 +36,10 @@ export function getChainVaults(chainId: number): VaultInfos[] {
     case blast.id:
       return [
         {
-          address: "0x2c978ef3b764f968ab4e5b7665ed4bc8605469cd",
-          kandel: "0xd92fc1278d49D75d484bEA5F1E551940052b8524",
-          market: blastMarkets[0],
-          strategist: "Skate.fi",
-        },
-        {
           address: "0xbC766847aB3b36F7012037f11Cd05B187F51Fc23",
           kandel: "0x2341561eaC01D79e184eaCF09f380EB8A0e3408b",
           market: blastMarkets[0],
-          strategist: "Skate.fi test",
+          strategist: "SKATEFI",
         },
       ]
     default:

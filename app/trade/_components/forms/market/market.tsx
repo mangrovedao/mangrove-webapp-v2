@@ -1,6 +1,8 @@
+import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { LucideChevronRight } from "lucide-react"
 import React from "react"
+import { formatUnits } from "viem"
 
 import {
   CustomRadioGroup,
@@ -13,8 +15,6 @@ import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
 import { EnhancedNumericInput } from "@components/token-input"
-import { BS } from "@mangrovedao/mgv/lib"
-import { formatUnits } from "viem"
 import { MarketDetails } from "../components/market-details"
 import { TradeAction } from "../enums"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
@@ -48,21 +48,23 @@ export function Market() {
     spotPrice,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
+  const sendBalance = formatUnits(
+    sendTokenBalance.balance?.balance || 0n,
+    sendToken?.decimals || 18,
+  )
+  const sendTokenBalanceAsNumber = sendBalance ? Number(sendBalance) : 0
+
   const handleSliderChange = (value: number) => {
-    const amount = (value * Number(sendTokenBalance.balance?.balance)) / 100
+    const amount = (value * sendTokenBalanceAsNumber) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
     computeReceiveAmount()
   }
 
-  const sendTokenBalanceAsBig = sendTokenBalance.balance?.balance
-    ? Big(Number(sendTokenBalance.balance.balance))
-    : Big(0)
-
   const sliderValue = Math.min(
     Big(!isNaN(Number(send)) ? Number(send) : 0)
       .mul(100)
-      .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
+      .div(sendTokenBalanceAsNumber === 0 ? 1 : sendTokenBalanceAsNumber)
       .toNumber(),
     100,
   ).toFixed(0)

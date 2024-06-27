@@ -1,5 +1,5 @@
 import useMarket from "@/providers/market.new"
-import { useCancelAmplifiedOrder } from "../hooks/use-cancel-amplified-order"
+// import { useCancelAmplifiedOrder } from "../hooks/use-cancel-amplified-order"
 import type { AmplifiedOrder } from "../schema"
 
 type Props = {
@@ -13,10 +13,10 @@ export default function CancelAmplifiedOfferDialog({
   market,
   onClose,
 }: Props) {
-  const retract = useCancelAmplifiedOrder({
-    offerId: order?.id,
-    onCancel: onClose,
-  })
+  // const retract = useCancelAmplifiedOrder({
+  //   offerId: order?.id,
+  //   onCancel: onClose,
+  // })
 
   if (!order) return null
 

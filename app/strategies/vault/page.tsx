@@ -1,6 +1,6 @@
 "use client"
 
-import { Coins, Gauge, Percent } from "lucide-react"
+import { Coins, ExternalLink, Gauge, Percent } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import {
@@ -14,10 +14,14 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Separator } from "@/components/ui/separator"
-import type { Token } from "@mangrovedao/mgv"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
+import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
 import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
+import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
 import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
+import { useClient } from "wagmi"
 import { Badge } from "../(list)/_components/badge"
 import { Vault } from "../(list)/_schemas/vaults"
 import { useVault } from "./_hooks/useVault"
@@ -80,6 +84,7 @@ export default function Page() {
               icon={<Gauge />}
               title="Strategist"
               value={vault?.strategist || ""}
+              link={true}
             />
           </div>
 
@@ -87,8 +92,7 @@ export default function Page() {
           {/* Holding card */}
           <div className="p-6">
             <HoldingCard
-              base={vault?.market.base}
-              quote={vault?.market.quote}
+              market={vault?.market}
               baseAmount={vault?.totalBase}
               quoteAmount={vault?.totalQuote}
             />
@@ -134,6 +138,7 @@ export default function Page() {
                 name={"action"}
                 value={action}
                 onValueChange={(e: Action) => {
+                  console.log(e)
                   setAction(e)
                 }}
               >
@@ -360,12 +365,15 @@ const Details = ({
         </div>
       </div>
       <div className="bg-primary-bush-green rounded-lg p-4">
-        <Title>Liquid Staking Strategy</Title>
+        <Title>Passive strategies</Title>
         <Caption className="text-gray">
-          Suitable for those looking to optimize yield on liquid staked
-          derivatives (LSDs). These strategies generate yield from the LSDs
-          themselves and are further enhanced through both trading fees and
-          external rewards (such as boosted liquidity pools).
+          Passive strategies on Mangrove are managed by third-party active
+          liquidity managers. This strategy is managed by SkateFi (formerly
+          known as Range protocol). SkateFi quantitative strategies
+          strategically deploy liquidity within narrow price bandwidths, with
+          liquidity actively monitored and rebalanced in real-time. Positions
+          are quickly adjusted based on volatile market conditions or trending
+          markets, with rebalancing spread minimized to optimize yield.{" "}
         </Caption>
       </div>
     </>
@@ -382,21 +390,48 @@ const Line = ({ title, value }: { title: ReactNode; value: ReactNode }) => {
 }
 
 const HoldingCard = ({
-  base,
-  quote,
+  market,
   baseAmount = 0n,
   quoteAmount = 0n,
 }: {
-  base?: Token
-  quote?: Token
+  market?: MarketParams
   baseAmount?: bigint
   quoteAmount?: bigint
 }) => {
+  const base = market?.base
+  const quote = market?.quote
   const numberBase = Number(formatUnits(baseAmount, base?.decimals || 18))
   const numberQuote = Number(formatUnits(quoteAmount, quote?.decimals || 18))
-  const total = numberBase + numberQuote
 
-  const basePercent = total === 0 ? 50 : (numberBase * 100) / total
+  const client = useClient()
+  const mangrove = useMangroveAddresses()
+
+  const { data: midPrice } = useQuery({
+    queryKey: [
+      "vault-market-mid-price",
+      base?.address,
+      quote?.address,
+      mangrove?.mgv,
+      mangrove?.mgvReader,
+      client,
+    ],
+    enabled: !!market && !!client && !!mangrove,
+    queryFn: async () => {
+      if (!market || !client || !mangrove)
+        throw new Error("Missing dependencies")
+
+      const book = await client
+        .extend(publicMarketActions(mangrove, market))
+        .getBook({ depth: 1n })
+      return book.midPrice
+    },
+    initialData: 3500,
+    staleTime: Infinity,
+  })
+
+  const total = numberBase * midPrice + numberQuote
+
+  const basePercent = total === 0 ? 50 : (numberBase * 100 * midPrice) / total
   const quotePercent = 100 - basePercent
 
   return (
@@ -454,11 +489,13 @@ const InfoCard = ({
   value,
   icon,
   info,
+  link,
 }: {
   title: string
   value: string
   icon: ReactNode
   info?: string
+  link?: boolean
 }) => {
   return (
     <div className="bg-primary-bush-green rounded-lg p-4 w-full">
@@ -471,7 +508,19 @@ const InfoCard = ({
         <div className="bg-primary-dark-green rounded-md w-8 h-8 flex justify-center items-center">
           {icon}
         </div>
-        <Text>{value}</Text>
+        {link ? (
+          <Link
+            href={"https://app.rangeprotocol.com/"}
+            target="_blank"
+            rel="noreferrer"
+            className="flex gap-2 items-center"
+          >
+            {value}
+            <ExternalLink className="h-5 w-5" />
+          </Link>
+        ) : (
+          <Text>{value}</Text>
+        )}
       </div>
     </div>
   )

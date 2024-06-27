@@ -1,6 +1,5 @@
 "use client"
 
-import Big from "big.js"
 import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
@@ -181,7 +180,7 @@ const BountyInventory = () => {
           <tr className="flex justify-between pt-4">
             <Text as="td">{chain?.nativeCurrency.symbol}</Text>
             <Text as="td">
-              {Big(currentParameter.lockedBounty ?? 0).toString()}{" "}
+              {Number(currentParameter.lockedBounty ?? 0).toString()}{" "}
               {chain?.nativeCurrency.symbol}
             </Text>
           </tr>
