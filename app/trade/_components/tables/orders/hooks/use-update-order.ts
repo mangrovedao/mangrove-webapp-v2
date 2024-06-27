@@ -47,6 +47,7 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
           throw new Error("Could not update order, missing params")
 
         const { isBid, limitPrice: price, send, receive } = form
+
         console.log({
           baseAmount: isBid ? send : receive,
           quoteAmount: isBid ? receive : send,
@@ -66,10 +67,9 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: tx,
         })
-
         return { receipt }
       } catch (error) {
-        console.error(error)
+        console.error(error as BaseError)
 
         if (error instanceof BaseError) {
           const revertError = error.walk(
@@ -78,11 +78,14 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
 
           if (revertError instanceof ContractFunctionExecutionError) {
             console.log(
+              revertError.stack,
+              revertError.args,
               revertError.cause,
               revertError.message,
               revertError.functionName,
               revertError.formattedArgs,
               revertError.details,
+              revertError,
             )
           }
         }
