@@ -94,6 +94,7 @@ export default function EditOrderSteps({
     "limit",
     order.isBid ? BS.buy : BS.sell,
   )
+
   const orderLogic = logics.find((item) => item.logic == order.outboundRoute)
 
   const { data: limitOrderSteps } = useLimitSteps({

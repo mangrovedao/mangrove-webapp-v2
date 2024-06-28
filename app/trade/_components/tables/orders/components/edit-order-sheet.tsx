@@ -75,13 +75,16 @@ export default function EditOrderSheet({
   const { expiryDate, isBid } = order
   const {
     handleSubmit,
-    form,
     setToggleEdit,
+    computeSendAmount,
+    computeReceiveAmount,
+    form,
     toggleEdit,
     displayDecimals,
     isOrderExpired,
     formattedPrice,
     sendTokenBalance,
+
     sendFrom,
     receiveTo,
   } = useEditOrder({
@@ -205,6 +208,7 @@ export default function EditOrderSheet({
                               onBlur={field.handleBlur}
                               onChange={(e) => {
                                 field.handleChange(e.target.value)
+                                computeReceiveAmount()
                               }}
                               error={field.state.meta.touchedErrors}
                               token={quote}
@@ -244,6 +248,7 @@ export default function EditOrderSheet({
                               onBlur={field.handleBlur}
                               onChange={(e) => {
                                 field.handleChange(e.target.value)
+                                computeReceiveAmount()
                               }}
                               error={field.state.meta.touchedErrors}
                               token={isBid ? quote : base}
@@ -269,10 +274,8 @@ export default function EditOrderSheet({
                         }`}</Text>
                       ) : (
                         <form.Field
-                          name="send"
-                          onChange={sendValidator(
-                            Number(sendTokenBalance.balance?.balance ?? 0),
-                          )}
+                          name="receive"
+                          onChange={isGreaterThanZeroValidator}
                         >
                           {(field) => (
                             <EnhancedNumericInput
@@ -284,6 +287,7 @@ export default function EditOrderSheet({
                               onBlur={field.handleBlur}
                               onChange={(e) => {
                                 field.handleChange(e.target.value)
+                                computeSendAmount()
                               }}
                               error={field.state.meta.touchedErrors}
                               token={isBid ? base : quote}
