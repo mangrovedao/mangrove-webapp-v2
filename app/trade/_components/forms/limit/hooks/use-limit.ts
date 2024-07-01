@@ -171,11 +171,6 @@ export function useLimit(props: Props) {
     const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
     const send = Number(form?.getFieldValue("send") ?? 0)
 
-    console.log({
-      limit,
-      send,
-    })
-
     form.setFieldValue(
       "receive",
       (bs === BS.buy ? send / limit : send * limit).toString(),
