@@ -33,7 +33,6 @@ export function Market() {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
-    receiveTokenBalance,
     handleSubmit,
     form,
     market,
@@ -107,7 +106,12 @@ export function Market() {
             <form.Field
               name="send"
               onChange={sendValidator(
-                Number(sendTokenBalance.balance?.balance ?? 0),
+                Number(
+                  formatUnits(
+                    sendTokenBalance?.balance?.balance || 0n,
+                    sendTokenBalance?.balance?.token.decimals || 18,
+                  ),
+                ),
               )}
             >
               {(field) => (
@@ -140,11 +144,7 @@ export function Market() {
                     ) === "0"
                   }
                   showBalance
-                  error={
-                    field.state.value === "0" && hasEnoughVolume
-                      ? [FIELD_ERRORS.insufficientVolume]
-                      : field.state.meta.touchedErrors
-                  }
+                  error={field.state.meta.touchedErrors}
                 />
               )}
             </form.Field>
