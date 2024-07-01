@@ -81,8 +81,6 @@ export function useMarketForm(props: Props) {
     spotPrice,
   } = useTradeInfos("market", bs)
 
-  console.log({ sendTokenBalance })
-
   const { book } = useBook()
 
   const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
