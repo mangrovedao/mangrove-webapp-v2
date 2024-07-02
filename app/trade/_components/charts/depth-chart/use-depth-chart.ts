@@ -38,8 +38,9 @@ function removeCrossedOrders(
 export function useDepthChart() {
   const { currentMarket: market } = useMarket()
   const { book, isLoading } = useBook({})
-  const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
+  const [hasScrolled, setHasScrolled] = React.useState(false)
   const [isScrolling, setIsScrolling] = React.useState(false)
+  const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const baseDecimals = market?.base.displayDecimals
   const priceDecimals = market?.quote.priceDisplayDecimals
   const { asks, bids } = removeCrossedOrders(book?.bids ?? [], book?.asks ?? [])
@@ -53,6 +54,62 @@ export function useDepthChart() {
     if (!bids?.length || !asks?.length) return 0
     return ((lowestAsk?.price ?? 0) + (highestBid?.price ?? 0)) / 2
   }, [asks?.length, bids?.length, highestBid?.price, lowestAsk?.price])
+
+  const OFFSET_FOR_ZOOM = Math.min(2, asks.length - 1, bids.length - 1)
+  const MAX_RATIO_PER_STEP = 2
+
+  // Sum up the asks and bids to get a cumulative volume array
+  const { cumulativeAsksForZoom, cumulativeBidsForZoom } = React.useMemo(() => {
+    const cumulativeAsksForZoom = asks.reduce((acc, off) => {
+      acc.push(off.volume + (acc.slice(-1)[0] ?? 0))
+      return acc
+    }, [] as number[])
+
+    const cumulativeBidsForZoom = bids.reduce((acc, off) => {
+      acc.push(off.volume + (acc.slice(-1)[0] ?? 0))
+      return acc
+    }, [] as number[])
+
+    return { cumulativeBidsForZoom, cumulativeAsksForZoom }
+  }, [market?.base.address, market?.quote.address, asks.length, bids.length])
+
+  const { maxDiff } = React.useMemo(() => {
+    let bidIndex = OFFSET_FOR_ZOOM
+    let askIndex = OFFSET_FOR_ZOOM
+
+    for (let i = OFFSET_FOR_ZOOM; i < cumulativeBidsForZoom.length - 2; i++) {
+      if (
+        cumulativeBidsForZoom[i + 1]! >
+        cumulativeBidsForZoom[i]! * MAX_RATIO_PER_STEP
+      ) {
+        bidIndex = i
+        break
+      }
+    }
+
+    if (bidIndex === OFFSET_FOR_ZOOM) {
+      bidIndex = cumulativeBidsForZoom.length - 1
+    }
+
+    for (let i = OFFSET_FOR_ZOOM; i < cumulativeAsksForZoom.length - 2; i++) {
+      if (
+        cumulativeAsksForZoom[i + 1]! >
+        cumulativeAsksForZoom[i]! * MAX_RATIO_PER_STEP
+      ) {
+        askIndex = i
+        break
+      }
+    }
+
+    if (askIndex === OFFSET_FOR_ZOOM) {
+      askIndex = cumulativeAsksForZoom.length - 1
+    }
+
+    const bidDiff = midPrice - bids[bidIndex]?.price!
+    const askDiff = asks[askIndex]?.price! - midPrice
+    const maxDiff = Math.max(bidDiff, askDiff) ?? 0
+    return { maxDiff }
+  }, [market?.base.address, market?.quote.address, asks.length, bids.length])
 
   function onMouseOut() {
     setIsScrolling(false)
@@ -71,31 +128,6 @@ export function useDepthChart() {
   const minZoomDomain = React.useMemo(() => {
     return ((midPrice ?? 0) - (highestBid?.price ?? 0)) * 1.15
   }, [highestBid?.price, midPrice])
-
-  React.useEffect(() => {
-    // Handle one-side orderbook
-    if (!asks?.length || !bids?.length) {
-      setZoomDomain(
-        !asks?.length ? highestBid?.price ?? 0 : highestAsk?.price ?? 0,
-      )
-      return
-    }
-    // set initial zoom domain
-    const newZoomDomain = Math.max(
-      (midPrice - (highestBid?.price || 0)) * 13,
-      (midPrice - (lowestBid?.price || 0)) / 2,
-      ((highestAsk?.price || 0) - midPrice) / 2,
-    )
-
-    setZoomDomain(newZoomDomain > midPrice ? midPrice : newZoomDomain)
-  }, [
-    asks?.length,
-    bids?.length,
-    highestAsk?.price,
-    highestBid?.price,
-    lowestBid?.price,
-    midPrice,
-  ])
 
   const { domain, range } = React.useMemo(() => {
     const domain =
@@ -147,6 +179,26 @@ export function useDepthChart() {
     zoomDomain,
   ])
 
+  React.useEffect(() => {
+    // Handle one-side orderbook
+    if (!asks?.length || !bids?.length) {
+      setZoomDomain(
+        !asks?.length ? highestBid?.price ?? 0 : highestAsk?.price ?? 0,
+      )
+      return
+    }
+
+    console.log(maxDiff, midPrice)
+    setZoomDomain(maxDiff)
+  }, [
+    asks?.length,
+    bids?.length,
+    highestAsk?.price,
+    highestBid?.price,
+    lowestBid?.price,
+    midPrice,
+  ])
+
   const onDepthChartZoom = ({ deltaY }: React.WheelEvent) => {
     if (
       !(
@@ -160,21 +212,21 @@ export function useDepthChart() {
     )
       return
 
-    setZoomDomain(
-      clamp(
-        Math.max(
-          1e-18,
-          Math.min(
-            Number.MAX_SAFE_INTEGER,
-            zoomDomain * Math.exp(deltaY / 1000),
-          ),
-          minZoomDomain,
-        ),
-        0,
-        midPrice,
-      ),
-    )
+    if (!hasScrolled) {
+      setHasScrolled(true)
+    }
+
+    // Thoughts? Messy or easier to follow?
+    // easier now, it's the same but on many lines, right?
+    // Should be the exact same, but I might have messed up the math, will double check
+    // that's what I was trying to understand / check, seems to be the same, need to do git diff :)
+    let newDomain = zoomDomain * Math.exp(deltaY / 1000)
+    newDomain = Math.min(Number.MAX_SAFE_INTEGER, newDomain)
+    newDomain = Math.max(1e-18, newDomain, minZoomDomain)
+    newDomain = clamp(newDomain, 0, midPrice)
+    setZoomDomain(newDomain)
   }
+
   return {
     zoomDomain,
     onDepthChartZoom,
