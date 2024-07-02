@@ -188,7 +188,6 @@ export function useDepthChart() {
       return
     }
 
-    console.log(maxDiff, midPrice)
     setZoomDomain(maxDiff)
   }, [
     asks?.length,

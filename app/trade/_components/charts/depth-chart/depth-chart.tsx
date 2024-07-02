@@ -60,11 +60,6 @@ export function DepthChart() {
     isLoading,
   } = useDepthChart()
 
-  console.log({
-    zoomDomain,
-    domain,
-  })
-
   if (asks?.length === 0 && bids?.length === 0 && !isLoading && !!market) {
     return (
       <div className="w-full h-full flex justify-center items-center">

@@ -37,7 +37,6 @@ export function getNumTicksBasedOnDecimals(
   minTicks = 2,
   maxTicks = 5,
 ) {
-  console.log("getNumTicksBasedOnDecimals value param:", value)
   // Convert the value to a string to check its decimal part
   const valueString = value.toString()
 
