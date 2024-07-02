@@ -215,10 +215,6 @@ export function useDepthChart() {
       setHasScrolled(true)
     }
 
-    // Thoughts? Messy or easier to follow?
-    // easier now, it's the same but on many lines, right?
-    // Should be the exact same, but I might have messed up the math, will double check
-    // that's what I was trying to understand / check, seems to be the same, need to do git diff :)
     let newDomain = zoomDomain * Math.exp(deltaY / 1000)
     newDomain = Math.min(Number.MAX_SAFE_INTEGER, newDomain)
     newDomain = Math.max(1e-18, newDomain, minZoomDomain)
