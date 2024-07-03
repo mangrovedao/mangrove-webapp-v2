@@ -81,9 +81,7 @@ export const useParameters = () => {
   //     initialData: { asksBalance: Big(0), bidsBalance: Big(0) },
   //   }).data ?? {}
 
-  const lockedBounty = Number(kandelState?.unlockedProvision ?? 0).toFixed(
-    nativeBalance?.decimals ?? 18,
-  )
+  const lockedBounty = formatUnits(kandelState?.totalProvision || 0n, 18)
 
   const getWithdawableBalances = async () => {
     if (!publicClient || !baseToken?.address || !quoteToken?.address) return
