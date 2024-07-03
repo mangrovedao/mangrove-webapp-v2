@@ -1731,6 +1731,7 @@ packages:
 
   '@mangrovedao/mgv@0.8.16':
     resolution: {integrity: sha512-RkSdgFlfnwO4YLdoxSadJIiNBb+cfBMqOhBzS2KsinKihqMKoMjaBEAdT8s2khuyIFgfLyImYUag7N5DGfrZXg==}
+
     peerDependencies:
       typescript: '>=5.0.4'
       viem: ^2.9.1
@@ -11315,6 +11316,7 @@ snapshots:
       semver: 7.6.2
 
   '@mangrovedao/mgv@0.8.16(typescript@5.4.5)(viem@2.13.10(bufferutil@4.0.8)(typescript@5.4.5)(zod@3.23.8))':
+
     dependencies:
       viem: 2.13.10(bufferutil@4.0.8)(typescript@5.4.5)(zod@3.23.8)
     optionalDependencies:
