@@ -37,7 +37,8 @@ export default function useForm() {
   const logics = useLogics()
   const { currentParameter } = strategyQuery.data ?? {}
 
-  const lockedBounty = kandelState?.unlockedProvision
+  const lockedBounty = formatUnits(kandelState?.totalProvision || 0n, 18)
+
   const {
     priceRange: [minPrice, maxPrice],
     setGlobalError,
@@ -79,7 +80,7 @@ export default function useForm() {
         (Number(currentParameter?.length) - 1).toString() || "10",
       )
       setStepSize(currentParameter?.stepSize || "")
-      setBountyDeposit(formatUnits(lockedBounty || 0n, 8))
+      setBountyDeposit(lockedBounty)
     }
   }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
 

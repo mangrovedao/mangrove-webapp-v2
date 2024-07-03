@@ -68,7 +68,7 @@ export function DepthChart() {
     )
   }
 
-  if (!(zoomDomain && midPrice) || isLoading) {
+  if (!midPrice || isLoading) {
     return (
       <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean" />
     )
@@ -111,11 +111,13 @@ export function DepthChart() {
               bottom: 16,
             }}
           >
-            <Axis
-              orientation="bottom"
-              numTicks={getNumTicksBasedOnDecimals(zoomDomain)}
-              tickFormat={(n) => formatNumber(n, zoomDomain >= 500)}
-            />
+            {zoomDomain ? (
+              <Axis
+                orientation="bottom"
+                numTicks={getNumTicksBasedOnDecimals(zoomDomain)}
+                tickFormat={(n) => formatNumber(n, zoomDomain >= 500)}
+              />
+            ) : undefined}
             <Grid
               numTicks={4}
               lineStyle={{
