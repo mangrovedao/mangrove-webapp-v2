@@ -1,6 +1,8 @@
 "use client"
 
 import { Bridge } from "@synapsecns/widget"
+
+import WarningBanner from "./_components/warning-banner"
 import { useEthersSigner } from "./_hooks/use-ethers-signer"
 
 export default function Page() {
@@ -11,11 +13,14 @@ export default function Page() {
   }
 
   return (
-    <div className="max-w-md m-auto">
-      <Bridge
-        web3Provider={signer.provider}
-        customTheme={{ bgColor: "hsl(180deg 86% 3%)" }}
-      />
+    <div>
+      <div className="max-w-md m-auto">
+        <Bridge
+          web3Provider={signer.provider}
+          customTheme={{ bgColor: "hsl(180deg 86% 3%)" }}
+        />
+      </div>
+      <WarningBanner />
     </div>
   )
 }
