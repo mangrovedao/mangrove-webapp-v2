@@ -51,7 +51,6 @@ export function Market() {
     sendTokenBalance.balance?.balance || 0n,
     sendToken?.decimals || 18,
   )
-
   const sendTokenBalanceAsNumber = sendBalance ? Number(sendBalance) : 0
 
   const handleSliderChange = (value: number) => {
