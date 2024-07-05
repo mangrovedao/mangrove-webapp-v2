@@ -1,19 +1,19 @@
 "use client"
 
 import { Bridge } from "@synapsecns/widget"
-import { useEthereumWallet } from "./_hooks/use-ethereum-wallet"
+import { useEthersSigner } from "./_hooks/use-ethers-signer"
 
 export default function Page() {
-  const { web3Provider } = useEthereumWallet()
+  const signer = useEthersSigner()
 
-  if (!web3Provider) {
+  if (!signer) {
     return null
   }
 
   return (
     <div className="max-w-md m-auto">
       <Bridge
-        web3Provider={web3Provider}
+        web3Provider={signer.provider}
         customTheme={{ bgColor: "hsl(180deg 86% 3%)" }}
       />
     </div>
