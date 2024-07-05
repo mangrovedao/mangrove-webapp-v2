@@ -23,7 +23,7 @@ export function useEpochLeaderboard({
     queryKey: ["epoch-leaderboard", first, skip, epoch, lcAccount],
     queryFn: async () => {
       try {
-        let url = `${env.NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST}/${epoch}?_start=${skip}&_limit=${first}`
+        let url = `${env.NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST}/ms1?_start=${skip}&_limit=${first}`
         if (lcAccount) {
           url += `&account=${lcAccount}`
         }

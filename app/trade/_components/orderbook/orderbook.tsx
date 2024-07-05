@@ -13,7 +13,6 @@ import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
-import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { BA } from "@mangrovedao/mgv/lib"
 import { SemiBook } from "./semibook"
 import { OrderBookTableCell } from "./table-cell"
@@ -85,7 +84,6 @@ function BookContent() {
     style: "percent",
     maximumFractionDigits: 2,
   }).format(spreadPercent / 100)
-  const priceDecimals = determinePriceDecimalsFromToken(bigestPrice)
 
   return (
     <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>

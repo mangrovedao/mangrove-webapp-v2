@@ -26,7 +26,8 @@ export function useUserVolume() {
     meta: {
       error: "Unable to retrieve user volume data",
     },
-    enabled: !!address,
+    // enabled: !!address,
+    enabled: false, // disabled for now because we do not have ne
     retry: false,
     staleTime: 1 * 60 * 1000, // 1 minute
   })

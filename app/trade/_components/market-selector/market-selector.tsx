@@ -8,9 +8,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import useMarket from "@/providers/market.new"
-import { TokenIcon } from "../../../../components/token-icon"
 import { MarketParams } from "@mangrovedao/mgv"
 import { getAddress, isAddressEqual } from "viem"
+import { TokenIcon } from "../../../../components/token-icon"
 
 function getSymbol(market?: MarketParams) {
   if (!market) return
@@ -28,10 +28,11 @@ export default function MarketSelector() {
     const [baseAddress, quoteAddress, tickSpacing] = value.split("/")
     if (!baseAddress || !quoteAddress || !tickSpacing) return
     try {
-      const market = markets.find(m => 
-        isAddressEqual(m.base.address, getAddress(baseAddress)) && 
-        isAddressEqual(m.quote.address, getAddress(quoteAddress)) && 
-        m.tickSpacing === BigInt(tickSpacing)
+      const market = markets.find(
+        (m) =>
+          isAddressEqual(m.base.address, getAddress(baseAddress)) &&
+          isAddressEqual(m.quote.address, getAddress(quoteAddress)) &&
+          m.tickSpacing === BigInt(tickSpacing),
       )
       if (!market) return
       setMarket(market)

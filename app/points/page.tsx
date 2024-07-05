@@ -33,7 +33,6 @@ export default function Page() {
 
   return isConnected ? (
     <div>
-      <LeaderboardWarningBanner />
       <JoinProgramBanner />
       <div className="flex flex-col items-center md:flex-row md:items-start md:justify-between">
         <Rewards />
