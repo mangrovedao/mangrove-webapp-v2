@@ -8,7 +8,12 @@ export function RedirectToBridge({ children }: React.PropsWithChildren) {
   const pathname = usePathname()
 
   React.useEffect(() => {
-    if (chainId !== 81457 && chainId !== 84532 && pathname !== "/bridge") {
+    if (
+      chainId !== undefined &&
+      chainId !== 81457 &&
+      chainId !== 84532 &&
+      pathname !== "/bridge"
+    ) {
       redirect("/bridge")
     }
   }, [chainId, pathname])
