@@ -75,7 +75,11 @@ function BookContent() {
   }).format(spreadPercent / 100)
 
   return (
-    <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
+    <ScrollArea
+      className="h-full trololo"
+      scrollHideDelay={200}
+      ref={scrollAreaRef}
+    >
       <Table className="text-sm leading-5 h-full select-none relative">
         <TableHeader className="sticky top-0 bg-background z-40 py-2 text-xs h-[var(--bar-height)]">
           <TableRow className="border-none">
