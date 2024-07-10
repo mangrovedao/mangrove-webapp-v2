@@ -41,7 +41,6 @@ export function useMarkets() {
   const chain = useChainId()
   switch (chain) {
     case blast.id:
-      console.log({ blastMarkets })
       return blastMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets
