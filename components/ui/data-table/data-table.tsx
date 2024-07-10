@@ -25,6 +25,7 @@ interface DataTableProps<TData> {
   onRowClick?: (row: TData | null) => void
   renderExtraRow?: (row: Row<TData>) => React.ReactNode
   tableRowClasses?: string
+  skeletonRows?: number
 }
 
 export function DataTable<TData>({
@@ -34,11 +35,13 @@ export function DataTable<TData>({
   pagination,
   isRowHighlighted = () => false,
   onRowHover = () => {},
-  onRowClick = () => {},
+  onRowClick,
   renderExtraRow = () => null,
   tableRowClasses,
+  skeletonRows = 2,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
+  const tableName = Object.keys(table._getAllFlatColumnsById()).join("-")
   const leafColumns = table
     .getAllLeafColumns()
     .filter((column) => column.getIsVisible())
@@ -48,10 +51,13 @@ export function DataTable<TData>({
       <Table>
         <TableHeader className="sticky top-[0] bg-background z-40 p-0 text-xs">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="px-2">
+                  <TableHead
+                    key={`${tableName}-head-${header.id}`}
+                    className="px-2"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -66,17 +72,17 @@ export function DataTable<TData>({
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <LoadingBody cells={leafColumns.length} rows={2} />
+            <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
           ) : rows?.length ? (
             rows.map((row) => (
               <>
                 <TableRow
-                  key={row.id}
+                  key={`${tableName}-body-row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
                     "text-gray-scale-300 hover:text-white transition-colors group/row",
                     {
-                      "cursor-pointer": onRowClick,
+                      "cursor-pointer": !!onRowClick,
                       "text-white hover:opacity-80 transition-all":
                         isRowHighlighted?.(row.original),
                     },
@@ -90,7 +96,7 @@ export function DataTable<TData>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
-                      key={cell.id}
+                      key={`${tableName}-body-cell-${cell.id}`}
                       className="px-0 py-2 group/cell whitespace-nowrap"
                     >
                       <div
@@ -117,7 +123,7 @@ export function DataTable<TData>({
               </>
             ))
           ) : (
-            <TableRow>
+            <TableRow key={`${tableName}-bodyrow-${Math.random()}`}>
               <TableCell
                 colSpan={leafColumns.length}
                 className="h-24 text-center text-muted-foreground"

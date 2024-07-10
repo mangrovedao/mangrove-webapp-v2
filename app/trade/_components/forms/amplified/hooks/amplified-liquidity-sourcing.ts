@@ -1,10 +1,9 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
-import { DefaultLogics } from "../../types"
 
 type Props = {
   sendFrom?: string
-  logics: DefaultLogics[]
+  logics: Logic[]
   fundOwner?: string
   sendToken?: Token
   availableTokens?: Token[]
@@ -35,8 +34,8 @@ export default function amplifiedLiquiditySourcing({
     const tokenToTest = availableTokens.map(async (token) => {
       if (sendFrom !== "simple") {
         try {
-          const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
-          await selectedLogic?.overlying(token)
+          // const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
+          // await selectedLogic?.overlying(token)
           return token
         } catch (error) {
           return
@@ -57,20 +56,18 @@ export default function amplifiedLiquiditySourcing({
         return
       }
 
-      const selectedLogic = logics.find((logic) => logic?.id === sendFrom)
+      const selectedLogic = logics.find((logic) => logic?.name === sendFrom)
 
       if (!selectedLogic) return
 
-      const logicBalance = await selectedLogic.balanceOfFromLogic(
-        token,
-        fundOwner,
-      )
+      // const logicBalance = await selectedLogic.balanceOfFromLogic(
+      //   token,
+      //   fundOwner,
+      // )
 
       setSendFromBalance({
-        formatted: logicBalance
-          .toNumber()
-          .toFixed(sendToken?.displayedDecimals),
-        balance: logicBalance.toNumber(),
+        formatted: "",
+        balance: 0,
       })
     } catch (error) {
       return

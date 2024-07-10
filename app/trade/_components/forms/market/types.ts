@@ -1,7 +1,7 @@
-import type { TradeAction } from "../enums"
+import { BS } from "@mangrovedao/mgv/lib"
 
 export type Form = {
-  tradeAction: TradeAction
+  bs: BS
   send: string
   receive: string
   slippage: number

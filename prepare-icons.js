@@ -20,6 +20,14 @@ function copyIcons() {
     "./public/custom-token-icons/blast/usdb.svg",
     "./public/cryptocurrency-icons/svg/color/usdb.svg",
   )
+  fs.copyFileSync(
+    "./public/custom-token-icons/blast/usde.svg",
+    "./public/cryptocurrency-icons/svg/color/usde.svg",
+  )
+  fs.copyFileSync(
+    "./public/custom-token-icons/blast/blast.svg",
+    "./public/cryptocurrency-icons/svg/color/blast.svg",
+  )
 }
 
 function genetareDicFromManifestFile() {
@@ -32,6 +40,8 @@ function genetareDicFromManifestFile() {
     { WETH: { color: "#627eea", name: "Wrapped Ethereum", symbol: "WETH" } },
     { WMATIC: { color: "#7F44E0", name: "Wrapped MATIC", symbol: "WMATIC" } },
     { USDB: { color: "#FCFC01", name: "USDB", symbol: "USDB" } },
+    { BLAST: { color: "#FCFC01", name: "BLAST", symbol: "BLAST" } },
+    { USDe: { color: "#FFFFFF", name: "USDe", symbol: "USDe" } },
   )
   fs.mkdirSync("./generated", { recursive: true })
   fs.writeFileSync("./generated/icons.json", JSON.stringify(dic))

@@ -8,102 +8,160 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
-import { useAccount } from "wagmi"
 
 import { formatDate } from "@/utils/date"
+import { useAccount, useBalance } from "wagmi"
+import { StrategyHistory } from "../../../_hooks/use-strategy-history"
 import useKandel from "../../../_providers/kandel-strategy"
 import BlockExplorer from "../../block-explorer"
 
 const columnHelper = createColumnHelper<Parameters>()
 const DEFAULT_DATA: Parameters[] = []
 
-export type Parameters = {
-  date: Date
-  spread: string
-  ratio: string
-  pricePoints: string
-  amount: string
-  txHash: string
-}
+export type Parameters = StrategyHistory
 
 type Params = {
-  data?: Parameters[]
+  data?: Parameters[] | null
 }
 
-export function useParametersTables({ data }: Params) {
-  const { chain } = useAccount()
-  const { baseToken } = useKandel()
+export function useParametersTable({ data }: Params) {
+  const { strategyStatusQuery } = useKandel()
+  const { market } = strategyStatusQuery.data ?? {}
+  const baseDecimals = market?.base.displayDecimals
+  const quoteDecimals = market?.quote.displayDecimals
+  const { address, chain } = useAccount()
+  const { data: nativeBalance } = useBalance({
+    address,
+  })
 
   const columns = React.useMemo(
     () => [
-      columnHelper.accessor("date", {
-        header: "date",
+      columnHelper.accessor("creationDate", {
+        header: "Date",
         cell: ({ row }) => {
-          const { date } = row.original
-          return <div>{formatDate(date)}</div>
+          const { creationDate } = row.original
+          if (!creationDate) return <div>N/A</div>
+          return <div>{formatDate(creationDate)}</div>
         },
       }),
 
       columnHelper.display({
-        id: "spread",
-        header: () => <div className="text-right">Spread</div>,
+        id: "offers",
+        header: () => <div className="text-right">Nb. of offers</div>,
         cell: ({ row }) => {
-          const { spread } = row.original
-          return <div className="w-full h-full flex justify-end">{spread}</div>
-        },
-      }),
+          const { numberOfOrders } = row.original
+          if (Number(numberOfOrders) <= 0)
+            return (
+              <div className="w-full h-full flex flex-col items-end">N/A</div>
+            )
 
-      columnHelper.display({
-        id: "ratio",
-        header: () => <div className="text-right">Ratio</div>,
-        cell: ({ row }) => {
-          const { ratio } = row.original
-          return <div className="w-full h-full flex justify-end">{ratio}</div>
-        },
-      }),
-
-      columnHelper.display({
-        id: "pricePoints",
-        header: () => <div className="text-right">No. of Price Points</div>,
-        cell: ({ row }) => {
-          const { pricePoints } = row.original
-          return (
-            <div className="w-full h-full flex justify-end">{pricePoints}</div>
-          )
-        },
-      }),
-
-      columnHelper.accessor("amount", {
-        id: "amount",
-        header: () => <div className="text-right">Amount</div>,
-        cell: ({ row }) => {
-          const { amount } = row.original
           return (
             <div className="w-full h-full flex justify-end">
-              {amount} {baseToken?.symbol}
+              {Number(numberOfOrders)}
             </div>
           )
         },
       }),
-      columnHelper.accessor("txHash", {
-        id: "txHash",
-        header: () => <div className="text-right">Transaction Hash</div>,
+
+      columnHelper.display({
+        id: "stepSize",
+        header: () => <div className="text-right">Step size</div>,
+        cell: ({ row }) => {
+          const { stepSize } = row.original
+          if (Number(stepSize) <= 0)
+            return (
+              <div className="w-full h-full flex flex-col items-end">N/A</div>
+            )
+
+          return (
+            <div className="w-full h-full flex justify-end">{stepSize}</div>
+          )
+        },
+      }),
+
+      columnHelper.display({
+        id: "txhash",
+        header: () => <div className="text-right">Transaction</div>,
         cell: ({ row }) => {
           const { txHash } = row.original
-          const blockExplorerUrl = chain?.blockExplorers?.default.url
+          if (!txHash)
+            return (
+              <div className="w-full h-full flex flex-col items-end">N/A</div>
+            )
           return (
             <div className="w-full h-full flex justify-end">
               <BlockExplorer
+                blockExplorerUrl={chain?.blockExplorers?.default.url}
                 address={txHash}
-                blockExplorerUrl={blockExplorerUrl}
-                description={false}
+                type="tx"
               />
             </div>
           )
         },
       }),
+
+      columnHelper.display({
+        id: "amount",
+        header: () => <div className="text-right">Price range (min, max)</div>,
+        cell: ({ row }) => {
+          const { maxPrice, minPrice } = row.original
+          if (!maxPrice || !minPrice)
+            return (
+              <div className="w-full h-full flex flex-col items-end">N/A</div>
+            )
+
+          return (
+            <div className="w-full h-full flex flex-col items-end">
+              <div>
+                {Number(minPrice).toFixed(quoteDecimals)} {market?.base.symbol}
+              </div>
+              <div>
+                {Number(maxPrice).toFixed(quoteDecimals)}
+                {market?.quote.symbol}{" "}
+              </div>
+            </div>
+          )
+        },
+      }),
+
+      columnHelper.display({
+        id: "amount",
+        header: () => <div className="text-right">Amount</div>,
+        cell: ({ row }) => {
+          const { askAmount, bidAmount } = row.original
+          if (!askAmount || !bidAmount)
+            return (
+              <div className="w-full h-full flex flex-col items-end">N/A</div>
+            )
+          return (
+            <div className="w-full h-full flex flex-col items-end">
+              <div>
+                {Number(askAmount).toFixed(baseDecimals)} {market?.base.symbol}
+              </div>
+              <div>
+                {Number(bidAmount).toFixed(quoteDecimals)}
+                {market?.quote.symbol}
+              </div>
+            </div>
+          )
+        },
+      }),
+
+      columnHelper.display({
+        id: "lockedBounty",
+        header: () => <div className="text-right">Bounty</div>,
+        cell: ({ row }) => {
+          const { bounty } = row.original
+          if (!bounty) return
+          return (
+            <div className="w-full h-full flex justify-end">
+              {Number(bounty).toFixed(6)} {nativeBalance?.symbol}
+            </div>
+          )
+        },
+      }),
     ],
-    [],
+    [chain?.blockExplorers?.default.url, market?.base, market?.quote],
   )
 
   return useReactTable({

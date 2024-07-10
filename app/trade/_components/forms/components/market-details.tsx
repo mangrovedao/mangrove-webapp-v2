@@ -3,16 +3,7 @@ type MarketDetailsProps = {
   takerFee?: string
   tickSize?: string
   spotPrice?: string
-  minVolume?: {
-    bid: {
-      volume: string | undefined
-      token: string | undefined
-    }
-    ask: {
-      volume: string | undefined
-      token: string | undefined
-    }
-  }
+  minVolume?: string
   amplifiedMinVolume?: string
 }
 
@@ -34,10 +25,7 @@ export function MarketDetails({
       ) : undefined}
 
       {minVolume ? (
-        <MarketDetailsLine
-          title={`Minimum volume`}
-          value={`${minVolume?.ask.volume} ${minVolume?.ask.token} / ${minVolume?.bid.volume} ${minVolume?.bid.token}`}
-        />
+        <MarketDetailsLine title={`Minimum volume`} value={`${minVolume}`} />
       ) : undefined}
     </Accordion>
   )

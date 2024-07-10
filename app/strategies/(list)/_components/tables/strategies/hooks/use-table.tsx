@@ -7,10 +7,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import Big from "big.js"
 import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
@@ -32,6 +34,7 @@ type Params = {
 
 export function useTable({ type, data, onCancel, onManage }: Params) {
   const { chain } = useAccount()
+
   const columns = React.useMemo(
     () => [
       columnHelper.display({
@@ -76,8 +79,8 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
           </div>
         ),
         cell: ({ row }) => {
-          const { min, max, quote } = row.original
-          return <MinMax min={min} max={max} quote={quote} />
+          const { min, max, quote, base } = row.original
+          return <MinMax min={min} max={max} quote={quote} base={base} />
         },
       }),
       columnHelper.display({
@@ -90,13 +93,28 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Value",
         cell: ({ row }) => {
-          const { base, quote, depositedBase, depositedQuote } = row.original
+          const { base, quote, offers } = row.original
+          const asksOffers = offers?.filter(
+            (item) => item.offerType === "asks" && item.live,
+          )
+          const bidsOffers = offers?.filter(
+            (item) => item.offerType === "bids" && item.live,
+          )
+
+          const baseAmountDeposited = asksOffers?.reduce((acc, curr) => {
+            return acc.add(Big(curr.gives))
+          }, Big(0))
+
+          const quoteAmountDeposited = bidsOffers?.reduce((acc, curr) => {
+            return acc.add(Big(curr.gives))
+          }, Big(0))
+
           return (
             <Value
               base={base}
-              baseValue={depositedBase}
+              baseValue={baseAmountDeposited.toFixed(6)}
               quote={quote}
-              quoteValue={depositedQuote}
+              quoteValue={quoteAmountDeposited.toFixed(6)}
             />
           )
         },
@@ -105,58 +123,66 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         header: "Status",
         cell: ({ row }) => {
           const { base, quote, address, offers } = row.original
-          return (
-            <Status
-              base={base}
-              quote={quote}
-              address={address}
-              offers={offers}
-            />
-          )
+          const { data } = useStrategyStatus({
+            address,
+            base,
+            quote,
+            offers,
+          })
+
+          return <Status status={data?.status} />
         },
       }),
+      // columnHelper.display({
+      //   header: "PnL",
+      //   cell: ({ row }) => {
+      //     const { return: ret } = row.original
+      //     return (
+      //       <div className="flex flex-col">
+      //         <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
+      //       </div>
+      //     )
+      //   },
+      // }),
+      // TODO: get from indexer
       columnHelper.display({
-        header: "Return (%)",
+        header: "Liquidity sourcing",
         cell: ({ row }) => {
-          const { return: ret } = row.original
-          return (
-            <div className="flex flex-col">
-              <div>{isNaN(ret as number) ? "-" : ret?.toString()}</div>
-            </div>
-          )
+          const {} = row.original
+          return <div className="flex flex-col">Wallet</div>
         },
-      }),
-      // TODO: get from indexer
-      columnHelper.display({
-        header: "Liquidity source",
-        cell: () => "Wallet",
-      }),
-      // TODO: get from indexer
-      columnHelper.display({
-        header: "Reward",
-        cell: () => "3.39%",
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => (
-          <div className="w-full h-full flex justify-end space-x-1">
-            <IconButton
-              tooltip="Manage"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onManage(row.original)}
-            >
-              <Pen />
-            </IconButton>
-            <IconButton
-              tooltip="Cancel strategy"
-              className="aspect-square w-6 rounded-full"
-              onClick={() => onCancel(row.original)}
-            >
-              <Close />
-            </IconButton>
-          </div>
-        ),
+        cell: ({ row }) => {
+          return (
+            <div className="w-full h-full flex justify-end space-x-1">
+              <IconButton
+                tooltip="Manage"
+                className="aspect-square w-6 rounded-full"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onManage(row.original)
+                }}
+              >
+                <Pen />
+              </IconButton>
+              <IconButton
+                tooltip="Cancel strategy"
+                className="aspect-square w-6 rounded-full"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onCancel(row.original)
+                }}
+              >
+                <Close />
+              </IconButton>
+            </div>
+          )
+        },
       }),
     ],
     [onManage, onCancel],

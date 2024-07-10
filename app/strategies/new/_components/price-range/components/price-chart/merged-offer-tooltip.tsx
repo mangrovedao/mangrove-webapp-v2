@@ -1,19 +1,20 @@
-import { Token } from "@mangrovedao/mangrove.js"
+import { Token } from "@mangrovedao/mgv"
 import { TooltipWithBounds } from "@visx/tooltip"
 import { ScaleLinear } from "d3-scale"
 
-import { MergedOffer } from "@/app/strategies/[address]/_utils/inventory"
 import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
-import { GeometricOffer } from "./geometric-distribution-dots"
+import { OfferParsed } from "@mangrovedao/mgv"
+import { BA } from "@mangrovedao/mgv/lib"
+import { TypedDistrubutionOffer } from "./geometric-distribution-dots"
 
 type Props = {
   height: number
   paddingBottom: number
   xScale: ScaleLinear<number, number>
-  onHover?: (offer: GeometricOffer) => void
+  onHover?: (offer: TypedDistrubutionOffer) => void
   onHoverOut?: () => void
-  mergedOffer: MergedOffer
+  mergedOffer: OfferParsed
   baseToken: Token
   quoteToken: Token
 }
@@ -50,7 +51,7 @@ export function MergedOfferTooltip({
   baseToken,
   quoteToken,
 }: Props) {
-  const isLive = mergedOffer.live
+  const isLive = mergedOffer.gives > 0
   return (
     <TooltipWithBounds
       top={height - paddingBottom}
@@ -59,20 +60,23 @@ export function MergedOfferTooltip({
     >
       <div
         className={cn("p-4 rounded-lg bg-[#0F1212] space-y-2 border", {
-          "border-cherry-400": mergedOffer.offerType === "asks",
-          "border-green-bangladesh": mergedOffer.offerType === "bids",
+          "border-cherry-400": mergedOffer.ba === BA.asks,
+          "border-green-bangladesh": mergedOffer.ba === BA.bids,
         })}
       >
         <StatusBadge isLive={isLive} />
         <div className="text-white">
           <span className="text-cloud-300">Price:</span>{" "}
-          {Number(mergedOffer.price).toFixed(quoteToken?.displayedDecimals)}{" "}
+          {Number(mergedOffer.price).toFixed(quoteToken?.displayDecimals)}{" "}
           {quoteToken?.symbol}
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {Number(mergedOffer.gives).toFixed(baseToken?.displayedDecimals)}{" "}
-          {baseToken?.symbol}
+          {Number(mergedOffer.gives).toFixed(
+            (mergedOffer.ba === BA.bids ? quoteToken : baseToken)
+              ?.displayDecimals,
+          )}{" "}
+          {(mergedOffer.ba === BA.bids ? quoteToken : baseToken)?.symbol}
         </div>
       </div>
     </TooltipWithBounds>

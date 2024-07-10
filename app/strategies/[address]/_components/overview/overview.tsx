@@ -6,6 +6,7 @@ export default function Overview() {
     <div>
       <PriceRangeInfos />
       <div className="py-10">
+        {/* TODO:add SCROll  */}
         <OffersTable />
       </div>
     </div>

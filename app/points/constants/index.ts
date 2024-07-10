@@ -1,26 +1,47 @@
 export const LEVELS = [
   {
-    amount: 1_000,
-    nextBoost: "1.75x",
+    amount: 10_000,
+    boost: 1.75,
     rankString: "1st",
   },
   {
-    amount: 10_000,
-    nextBoost: "2.5x",
+    amount: 20_000,
+    boost: 2.5,
     rankString: "2nd",
   },
   {
     amount: 50_000,
-    nextBoost: "3x",
+    boost: 3,
     rankString: "3rd",
   },
   {
     amount: 100_000,
-    nextBoost: "3.5x",
+    boost: 3.5,
     rankString: "4th",
   },
   {
     amount: 500_000,
-    nextBoost: "4x",
+    boost: 4,
   },
 ]
+
+export function getLevels(volume?: number) {
+  if (!volume) {
+    return {
+      currentIndex: 0,
+      nextIndex: 0,
+      nextLevel: LEVELS[0],
+    }
+  }
+
+  const currentIndex =
+    LEVELS.findIndex((l) => l.amount > volume) === -1
+      ? LEVELS.length - 1
+      : LEVELS.findIndex((l) => l.amount > volume) - 1
+  const nextIndex = currentIndex + 1
+  return {
+    currentIndex,
+    nextIndex,
+    nextLevel: LEVELS[nextIndex],
+  }
+}

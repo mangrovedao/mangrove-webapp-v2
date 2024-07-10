@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
 import { useFills } from "./use-fills"
 import { useTable } from "./use-table"
@@ -11,7 +11,7 @@ export function Fills() {
     page: 1,
     pageSize: 10,
   })
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { data: count } = useFills({
     select: (fills) => fills.length,
   })

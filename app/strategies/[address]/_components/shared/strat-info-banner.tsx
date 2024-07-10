@@ -1,25 +1,26 @@
-import { AverageReturn } from "../../../(shared)/_components/average-return"
 import useKandel from "../../_providers/kandel-strategy"
+import { useParameters } from "../parameters/hook/use-parameters"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function StratInfoBanner() {
-  const { strategyQuery, strategyStatusQuery, baseToken, quoteToken } =
+  const { strategyStatusQuery, strategyAddress, baseToken, quoteToken } =
     useKandel()
-  const { bidsBalance, asksBalance } = strategyStatusQuery.data ?? {}
 
-  const avgReturnPercentage = strategyQuery.data?.return as number | undefined
+  const { publishedBase, publishedQuote, currentParameter } = useParameters()
 
-  const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
+  // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
+
+  const baseValue = `${Number(publishedBase)?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${Number(publishedQuote)?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
   const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
 
   return (
     <div>
       <div className="relative">
         <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 justify-between items-center px-6 pb-8 my-3">
-          <AverageReturn percentage={avgReturnPercentage} />
-          <UnrealizedPnl />
+          {/* <AverageReturn percentage={avgReturnPercentage} /> */}
+          <UnrealizedPnl pnl={currentParameter.pnlQuote} />
           <TotalInventory
             value={baseValue}
             symbol={baseToken?.symbol}

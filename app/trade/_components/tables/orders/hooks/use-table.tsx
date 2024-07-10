@@ -14,7 +14,7 @@ import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
 import { Timer } from "../components/timer"
@@ -30,7 +30,7 @@ type Params = {
 }
 
 export function useTable({ data, onCancel, onEdit }: Params) {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const columns = React.useMemo(
     () => [
       columnHelper.display({
@@ -78,8 +78,8 @@ export function useTable({ data, onCancel, onEdit }: Params) {
           const symbol = isBid ? baseSymbol : quoteSymbol
 
           const displayDecimals = isBid
-            ? market?.base.displayedDecimals
-            : market?.quote.displayedDecimals
+            ? market?.base.displayDecimals
+            : market?.quote.displayDecimals
 
           const amount = Big(initialWants).toFixed(displayDecimals)
           const filled = Big(takerGot).toFixed(displayDecimals)
@@ -116,9 +116,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
           market ? (
             row.getValue() ? (
               <span>
-                {Big(row.getValue()).toFixed(
-                  market.quote.displayedAsPriceDecimals,
-                )}{" "}
+                {Big(row.getValue()).toFixed(market.quote.priceDisplayDecimals)}{" "}
                 {market.quote.symbol}
               </span>
             ) : (
@@ -159,7 +157,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
                 <Pen />
               </IconButton>
               <IconButton
-                tooltip="Retract offer"
+                tooltip="Cancel offer"
                 className="aspect-square w-6 rounded-full"
                 onClick={(e) => {
                   e.preventDefault()

@@ -1,6 +1,8 @@
+import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { LucideChevronRight } from "lucide-react"
 import React from "react"
+import { formatUnits } from "viem"
 
 import {
   CustomRadioGroup,
@@ -31,7 +33,6 @@ export function Market() {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
-    receiveTokenBalance,
     handleSubmit,
     form,
     market,
@@ -46,21 +47,23 @@ export function Market() {
     spotPrice,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
 
+  const sendBalance = formatUnits(
+    sendTokenBalance.balance?.balance || 0n,
+    sendToken?.decimals || 18,
+  )
+  const sendTokenBalanceAsNumber = sendBalance ? Number(sendBalance) : 0
+
   const handleSliderChange = (value: number) => {
-    const amount = (value * Number(sendTokenBalance.formatted)) / 100
+    const amount = (value * sendTokenBalanceAsNumber) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
     computeReceiveAmount()
   }
 
-  const sendTokenBalanceAsBig = sendTokenBalance.formatted
-    ? Big(Number(sendTokenBalance.formatted))
-    : Big(0)
-
   const sliderValue = Math.min(
     Big(!isNaN(Number(send)) ? Number(send) : 0)
       .mul(100)
-      .div(sendTokenBalanceAsBig.eq(0) ? 1 : sendTokenBalanceAsBig)
+      .div(sendTokenBalanceAsNumber === 0 ? 1 : sendTokenBalanceAsNumber)
       .toNumber(),
     100,
   ).toFixed(0)
@@ -69,13 +72,13 @@ export function Market() {
     <>
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <form.Field name="tradeAction">
+          <form.Field name="bs">
             {(field) => (
               <CustomRadioGroup
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
-                onValueChange={(e: TradeAction) => {
+                onValueChange={(e: BS) => {
                   field.handleChange(e)
                   computeReceiveAmount()
                 }}
@@ -101,7 +104,14 @@ export function Market() {
           <div className="space-y-4 !mt-6">
             <form.Field
               name="send"
-              onChange={sendValidator(Number(sendTokenBalance.formatted ?? 0))}
+              onChange={sendValidator(
+                Number(
+                  formatUnits(
+                    sendTokenBalance?.balance?.balance || 0n,
+                    sendTokenBalance?.balance?.token.decimals || 18,
+                  ),
+                ),
+              )}
             >
               {(field) => (
                 <EnhancedNumericInput
@@ -114,19 +124,26 @@ export function Market() {
                   }}
                   balanceAction={{
                     onClick: () => {
-                      field.handleChange(sendTokenBalance.formatted || "0"),
+                      field.handleChange(
+                        formatUnits(
+                          sendTokenBalance.balance?.balance || 0n,
+                          sendToken?.decimals ?? 18,
+                        ) || "0",
+                      ),
                         computeReceiveAmount()
                     },
                   }}
                   token={sendToken}
                   label="Send amount"
-                  disabled={!market || sendTokenBalance.formatted === "0"}
-                  showBalance
-                  error={
-                    field.state.value === "0" && hasEnoughVolume
-                      ? [FIELD_ERRORS.insufficientVolume]
-                      : field.state.meta.touchedErrors
+                  disabled={
+                    !market ||
+                    formatUnits(
+                      sendTokenBalance.balance?.balance ?? 0n,
+                      sendToken?.decimals ?? 18,
+                    ) === "0"
                   }
+                  showBalance
+                  error={field.state.meta.touchedErrors}
                 />
               )}
             </form.Field>
@@ -268,7 +285,7 @@ export function Market() {
               selector={(state) => [
                 state.canSubmit,
                 state.isSubmitting,
-                state.values.tradeAction,
+                state.values.bs,
               ]}
             >
               {([canSubmit, isSubmitting, tradeAction]) => {

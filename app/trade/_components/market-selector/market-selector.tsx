@@ -1,6 +1,4 @@
 "use client"
-import type { Mangrove } from "@mangrovedao/mangrove.js"
-import { useAccount } from "wagmi"
 
 import {
   Select,
@@ -9,57 +7,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
-import { useRouter } from "next/navigation"
+import useMarket from "@/providers/market.new"
+import { MarketParams } from "@mangrovedao/mgv"
+import { getAddress, isAddressEqual } from "viem"
 import { TokenIcon } from "../../../../components/token-icon"
 
-function getSymbol(market?: Mangrove.OpenMarketInfo) {
+function getSymbol(market?: MarketParams) {
   if (!market) return
-  return `${market?.base?.symbol}/${market?.quote?.symbol}`
+  return `${market.base.symbol}/${market.quote.symbol}`
 }
 
-function getValue(market: Mangrove.OpenMarketInfo) {
-  return `${market.base.address}/${market.quote.address}`
+function getValue(market: MarketParams) {
+  return `${market.base.address}/${market.quote.address}/${market.tickSpacing}`
 }
 
 export default function MarketSelector() {
-  const router = useRouter()
-  const { marketsInfoQuery } = useMangrove()
-  const { marketInfo } = useMarket()
-  const { isConnected } = useAccount()
+  const { markets, currentMarket, setMarket } = useMarket()
 
   const onValueChange = (value: string) => {
-    const [baseAddress, quoteAddress] = value.split("/")
-    const marketInfo = marketsInfoQuery.data?.find(
-      ({ base, quote }) =>
-        base.address === baseAddress && quote.address === quoteAddress,
-    )
-    router.push(`?market=${marketInfo?.base.id},${marketInfo?.quote.id}`, {
-      scroll: false,
-    })
+    const [baseAddress, quoteAddress, tickSpacing] = value.split("/")
+    if (!baseAddress || !quoteAddress || !tickSpacing) return
+    try {
+      const market = markets.find(
+        (m) =>
+          isAddressEqual(m.base.address, getAddress(baseAddress)) &&
+          isAddressEqual(m.quote.address, getAddress(quoteAddress)) &&
+          m.tickSpacing === BigInt(tickSpacing),
+      )
+      if (!market) return
+      setMarket(market)
+    } catch (e) {}
   }
 
   return (
     <Select
       value={
-        marketInfo
-          ? `${marketInfo?.base.address}/${marketInfo?.quote.address}`
+        currentMarket
+          ? `${currentMarket.base.address}/${currentMarket.quote.address}/${currentMarket.tickSpacing}`
           : undefined
       }
       onValueChange={onValueChange}
-      disabled={marketsInfoQuery.isLoading || !marketInfo || !isConnected}
+      disabled={!markets.length}
     >
       <SelectTrigger className="p-0 rounded-none bg-transparent text-sm !border-transparent">
         <SelectValue
-          placeholder={!marketInfo ? "Select a market" : "No markets"}
+          placeholder={!markets.length ? "Select a market" : "No markets"}
           suppressHydrationWarning
         />
       </SelectTrigger>
       <SelectContent>
-        {marketsInfoQuery.data?.map((m) => (
+        {markets.map((m) => (
           <SelectItem
-            key={`${m.base.address}/${m.quote.address}`}
+            key={`${m.base.address}/${m.quote.address}/${m.tickSpacing}`}
             value={getValue(m)}
           >
             <div className="flex items-center space-x-2">

@@ -2,14 +2,20 @@
 "use client"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
-import Big from "big.js"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
 
-import useMangrove from "@/providers/mangrove"
-import useMarket from "@/providers/market"
-import { TradeAction } from "../../enums"
-import { useTradeInfos } from "../../hooks/use-trade-infos"
+import { useLogics } from "@/hooks/use-addresses"
+import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
+import { useBook } from "@/hooks/use-book"
+import useMarket from "@/providers/market.new"
+import {
+  BS,
+  Order,
+  getDefaultLimitOrderGasreq,
+  minVolume,
+} from "@mangrovedao/mgv/lib"
+import { formatUnits, parseUnits } from "viem"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -18,18 +24,16 @@ type Props = {
 }
 
 export function useLimit(props: Props) {
-  const { mangrove } = useMangrove()
-  const { market, marketInfo } = useMarket()
-
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      tradeAction: TradeAction.BUY,
+      bs: BS.buy,
       limitPrice: "",
       send: "",
       sendFrom: "simple",
       receive: "",
       receiveTo: "simple",
+      orderType: Order.GTC,
       timeInForce: TimeInForce.GOOD_TIL_TIME,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
@@ -37,59 +41,113 @@ export function useLimit(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const tradeAction = form.useStore((state) => state.values.tradeAction)
+  const { currentMarket } = useMarket()
+  const logics = useLogics()
+
+  const bs = form.useStore((state) => state.values.bs)
   const send = form.useStore((state) => state.values.send)
-  const sendFrom = form.useStore((state) => state.values.sendFrom)
-  const receiveTo = form.useStore((state) => state.values.receiveTo)
 
   const timeInForce = form.useStore((state) => state.values.timeInForce)
-  const logics = mangrove ? Object.values(mangrove.logics) : []
-  const selectedSource = logics.find((logic) => logic?.id === sendFrom)
 
-  const {
-    quoteToken,
-    sendToken,
-    receiveToken,
-    feeInPercentageAsString,
-    sendTokenBalance,
-    receiveTokenBalance,
-    tickSize,
-    spotPrice,
-    defaultLimitPrice,
-  } = useTradeInfos("limit", tradeAction)
+  const { book } = useBook()
 
-  const minAsk = market
-    ?.getSemibook("asks")
-    .getMinimumVolume(selectedSource?.gasOverhead || 200_000)
+  const isBid = bs === BS.buy
+  const sendToken = bs === BS.buy ? currentMarket?.quote : currentMarket?.base
+  const receiveToken =
+    bs === BS.buy ? currentMarket?.base : currentMarket?.quote
+  const quoteToken = currentMarket?.quote
 
-  const minBid = market
-    ?.getSemibook("bids")
-    .getMinimumVolume(selectedSource?.gasOverhead || 200_000)
+  const { logics: sendLogics } = useTokenLogics({ token: sendToken?.address })
+  const { logics: receiveLogics } = useTokenLogics({
+    token: receiveToken?.address,
+  })
 
-  const minVolume =
-    tradeAction === TradeAction.BUY
-      ? {
-          bid: {
-            volume: minAsk?.toFixed(receiveToken?.displayedDecimals),
-            token: receiveToken?.symbol,
-          },
-          ask: {
-            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
-            token: quoteToken?.symbol,
-          },
-        }
-      : {
-          bid: {
-            volume: minBid?.toFixed(quoteToken?.displayedDecimals),
-            token: quoteToken?.symbol,
-          },
-          ask: {
-            volume: minAsk?.toFixed(sendToken?.displayedDecimals),
-            token: sendToken?.symbol,
-          },
-        }
+  // asks : sell base, buy quote
+  // bids : buy base, sell quote
 
-  // TODO: fix TS type for useEventListener
+  const [sendFrom, receiveTo] = form.useStore((state) => [
+    sendLogics.find((l) => l.logic.name === state.values.sendFrom),
+    receiveLogics.find((l) => l.logic.name === state.values.receiveTo),
+  ])
+
+  const { balance: sendTokenBalance } = useTokenBalance({
+    token: sendToken?.address,
+    logic: sendFrom?.logic.logic,
+  })
+
+  const sendTokenBalanceFormatted = formatUnits(
+    sendTokenBalance?.balance || 0n,
+    sendToken?.decimals || 18,
+  )
+
+  const { balance: receiveTokenBalance } = useTokenBalance({
+    token: receiveToken?.address,
+    logic: receiveTo?.logic.logic,
+  })
+
+  const receiveTokenBalanceFormatted = formatUnits(
+    receiveTokenBalance?.balance || 0n,
+    receiveToken?.decimals || 18,
+  )
+
+  const fee = Number(
+    (isBid ? book?.asksConfig?.fee : book?.bidsConfig?.fee) ?? 0,
+  )
+
+  const feeInPercentageAsString = new Intl.NumberFormat("en-US", {
+    style: "percent",
+    maximumFractionDigits: 2,
+  }).format(fee / 10_000)
+
+  const tickSize = currentMarket?.tickSpacing
+    ? `${((1.0001 ** Number(currentMarket?.tickSpacing) - 1) * 100).toFixed(2)}%`
+    : ""
+
+  const spotPrice = isBid
+    ? book?.bids[0]?.price || 0
+    : book?.asks[0]?.price || 0
+
+  const [baseAmount, quoteAmount, humanPrice, sendAmount, receiveAmount] =
+    form.useStore((state) => {
+      const sendIsValid =
+        !isNaN(Number(state.values.send)) && isFinite(Number(state.values.send))
+      const receiveIsValid =
+        !isNaN(Number(state.values.receive)) &&
+        isFinite(Number(state.values.receive))
+
+      const sendAmount = parseUnits(
+        sendIsValid ? state.values.send : "0",
+        sendToken?.decimals || 18,
+      )
+      const receiveAmount = parseUnits(
+        receiveIsValid ? state.values.receive : "0",
+        receiveToken?.decimals || 18,
+      )
+      const base =
+        state.values.bs === BS.buy
+          ? ([receiveAmount, sendAmount] as const)
+          : ([sendAmount, receiveAmount] as const)
+      const humanPrice = Number(state.values.limitPrice) || 1
+      return [...base, humanPrice, sendAmount, receiveAmount] as const
+    })
+
+  const gasreq = BigInt(
+    Math.max(
+      Number(sendFrom?.logic.gasreq || 0),
+      Number(receiveTo?.logic.gasreq || 0),
+      Number(getDefaultLimitOrderGasreq()),
+    ),
+  )
+
+  const minAsk = book ? minVolume(book.asksConfig, gasreq) : 0n
+  const minBid = book ? minVolume(book.bidsConfig, gasreq) : 0n
+
+  const minComputedVolume = bs === BS.buy ? minBid : minAsk
+  const minVolumeFormatted = formatUnits(
+    minComputedVolume,
+    sendToken?.decimals || 18,
+  )
+
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
@@ -98,7 +156,7 @@ export function useLimit(props: Props) {
   ) {
     form.setFieldValue("limitPrice", event.detail.price)
     form.validateAllFields("blur")
-    if (send === "") return
+    if (sendAmount === 0n) return
     computeReceiveAmount()
   }
 
@@ -109,78 +167,31 @@ export function useLimit(props: Props) {
   }
 
   function computeReceiveAmount() {
-    const limitPrice = form.state.values.limitPrice
-    const send = form.state.values.send
-    const bigSend = Big(!isNaN(Number(send)) ? Number(send) : 0)
-    const bigLimitPrice = Big(
-      !isNaN(Number(limitPrice)) ? Number(limitPrice) : 0,
+    if (!currentMarket) return
+    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+    const send = Number(form?.getFieldValue("send") ?? 0)
+
+    form.setFieldValue(
+      "receive",
+      (bs === BS.buy ? send / limit : send * limit).toString(),
     )
-
-    if (send === "") return
-
-    let limit,
-      receive = ""
-    if (tradeAction === TradeAction.SELL) {
-      limit = bigLimitPrice
-
-      receive = limit.mul(bigSend).toString()
-    } else {
-      limit = Number(limitPrice) !== 0 ? Number(limitPrice) : 1
-      receive = bigSend.div(limit).toString()
-    }
-
-    form.store.setState(
-      (state) => {
-        return {
-          ...state,
-          values: {
-            ...state.values,
-            receive,
-          },
-        }
-      },
-      {
-        priority: "high",
-      },
-    )
-    if (!(limitPrice && send)) return
     form.validateAllFields("submit")
   }
 
   function computeSendAmount() {
-    const limitPrice = form.state.values.limitPrice
-    const receive = form.state.values.receive
-    const bigReceive = Big(!isNaN(Number(receive)) ? Number(receive) : 0)
-
-    if (receive === "") return
-    let send = ""
-    if (tradeAction === TradeAction.SELL) {
-      send = bigReceive
-        .div(Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 1))
-        .toString()
-    } else {
-      send = Big(!isNaN(Number(limitPrice)) ? Number(limitPrice) : 0)
-        .mul(bigReceive)
-        .toString()
-    }
-
-    form.store.setState(
-      (state) => {
-        return {
-          ...state,
-          values: {
-            ...state.values,
-            send,
-          },
-        }
-      },
-      {
-        priority: "high",
-      },
+    if (!currentMarket) return
+    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+    const receive = Number(form?.getFieldValue("receive") ?? 0)
+    form.setFieldValue(
+      "send",
+      (bs === BS.buy ? receive * limit : receive / limit).toString(),
     )
-    if (!(limitPrice && receive)) return
     form.validateAllFields("submit")
   }
+
+  React.useEffect(() => {
+    form?.reset()
+  }, [form, currentMarket?.base, currentMarket?.quote])
 
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
@@ -193,46 +204,47 @@ export function useLimit(props: Props) {
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
     form.validateAllFields("submit")
-  }, [form, tradeAction])
+  }, [form, bs])
 
   React.useEffect(() => {
-    form?.reset()
-  }, [form, market?.base, market?.quote])
+    const limitPrice =
+      bs === BS.buy ? book?.asks[0]?.price : book?.bids[0]?.price
 
-  React.useEffect(() => {
-    if (!defaultLimitPrice || !form || !sendToken) return
+    if (!limitPrice || !form || !sendToken) return
 
     //what is this x)
     setTimeout(() => {
       form?.setFieldValue(
         "limitPrice",
-        defaultLimitPrice.toFixed(sendToken.displayedDecimals),
+        limitPrice.toFixed(sendToken.displayDecimals),
       )
       form?.validateAllFields("blur")
     }, 0)
-  }, [form, defaultLimitPrice])
+  }, [bs, book?.midPrice])
 
   return {
-    tradeAction,
-    computeReceiveAmount,
-    computeSendAmount,
-    sendTokenBalance,
-    receiveTokenBalance,
-    handleSubmit,
     form,
-    quoteToken,
-    market,
-    sendToken,
-    send,
-    sendFrom,
-    receiveTo,
-    receiveToken,
-    tickSize,
-    feeInPercentageAsString,
-    spotPrice,
     timeInForce,
+    sendFrom,
+    send,
+    receiveTo,
+    sendToken,
+    receiveToken,
+    sendTokenBalance,
+    sendTokenBalanceFormatted,
+    receiveTokenBalance,
+    receiveTokenBalanceFormatted,
     logics,
-    selectedSource,
-    minVolume,
+    sendLogics,
+    spotPrice,
+    receiveLogics,
+    feeInPercentageAsString,
+    tickSize,
+    minVolume: minComputedVolume,
+    minVolumeFormatted,
+    computeSendAmount,
+    computeReceiveAmount,
+    handleSubmit,
+    quoteToken,
   }
 }

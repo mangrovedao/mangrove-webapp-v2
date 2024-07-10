@@ -1,22 +1,20 @@
 "use client"
-import Link from "next/link"
 import { debounce } from "radash"
 import React from "react"
+import { Address } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
+import { useBook } from "@/hooks/use-book"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMarket from "@/providers/market"
+import { default as useMarketNew } from "@/providers/market.new"
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
-import { Address } from "viem"
-import { AverageReturn } from "../../../(shared)/_components/average-return"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import DeployStrategyDialog from "../launch-strategy-dialog"
-import { LiquiditySource } from "./components/liquidity-source"
 import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
 
@@ -25,7 +23,10 @@ export const PriceRange = withClientOnly(function ({
 }: {
   className?: string
 }) {
-  const { requestBookQuery, midPrice, market, riskAppetite } = useMarket()
+  const { book, isLoading } = useBook()
+  const { currentMarket: market } = useMarketNew()
+  const midPrice = book?.midPrice
+  const riskAppetite = "-"
 
   const { data: baseToken } = useTokenFromAddress(
     market?.base.address as Address,
@@ -43,21 +44,21 @@ export const PriceRange = withClientOnly(function ({
   const [maxPercentage, setMaxPercentage] = React.useState("")
 
   const {
-    setPriceRange,
-    offersWithPrices,
-    setOffersWithPrices,
-    globalError,
-    errors,
-    setErrors,
-    isChangingFrom,
-    setIsChangingFrom,
+    distribution,
     baseDeposit,
     quoteDeposit,
     bountyDeposit,
     stepSize,
-    ratio,
-    pricePoints,
-    distribution,
+    numberOfOffers,
+    kandelParams,
+    globalError,
+    errors,
+    isChangingFrom,
+    sendFrom,
+    receiveTo,
+    setPriceRange,
+    setErrors,
+    setIsChangingFrom,
   } = useNewStratStore()
 
   const formIsInvalid =
@@ -66,8 +67,8 @@ export const PriceRange = withClientOnly(function ({
     !minPrice ||
     !maxPrice ||
     !stepSize ||
-    !pricePoints ||
-    !distribution
+    !numberOfOffers ||
+    !kandelParams
 
   const priceRange: [number, number] | undefined =
     minPrice && maxPrice ? [Number(minPrice), Number(maxPrice)] : undefined
@@ -203,31 +204,36 @@ export const PriceRange = withClientOnly(function ({
   )
 
   React.useEffect(() => {
-    if (offersWithPrices) setOffersWithPrices(undefined)
     if (!minPrice || !maxPrice) return
     debouncedSetPriceRange(minPrice, maxPrice)
   }, [minPrice, maxPrice])
+
+  React.useEffect(() => {
+    setPriceRange("", "")
+    handleFieldChange("chart")
+    setMinPrice("")
+    setMaxPrice("")
+  }, [market])
 
   return (
     <div className={className}>
       <div className="border-b">
         <div className="flex justify-between items-center px-6 pb-8">
-          <AverageReturn />
           <RiskAppetiteBadge value={riskAppetite} />
-          <LiquiditySource />
+          {/* <LiquiditySource /> */}
         </div>
       </div>
 
       {/* CHART */}
       <div className="px-6 space-y-6">
         <PriceRangeChart
-          bids={requestBookQuery.data?.bids}
-          asks={requestBookQuery.data?.asks}
+          bids={book?.bids}
+          asks={book?.asks}
           onPriceRangeChange={handleOnPriceRangeChange}
           priceRange={priceRange}
           initialMidPrice={midPrice}
-          isLoading={requestBookQuery.status === "pending"}
-          geometricKandelDistribution={offersWithPrices}
+          isLoading={isLoading}
+          geometricKandelDistribution={distribution}
           baseToken={baseToken}
           quoteToken={quoteToken}
         />
@@ -300,14 +306,6 @@ export const PriceRange = withClientOnly(function ({
 
         <div className="flex justify-between">
           <Button
-            asChild
-            variant={"secondary"}
-            size={"lg"}
-            className="w-full text-center max-w-32"
-          >
-            <Link href="/strategies">Back</Link>
-          </Button>
-          <Button
             size={"lg"}
             rightIcon
             className="w-full max-w-72 text-center"
@@ -320,14 +318,15 @@ export const PriceRange = withClientOnly(function ({
         <DeployStrategyDialog
           strategy={{
             riskAppetite,
-            distribution,
+            kandelParams,
             baseDeposit,
             quoteDeposit,
             priceRange,
-            pricePoints,
-            ratio,
+            numberOfOffers,
             stepSize,
             bountyDeposit,
+            sendFrom,
+            receiveTo,
           }}
           isOpen={summaryDialog}
           onClose={() => setSummaryDialog(false)}

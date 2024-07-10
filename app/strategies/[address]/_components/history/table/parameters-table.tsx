@@ -1,24 +1,19 @@
+"use client"
+
 import { DataTable } from "@/components/ui/data-table/data-table"
+import { useStrategyHistory } from "../../../_hooks/use-strategy-history"
 import useKandel from "../../../_providers/kandel-strategy"
-import { useParameters } from "../../parameters/hook/use-parameters"
-import { Parameters, useParametersTables } from "./use-parameters-table"
+import { useParametersTable } from "./use-parameters-table"
 
 export default function HistoryTable() {
   const { strategyQuery, strategyStatusQuery } = useKandel()
 
-  const { currentParameter, depositedBase } = useParameters()
-  const { creationDate, length, priceRatio } = currentParameter
+  const { data: strategyHistory } = useStrategyHistory({
+    kandelAddress: strategyQuery.data?.address,
+  })
 
-  const table = useParametersTables({
-    data: [
-      {
-        date: creationDate,
-        spread: "-",
-        pricePoints: length,
-        amount: depositedBase,
-        ratio: priceRatio?.toFixed(4),
-      },
-    ] as Parameters[],
+  const table = useParametersTable({
+    data: strategyHistory,
   })
 
   const isLoading = strategyQuery.isLoading || strategyStatusQuery.isLoading

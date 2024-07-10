@@ -28,4 +28,9 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
+
+  ignoreErrors: [
+    /User rejected the request/,
+    /The provider is disconnected from all chains/,
+  ],
 })

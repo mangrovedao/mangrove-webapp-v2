@@ -1,54 +1,66 @@
 import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
-import { AverageReturn } from "../../../(shared)/_components/average-return"
+import { useKandelBook } from "../../_hooks/use-kandel-book"
 import useKandel from "../../_providers/kandel-strategy"
-import { MergedOffers } from "../../_utils/inventory"
+import { useParameters } from "../parameters/hook/use-parameters"
 import { LegendItem } from "./legend-item"
 import TotalInventory from "./total-inventory"
 import UnrealizedPnl from "./unrealized-pnl"
 
 export default function PriceRangeInfos() {
-  const {
-    strategyQuery,
-    strategyStatusQuery,
-    baseToken,
-    quoteToken,
-    mergedOffers,
-  } = useKandel()
-  const { bidsBalance, asksBalance } = strategyStatusQuery.data ?? {}
+  const { strategyStatusQuery, baseToken, quoteToken, mergedOffers } =
+    useKandel()
 
-  const bids = strategyStatusQuery.data?.book?.bids ?? []
-  const asks = strategyStatusQuery.data?.book?.asks ?? []
+  console.log(
+    strategyStatusQuery.data?.minPrice,
+    strategyStatusQuery.data?.maxPrice,
+  )
 
-  const avgReturnPercentage = strategyQuery.data?.return as number | undefined
-  const priceRange = !strategyQuery.isLoading
-    ? ([Number(strategyQuery.data?.min), Number(strategyQuery.data?.max)] as [
-        number,
-        number,
-      ])
-    : undefined
-  const baseValue = `${asksBalance?.toFixed(baseToken?.displayedDecimals)} ${baseToken?.symbol}`
-  const quoteValue = `${bidsBalance?.toFixed(quoteToken?.displayedDecimals)} ${quoteToken?.symbol}`
-  const isLoading = strategyStatusQuery.isLoading || !baseToken || !quoteToken
-  const chartIsLoading =
-    (strategyStatusQuery.isLoading && strategyQuery.isLoading) ||
-    !(baseToken && quoteToken && strategyStatusQuery.data?.midPrice)
+  const { publishedBase, publishedQuote, currentParameter } = useParameters()
+  const { book } = useKandelBook()
+  const bids = book?.bids ?? []
+  const asks = book?.asks ?? []
+  const isActive = strategyStatusQuery.data?.status !== "active"
+
+  const offerPrices = mergedOffers.map((item) => item.price)
+  const minPrice = strategyStatusQuery.data?.minPrice
+  const maxPrice = strategyStatusQuery.data?.maxPrice
+
+  // const avgReturnPercentage = strategyQuery.data?.return as number | undefined
+  const priceRange = isActive
+    ? ([0, 0] as [number, number])
+    : ([minPrice, maxPrice] as [number, number])
+
+  const baseValue = `${Number(publishedBase)?.toFixed(baseToken?.displayDecimals)} ${baseToken?.symbol}`
+  const quoteValue = `${Number(publishedQuote)?.toFixed(quoteToken?.displayDecimals)} ${quoteToken?.symbol}`
+  const isLoading = !baseToken || !quoteToken || strategyStatusQuery.isLoading
+
+  const chartIsLoading = !(
+    mergedOffers &&
+    bids &&
+    asks &&
+    minPrice &&
+    maxPrice &&
+    book?.midPrice &&
+    baseToken &&
+    quoteToken
+  )
 
   return (
     <div>
       <div className="relative">
         <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 justify-between items-center px-6 pb-8 my-3">
-          <AverageReturn percentage={avgReturnPercentage} />
-          <UnrealizedPnl />
+          {/* <AverageReturn percentage={avgReturnPercentage} /> */}
+          <UnrealizedPnl pnl={currentParameter.pnlQuote} />
           <TotalInventory
             value={baseValue}
             symbol={baseToken?.symbol}
-            loading={isLoading}
+            loading={isLoading || baseValue === "0"}
             label="Total base inventory"
           />
           <TotalInventory
             value={quoteValue}
             symbol={quoteToken?.symbol}
-            loading={isLoading}
+            loading={isLoading || quoteValue === "0"}
             label="Total quote inventory"
           />
         </div>
@@ -59,10 +71,10 @@ export default function PriceRangeInfos() {
           isLoading={chartIsLoading}
           bids={bids}
           asks={asks}
-          initialMidPrice={strategyStatusQuery.data?.midPrice?.toNumber()}
+          initialMidPrice={book?.midPrice}
           priceRange={priceRange}
           viewOnly
-          mergedOffers={mergedOffers as MergedOffers}
+          mergedOffers={mergedOffers}
           baseToken={baseToken}
           quoteToken={quoteToken}
         />

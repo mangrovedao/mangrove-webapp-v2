@@ -9,14 +9,14 @@ import {
 } from "@tanstack/react-table"
 import Big from "big.js"
 import React from "react"
+import { useAccount } from "wagmi"
 
 import BlockExplorer from "@/app/strategies/[address]/_components/block-explorer"
 import { TokenPair } from "@/components/token-pair"
 import { Skeleton } from "@/components/ui/skeleton"
-import useMarket from "@/providers/market"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
-import { useAccount } from "wagmi"
 import type { Fill } from "./schema"
 
 const columnHelper = createColumnHelper<Fill>()
@@ -27,7 +27,7 @@ type Params = {
 }
 
 export function useTable({ data }: Params) {
-  const { market } = useMarket()
+  const { currentMarket: market } = useMarket()
   const { chain } = useAccount()
 
   const columns = React.useMemo(
@@ -75,27 +75,27 @@ export function useTable({ data }: Params) {
           if (!market) return null
           const { base, quote } = market
           const [received, sent] = isBid ? [base, quote] : [quote, base]
+
           return (
             <div className={cn("flex flex-col")}>
               <span className="text-sm">
-                {Big(takerGot).toFixed(received.displayedDecimals)}{" "}
+                {Big(takerGot).toFixed(received.displayDecimals)}{" "}
                 {received.symbol}
               </span>
               <span className="text-xs opacity-50">
-                {Big(takerGave).toFixed(sent.displayedDecimals)} {sent.symbol}
+                {Big(takerGave).toFixed(sent.displayDecimals)} {sent.symbol}
               </span>
             </div>
           )
         },
       }),
-
       columnHelper.accessor("price", {
         header: "Price",
         cell: (row) =>
           market ? (
             row.getValue() ? (
               <span>
-                {Big(row.getValue()).toFixed(market.quote.displayedDecimals)}{" "}
+                {Big(row.getValue()).toFixed(market.quote.displayDecimals)}{" "}
                 {market.quote.symbol}
               </span>
             ) : (
@@ -105,10 +105,25 @@ export function useTable({ data }: Params) {
             <Skeleton className="w-20 h-6" />
           ),
       }),
+
       columnHelper.accessor("creationDate", {
         header: "Date",
         cell: (row) => <div>{formatDate(row.getValue())}</div>,
       }),
+
+      columnHelper.accessor("status", {
+        header: "Status",
+        cell: ({ row }) =>
+          row.original.status ? (
+            <span className="capitalize">
+              {" "}
+              {row.original.status.toLowerCase()}
+            </span>
+          ) : (
+            <Skeleton className="w-20 h-6" />
+          ),
+      }),
+
       columnHelper.display({
         header: "Explorer",
         cell: ({ row }) => {

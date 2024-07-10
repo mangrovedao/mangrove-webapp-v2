@@ -1,23 +1,20 @@
 "use client"
 
-import { Info } from "lucide-react"
+import Link from "next/link"
 import React from "react"
+import { useAccount } from "wagmi"
 
+import InfoTooltip from "@/components/info-tooltip"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+
+import { Button } from "@/components/ui/button"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
-import CloseDialog from "./dialogs/close"
-import { Deposit } from "./dialogs/deposit"
-import { Publish } from "./dialogs/publish"
-import { UnPublish } from "./dialogs/unpublish"
 import { Withdraw } from "./dialogs/withdraw"
 import { useParameters } from "./hook/use-parameters"
-import { useInventoryTable } from "./table/use-inventory-table"
 
 const InfoLine = ({
   title,
@@ -39,25 +36,34 @@ const InfoBar = () => {
 
   return (
     <div className=" flex justify-between bg-blend-darken rounded-lg">
-      <InfoLine title="Ratio" value={currentParameter.priceRatio?.toFixed(4)} />
-      <InfoLine title="No. of price points" value={currentParameter?.length} />
+      <InfoLine
+        title="Nb. of offers"
+        value={Number(currentParameter?.length) - 1}
+      />
       <InfoLine title="Step size" value={currentParameter?.stepSize} />
       <InfoLine
         title="Min price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={
+          currentParameter?.minPrice
+            ? `${currentParameter?.minPrice?.toFixed(quote?.priceDisplayDecimals)} ${quote?.symbol}`
+            : "-"
+        }
       />
       <InfoLine
         title="Max price"
-        value={`${currentParameter?.minPrice?.toFixed(quote?.decimals)} ${quote?.symbol}`}
+        value={
+          currentParameter?.maxPrice
+            ? `${currentParameter?.maxPrice?.toFixed(quote?.priceDisplayDecimals)} ${quote?.symbol}`
+            : "-"
+        }
       />
     </div>
   )
 }
 
-const UnallocatedInventory = () => {
-  const { unallocatedBase, unallocatedQuote, quote, base } = useParameters()
-  const [deposit, toggleDeposit] = React.useReducer((isOpen) => !isOpen, false)
-  const [publish, togglePublish] = React.useReducer((isOpen) => !isOpen, false)
+const Inventory = () => {
+  const { withdrawBase, withdrawQuote, base, quote } = useParameters()
+  // const [publish, togglePublish] = React.useReducer((isOpen) => !isOpen, false)
   const [withdraw, toggleWithdraw] = React.useReducer(
     (isOpen) => !isOpen,
     false,
@@ -67,123 +73,62 @@ const UnallocatedInventory = () => {
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
-          <Title>Unallocated inventory</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+        <div className="flex items-center">
+          <Title>Withdrawable balance</Title>
+          <InfoTooltip>
+            <Caption>
+              These are the funds received by the strategy that were
+              unsuccessfully sent through your router.
+            </Caption>
+
+            <Caption>
+              If you decide to leave the funds in the strategy, they will still
+              be used.
+            </Caption>
+          </InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleDeposit}>Deposit</Button>
-          <Button onClick={togglePublish} variant={"secondary"}>
+          {/* <Button onClick={togglePublish} variant={"secondary"}>
             Publish
-          </Button>
-          <Button onClick={toggleWithdraw} variant={"secondary"}>
+          </Button> */}
+          <Button
+            onClick={toggleWithdraw}
+            variant={"secondary"}
+            disabled={
+              Number(withdrawBase ?? 0) <= 0 && Number(withdrawQuote ?? 0) <= 0
+            }
+          >
             Withdraw
           </Button>
         </div>
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
             <Caption className="text-muted-foreground">Asset</Caption>
             <Caption className="text-muted-foreground">Amount</Caption>
           </tr>
         </thead>
-        <Separator />
-        <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
+        <tbody className="w-full flex flex-col gap-4 divide-y">
+          <tr className="flex justify-between pt-4">
             <Text>{base?.symbol}</Text>
             <Text>
-              {unallocatedBase} {base?.symbol}
+              {withdrawBase} {base?.symbol}
             </Text>
           </tr>
-          <Separator />
-          <tr className="flex justify-between">
+          <tr className="flex justify-between pt-4">
             <Text>{quote?.symbol}</Text>
             <Text>
-              {unallocatedQuote} {quote?.symbol}
+              {withdrawQuote} {quote?.symbol}
             </Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
 
       {/* Dialogs */}
-      <Deposit
-        open={deposit}
-        onClose={toggleDeposit}
-        togglePublish={togglePublish}
-      />
-      <Publish open={publish} onClose={togglePublish} />
       <Withdraw open={withdraw} onClose={toggleWithdraw} />
-    </div>
-  )
-}
-
-const PublishedInventory = () => {
-  const { quote, base, depositedBase, depositedQuote } = useParameters()
-
-  const [unPublish, toggleUnpublish] = React.useReducer(
-    (isOpen) => !isOpen,
-    false,
-  )
-  const [close, toggleClose] = React.useReducer((isOpen) => !isOpen, false)
-
-  const table = useInventoryTable({
-    data: [
-      { amount: "0.00000", asset: "WETH" },
-      { amount: "0.0000", asset: "USDC" },
-    ],
-  })
-
-  return (
-    <div>
-      {/* Header */}
-      <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
-          <Title>Published inventory</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={toggleUnpublish}>Un-publish</Button>
-          <Button onClick={toggleClose} variant={"secondary"}>
-            Close Strategy
-          </Button>
-        </div>
-      </div>
-
-      {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
-        <thead>
-          <tr className="flex justify-between">
-            <Caption className="text-muted-foreground">Asset</Caption>
-            <Caption className="text-muted-foreground">Amount</Caption>
-          </tr>
-        </thead>
-        <Separator />
-        <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
-            <Text>{base?.symbol}</Text>
-            <Text>
-              {depositedBase} {base?.symbol}
-            </Text>
-          </tr>
-          <Separator />
-          <tr className="flex justify-between">
-            <Text>{quote?.symbol}</Text>
-            <Text>
-              {depositedQuote} {quote?.symbol}
-            </Text>
-          </tr>
-        </tbody>
-        <Separator />
-      </table>
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
-
-      {/* Dialogs */}
-      <CloseDialog isOpen={close} onClose={toggleClose} />
-      <UnPublish open={unPublish} onClose={toggleUnpublish} />
     </div>
   )
 }
@@ -191,42 +136,56 @@ const PublishedInventory = () => {
 const BountyInventory = () => {
   const [bounty, toggleBounty] = React.useReducer((isOpen) => !isOpen, false)
   const { currentParameter } = useParameters()
-
-  const table = useInventoryTable({
-    data: [{ amount: "0.0000", asset: "USDC" }],
-  })
+  const { chain } = useAccount()
 
   return (
     <div>
       {/* Header */}
       <div className="flex justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center">
           <Title>Bounty</Title>
-          <Info className="h-4 w-4 hover:text-green-caribbean" />
+          <InfoTooltip side="right">
+            <Caption>
+              Amount of native tokens deposited into the strategy to cover
+            </Caption>
+            <Caption>in case your offer fails to deliver. </Caption>
+            <Link
+              href="https://docs.mangrove.exchange/general/kandel/how-does-kandel-work/parameters"
+              target="_blank"
+              rel="noreferrer"
+              className="text-green-caribbean underline text-xs"
+            >
+              Learn more
+            </Link>
+          </InfoTooltip>
         </div>
         <div className="flex gap-2">
-          <Button onClick={toggleBounty}>Add Bounty</Button>
+          {/* <Button onClick={toggleBounty}>Add</Button> */}
         </div>
       </div>
 
       {/* Table */}
-      <table className="w-full flex flex-col gap-2 mt-5">
+      <table className="w-full flex flex-col gap-2 mt-5 divide-y border-b pb-4">
         <thead>
           <tr className="flex justify-between">
-            <Caption className="text-muted-foreground">Asset</Caption>
-            <Caption className="text-muted-foreground">Amount</Caption>
+            <Caption as={"td"} className="text-muted-foreground">
+              Asset
+            </Caption>
+            <Caption as={"td"} className="text-muted-foreground">
+              Amount
+            </Caption>
           </tr>
         </thead>
-        <Separator />
         <tbody className="w-full flex flex-col gap-4">
-          <tr className="flex justify-between ">
-            <Text>MATIC</Text>
-            <Text>{currentParameter.lockedBounty} MATIC</Text>
+          <tr className="flex justify-between pt-4">
+            <Text as="td">{chain?.nativeCurrency.symbol}</Text>
+            <Text as="td">
+              {Number(currentParameter.lockedBounty ?? 0).toString()}{" "}
+              {chain?.nativeCurrency.symbol}
+            </Text>
           </tr>
         </tbody>
-        <Separator />
       </table>
-      {/* <DataTable table={table} isLoading={false} isError={false} /> */}
 
       {/* Dialogs */}
       <Bounty open={bounty} onClose={toggleBounty} />
@@ -245,9 +204,10 @@ export default function Parameters() {
 
       {/* Tables */}
       <div className="flex flex-col gap-10 pb-5 pt-10 ">
-        <UnallocatedInventory />
-        <PublishedInventory />
+        {/* <PublishedInventory /> */}
+
         <BountyInventory />
+        <Inventory />
       </div>
     </div>
   )

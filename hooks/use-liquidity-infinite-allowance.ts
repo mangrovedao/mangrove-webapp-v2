@@ -1,18 +1,27 @@
-import { DefaultLogics } from "@/app/trade/_components/forms/types"
-import type { Token } from "@mangrovedao/mangrove.js"
+import { Logic, Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
 export const useIsLiquidityInfiniteAllowance = (
   token?: Token,
   spender?: string | null,
-  logic?: DefaultLogics,
+  logic?: Logic,
 ) => {
   return useQuery({
-    queryKey: ["isTokenInfiniteAllowance", token?.id, spender, logic?.id],
+    queryKey: [
+      "isTokenInfiniteAllowance",
+      token?.address,
+      spender,
+      logic?.name,
+    ],
     queryFn: async () => {
-      if (!(token && spender && logic)) return null
-      const tokenToApprove = await logic.overlying(token)
-      return await tokenToApprove.allowanceInfinite({ spender })
+      // if (!(token && spender && logic)) return null
+      // const tokenToApprove = await logic.overlying(token)
+      // if (tokenToApprove instanceof Token) {
+      //   return await tokenToApprove.allowanceInfinite({ spender })
+      // } else {
+      //   // TODO: erc721 approve for all
+      //   return
+      // }
     },
     enabled: !!(token && spender && logic),
     meta: {

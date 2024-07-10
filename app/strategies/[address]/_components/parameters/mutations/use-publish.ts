@@ -1,16 +1,17 @@
-import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
+import { OfferParsed } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
-import { MergedOffer, MergedOffers } from "../../../_utils/inventory"
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
+import { BA } from "@mangrovedao/mgv/lib"
 
 export function usePublish({
-  stratInstance,
+  kandelInstance,
   mergedOffers,
   volumes,
 }: {
-  stratInstance?: GeometricKandelInstance
-  mergedOffers: MergedOffers
+  kandelInstance?: ReturnType<typeof useKandelInstance>
+  mergedOffers: OfferParsed[]
   volumes: { baseAmount: string; quoteAmount: string }
 }) {
   const queryClient = useQueryClient()
@@ -18,14 +19,14 @@ export function usePublish({
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!stratInstance || !mergedOffers) {
+        if (!kandelInstance || !mergedOffers) {
           throw new Error("Strategy Instance could not be fetched")
         }
 
         const { baseAmount, quoteAmount } = volumes
 
         const bids = mergedOffers
-          .filter((x: MergedOffer) => x.offerType === "bids")
+          .filter((x: OfferParsed) => x.ba === BA.bids)
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,
@@ -33,27 +34,28 @@ export function usePublish({
           }))
 
         const asks = mergedOffers
-          .filter((x: MergedOffer) => x.offerType === "asks")
+          .filter((x: OfferParsed) => x.ba === BA.asks)
           .map((offer) => ({
             tick: offer.tick,
             index: offer.index,
             gives: offer.gives,
           }))
+        // note: to re-implement
 
-        const newDistribution =
-          await stratInstance.calculateDistributionWithUniformlyChangedVolume({
-            explicitOffers: { asks, bids },
-            baseDelta: baseAmount,
-            quoteDelta: quoteAmount,
-          })
+        // const newDistribution =
+        //   await kandelInstance.calculateDistributionWithUniformlyChangedVolume({
+        //     explicitOffers: { asks, bids },
+        //     baseDelta: baseAmount,
+        //     quoteDelta: quoteAmount,
+        //   })
 
-        if (!newDistribution) {
-          throw new Error("Error calculating new distribution")
-        }
+        // if (!newDistribution) {
+        //   throw new Error("Error calculating new distribution")
+        // }
 
-        const txs = await stratInstance.populateGeneralChunks(newDistribution)
+        // const txs = await kandelInstance.populateGeneralChunks(newDistribution)
 
-        const res = txs && (await Promise.all(txs.map((tx) => tx.wait())))
+        // const res = txs && (await Promise.all(txs.map((tx) => tx.wait())))
 
         toast.success("Published successfully")
       } catch (err) {

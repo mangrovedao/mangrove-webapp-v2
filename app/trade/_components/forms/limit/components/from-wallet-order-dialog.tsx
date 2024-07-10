@@ -1,39 +1,26 @@
 import React from "react"
 import { useAccount } from "wagmi"
 
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
-
 import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { Button, type ButtonProps } from "@/components/ui/button"
+import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { useIsTokenInfiniteAllowance } from "@/hooks/use-is-token-infinite-allowance"
-import useMangrove from "@/providers/mangrove"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { Logic } from "@mangrovedao/mgv"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
 import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
+import { useLimitSteps } from "../hooks/use-steps"
 import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
 type Props = {
   form: Form & {
-    selectedSource?: SimpleLogic | SimpleAaveLogic | OrbitLogic
-    minVolume: {
-      bid: {
-        volume: string | undefined
-        token: string | undefined
-      }
-      ask: {
-        volume: string | undefined
-        token: string | undefined
-      }
-    }
+    minVolume: string
   }
   onClose: () => void
 }
@@ -45,7 +32,7 @@ const btnProps: ButtonProps = {
 }
 
 export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
-  const { chain } = useAccount()
+  const { chain, address } = useAccount()
   const {
     baseToken,
     quoteToken,
@@ -55,17 +42,16 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     feeInPercentageAsString,
     tickSize,
     spotPrice,
-  } = useTradeInfos("limit", form.tradeAction)
-  // const { isDeployed, isBound } = useSmartRouter().data ?? {}
+  } = useTradeInfos("limit", form.bs)
 
-  const { data: isInfiniteAllowance } = useIsTokenInfiniteAllowance(
-    sendToken,
-    spender,
-    form.selectedSource,
-  )
+  const { data: limitOrderSteps } = useLimitSteps({
+    user: address,
+    bs: form.bs,
+    logic: form.sendFrom,
+  })
 
   let steps = [] as string[]
-  if (!isInfiniteAllowance) {
+  if (!limitOrderSteps?.[0].done) {
     steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
   }
 
@@ -76,6 +62,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   // if (!isBound) {
   //   steps = [...steps, "Limit order activation"]
   // }
+
   steps = [...steps, "Send"]
 
   const isDialogOpenRef = React.useRef(false)
@@ -101,7 +88,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       if (!isDialogOpenRef.current) return
       onClose()
       tradeService.openTxCompletedDialog({
-        address: result.txReceipt.transactionHash ?? "",
+        address: result.transactionHash ?? "",
         blockExplorerUrl: chain?.blockExplorers?.default.url,
       })
     },
@@ -109,14 +96,13 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
 
   const [currentStep, helpers] = useStep(steps.length)
 
-  const { mangrove } = useMangrove()
-  const logics = mangrove ? Object.values(mangrove.logics) : []
-  const logic = logics.find((logic) => logic?.id === form.sendFrom)
+  const logics = useLogics()
+  const logic = logics.find((logic) => logic?.name === form.sendFrom)
 
   const { goToNextStep } = helpers
 
   const stepInfos = [
-    !isInfiniteAllowance && {
+    !limitOrderSteps?.[0].done && {
       body: (
         <SummaryStep
           form={form}
@@ -132,7 +118,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         </Button>
       ),
     },
-    !isInfiniteAllowance && {
+    !limitOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
         <Button
@@ -143,8 +129,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
             approve.mutate(
               {
                 token: sendToken,
-                //@ts-ignore
-                logic,
+                logic: logic as Logic,
                 spender,
               },
               {

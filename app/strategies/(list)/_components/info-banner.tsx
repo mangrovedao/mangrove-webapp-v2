@@ -2,7 +2,7 @@
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { KANDEL_DOC_URL } from "@/constants/docs"
+import { KANDEL_DOC_URL, STRATEGIES_DOC_URL } from "@/constants/docs"
 import Link from "next/link"
 
 const BULLETS = [
@@ -45,10 +45,15 @@ export function InfoBanner() {
             </Text>
           ))}
         </ul>
-        <span>
+        <span className="space-x-2">
+          <Button variant={"primary"} size={"lg"} className="px-5" asChild>
+            <Link href={STRATEGIES_DOC_URL} target="_blank" rel="noreferrer">
+              Strategies guide
+            </Link>
+          </Button>
           <Button variant={"secondary"} size={"lg"} className="px-5" asChild>
             <Link href={KANDEL_DOC_URL} target="_blank" rel="noreferrer">
-              More about Kandel Positions
+              More about Kandel
             </Link>
           </Button>
         </span>

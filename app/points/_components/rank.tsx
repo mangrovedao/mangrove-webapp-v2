@@ -1,17 +1,20 @@
 import { cn } from "@/utils"
+import { formatNumber } from "@/utils/numbers"
+import { useAccount } from "wagmi"
 import BoxContainer from "./box-container"
-import { useUserRank } from "./leaderboard/use-leaderboard"
+import { useEpochLeaderboard } from "./leaderboard/use-epoch-leaderboard"
 
-type Props = {
-  className?: string
-  rank?: number
-  totalTraders?: number
-}
-
-export default function Rank({ className, totalTraders = 39059 }: Props) {
-  const { data } = useUserRank()
-  const rank = data?.[0]?.rank ?? -1
-  const rankLabel = rank > 0 ? rank : "Unranked"
+export default function Rank({ className }: { className?: string }) {
+  const { address: account } = useAccount()
+  const totalLeaderboardQuery = useEpochLeaderboard({
+    epoch: "total",
+  })
+  const accountTotalQuery = useEpochLeaderboard({
+    epoch: "total",
+    account,
+  })
+  const rank = accountTotalQuery.data?.leaderboard?.[0]?.rank
+  const rankLabel = rank ? rank : "Unranked"
 
   return (
     <BoxContainer className={cn(className)}>
@@ -42,9 +45,12 @@ export default function Rank({ className, totalTraders = 39059 }: Props) {
               {rankLabel}
             </span>
           </div>
-          {/* <div className="text-xs text-cloud-200 flex items-center pt-7">
-            of {totalTraders} traders
-          </div> */}
+          {totalLeaderboardQuery.data?.totalCount ? (
+            <div className="text-xs text-cloud-200 flex items-center pt-7">
+              of {formatNumber(Number(totalLeaderboardQuery.data?.totalCount))}{" "}
+              traders
+            </div>
+          ) : undefined}
         </div>
       </div>
     </BoxContainer>

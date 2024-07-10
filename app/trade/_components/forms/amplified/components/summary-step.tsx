@@ -1,13 +1,10 @@
-import type { Token } from "@mangrovedao/mangrove.js"
-import { SimpleAaveLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleAaveLogic"
-import { SimpleLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/SimpleLogic"
+import type { Logic, Token } from "@mangrovedao/mgv"
 import Big from "big.js"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Text } from "@/components/typography/text"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
-import { OrbitLogic } from "@mangrovedao/mangrove.js/dist/nodejs/logics/OrbitLogic"
 import { TimeInForce } from "../enums"
 import type { AssetWithInfos, Form } from "../types"
 
@@ -15,7 +12,7 @@ type Props = {
   form: Omit<Form, "assets">
   tokenToAmplify?: Token
   sendAmount: string
-  source: SimpleLogic | SimpleAaveLogic | OrbitLogic
+  source: Logic
   assetsWithToken?: AssetWithInfos[]
 }
 
@@ -35,7 +32,7 @@ export function SummaryStep({
         </span>
       </div>
       <Line
-        title={`Send from ${source?.id.includes("simple") ? "Wallet" : source?.id.toUpperCase()}`}
+        title={`Send from ${source?.name.includes("simple") ? "Wallet" : source?.name.toUpperCase()}`}
       >
         {Big(
           !isNaN(Number(form.sendAmount)) ? Number(form.sendAmount) : 0,
@@ -64,15 +61,15 @@ export function SummaryStep({
                     !isNaN(Number(asset.limitPrice))
                       ? Number(asset.limitPrice)
                       : 0,
-                  ).toFixed(asset.token.displayedAsPriceDecimals)}{" "}
+                  ).toFixed(asset.token.priceDisplayDecimals)}{" "}
                   <Unit>{asset.token.symbol}</Unit>
                 </Line>
                 <Line
-                  title={`Receive to ${asset.receiveTo.id === "simple" ? "Wallet" : asset.receiveTo.id.toUpperCase()}`}
+                  title={`Receive to ${asset.receiveTo.name === "simple" ? "Wallet" : asset.receiveTo.name.toUpperCase()}`}
                 >
                   {Big(
                     !isNaN(Number(asset.amount)) ? Number(asset.amount) : 0,
-                  ).toFixed(asset.token.displayedDecimals)}{" "}
+                  ).toFixed(asset.token.displayDecimals)}{" "}
                   <Unit>{asset.token.symbol}</Unit>
                 </Line>
               </>

@@ -1,20 +1,24 @@
 import { cn } from "@/utils"
+import { getLevels } from "../constants"
 import { formatNumber } from "../utils"
 import BoxContainer from "./box-container"
 
 type Props = {
   className?: string
   level?: number
+  volume?: number
   boost?: number
-  previousVolume?: number
 }
 
 export default function CurrentBoost({
   className,
-  level = 0,
+  // level = 0,
   boost = 1,
-  previousVolume = 0,
+  volume = 0,
 }: Props) {
+  const { nextIndex, currentIndex } = getLevels(volume)
+  const level = currentIndex
+
   return (
     <BoxContainer className={cn(className)}>
       <div className="flex space-x-4">
@@ -43,13 +47,13 @@ export default function CurrentBoost({
         </div>
         <div>
           <div className="text-sm text-cloud-200">Current boost</div>
-          <div className="flex items-center">
+          <div className="flex items-center flex-wrap">
             <span
               className={cn("font-medium text-[32px]", {
                 "text-cloud-00": !boost,
               })}
             >
-              {boost}x
+              {boost <= 1 ? 1 : boost}x
             </span>
             <span
               className={cn(
@@ -57,11 +61,27 @@ export default function CurrentBoost({
                 !level ? "bg-cloud-300" : "text-primary-bush-green",
               )}
             >
-              Level {level}
+              Level {nextIndex}
             </span>
+
+            {}
+
+            {/* {type ? (
+              <span
+                className={cn(
+                  "ml-3 max-h-[24px] p-1.5 bg-green-bangladesh text-sm rounded-md flex items-center line-clamp-1",
+                )}
+              >
+                {formatNFTName(type)}
+                <InfoTooltip className="text-white">
+                  You've received a {boost}x boost for holding the{" "}
+                  {formatNFTName(type)}
+                </InfoTooltip>
+              </span>
+            ) : undefined} */}
           </div>
           <div className="text-xs text-cloud-200 flex items-center pt-7">
-            previous volume {formatNumber(previousVolume)}
+            previous volume {formatNumber(volume)}
           </div>
         </div>
       </div>

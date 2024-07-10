@@ -1,58 +1,50 @@
 import React from "react"
 
 import {
-  CustomTabs,
-  CustomTabsContent,
-  CustomTabsList,
-  CustomTabsTrigger,
-} from "@/components/custom-tabs"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { cn } from "@/utils"
-import { renderElement } from "@/utils/render"
+  CustomRadioGroup,
+  CustomRadioGroupItem,
+} from "@/components/custom-radio-group"
+import { CustomTabs } from "@/components/custom-tabs"
 import { Strategies } from "./strategies/strategies"
+import { Vaults } from "./vaults/vaults"
 
-enum StrategiesTables {
-  // ALL_STRATEGIES = "All strategies",
-  MY_STRATEGIES = "My strategies",
-}
-
-const TABS_CONTENT = {
-  // [StrategiesTables.ALL_STRATEGIES]: <Strategies type="all" />,
-  [StrategiesTables.MY_STRATEGIES]: <Strategies type="user" />,
+enum StrategyType {
+  PASSIVE = "Passive",
+  PRO = "Pro",
 }
 
 export function Tables({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
+  const [strategiesType, setStrategiesType] = React.useState(StrategyType.PRO)
+
   return (
-    <CustomTabs
-      {...props}
-      defaultValue={Object.values(StrategiesTables)[0]}
-      className={cn(className)}
-    >
-      <CustomTabsList className="w-full flex justify-start border-b px-0">
-        {Object.values(StrategiesTables).map((table) => (
-          <CustomTabsTrigger
-            key={`${table}-tab`}
-            value={table}
+    <div className="pt-4 space-y-4">
+      <CustomRadioGroup
+        name={"strategy-type"}
+        value={strategiesType}
+        onValueChange={(e: StrategyType) => {
+          setStrategiesType(e)
+        }}
+        className="max-w-96"
+      >
+        {Object.values(StrategyType).map((action) => (
+          <CustomRadioGroupItem
+            key={action}
+            value={action}
+            id={action}
             className="capitalize"
           >
-            {table}
-          </CustomTabsTrigger>
+            {action}
+          </CustomRadioGroupItem>
         ))}
-      </CustomTabsList>
-      <div className="w-full py-4">
-        {Object.values(StrategiesTables).map((table) => (
-          <CustomTabsContent key={`${table}-content`} value={table}>
-            <ScrollArea className="h-full" scrollHideDelay={200}>
-              <div>{renderElement(TABS_CONTENT[table])}</div>
-              <ScrollBar orientation="vertical" className="z-50" />
-              <ScrollBar orientation="horizontal" className="z-50" />
-            </ScrollArea>
-          </CustomTabsContent>
-        ))}
-      </div>
-    </CustomTabs>
+      </CustomRadioGroup>
+      {strategiesType === StrategyType.PASSIVE ? (
+        <Vaults type="all" />
+      ) : (
+        <Strategies type="user" />
+      )}
+    </div>
   )
 }

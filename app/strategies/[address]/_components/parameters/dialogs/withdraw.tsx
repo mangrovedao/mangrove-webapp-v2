@@ -5,28 +5,21 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
-import { ApproveStep } from "@/app/strategies/new/_components/form/components/approve-step"
 import { Steps } from "@/app/strategies/new/_components/form/components/steps"
-import { useApproveKandelStrategy } from "@/app/strategies/new/_hooks/use-approve-kandel-strategy"
 import Dialog from "@/components/dialogs/dialog"
+import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { KANDEL_DOC_URL } from "@/constants/docs"
 import { useStep } from "@/hooks/use-step"
-import { TooltipInfo } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import Link from "next/link"
 import useKandel from "../../../_providers/kandel-strategy"
+import { useParameters } from "../hook/use-parameters"
 import { useWithDraw } from "../mutations/use-withdraw"
 import { SuccessDialog } from "./succes-dialog"
 
@@ -41,64 +34,27 @@ export function Withdraw({ open, onClose }: Props) {
     false,
   )
 
-  const { strategyQuery, strategyStatusQuery, strategyAddress } = useKandel()
-
+  const { strategyQuery, strategyAddress, baseToken, quoteToken } = useKandel()
+  const { withdrawBase, withdrawQuote } = useParameters()
   const { address } = useAccount()
-
-  const { market } = strategyStatusQuery.data ?? {}
 
   const { data: strategy } = useStrategyStatus({
     address: strategyAddress,
-    base: market?.base.symbol,
-    quote: market?.quote.symbol,
+    base: baseToken?.symbol,
+    quote: quoteToken?.symbol,
     offers: strategyQuery.data?.offers,
   })
-  const getUnpublishedBalances = async () => {
-    const asks =
-      await strategyStatusQuery.data?.stratInstance.getUnpublished("asks")
-    const bids =
-      await strategyStatusQuery.data?.stratInstance.getUnpublished("bids")
 
-    return { asks, bids }
-  }
-
-  let steps = [
-    "Set",
-    `Approve ${market?.base?.symbol}/${market?.quote?.symbol}`,
-    "Withdraw",
-  ]
+  let steps = ["Set", "Withdraw"]
 
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset } = helpers
 
-  const [baseAmount, setBaseAmount] = React.useState("")
-  const [quoteAmount, setQuoteAmount] = React.useState("")
-
-  const [upublishedBase, setUnpublishedBase] = React.useState("")
-  const [upublishedQuote, setUnpublishedQuote] = React.useState("")
-
-  React.useEffect(() => {
-    const fetchUnpublishedBalances = async () => {
-      try {
-        const { asks, bids } = await getUnpublishedBalances()
-        if (!asks || !bids) return
-
-        setUnpublishedBase(asks.toFixed(market?.base.decimals))
-        setUnpublishedQuote(bids.toFixed(market?.quote.decimals))
-      } catch (error) {
-        console.error("Error fetching unpublished balances:", error)
-      }
-    }
-
-    fetchUnpublishedBalances()
-  }, [strategyStatusQuery.data])
-
-  const approve = useApproveKandelStrategy({
-    setKandelAddress: (address) => address,
-  })
+  const [baseAmount, setBaseAmount] = React.useState("0")
+  const [quoteAmount, setQuoteAmount] = React.useState("0")
 
   const withdraw = useWithDraw({
-    stratInstance: strategy?.stratInstance,
+    kandelInstance: strategy?.kandelInstance,
     volumes: { baseAmount, quoteAmount },
   })
 
@@ -108,38 +64,35 @@ export function Withdraw({ open, onClose }: Props) {
         <div className="grid gap-4">
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setBaseAmount(upublishedBase),
-              text: "MAX",
+              onClick: () => setBaseAmount(withdrawBase),
             }}
             value={baseAmount}
-            label={`${market?.base.symbol} amount`}
-            customBalance={upublishedBase}
+            label={`${baseToken?.symbol} amount`}
+            customBalance={withdrawBase}
             showBalance
-            balanceLabel="Unpublished inventory"
-            token={market?.base}
+            balanceLabel="Withdrawable inventory"
+            token={baseToken}
             onChange={(e) => setBaseAmount(e.target.value)}
             error={
-              Number(baseAmount) > Number(upublishedBase)
-                ? "Invalid amount"
-                : ""
+              Number(baseAmount) > Number(withdrawBase) ? "Invalid amount" : ""
             }
           />
 
           <EnhancedNumericInput
             balanceAction={{
-              onClick: () => setQuoteAmount(upublishedQuote),
-              text: "MAX",
+              onClick: () => setQuoteAmount(withdrawQuote),
             }}
             value={quoteAmount}
-            label={`${market?.quote.symbol} amount`}
-            balanceLabel="Unpublished inventory"
+            label={`${quoteToken?.symbol} amount`}
+            customBalance={withdrawQuote}
+            balanceLabel="Withdrawable inventory"
             onChange={(e) => setQuoteAmount(e.target.value)}
             error={
-              Number(quoteAmount) > Number(upublishedQuote)
+              Number(quoteAmount) > Number(withdrawQuote)
                 ? "Invalid amount"
                 : ""
             }
-            token={market?.quote}
+            token={quoteToken}
             showBalance
           />
         </div>
@@ -148,13 +101,12 @@ export function Withdraw({ open, onClose }: Props) {
       button: (
         <Button
           disabled={
-            !baseAmount ||
-            !quoteAmount ||
-            Number(baseAmount) > Number(upublishedBase) ||
-            Number(quoteAmount) > Number(upublishedQuote)
+            Number(baseAmount) > Number(withdrawBase) ||
+            Number(quoteAmount) > Number(withdrawQuote)
           }
           onClick={goToNextStep}
           className="w-full flex items-center justify-center !mt-6"
+          size={"lg"}
         >
           Proceed{" "}
           <div
@@ -172,50 +124,18 @@ export function Withdraw({ open, onClose }: Props) {
     },
     {
       body: (
-        <div className="text-center">
-          <ApproveStep
-            baseToken={market?.base}
-            quoteToken={market?.quote}
-            baseDeposit={baseAmount}
-            quoteDeposit={quoteAmount}
-          />
-        </div>
-      ),
-      button: (
-        <Button
-          className="w-full flex items-center justify-center !mt-6"
-          disabled={approve.isPending}
-          loading={approve.isPending}
-          onClick={() => {
-            approve.mutate(
-              {
-                baseDeposit: baseAmount,
-                quoteDeposit: quoteAmount,
-              },
-              {
-                onSuccess: goToNextStep,
-              },
-            )
-          }}
-        >
-          Approve
-        </Button>
-      ),
-    },
-    {
-      body: (
         <div className="grid gap-2 p-5 bg-primary-dark-green rounded-lg">
           <Title>Review</Title>
           <div className="flex justify-between">
-            <Text>{market?.base.symbol} amount</Text>
+            <Text>{baseToken?.symbol} amount</Text>
             <Text className="text-primary">
-              {baseAmount} {market?.base.symbol}
+              {baseAmount} {baseToken?.symbol}
             </Text>
           </div>
           <div className="flex justify-between">
-            <Text>{market?.quote.symbol} amount</Text>
+            <Text>{quoteToken?.symbol} amount</Text>
             <Text className="text-primary">
-              {quoteAmount} {market?.quote.symbol}
+              {quoteAmount} {quoteToken?.symbol}
             </Text>
           </div>
           <div className="flex justify-between">
@@ -226,7 +146,6 @@ export function Withdraw({ open, onClose }: Props) {
           </div>
         </div>
       ),
-
       button: (
         <Button
           disabled={withdraw.isPending}
@@ -283,21 +202,16 @@ export function Withdraw({ open, onClose }: Props) {
             >
               Withdraw
             </Title>
-            <TooltipProvider>
-              <Tooltip delayDuration={200} defaultOpen={false}>
-                <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                  <TooltipInfo />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <Text>Only unpublished funds are available to withdraw.</Text>
-                  <Link href={KANDEL_DOC_URL} target="_blank">
-                    <Caption className="text-primary underline">
-                      Learn more
-                    </Caption>
-                  </Link>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <InfoTooltip>
+              <Caption>
+                Only unpublished funds are available to withdraw.
+              </Caption>
+              <Link href={KANDEL_DOC_URL} target="_blank">
+                <Caption className="text-green-caribbean underline">
+                  Learn more
+                </Caption>
+              </Link>
+            </InfoTooltip>
           </div>
         </Dialog.Title>
         <Steps steps={steps} currentStep={currentStep} />

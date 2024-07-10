@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
-import useMangrove from "@/providers/mangrove"
+import { useMarkets } from "@/hooks/use-addresses"
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import { useLoadingStore } from "@/stores/loading.store"
 import { AmplifiedOrder, parseAmplifiedOrders } from "../schema"
@@ -22,8 +22,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
-  const { marketsInfoQuery } = useMangrove()
-  const { data: openMarkets } = marketsInfoQuery
+  const currentMarkets = useMarkets()
 
   const { indexerSdk } = useIndexerSdk()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -36,10 +35,10 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
     queryKey: ["amplified", address],
     queryFn: async () => {
       try {
-        if (!indexerSdk || !address || !openMarkets) return []
+        if (!indexerSdk || !address || !currentMarkets) return []
         startLoading(TRADE.TABLES.ORDERS)
         const markets =
-          openMarkets.map((market) => {
+          currentMarkets.map((market) => {
             return {
               quote: market.base,
               base: market.quote,
@@ -58,19 +57,19 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
             (offer) => offer.isMarketFound,
           )
 
-          const atLeastOneOpenOffer = order.offers.some((offer) => offer.isOpen)
+          const closedOffers = order.offers.every((offer) => !offer.isOpen)
 
           const isExpired = order.expiryDate
             ? new Date(order.expiryDate) < new Date()
             : true
 
-          return allOffersMarketFound && !isExpired && atLeastOneOpenOffer
+          return allOffersMarketFound && !closedOffers && !isExpired
         })
 
         return parseAmplifiedOrders(filteredResult)
       } catch (e) {
         console.error(e)
-        throw new Error("")
+        throw new Error("Unable to retrieve amplified orders")
       } finally {
         stopLoading(TRADE.TABLES.ORDERS)
       }
@@ -79,7 +78,7 @@ export function useAmplifiedOrders<T = AmplifiedOrder[]>({
     meta: {
       error: "Unable to retrieve amplified orders",
     },
-    enabled: !!(isConnected && address && indexerSdk && openMarkets),
+    enabled: !!(isConnected && address && indexerSdk && currentMarkets),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

@@ -1,31 +1,31 @@
-import useMangrove from "@/providers/mangrove"
-import { GeometricKandelInstance } from "@mangrovedao/mangrove.js"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
+import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
+
 export function useBounty({
-  stratInstance,
+  kandelInstance,
   bounty,
 }: {
-  stratInstance?: GeometricKandelInstance
+  kandelInstance?: ReturnType<typeof useKandelInstance>
   bounty: string
 }) {
-  const { mangrove } = useMangrove()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async () => {
       try {
-        if (!stratInstance) {
+        if (!kandelInstance) {
           throw new Error("Strategy Instance could not be fetched")
         }
 
-        const txs = await stratInstance.populateGeneralDistribution({
-          funds: bounty,
-          parameters: { gasprice: mangrove?._config.gasprice },
-        })
+        // note: to re-implement
+        // const txs = await kandelInstance.populateGeneralDistribution({
+        //   funds: bounty,
+        //   parameters: { gasprice: mangrove?._config.gasprice },
+        // })
 
-        const res = txs && (await Promise.all(txs.map((tx) => tx?.wait())))
+        // const res = txs && (await Promise.all(txs.map((tx) => tx?.wait())))
 
         toast.success("Bounty added successfully")
       } catch (err) {

@@ -16,6 +16,7 @@ export const bidsOrAsksSchema = z.union([z.literal("bids"), z.literal("asks")])
 
 export const kandelTypeStringSchema = z.union([
   z.literal("Kandel"),
+  z.literal("SmartKandel"),
   z.literal("KandelAAVE"),
 ])
 
@@ -38,6 +39,13 @@ export const depositsAndWithdraws = z.object({
   token: z.string(),
   amount: z.string(),
   isDeposit: z.boolean(),
+})
+
+export const parametersHistory = z.object({
+  date: z.date().nullish(),
+  length: z.string().nullish(),
+  stepSize: z.string().nullish(),
+  transactionHash: z.string().nullish(),
 })
 
 export const strategySchema = z.object({

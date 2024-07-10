@@ -1,4 +1,4 @@
-import { type Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 import { type ValidationError } from "@tanstack/react-form"
 import React from "react"
 

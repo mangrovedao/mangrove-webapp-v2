@@ -1,23 +1,38 @@
+import { useAccount } from "wagmi"
+
 import { cn } from "@/utils"
-import { useUserRank } from "./leaderboard/use-leaderboard"
+import { formatNumber } from "@/utils/numbers"
+import { useEpochLeaderboard } from "./leaderboard/use-epoch-leaderboard"
 
 export default function TotalPoints() {
-  const { data } = useUserRank()
+  const { address } = useAccount()
+
+  const accountTotalQuery = useEpochLeaderboard({
+    epoch: "total",
+    account: address?.toLowerCase(),
+  })
+
+  const userData = accountTotalQuery.data?.leaderboard?.[0]
 
   const points = [
     {
       id: "Trader points",
-      points: Number(data?.[0]?.taker_points ?? 0),
+      points: Number(userData?.taker ?? 0),
       color: "bg-green-caribbean",
     },
     {
       id: "Liquidity providing points",
-      points: Number(data?.[0]?.maker_points ?? 0),
+      points: Number(userData?.maker ?? 0),
       color: "bg-[#8F5AE8]",
     },
+    // {
+    //   id: "Community points",
+    //   points: Number(userPoints?.community_points ?? 0),
+    //   color: "bg-white",
+    // },
     {
       id: "Referral points",
-      points: Number(data?.[0]?.referees_points ?? 0),
+      points: Number(userData?.ref ?? 0),
       color: "bg-green-bangladesh",
     },
   ]
@@ -28,7 +43,7 @@ export default function TotalPoints() {
       <div className="flex justify-between">
         <div className="text-base text-cloud-200 font-normal">Total</div>
         <div className="text-base text-white font-normal">
-          {totalPoints} points
+          {formatNumber(totalPoints)} points
         </div>
       </div>
       <div className="h-1 w-full rounded-lg overflow-hidden flex mt-2">
@@ -63,7 +78,7 @@ export default function TotalPoints() {
                   ></span>
                   {item.id}
                 </td>
-                <td className="text-right py-1">{item.points}</td>
+                <td className="text-right py-1">{formatNumber(item.points)}</td>
                 <td className="text-right text-cloud-200 py-1">
                   ({percentage.toFixed(0)}%)
                 </td>

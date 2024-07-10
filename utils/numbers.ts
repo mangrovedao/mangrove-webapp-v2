@@ -1,15 +1,15 @@
 "use client"
 
-import type { Token } from "@mangrovedao/mangrove.js"
+import type { Token } from "@mangrovedao/mgv"
 import getUserLocale from "get-user-locale"
 
 export function formatNumber(
-  value: number | bigint,
+  value: number | bigint | null,
   options?: Intl.NumberFormatOptions | undefined,
 ) {
   return Intl.NumberFormat(getUserLocale(), {
     ...options,
-  }).format(value)
+  }).format(value ?? 0)
 }
 
 export function determineDecimals(
@@ -60,7 +60,7 @@ export function determinePriceDecimalsFromToken(
   value: number | bigint | undefined,
   token?: Token,
 ) {
-  return determineDecimals(value, token?.displayedAsPriceDecimals)
+  return determineDecimals(value, token?.priceDisplayDecimals)
 }
 
 export function getSeparator() {

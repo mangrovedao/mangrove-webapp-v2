@@ -1,26 +1,23 @@
 import { AlertCircle } from "lucide-react"
 
-import useKandel from "@/app/strategies/(list)/_providers/kandel-strategies"
 import Dialog from "@/components/dialogs/dialog"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { useCloseStrategy } from "../../../_hooks/use-close-strategy"
-import useKandelContext from "../../../_providers/kandel-strategy"
 
 type Props = {
   isOpen: boolean
+  strategyAddress: string
   onClose: () => void
 }
 
-export default function CloseDialog({ isOpen, onClose }: Props) {
-  const { getMarketFromAddresses } = useMarket()
-  const { strategyQuery } = useKandelContext()
-  const { kandelStrategies } = useKandel()
-  const { base, quote, address: strategyAddress } = strategyQuery.data ?? {}
-
+export default function CloseStrategyDialog({
+  isOpen,
+  onClose,
+  strategyAddress,
+}: Props) {
   const closeStrategy = useCloseStrategy({ strategyAddress })
 
   return (
@@ -35,30 +32,19 @@ export default function CloseDialog({ isOpen, onClose }: Props) {
       </Dialog.Title>
       <Dialog.Description>
         <div className="flex flex-col space-y-2 mt-9">
-          <Title>Are you sure you want to close this strategy</Title>
+          <Title>Are you sure you want to close this strategy ?</Title>
           <Text>You can re-open it at any time.</Text>
-          <Text>
-            Funds will be withdrawn from the strategy and returned to your
-            wallet.
-          </Text>
         </div>
       </Dialog.Description>
       <Dialog.Footer>
         <Button
           className="w-full"
           onClick={() => {
-            closeStrategy.mutate(
-              {
-                getMarketFromAddresses,
-                kandelStrategies,
-                base,
-                quote,
-              },
-              { onSuccess: () => onClose },
-            )
+            closeStrategy.mutate(undefined, { onSuccess: () => onClose() })
           }}
           disabled={closeStrategy.isPending}
           loading={closeStrategy.isPending}
+          size={"lg"}
         >
           Yes, close strategy
         </Button>
@@ -67,6 +53,7 @@ export default function CloseDialog({ isOpen, onClose }: Props) {
           className="w-full"
           variant={"secondary"}
           disabled={closeStrategy.isPending}
+          size={"lg"}
         >
           No, cancel
         </Button>
