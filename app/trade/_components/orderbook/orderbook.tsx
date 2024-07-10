@@ -45,12 +45,11 @@ export function OrderBook({
 }
 
 function BookContent() {
-  // const { requestBookQuery, market } = useMarket()
-  // const market = useMarket()
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
-  const { book, isLoading, isError } = useBook()
-  // const { asks, bids } = requestBookQuery.data ?? {}
+  const { book, isLoading } = useBook({
+    aggregateOffersWithSamePrice: true,
+  })
 
   if (isLoading || !book || !currentMarket) {
     return (
@@ -65,21 +64,11 @@ function BookContent() {
       </div>
     )
   }
-
-  const highestAskPrice = book.asks[book.asks.length - 1]?.price
   const lowestAskPrice = book.asks[0]?.price
   const highestBidPrice = book.bids[0]?.price
-  const bigestPrice = highestAskPrice ?? highestBidPrice ?? 0
   const spread = Math.abs((lowestAskPrice ?? 0) - (highestBidPrice ?? 0))
   const spreadPercent = (spread / (highestBidPrice ?? 1)) * 100
 
-  // const bigestPrice = highestAskPrice ?? highestBidPrice ?? Big(0)
-  // const spread = lowestAskPrice?.sub(highestBidPrice ?? 0).abs()
-  // const spreadPercent =
-  //   spread
-  //     ?.mul(100)
-  //     .div(highestBidPrice ?? 1)
-  //     .toNumber() ?? 0
   const spreadPercentString = new Intl.NumberFormat("en-US", {
     style: "percent",
     maximumFractionDigits: 2,
