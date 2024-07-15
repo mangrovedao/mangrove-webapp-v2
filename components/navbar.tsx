@@ -39,9 +39,9 @@ import {
 
 import useLocalStorage from "@/hooks/use-local-storage"
 import { baseSepolia, blast, blastSepolia } from "viem/chains"
+import ChainSelector from "./chain-selector"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
-import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 import {
   Tooltip,
@@ -248,7 +248,8 @@ const RightPart = withClientOnly(() => {
       <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
-      <Button
+      <ChainSelector />
+      {/* <Button
         variant="invisible"
         className="!space-x-4 lg:flex items-center hidden"
         size="sm"
@@ -268,7 +269,7 @@ const RightPart = withClientOnly(() => {
         <div className="pl-2">
           <ChevronDown className="w-3" />
         </div>
-      </Button>
+      </Button> */}
 
       <Separator orientation="vertical" />
 
