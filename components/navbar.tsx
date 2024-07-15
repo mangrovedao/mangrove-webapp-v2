@@ -299,7 +299,7 @@ const RightPart = withClientOnly(() => {
           <DropdownMenuItem asChild>
             <Link href={"/bridge"}>
               <Route className="mr-2 h-4 w-4" />
-              <span>Bridge</span>
+              <span>Bridge assets</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleChangeNetwork}>
