@@ -4,8 +4,10 @@ import { useChainId, useSwitchChain } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
 import { useChains } from "@/providers/chains"
+import { cn } from "@/utils"
 import { getChainObjectById } from "@/utils/chains"
 import { Button } from "./ui/button"
+import { XClose } from "./ui/dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 export default function ChainSelector() {
@@ -29,19 +31,43 @@ export default function ChainSelector() {
 
   return (
     <>
-      <Dialog open={!!isChainDialogOpen} onClose={closeDialog}>
-        <Dialog.Description>
+      <Dialog
+        open={!!isChainDialogOpen}
+        onClose={closeDialog}
+        showCloseButton={false}
+        className="p-0 !max-w-96 max-h-96"
+      >
+        <div className="flex justify-between items-center px-4 sticky top-0 bg-background py-4">
+          <h1 className="text-xl font-extrabold">Switch Networks</h1>
+          <Dialog.Close>
+            <XClose />
+          </Dialog.Close>
+        </div>
+        <Dialog.Description className="space-y-1 py-2 overflow-hidden">
           {chains.map(({ id, name }) => (
-            <div key={id}>
+            <div key={id} className="px-2">
               <Button
-                variant={"link"}
+                className={cn(
+                  "text-left text-lg w-full flex items-center px-4 space-x-2",
+                  {
+                    "bg-green-bangladesh": chain?.id === id,
+                  },
+                )}
+                variant={"invisible"}
                 onClick={() => {
                   switchChain({
                     chainId: id,
                   })
                 }}
               >
-                {name}
+                <ImageWithHideOnError
+                  src={`https://icons.llamao.fi/icons/chains/rsz_${name.toLowerCase().replaceAll(" ", "_")}.jpg`}
+                  alt=""
+                  className="rounded-full overflow-hidden"
+                  width={28}
+                  height={28}
+                />
+                <span>{name}</span>
               </Button>
             </div>
           ))}
@@ -49,7 +75,7 @@ export default function ChainSelector() {
       </Dialog>
       <Button
         variant="invisible"
-        className="!space-x-4 lg:flex items-center hidden"
+        className={"!space-x-4 lg:flex items-center hidden"}
         size="sm"
         onClick={openDialog}
       >
