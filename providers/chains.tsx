@@ -1,17 +1,17 @@
 "use client"
 
-import { bridgeableSynapseChainIds, getChainObjectById } from "@/utils/chains"
+import {
+  bridgeableSynapseChainIds,
+  getChainObjectById,
+  mangroveCompatibleChainIds,
+} from "@/utils/chains"
 import { usePathname } from "next/navigation"
 import React from "react"
 import type { Chain } from "viem/chains"
-import * as viemChains from "viem/chains"
 import { useChainId } from "wagmi"
 
 export const chainsConfig = {
-  mangroveCompatibleChainIds: [
-    viemChains.blast.id,
-    viemChains.baseSepolia.id,
-  ] as number[],
+  mangroveCompatibleChainIds,
   pages: [
     {
       path: "/bridge",
@@ -21,14 +21,12 @@ export const chainsConfig = {
 }
 
 type IChainsContext = {
-  chains: Chain[]
+  chains?: Chain[]
   isChainCompatibleWithMangrove?: boolean
   isChainDialogOpen?: boolean
   setIsChainDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
-const ChainsContext = React.createContext<IChainsContext>({
-  chains: [],
-})
+const ChainsContext = React.createContext<IChainsContext>({})
 
 export const useChains = () => React.useContext(ChainsContext)
 

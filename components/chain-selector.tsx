@@ -37,14 +37,16 @@ export default function ChainSelector() {
         showCloseButton={false}
         className="p-0 !max-w-96 max-h-96"
       >
-        <div className="flex justify-between items-center px-4 sticky top-0 bg-background py-4">
-          <h1 className="text-xl font-extrabold">Switch Networks</h1>
-          <Dialog.Close>
-            <XClose />
-          </Dialog.Close>
+        <div className="sticky top-0 inset-x-0 bg-background">
+          <div className="flex justify-between items-center px-4 py-4">
+            <h1 className="text-xl font-extrabold">Switch Networks</h1>
+            <Dialog.Close>
+              <XClose />
+            </Dialog.Close>
+          </div>
         </div>
         <Dialog.Description className="space-y-1 py-2 overflow-hidden">
-          {chains.map(({ id, name }) => (
+          {chains?.map(({ id, name }) => (
             <div key={id} className="px-2">
               <Button
                 className={cn(
@@ -84,7 +86,7 @@ export default function ChainSelector() {
             src={`/assets/chains/${chainId}.webp`}
             width={16}
             height={16}
-            className="h-4 rounded-sm"
+            className="h-4 rounded-sm size-4"
             key={chainId}
             alt={`${chain?.name}-logo`}
           />

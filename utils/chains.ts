@@ -33,8 +33,10 @@ const CHAIN_IDS = WHITELISTED_CHAIN_IDS
     : [WHITELISTED_CHAIN_IDS]
   : [DEFAULT_CHAIN_ID]
 
+export const mangroveCompatibleChainIds = CHAIN_IDS.map((x) => Number(x))
+
 export const mangroveAndBridgeableChainIds = Array.from(
-  new Set([...CHAIN_IDS.map((x) => Number(x)), ...bridgeableSynapseChainIds]),
+  new Set([...mangroveCompatibleChainIds, ...bridgeableSynapseChainIds]),
 )
 
 type WagmiChains = Record<string, Chain>

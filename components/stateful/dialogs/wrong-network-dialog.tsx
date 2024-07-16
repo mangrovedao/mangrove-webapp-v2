@@ -8,7 +8,7 @@ import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 
 export function WrongNetworkAlertDialog() {
-  const { chain, isConnected } = useAccount()
+  const { chain, isConnected, isConnecting } = useAccount()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
   const isNetworkSupported = !!chains?.find((c) => c.id === chain?.id)
 
@@ -19,13 +19,13 @@ export function WrongNetworkAlertDialog() {
       !isChainDialogOpen &&
       isConnected &&
       !isNetworkSupported &&
-      chains.length
+      !!chains?.length
     ) {
       setOpen(true)
     } else {
       setOpen(false)
     }
-  }, [chain, isNetworkSupported, isChainDialogOpen])
+  }, [chain, chains, isNetworkSupported, isChainDialogOpen, isConnecting])
 
   function handleChangeNetwork() {
     setOpen(false)
