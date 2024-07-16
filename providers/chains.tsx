@@ -57,11 +57,12 @@ export const ChainsProvider = ({ children }: React.PropsWithChildren) => {
       const chainObjects = pageConfig.chainIds
         .map((x) => getChainObjectById(x.toString()))
         .filter((x) => !!x)
+      // @ts-ignore
       setChains(chainObjects)
       return
     }
-
     setChains(
+      // @ts-ignore
       chainsConfig.mangroveCompatibleChainIds
         .map((x) => getChainObjectById(x.toString()))
         .filter((x) => !!x),
