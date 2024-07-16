@@ -11,6 +11,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
 import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
+import { formatUnits } from "viem"
 import { TimeInForce } from "../../../forms/limit/enums"
 import {
   isGreaterThanZeroValidator,
@@ -235,7 +236,12 @@ export default function EditOrderSheet({
                         <form.Field
                           name="send"
                           onChange={sendValidator(
-                            Number(sendTokenBalance.balance?.balance ?? 0),
+                            Number(
+                              formatUnits(
+                                sendTokenBalance.balance?.balance || 0n,
+                                8,
+                              ),
+                            ),
                           )}
                         >
                           {(field) => (

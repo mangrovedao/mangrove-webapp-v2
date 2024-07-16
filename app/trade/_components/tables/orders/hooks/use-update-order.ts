@@ -7,7 +7,7 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { BS } from "@mangrovedao/mgv/lib"
-import { BaseError, ContractFunctionExecutionError, parseEther } from "viem"
+import { BaseError, ContractFunctionExecutionError, parseUnits } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import { Form } from "../types"
 
@@ -21,6 +21,7 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
   const { currentMarket: market } = useMarket()
   const { book } = useBook()
   const { address } = useAccount()
+  const { currentMarket } = useMarket()
 
   const marketClient = useMarketClient()
   const { data: walletClient } = useWalletClient()
@@ -48,15 +49,14 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
 
         const { isBid, limitPrice: price, send, receive } = form
 
-        console.log({
-          baseAmount: isBid ? send : receive,
-          quoteAmount: isBid ? receive : send,
-        })
-
         const { request } = await marketClient.simulateUpdateOrder({
           offerId: BigInt(Number(offerId)),
-          baseAmount: isBid ? parseEther(send) : parseEther(receive),
-          quoteAmount: isBid ? parseEther(receive) : parseEther(send),
+          baseAmount: isBid
+            ? parseUnits(receive, currentMarket?.base.decimals || 18)
+            : parseUnits(send, currentMarket?.base.decimals || 18),
+          quoteAmount: isBid
+            ? parseUnits(send, currentMarket?.quote.decimals || 18)
+            : parseUnits(receive, currentMarket?.quote.decimals || 18),
           bs: isBid ? BS.buy : BS.sell,
           book: book,
           restingOrderGasreq: 250_000n,
