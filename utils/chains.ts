@@ -22,6 +22,7 @@ export const bridgeableSynapseChainIds = [
   wagmiChains.dfk.id,
   wagmiChains.aurora.id,
   wagmiChains.harmonyOne.id,
+  wagmiChains.cronos.id,
 ]
 
 const WHITELISTED_CHAIN_IDS = env.NEXT_PUBLIC_WHITELISTED_CHAIN_IDS
