@@ -15,9 +15,20 @@ enum StrategyType {
 
 export function Tables({
   className,
+  hideCreateStrat,
   ...props
-}: React.ComponentProps<typeof CustomTabs>) {
+}: React.ComponentProps<typeof CustomTabs> & {
+  hideCreateStrat: (bool: boolean) => void
+}) {
   const [strategiesType, setStrategiesType] = React.useState(StrategyType.PRO)
+
+  React.useEffect(() => {
+    if (strategiesType === "Passive") {
+      hideCreateStrat(true)
+    } else {
+      hideCreateStrat(false)
+    }
+  }, [strategiesType])
 
   return (
     <div className="pt-4 space-y-4">
