@@ -93,7 +93,7 @@ export default function EditStrategyDialog({
   ].filter(Boolean)
 
   const [currentStep, helpers] = useStep(steps.length)
-  const { goToNextStep, reset } = helpers
+  const { goToNextStep, goToPrevStep, reset } = helpers
   const stepInfos = [
     {
       body: (
@@ -179,20 +179,25 @@ export default function EditStrategyDialog({
         </div>
       ),
       button: (
-        <Button
-          {...btnProps}
-          disabled={isRetractingOffers}
-          loading={isRetractingOffers}
-          onClick={() => {
-            if (!strategy) return
+        <>
+          <Button variant={"secondary"} onClick={() => goToPrevStep()}>
+            Return
+          </Button>
+          <Button
+            {...btnProps}
+            disabled={isRetractingOffers}
+            loading={isRetractingOffers}
+            onClick={() => {
+              if (!strategy) return
 
-            retractOffers(undefined, {
-              onSuccess: goToNextStep,
-            })
-          }}
-        >
-          Reset
-        </Button>
+              retractOffers(undefined, {
+                onSuccess: goToNextStep,
+              })
+            }}
+          >
+            Reset
+          </Button>
+        </>
       ),
     },
 

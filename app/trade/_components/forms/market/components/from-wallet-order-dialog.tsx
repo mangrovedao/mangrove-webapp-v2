@@ -81,7 +81,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
 
   const [currentStep, helpers] = useStep(steps.length)
 
-  const { goToNextStep } = helpers
+  const { goToNextStep, goToPrevStep } = helpers
 
   const stepInfos = [
     !marketOrderSteps?.[0].done && {
@@ -103,24 +103,29 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     !marketOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
-        <Button
-          {...btnProps}
-          disabled={approve.isPending}
-          loading={approve.isPending}
-          onClick={() => {
-            approve.mutate(
-              {
-                token: sendToken,
-                spender,
-              },
-              {
-                onSuccess: goToNextStep,
-              },
-            )
-          }}
-        >
-          Approve
-        </Button>
+        <>
+          <Button variant={"secondary"} onClick={() => goToPrevStep()}>
+            Return
+          </Button>
+          <Button
+            {...btnProps}
+            disabled={approve.isPending}
+            loading={approve.isPending}
+            onClick={() => {
+              approve.mutate(
+                {
+                  token: sendToken,
+                  spender,
+                },
+                {
+                  onSuccess: goToNextStep,
+                },
+              )
+            }}
+          >
+            Approve
+          </Button>
+        </>
       ),
     },
     {
