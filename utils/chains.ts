@@ -2,6 +2,28 @@ import { env } from "@/env.mjs"
 import type { Chain } from "viem/chains"
 import * as wagmiChains from "viem/chains"
 
+export const bridgeableSynapseChainIds = [
+  wagmiChains.blast.id,
+  wagmiChains.baseSepolia.id,
+  wagmiChains.mainnet.id,
+  wagmiChains.optimism.id,
+  wagmiChains.opBNB.id,
+  wagmiChains.polygon.id,
+  wagmiChains.fantom.id,
+  wagmiChains.boba.id,
+  wagmiChains.metis.id,
+  wagmiChains.moonriver.id,
+  wagmiChains.dogechain.id,
+  wagmiChains.canto.id,
+  wagmiChains.klaytn.id,
+  wagmiChains.base.id,
+  wagmiChains.arbitrum.id,
+  wagmiChains.avalanche.id,
+  wagmiChains.dfk.id,
+  wagmiChains.aurora.id,
+  wagmiChains.harmonyOne.id,
+]
+
 const WHITELISTED_CHAIN_IDS = env.NEXT_PUBLIC_WHITELISTED_CHAIN_IDS
 const DEFAULT_CHAIN_ID = "80001"
 const CHAIN_IDS = WHITELISTED_CHAIN_IDS
@@ -10,13 +32,20 @@ const CHAIN_IDS = WHITELISTED_CHAIN_IDS
     : [WHITELISTED_CHAIN_IDS]
   : [DEFAULT_CHAIN_ID]
 
+export const mangroveAndBridgeableChainIds = Array.from(
+  new Set([...CHAIN_IDS, ...bridgeableSynapseChainIds]),
+)
+
 type WagmiChains = Record<string, Chain>
 
 export function getWhitelistedChainObjects() {
   const result = []
   for (const chainName in wagmiChains) {
     const chainObject = (wagmiChains as WagmiChains)[chainName]
-    if (chainObject && CHAIN_IDS.includes(chainObject.id.toString())) {
+    if (
+      chainObject &&
+      mangroveAndBridgeableChainIds.includes(chainObject.id.toString())
+    ) {
       result.push(chainObject)
     }
   }

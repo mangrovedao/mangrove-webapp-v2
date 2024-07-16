@@ -1,94 +1,23 @@
-import Dialog from "@/components/dialogs/dialog"
-import {
-  provideRainbowKitChains,
-  RainbowKitChain,
-} from "@/utils/provideRainbowKitChains"
 import { ChevronDown } from "lucide-react"
 import React from "react"
-import { useChainId, useChains, useSwitchChain } from "wagmi"
+import { useChainId, useSwitchChain } from "wagmi"
+
+import Dialog from "@/components/dialogs/dialog"
+import { useChains } from "@/providers/chains"
 import { Button } from "./ui/button"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
-
-export type AsyncImageSrc = () => Promise<string>
-
-const cachedUrls = new Map<AsyncImageSrc, string>()
-// Store requests in a cache so we don't fetch the same image twice
-const cachedRequestPromises = new Map<AsyncImageSrc, Promise<string | void>>()
-
-function useForceUpdate() {
-  const [, forceUpdate] = React.useReducer((x) => x + 1, 0)
-
-  return forceUpdate
-}
-
-async function loadAsyncImage(asyncImage: () => Promise<string>) {
-  const cachedRequestPromise = cachedRequestPromises.get(asyncImage)
-
-  // Don't fetch if we already have a request in progress / completed
-  if (cachedRequestPromise) {
-    return cachedRequestPromise
-  }
-
-  const load = async () =>
-    asyncImage().then(async (url: string) => {
-      // Uncomment to simulate slow image loading:
-      // await new Promise(resolve =>
-      //   setTimeout(resolve, 2000 + Math.random() * 1000)
-      // );
-
-      // Uncomment to simulate random failure:
-      // if (Math.random() > 0.25) {
-      //   throw new Error();
-      // }
-
-      cachedUrls.set(asyncImage, url)
-
-      return url
-    })
-
-  const requestPromise = load().catch((_err) => {
-    // Retry once if the request failed
-    return load().catch((_err) => {
-      // Ignore failed retry, remove failed request from
-      // promise cache so next request can try again
-      cachedRequestPromises.delete(asyncImage)
-    })
-  })
-
-  cachedRequestPromises.set(asyncImage, requestPromise)
-
-  return requestPromise
-}
-
-export function useAsyncImage(
-  url?: string | AsyncImageSrc,
-): string | undefined {
-  const cachedUrl = typeof url === "function" ? cachedUrls.get(url) : undefined
-  const forceUpdate = useForceUpdate()
-
-  React.useEffect(() => {
-    if (typeof url === "function" && !cachedUrl) {
-      loadAsyncImage(url).then(forceUpdate)
-    }
-  }, [url, cachedUrl, forceUpdate])
-
-  return typeof url === "function" ? cachedUrl : url
-}
-
-function AsyncImage(props: React.ComponentProps<"img">) {
-  const src = useAsyncImage(props.src)
-  return <img {...props} src={src} />
-}
 
 export default function ChainSelector() {
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
-  const chains = useChains()
+  const { chains } = useChains()
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const chain = chains.find((c) => c.id === chainId)
-  const rainbowkitChains: RainbowKitChain[] = provideRainbowKitChains(chains)
 
-  console.log(rainbowkitChains)
+  // Close dialog if the chain id has changed
+  React.useEffect(() => {
+    setIsDialogOpen(false)
+  }, [chain?.id])
 
   function openDialog() {
     setIsDialogOpen(true)
@@ -102,10 +31,18 @@ export default function ChainSelector() {
     <>
       <Dialog open={isDialogOpen} onClose={closeDialog}>
         <Dialog.Description>
-          {rainbowkitChains.map(({ id, name, iconUrl }) => (
+          {chains.map(({ id, name }) => (
             <div key={id}>
-              {iconUrl ? <AsyncImage src={iconUrl} /> : undefined}
-              <span>{name}</span>
+              <Button
+                variant={"link"}
+                onClick={() =>
+                  switchChain({
+                    chainId: id,
+                  })
+                }
+              >
+                {name}
+              </Button>
             </div>
           ))}
         </Dialog.Description>

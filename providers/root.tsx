@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { ChainsProvider } from "./chains"
 import { DialogProvider } from "./dialogs"
 import { FocusOutline } from "./focus-outline"
 import { MangroveProvider } from "./mangrove"
@@ -16,11 +17,13 @@ export function RootProvider({ children }: React.PropsWithChildren) {
           <DialogProvider>
             <RedirectToBridge>
               <MangroveProvider>
-                <FocusOutline>
-                  <StyledJsxRegistry>
-                    <CSPostHogProvider>{children}</CSPostHogProvider>
-                  </StyledJsxRegistry>
-                </FocusOutline>
+                <ChainsProvider>
+                  <FocusOutline>
+                    <StyledJsxRegistry>
+                      <CSPostHogProvider>{children}</CSPostHogProvider>
+                    </StyledJsxRegistry>
+                  </FocusOutline>
+                </ChainsProvider>
               </MangroveProvider>
             </RedirectToBridge>
           </DialogProvider>

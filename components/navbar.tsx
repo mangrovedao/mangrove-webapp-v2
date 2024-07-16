@@ -38,6 +38,7 @@ import {
 } from "@rainbow-me/rainbowkit"
 
 import useLocalStorage from "@/hooks/use-local-storage"
+import { useChains } from "@/providers/chains"
 import { baseSepolia, blast, blastSepolia } from "viem/chains"
 import ChainSelector from "./chain-selector"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
@@ -57,34 +58,32 @@ type Props = React.ComponentProps<"nav"> & {
 
 export function Navbar({ className, innerClasses, ...props }: Props) {
   const currentRoute = usePathname()
-  const { chainId } = useAccount()
-  const pathname = usePathname()
   const clipPathId = React.useId()
+  const { isChainCompatibleWithMangrove } = useChains()
 
-  const links =
-    pathname === "/bridge" && chainId !== baseSepolia.id && chainId !== blast.id
-      ? []
-      : [
-          {
-            name: "Trade",
-            href: "/trade",
-          },
-          {
-            name: "Strategies",
-            href: "/strategies",
-            disabled: false,
-            message: "Cooking...",
-          },
-          {
-            name: "Points",
-            href: "/points",
-            disabled: false,
-          },
-          {
-            name: "Referrals",
-            href: "/referrals",
-          },
-        ]
+  const links = !isChainCompatibleWithMangrove
+    ? []
+    : [
+        {
+          name: "Trade",
+          href: "/trade",
+        },
+        {
+          name: "Strategies",
+          href: "/strategies",
+          disabled: false,
+          message: "Cooking...",
+        },
+        {
+          name: "Points",
+          href: "/points",
+          disabled: false,
+        },
+        {
+          name: "Referrals",
+          href: "/referrals",
+        },
+      ]
 
   return (
     <nav
