@@ -5,6 +5,7 @@ import {
   ExternalLink,
   LogOut,
   Network,
+  Route,
   Wallet,
 } from "lucide-react"
 import Link from "next/link"
@@ -62,12 +63,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
 
   const links =
     pathname === "/bridge" && chainId !== baseSepolia.id && chainId !== blast.id
-      ? [
-          {
-            name: "Bridge to blast",
-            href: "/bridge",
-          },
-        ]
+      ? []
       : [
           {
             name: "Trade",
@@ -87,10 +83,6 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
           {
             name: "Referrals",
             href: "/referrals",
-          },
-          {
-            name: "Bridge to blast",
-            href: "/bridge",
           },
         ]
 
@@ -304,6 +296,12 @@ const RightPart = withClientOnly(() => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Chain: {chain?.name}</DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+            <Link href={"/bridge"}>
+              <Route className="mr-2 h-4 w-4" />
+              <span>Bridge assets</span>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleChangeNetwork}>
             <Network className="mr-2 h-4 w-4" />
             <span>Change network</span>
