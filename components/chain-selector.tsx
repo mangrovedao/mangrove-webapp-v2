@@ -4,42 +4,42 @@ import { useChainId, useSwitchChain } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
 import { useChains } from "@/providers/chains"
+import { getChainObjectById } from "@/utils/chains"
 import { Button } from "./ui/button"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 export default function ChainSelector() {
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
-  const { chains } = useChains()
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const chain = chains.find((c) => c.id === chainId)
+  const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
+  const chain = getChainObjectById(chainId.toString())
 
   // Close dialog if the chain id has changed
   React.useEffect(() => {
-    setIsDialogOpen(false)
+    setIsChainDialogOpen?.(false)
   }, [chain?.id])
 
   function openDialog() {
-    setIsDialogOpen(true)
+    setIsChainDialogOpen?.(true)
   }
 
   function closeDialog() {
-    setIsDialogOpen(false)
+    setIsChainDialogOpen?.(false)
   }
 
   return (
     <>
-      <Dialog open={isDialogOpen} onClose={closeDialog}>
+      <Dialog open={!!isChainDialogOpen} onClose={closeDialog}>
         <Dialog.Description>
           {chains.map(({ id, name }) => (
             <div key={id}>
               <Button
                 variant={"link"}
-                onClick={() =>
+                onClick={() => {
                   switchChain({
                     chainId: id,
                   })
-                }
+                }}
               >
                 {name}
               </Button>

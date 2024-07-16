@@ -33,7 +33,7 @@ const CHAIN_IDS = WHITELISTED_CHAIN_IDS
   : [DEFAULT_CHAIN_ID]
 
 export const mangroveAndBridgeableChainIds = Array.from(
-  new Set([...CHAIN_IDS, ...bridgeableSynapseChainIds]),
+  new Set([...CHAIN_IDS.map((x) => Number(x)), ...bridgeableSynapseChainIds]),
 )
 
 type WagmiChains = Record<string, Chain>
@@ -42,10 +42,7 @@ export function getWhitelistedChainObjects() {
   const result = []
   for (const chainName in wagmiChains) {
     const chainObject = (wagmiChains as WagmiChains)[chainName]
-    if (
-      chainObject &&
-      mangroveAndBridgeableChainIds.includes(chainObject.id.toString())
-    ) {
+    if (chainObject && mangroveAndBridgeableChainIds.includes(chainObject.id)) {
       result.push(chainObject)
     }
   }

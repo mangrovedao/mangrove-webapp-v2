@@ -20,30 +20,21 @@ export const chainsConfig = {
   ],
 }
 
-type ViemChains = Record<string, Chain>
-
-function getAllViemChains() {
-  const result = []
-  for (const chainName in viemChains) {
-    const chainObject = (viemChains as ViemChains)[chainName]
-    if (chainObject) result.push(chainObject)
-  }
-  return result
-}
-
 type IChainsContext = {
   chains: Chain[]
-  isChainCompatibleWithMangrove: boolean
+  isChainCompatibleWithMangrove?: boolean
+  isChainDialogOpen?: boolean
+  setIsChainDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 const ChainsContext = React.createContext<IChainsContext>({
   chains: [],
-  isChainCompatibleWithMangrove: false,
 })
 
 export const useChains = () => React.useContext(ChainsContext)
 
 export const ChainsProvider = ({ children }: React.PropsWithChildren) => {
   const chainId = useChainId()
+  const [isChainDialogOpen, setIsChainDialogOpen] = React.useState(false)
   const [chains, setChains] = React.useState<Chain[]>([])
   const [isChainCompatibleWithMangrove, setIsChainCompatibleWithMangrove] =
     React.useState(false)
@@ -84,6 +75,8 @@ export const ChainsProvider = ({ children }: React.PropsWithChildren) => {
       value={{
         chains,
         isChainCompatibleWithMangrove,
+        isChainDialogOpen,
+        setIsChainDialogOpen,
       }}
     >
       {children}

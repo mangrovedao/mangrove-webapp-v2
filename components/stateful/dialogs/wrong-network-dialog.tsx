@@ -1,31 +1,30 @@
 "use client"
-import { useChainModal } from "@rainbow-me/rainbowkit"
 import React from "react"
-import { useAccount, useConfig } from "wagmi"
+import { useAccount } from "wagmi"
 
 import Dialog from "@/components/dialogs/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 
 export function WrongNetworkAlertDialog() {
-  const { openChainModal, chainModalOpen } = useChainModal()
   const { chain, isConnected } = useAccount()
-  const { chains } = useConfig()
+  const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
   const isNetworkSupported = chains.find((c) => c.id === chain?.id)
 
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
-    if (!chainModalOpen && isConnected && !isNetworkSupported) {
+    if (!isChainDialogOpen && isConnected && !isNetworkSupported) {
       setOpen(true)
     } else {
       setOpen(false)
     }
-  }, [chain, isNetworkSupported, chainModalOpen])
+  }, [chain, isNetworkSupported, isChainDialogOpen])
 
   function handleChangeNetwork() {
     setOpen(false)
-    openChainModal?.()
+    setIsChainDialogOpen?.(true)
   }
 
   const title = !isNetworkSupported
