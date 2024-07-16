@@ -153,7 +153,6 @@ export function useMarketForm(props: Props) {
         bs === BS.buy ? formattedBaseEstimation : formattedQuoteEstimation
       const estimatedSend =
         bs === BS.buy ? formattedQuoteEstimation : formattedBaseEstimation
-
       estimateFrom === "receive"
         ? form.setFieldValue("send", estimatedSend)
         : form.setFieldValue("receive", estimatedReceive)
@@ -181,15 +180,6 @@ export function useMarketForm(props: Props) {
   const computeSendAmount = React.useCallback(() => {
     setEstimateFrom("receive")
   }, [])
-
-  React.useEffect(() => {
-    const send = form?.getFieldValue("send")
-    const receive = form?.getFieldValue("receive")
-    if (!(send && receive)) return
-    form.setFieldValue("send", receive)
-    form.setFieldValue("receive", send)
-    form.validateAllFields("submit")
-  }, [form, bs])
 
   React.useEffect(() => {
     form?.reset()

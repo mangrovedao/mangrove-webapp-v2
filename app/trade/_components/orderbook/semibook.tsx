@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
 import { OrderBookTableCell } from "./table-cell"
 import { calculateCumulatedVolume } from "./utils"
@@ -32,6 +33,7 @@ export const SemiBook = React.forwardRef<
   React.ElementRef<typeof TableRow>,
   SemiBookProps
 >(({ type, data, priceDecimals }, ref) => {
+  const { currentMarket } = useMarket()
   const { dataWithCumulatedVolume, maxVolume } = calculateCumulatedVolume(data)
   const offers = dataWithCumulatedVolume?.[type].sort(
     (a, b) => b.price - a.price,
@@ -42,6 +44,12 @@ export const SemiBook = React.forwardRef<
     const { price, id, volume, cumulatedVolume } = offer
     const cumulatedVolumePercentage =
       ((cumulatedVolume ?? 0) * 100) / (maxVolume ?? 1)
+
+    const pDecimals =
+      currentMarket?.quote.symbol === "WETH" &&
+      currentMarket?.base.symbol === "BLAST"
+        ? 8
+        : priceDecimals
     return (
       <>
         <TableRow
@@ -72,10 +80,13 @@ export const SemiBook = React.forwardRef<
                   className={cn("hover:opacity-80 transition-opacity ml-1")}
                 >
                   <span className="!font-roboto">
-                    {price.toFixed(priceDecimals)}
+                    {price.toFixed(pDecimals)}
                   </span>
                 </TooltipTrigger>
-                <TooltipContent> {price.toFixed(8)}</TooltipContent>
+                <TooltipContent>
+                  {" "}
+                  {price.toFixed(currentMarket?.quote.decimals)}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </OrderBookTableCell>

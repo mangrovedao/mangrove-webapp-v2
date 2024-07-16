@@ -84,6 +84,17 @@ export function useTable({ data }: Params) {
           )
         },
       }),
+      columnHelper.accessor("community", {
+        header: () => <div className="text-right">Community points</div>,
+        cell: (row) => {
+          const communityPoints = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(communityPoints)}
+            </div>
+          )
+        },
+      }),
       columnHelper.accessor("total", {
         header: () => <div className="text-right">Total points</div>,
         cell: (row) => {
@@ -91,6 +102,17 @@ export function useTable({ data }: Params) {
           return (
             <div className="w-full h-full flex justify-end font-roboto">
               {formatNumber(totalPoints)}
+            </div>
+          )
+        },
+      }),
+      columnHelper.accessor("share", {
+        header: () => <div className="text-right">Share</div>,
+        cell: (row) => {
+          const share = row.getValue()
+          return (
+            <div className="w-full h-full flex justify-end font-roboto">
+              {formatNumber(share, { maximumFractionDigits: 2 })}%
             </div>
           )
         },

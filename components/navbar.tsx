@@ -5,6 +5,7 @@ import {
   ExternalLink,
   LogOut,
   Network,
+  Route,
   Wallet,
 } from "lucide-react"
 import Link from "next/link"
@@ -50,49 +51,40 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip"
 
-const LINKS = [
-  {
-    name: "Trade",
-    href: "/trade",
-  },
-  {
-    name: "Strategies",
-    href: "/strategies",
-    disabled: false,
-    message: "Cooking...",
-  },
-  {
-    name: "Points",
-    href: "/points",
-    disabled: false,
-    // message: (
-    //   <div className="z-50">
-    //     Points program is live! <br />
-    //     The Points page will be available in the coming days.
-    //     <br />
-    //     More info{" "}
-    //     <Link
-    //       href={"https://docs.mangrove.exchange/general/points/"}
-    //       className="text-green-caribbean"
-    //     >
-    //       here
-    //     </Link>
-    //   </div>
-    // ),
-  },
-  {
-    name: "Referrals",
-    href: "/referrals",
-  },
-]
-
 type Props = React.ComponentProps<"nav"> & {
   innerClasses?: string
 }
 
 export function Navbar({ className, innerClasses, ...props }: Props) {
   const currentRoute = usePathname()
+  const { chainId } = useAccount()
+  const pathname = usePathname()
   const clipPathId = React.useId()
+
+  const links =
+    pathname === "/bridge" && chainId !== baseSepolia.id && chainId !== blast.id
+      ? []
+      : [
+          {
+            name: "Trade",
+            href: "/trade",
+          },
+          {
+            name: "Strategies",
+            href: "/strategies",
+            disabled: false,
+            message: "Cooking...",
+          },
+          {
+            name: "Points",
+            href: "/points",
+            disabled: false,
+          },
+          {
+            name: "Referrals",
+            href: "/referrals",
+          },
+        ]
 
   return (
     <nav
@@ -130,7 +122,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
           <Separator orientation="vertical" className="hidden lg:block" />
 
           <div className="space-x-4 lg:space-x-10">
-            {LINKS.map(({ name, href, disabled, message }) => (
+            {links.map(({ name, href, disabled, message }) => (
               <Link
                 key={href}
                 href={disabled ? "#" : href}
@@ -304,6 +296,12 @@ const RightPart = withClientOnly(() => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Chain: {chain?.name}</DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+            <Link href={"/bridge"}>
+              <Route className="mr-2 h-4 w-4" />
+              <span>Bridge assets</span>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleChangeNetwork}>
             <Network className="mr-2 h-4 w-4" />
             <span>Change network</span>
