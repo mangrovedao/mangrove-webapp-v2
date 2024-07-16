@@ -10,12 +10,17 @@ import { cn } from "@/utils"
 export function WrongNetworkAlertDialog() {
   const { chain, isConnected } = useAccount()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
-  const isNetworkSupported = chains.find((c) => c.id === chain?.id)
+  const isNetworkSupported = !!chains?.find((c) => c.id === chain?.id)
 
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
-    if (!isChainDialogOpen && isConnected && !isNetworkSupported) {
+    if (
+      !isChainDialogOpen &&
+      isConnected &&
+      !isNetworkSupported &&
+      chains.length
+    ) {
       setOpen(true)
     } else {
       setOpen(false)
