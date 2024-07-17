@@ -31,7 +31,7 @@ export function Market({
   return (
     <CustomTabs
       {...props}
-      defaultValue={Object.values(ChartType)[0]}
+      defaultValue={Object.values(ChartType)[1]}
       className={cn(className, "h-full")}
     >
       <CustomTabsList className="w-full flex justify-start border-b">

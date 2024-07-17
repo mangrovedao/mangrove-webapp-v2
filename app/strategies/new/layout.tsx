@@ -4,7 +4,7 @@ import React from "react"
 import { KandelStrategiesProvider } from "@/app/strategies/(list)/_providers/kandel-strategies"
 import { Navbar } from "@/components/navbar"
 import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
-import { MarketProvider } from "@/providers/market.new"
+import { MarketProvider } from "@/providers/market"
 
 import WarningBanner from "../(shared)/_components/warning-banner"
 import { KandelStrategyProvider } from "../[address]/_providers/kandel-strategy"

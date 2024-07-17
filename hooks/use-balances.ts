@@ -1,4 +1,4 @@
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { Logic } from "@mangrovedao/mgv"
 import type { GetBalanceResult } from "@mangrovedao/mgv/actions/balances"
 import { useQuery } from "@tanstack/react-query"

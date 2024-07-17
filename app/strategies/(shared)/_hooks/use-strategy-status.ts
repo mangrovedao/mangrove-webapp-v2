@@ -5,7 +5,7 @@ import { useClient, usePublicClient } from "wagmi"
 
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { getTokenPriceInToken } from "@/services/tokens.service"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"

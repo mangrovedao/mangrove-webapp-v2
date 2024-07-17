@@ -4,7 +4,7 @@ import { toast } from "sonner"
 import { useAccount, useClient, usePublicClient, useWalletClient } from "wagmi"
 
 import { useSmartKandel } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BaseError, ContractFunctionExecutionError } from "viem"
 

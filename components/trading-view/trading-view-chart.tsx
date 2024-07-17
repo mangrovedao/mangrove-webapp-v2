@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import React from "react"
 import {
@@ -13,15 +14,20 @@ import datafeed from "./datafeed"
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
 ) => {
+  const { currentMarket } = useMarket()
   const [isLoading, setIsLoading] = React.useState(true)
   const chartContainerRef =
     React.useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>
 
   React.useEffect(() => {
+    if (!currentMarket) return
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: props.symbol,
       // BEWARE: no trailing slash is expected in feed URL
-      datafeed: datafeed,
+      datafeed: datafeed({
+        base: currentMarket?.base.symbol,
+        quote: currentMarket?.quote.symbol,
+      }),
 
       interval: props.interval!,
       container: chartContainerRef.current,
@@ -65,7 +71,7 @@ export const TVChartContainer = (
     return () => {
       tvWidget.remove()
     }
-  }, [props])
+  }, [props, currentMarket?.base, currentMarket?.quote])
 
   return (
     <div className="w-full h-full relative">

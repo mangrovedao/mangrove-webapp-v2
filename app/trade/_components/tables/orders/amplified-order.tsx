@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { useOrders } from "./hooks/use-orders"
 import type { AmplifiedOrder } from "./schema"
 

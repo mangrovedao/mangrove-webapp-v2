@@ -8,7 +8,7 @@ import { useBook } from "@/hooks/use-book"
 import {
   default as useMarket,
   default as useMarketNew,
-} from "@/providers/market.new"
+} from "@/providers/market"
 import { useEventListener } from "usehooks-ts"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import { Asset, AssetWithInfos } from "../types"

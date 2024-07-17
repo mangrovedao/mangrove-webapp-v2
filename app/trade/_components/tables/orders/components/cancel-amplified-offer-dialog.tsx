@@ -1,4 +1,4 @@
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 // import { useCancelAmplifiedOrder } from "../hooks/use-cancel-amplified-order"
 import type { AmplifiedOrder } from "../schema"
 

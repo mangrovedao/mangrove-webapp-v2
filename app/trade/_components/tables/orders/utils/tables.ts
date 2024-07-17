@@ -1,6 +1,6 @@
 import Big from "big.js"
 
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { AmplifiedOrder, type Order } from "../schema"
 
 export function getOrderProgress(

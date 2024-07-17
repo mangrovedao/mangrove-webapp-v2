@@ -12,7 +12,7 @@ import React from "react"
 import { formatUnits, parseUnits } from "viem"
 
 import { useBook } from "@/hooks/use-book"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"

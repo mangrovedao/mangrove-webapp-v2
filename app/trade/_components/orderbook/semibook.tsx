@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { OrderBookTableCell } from "./table-cell"
 import { calculateCumulatedVolume } from "./utils"

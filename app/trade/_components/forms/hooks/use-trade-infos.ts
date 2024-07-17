@@ -1,6 +1,6 @@
 import { useTokenBalance } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { determineDecimals } from "@/utils/numbers"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useSpenderAddress } from "./use-spender-address"

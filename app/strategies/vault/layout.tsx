@@ -3,7 +3,7 @@ import React from "react"
 
 import { Navbar } from "@/components/navbar"
 import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
-import { MarketProvider } from "@/providers/market.new"
+import { MarketProvider } from "@/providers/market"
 import WarningBanner from "../(shared)/_components/warning-banner"
 
 export const metadata: Metadata = {

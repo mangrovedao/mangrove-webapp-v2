@@ -8,7 +8,7 @@ import { useEventListener } from "usehooks-ts"
 import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import {
   BS,
   Order,

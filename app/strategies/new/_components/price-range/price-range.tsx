@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
 import { useBook } from "@/hooks/use-book"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import { default as useMarketNew } from "@/providers/market.new"
+import { default as useMarketNew } from "@/providers/market"
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"

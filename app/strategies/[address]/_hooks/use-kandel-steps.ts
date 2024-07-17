@@ -2,7 +2,7 @@ import { kandelSeederActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
 import { useMangroveAddresses, useSmartKandel } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
 import { useAccount, useClient, usePublicClient } from "wagmi"
