@@ -5,6 +5,7 @@ import {
   ExternalLink,
   LogOut,
   Network,
+  Route,
   Wallet,
 } from "lucide-react"
 import Link from "next/link"
@@ -37,10 +38,11 @@ import {
 } from "@rainbow-me/rainbowkit"
 
 import useLocalStorage from "@/hooks/use-local-storage"
+import { useChains } from "@/providers/chains"
 import { baseSepolia, blast, blastSepolia } from "viem/chains"
+import ChainSelector from "./chain-selector"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
-import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Separator } from "./ui/separator"
 import {
   Tooltip,
@@ -56,43 +58,32 @@ type Props = React.ComponentProps<"nav"> & {
 
 export function Navbar({ className, innerClasses, ...props }: Props) {
   const currentRoute = usePathname()
-  const { chainId } = useAccount()
-  const pathname = usePathname()
   const clipPathId = React.useId()
+  const { isChainCompatibleWithMangrove } = useChains()
 
-  const links =
-    pathname === "/bridge" && chainId !== baseSepolia.id && chainId !== blast.id
-      ? [
-          {
-            name: "Bridge to blast",
-            href: "/bridge",
-          },
-        ]
-      : [
-          {
-            name: "Trade",
-            href: "/trade",
-          },
-          {
-            name: "Strategies",
-            href: "/strategies",
-            disabled: false,
-            message: "Cooking...",
-          },
-          {
-            name: "Points",
-            href: "/points",
-            disabled: false,
-          },
-          {
-            name: "Referrals",
-            href: "/referrals",
-          },
-          {
-            name: "Bridge to blast",
-            href: "/bridge",
-          },
-        ]
+  const links = !isChainCompatibleWithMangrove
+    ? []
+    : [
+        {
+          name: "Trade",
+          href: "/trade",
+        },
+        {
+          name: "Strategies",
+          href: "/strategies",
+          disabled: false,
+          message: "Cooking...",
+        },
+        {
+          name: "Points",
+          href: "/points",
+          disabled: false,
+        },
+        {
+          name: "Referrals",
+          href: "/referrals",
+        },
+      ]
 
   return (
     <nav
@@ -256,7 +247,8 @@ const RightPart = withClientOnly(() => {
       <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
-      <Button
+      <ChainSelector />
+      {/* <Button
         variant="invisible"
         className="!space-x-4 lg:flex items-center hidden"
         size="sm"
@@ -276,7 +268,7 @@ const RightPart = withClientOnly(() => {
         <div className="pl-2">
           <ChevronDown className="w-3" />
         </div>
-      </Button>
+      </Button> */}
 
       <Separator orientation="vertical" />
 
@@ -304,6 +296,12 @@ const RightPart = withClientOnly(() => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Chain: {chain?.name}</DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+            <Link href={"/bridge"}>
+              <Route className="mr-2 h-4 w-4" />
+              <span>Bridge assets</span>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleChangeNetwork}>
             <Network className="mr-2 h-4 w-4" />
             <span>Change network</span>

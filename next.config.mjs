@@ -23,7 +23,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["explorer-api.walletconnect.com"],
+    domains: ["explorer-api.walletconnect.com", "icons.llamao.fi"],
   },
   async redirects() {
     return Promise.resolve([
