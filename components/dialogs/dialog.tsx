@@ -14,13 +14,14 @@ export default function Dialog({
   onClose,
   type,
   children,
+  className,
   showCloseButton = true,
 }: DialogProps) {
   return (
     <Root.Dialog open={open} onOpenChange={onClose}>
       <div className="w-full h-full relative">
         <Root.DialogContent
-          className={getContentClasses(type)}
+          className={cn(getContentClasses(type), className)}
           showCloseButton={showCloseButton}
         >
           <Root.DialogHeader>

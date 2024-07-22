@@ -121,10 +121,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     !limitOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
-        <>
-          <Button variant={"secondary"} onClick={() => goToPrevStep()}>
-            Return
-          </Button>
+        <div className="grid gap-2 w-full ">
           <Button
             {...btnProps}
             disabled={approve.isPending}
@@ -144,7 +141,16 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
           >
             Approve
           </Button>
-        </>
+          <Button
+            size={"lg"}
+            variant={"secondary"}
+            onClick={() => goToPrevStep()}
+            disabled={approve.isPending}
+            loading={approve.isPending}
+          >
+            Back
+          </Button>
+        </div>
       ),
     },
     // isDeployed && {

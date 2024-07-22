@@ -12,6 +12,7 @@ export type DialogProps = {
   children: React.ReactNode
   type?: DialogType
   showCloseButton?: boolean
+  className?: string
 }
 
 export type Nodes = {

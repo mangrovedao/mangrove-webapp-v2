@@ -152,15 +152,7 @@ export default function DeployStrategyDialog({
     !deployRouter?.done && {
       body: <ActivateRouter />,
       button: (
-        <>
-          <Button
-            variant={"secondary"}
-            disabled={deploySmartRouter.isPending}
-            loading={deploySmartRouter.isPending}
-            onClick={() => goToPrevStep()}
-          >
-            Return
-          </Button>
+        <div className="grid gap-2 w-full ">
           <Button
             {...btnProps}
             disabled={deploySmartRouter.isPending}
@@ -173,7 +165,15 @@ export default function DeployStrategyDialog({
           >
             Activate
           </Button>
-        </>
+          <Button
+            variant={"secondary"}
+            disabled={deploySmartRouter.isPending}
+            loading={deploySmartRouter.isPending}
+            onClick={() => goToPrevStep()}
+          >
+            Back
+          </Button>
+        </div>
       ),
     },
 
