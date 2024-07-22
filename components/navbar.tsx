@@ -75,6 +75,10 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
           message: "Cooking...",
         },
         {
+          name: "Swap",
+          href: "https://swap.mangrove.exchange",
+        },
+        {
           name: "Points",
           href: "/points",
           disabled: false,
