@@ -10,11 +10,6 @@ export default function PriceRangeInfos() {
   const { strategyStatusQuery, baseToken, quoteToken, mergedOffers } =
     useKandel()
 
-  console.log(
-    strategyStatusQuery.data?.minPrice,
-    strategyStatusQuery.data?.maxPrice,
-  )
-
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
   const { book } = useKandelBook()
   const bids = book?.bids ?? []

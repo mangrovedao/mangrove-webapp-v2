@@ -7,8 +7,8 @@ import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-
 import useMarket from "@/providers/market.new"
 import { useLoadingStore } from "@/stores/loading.store"
 import { BS } from "@mangrovedao/mgv/lib"
-import { parseEther } from "viem"
-import { usePublicClient, useWalletClient } from "wagmi"
+import { BaseError, ContractFunctionExecutionError, parseUnits } from "viem"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import { Form } from "../types"
 
 type useUpdateOrderProps = {
@@ -20,6 +20,8 @@ type useUpdateOrderProps = {
 export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
   const { currentMarket: market } = useMarket()
   const { book } = useBook()
+  const { address } = useAccount()
+  const { currentMarket } = useMarket()
 
   const marketClient = useMarketClient()
   const { data: walletClient } = useWalletClient()
@@ -45,25 +47,48 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         )
           throw new Error("Could not update order, missing params")
 
-        const { isBid, limitPrice: price, send: volume } = form
+        const { isBid, limitPrice: price, send, receive } = form
 
         const { request } = await marketClient.simulateUpdateOrder({
           offerId: BigInt(Number(offerId)),
-          baseAmount: isBid ? parseEther("0") : parseEther(volume),
-          quoteAmount: isBid ? parseEther(volume) : parseEther("0"),
+          baseAmount: isBid
+            ? parseUnits(receive, currentMarket?.base.decimals || 18)
+            : parseUnits(send, currentMarket?.base.decimals || 18),
+          quoteAmount: isBid
+            ? parseUnits(send, currentMarket?.quote.decimals || 18)
+            : parseUnits(receive, currentMarket?.quote.decimals || 18),
           bs: isBid ? BS.buy : BS.sell,
           book: book,
           restingOrderGasreq: 250_000n,
+          account: address,
         })
 
         const tx = await walletClient.writeContract(request)
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: tx,
         })
-
         return { receipt }
       } catch (error) {
-        console.error(error)
+        console.error(error as BaseError)
+
+        if (error instanceof BaseError) {
+          const revertError = error.walk(
+            (error) => error instanceof ContractFunctionExecutionError,
+          )
+
+          if (revertError instanceof ContractFunctionExecutionError) {
+            console.log(
+              revertError.stack,
+              revertError.args,
+              revertError.cause,
+              revertError.message,
+              revertError.functionName,
+              revertError.formattedArgs,
+              revertError.details,
+              revertError,
+            )
+          }
+        }
         throw new Error("Failed to update the limit order")
       }
     },
