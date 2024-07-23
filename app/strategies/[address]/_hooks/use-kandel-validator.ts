@@ -55,6 +55,7 @@ export function useValidateKandel(
           quoteAmount: kandelParams.quoteAmount,
           stepSize: kandelParams.stepSize,
           pricePoints: kandelParams.pricePoints,
+          deposit: true,
         })
 
         // // @ts-ignore
