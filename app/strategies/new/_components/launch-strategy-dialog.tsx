@@ -1,4 +1,4 @@
-import { KandelParams, Logic, Token } from "@mangrovedao/mgv"
+import { KandelParams, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -10,7 +10,6 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import useMarket from "@/providers/market.new"
@@ -50,7 +49,6 @@ export default function DeployStrategyDialog({
   const { currentMarket } = useMarket()
   const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
   const { data: kandelSteps } = useKandelSteps()
-  const logics = useLogics()
 
   const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
@@ -67,9 +65,6 @@ export default function DeployStrategyDialog({
 
   const approveToken = useInfiniteApproveToken()
   const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
-
-  const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
-  const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
 
   let steps = [
     "Summary",
@@ -143,8 +138,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: baseToken,
-                logic: baseLogic as Logic,
-                spender,
+                spender: data?.kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -171,8 +165,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: quoteToken,
-                logic: quoteLogic as Logic,
-                spender,
+                spender: data?.kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
