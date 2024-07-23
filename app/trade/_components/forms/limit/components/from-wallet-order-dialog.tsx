@@ -99,7 +99,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   const logics = useLogics()
   const logic = logics.find((logic) => logic?.name === form.sendFrom)
 
-  const { goToNextStep } = helpers
+  const { goToNextStep, goToPrevStep } = helpers
 
   const stepInfos = [
     !limitOrderSteps?.[0].done && {
@@ -121,25 +121,36 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     !limitOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
-        <Button
-          {...btnProps}
-          disabled={approve.isPending}
-          loading={approve.isPending}
-          onClick={() => {
-            approve.mutate(
-              {
-                token: sendToken,
-                logic: logic as Logic,
-                spender,
-              },
-              {
-                onSuccess: goToNextStep,
-              },
-            )
-          }}
-        >
-          Approve
-        </Button>
+        <div className="grid gap-2 w-full ">
+          <Button
+            {...btnProps}
+            disabled={approve.isPending}
+            loading={approve.isPending}
+            onClick={() => {
+              approve.mutate(
+                {
+                  token: sendToken,
+                  logic: logic as Logic,
+                  spender,
+                },
+                {
+                  onSuccess: goToNextStep,
+                },
+              )
+            }}
+          >
+            Approve
+          </Button>
+          <Button
+            size={"lg"}
+            variant={"secondary"}
+            onClick={() => goToPrevStep()}
+            disabled={approve.isPending}
+            loading={approve.isPending}
+          >
+            Back
+          </Button>
+        </div>
       ),
     },
     // isDeployed && {

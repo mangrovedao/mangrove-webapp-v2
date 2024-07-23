@@ -2,15 +2,13 @@ import {
   baseSepoliaLogics,
   baseSepoliaMangrove,
   baseSepoliaMarkets,
-  baseSepoliaSmartKandel,
   baseSepoliaTokens,
   blastLogics,
   blastMangrove,
   blastMarkets,
-  blastSmartKandel,
   blastTokens,
 } from "@mangrovedao/mgv/addresses"
-import { baseSepolia, blast } from "viem/chains"
+import { arbitrum, baseSepolia, blast } from "viem/chains"
 import { useChainId } from "wagmi"
 
 export function useMangroveAddresses() {
@@ -25,13 +23,15 @@ export function useMangroveAddresses() {
   }
 }
 
-export function useSmartKandel() {
+export function useKandelSeeder() {
   const chain = useChainId()
   switch (chain) {
     case blast.id:
-      return blastSmartKandel
+      return "0x4bb7567303c8bde27a4b490b3e5f1593c891b03d"
+    case arbitrum.id:
+      return "0x89139bed90b1bfb5501f27be6d6f9901ae35745d"
     case baseSepolia.id:
-      return baseSepoliaSmartKandel
+      return "0x1a839030107167452d69d8f1a673004b2a1b8a3a"
     default:
       return undefined
   }
