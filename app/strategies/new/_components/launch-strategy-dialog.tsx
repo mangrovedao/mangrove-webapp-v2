@@ -2,9 +2,7 @@ import { KandelParams, Logic, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
-import { ActivateRouter } from "@/app/trade/_components/forms/components/activate-router"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
-import { useDeploySmartRouter } from "@/app/trade/_components/forms/hooks/use-router-deploy"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
@@ -16,8 +14,6 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import useMarket from "@/providers/market.new"
-import { useActivateStrategySmartRouter } from "../../(shared)/_hooks/use-activate-smart-router"
-import { useActivateKandelLogics } from "../../[address]/_hooks/use-activate-kandel-logics"
 import { useKandelSteps } from "../../[address]/_hooks/use-kandel-steps"
 import { useCreateKandelStrategy } from "../_hooks/use-deploy-kandel-strategy"
 import { useLaunchKandelStrategy } from "../_hooks/use-launch-kandel-strategy"
@@ -56,8 +52,7 @@ export default function DeployStrategyDialog({
   const { data: kandelSteps } = useKandelSteps()
   const logics = useLogics()
 
-  const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
-    kandelSteps ?? [{}]
+  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -70,26 +65,15 @@ export default function DeployStrategyDialog({
     data,
   } = useCreateKandelStrategy()
 
-  const deploySmartRouter = useDeploySmartRouter({
-    owner: deployRouter?.params.owner,
-  })
-  const activateSmartRouter = useActivateStrategySmartRouter(
-    data?.kandelAddress,
-  )
-  const activateLogics = useActivateKandelLogics(data?.kandelAddress)
   const approveToken = useInfiniteApproveToken()
   const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
 
   const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
   const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
-  const logicGasReq = Number(baseLogic?.gasreq || 0) + 100_000
 
   let steps = [
     "Summary",
     "Create strategy instance",
-    !deployRouter?.done ? "Activate router" : "",
-    !bind?.done ? "Bind router" : "",
-    baseLogic?.logic && !setLogics?.done ? "Set logics" : "",
     !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
     !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     "Launch strategy",
@@ -143,64 +127,6 @@ export default function DeployStrategyDialog({
         </Button>
       ),
     },
-
-    !deployRouter?.done && {
-      body: <ActivateRouter />,
-      button: (
-        <Button
-          {...btnProps}
-          disabled={deploySmartRouter.isPending}
-          loading={deploySmartRouter.isPending}
-          onClick={() => {
-            deploySmartRouter.mutate(undefined, {
-              onSuccess: goToNextStep,
-            })
-          }}
-        >
-          Activate
-        </Button>
-      ),
-    },
-
-    !bind?.done && {
-      body: <ActivateRouter />,
-      button: (
-        <Button
-          {...btnProps}
-          disabled={activateSmartRouter.isPending}
-          loading={activateSmartRouter.isPending}
-          onClick={() => {
-            activateSmartRouter.mutate(undefined, {
-              onSuccess: goToNextStep,
-            })
-          }}
-        >
-          Bind
-        </Button>
-      ),
-    },
-
-    baseLogic?.logic &&
-      !setLogics?.done && {
-        body: <ActivateRouter />,
-        button: (
-          <Button
-            {...btnProps}
-            disabled={activateLogics.isPending}
-            loading={activateLogics.isPending}
-            onClick={() => {
-              activateLogics.mutate(
-                { logic: baseLogic.logic, gasreq: logicGasReq },
-                {
-                  onSuccess: goToNextStep,
-                },
-              )
-            }}
-          >
-            Set sources
-          </Button>
-        ),
-      },
 
     !baseApprove?.done && {
       body: (

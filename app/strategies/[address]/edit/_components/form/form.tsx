@@ -1,20 +1,8 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
-import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
-import InfoTooltip from "@/components/info-tooltip"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
-import { Caption } from "@/components/typography/caption"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
@@ -68,7 +56,7 @@ export function Form({ className }: { className?: string }) {
       <Fieldset legend="Select market">
         <MarketSelector disabled={true} />
       </Fieldset>
-
+      {/* 
       <Fieldset legend="Liquidity sourcing">
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
@@ -163,7 +151,7 @@ export function Form({ className }: { className?: string }) {
             </Select>
           </div>
         </div>
-      </Fieldset>
+      </Fieldset> */}
 
       <Fieldset className="space-y-4" legend="Edit inventory">
         <div>

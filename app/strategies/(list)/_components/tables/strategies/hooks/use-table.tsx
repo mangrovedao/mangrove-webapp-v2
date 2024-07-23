@@ -145,13 +145,13 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
       //   },
       // }),
       // TODO: get from indexer
-      columnHelper.display({
-        header: "Liquidity sourcing",
-        cell: ({ row }) => {
-          const {} = row.original
-          return <div className="flex flex-col">Wallet</div>
-        },
-      }),
+      // columnHelper.display({
+      //   header: "Liquidity sourcing",
+      //   cell: ({ row }) => {
+      //     const {} = row.original
+      //     return <div className="flex flex-col">Wallet</div>
+      //   },
+      // }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,

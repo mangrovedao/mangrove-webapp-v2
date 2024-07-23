@@ -51,8 +51,7 @@ export default function EditStrategyDialog({
   const { data: kandelSteps } = useKandelSteps()
   const logics = useLogics()
 
-  const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
-    kandelSteps ?? [{}]
+  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -82,10 +81,6 @@ export default function EditStrategyDialog({
 
   let steps = [
     "Summary",
-    // "Set liquidity sourcing",
-    // TODO: apply liquidity sourcing with setLogics
-    // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
-    // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
     !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
     !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     strategy?.hasLiveOffers ? "Reset strategy" : "",
