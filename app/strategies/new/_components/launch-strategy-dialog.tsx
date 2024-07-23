@@ -75,7 +75,7 @@ export default function DeployStrategyDialog({
   ].filter(Boolean)
 
   const [currentStep, helpers] = useStep(steps.length)
-  const { goToNextStep, reset } = helpers
+  const { goToNextStep, reset, goToPrevStep } = helpers
   const stepInfos = [
     {
       body: (
@@ -108,21 +108,25 @@ export default function DeployStrategyDialog({
         </div>
       ),
       button: (
-        <Button
-          {...btnProps}
-          disabled={createKandelStrategyPending}
-          loading={createKandelStrategyPending}
-          onClick={() => {
-            createKandelStrategy(undefined, {
-              onSuccess: goToNextStep,
-            })
-          }}
-        >
-          Create kandel instance
-        </Button>
+        <>
+          <Button variant={"secondary"} onClick={() => goToPrevStep()}>
+            Return
+          </Button>
+          <Button
+            {...btnProps}
+            disabled={createKandelStrategyPending}
+            loading={createKandelStrategyPending}
+            onClick={() => {
+              createKandelStrategy(undefined, {
+                onSuccess: goToNextStep,
+              })
+            }}
+          >
+            Create kandel instance
+          </Button>
+        </>
       ),
     },
-
     !baseApprove?.done && {
       body: (
         <div className="text-center">
