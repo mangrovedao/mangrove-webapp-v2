@@ -1,4 +1,4 @@
-import { KandelParams, Logic, Token } from "@mangrovedao/mgv"
+import { KandelParams, Token } from "@mangrovedao/mgv"
 import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
@@ -12,7 +12,6 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { useStep } from "@/hooks/use-step"
 import { NewStratStore } from "../../../new/_stores/new-strat.store"
@@ -49,10 +48,7 @@ export default function EditStrategyDialog({
 }: Props) {
   const { address } = useAccount()
   const { data: kandelSteps } = useKandelSteps()
-  const logics = useLogics()
-
-  const [sow, deployRouter, bind, setLogics, baseApprove, quoteApprove] =
-    kandelSteps ?? [{}]
+  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -77,15 +73,8 @@ export default function EditStrategyDialog({
   const { mutate: editKandelStrategy, isPending: isEditingKandelStrategy } =
     useEditKandelStrategy(kandelClient)
 
-  const baseLogic = logics.find((logic) => logic?.name === strategy?.sendFrom)
-  const quoteLogic = logics.find((logic) => logic?.name === strategy?.receiveTo)
-
   let steps = [
     "Summary",
-    // "Set liquidity sourcing",
-    // TODO: apply liquidity sourcing with setLogics
-    // TODO: if sendFrom v3 logic selected then it'll the same it the other side for receive
-    // TODO: if erc721 approval, add select field with available nft ids then nft.approveForAll
     !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
     !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     strategy?.hasLiveOffers ? "Reset strategy" : "",
@@ -126,8 +115,7 @@ export default function EditStrategyDialog({
             approveBaseToken.mutate(
               {
                 token: baseToken,
-                logic: baseLogic as Logic,
-                spender,
+                spender: kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -154,8 +142,7 @@ export default function EditStrategyDialog({
             approveQuoteToken.mutate(
               {
                 token: quoteToken,
-                logic: quoteLogic as Logic,
-                spender,
+                spender: kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
