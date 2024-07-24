@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query"
 import { useKandelSeeder, useMangroveAddresses } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
-import { getUserRouter } from "@mangrovedao/mgv/actions"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
 
@@ -46,10 +45,6 @@ export function useKandelSteps() {
           !currentMarket
         )
           throw new Error("Could not fetch kandel steps, missing params")
-
-        const userRouter = await getUserRouter(publicClient, addresses, {
-          user: address,
-        })
         const kandelActions = kandelSeederActions(currentMarket, kandelSeeder)
         const seeder = kandelActions(client)
 

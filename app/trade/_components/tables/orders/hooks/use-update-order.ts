@@ -113,7 +113,6 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
-        queryClient.invalidateQueries({ queryKey: ["amplified"] })
       } catch (error) {
         console.error(error)
       }
