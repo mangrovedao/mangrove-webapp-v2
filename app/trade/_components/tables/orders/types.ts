@@ -1,5 +1,3 @@
-import { Logic } from "@mangrovedao/mgv"
-import { TimeInForce } from "../../forms/amplified/enums"
 import { TimeToLiveUnit } from "../../forms/limit/enums"
 
 export type Form = {
@@ -9,24 +7,4 @@ export type Form = {
   timeToLive: string
   timeToLiveUnit: TimeToLiveUnit
   isBid: boolean
-}
-
-type Asset = {
-  limitPrice: string
-  receiveAmount: string
-}
-
-export enum AmplifiedOrderStatus {
-  "Open",
-  "Closed",
-}
-
-export type AmplifiedForm = {
-  send: string
-  sendFrom: Logic
-  assets: Asset[]
-  timeInForce: TimeInForce
-  timeToLive: string
-  timeToLiveUnit: TimeToLiveUnit
-  status: AmplifiedOrderStatus
 }

@@ -3,9 +3,7 @@ import { getUserRouter } from "@mangrovedao/mgv/actions"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
 
-export const useSpenderAddress = (
-  type: "kandel" | "limit" | "market" | "amplified",
-) => {
+export const useSpenderAddress = (type: "kandel" | "limit" | "market") => {
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
   const { address } = useAccount()
