@@ -10,6 +10,16 @@ import { Button } from "./ui/button"
 import { XClose } from "./ui/dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
+function getIconFromChainlist(name: string) {
+  let icon = name
+
+  if (icon.includes("Arbitrum One")) {
+    icon = "arbitrum"
+  }
+
+  return `https://icons.llamao.fi/icons/chains/rsz_${icon.toLowerCase().replaceAll(" ", "_")}.jpg`
+}
+
 export default function ChainSelector() {
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
@@ -63,7 +73,7 @@ export default function ChainSelector() {
                 }}
               >
                 <ImageWithHideOnError
-                  src={`https://icons.llamao.fi/icons/chains/rsz_${name.toLowerCase().replaceAll(" ", "_")}.jpg`}
+                  src={getIconFromChainlist(name)}
                   alt=""
                   className="rounded-full overflow-hidden"
                   width={28}
