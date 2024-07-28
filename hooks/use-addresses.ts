@@ -1,4 +1,7 @@
 import {
+  arbitrumMangrove,
+  arbitrumMarkets,
+  arbitrumTokens,
   baseSepoliaLogics,
   baseSepoliaMangrove,
   baseSepoliaMarkets,
@@ -16,6 +19,8 @@ export function useMangroveAddresses() {
   switch (chain) {
     case blast.id:
       return blastMangrove
+    case arbitrum.id:
+      return arbitrumMangrove
     case baseSepolia.id:
       return baseSepoliaMangrove
     default:
@@ -42,6 +47,8 @@ export function useMarkets() {
   switch (chain) {
     case blast.id:
       return blastMarkets
+    case arbitrum.id:
+      return arbitrumMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets
     default:
@@ -54,6 +61,8 @@ export function useLogics() {
   switch (chain) {
     case blast.id:
       return blastLogics
+    case arbitrum.id:
+      return []
     case baseSepolia.id:
       return baseSepoliaLogics
     default:
@@ -66,6 +75,8 @@ export function useTokens() {
   switch (chain) {
     case blast.id:
       return blastTokens
+    case arbitrum.id:
+      return arbitrumTokens
     case baseSepolia.id:
       return baseSepoliaTokens
     default:
