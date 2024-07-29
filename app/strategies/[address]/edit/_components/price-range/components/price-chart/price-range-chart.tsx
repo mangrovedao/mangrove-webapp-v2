@@ -99,12 +99,12 @@ export function PriceRangeChart({
     initialMidPrice,
     lowestAsk?.price,
   ])
-  const xLowerBound = midPrice ? midPrice * 0.7 : 0 // 30% lower than mid price
-  const xUpperBound = midPrice ? midPrice * 1.3 : 6000 // 30% higher than mid price
+  // const xLowerBound = midPrice ? midPrice * 0.7 : 0 // 30% lower than mid price
+  // const xUpperBound = midPrice ? midPrice * 1.3 : 6000 // 30% higher than mid price
 
   const maxVolume = Math.max(...offers.map((offer) => offer.volume))
 
-  const [xDomain, setXDomain] = React.useState([xLowerBound, xUpperBound])
+  const [xDomain, setXDomain] = React.useState([0, 0])
   const [dragStartPoint, setDragStartPoint] = React.useState<{
     x: number
     y: number
@@ -116,21 +116,21 @@ export function PriceRangeChart({
 
   const altPressed = useKeyPress("Alt")
 
-  // if viewOnly, set the xDomain to the priceRange
+  // TODO : add boolean to add context and know if we just init vs dragged or set new values
   React.useEffect(() => {
-    if (!viewOnly || !priceRange) return
-    const [min, max] = priceRange
-    const xLowerBound = min * 0.8
-    const xUpperBound = max * 1.1
-    setXDomain([xLowerBound, xUpperBound])
-  }, [viewOnly, priceRange])
+    const min = priceRange?.[0] ?? 0
+    const max = priceRange?.[1] ?? 0
 
-  React.useEffect(() => {
-    if (!midPrice || viewOnly) return
-    const xLowerBound = midPrice * 0.7 // 30% lower than mid price
-    const xUpperBound = midPrice * 1.3 // 30% higher than mid price
+    if (!priceRange && min && max && min > 0 && max > 0) return
+    console.log({
+      min,
+      max,
+    })
+    // const [min, max] = priceRange
+    const xLowerBound = min * 0.8
+    const xUpperBound = max * 1.2
     setXDomain([xLowerBound, xUpperBound])
-  }, [midPrice])
+  }, [priceRange])
 
   const xScale = scaleLinear({
     domain: xDomain,
