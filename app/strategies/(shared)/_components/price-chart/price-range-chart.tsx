@@ -142,22 +142,6 @@ export function PriceRangeChart({
     setXDomain([xLowerBound, xUpperBound])
   }, [midPrice, priceRange])
 
-  // if viewOnly, set the xDomain to the priceRange
-  // React.useEffect(() => {
-  //   if (!viewOnly || !priceRange) return
-  //   const [min, max] = priceRange
-  //   const xLowerBound = min * 0.8
-  //   const xUpperBound = max * 1.1
-  //   setXDomain([xLowerBound, xUpperBound])
-  // }, [viewOnly, priceRange])
-
-  // React.useEffect(() => {
-  //   if (!midPrice || viewOnly) return
-  //   const xLowerBound = midPrice * 0.7 // 30% lower than mid price
-  //   const xUpperBound = midPrice * 1.3 // 30% higher than mid price
-  //   setXDomain([xLowerBound, xUpperBound])
-  // }, [midPrice])
-
   const xScale = scaleLinear({
     domain: xDomain,
     range: [0, width - paddingRight],
