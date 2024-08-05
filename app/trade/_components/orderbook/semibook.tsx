@@ -50,12 +50,13 @@ export const SemiBook = React.forwardRef<
       currentMarket?.base.symbol === "BLAST"
         ? 8
         : priceDecimals
+
     return (
       <>
         <TableRow
           ref={refIndex === i ? ref : null}
           key={`${type}-${id}`}
-          className={`relative h-6 border-none hover:opacity-80 transition-opacity cursor-pointer`}
+          className={`z-50 relative h-6 border-none hover:opacity-80 transition-opacity cursor-pointer`}
           onClick={() => {
             dispatchEvent(
               new CustomEvent("on-orderbook-offer-clicked", {
@@ -70,7 +71,20 @@ export const SemiBook = React.forwardRef<
               type === "bids" ? "text-green-caribbean" : "text-red-100",
             )}
           >
-            {volume.toFixed(3)}
+            <TooltipProvider>
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger
+                  className={cn("hover:opacity-80 transition-opacity ml-1")}
+                >
+                  <span className="!font-roboto">
+                    {volume.toFixed(pDecimals)}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="">
+                  {volume.toFixed(currentMarket?.base.decimals)}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </OrderBookTableCell>
 
           <OrderBookTableCell className="text-right">
@@ -92,7 +106,20 @@ export const SemiBook = React.forwardRef<
           </OrderBookTableCell>
 
           <OrderBookTableCell className="text-gray">
-            {(price * volume).toFixed(priceDecimals)}
+            <TooltipProvider>
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger
+                  className={cn("hover:opacity-80 transition-opacity ml-1")}
+                >
+                  <span className="!font-roboto">
+                    {(price * volume).toFixed(priceDecimals)}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="">
+                  {(price * volume).toFixed(currentMarket?.quote.decimals)}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </OrderBookTableCell>
           <td
             className={cn(
