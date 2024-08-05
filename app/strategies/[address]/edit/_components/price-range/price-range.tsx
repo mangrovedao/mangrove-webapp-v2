@@ -7,6 +7,7 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
 
+import { PriceRangeChart } from "@/app/strategies/(shared)/_components/price-chart/price-range-chart"
 import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
@@ -19,7 +20,6 @@ import { useKandelBook } from "../../../_hooks/use-kandel-book"
 import useKandel from "../../../_providers/kandel-strategy"
 import EditStrategyDialog from "../edit-strategy-dialog"
 import { LiquiditySource } from "./components/liquidity-source"
-import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
 
 export const PriceRange = withClientOnly(function ({

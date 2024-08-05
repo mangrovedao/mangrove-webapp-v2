@@ -1,5 +1,8 @@
 import { cn } from "@/utils"
-import { calculatePriceDifferencePercentage } from "@/utils/numbers"
+import {
+  calculatePriceDifferencePercentage,
+  determineDecimals,
+} from "@/utils/numbers"
 import { Tooltip } from "@visx/tooltip"
 import type { ScaleLinear } from "d3-scale"
 
@@ -58,7 +61,7 @@ export function RangeTooltips({
               "whitespace-nowrap -translate-x-2/3 px-2 py-1 rounded-md text-sm leading-[14px] bg-cloud-400 text-white",
             )}
           >
-            Mid {midPrice.toFixed(2)}
+            Mid {midPrice.toFixed(determineDecimals(midPrice))}
           </div>
         </Tooltip>
       ) : undefined}
@@ -106,7 +109,8 @@ function RangeTooltip({
           },
         )}
       >
-        {text} {value.toFixed(2)} {midPrice ? `${percentage.toFixed(2)}%` : ""}
+        {text} {value.toFixed(determineDecimals(2, 6))}{" "}
+        {midPrice ? `${percentage.toFixed(2)}%` : ""}
       </div>
     </Tooltip>
   )
