@@ -72,7 +72,6 @@
     "lucide-react": "^0.408.0",
     "next": "^14.0.4",
     "next-ssl-redirect-middleware": "^0.1.5",
-    "nuqs": "^1.17.6",
     "posthog-js": "^1.98.2",
     "radash": "^11.0.0",
     "react": "18.2.0",
