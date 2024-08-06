@@ -41,7 +41,7 @@ export function useLaunchKandelStrategy(kandelAddress?: string) {
         const { request } = await kandelClient.simulatePopulate({
           ...kandelParams,
           account: address as Address,
-          value: parseEther(bountyDeposit, 1),
+          value: parseEther(bountyDeposit),
         })
 
         const hash = await walletClient.writeContract(request)
