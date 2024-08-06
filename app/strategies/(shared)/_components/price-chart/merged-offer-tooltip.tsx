@@ -6,7 +6,6 @@ import { Title } from "@/components/typography/title"
 import { cn } from "@/utils"
 import { OfferParsed } from "@mangrovedao/mgv"
 import { BA } from "@mangrovedao/mgv/lib"
-import { formatEther } from "viem"
 import { TypedDistrubutionOffer } from "./geometric-distribution-dots"
 
 type Props = {
@@ -15,7 +14,7 @@ type Props = {
   xScale: ScaleLinear<number, number>
   onHover?: (offer: TypedDistrubutionOffer) => void
   onHoverOut?: () => void
-  mergedOffer: OfferParsed
+  mergedOffer: OfferParsed & { formattedGives: string }
   baseToken: Token
   quoteToken: Token
 }
@@ -73,7 +72,7 @@ export function MergedOfferTooltip({
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {Number(formatEther(mergedOffer.gives, "wei")).toFixed(
+          {Number(mergedOffer.formattedGives).toFixed(
             (mergedOffer.ba === BA.bids ? quoteToken : baseToken)
               ?.displayDecimals,
           )}{" "}
