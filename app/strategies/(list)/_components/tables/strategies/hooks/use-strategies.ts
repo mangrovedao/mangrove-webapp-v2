@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { useAccount, useChainId } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { useTokens } from "@/hooks/use-addresses"
 import useIndexerSdk from "@/providers/mangrove-indexer"
@@ -19,8 +19,7 @@ export function useStrategies<T = Strategy[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const chainId = useChainId()
-  const { address, isConnected } = useAccount()
+  const { address, isConnected, chainId } = useAccount()
   const { indexerSdk } = useIndexerSdk()
   const tokens = useTokens()
   const tokensList = tokens.map((token) => token.address.toLowerCase())

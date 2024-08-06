@@ -4,10 +4,10 @@ import * as wagmiChains from "wagmi/chains"
 /* eslint-disable @next/next/no-img-element */
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { useChainId } from "wagmi"
+import { useAccount } from "wagmi"
 
 export function InfoBanner() {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   return (
     <div className="w-full max-w-[1252px] bg-primary-dark-green rounded-lg mx-auto flex">
       <div className="h-auto w-1/3 relative rounded-lg overflow-hidden hidden xl:block">

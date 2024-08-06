@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { z } from "zod"
 
-import { useAccount, useChainId } from "wagmi"
+import { useAccount } from "wagmi"
 
 const tokenSchema = z.object({
   takerSentTokenSymbol: z.string(),
@@ -25,7 +25,7 @@ const useMangroveTokenPricesQuery = (
   baseAddress?: string,
   quoteAddress?: string,
 ) => {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   return useQuery({
     queryKey: ["mangroveTokenPrice", baseAddress, quoteAddress, chainId],
     queryFn: async () => {

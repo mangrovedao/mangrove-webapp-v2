@@ -8,7 +8,7 @@ import {
 import { usePathname } from "next/navigation"
 import React from "react"
 import type { Chain } from "viem/chains"
-import { useChainId } from "wagmi"
+import { useAccount } from "wagmi"
 
 export const chainsConfig = {
   mangroveCompatibleChainIds,
@@ -31,7 +31,7 @@ const ChainsContext = React.createContext<IChainsContext>({})
 export const useChains = () => React.useContext(ChainsContext)
 
 export const ChainsProvider = ({ children }: React.PropsWithChildren) => {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   const [isChainDialogOpen, setIsChainDialogOpen] = React.useState(false)
   const [chains, setChains] = React.useState<Chain[]>([])
   const [isChainCompatibleWithMangrove, setIsChainCompatibleWithMangrove] =

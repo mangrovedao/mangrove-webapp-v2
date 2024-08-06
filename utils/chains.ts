@@ -52,7 +52,7 @@ export function getWhitelistedChainObjects() {
   return renameChainNames(result)
 }
 
-export function getChainObjectById(chainId: string): Chain | undefined {
+export function getChainObjectById(chainId?: string): Chain | undefined {
   for (const chainName in wagmiChains) {
     const chainObject: Chain | undefined = (wagmiChains as WagmiChains)[
       chainName
