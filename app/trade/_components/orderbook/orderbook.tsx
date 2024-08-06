@@ -64,6 +64,7 @@ function BookContent() {
       </div>
     )
   }
+
   const lowestAskPrice = book.asks[0]?.price
   const highestBidPrice = book.bids[0]?.price
   const spread = Math.abs((lowestAskPrice ?? 0) - (highestBidPrice ?? 0))
