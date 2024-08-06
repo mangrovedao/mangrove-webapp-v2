@@ -6,11 +6,11 @@ import { useTokens } from "./use-addresses"
 export function useTokenFromId(address: Address) {
   const tokens = useTokens()
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["tokenFromId", address, tokens],
     queryFn: () => {
       if (!(address && tokens)) return null
-      return tokens.find((item) => item.address == address)
+      const token = tokens.find((item) => item.address == address)
+      return token ?? null
     },
     enabled: !!(address && tokens),
   })

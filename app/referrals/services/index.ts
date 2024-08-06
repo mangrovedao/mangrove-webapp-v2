@@ -2,13 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createZodFetcher } from "zod-fetch"
 
 import { Address, Hex, TypedDataDomain, parseAbiParameter } from "viem"
-import { useAccount, useChainId, useWalletClient } from "wagmi"
+import { useAccount, useWalletClient } from "wagmi"
 import { startPostResponseSchema, startedGetResponseSchema } from "./schema"
 
 const fetchWithZod = createZodFetcher()
 
 export function useDomain() {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   return {
     chainId,
     name: "MangroveReferral",

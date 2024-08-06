@@ -3,7 +3,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { parseUnits, type Address } from "viem"
 import {
-  useChainId,
+  useAccount,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
@@ -21,7 +21,7 @@ type Props = {
 }
 
 export function Actions({ faucetToken }: Props) {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   const isMgv = faucetToken.mgvTestToken
   const tokenQuery = useTokenFromAddress(faucetToken.address as Address)
   const mintLimit = useMintLimit(faucetToken.address as Address, !!isMgv)

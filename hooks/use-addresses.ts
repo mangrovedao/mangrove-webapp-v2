@@ -12,11 +12,11 @@ import {
   blastTokens,
 } from "@mangrovedao/mgv/addresses"
 import { arbitrum, baseSepolia, blast } from "viem/chains"
-import { useChainId } from "wagmi"
+import { useAccount } from "wagmi"
 
 export function useMangroveAddresses() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastMangrove
     case arbitrum.id:
@@ -29,8 +29,8 @@ export function useMangroveAddresses() {
 }
 
 export function useKandelSeeder() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return "0x4bb7567303c8bde27a4b490b3e5f1593c891b03d"
     case arbitrum.id:
@@ -43,8 +43,8 @@ export function useKandelSeeder() {
 }
 
 export function useMarkets() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastMarkets
     case arbitrum.id:
@@ -57,8 +57,8 @@ export function useMarkets() {
 }
 
 export function useLogics() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastLogics
     case arbitrum.id:
@@ -71,8 +71,8 @@ export function useLogics() {
 }
 
 export function useTokens() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastTokens
     case arbitrum.id:

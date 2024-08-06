@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react"
 import React from "react"
-import { useChainId, useSwitchChain } from "wagmi"
+import { useAccount, useSwitchChain } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
 import { useChains } from "@/providers/chains"
@@ -21,10 +21,10 @@ function getIconFromChainlist(name: string) {
 }
 
 export default function ChainSelector() {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   const { switchChain } = useSwitchChain()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
-  const chain = getChainObjectById(chainId.toString())
+  const chain = getChainObjectById(chainId?.toString())
 
   // Close dialog if the chain id has changed
   React.useEffect(() => {
