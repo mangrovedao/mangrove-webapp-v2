@@ -76,6 +76,7 @@ export default function useForm() {
       setQuoteDeposit(
         formatUnits(kandelState?.quoteAmount || 0n, quoteToken?.decimals || 18),
       )
+      // FIXME: check if this is correct
       setNumberOfOffers(
         (Number(currentParameter?.length) - 1).toString() || "10",
       )
@@ -106,7 +107,7 @@ export default function useForm() {
       baseAmount: parseUnits(baseDeposit, baseToken?.decimals || 18),
       quoteAmount: parseUnits(quoteDeposit, quoteToken?.decimals || 18),
       stepSize: BigInt(debouncedStepSize),
-      pricePoints: BigInt(debouncedNumberOfOffers),
+      pricePoints: BigInt(Number(debouncedNumberOfOffers) + 1),
     },
     isMissingField,
   )

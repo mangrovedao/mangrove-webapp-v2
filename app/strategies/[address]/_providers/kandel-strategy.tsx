@@ -9,13 +9,9 @@ import { BA } from "@mangrovedao/mgv/lib"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
 import { useStrategy } from "../_hooks/use-strategy"
 
-// const marketQueryParam = z.array(z.string()).length(3)
-
 const useKandelStrategyContext = () => {
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()
-  // const pp = useQueryState("market", parseAsJson(marketQueryParam.parse))
-  // console.log({ pp })
 
   //note: in case this context is used in strategy creation, get the market from the params
   const searchParams = useSearchParams()
