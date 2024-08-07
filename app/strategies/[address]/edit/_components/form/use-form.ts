@@ -76,7 +76,6 @@ export default function useForm() {
       setQuoteDeposit(
         formatUnits(kandelState?.quoteAmount || 0n, quoteToken?.decimals || 18),
       )
-      // FIXME: check if this is correct
       setNumberOfOffers(
         (Number(currentParameter?.length) - 1).toString() || "10",
       )
