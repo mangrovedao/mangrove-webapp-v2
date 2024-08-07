@@ -85,7 +85,7 @@ export function useOffersTable({ data }: Params) {
           const quote = ba === BA.bids ? gives : wants
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(formatUnits(quote, market?.base.decimals || 18)).toFixed(
+              {Number(formatUnits(quote, market?.quote.decimals || 18)).toFixed(
                 market?.quote.displayDecimals,
               )}{" "}
               {market?.quote.symbol}

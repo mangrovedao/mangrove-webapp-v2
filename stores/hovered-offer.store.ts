@@ -3,7 +3,7 @@ import { create, type StateCreator } from "zustand"
 import { OfferParsed } from "@mangrovedao/mgv"
 
 type Store = {
-  hoveredOffer?: OfferParsed
+  hoveredOffer?: OfferParsed & { formattedGives?: string }
 }
 
 type Actions = {

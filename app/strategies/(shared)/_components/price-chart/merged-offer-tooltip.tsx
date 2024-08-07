@@ -14,7 +14,7 @@ type Props = {
   xScale: ScaleLinear<number, number>
   onHover?: (offer: TypedDistrubutionOffer) => void
   onHoverOut?: () => void
-  mergedOffer: OfferParsed
+  mergedOffer: OfferParsed & { formattedGives?: string }
   baseToken: Token
   quoteToken: Token
 }
@@ -72,7 +72,7 @@ export function MergedOfferTooltip({
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {Number(mergedOffer.gives).toFixed(
+          {Number(mergedOffer.formattedGives).toFixed(
             (mergedOffer.ba === BA.bids ? quoteToken : baseToken)
               ?.displayDecimals,
           )}{" "}
