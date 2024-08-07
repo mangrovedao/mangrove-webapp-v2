@@ -14,7 +14,7 @@ type Props = {
   xScale: ScaleLinear<number, number>
   onHover?: (offer: TypedDistrubutionOffer) => void
   onHoverOut?: () => void
-  mergedOffer: OfferParsed & { formattedGives: string }
+  mergedOffer: OfferParsed & { formattedGives?: string }
   baseToken: Token
   quoteToken: Token
 }
