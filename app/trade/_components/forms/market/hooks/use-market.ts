@@ -140,8 +140,6 @@ export function useMarketForm(props: Props) {
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
 
-      console.log("sdk values", baseEstimation, quoteEstimation)
-
       const formattedBaseEstimation = formatUnits(
         baseEstimation,
         market?.base.decimals ?? 18,
@@ -164,8 +162,6 @@ export function useMarketForm(props: Props) {
       return { baseEstimation, quoteEstimation }
     },
   })
-
-  // console.log("last step", data?.baseEstimation, data?.quoteEstimation)
 
   const hasEnoughVolume =
     ((Number(receive) || Number(send)) != 0 &&
