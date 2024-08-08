@@ -103,12 +103,12 @@ export function useMarketForm(props: Props) {
       const baseAmount =
         bs == BS.buy
           ? parseUnits(receive, market?.base.decimals ?? 18)
-          : parseUnits(send, market?.quote.decimals ?? 18)
+          : parseUnits(send, market?.base.decimals ?? 18)
 
       const quoteAmount =
         bs == BS.buy
           ? parseUnits(send, market?.quote.decimals ?? 18)
-          : parseUnits(receive, market?.base.decimals ?? 18)
+          : parseUnits(receive, market?.quote.decimals ?? 18)
 
       const isBasePay = market?.base.address === sendToken?.address
 
@@ -133,12 +133,14 @@ export function useMarketForm(props: Props) {
               }
             : {
                 base: baseAmount,
-                bs: BS.buy,
+                bs: BS.sell,
                 book,
               }
 
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
+
+      console.log("sdk values", baseEstimation, quoteEstimation)
 
       const formattedBaseEstimation = formatUnits(
         baseEstimation,
@@ -163,9 +165,12 @@ export function useMarketForm(props: Props) {
     },
   })
 
+  // console.log("last step", data?.baseEstimation, data?.quoteEstimation)
+
   const hasEnoughVolume =
-    (Number(receive) || Number(send)) != 0 &&
-    Number(data?.baseEstimation || data?.quoteEstimation) === 0
+    ((Number(receive) || Number(send)) != 0 &&
+      Number(data?.baseEstimation) === 0) ||
+    Number(data?.quoteEstimation) === 0
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
