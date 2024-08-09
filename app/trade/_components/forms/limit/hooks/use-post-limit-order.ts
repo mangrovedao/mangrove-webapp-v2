@@ -23,6 +23,7 @@ import { toast } from "sonner"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import { TradeMode } from "../../enums"
 import { successToast } from "../../utils"
+import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 import { estimateTimestamp } from "../utils"
 
@@ -101,9 +102,10 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           book,
           orderType: timeInForce as number,
           // If expiry date is ignored, then it will not expire
-          expiryDate: BigInt(
-            estimateTimestamp({ timeToLiveUnit: "Day", timeToLive }),
-          ), // 1 hour
+          expiryDate:
+            timeInForce === TimeInForce.GTC || timeInForce === TimeInForce.PO
+              ? BigInt(estimateTimestamp({ timeToLiveUnit: "Day", timeToLive }))
+              : undefined, // 1 hour
           restingOrderGasreq,
           // logics can be left to undefined (meaning no logic)
           takerGivesLogic,
