@@ -11,15 +11,15 @@ import {
 import { useMarkets } from "@/hooks/use-addresses"
 import { getFeatureFlagConfig } from "@/schemas/feature-flag"
 import { useRouter } from "next/navigation"
+import React from "react"
 import { InfoBanner } from "./_components/info-banner"
 import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
   const router = useRouter()
   const markets = useMarkets()
-
   const featureFlagConfig = getFeatureFlagConfig()
-
+  const [hideCreateStrat, setHideCreateStrat] = React.useState(false)
   function handleNext() {
     if (!markets[0]) return
     router.push(
@@ -41,6 +41,7 @@ export default function Page() {
             rightIcon
             onClick={handleNext}
             suppressHydrationWarning
+            disabled={hideCreateStrat}
           >
             Create strategy
           </Button>
@@ -64,7 +65,7 @@ export default function Page() {
           </TooltipProvider>
         )}
       </div>
-      <Tables />
+      <Tables hideCreateStrat={setHideCreateStrat} />
     </main>
   )
 }

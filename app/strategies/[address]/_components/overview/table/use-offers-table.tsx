@@ -11,7 +11,7 @@ import {
 import React from "react"
 import { formatUnits } from "viem"
 
-import { StatusBadge } from "@/app/strategies/new/_components/price-range/components/price-chart/merged-offer-tooltip"
+import { StatusBadge } from "@/app/strategies/(shared)/_components/price-chart/merged-offer-tooltip"
 import { cn } from "@/utils"
 import { BA, inboundFromOutbound } from "@mangrovedao/mgv/lib"
 import useKandel from "../../../_providers/kandel-strategy"
@@ -85,7 +85,7 @@ export function useOffersTable({ data }: Params) {
           const quote = ba === BA.bids ? gives : wants
           return (
             <div className="w-full h-full flex justify-end">
-              {Number(formatUnits(quote, market?.base.decimals || 18)).toFixed(
+              {Number(formatUnits(quote, market?.quote.decimals || 18)).toFixed(
                 market?.quote.displayDecimals,
               )}{" "}
               {market?.quote.symbol}

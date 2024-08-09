@@ -74,7 +74,7 @@ export default function useForm() {
       baseAmount: parseUnits(baseDeposit, baseToken?.decimals || 18),
       quoteAmount: parseUnits(quoteDeposit, quoteToken?.decimals || 18),
       stepSize: BigInt(debouncedStepSize),
-      pricePoints: BigInt(debouncedNumberOfOffers),
+      pricePoints: BigInt(Number(debouncedNumberOfOffers) + 1),
     },
     isMissingField,
   )

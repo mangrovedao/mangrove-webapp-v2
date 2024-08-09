@@ -8,7 +8,6 @@ import { Settings, X } from "lucide-react"
 import { useLocalStorage } from "usehooks-ts"
 import { ConnectWalletBanner } from "./_components/connect-wallet-banner"
 import CurrentBoost from "./_components/current-boost"
-import { JoinProgramBanner } from "./_components/join-program-banner"
 import { Leaderboard } from "./_components/leaderboard/table"
 import { useUserVolume } from "./_components/leaderboard/use-leaderboard"
 import NextLevel from "./_components/next-level"
@@ -33,7 +32,6 @@ export default function Page() {
 
   return isConnected ? (
     <div>
-      <JoinProgramBanner />
       <div className="flex flex-col items-center md:flex-row md:items-start md:justify-between">
         <Rewards />
         <TotalPoints />

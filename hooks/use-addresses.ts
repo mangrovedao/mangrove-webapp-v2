@@ -1,23 +1,26 @@
 import {
+  arbitrumMangrove,
+  arbitrumMarkets,
+  arbitrumTokens,
   baseSepoliaLogics,
   baseSepoliaMangrove,
   baseSepoliaMarkets,
-  baseSepoliaSmartKandel,
   baseSepoliaTokens,
   blastLogics,
   blastMangrove,
   blastMarkets,
-  blastSmartKandel,
   blastTokens,
 } from "@mangrovedao/mgv/addresses"
-import { baseSepolia, blast } from "viem/chains"
-import { useChainId } from "wagmi"
+import { arbitrum, baseSepolia, blast } from "viem/chains"
+import { useAccount } from "wagmi"
 
 export function useMangroveAddresses() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastMangrove
+    case arbitrum.id:
+      return arbitrumMangrove
     case baseSepolia.id:
       return baseSepoliaMangrove
     default:
@@ -25,23 +28,27 @@ export function useMangroveAddresses() {
   }
 }
 
-export function useSmartKandel() {
-  const chain = useChainId()
-  switch (chain) {
+export function useKandelSeeder() {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
-      return blastSmartKandel
+      return "0x4bb7567303c8bde27a4b490b3e5f1593c891b03d"
+    case arbitrum.id:
+      return "0x89139bed90b1bfb5501f27be6d6f9901ae35745d"
     case baseSepolia.id:
-      return baseSepoliaSmartKandel
+      return "0x1a839030107167452d69d8f1a673004b2a1b8a3a"
     default:
       return undefined
   }
 }
 
 export function useMarkets() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastMarkets
+    case arbitrum.id:
+      return arbitrumMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets
     default:
@@ -50,10 +57,12 @@ export function useMarkets() {
 }
 
 export function useLogics() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastLogics
+    case arbitrum.id:
+      return []
     case baseSepolia.id:
       return baseSepoliaLogics
     default:
@@ -62,10 +71,12 @@ export function useLogics() {
 }
 
 export function useTokens() {
-  const chain = useChainId()
-  switch (chain) {
+  const { chainId } = useAccount()
+  switch (chainId) {
     case blast.id:
       return blastTokens
+    case arbitrum.id:
+      return arbitrumTokens
     case baseSepolia.id:
       return baseSepoliaTokens
     default:

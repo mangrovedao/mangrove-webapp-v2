@@ -2,14 +2,14 @@ import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { kandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { getAddress, isAddress, isAddressEqual } from "viem"
-import { useAccount, useChainId, usePublicClient } from "wagmi"
+import { useAccount, usePublicClient } from "wagmi"
 import {
   getChainVaults,
   getVaultsInformation,
 } from "../../(list)/_components/tables/vaults/services/skate-vaults"
 
 export function useVault(id?: string | null) {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   const { address: user } = useAccount()
   const publicClient = usePublicClient()
   const params = useMangroveAddresses()
@@ -18,7 +18,7 @@ export function useVault(id?: string | null) {
     queryFn: async () => {
       if (!publicClient || !params)
         throw new Error("Public client is not enabled")
-      if (!id) return { vault: undefined, kandelState: undefined }
+      if (!id || !chainId) return { vault: undefined, kandelState: undefined }
       if (!isAddress(id)) throw new Error("Invalid address")
       const vaultAddress = getAddress(id)
       const vault = getChainVaults(chainId).find((v) =>
@@ -36,7 +36,7 @@ export function useVault(id?: string | null) {
         kandelState,
       }
     },
-    enabled: !!publicClient && !!params,
+    enabled: !!publicClient && !!params && !!chainId,
     initialData: { vault: undefined, kandelState: undefined },
   })
 }

@@ -2,7 +2,7 @@ import useMarket from "@/providers/market"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   BaseError,
-  ContractFunctionExecutionError,
+  ContractFunctionRevertedError,
   TransactionReceipt,
   parseUnits,
 } from "viem"
@@ -140,11 +140,17 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
       } catch (error) {
         if (error instanceof BaseError) {
           const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
+            (error) => error instanceof ContractFunctionRevertedError,
           )
-          console.log(revertError)
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log({ ...revertError.args })
+
+          if (revertError instanceof ContractFunctionRevertedError) {
+            console.log(
+              revertError.cause,
+              revertError.message,
+              revertError.details,
+              revertError.data,
+              revertError,
+            )
           }
         }
         console.error(error)

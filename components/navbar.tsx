@@ -39,7 +39,7 @@ import {
 
 import useLocalStorage from "@/hooks/use-local-storage"
 import { useChains } from "@/providers/chains"
-import { baseSepolia, blast, blastSepolia } from "viem/chains"
+import { arbitrum, baseSepolia, blast, blastSepolia } from "viem/chains"
 import ChainSelector from "./chain-selector"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
@@ -73,6 +73,10 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
           href: "/strategies",
           disabled: false,
           message: "Cooking...",
+        },
+        {
+          name: "Swap",
+          href: "https://swap.mangrove.exchange",
         },
         {
           name: "Points",
@@ -317,7 +321,8 @@ const RightPart = withClientOnly(() => {
 
           {(chain?.id == blastSepolia.id ||
             chain?.id == blast.id ||
-            chain?.id == baseSepolia.id) && (
+            chain?.id == baseSepolia.id ||
+            chain?.id == arbitrum.id) && (
             <>
               <DropdownMenuItem asChild onClick={() => setWrapETH(!wrapETH)}>
                 <div>

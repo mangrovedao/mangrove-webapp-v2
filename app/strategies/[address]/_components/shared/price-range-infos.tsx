@@ -1,4 +1,4 @@
-import { PriceRangeChart } from "@/app/strategies/new/_components/price-range/components/price-chart/price-range-chart"
+import { PriceRangeChart } from "@/app/strategies/(shared)/_components/price-chart/price-range-chart"
 import { useKandelBook } from "../../_hooks/use-kandel-book"
 import useKandel from "../../_providers/kandel-strategy"
 import { useParameters } from "../parameters/hook/use-parameters"
@@ -9,11 +9,6 @@ import UnrealizedPnl from "./unrealized-pnl"
 export default function PriceRangeInfos() {
   const { strategyStatusQuery, baseToken, quoteToken, mergedOffers } =
     useKandel()
-
-  console.log(
-    strategyStatusQuery.data?.minPrice,
-    strategyStatusQuery.data?.maxPrice,
-  )
 
   const { publishedBase, publishedQuote, currentParameter } = useParameters()
   const { book } = useKandelBook()

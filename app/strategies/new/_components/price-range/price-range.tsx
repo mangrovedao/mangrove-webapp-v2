@@ -13,9 +13,9 @@ import {
   calculatePriceDifferencePercentage,
   calculatePriceFromPercentage,
 } from "@/utils/numbers"
+import { PriceRangeChart } from "../../../(shared)/_components/price-chart/price-range-chart"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 import DeployStrategyDialog from "../launch-strategy-dialog"
-import { PriceRangeChart } from "./components/price-chart/price-range-chart"
 import { RiskAppetiteBadge } from "./components/risk-appetite"
 
 export const PriceRange = withClientOnly(function ({

@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react"
 import React from "react"
-import { useChainId, useSwitchChain } from "wagmi"
+import { useAccount, useSwitchChain } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
 import { useChains } from "@/providers/chains"
@@ -10,11 +10,21 @@ import { Button } from "./ui/button"
 import { XClose } from "./ui/dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
+function getIconFromChainlist(name: string) {
+  let icon = name
+
+  if (icon.includes("Arbitrum One")) {
+    icon = "arbitrum"
+  }
+
+  return `https://icons.llamao.fi/icons/chains/rsz_${icon.toLowerCase().replaceAll(" ", "_")}.jpg`
+}
+
 export default function ChainSelector() {
-  const chainId = useChainId()
+  const { chainId } = useAccount()
   const { switchChain } = useSwitchChain()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
-  const chain = getChainObjectById(chainId.toString())
+  const chain = getChainObjectById(chainId?.toString())
 
   // Close dialog if the chain id has changed
   React.useEffect(() => {
@@ -63,7 +73,7 @@ export default function ChainSelector() {
                 }}
               >
                 <ImageWithHideOnError
-                  src={`https://icons.llamao.fi/icons/chains/rsz_${name.toLowerCase().replaceAll(" ", "_")}.jpg`}
+                  src={getIconFromChainlist(name)}
                   alt=""
                   className="rounded-full overflow-hidden"
                   width={28}

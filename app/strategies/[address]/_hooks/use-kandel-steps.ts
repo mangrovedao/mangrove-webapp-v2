@@ -1,10 +1,9 @@
 import { kandelSeederActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
-import { useMangroveAddresses, useSmartKandel } from "@/hooks/use-addresses"
+import { useKandelSeeder, useMangroveAddresses } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
-import { getUserRouter } from "@mangrovedao/mgv/actions"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
 
@@ -13,7 +12,7 @@ export function useKandelSteps() {
   const { markets } = useMarket()
   const { baseToken, quoteToken } = useKandel()
   const client = useClient()
-  const smartKandel = useSmartKandel()
+  const kandelSeeder = useKandelSeeder()
 
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
@@ -29,7 +28,7 @@ export function useKandelSteps() {
   return useQuery({
     queryKey: [
       "kandel-steps",
-      smartKandel,
+      kandelSeeder,
       address,
       baseToken?.address,
       quoteToken?.address,
@@ -38,7 +37,7 @@ export function useKandelSteps() {
       try {
         if (!baseToken || !quoteToken) return null
         if (
-          !smartKandel ||
+          !kandelSeeder ||
           !address ||
           !publicClient ||
           !addresses ||
@@ -46,16 +45,11 @@ export function useKandelSteps() {
           !currentMarket
         )
           throw new Error("Could not fetch kandel steps, missing params")
-
-        const userRouter = await getUserRouter(publicClient, addresses, {
-          user: address,
-        })
-        const kandelSeeder = kandelSeederActions(currentMarket, smartKandel)
-        const seeder = kandelSeeder(client)
+        const kandelActions = kandelSeederActions(currentMarket, kandelSeeder)
+        const seeder = kandelActions(client)
 
         const currentSteps = await seeder.getKandelSteps({
           user: address,
-          userRouter: userRouter,
         })
 
         return currentSteps
@@ -64,7 +58,7 @@ export function useKandelSteps() {
         throw new Error("Unable to retrieve kandel steps")
       }
     },
-    enabled: !!smartKandel && !!address,
+    enabled: !!kandelSeeder && !!address,
     meta: {
       error: "Unable to retrieve kandel steps",
     },

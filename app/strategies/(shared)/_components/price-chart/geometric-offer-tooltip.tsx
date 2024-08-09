@@ -4,6 +4,7 @@ import { ScaleLinear } from "d3-scale"
 
 import { cn } from "@/utils"
 import { BA } from "@mangrovedao/mgv/lib"
+import { formatEther } from "viem"
 import { TypedDistrubutionOffer } from "./geometric-distribution-dots"
 
 type Props = {
@@ -44,7 +45,7 @@ export function GeometricOfferTooltip({
         </div>
         <div className="text-white">
           <span className="text-cloud-300">Volume:</span>{" "}
-          {Number(hoveredGeometricOffer.gives).toFixed(
+          {Number(formatEther(hoveredGeometricOffer.gives, "wei")).toFixed(
             (hoveredGeometricOffer.type === BA.bids ? quoteToken : baseToken)
               ?.displayDecimals,
           )}{" "}

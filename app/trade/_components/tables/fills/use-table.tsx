@@ -63,7 +63,6 @@ export function useTable({ data }: Params) {
         },
         sortingFn: "datetime",
       }),
-      // TODO: change when we will have amplified orders
       columnHelper.accessor("isMarketOrder", {
         header: "Type",
         cell: (row) => (row.getValue() ? "Market" : "Limit"),

@@ -12,7 +12,6 @@ import { renderElement } from "@/utils/render"
 import { TRADE } from "../../_constants/loading-keys"
 import { Fills } from "./fills/fills"
 import { useFills } from "./fills/use-fills"
-// import { AmplifiedOrders } from "./orders/amplified-order"
 
 import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
@@ -20,13 +19,11 @@ import { Orders } from "./orders/orders"
 export enum TradeTables {
   ORDERS = "orders",
   FILLS = "fills",
-  // AMPLIFIED = "amplified",
 }
 
 const TABS_CONTENT = {
   [TradeTables.ORDERS]: Orders,
   [TradeTables.FILLS]: Fills,
-  // [TradeTables.AMPLIFIED]: AmplifiedOrders,
 }
 
 export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
@@ -42,10 +39,6 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const { data: fillsCount } = useFills({
     select: (fills) => fills.length,
   })
-
-  // const { data: amplifedCount } = useAmplifiedOrders({
-  //   select: (amplified) => amplified.length,
-  // })
 
   return (
     <CustomTabs {...props} defaultValue={Object.values(TradeTables)[0]}>

@@ -24,6 +24,7 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const { currentMarket: market } = useMarket()
   const {
     initialGives,
+    initialWants,
     price: currentPrice,
     isBid,
     expiryDate,
@@ -37,25 +38,53 @@ export function useEditOrder({ order, onSubmit }: Props) {
 
   const sendFrom = findLogicByAddress(outboundRoute)
   const receiveTo = findLogicByAddress(inboundRoute)
-
-  const baseDecimals = market?.base.displayDecimals
   const quoteDecimals = market?.quote.displayDecimals
+  const baseDecimals = market?.base.displayDecimals
 
-  const displayDecimals = isBid ? quoteDecimals : baseDecimals
+  const volumeDecimals = order.isBid
+    ? market?.quote.displayDecimals
+    : market?.base.displayDecimals
 
-  const volume = Big(initialGives).toFixed(displayDecimals)
+  const amountDecimals = order.isBid
+    ? market?.base.displayDecimals
+    : market?.quote.displayDecimals
+
+  const volume = Big(initialGives).toFixed(volumeDecimals)
+  const amount = Big(initialWants).toFixed(amountDecimals)
 
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
       limitPrice: Number(currentPrice).toFixed(quoteDecimals),
       send: volume,
+      receive: amount,
       timeToLive: "1",
       timeToLiveUnit: TimeToLiveUnit.DAY,
       isBid: isBid,
     },
     onSubmit: (values) => onSubmit(values),
   })
+
+  function computeReceiveAmount() {
+    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+    const send = Number(form?.getFieldValue("send") ?? 0)
+
+    form.setFieldValue(
+      "receive",
+      (isBid ? send / limit : send * limit).toString(),
+    )
+    form.validateAllFields("submit")
+  }
+
+  function computeSendAmount() {
+    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+    const receive = Number(form?.getFieldValue("receive") ?? 0)
+    form.setFieldValue(
+      "send",
+      (isBid ? receive * limit : receive / limit).toString(),
+    )
+    form.validateAllFields("submit")
+  }
 
   const tradeAction = isBid ? BS.buy : BS.sell
   const { sendTokenBalance } = useTradeInfos("limit", tradeAction)
@@ -80,6 +109,8 @@ export function useEditOrder({ order, onSubmit }: Props) {
   return {
     handleSubmit,
     setToggleEdit,
+    computeReceiveAmount,
+    computeSendAmount,
     form,
     sendFrom,
     receiveTo,

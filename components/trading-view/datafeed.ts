@@ -10,6 +10,8 @@ import {
   SymbolResolveExtension,
 } from "@/public/charting_library/charting_library"
 
+import { data } from "./sample"
+
 type Params = {
   base: string
   quote: string
@@ -38,12 +40,12 @@ export default function datafeed({ base, quote }: Params) {
     onReady: (callback: OnReadyCallback) => {
       console.log("[onReady]: Method call")
       callback({
-        supports_search: true,
-        supports_group_request: false,
+        // supports_search: true,
+        // supports_group_request: false,
         supports_marks: true,
         supports_timescale_marks: true,
         supports_time: true,
-        supported_resolutions: ["1W"],
+        // supported_resolutions: ["1D"],
       })
     },
     searchSymbols: (
@@ -89,6 +91,16 @@ export default function datafeed({ base, quote }: Params) {
       console.log("[getBars]: Method call", symbolInfo)
       const bars = new Array(periodParams.countBack)
 
+      const marketdata = data.map((item) => {
+        return {
+          time: new Date(item.ts).getTime(),
+          open: item.open_price,
+          high: item.max_price,
+          low: item.min_price,
+          close: item.close_price,
+        }
+      })
+
       // For constructing the bars we are starting from the `to` time minus 1 day, and working backwards until we have `countBack` bars.
       let time = new Date(periodParams.to * 1000)
       time.setUTCHours(0)
@@ -121,7 +133,7 @@ export default function datafeed({ base, quote }: Params) {
       }
 
       // Once all the bars (usually countBack is around 300 bars) the array of candles is returned to the library.
-      onResult(bars)
+      onResult(marketdata)
     },
     subscribeBars: (
       symbolInfo: LibrarySymbolInfo,
