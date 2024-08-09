@@ -8,7 +8,7 @@ import {
   getDefaultConfig,
 } from "@rainbow-me/rainbowkit"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { baseSepolia, blast } from "viem/chains"
+import { arbitrum, baseSepolia, blast } from "viem/chains"
 import { WagmiProvider, http } from "wagmi"
 
 import { env } from "@/env.mjs"
@@ -26,6 +26,7 @@ const config = getDefaultConfig({
   transports: {
     [baseSepolia.id]: http(),
     [blast.id]: http(),
+    [arbitrum.id]: http(),
   },
 })
 

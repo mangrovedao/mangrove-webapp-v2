@@ -83,6 +83,7 @@ export function PriceRangeChart({
   const { isConnected } = useAccount()
   const { ref, width = 0, height = 0 } = useResizeObserver()
   const [isMovingRange, setIsMovingRange] = React.useState(false)
+  const [hasBeenInit, setHasBeenInit] = React.useState(false)
   const offers = [
     ...bids.map((bid) => ({ ...bid, type: "bid" })),
     ...asks.map((ask) => ({ ...ask, type: "ask" })),
@@ -120,21 +121,26 @@ export function PriceRangeChart({
 
   const altPressed = useKeyPress("Alt")
 
-  // if viewOnly, set the xDomain to the priceRange
   React.useEffect(() => {
-    if (!viewOnly || !priceRange) return
-    const [min, max] = priceRange
-    const xLowerBound = min * 0.8
-    const xUpperBound = max * 1.1
+    const [min, max] = priceRange ?? [0, 0]
+    const centralValue = (min + max) / 2
+
+    if ((min === 0 && max === 0) || hasBeenInit) return
+    const lowerFactor = min / centralValue
+    const upperFactor = max / centralValue
+    const xLowerBound = min * lowerFactor
+    const xUpperBound = max * upperFactor
     setXDomain([xLowerBound, xUpperBound])
-  }, [viewOnly, priceRange])
+    setHasBeenInit(true)
+  }, [priceRange, hasBeenInit])
 
   React.useEffect(() => {
-    if (!midPrice || viewOnly) return
+    const [min, max] = priceRange ?? [0, 0]
+    if (!midPrice || viewOnly || (min !== 0 && max !== 0)) return
     const xLowerBound = midPrice * 0.7 // 30% lower than mid price
     const xUpperBound = midPrice * 1.3 // 30% higher than mid price
     setXDomain([xLowerBound, xUpperBound])
-  }, [midPrice])
+  }, [midPrice, priceRange])
 
   const xScale = scaleLinear({
     domain: xDomain,

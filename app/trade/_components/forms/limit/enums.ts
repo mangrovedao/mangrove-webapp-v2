@@ -1,7 +1,8 @@
 export enum TimeInForce {
-  IMMEDIATE_OR_CANCEL = "Immediate or cancel",
-  GOOD_TIL_TIME = "Good til time",
-  FILL_OR_KILL = "Fill or kill",
+  GTC = 0,
+  PO = 2,
+  IOC = 3,
+  FOK = 4,
 }
 
 export enum TimeToLiveUnit {

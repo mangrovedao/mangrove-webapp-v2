@@ -1,4 +1,4 @@
-import { BS, Order } from "@mangrovedao/mgv/lib"
+import { BS } from "@mangrovedao/mgv/lib"
 import React from "react"
 import { formatUnits } from "viem"
 
@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market.new"
 import { cn } from "@/utils"
+import { enumKeys } from "@/utils/enums"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"
@@ -354,7 +355,7 @@ export function Limit() {
             <Separator className="!my-6" />
 
             <Accordion title="Advanced">
-              <form.Field name="orderType">
+              <form.Field name="timeInForce">
                 {(field) => {
                   return (
                     <div className="grid text-md space-y-2">
@@ -372,10 +373,10 @@ export function Limit() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {Object.values(Order).map((timeInForce) => (
+                            {enumKeys(TimeInForce).map((timeInForce) => (
                               <SelectItem
                                 key={timeInForce}
-                                value={timeInForce.toString()}
+                                value={TimeInForce[timeInForce].toString()}
                               >
                                 {timeInForce}
                               </SelectItem>
@@ -390,7 +391,9 @@ export function Limit() {
 
               <div
                 className={cn("flex justify-between space-x-2", {
-                  hidden: timeInForce !== TimeInForce.GOOD_TIL_TIME,
+                  hidden:
+                    timeInForce !== TimeInForce.GTC &&
+                    timeInForce !== TimeInForce.PO,
                 })}
               >
                 <form.Field
