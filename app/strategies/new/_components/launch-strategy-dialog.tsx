@@ -108,10 +108,7 @@ export default function DeployStrategyDialog({
         </div>
       ),
       button: (
-        <>
-          <Button variant={"secondary"} onClick={() => goToPrevStep()}>
-            Return
-          </Button>
+        <div className="grid gap-2 w-full">
           <Button
             {...btnProps}
             disabled={createKandelStrategyPending}
@@ -124,9 +121,18 @@ export default function DeployStrategyDialog({
           >
             Create kandel instance
           </Button>
-        </>
+
+          <Button
+            variant={"secondary"}
+            disabled={createKandelStrategyPending}
+            onClick={() => goToPrevStep()}
+          >
+            Back
+          </Button>
+        </div>
       ),
     },
+
     !baseApprove?.done && {
       body: (
         <div className="text-center">
@@ -142,7 +148,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: baseToken,
-                spender: data?.kandelAddress,
+                spender: baseApprove?.params.spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -154,6 +160,7 @@ export default function DeployStrategyDialog({
         </Button>
       ),
     },
+
     !quoteApprove?.done && {
       body: (
         <div className="text-center">
@@ -169,7 +176,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: quoteToken,
-                spender: data?.kandelAddress,
+                spender: quoteApprove?.params.spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -181,6 +188,7 @@ export default function DeployStrategyDialog({
         </Button>
       ),
     },
+
     {
       body: (
         <Summary

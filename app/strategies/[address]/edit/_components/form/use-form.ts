@@ -82,7 +82,15 @@ export default function useForm() {
       setStepSize(currentParameter?.stepSize || "")
       setBountyDeposit(lockedBounty)
     }
-  }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
+  }, [
+    strategyQuery.data?.offers,
+    kandelState?.baseAmount,
+    strategyStatusQuery.data?.offerStatuses,
+    kandelState?.quoteAmount,
+    lockedBounty,
+    currentParameter?.length,
+    currentParameter?.stepSize,
+  ])
 
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
