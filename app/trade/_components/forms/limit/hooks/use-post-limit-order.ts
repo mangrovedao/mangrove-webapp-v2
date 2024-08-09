@@ -63,7 +63,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           bs,
           send: gives,
           receive: wants,
-          orderType,
+          timeInForce,
           timeToLive,
           sendFrom,
           receiveTo,
@@ -99,7 +99,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           quoteAmount,
           bs,
           book,
-          orderType,
+          orderType: timeInForce as number,
           // If expiry date is ignored, then it will not expire
           expiryDate: BigInt(
             estimateTimestamp({ timeToLiveUnit: "Day", timeToLive }),

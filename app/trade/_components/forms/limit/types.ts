@@ -1,4 +1,4 @@
-import { BS, Order } from "@mangrovedao/mgv/lib"
+import { BS } from "@mangrovedao/mgv/lib"
 import { TimeInForce, type TimeToLiveUnit } from "./enums"
 
 export type Form = {
@@ -6,7 +6,6 @@ export type Form = {
   limitPrice: string
   send: string
   receive: string
-  orderType: Order
   timeInForce: TimeInForce
   timeToLive: string
   timeToLiveUnit: TimeToLiveUnit
