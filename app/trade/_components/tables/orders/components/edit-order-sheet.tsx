@@ -308,7 +308,7 @@ export default function EditOrderSheet({
 
                   <SheetLine
                     title="Time in force"
-                    item={<Text>{TimeInForce.GOOD_TIL_TIME}</Text>}
+                    item={<Text>{TimeInForce.GTC}</Text>}
                     secondaryItem={
                       expiryDate && (
                         <Text className="text-muted-foreground">

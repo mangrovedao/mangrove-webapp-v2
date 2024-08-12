@@ -1,13 +1,5 @@
 "use client"
-import {
-  Coins,
-  Copy,
-  ExternalLink,
-  LogOut,
-  Network,
-  Route,
-  Wallet,
-} from "lucide-react"
+import { Coins, Copy, ExternalLink, LogOut, Route, Wallet } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import posthog from "posthog-js"
@@ -37,7 +29,6 @@ import {
   useConnectModal,
 } from "@rainbow-me/rainbowkit"
 
-import useLocalStorage from "@/hooks/use-local-storage"
 import { useChains } from "@/providers/chains"
 import { arbitrum, baseSepolia, blast, blastSepolia } from "viem/chains"
 import ChainSelector from "./chain-selector"
@@ -197,38 +188,8 @@ const RightPart = withClientOnly(() => {
     openAccountModal?.()
   }
 
-  function handleChangeNetwork() {
-    openChainModal?.()
-  }
-  const [hideDisclaimer] = useLocalStorage<boolean>("hideDisclaimer", false)
   const [wrapETH, setWrapETH] = React.useState(false)
   const [unWrapETH, setUnWrapETH] = React.useState(false)
-
-  // React.useEffect(() => {
-  //   if (!isConnected && !address) {
-  //     useDialogStore.setState({
-  //       opened: true,
-  //       title: "Please connect your wallet to access Mangrove dApp",
-  //       type: "mangrove",
-  //       children: (
-  //         <div className="flex flex-col space-y-2">
-  //           <Button
-  //             onClick={() => {
-  //               useDialogStore.setState({
-  //                 opened: false,
-  //               })
-  //               handleConnect()
-  //             }}
-  //             disabled={isConnecting}
-  //             size="lg"
-  //           >
-  //             Connect wallet
-  //           </Button>
-  //         </div>
-  //       ),
-  //     })
-  //   }
-  // }, [isConnected])
 
   React.useEffect(() => {
     if (address && !chain?.id) {
@@ -252,27 +213,6 @@ const RightPart = withClientOnly(() => {
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
       <ChainSelector />
-      {/* <Button
-        variant="invisible"
-        className="!space-x-4 lg:flex items-center hidden"
-        size="sm"
-        onClick={handleChangeNetwork}
-      >
-        <span className="flex space-x-2">
-          <ImageWithHideOnError
-            src={`/assets/chains/${chain?.id}.webp`}
-            width={16}
-            height={16}
-            className="h-4 rounded-sm"
-            key={chain?.id}
-            alt={`${chain?.name}-logo`}
-          />
-          <span className="text-sm whitespace-nowrap">{chain?.name}</span>
-        </span>
-        <div className="pl-2">
-          <ChevronDown className="w-3" />
-        </div>
-      </Button> */}
 
       <Separator orientation="vertical" />
 
@@ -305,10 +245,6 @@ const RightPart = withClientOnly(() => {
               <Route className="mr-2 h-4 w-4" />
               <span>Bridge assets</span>
             </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleChangeNetwork}>
-            <Network className="mr-2 h-4 w-4" />
-            <span>Change network</span>
           </DropdownMenuItem>
           {chain?.testnet && (
             <DropdownMenuItem asChild>

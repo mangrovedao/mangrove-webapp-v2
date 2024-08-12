@@ -34,8 +34,8 @@ export default function WarningBanner() {
         </div>
         <div>
           <Caption className="text-base!">
-            You'll need to switch back to Blast if you want to browse the rest
-            of the web app :{" "}
+            You'll need to switch back to a supported network if you want to
+            browse the rest of the web app :{" "}
             <Button
               className="text-md"
               variant={"link"}

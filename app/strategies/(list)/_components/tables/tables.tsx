@@ -5,8 +5,16 @@ import {
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group"
 import { CustomTabs } from "@/components/custom-tabs"
+import { useAccount } from "wagmi"
 import { Strategies } from "./strategies/strategies"
 import { Vaults } from "./vaults/vaults"
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 enum StrategyType {
   PASSIVE = "Passive",
@@ -21,7 +29,7 @@ export function Tables({
   hideCreateStrat: (bool: boolean) => void
 }) {
   const [strategiesType, setStrategiesType] = React.useState(StrategyType.PRO)
-
+  const { chain } = useAccount()
   React.useEffect(() => {
     if (strategiesType === "Passive") {
       hideCreateStrat(true)
@@ -46,8 +54,25 @@ export function Tables({
             value={action}
             id={action}
             className="capitalize"
+            disabled={
+              action === StrategyType.PASSIVE && chain?.name === "Arbitrum One"
+            }
           >
-            {action}
+            <TooltipProvider>
+              <Tooltip delayDuration={200}>
+                <TooltipTrigger className="hover:opacity-80 transition-opacity">
+                  {action}
+                </TooltipTrigger>
+                <TooltipContent
+                  hidden={
+                    action === StrategyType.PRO ||
+                    chain?.name !== "Arbitrum One"
+                  }
+                >
+                  Please switch to a supported network
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CustomRadioGroupItem>
         ))}
       </CustomRadioGroup>

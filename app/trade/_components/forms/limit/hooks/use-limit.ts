@@ -9,12 +9,7 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
-import {
-  BS,
-  Order,
-  getDefaultLimitOrderGasreq,
-  minVolume,
-} from "@mangrovedao/mgv/lib"
+import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
 import { formatUnits, parseUnits } from "viem"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
@@ -33,8 +28,7 @@ export function useLimit(props: Props) {
       sendFrom: "simple",
       receive: "",
       receiveTo: "simple",
-      orderType: Order.GTC,
-      timeInForce: TimeInForce.GOOD_TIL_TIME,
+      timeInForce: TimeInForce.GTC,
       timeToLive: "28",
       timeToLiveUnit: TimeToLiveUnit.DAY,
     },

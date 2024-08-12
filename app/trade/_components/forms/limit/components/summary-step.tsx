@@ -4,6 +4,7 @@ import Big from "big.js"
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
+import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
@@ -27,6 +28,11 @@ export function SummaryStep({
   const receiveTo = form.receiveTo.includes("simple")
     ? "Wallet"
     : form.receiveTo.toUpperCase()
+
+  const timeInForceKey = TimeInForce[form.timeInForce]
+  const showTimeToLive =
+    (form.timeToLive && form.timeInForce === TimeInForce.GTC) ||
+    form.timeInForce === TimeInForce.PO
 
   return (
     <div className="bg-[#041010] rounded-lg p-4 space-y-4">
@@ -59,8 +65,8 @@ export function SummaryStep({
         </Line> */}
         <Line title="Time in force">
           <div className="flex flex-col items-end">
-            {form.timeToLive}{" "}
-            {form.timeToLive && (
+            {timeInForceKey}{" "}
+            {showTimeToLive && (
               <Unit>
                 {form.timeToLive}{" "}
                 <span className="lowercase">
