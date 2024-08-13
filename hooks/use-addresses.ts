@@ -14,6 +14,8 @@ import {
 import { arbitrum, baseSepolia, blast } from "viem/chains"
 import { useAccount } from "wagmi"
 
+export const aaveKandelSeeder = "0x55B12De431C6e355b56b79472a3632faec58FB5a"
+
 export function useMangroveAddresses() {
   const { chainId } = useAccount()
   switch (chainId) {

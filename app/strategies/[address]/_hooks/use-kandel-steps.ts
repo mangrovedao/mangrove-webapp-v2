@@ -1,13 +1,21 @@
 import { kandelSeederActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
-import { useKandelSeeder, useMangroveAddresses } from "@/hooks/use-addresses"
+import {
+  aaveKandelSeeder,
+  useKandelSeeder,
+  useMangroveAddresses,
+} from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getErrorMessage } from "@/utils/errors"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
 
-export function useKandelSteps() {
+type Props = {
+  liquiditySourcing?: string
+}
+
+export function useKandelSteps({ liquiditySourcing }: Props) {
   const { address } = useAccount()
   const { markets } = useMarket()
   const { baseToken, quoteToken } = useKandel()
@@ -45,7 +53,14 @@ export function useKandelSteps() {
           !currentMarket
         )
           throw new Error("Could not fetch kandel steps, missing params")
-        const kandelActions = kandelSeederActions(currentMarket, kandelSeeder)
+
+        const kandelSeederAddress =
+          liquiditySourcing === "Aave" ? aaveKandelSeeder : kandelSeeder
+
+        const kandelActions = kandelSeederActions(
+          currentMarket,
+          kandelSeederAddress,
+        )
         const seeder = kandelActions(client)
 
         const currentSteps = await seeder.getKandelSteps({

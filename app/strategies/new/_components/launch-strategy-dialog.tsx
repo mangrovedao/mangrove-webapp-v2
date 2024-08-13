@@ -48,7 +48,9 @@ export default function DeployStrategyDialog({
   const { address } = useAccount()
   const { currentMarket } = useMarket()
   const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
-  const { data: kandelSteps } = useKandelSteps()
+  const { data: kandelSteps } = useKandelSteps({
+    liquiditySourcing: strategy?.sendFrom,
+  })
 
   const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 

@@ -78,7 +78,7 @@ export function Form({ className }: { className?: string }) {
         <div className="flex justify-between space-x-2 pt-2">
           <div className="flex flex-col w-full">
             <Label className="flex items-center">
-              Send from
+              Source
               <InfoTooltip>
                 <Caption>Select the origin of the assets</Caption>
               </InfoTooltip>
@@ -89,53 +89,6 @@ export function Form({ className }: { className?: string }) {
               value={sendFrom}
               onValueChange={(value: string) => {
                 handleSendFromChange(value)
-              }}
-              disabled={fieldsDisabled}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem key={"simple"} value={"simple"}>
-                    <div className="flex gap-2 w-full items-center">
-                      <SourceIcon sourceId={"simple"} />
-                      <Caption className="capitalize">{"Wallet"}</Caption>
-                    </div>
-                  </SelectItem>
-                  {logics?.map(
-                    (logic) =>
-                      logic && (
-                        <SelectItem key={logic.name} value={logic.name}>
-                          <div className="flex gap-2 w-full items-center">
-                            <SourceIcon sourceId={logic.name} />
-                            <Caption className="capitalize">
-                              {logic.name}
-                            </Caption>
-                          </div>
-                        </SelectItem>
-                      ),
-                  )}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex flex-col w-full z-50">
-            <Label className="flex items-center">
-              Receive to
-              <InfoTooltip className="ml-2">
-                <div>
-                  <Caption>Select the destination of the assets</Caption>
-                </div>
-              </InfoTooltip>
-            </Label>
-
-            <Select
-              name={"receiveTo"}
-              value={receiveTo}
-              onValueChange={(value: string) => {
-                handleReceiveToChange(value)
               }}
               disabled={fieldsDisabled}
             >
