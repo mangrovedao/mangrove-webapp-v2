@@ -36,11 +36,8 @@ export const TVChartContainer = (
         base: currentMarket?.base.symbol,
         quote: currentMarket?.quote.symbol,
       }),
-      timeframe: {
-        from,
-        to,
-      },
-      interval: props.interval!,
+      timeframe: "1M",
+      // interval: props.interval!,
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",

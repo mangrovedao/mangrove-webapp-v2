@@ -73,7 +73,7 @@ export default function datafeed({ base, quote }: Params) {
         exchange: "",
         minmov: 1,
         pricescale: 100,
-        has_intraday: false,
+        has_intraday: true,
         visible_plots_set: "ohlcv",
         has_weekly_and_monthly: false,
         // supported_resolutions: ["1", "5", "30", "60", "1D", "1W"],
@@ -154,12 +154,29 @@ export default function datafeed({ base, quote }: Params) {
       console.log(
         "[subscribeBars]: Method call with listenerGuid:",
         listenerGuid,
+        symbolInfo,
+        resolution,
       )
     },
     unsubscribeBars: (listenerGuid: string) => {
       console.log(
         "[unsubscribeBars]: Method call with listenerGuid:",
         listenerGuid,
+      )
+    },
+    getMarks: (
+      symbolInfo: LibrarySymbolInfo,
+      startDate: any,
+      endDate: any,
+      onDataCallback: any,
+      resolution: any,
+    ) => {
+      console.log(
+        "[getMarks]: Method call",
+        symbolInfo,
+        startDate,
+        endDate,
+        resolution,
       )
     },
   }
