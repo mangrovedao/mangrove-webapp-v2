@@ -11,6 +11,14 @@ import {
 import { Skeleton } from "../ui/skeleton"
 import datafeed from "./datafeed"
 
+const from = new Date(2024, 7, 1).getTime() / 1000
+const to = new Date().getTime() / 1000
+
+console.log({
+  from,
+  to,
+})
+
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
 ) => {
@@ -28,7 +36,10 @@ export const TVChartContainer = (
         base: currentMarket?.base.symbol,
         quote: currentMarket?.quote.symbol,
       }),
-
+      timeframe: {
+        from,
+        to,
+      },
       interval: props.interval!,
       container: chartContainerRef.current,
       library_path: "charting_library/",

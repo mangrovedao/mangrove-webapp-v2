@@ -42,10 +42,10 @@ export default function datafeed({ base, quote }: Params) {
       callback({
         // supports_search: true,
         // supports_group_request: false,
-        supports_marks: true,
+        supports_marks: false,
         supports_timescale_marks: true,
         supports_time: true,
-        // supported_resolutions: ["1D"],
+        supported_resolutions: ["1D", "1W"] as ResolutionString[],
       })
     },
     searchSymbols: (
@@ -76,7 +76,8 @@ export default function datafeed({ base, quote }: Params) {
         has_intraday: false,
         visible_plots_set: "ohlcv",
         has_weekly_and_monthly: false,
-        supported_resolutions: ["1", "5", "30", "60", "1D", "1W"],
+        // supported_resolutions: ["1", "5", "30", "60", "1D", "1W"],
+        supported_resolutions: ["1D", "1W"],
         volume_precision: 2,
         data_status: "streaming",
       })
@@ -90,7 +91,12 @@ export default function datafeed({ base, quote }: Params) {
     ) => {
       console.log("[getBars]: Method call", symbolInfo)
       const bars = new Array(periodParams.countBack)
-
+      console.log({
+        bars,
+        symbolInfo,
+        resolution,
+        periodParams,
+      })
       const marketdata = data.map((item) => {
         return {
           time: new Date(item.ts).getTime(),
@@ -132,8 +138,11 @@ export default function datafeed({ base, quote }: Params) {
         time.setUTCDate(time.getUTCDate() - 1)
       }
 
+      console.log(marketdata)
+      console.log(bars)
+
       // Once all the bars (usually countBack is around 300 bars) the array of candles is returned to the library.
-      onResult(marketdata)
+      onResult(bars)
     },
     subscribeBars: (
       symbolInfo: LibrarySymbolInfo,
