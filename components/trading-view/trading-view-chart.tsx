@@ -5,6 +5,7 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import React from "react"
 import {
+  ResolutionString,
   widget,
   type ChartingLibraryWidgetOptions,
 } from "../../public/charting_library"
@@ -13,11 +14,6 @@ import datafeed from "./datafeed"
 
 const from = new Date(2024, 7, 1).getTime() / 1000
 const to = new Date().getTime() / 1000
-
-console.log({
-  from,
-  to,
-})
 
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
@@ -30,18 +26,21 @@ export const TVChartContainer = (
   React.useEffect(() => {
     if (!currentMarket) return
     const widgetOptions: ChartingLibraryWidgetOptions = {
-      symbol: props.symbol,
+      symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
       // BEWARE: no trailing slash is expected in feed URL
+      // @ts-ignore
       datafeed: datafeed({
         base: currentMarket?.base.symbol,
         quote: currentMarket?.quote.symbol,
+        baseAddress: currentMarket?.base.address,
+        quoteAddress: currentMarket?.quote.address,
       }),
       timeframe: "1M",
-      // interval: props.interval!,
+      interval: "1W" as ResolutionString,
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
-      // debug: true,
+      debug: true,
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [

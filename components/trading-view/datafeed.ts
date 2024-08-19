@@ -10,32 +10,19 @@ import {
   SymbolResolveExtension,
 } from "@/public/charting_library/charting_library"
 
-import { data } from "./sample"
-
 type Params = {
   base: string
   quote: string
+  baseAddress: string
+  quoteAddress: string
 }
 
-// api url : https://data.mangrove.exchange/price-chart
-/**
- // Zod schema (query params for the url above)
-const GetPriceChartSchema = z.object({
-  base: ethAddressSchema,
-  quote: ethAddressSchema,
-  start: z.date({ coerce: true }),
-  end: z
-    .date({ coerce: true })
-    .optional()
-    .default(() => new Date()),
-  interval: z.enum(['5s', '30s', '1m', '5m', '10m', '30m', '1hr', '6hr', '12hr', '1d'])
-});
- */
-
-// create me the url with the query params
-// https://data.mangrove.exchange/price-chart?base=0x4300000000000000000000000000000000000004&quote=0x4300000000000000000000000000000000000003&start=2024-01-01&end=2024-07-12&interval=1d
-
-export default function datafeed({ base, quote }: Params) {
+export default function datafeed({
+  base,
+  quote,
+  baseAddress,
+  quoteAddress,
+}: Params) {
   return {
     onReady: (callback: OnReadyCallback) => {
       console.log("[onReady]: Method call")
@@ -45,7 +32,7 @@ export default function datafeed({ base, quote }: Params) {
         supports_marks: false,
         supports_timescale_marks: true,
         supports_time: true,
-        supported_resolutions: ["1D", "1W"] as ResolutionString[],
+        supported_resolutions: ["1D", "1W", "12M"] as ResolutionString[],
       })
     },
     searchSymbols: (
@@ -64,9 +51,9 @@ export default function datafeed({ base, quote }: Params) {
     ) => {
       console.log("[resolveSymbol]: Method call", symbolName)
       onResolve({
-        ticker: `${base}/${quote}`,
-        name: `${base}/${quote}`,
-        description: `${base}/${quote}`,
+        ticker: `${base}-${quote}`,
+        name: `${base}-${quote}`,
+        description: `${base}-${quote}`,
         type: "stock",
         session: "24x7",
         timezone: "Etc/UTC",
@@ -75,37 +62,36 @@ export default function datafeed({ base, quote }: Params) {
         pricescale: 100,
         has_intraday: true,
         visible_plots_set: "ohlcv",
-        has_weekly_and_monthly: false,
-        // supported_resolutions: ["1", "5", "30", "60", "1D", "1W"],
-        supported_resolutions: ["1D", "1W"],
+        has_weekly_and_monthly: true,
+        supported_resolutions: ["1D", "1W"] as ResolutionString[],
         volume_precision: 2,
         data_status: "streaming",
+        listed_exchange: "",
+        format: "price",
       })
     },
-    getBars: (
+    getBars: async (
       symbolInfo: LibrarySymbolInfo,
       resolution: ResolutionString,
       periodParams: PeriodParams,
       onResult: HistoryCallback,
       onError: ErrorCallback,
     ) => {
-      console.log("[getBars]: Method call", symbolInfo)
-      const bars = new Array(periodParams.countBack)
-      console.log({
-        bars,
+      console.log("[getBars]: Method call", {
         symbolInfo,
         resolution,
         periodParams,
       })
-      const marketdata = data.map((item) => {
-        return {
-          time: new Date(item.ts).getTime(),
-          open: item.open_price,
-          high: item.max_price,
-          low: item.min_price,
-          close: item.close_price,
-        }
-      })
+
+      // do a request to this api : https://data.mangrove.exchange/price-chart?base=0x4300000000000000000000000000000000000004&quote=0x4300000000000000000000000000000000000003&start=2024-01-08&end=2024-14-08&interval=1d
+      // and return the response to the library
+      // const response = await fetch(
+      //   `https://data.mangrove.exchange/price-chart?base=${baseAddress}&quote=${quoteAddress}&start=${periodParams.from}&end=${periodParams.to}&interval=${resolution}`,
+      // )
+      // const data = await response.json()
+      // console.log({ data })
+
+      const bars = new Array(periodParams.countBack)
 
       // For constructing the bars we are starting from the `to` time minus 1 day, and working backwards until we have `countBack` bars.
       let time = new Date(periodParams.to * 1000)
@@ -138,9 +124,6 @@ export default function datafeed({ base, quote }: Params) {
         time.setUTCDate(time.getUTCDate() - 1)
       }
 
-      console.log(marketdata)
-      console.log(bars)
-
       // Once all the bars (usually countBack is around 300 bars) the array of candles is returned to the library.
       onResult(bars)
     },
@@ -151,12 +134,12 @@ export default function datafeed({ base, quote }: Params) {
       listenerGuid: string,
       onResetCacheNeededCallback: () => void,
     ) => {
-      console.log(
-        "[subscribeBars]: Method call with listenerGuid:",
-        listenerGuid,
-        symbolInfo,
-        resolution,
-      )
+      // console.log(
+      //   "[subscribeBars]: Method call with listenerGuid:",
+      //   listenerGuid,
+      //   symbolInfo,
+      //   resolution,
+      // )
     },
     unsubscribeBars: (listenerGuid: string) => {
       console.log(
@@ -171,13 +154,13 @@ export default function datafeed({ base, quote }: Params) {
       onDataCallback: any,
       resolution: any,
     ) => {
-      console.log(
-        "[getMarks]: Method call",
-        symbolInfo,
-        startDate,
-        endDate,
-        resolution,
-      )
+      // console.log(
+      //   "[getMarks]: Method call",
+      //   symbolInfo,
+      //   startDate,
+      //   endDate,
+      //   resolution,
+      // )
     },
   }
 }
