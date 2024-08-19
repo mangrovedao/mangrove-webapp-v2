@@ -24,7 +24,7 @@ function DisclaimerDialog() {
     setHideDisclaimer(true)
   }
 
-  if (!isMobile) {
+  if (isMobile) {
     return <MobileOverlay />
   }
 
