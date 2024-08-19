@@ -22,7 +22,7 @@ function DisclaimerDialog() {
     setHideDisclaimer(true)
   }
   return (
-    <Dialog open={!hideDisclaimer} type="mangrove">
+    <Dialog open={!hideDisclaimer} type="mangrove" className="md:block hidden">
       <Dialog.Title>Welcome to the Mangrove dApp!</Dialog.Title>
       <Dialog.Description>
         <div>
