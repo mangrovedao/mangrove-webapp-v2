@@ -2,10 +2,10 @@ import React from "react"
 import { Toaster } from "sonner"
 
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
+import DisclaimerDialog from "@/components/stateful/dialogs/disclaimer-dialog"
 import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-network-dialog"
 import { RootProvider } from "@/providers/root"
 
-import { Button } from "@/components/ui/button"
 import "./globals.css"
 
 const toastClasses =
@@ -24,7 +24,7 @@ export default function RootLayout({
           {children}
           <AdminCommand />
           <WrongNetworkAlertDialog />
-          {/* <DisclaimerDialog /> */}
+          <DisclaimerDialog />
         </RootProvider>
         <Toaster
           position="bottom-center"
@@ -44,21 +44,6 @@ export default function RootLayout({
             },
           }}
         />
-        <div className="fixed bg-black-rich inset-0 z-[999] md:hidden px-4">
-          <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-white text-center">
-              This app is not optimized for mobile yet. <br /> You can use the
-              Swap app on small devices.
-              <br />
-              <br />
-              <Button>
-                <a href="https://swap.mangrove.exchange" target="_blank">
-                  Go to Swap App
-                </a>
-              </Button>
-            </p>
-          </div>
-        </div>
       </body>
     </html>
   )

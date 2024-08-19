@@ -1,8 +1,10 @@
 "use client"
 import { CheckedState } from "@radix-ui/react-checkbox"
 import React from "react"
+import { isMobile } from "react-device-detect"
 
 import Dialog from "@/components/dialogs/alert-dialog"
+import MobileOverlay from "@/components/mobile-overlay"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import withClientOnly from "@/hocs/withClientOnly"
@@ -21,8 +23,13 @@ function DisclaimerDialog() {
   function handleAcceptTerms() {
     setHideDisclaimer(true)
   }
+
+  if (!isMobile) {
+    return <MobileOverlay />
+  }
+
   return (
-    <Dialog open={!hideDisclaimer} type="mangrove" className="md:block hidden">
+    <Dialog open={!hideDisclaimer} type="mangrove">
       <Dialog.Title>Welcome to the Mangrove dApp!</Dialog.Title>
       <Dialog.Description>
         <div>

@@ -75,6 +75,7 @@
     "posthog-js": "^1.98.2",
     "radash": "^11.0.0",
     "react": "18.2.0",
+    "react-device-detect": "^2.2.3",
     "react-dom": "18.2.0",
     "react-jazzicon": "^1.0.4",
     "react-number-format": "^5.3.1",
