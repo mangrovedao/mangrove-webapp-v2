@@ -36,7 +36,7 @@ export default function useForm() {
 
   const logics = useLogics()
   const { currentParameter } = strategyQuery.data ?? {}
-
+  console.log(kandelState, strategyQuery.data)
   const lockedBounty = formatUnits(kandelState?.totalProvision || 0n, 18)
 
   const {
@@ -122,7 +122,7 @@ export default function useForm() {
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
-  const minProv = formatUnits(minProvision || 0n, quoteToken?.decimals || 18)
+  const minProv = formatUnits(minProvision || 0n, 18)
 
   // I need the distribution to be set in the store to share it with the price range component
   React.useEffect(() => {

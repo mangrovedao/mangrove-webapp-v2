@@ -5,7 +5,6 @@ import { useAccount, useBalance } from "wagmi"
 import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
-import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
@@ -57,7 +56,6 @@ export default function EditStrategyDialog({
   const { data: nativeBalance } = useBalance({
     address,
   })
-  const { data: spender } = useSpenderAddress("kandel")
 
   const { strategyQuery, baseToken, quoteToken } = useKandel()
   const kandelAddress = strategyQuery.data?.address

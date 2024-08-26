@@ -231,7 +231,7 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={nativeBalance?.symbol}
-            value={minProvision?.toString()}
+            value={minProvision}
             action={{
               onClick: handleBountyDepositChange,
               text: "Update",

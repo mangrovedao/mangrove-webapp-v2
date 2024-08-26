@@ -90,7 +90,7 @@ export default function useForm() {
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
-  const minProv = formatUnits(minProvision || 0n, quoteToken?.decimals || 18)
+  const minProv = formatUnits(minProvision || 0n, 18)
 
   // I need the params to be set in the store to share it with the price range component
   React.useEffect(() => {
