@@ -15,6 +15,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Close } from "@/svgs"
 import wethAbi from "../../../app/faucet/_abis/weth.json"
+import { wethAdresses } from "./wrap-dialog"
 
 type Props = {
   isOpen: boolean
@@ -30,22 +31,19 @@ export default function UnWrapETHDialog({ isOpen, onClose }: Props) {
   const [amount, setAmount] = React.useState("")
   const [amountError, setAmountError] = React.useState("")
 
-  const wethAdresses: { [key: number]: string } = {
-    168587773: "0x4200000000000000000000000000000000000023",
-    81457: "0x4300000000000000000000000000000000000004",
-  }
-
   const { data: wethBalance } = useBalance({
     address,
-    token: wethAdresses[chain?.id as number] as Address,
+    token: wethAdresses[chain?.id as number],
   })
 
   const unWrapETH = () => {
     try {
       if (!chain?.id || !wethBalance) return
+      const wethAdress = wethAdresses[chain.id]
+      if (!wethAdress) return
       const parsedAmount = parseUnits(amount, wethBalance.decimals)
       writeContract({
-        address: wethAdresses[chain.id] as Address,
+        address: wethAdress,
         abi: wethAbi,
         functionName: "withdraw",
         args: [parsedAmount],
