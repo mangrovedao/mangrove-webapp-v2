@@ -1,4 +1,4 @@
-import type { Address } from "viem"
+import { formatUnits, type Address } from "viem"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
@@ -21,16 +21,19 @@ export function MinMax({ min, max, quote, base }: Props) {
   }
 
   const decimals = Number(quoteToken?.decimals) - Number(baseToken?.decimals)
-  const maxNumber = Number(max) * decimals
-  const minNumber = Number(min) * decimals
+
+  const minBigInt = BigInt(Math.floor(Number(min)))
+  const maxBigInt = BigInt(Math.floor(Number(max)))
 
   return (
     <div>
       <div>
-        {Number(min).toFixed(displayedDecimals)} {symbol}
+        {Number(formatUnits(minBigInt, decimals)).toFixed(displayedDecimals)}{" "}
+        {symbol}
       </div>
       <div>
-        {Number(max).toFixed(displayedDecimals)} {symbol}
+        {Number(formatUnits(maxBigInt, decimals)).toFixed(displayedDecimals)}{" "}
+        {symbol}
       </div>
     </div>
   )
