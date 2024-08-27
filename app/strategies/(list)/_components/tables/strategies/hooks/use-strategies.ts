@@ -16,7 +16,7 @@ type Params<T> = {
 }
 
 export function useStrategies<T = Strategy[]>({
-  filters: { first = 10, skip = 0 } = {},
+  filters: { first = 5, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
   const { address, isConnected, chainId } = useAccount()
