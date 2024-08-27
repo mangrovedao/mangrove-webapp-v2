@@ -53,11 +53,7 @@ export default function Page() {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])
 
-  // console.log(vault)
-  // console.log(kandelState)
-
   const { push } = useRouter()
-  // const markets = useMarkets()
 
   return (
     <div className="max-w-full mx-auto px-20 pb-4">
