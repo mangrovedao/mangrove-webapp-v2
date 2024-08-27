@@ -82,7 +82,15 @@ export default function useForm() {
       setStepSize(currentParameter?.stepSize || "")
       setBountyDeposit(lockedBounty)
     }
-  }, [strategyQuery.data?.offers, strategyStatusQuery.data?.offerStatuses])
+  }, [
+    strategyQuery.data?.offers,
+    kandelState?.baseAmount,
+    strategyStatusQuery.data?.offerStatuses,
+    kandelState?.quoteAmount,
+    lockedBounty,
+    currentParameter?.length,
+    currentParameter?.stepSize,
+  ])
 
   const debouncedStepSize = useDebounce(stepSize, 300)
   const debouncedNumberOfOffers = useDebounce(numberOfOffers, 300)
@@ -213,12 +221,21 @@ export default function useForm() {
     const value = typeof e === "string" ? e : e.target.value
     setBountyDeposit(value)
   }
+  const totalBaseBalance =
+    baseBalance?.balance && kandelState?.baseAmount
+      ? baseBalance.balance + kandelState.baseAmount
+      : undefined
+
+  const totalQuoteBalance =
+    quoteBalance?.balance && kandelState?.quoteAmount
+      ? quoteBalance.balance + kandelState.quoteAmount
+      : undefined
 
   React.useEffect(() => {
     const newErrors = { ...errors }
 
     // Base Deposit Validation
-    if (Number(baseDeposit) > Number(baseBalance.formatted) && baseDeposit) {
+    if (Number(baseDeposit) > Number(totalBaseBalance) && baseDeposit) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
     } else if (Number(minBase) > 0 && Number(baseDeposit) === 0) {
@@ -230,7 +247,7 @@ export default function useForm() {
     }
 
     // Quote Deposit Validation
-    if (Number(quoteDeposit) > Number(quoteBalance.formatted) && quoteDeposit) {
+    if (Number(quoteDeposit) > Number(totalQuoteBalance) && quoteDeposit) {
       newErrors.quoteDeposit =
         "Quote deposit cannot be greater than wallet balance"
     } else if (minQuote && Number(minQuote) > 0 && Number(quoteDeposit) === 0) {
@@ -291,6 +308,8 @@ export default function useForm() {
   ])
 
   return {
+    baseBalance,
+    quoteBalance,
     baseToken,
     quoteToken,
     minBaseAmount: minBase,
@@ -299,7 +318,10 @@ export default function useForm() {
     isChangingFrom,
     numberOfOffers,
     baseDeposit,
+    kandelState,
     quoteDeposit,
+    totalBaseBalance,
+    totalQuoteBalance,
     nativeBalance,
     bountyDeposit,
     fieldsDisabled,

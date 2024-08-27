@@ -115,7 +115,7 @@ export default function EditStrategyDialog({
             approveBaseToken.mutate(
               {
                 token: baseToken,
-                spender: kandelAddress,
+                spender: baseApprove?.params.spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -127,6 +127,7 @@ export default function EditStrategyDialog({
         </Button>
       ),
     },
+
     !quoteApprove?.done && {
       body: (
         <div className="text-center">
@@ -142,7 +143,7 @@ export default function EditStrategyDialog({
             approveQuoteToken.mutate(
               {
                 token: quoteToken,
-                spender: kandelAddress,
+                spender: quoteApprove?.params.spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -154,6 +155,7 @@ export default function EditStrategyDialog({
         </Button>
       ),
     },
+
     strategy?.hasLiveOffers && {
       body: (
         <div className="bg-[#041010] rounded-lg px-4 pt-4 pb-12 space-y-8">
@@ -184,7 +186,6 @@ export default function EditStrategyDialog({
           <Button
             variant={"secondary"}
             disabled={isRetractingOffers}
-            loading={isRetractingOffers}
             onClick={() => goToPrevStep()}
           >
             Back
