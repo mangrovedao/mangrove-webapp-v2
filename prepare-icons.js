@@ -44,6 +44,7 @@ function genetareDicFromManifestFile() {
     { WETH: { color: "#627eea", name: "Wrapped Ethereum", symbol: "WETH" } },
     {
       weETH: {
+        color: "#37A1F4",
         name: "Wrapped eETH (weETH)",
         symbol: "weETH",
       },
