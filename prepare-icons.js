@@ -28,6 +28,10 @@ function copyIcons() {
     "./public/custom-token-icons/blast/blast.svg",
     "./public/cryptocurrency-icons/svg/color/blast.svg",
   )
+  fs.copyFileSync(
+    "./public/custom-token-icons/blast/weeth.svg",
+    "./public/cryptocurrency-icons/svg/color/weeth.svg",
+  )
 }
 
 function genetareDicFromManifestFile() {
@@ -38,6 +42,12 @@ function genetareDicFromManifestFile() {
     })),
     // TODO: to remove after working on a generic mapping
     { WETH: { color: "#627eea", name: "Wrapped Ethereum", symbol: "WETH" } },
+    {
+      weETH: {
+        name: "Wrapped eETH (weETH)",
+        symbol: "weETH",
+      },
+    },
     { WMATIC: { color: "#7F44E0", name: "Wrapped MATIC", symbol: "WMATIC" } },
     { USDB: { color: "#FCFC01", name: "USDB", symbol: "USDB" } },
     { BLAST: { color: "#FCFC01", name: "BLAST", symbol: "BLAST" } },
