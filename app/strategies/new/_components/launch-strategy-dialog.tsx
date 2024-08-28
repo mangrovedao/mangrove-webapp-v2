@@ -51,7 +51,7 @@ export default function DeployStrategyDialog({
   const { data: kandelSteps } = useKandelSteps({
     liquiditySourcing: strategy?.sendFrom,
   })
-
+  console.log(strategy?.sendFrom)
   const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
@@ -63,7 +63,7 @@ export default function DeployStrategyDialog({
     mutate: createKandelStrategy,
     isPending: createKandelStrategyPending,
     data,
-  } = useCreateKandelStrategy()
+  } = useCreateKandelStrategy({ liquiditySourcing: strategy?.sendFrom })
 
   const approveToken = useInfiniteApproveToken()
   const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)

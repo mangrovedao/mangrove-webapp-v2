@@ -36,7 +36,7 @@ export default function useForm() {
 
   const logics = useLogics()
   const { currentParameter } = strategyQuery.data ?? {}
-  console.log(kandelState, strategyQuery.data)
+  console.log("KANDEL DATA", strategyQuery.data)
   const lockedBounty = formatUnits(kandelState?.totalProvision || 0n, 18)
 
   const {

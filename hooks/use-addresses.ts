@@ -30,6 +30,20 @@ export function useMangroveAddresses() {
   }
 }
 
+export function useAaveKandelSeeder() {
+  const { chainId } = useAccount()
+  switch (chainId) {
+    case blast.id:
+      return "" // no aave on blast
+    case arbitrum.id:
+      return "0x55B12De431C6e355b56b79472a3632faec58FB5a"
+    case baseSepolia.id:
+      return "0xCb62cD0Ea7aD46d5B630C1068C7bED2cBd2b7E23"
+    default:
+      return undefined
+  }
+}
+
 export function useKandelSeeder() {
   const { chainId } = useAccount()
   switch (chainId) {

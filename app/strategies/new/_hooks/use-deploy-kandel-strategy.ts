@@ -3,24 +3,30 @@ import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { useAccount, useClient, usePublicClient, useWalletClient } from "wagmi"
 
-import { useKandelSeeder } from "@/hooks/use-addresses"
+import { useAaveKandelSeeder, useKandelSeeder } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BaseError, ContractFunctionExecutionError } from "viem"
-
-export function useCreateKandelStrategy() {
+type Props = {
+  liquiditySourcing?: string
+}
+export function useCreateKandelStrategy({ liquiditySourcing }: Props) {
   const { address } = useAccount()
   const { currentMarket } = useMarket()
   const client = useClient()
   const kandelSeeder = useKandelSeeder()
+  const kandelAaveSeeder = useAaveKandelSeeder()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
+
+  const kandelSeederAddress =
+    liquiditySourcing === "Aave" ? kandelAaveSeeder : kandelSeeder
 
   return useMutation({
     mutationFn: async () => {
       try {
         if (
-          !kandelSeeder ||
+          !kandelSeederAddress ||
           !address ||
           !client ||
           !currentMarket ||
@@ -28,7 +34,10 @@ export function useCreateKandelStrategy() {
         )
           return
 
-        const kandelActions = kandelSeederActions(currentMarket, kandelSeeder)
+        const kandelActions = kandelSeederActions(
+          currentMarket,
+          kandelSeederAddress,
+        )
         const seeder = kandelActions(client)
 
         const { request, result } = await seeder.simulateSow({
