@@ -1,8 +1,20 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
+import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
+import InfoTooltip from "@/components/info-tooltip"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Caption } from "@/components/typography/caption"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
 import { Fieldset } from "../fieldset"
@@ -17,6 +29,7 @@ export function Form({ className }: { className?: string }) {
     minBaseAmount,
     minQuoteAmount,
     minProvision,
+    currentLiquiditySourcing,
     baseDeposit,
     quoteDeposit,
     fieldsDisabled,
@@ -45,7 +58,7 @@ export function Form({ className }: { className?: string }) {
         <Skeleton className="w-full h-screen" />
       </div>
     )
-
+  console.log(currentLiquiditySourcing)
   return (
     <form
       className={cn("space-y-6", className)}
@@ -55,6 +68,47 @@ export function Form({ className }: { className?: string }) {
     >
       <Fieldset legend="Select market">
         <MarketSelector disabled={true} />
+      </Fieldset>
+
+      <Fieldset legend="Liquidity sourcing">
+        <div className="flex justify-between space-x-2 pt-2">
+          <div className="flex flex-col w-full">
+            <Label className="flex items-center">
+              Source
+              <InfoTooltip>
+                <Caption>Select the origin of the assets</Caption>
+              </InfoTooltip>
+            </Label>
+
+            <Select
+              name={"SendFrom"}
+              value={currentLiquiditySourcing}
+              onValueChange={(value: string) => {
+                handleSendFromChange(value)
+              }}
+              disabled={true} //note: we don't allow modifying liquidity sourcing
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem
+                    key={currentLiquiditySourcing}
+                    value={currentLiquiditySourcing}
+                  >
+                    <div className="flex gap-2 w-full items-center">
+                      <SourceIcon sourceId={currentLiquiditySourcing} />
+                      <Caption className="capitalize">
+                        {currentLiquiditySourcing}
+                      </Caption>
+                    </div>
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </Fieldset>
 
       <Fieldset className="space-y-4" legend="Edit inventory">

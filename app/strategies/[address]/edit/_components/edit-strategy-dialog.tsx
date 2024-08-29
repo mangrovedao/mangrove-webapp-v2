@@ -310,6 +310,7 @@ const Summary = ({
     bountyDeposit,
     priceRange,
     riskAppetite,
+    onAave,
   } = strategy ?? {}
 
   const [minPrice, maxPrice] = priceRange ?? []
@@ -327,7 +328,7 @@ const Summary = ({
 
         <SummaryLine
           title="Liquidity source"
-          value={<Text>{false ? "Aave" : "Wallet"}</Text>}
+          value={<Text>{onAave ? "Aave" : "Wallet"}</Text>}
         />
 
         <SummaryLine title="Risk appetite" value={<Text>Medium</Text>} />

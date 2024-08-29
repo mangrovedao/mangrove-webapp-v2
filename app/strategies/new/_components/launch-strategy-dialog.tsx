@@ -23,6 +23,7 @@ type StrategyDetails = Omit<
   "isChangingFrom" | "globalError" | "errors" | "priceRange"
 > & {
   riskAppetite?: string
+  strategyType?: string
   priceRange?: [number, number]
   kandelParams?: KandelParams
 }
@@ -50,7 +51,7 @@ export default function DeployStrategyDialog({
   const { data: kandelSteps } = useKandelSteps({
     liquiditySourcing: strategy?.sendFrom,
   })
-  console.log(strategy?.sendFrom)
+
   const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
@@ -294,8 +295,10 @@ const Summary = ({
     bountyDeposit,
     priceRange,
     riskAppetite,
+    sendFrom,
   } = strategy ?? {}
 
+  const onAave = sendFrom === "Aave"
   const [minPrice, maxPrice] = priceRange ?? []
 
   return (
@@ -311,7 +314,7 @@ const Summary = ({
 
         <SummaryLine
           title="Liquidity source"
-          value={<Text>{false ? "Aave" : "Wallet"}</Text>}
+          value={<Text>{onAave ? "Aave" : "Wallet"}</Text>}
         />
 
         <SummaryLine title="Risk appetite" value={<Text>Medium</Text>} />

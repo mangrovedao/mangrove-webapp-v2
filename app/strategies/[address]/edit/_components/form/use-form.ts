@@ -33,11 +33,12 @@ export default function useForm() {
   const { data: nativeBalance } = useBalance({
     address,
   })
-
   const logics = useLogics()
   const { currentParameter } = strategyQuery.data ?? {}
-  console.log("KANDEL DATA", strategyQuery.data)
+
   const lockedBounty = formatUnits(kandelState?.totalProvision || 0n, 18)
+  const onAave = strategyQuery.data?.type === "KandelAAVE"
+  const currentLiquiditySourcing = onAave ? "Aave" : "simple"
 
   const {
     priceRange: [minPrice, maxPrice],
@@ -69,7 +70,6 @@ export default function useForm() {
       strategyQuery.data?.offers.some((x) => x.live) &&
       strategyStatusQuery.isFetched
     ) {
-      //   getCurrentLiquiditySourcing()
       setBaseDeposit(
         formatUnits(kandelState?.baseAmount || 0n, baseToken?.decimals || 18),
       )
@@ -309,6 +309,7 @@ export default function useForm() {
     sendFrom,
     receiveTo,
     logics,
+    currentLiquiditySourcing,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,
