@@ -110,7 +110,11 @@ export default function DeployStrategyDialog({
       ),
       button: (
         <>
-          <Button variant={"secondary"} onClick={() => goToPrevStep()}>
+          <Button
+            variant={"secondary"}
+            onClick={() => goToPrevStep()}
+            disabled={createKandelStrategyPending}
+          >
             Return
           </Button>
           <Button

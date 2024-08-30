@@ -58,7 +58,7 @@ export function Form({ className }: { className?: string }) {
         <Skeleton className="w-full h-screen" />
       </div>
     )
-  console.log(currentLiquiditySourcing)
+
   return (
     <form
       className={cn("space-y-6", className)}
