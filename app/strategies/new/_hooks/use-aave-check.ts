@@ -20,6 +20,7 @@ export function useCanUseAave(market?: MarketParams) {
       try {
         if (!publicClient || !seederAddress || !market) return null
         console.log("INSIDE")
+
         const canUse = await publicClient
           .extend(aaveKandelActions(seederAddress as Address))
           .checkAaveMarket({ market })
@@ -29,7 +30,7 @@ export function useCanUseAave(market?: MarketParams) {
         console.error(error)
       }
     },
-    // enabled: !!seederAddress,
+    enabled: !!seederAddress,
   })
   return {
     data,
