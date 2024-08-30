@@ -109,7 +109,7 @@ export default function DeployStrategyDialog({
         </div>
       ),
       button: (
-        <>
+         <>
           <Button
             variant={"secondary"}
             onClick={() => goToPrevStep()}
@@ -132,6 +132,7 @@ export default function DeployStrategyDialog({
         </>
       ),
     },
+
     !baseApprove?.done && {
       body: (
         <div className="text-center">
@@ -147,7 +148,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: baseToken,
-                spender: data?.kandelAddress,
+                spender: baseApprove?.params.spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -159,6 +160,7 @@ export default function DeployStrategyDialog({
         </Button>
       ),
     },
+
     !quoteApprove?.done && {
       body: (
         <div className="text-center">
@@ -174,7 +176,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: quoteToken,
-                spender: data?.kandelAddress,
+                spender: quoteApprove?.params.spender,
               },
               {
                 onSuccess: goToNextStep,
@@ -186,6 +188,7 @@ export default function DeployStrategyDialog({
         </Button>
       ),
     },
+
     {
       body: (
         <Summary

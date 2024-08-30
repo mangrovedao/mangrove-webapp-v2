@@ -64,6 +64,7 @@ export function useMarkets() {
     case blast.id:
       return blastMarkets
     case arbitrum.id:
+      console.log("arbitrumMarkets", arbitrumMarkets)
       return arbitrumMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets

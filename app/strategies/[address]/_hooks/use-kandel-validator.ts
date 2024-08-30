@@ -58,42 +58,10 @@ export function useValidateKandel(
           deposit: true,
         })
 
-        // // @ts-ignore
-        // BigInt.prototype.toJSON = function () {
-        //   return this.toString()
-        // }
-
-        // console.log(
-        //   "response",
-        //   JSON.stringify({
-        //     params,
-        //     rawParams,
-        //     minBaseAmount,
-        //     minQuoteAmount,
-        //     minProvision,
-        //     distribution,
-        //     isValid,
-        //   }),
-        // )
-
-        // console.log(
-        //   "sent params",
-        //   JSON.stringify({
-        //     gasreq: kandelParams.gasreq,
-        //     factor: kandelParams.factor,
-        //     asksLocalConfig: book.asksConfig,
-        //     bidsLocalConfig: book.bidsConfig,
-        //     minPrice: Number(kandelParams.minPrice),
-        //     maxPrice: Number(kandelParams.maxPrice),
-        //     midPrice: book.midPrice,
-        //     marketConfig: book.marketConfig,
-        //     market: currentMarket,
-        //     baseAmount: kandelParams.baseAmount,
-        //     quoteAmount: kandelParams.quoteAmount,
-        //     stepSize: kandelParams.stepSize,
-        //     pricePoints: kandelParams.pricePoints,
-        //   }),
-        // )
+        // @ts-ignore
+        BigInt.prototype.toJSON = function () {
+          return this.toString()
+        }
 
         return {
           params,

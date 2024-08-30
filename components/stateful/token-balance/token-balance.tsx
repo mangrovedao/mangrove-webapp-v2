@@ -31,7 +31,7 @@ export function TokenBalance(props: {
   const amount = !token
     ? formatUnits(nativeBalance?.value || 0n, nativeBalance?.decimals || 18)
     : formatUnits(balance?.balance || 0n, token?.decimals || 18)
-  const decimals = !token ? nativeBalance?.decimals : token.symbol
+  const decimals = !token ? nativeBalance?.decimals : token.decimals
   const formatted = amount
 
   return (
@@ -53,7 +53,7 @@ export function TokenBalance(props: {
                   props.action?.onClick(formatted || "")
                 }}
               >
-                <span title={formatted?.toString()}>
+                <span>
                   {Number(formatted).toFixed(token?.displayDecimals ?? 8)}{" "}
                   {symbol}
                 </span>

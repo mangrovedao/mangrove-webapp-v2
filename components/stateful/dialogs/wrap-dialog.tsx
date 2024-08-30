@@ -20,6 +20,12 @@ type Props = {
   onClose: () => void
 }
 
+export const wethAdresses: { [key: number]: Address | undefined } = {
+  168587773: "0x4200000000000000000000000000000000000023",
+  81457: "0x4300000000000000000000000000000000000004",
+  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+}
+
 export default function WrapETHDialog({ isOpen, onClose }: Props) {
   const { chain, address } = useAccount()
   const { data: nativeBalance } = useBalance({
@@ -33,16 +39,13 @@ export default function WrapETHDialog({ isOpen, onClose }: Props) {
   const [amount, setAmount] = React.useState("")
   const [amountError, setAmountError] = React.useState("")
 
-  const wethAdresses: { [key: number]: string } = {
-    168587773: "0x4200000000000000000000000000000000000023",
-    81457: "0x4300000000000000000000000000000000000004",
-  }
-
   const wrapETH = () => {
     try {
       if (!chain?.id) return
+      const wethAdress = wethAdresses[chain.id]
+      if (!wethAdress) return
       sendTransaction({
-        to: wethAdresses[chain.id] as Address,
+        to: wethAdress,
         value: parseEther(amount),
       })
     } catch (error) {
