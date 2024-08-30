@@ -70,6 +70,7 @@ export default function useForm() {
       strategyQuery.data?.offers.some((x) => x.live) &&
       strategyStatusQuery.isFetched
     ) {
+      setSendFrom(currentLiquiditySourcing)
       setBaseDeposit(
         formatUnits(kandelState?.baseAmount || 0n, baseToken?.decimals || 18),
       )

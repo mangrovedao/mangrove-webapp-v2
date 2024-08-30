@@ -19,8 +19,7 @@ export function useCanUseAave(market?: MarketParams) {
     queryFn: async () => {
       try {
         if (!publicClient || !seederAddress || !market) return null
-        console.log(1)
-
+        console.log("INSIDE")
         const canUse = await publicClient
           .extend(aaveKandelActions(seederAddress as Address))
           .checkAaveMarket({ market })
