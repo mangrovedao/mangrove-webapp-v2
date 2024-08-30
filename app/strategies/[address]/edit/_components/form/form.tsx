@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
-import { formatUnits } from "viem"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
@@ -33,10 +32,11 @@ export function Form({ className }: { className?: string }) {
     currentLiquiditySourcing,
     baseDeposit,
     quoteDeposit,
-    totalQuoteBalance,
-    totalBaseBalance,
     fieldsDisabled,
     errors,
+    sendFrom,
+    isValid,
+    receiveTo,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     isChangingFrom,
@@ -48,6 +48,8 @@ export function Form({ className }: { className?: string }) {
     handleNumberOfOffersChange,
     handleStepSizeChange,
     handleBountyDepositChange,
+    handleSendFromChange,
+    handleReceiveToChange,
   } = useForm()
 
   if (!baseToken || !quoteToken)
@@ -131,11 +133,9 @@ export function Form({ className }: { className?: string }) {
             loading={fieldsDisabled}
           />
 
-          <CustomBalance
+          <TokenBalance
             label="Wallet balance"
             token={baseToken}
-            balance={formatUnits(totalBaseBalance || 0n, baseToken.decimals)}
-            tooltip="This is your current wallet balance plus your deposited liquidity"
             action={{
               onClick: handleBaseDepositChange,
               text: "MAX",
@@ -163,12 +163,9 @@ export function Form({ className }: { className?: string }) {
             }}
             loading={fieldsDisabled}
           />
-
-          <CustomBalance
+          <TokenBalance
             label="Wallet balance"
             token={quoteToken}
-            balance={formatUnits(totalQuoteBalance || 0n, quoteToken.decimals)}
-            tooltip="This is your current wallet balance plus your deposited liquidity"
             action={{
               onClick: handleQuoteDepositChange,
               text: "MAX",

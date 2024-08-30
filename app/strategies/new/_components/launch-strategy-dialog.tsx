@@ -109,7 +109,7 @@ export default function DeployStrategyDialog({
         </div>
       ),
       button: (
-         <>
+        <>
           <Button
             variant={"secondary"}
             onClick={() => goToPrevStep()}
