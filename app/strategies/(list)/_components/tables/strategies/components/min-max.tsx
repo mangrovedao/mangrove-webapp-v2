@@ -25,26 +25,18 @@ export function MinMax({ min, max, quote, base }: Props) {
   const minBigInt = BigInt(Math.floor(Number(min)))
   const maxBigInt = BigInt(Math.floor(Number(max)))
 
-  console.log(quoteToken.decimals)
-
   if (!quoteToken) {
     return
   }
 
-  console.log(quoteToken.decimals)
-
   return (
     <div>
       <div>
-        {Number(formatUnits(minBigInt, quoteToken?.decimals)).toFixed(
-          displayedDecimals,
-        )}{" "}
+        {Number(formatUnits(minBigInt, decimals)).toFixed(displayedDecimals)}{" "}
         {symbol}
       </div>
       <div>
-        {Number(formatUnits(maxBigInt, quoteToken?.decimals)).toFixed(
-          displayedDecimals,
-        )}{" "}
+        {Number(formatUnits(maxBigInt, decimals)).toFixed(displayedDecimals)}{" "}
         {symbol}
       </div>
     </div>
