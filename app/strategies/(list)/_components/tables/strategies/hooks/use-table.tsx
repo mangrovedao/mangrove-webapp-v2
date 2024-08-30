@@ -154,6 +154,8 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
+          const hasLiveOffers = row.original.offers.some((x) => x.live)
+
           return (
             <div className="w-full h-full flex justify-end space-x-1">
               <IconButton
@@ -170,6 +172,7 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
               <IconButton
                 tooltip="Cancel strategy"
                 className="aspect-square w-6 rounded-full"
+                disabled={!hasLiveOffers}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
