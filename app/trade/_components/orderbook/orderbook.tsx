@@ -17,6 +17,7 @@ import { BA } from "@mangrovedao/mgv/lib"
 import { SemiBook } from "./semibook"
 import { OrderBookTableCell } from "./table-cell"
 import { OrderBookTableHead } from "./table-head"
+import Trades from "./trades"
 import useScrollToMiddle from "./use-scroll-to-middle"
 
 export function OrderBook({
@@ -34,10 +35,16 @@ export function OrderBook({
     >
       <CustomTabsList className="w-full flex justify-start border-b">
         <CustomTabsTrigger value={"book"}>Book</CustomTabsTrigger>
+        <CustomTabsTrigger value={"trades"}>Trades</CustomTabsTrigger>
       </CustomTabsList>
       <CustomTabsContent value="book">
         <div className="p-1 relative h-full">
           <BookContent />
+        </div>
+      </CustomTabsContent>
+      <CustomTabsContent value="trades">
+        <div className="p-1 relative h-full">
+          <Trades />
         </div>
       </CustomTabsContent>
     </CustomTabs>
