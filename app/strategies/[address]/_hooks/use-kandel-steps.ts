@@ -1,9 +1,10 @@
-import { kandelSeederActions } from "@mangrovedao/mgv"
+import { kandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
-import { useKandelSeeder, useMangroveAddresses } from "@/hooks/use-addresses"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
+import { Address } from "viem"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
 
@@ -12,7 +13,6 @@ export function useKandelSteps() {
   const { markets } = useMarket()
   const { baseToken, quoteToken } = useKandel()
   const client = useClient()
-  const kandelSeeder = useKandelSeeder()
 
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
@@ -28,7 +28,6 @@ export function useKandelSteps() {
   return useQuery({
     queryKey: [
       "kandel-steps",
-      kandelSeeder,
       address,
       baseToken?.address,
       quoteToken?.address,
@@ -37,7 +36,6 @@ export function useKandelSteps() {
       try {
         if (!baseToken || !quoteToken) return null
         if (
-          !kandelSeeder ||
           !address ||
           !publicClient ||
           !addresses ||
@@ -45,10 +43,16 @@ export function useKandelSteps() {
           !currentMarket
         )
           throw new Error("Could not fetch kandel steps, missing params")
-        const kandelActions = kandelSeederActions(currentMarket, kandelSeeder)
-        const seeder = kandelActions(client)
 
-        const currentSteps = await seeder.getKandelSteps({
+        const kandelInstance = client?.extend(
+          kandelActions(
+            addresses,
+            currentMarket, // the market object
+            address as Address, // the kandel seeder address
+          ),
+        )
+
+        const currentSteps = await kandelInstance.getKandelSteps({
           user: address,
         })
 
@@ -58,7 +62,7 @@ export function useKandelSteps() {
         throw new Error("Unable to retrieve kandel steps")
       }
     },
-    enabled: !!kandelSeeder && !!address,
+    enabled: !!address,
     meta: {
       error: "Unable to retrieve kandel steps",
     },

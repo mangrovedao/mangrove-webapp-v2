@@ -1,10 +1,12 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
+import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
+import { formatUnits } from "viem"
 import { Fieldset } from "../fieldset"
 import { MinimumRecommended } from "./components/minimum-recommended"
 import { MustBeAtLeastInfo } from "./components/must-be-at-least-info"
@@ -19,11 +21,10 @@ export function Form({ className }: { className?: string }) {
     minProvision,
     baseDeposit,
     quoteDeposit,
+    totalQuoteBalance,
+    totalBaseBalance,
     fieldsDisabled,
     errors,
-    sendFrom,
-    isValid,
-    receiveTo,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     isChangingFrom,
@@ -35,8 +36,6 @@ export function Form({ className }: { className?: string }) {
     handleNumberOfOffersChange,
     handleStepSizeChange,
     handleBountyDepositChange,
-    handleSendFromChange,
-    handleReceiveToChange,
   } = useForm()
 
   if (!baseToken || !quoteToken)
@@ -79,9 +78,11 @@ export function Form({ className }: { className?: string }) {
             loading={fieldsDisabled}
           />
 
-          <TokenBalance
+          <CustomBalance
             label="Wallet balance"
             token={baseToken}
+            balance={formatUnits(totalBaseBalance || 0n, baseToken.decimals)}
+            tooltip="This is your current wallet balance plus your deposited liquidity"
             action={{
               onClick: handleBaseDepositChange,
               text: "MAX",
@@ -109,9 +110,12 @@ export function Form({ className }: { className?: string }) {
             }}
             loading={fieldsDisabled}
           />
-          <TokenBalance
+
+          <CustomBalance
             label="Wallet balance"
             token={quoteToken}
+            balance={formatUnits(totalQuoteBalance || 0n, quoteToken.decimals)}
+            tooltip="This is your current wallet balance plus your deposited liquidity"
             action={{
               onClick: handleQuoteDepositChange,
               text: "MAX",
