@@ -1,4 +1,4 @@
-import { useAaveKandelSeeder } from "@/hooks/use-addresses"
+import { useAaveKandelRouter } from "@/hooks/use-addresses"
 import { MarketParams, aaveKandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { Address, BaseError, ContractFunctionExecutionError } from "viem"
@@ -6,23 +6,21 @@ import { usePublicClient } from "wagmi"
 
 export function useCanUseAave(market?: MarketParams) {
   const publicClient = usePublicClient()
-  const seederAddress = useAaveKandelSeeder()
-  console.log(1, market, publicClient, seederAddress)
+  const routerAddress = useAaveKandelRouter()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [
       "can-use-aave",
       market?.base.address,
       market?.quote.address,
-      seederAddress,
+      routerAddress,
     ],
     queryFn: async () => {
       try {
-        if (!publicClient || !seederAddress || !market) return null
-        console.log("INSIDE")
+        if (!publicClient || !routerAddress || !market) return null
 
         const canUse = await publicClient
-          .extend(aaveKandelActions(seederAddress as Address))
+          .extend(aaveKandelActions(routerAddress as Address))
           .checkAaveMarket({ market })
 
         return canUse
@@ -46,7 +44,7 @@ export function useCanUseAave(market?: MarketParams) {
         return null
       }
     },
-    enabled: !!seederAddress,
+    enabled: !!routerAddress,
   })
   return {
     data,

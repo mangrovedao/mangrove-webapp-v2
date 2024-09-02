@@ -35,10 +35,8 @@ export default function useForm() {
   const logics = useLogics()
 
   const usableLogics = !canUseAave.data
-    ? logics.filter((item) => item.name === "Aave")
+    ? logics.filter((item) => item.name !== "Aave")
     : logics
-
-  console.log(usableLogics, canUseAave)
 
   const {
     priceRange: [minPrice, maxPrice],
