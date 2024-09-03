@@ -142,8 +142,8 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={approveToken.isPending}
-          loading={approveToken.isPending}
+          disabled={approveToken.isPending || !baseApprove?.params.spender}
+          loading={approveToken.isPending || !baseApprove?.params.spender}
           onClick={() => {
             approveToken.mutate(
               {
@@ -170,8 +170,8 @@ export default function DeployStrategyDialog({
       button: (
         <Button
           {...btnProps}
-          disabled={approveToken.isPending}
-          loading={approveToken.isPending}
+          disabled={approveToken.isPending || !!quoteApprove?.params.spender}
+          loading={approveToken.isPending || !!quoteApprove?.params.spender}
           onClick={() => {
             approveToken.mutate(
               {
