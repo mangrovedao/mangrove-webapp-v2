@@ -109,14 +109,7 @@ export default function DeployStrategyDialog({
         </div>
       ),
       button: (
-        <>
-          <Button
-            variant={"secondary"}
-            onClick={() => goToPrevStep()}
-            disabled={createKandelStrategyPending}
-          >
-            Return
-          </Button>
+        <div className="grid gap-2 w-full ">
           <Button
             {...btnProps}
             disabled={createKandelStrategyPending}
@@ -129,7 +122,15 @@ export default function DeployStrategyDialog({
           >
             Create kandel instance
           </Button>
-        </>
+          <Button
+            size={"lg"}
+            variant={"secondary"}
+            onClick={() => goToPrevStep()}
+            disabled={createKandelStrategyPending}
+          >
+            Return
+          </Button>
+        </div>
       ),
     },
 

@@ -186,6 +186,7 @@ export default function EditStrategyDialog({
             Activate
           </Button>
           <Button
+            size={"lg"}
             variant={"secondary"}
             disabled={isRetractingOffers}
             onClick={() => goToPrevStep()}
