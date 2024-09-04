@@ -1,6 +1,5 @@
 "use client"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import React from "react"
 
 import useMarket from "@/providers/market.new"
 import { useAccount } from "wagmi"
@@ -10,20 +9,20 @@ import { useTradeHistory } from "./use-trade-history"
 
 export function Trades() {
   const { chain } = useAccount()
-  const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
-    page: 1,
-    pageSize: 10,
-  })
+  // const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
+  //   page: 1,
+  //   pageSize: 5,
+  // })
   const { currentMarket: market } = useMarket()
-  const tradesHistoryQuery = useTradeHistory({
-    filters: {
-      skip: (page - 1) * pageSize,
-    },
-  })
+  const tradesHistoryQuery = useTradeHistory()
+
+  console.log({ data: tradesHistoryQuery.data })
 
   const table = useTable({
     data: tradesHistoryQuery.data,
   })
+
+  console.log({ table })
 
   const blockExplorerUrl = chain?.blockExplorers?.default.url
 
