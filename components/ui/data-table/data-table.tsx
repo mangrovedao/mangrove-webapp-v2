@@ -26,6 +26,7 @@ interface DataTableProps<TData> {
   renderExtraRow?: (row: Row<TData>) => React.ReactNode
   tableRowClasses?: string
   skeletonRows?: number
+  cellClasses?: string
 }
 
 export function DataTable<TData>({
@@ -39,6 +40,7 @@ export function DataTable<TData>({
   renderExtraRow = () => null,
   tableRowClasses,
   skeletonRows = 2,
+  cellClasses,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const tableName = Object.keys(table._getAllFlatColumnsById()).join("-")
@@ -97,7 +99,10 @@ export function DataTable<TData>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={`${tableName}-body-cell-${cell.id}`}
-                      className="px-0 py-2 group/cell whitespace-nowrap"
+                      className={cn(
+                        "px-0 py-2 group/cell whitespace-nowrap",
+                        cellClasses,
+                      )}
                     >
                       <div
                         className={cn(
