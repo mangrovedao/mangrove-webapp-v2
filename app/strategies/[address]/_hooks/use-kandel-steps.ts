@@ -1,4 +1,4 @@
-import { kandelSeederActions } from "@mangrovedao/mgv"
+import { kandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
 import {
@@ -33,13 +33,13 @@ export function useKandelSteps({ liquiditySourcing }: Props) {
         quoteToken?.address.toLocaleLowerCase(),
   )
 
-  const kandelSeederAddress =
-    liquiditySourcing === "Aave" ? kandelAaveSeeder : kandelSeeder
+  const isAave = liquiditySourcing === "Aave"
+  const kandelSeederAddress = isAave ? kandelAaveSeeder : kandelSeeder
 
   return useQuery({
     queryKey: [
       "kandel-steps",
-      kandelSeederAddress,
+      isAave,
       address,
       baseToken?.address,
       quoteToken?.address,
@@ -57,24 +57,20 @@ export function useKandelSteps({ liquiditySourcing }: Props) {
         )
           throw new Error("Could not fetch kandel steps, missing params")
 
-        const kandelActions = kandelSeederActions(
-          currentMarket,
-          kandelSeederAddress,
-        )
+        const actions = kandelActions(addresses, currentMarket, address)(client)
 
-        const seeder = kandelActions(client)
-
-        const currentSteps = await seeder.getKandelSteps({
+        const currentSteps = await actions.getKandelSteps({
           user: address,
         })
 
+        console.log(currentSteps[1].params, isAave)
         return currentSteps
       } catch (e) {
         console.error(getErrorMessage(e))
         throw new Error("Unable to retrieve kandel steps")
       }
     },
-    enabled: !!kandelSeeder && !!address,
+    enabled: !!currentMarket,
     meta: {
       error: "Unable to retrieve kandel steps",
     },

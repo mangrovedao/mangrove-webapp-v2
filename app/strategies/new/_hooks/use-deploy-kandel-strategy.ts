@@ -6,7 +6,7 @@ import { useAccount, useClient, usePublicClient, useWalletClient } from "wagmi"
 import { useAaveKandelSeeder, useKandelSeeder } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market.new"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { BaseError, ContractFunctionExecutionError } from "viem"
+import { BaseError, TransactionExecutionError } from "viem"
 type Props = {
   liquiditySourcing?: string
 }
@@ -21,7 +21,7 @@ export function useCreateKandelStrategy({ liquiditySourcing }: Props) {
 
   const kandelSeederAddress =
     liquiditySourcing === "Aave" ? kandelAaveSeeder : kandelSeeder
-
+  console.log(kandelSeederAddress, liquiditySourcing)
   return useMutation({
     mutationFn: async () => {
       try {
@@ -38,11 +38,13 @@ export function useCreateKandelStrategy({ liquiditySourcing }: Props) {
           currentMarket,
           kandelSeederAddress,
         )
+
         const seeder = kandelActions(client)
 
         const { request, result } = await seeder.simulateSow({
           account: address,
         })
+
         const hash = await walletClient.writeContract(request)
         const receipt = await publicClient?.waitForTransactionReceipt({
           hash,
@@ -55,15 +57,15 @@ export function useCreateKandelStrategy({ liquiditySourcing }: Props) {
         toast.error(description)
         if (error instanceof BaseError) {
           const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
+            (error) => error instanceof TransactionExecutionError,
           )
 
-          if (revertError instanceof ContractFunctionExecutionError) {
+          if (revertError instanceof TransactionExecutionError) {
             console.log(
               revertError.cause,
               revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
+              // revertError.functionName,
+              // revertError.formattedArgs,
               revertError.details,
             )
           }
