@@ -16,13 +16,9 @@ export function Trades() {
   const { currentMarket: market } = useMarket()
   const tradesHistoryQuery = useTradeHistory()
 
-  console.log({ data: tradesHistoryQuery.data })
-
   const table = useTable({
     data: tradesHistoryQuery.data,
   })
-
-  console.log({ table })
 
   const blockExplorerUrl = chain?.blockExplorers?.default.url
 

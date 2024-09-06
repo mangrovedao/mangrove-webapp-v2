@@ -74,6 +74,12 @@ export function useTable({ data }: Params) {
   )
 
   return useReactTable({
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: data?.length ?? 500,
+      },
+    },
     data: data ?? DEFAULT_DATA,
     columns,
     enableRowSelection: false,
