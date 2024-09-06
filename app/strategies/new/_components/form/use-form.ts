@@ -30,11 +30,11 @@ export default function useForm() {
     address,
   })
 
-  const canUseAave = useCanUseAave(market as MarketParams)
+  const { data: canUseAave } = useCanUseAave(market as MarketParams)
 
   const logics = useLogics()
 
-  const usableLogics = !canUseAave.data
+  const usableLogics = !canUseAave
     ? logics.filter((item) => item.name !== "Aave")
     : logics
 

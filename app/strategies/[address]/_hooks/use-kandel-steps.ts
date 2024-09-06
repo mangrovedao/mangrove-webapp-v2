@@ -63,7 +63,6 @@ export function useKandelSteps({ liquiditySourcing }: Props) {
           user: address,
         })
 
-        console.log(currentSteps[1].params, isAave)
         return currentSteps
       } catch (e) {
         console.error(getErrorMessage(e))

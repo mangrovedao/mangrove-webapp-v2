@@ -21,7 +21,7 @@ export function useCreateKandelStrategy({ liquiditySourcing }: Props) {
 
   const kandelSeederAddress =
     liquiditySourcing === "Aave" ? kandelAaveSeeder : kandelSeeder
-  console.log(kandelSeederAddress, liquiditySourcing)
+
   return useMutation({
     mutationFn: async () => {
       try {

@@ -78,7 +78,6 @@ export function useMarkets() {
     case blast.id:
       return blastMarkets
     case arbitrum.id:
-      console.log("arbitrumMarkets", arbitrumMarkets)
       return arbitrumMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets
@@ -93,7 +92,15 @@ export function useLogics() {
     case blast.id:
       return blastLogics
     case arbitrum.id:
-      return []
+      return [
+        {
+          name: "Aave",
+          logic: "0xF1E3f817fF9CaAF7083a58C50a3c4a05f80dE565",
+          gasreq: "1300000",
+          logicOverlying: {},
+          logicBalance: {},
+        },
+      ]
     case baseSepolia.id:
       return baseSepoliaLogics
     default:
