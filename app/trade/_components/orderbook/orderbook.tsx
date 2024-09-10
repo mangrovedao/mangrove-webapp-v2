@@ -17,6 +17,7 @@ import { BA } from "@mangrovedao/mgv/lib"
 import { SemiBook } from "./semibook"
 import { OrderBookTableCell } from "./table-cell"
 import { OrderBookTableHead } from "./table-head"
+import { Trades } from "./trade-history/trades"
 import useScrollToMiddle from "./use-scroll-to-middle"
 
 export function OrderBook({
@@ -34,10 +35,16 @@ export function OrderBook({
     >
       <CustomTabsList className="w-full flex justify-start border-b">
         <CustomTabsTrigger value={"book"}>Book</CustomTabsTrigger>
+        <CustomTabsTrigger value={"trades"}>Trades</CustomTabsTrigger>
       </CustomTabsList>
       <CustomTabsContent value="book">
         <div className="p-1 relative h-full">
           <BookContent />
+        </div>
+      </CustomTabsContent>
+      <CustomTabsContent value="trades">
+        <div className="p-1 relative h-full">
+          <Trades />
         </div>
       </CustomTabsContent>
     </CustomTabs>
@@ -76,11 +83,7 @@ function BookContent() {
   }).format(spreadPercent / 100)
 
   return (
-    <ScrollArea
-      className="h-full trololo"
-      scrollHideDelay={200}
-      ref={scrollAreaRef}
-    >
+    <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
       <Table className="text-sm leading-5 h-full select-none relative">
         <TableHeader className="sticky top-0 bg-background z-40 py-2 text-xs h-[var(--bar-height)]">
           <TableRow className="border-none">
