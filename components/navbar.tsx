@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import withClientOnly from "@/hocs/withClientOnly"
 
-import { Bell, ChevronDown } from "@/svgs"
+import { ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import {
@@ -68,15 +68,6 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
         {
           name: "Swap",
           href: "https://swap.mangrove.exchange",
-        },
-        {
-          name: "Points",
-          href: "/points",
-          disabled: false,
-        },
-        {
-          name: "Referrals",
-          href: "/referrals",
         },
       ]
 
@@ -307,10 +298,6 @@ const RightPart = withClientOnly(() => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Separator orientation="vertical" />
-      <Button variant={"invisible"} size="sm" className="h-full">
-        <Bell className="text-white w-4" />
-      </Button>
     </div>
   )
 })
