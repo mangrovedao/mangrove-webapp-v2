@@ -86,6 +86,9 @@ importers:
       '@t3-oss/env-nextjs':
         specifier: ^0.6.1
         version: 0.6.1(typescript@5.4.5)(zod@3.23.8)
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.10)
       '@tanstack/react-form':
         specifier: 0.10.3
         version: 0.10.3(react-dom@18.2.0(react@18.2.0))(react-native@0.74.2(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.2.0))(react@18.2.0)
@@ -202,7 +205,7 @@ importers:
         version: 1.14.0
       tailwindcss-animate:
         specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@3.4.4)
+        version: 1.0.7(tailwindcss@3.4.10)
       use-debounce:
         specifier: ^10.0.1
         version: 10.0.1(react@18.2.0)
@@ -313,8 +316,8 @@ importers:
         specifier: ^7.6.8
         version: 7.6.19(bufferutil@4.0.8)
       tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.4
+        specifier: ^3.4.10
+        version: 3.4.10
       typescript:
         specifier: ^5.3.3
         version: 5.4.5
@@ -3550,6 +3553,11 @@ packages:
     peerDependencies:
       typescript: '>=4.7.2'
       zod: ^3.0.0
+
+  '@tailwindcss/container-queries@0.1.1':
+    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
+    peerDependencies:
+      tailwindcss: '>=3.2.0'
 
   '@tanstack/eslint-plugin-query@4.38.0':
     resolution: {integrity: sha512-KmcrnjTQzONBqxNWSVKyPNi5tLq0URvIiWThE9HIK5qePGtB0VqoHfOsn4nuGJD268xDNDpFQjQiko9mMa5iLQ==}
@@ -8888,8 +8896,8 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
 
-  tailwindcss@3.4.4:
-    resolution: {integrity: sha512-ZoyXOdJjISB7/BcLTR6SEsLgKtDStYyYZVLsUtWChO4Ps20CBad7lfJKVDiejocV4ME1hLmyY0WJE3hSDcmQ2A==}
+  tailwindcss@3.4.10:
+    resolution: {integrity: sha512-KWZkVPm7yJRhdu4SRSl9d4AK2wM3a50UsvgHZO7xY77NQr2V+fIrEuoDGQcbvswWvFGbS2f6e+jC/6WJm1Dl0w==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -14529,6 +14537,10 @@ snapshots:
       '@t3-oss/env-core': 0.6.1(typescript@5.4.5)(zod@3.23.8)
       typescript: 5.4.5
       zod: 3.23.8
+
+  '@tailwindcss/container-queries@0.1.1(tailwindcss@3.4.10)':
+    dependencies:
+      tailwindcss: 3.4.10
 
   '@tanstack/eslint-plugin-query@4.38.0(eslint@8.57.0)':
     dependencies:
@@ -21001,11 +21013,11 @@ snapshots:
 
   tailwind-merge@1.14.0: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@3.4.4):
+  tailwindcss-animate@1.0.7(tailwindcss@3.4.10):
     dependencies:
-      tailwindcss: 3.4.4
+      tailwindcss: 3.4.10
 
-  tailwindcss@3.4.4:
+  tailwindcss@3.4.10:
     dependencies:
       '@alloc/quick-lru': 5.2.0
       arg: 5.0.2
