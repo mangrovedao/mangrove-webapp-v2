@@ -29,9 +29,10 @@ export function useTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.display({
-        header: "Size",
+        header: `Size (${market?.base.symbol})`,
         cell: ({ row }) => {
           const { takerGot, takerGave, isBid } = row.original
+
           if (!market) return null
           const { base } = market
           const baseValue = isBid ? takerGot : takerGave
@@ -43,19 +44,18 @@ export function useTable({ data }: Params) {
                 "text-red-100": !isBid,
               })}
             >
-              {Big(baseValue).toFixed(base.displayDecimals)} {base.symbol}
+              {Big(baseValue).toFixed(base.displayDecimals)}
             </span>
           )
         },
       }),
       columnHelper.accessor("price", {
-        header: "Price",
+        header: `Price (${market?.quote.symbol})`,
         cell: (row) =>
           market ? (
             row.getValue() ? (
               <span>
-                {Big(row.getValue()).toFixed(market.quote.displayDecimals)}{" "}
-                {market.quote.symbol}
+                {Big(row.getValue()).toFixed(market.quote.displayDecimals)}
               </span>
             ) : (
               <span>-</span>
@@ -67,7 +67,7 @@ export function useTable({ data }: Params) {
 
       columnHelper.accessor("creationDate", {
         header: "Date",
-        cell: (row) => <div>{formatDate(row.getValue(), "h:mm:ss")}</div>,
+        cell: (row) => <div>{formatDate(row.getValue(), "HH:mm:ss")}</div>,
       }),
     ],
     [market],
