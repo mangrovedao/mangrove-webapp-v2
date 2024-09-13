@@ -15,14 +15,10 @@ type Params = {
   quote: string
   baseAddress: string
   quoteAddress: string
+  chainId: number | undefined
 }
 
-export default function datafeed({
-  base,
-  quote,
-  baseAddress,
-  quoteAddress,
-}: Params) {
+export default function datafeed({ base, quote, chainId }: Params) {
   return {
     onReady: (callback: OnReadyCallback) => {
       console.log("[onReady]: Method call")
@@ -83,13 +79,34 @@ export default function datafeed({
         periodParams,
       })
 
-      // do a request to this api : https://data.mangrove.exchange/price-chart?base=0x4300000000000000000000000000000000000004&quote=0x4300000000000000000000000000000000000003&start=2024-01-08&end=2024-14-08&interval=1d
-      // and return the response to the library
-      // const response = await fetch(
-      //   `https://data.mangrove.exchange/price-chart?base=${baseAddress}&quote=${quoteAddress}&start=${periodParams.from}&end=${periodParams.to}&interval=${resolution}`,
-      // )
-      // const data = await response.json()
-      // console.log({ data })
+      const start = new Date(periodParams.from * 1000)
+      const end = new Date(periodParams.to * 1000)
+      const formattedStart = start.toISOString().split("T")[0]
+      const formattedEnd = end.toISOString().split("T")[0]
+
+      const response = await fetch(
+        `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${chainId}&interval=${resolution}&start_time=${formattedStart}&end_time=${formattedEnd}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      )
+      const data = await response.json()
+
+      /**
+      Data from the api 
+      {
+        startTime: '2024-08-05T00:00:00.000Z',
+        endTime: '2024-08-11T23:59:59.999Z',
+        openTime: '2024-08-07T12:15:47.000Z',
+        closeTime: '2024-08-11T14:23:26.000Z',
+        open: '2473.308445245174',
+        high: '2677.6853237283844',
+        close: '2669.9316804056784',
+        low: '2450.1695935018806'
+      }
+       */
 
       const bars = new Array(periodParams.countBack)
 

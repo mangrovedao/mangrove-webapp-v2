@@ -4,6 +4,7 @@
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import React from "react"
+import { useAccount } from "wagmi"
 import {
   ResolutionString,
   widget,
@@ -18,6 +19,7 @@ const to = new Date().getTime() / 1000
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
 ) => {
+  const { chainId } = useAccount()
   const { currentMarket } = useMarket()
   const [isLoading, setIsLoading] = React.useState(true)
   const chartContainerRef =
@@ -34,6 +36,7 @@ export const TVChartContainer = (
         quote: currentMarket?.quote.symbol,
         baseAddress: currentMarket?.base.address,
         quoteAddress: currentMarket?.quote.address,
+        chainId,
       }),
       timeframe: "1M",
       interval: "1W" as ResolutionString,
