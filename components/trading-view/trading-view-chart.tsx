@@ -43,7 +43,7 @@ export const TVChartContainer = (
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
-      debug: true,
+      debug: false,
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [
