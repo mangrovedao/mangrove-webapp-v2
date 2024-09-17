@@ -1,7 +1,7 @@
 "use client"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { useAccount } from "wagmi"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
 import { useTable } from "./use-table"

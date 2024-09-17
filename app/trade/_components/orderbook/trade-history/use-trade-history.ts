@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { getSemibooksOLKeys, hash } from "@mangrovedao/mgv/lib"
 import { parseTradeHistory, type TradeHistory } from "./schema"

@@ -11,7 +11,7 @@ import Big from "big.js"
 import React from "react"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
 import type { TradeHistory } from "../trade-history/schema"
