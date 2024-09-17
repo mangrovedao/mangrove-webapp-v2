@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import React from "react"
 
 import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
-import { MarketProvider } from "@/providers/market.new"
+import { MarketProvider } from "@/providers/market"
 
 export const metadata: Metadata = {
   title: "Edit Strategy | Mangrove DEX",

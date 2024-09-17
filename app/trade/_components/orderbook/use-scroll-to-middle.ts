@@ -1,4 +1,4 @@
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import React from "react"
 
 export default function useScrollToMiddle() {

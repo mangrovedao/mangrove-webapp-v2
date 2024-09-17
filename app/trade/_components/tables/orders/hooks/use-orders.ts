@@ -5,7 +5,7 @@ import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
 import { hash } from "@mangrovedao/mgv"

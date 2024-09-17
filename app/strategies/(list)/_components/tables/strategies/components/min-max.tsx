@@ -25,13 +25,9 @@ export function MinMax({ min, max, quote, base }: Props) {
   const minBigInt = BigInt(Math.floor(Number(min)))
   const maxBigInt = BigInt(Math.floor(Number(max)))
 
-  console.log(quoteToken.decimals)
-
   if (!quoteToken) {
     return
   }
-
-  console.log(quoteToken.decimals)
 
   return (
     <div>

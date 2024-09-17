@@ -1,6 +1,6 @@
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { useCancelOrder } from "../hooks/use-cancel-order"
 import type { Order } from "../schema"
 
