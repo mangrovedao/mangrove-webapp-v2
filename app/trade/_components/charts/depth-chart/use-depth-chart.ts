@@ -2,7 +2,7 @@ import Big from "big.js"
 import React from "react"
 
 import { useBook } from "@/hooks/use-book"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { clamp } from "@/utils/interpolation"
 import type { CompleteOffer } from "@mangrovedao/mgv"
 import { calculateCumulative } from "./utils"

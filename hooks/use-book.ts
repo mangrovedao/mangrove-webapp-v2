@@ -1,4 +1,4 @@
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import type { BookParams, CompleteOffer } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 

@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { MarketParams } from "@mangrovedao/mgv"
 import { getAddress, isAddressEqual } from "viem"
 import { TokenIcon } from "../../../../components/token-icon"

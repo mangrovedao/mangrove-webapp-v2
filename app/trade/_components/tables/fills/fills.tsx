@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
 import { useFills } from "./use-fills"
 import { useTable } from "./use-table"
