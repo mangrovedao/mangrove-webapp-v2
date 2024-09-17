@@ -2,7 +2,7 @@
 import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import CancelOfferDialog from "./components/cancel-offer-dialog"
 import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"

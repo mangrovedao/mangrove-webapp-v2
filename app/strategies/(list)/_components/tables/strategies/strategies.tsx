@@ -4,7 +4,7 @@ import React from "react"
 
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table/data-table"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import type { Strategy } from "../../../_schemas/kandels"
 import { useStrategies } from "./hooks/use-strategies"
 import { useTable } from "./hooks/use-table"

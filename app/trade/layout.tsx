@@ -7,7 +7,7 @@ import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
 import {
   MarketProvider,
   MarketProvider as NewMarketProvider,
-} from "@/providers/market.new"
+} from "@/providers/market"
 
 export const metadata: Metadata = {
   title: "Trade | Mangrove DEX",

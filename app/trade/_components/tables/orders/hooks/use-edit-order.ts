@@ -8,7 +8,7 @@ import Big from "big.js"
 import React from "react"
 
 import { useLogics } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { hasExpired } from "@/utils/date"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"

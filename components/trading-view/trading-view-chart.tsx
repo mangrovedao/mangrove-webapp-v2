@@ -1,39 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import React from "react"
+import { useAccount } from "wagmi"
 import {
+  ResolutionString,
   widget,
   type ChartingLibraryWidgetOptions,
 } from "../../public/charting_library"
 import { Skeleton } from "../ui/skeleton"
+import datafeed from "./datafeed"
+
+const from = new Date(2024, 7, 1).getTime() / 1000
+const to = new Date().getTime() / 1000
 
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
 ) => {
+  const { chainId } = useAccount()
+  const { currentMarket } = useMarket()
   const [isLoading, setIsLoading] = React.useState(true)
   const chartContainerRef =
     React.useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>
 
   React.useEffect(() => {
+    if (!currentMarket) return
     const widgetOptions: ChartingLibraryWidgetOptions = {
-      symbol: props.symbol,
+      symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
       // BEWARE: no trailing slash is expected in feed URL
-      datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(
-        "https://demo_feed.tradingview.com",
-        undefined,
-        {
-          maxResponseLength: 1000,
-          expectedOrder: "latestFirst",
-        },
-      ),
-
-      interval: props.interval!,
+      // @ts-ignore
+      datafeed: datafeed({
+        base: currentMarket?.base.symbol,
+        quote: currentMarket?.quote.symbol,
+        baseAddress: currentMarket?.base.address,
+        quoteAddress: currentMarket?.quote.address,
+        chainId,
+      }),
+      timeframe: "1M",
+      interval: "1W" as ResolutionString,
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
-      // debug: true,
+      debug: false,
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [
@@ -71,7 +81,7 @@ export const TVChartContainer = (
     return () => {
       tvWidget.remove()
     }
-  }, [props])
+  }, [props, currentMarket?.base, currentMarket?.quote])
 
   return (
     <div className="w-full h-full relative">

@@ -1,7 +1,7 @@
 import { CompleteOffer } from "@mangrovedao/mgv"
 import { BA, BS } from "@mangrovedao/mgv/lib"
 
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 
 export function baToBs(ba: BA): BS {
   return ba === BA.asks ? BS.buy : BS.sell

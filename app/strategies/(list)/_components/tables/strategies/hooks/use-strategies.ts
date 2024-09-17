@@ -35,7 +35,6 @@ export function useStrategies<T = Strategy[]>({
           skip,
           knownTokens: tokensList,
         })
-        console.log({ result })
         return parseStrategies(result)
       } catch (error) {
         console.error(error)

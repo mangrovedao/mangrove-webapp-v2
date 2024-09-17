@@ -12,9 +12,12 @@ export function formatExpiryDate(date: Date) {
   })
 }
 
-export function formatDate(date: Date | string) {
+export function formatDate(
+  date: Date | string,
+  formatString = "MM/dd/yyyy h:mm:ss aaaa",
+) {
   const d = typeof date === "string" ? new Date(date) : date
-  return format(d, "MM/dd/yyyy h:mm:ss aaaa")
+  return format(d, formatString)
 }
 
 export function formatDateWithoutHours(date: Date | string) {

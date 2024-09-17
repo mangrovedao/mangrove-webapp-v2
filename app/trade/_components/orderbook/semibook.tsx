@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { OrderBookTableCell } from "./table-cell"
 import { calculateCumulatedVolume } from "./utils"
@@ -56,7 +56,7 @@ export const SemiBook = React.forwardRef<
         <TableRow
           ref={refIndex === i ? ref : null}
           key={`${type}-${id}`}
-          className={`z-50 relative h-6 border-none hover:opacity-80 transition-opacity cursor-pointer`}
+          className={`z-30 relative h-6 border-none hover:opacity-80 transition-opacity cursor-pointer`}
           onClick={() => {
             dispatchEvent(
               new CustomEvent("on-orderbook-offer-clicked", {

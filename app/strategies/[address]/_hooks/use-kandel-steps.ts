@@ -6,7 +6,7 @@ import {
   useKandelSeeder,
   useMangroveAddresses,
 } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
