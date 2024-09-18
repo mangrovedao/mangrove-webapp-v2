@@ -3,7 +3,7 @@ import { Address } from "viem"
 
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { useClient } from "wagmi"
 
 type Params = Partial<Pick<Strategy, "address" | "base" | "quote">>

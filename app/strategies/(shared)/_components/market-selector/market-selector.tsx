@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 
 function getSymbol(market?: MarketParams) {
   if (!market) return

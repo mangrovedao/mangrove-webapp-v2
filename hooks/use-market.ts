@@ -1,4 +1,4 @@
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { publicMarketActions } from "@mangrovedao/mgv"
 import { usePublicClient } from "wagmi"
 import { useMangroveAddresses } from "./use-addresses"

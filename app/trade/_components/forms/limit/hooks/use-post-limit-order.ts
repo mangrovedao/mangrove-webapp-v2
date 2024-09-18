@@ -1,4 +1,4 @@
-import useMarket from "@/providers/market.new"
+import useMarket from "@/providers/market"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   BaseError,
