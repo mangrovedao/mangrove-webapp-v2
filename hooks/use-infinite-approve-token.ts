@@ -10,6 +10,7 @@ export function useInfiniteApproveToken() {
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
   const balances = useBalances()
+  console.log(1)
 
   return useMutation({
     mutationFn: async ({
@@ -22,8 +23,11 @@ export function useInfiniteApproveToken() {
       spender?: string | null
     }) => {
       try {
+        console.log(2, token, logic, spender)
+
         if (!(token && spender && publicClient && walletClient)) return
 
+        console.log(3)
         const logicToken = balances.balances?.overlying.find(
           (item) => item.logic.name === logic?.name,
         )

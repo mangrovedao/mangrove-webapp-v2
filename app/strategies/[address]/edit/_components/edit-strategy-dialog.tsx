@@ -117,7 +117,7 @@ export default function EditStrategyDialog({
             approveBaseToken.mutate(
               {
                 token: baseToken,
-                spender: baseApprove?.params.spender,
+                spender: kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -145,7 +145,7 @@ export default function EditStrategyDialog({
             approveQuoteToken.mutate(
               {
                 token: quoteToken,
-                spender: quoteApprove?.params.spender,
+                spender: kandelAddress,
               },
               {
                 onSuccess: goToNextStep,

@@ -70,10 +70,12 @@ export default function DeployStrategyDialog({
   let steps = [
     "Summary",
     "Create strategy instance",
-    !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
-    !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
+    baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
+    quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     "Launch strategy",
   ].filter(Boolean)
+
+  console.log(baseApprove)
 
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset, goToPrevStep } = helpers
@@ -134,7 +136,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !baseApprove?.done && {
+    baseApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -149,7 +151,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: baseToken,
-                spender: baseApprove?.params.spender,
+                spender: data?.kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -162,7 +164,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    !quoteApprove?.done && {
+    quoteApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
@@ -177,7 +179,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: quoteToken,
-                spender: quoteApprove?.params.spender,
+                spender: data?.kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
