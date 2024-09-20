@@ -63,7 +63,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="overflow-auto overscroll-contain flex flex-col flex-1">
+        <div className="overflow-hidden overscroll-contain flex flex-col flex-1">
           <div className="@container flex flex-col flex-1">
             <div className="grid w-full overflow-hidden">
               {MENUS.map(({ href, icon: Icon, text }) => (

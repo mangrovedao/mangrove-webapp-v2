@@ -41,6 +41,8 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@rainbow-me/rainbowkit": "^2.0.1",
+    "@rive-app/react-canvas": "^4.14.1",
+    "@rive-app/react-canvas-lite": "^4.14.1",
     "@sentry/nextjs": "^7.93.0",
     "@storybook/preview-api": "^7.6.8",
     "@synapsecns/widget": "^0.6.1",
