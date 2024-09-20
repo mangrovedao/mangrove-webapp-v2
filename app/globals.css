@@ -80,6 +80,109 @@
 
     /* Sonner */
     --success-bg: var(hsl(--bg-gray-scale-700));
+
+    /* New variables from Leo */
+    --color-white: 0, 0%, 100%;
+    --color-bluegray-25: 187.5, 30.8%, 94.9%;
+    --color-bluegray-50: 191.3, 32%, 90.2%;
+    --color-bluegray-100: 189.5, 30.6%, 75.7%;
+    --color-bluegray-200: 189.7, 30.7%, 60.4%;
+    --color-bluegray-300: 189.7, 39.9%, 45.7%;
+    --color-bluegray-400: 189.9, 39.9%, 35.9%;
+    --color-bluegray-500: 189.5, 39.9%, 28%;
+    --color-bluegray-600: 190.4, 40%, 25.5%;
+    --color-bluegray-700: 189.3, 39.8%, 22.2%;
+    --color-bluegray-800: 191.1, 39.6%, 18.8%;
+    --color-bluegray-900: 189.6, 41%, 12%;
+    --color-bluegray-950: 188.6, 38.9%, 7.1%;
+
+    --color-brand-25: 150, 60%, 98%;
+    --color-brand-50: 147.5, 63.2%, 92.5%;
+    --color-brand-100: 146.3, 61.3%, 81.8%;
+    --color-brand-200: 148.2, 62.5%, 68.6%;
+    --color-brand-300: 154.2, 70.5%, 49.2%;
+    --color-brand-400: 152.8, 100%, 39.8%;
+    --color-brand-500: 147.6, 100%, 37.5%;
+    --color-brand-600: 146.3, 100%, 34.5%;
+    --color-brand-700: 144.5, 100%, 30.8%;
+    --color-brand-800: 142.9, 100%, 27.3%;
+    --color-brand-900: 137.4, 100%, 21%;
+    --color-brand-950: 137.7, 100%, 12%;
+
+    --color-gray-dark-25: 0, 0%, 98%;
+    --color-gray-dark-50: 180, 4.8%, 95.9%;
+    --color-gray-dark-100: 180, 3.2%, 93.9%;
+    --color-gray-dark-200: 180, 5.6%, 92.9%;
+    --color-gray-dark-300: 180, 4.3%, 82%;
+    --color-gray-dark-400: 180, 3.9%, 60%;
+    --color-gray-dark-500: 180, 3.8%, 53.9%;
+    --color-gray-dark-600: 180, 3.9%, 40%;
+    --color-gray-dark-700: 180, 4.4%, 22.2%;
+    --color-gray-dark-800: 180, 3.9%, 15.1%;
+    --color-gray-dark-900: 180, 4.9%, 12%;
+    --color-gray-dark-950: 180, 2.4%, 8%;
+
+    --color-success-25: 142.5, 80%, 98%;
+    --color-success-50: 144.7, 81%, 95.9%;
+    --color-success-100: 140, 75%, 92.2%;
+    --color-success-200: 143.8, 68%, 80.4%;
+    --color-success-300: 148, 63.3%, 66.9%;
+    --color-success-400: 149.6, 57.3%, 54.1%;
+    --color-success-500: 152.1, 77.1%, 39.4%;
+    --color-success-600: 153.2, 91%, 30.4%;
+    --color-success-700: 154.8, 90.3%, 24.3%;
+    --color-success-800: 155.3, 84.2%, 19.8%;
+    --color-success-900: 156, 83.3%, 16.5%;
+    --color-success-950: 156.5, 82.1%, 11%;
+
+    --bg-active: var(--color-bluegray-800);
+    --bg-disabled-subtle: var(--color-bluegray-900);
+    --bg-primary: var(--color-bluegray-950);
+    --bg-primary-hover: var(--color-bluegray-900);
+    --bg-secondary: var(--color-bluegray-900);
+    --bg-tertiary: var(--color-bluegray-800);
+
+    --border-brand: var(--color-brand-400);
+    --border-primary: var(--color-bluegray-600);
+    --border-secondary: var(--color-bluegray-700);
+    --border-tertiary: var(--color-bluegray-800);
+
+    --nav-item-button-bg-active: var(--color-brand-900);
+    --nav-item-button-icon-fg: var(--color-bluegray-200);
+    --nav-item-button-icon-fg-active: var(--color-brand-50);
+    --nav-item-button-icon-fg-hover: var(--color-brand-500);
+
+    --button-primary-bg: var(--color-brand-700);
+    --button-primary-bg-hover: var(--color-brand-500);
+    --button-primary-fg: var(--color-brand-25);
+    --button-primary-fg-hover: var(--color-brand-25);
+
+    --button-secondary-bg: var(--color-bluegray-900);
+    --button-secondary-bg-hover: var(--color-bluegray-700);
+    --button-secondary-fg: var(--color-bluegray-100);
+    --button-secondary-fg-hover: var(--color-bluegray-25);
+
+    --button-tertiary-bg: var(--color-bluegray-950);
+    --button-tertiary-bg-hover: var(--color-bluegray-700);
+    --button-tertiary-fg: var(--text-tertiary);
+    --button-tertiary-fg-hover: var(--color-bluegray-25);
+
+    --fg-disabled-subtle: var(--color-bluegray-600);
+    --fg-primary: var(--color-white);
+    --fg-quaternary: var(--color-bluegray-400);
+    --fg-secondary: var(--color-bluegray-200);
+    --fg-tertiary: var(--color-bluegray-300);
+    --fg-tertiary-hover: var(--color-bluegray-200);
+
+    --text-brand: var(--color-brand-400);
+    --text-disabled: var(--color-bluegray-500);
+    --text-placeholder: var(--color-bluegray-400);
+    --text-primary: var(--color-bluegray-50);
+    --text-quaternary: var(--color-bluegray-400);
+    --text-secondary: var(--color-bluegray-200);
+    --text-secondary-hover: var(--color-bluegray-50);
+    --text-tertiary: var(--color-bluegray-300);
+    --text-tertiary-hover: var(--color-bluegray-100);
   }
 
   * {
