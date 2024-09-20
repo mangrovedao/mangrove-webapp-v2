@@ -1,10 +1,35 @@
+"use client"
+import { EarnIcon, HelpIcon, RewardsIcon, SwapIcon, TradeIcon } from "@/svgs"
 import Link from "next/link"
+
+const MENUS = [
+  {
+    href: "/swap",
+    icon: SwapIcon,
+    text: "Swap",
+  },
+  {
+    href: "/trade",
+    icon: TradeIcon,
+    text: "Trade",
+  },
+  {
+    href: "/earn",
+    icon: EarnIcon,
+    text: "Earn",
+  },
+  {
+    href: "/rewards",
+    icon: RewardsIcon,
+    text: "Rewards",
+  },
+]
 
 export default function Navbar() {
   return (
     <div className="@container/sidebar hidden md:flex group flex-col min-h-screen sticky top-0 left-0 z-[100] transition-[width,opacity] ease-out duration-300 flex-none w-[88px]">
       <div className="flex flex-col flex-grow bg-bg-secondary bg-contain bg-no-repeat bg-left-bottom text-white max-w-[240px] py-5 border-r border-border-primary transition-all ease-out duration-300 flex-none w-[88px] group-hover:w-[240px] 3xl:w-[240px]">
-        <div className="@container mb-8 px-6 py-3 flex justify-between relative overflow-hidden">
+        <div className="@container mb-8 px-[22px] py-3 flex justify-between relative overflow-hidden">
           <div className="overflow-hidden ml-1.5 w-[155px]">
             <Link href="/" className="relative flex">
               <svg
@@ -35,6 +60,40 @@ export default function Navbar() {
                 ></path>
               </svg>
             </Link>
+          </div>
+        </div>
+
+        <div className="overflow-auto overscroll-contain flex flex-col flex-1">
+          <div className="@container flex flex-col flex-1">
+            <div className="grid w-full overflow-hidden">
+              {MENUS.map(({ href, icon: Icon, text }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="flex items-center w-full gap-2 px-6 py-4 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover active:text-nav-item-button-icon-fg-active"
+                >
+                  <span className="w-[39px] flex justify-center items-center">
+                    <Icon />
+                  </span>
+                  <div className="opacity-0 @[120px]:opacity-100 transition ease-out duration-300 text-base">
+                    {text}
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="grid overflow-hidden mt-auto w-[239px]">
+              <Link
+                href={"/help"}
+                className="flex items-center w-full gap-2 px-6 py-4 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover"
+              >
+                <span className="w-[39px] flex justify-center items-center">
+                  <HelpIcon />
+                </span>
+                <div className="opacity-0 @[120px]:opacity-100 transition ease-out duration-300 text-base">
+                  Help
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
