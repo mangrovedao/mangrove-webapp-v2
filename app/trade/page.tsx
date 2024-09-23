@@ -8,7 +8,7 @@ import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
   return (
-    <main>
+    <main className="md:pl-[88px]">
       <section className="trade-section">
         <div className="px-4 border-b h-[var(--bar-height)] flex items-center relative">
           <MarketSelector />

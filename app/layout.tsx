@@ -6,7 +6,8 @@ import DisclaimerDialog from "@/components/stateful/dialogs/disclaimer-dialog"
 import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-network-dialog"
 import { RootProvider } from "@/providers/root"
 
-import Navbar from "@/components/navbar-new"
+import { Navbar } from "@/components/navbar"
+import Sidebar from "@/components/sidebar"
 import "./globals.css"
 
 const toastClasses =
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <RootProvider>
+          <Sidebar />
           <Navbar />
           {children}
           <AdminCommand />

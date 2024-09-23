@@ -39,7 +39,7 @@
     --color-mango-300: 50, 42%, 11%;
 
     --tw-ring-color: var(hsl(--color-primary-dark-green));
-    --background: 180 86% 3%;
+    --background: 188.6, 38.9%, 7.1%;
     --foreground: 210 40% 98%;
 
     --card: 222.2 84% 4.9%;
@@ -63,7 +63,7 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 177 72% 6%;
+    --border: var(--color-bluegray-700);
     --input: 217.2 32.6% 17.5%;
     --ring: var(--color-green-bangladesh);
 

@@ -1,6 +1,6 @@
 import { buildChartTheme, darkTheme } from "@visx/xychart"
 
-const borderVar = "hsl(var(--border))"
+const borderVar = "hsl(var(--border), .3)"
 const borderWidthVar = "var(--border-width)"
 const greenColorVar = "hsl(var(--color-green-caribbean))"
 const redColorVar = "hsl(var(--color-red-100))"
