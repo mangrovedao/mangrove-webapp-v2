@@ -47,18 +47,19 @@ export default function EditStrategyDialog({
 }: Props) {
   const { address } = useAccount()
 
-  const { data: kandelSteps } = useKandelSteps({
-    liquiditySourcing: strategy?.sendFrom,
-  })
-
-  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
-
   const { data: nativeBalance } = useBalance({
     address,
   })
 
   const { strategyQuery, baseToken, quoteToken } = useKandel()
   const kandelAddress = strategyQuery.data?.address
+
+  const { data: kandelSteps } = useKandelSteps({
+    liquiditySourcing: strategy?.sendFrom,
+    kandelAddress: kandelAddress,
+  })
+
+  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const approveBaseToken = useInfiniteApproveToken()
   const approveQuoteToken = useInfiniteApproveToken()

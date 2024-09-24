@@ -36,7 +36,6 @@ export function useKandelSteps({ liquiditySourcing, kandelAddress }: Props) {
   )
 
   const isAave = liquiditySourcing === "Aave"
-  console.log("isAave", isAave)
   const kandelSeederAddress = isAave ? kandelAaveSeeder : kandelSeeder
 
   return useQuery({
