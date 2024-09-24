@@ -163,6 +163,7 @@ export function Form({ className }: { className?: string }) {
             }}
             loading={fieldsDisabled}
           />
+
           <TokenBalance
             label="Wallet balance"
             token={quoteToken}
