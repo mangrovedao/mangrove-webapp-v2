@@ -8,14 +8,16 @@ import {
 } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
+import { Address } from "viem"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
 
 type Props = {
   liquiditySourcing?: string
+  kandelAddress?: string
 }
 
-export function useKandelSteps({ liquiditySourcing }: Props) {
+export function useKandelSteps({ liquiditySourcing, kandelAddress }: Props) {
   const { address } = useAccount()
   const { markets } = useMarket()
   const { baseToken, quoteToken } = useKandel()
@@ -34,6 +36,7 @@ export function useKandelSteps({ liquiditySourcing }: Props) {
   )
 
   const isAave = liquiditySourcing === "Aave"
+  console.log("isAave", isAave)
   const kandelSeederAddress = isAave ? kandelAaveSeeder : kandelSeeder
 
   return useQuery({
@@ -53,11 +56,16 @@ export function useKandelSteps({ liquiditySourcing }: Props) {
           !addresses ||
           !client ||
           !currentMarket ||
-          !kandelSeederAddress
+          !kandelSeederAddress ||
+          !kandelAddress
         )
           throw new Error("Could not fetch kandel steps, missing params")
 
-        const actions = kandelActions(addresses, currentMarket, address)(client)
+        const actions = kandelActions(
+          addresses,
+          currentMarket,
+          kandelAddress as Address,
+        )(client)
 
         const currentSteps = await actions.getKandelSteps({
           user: address,

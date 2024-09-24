@@ -48,11 +48,6 @@ export default function DeployStrategyDialog({
   const { address } = useAccount()
   const { currentMarket } = useMarket()
   const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
-  const { data: kandelSteps } = useKandelSteps({
-    liquiditySourcing: strategy?.sendFrom,
-  })
-
-  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
@@ -64,18 +59,23 @@ export default function DeployStrategyDialog({
     data,
   } = useCreateKandelStrategy({ liquiditySourcing: strategy?.sendFrom })
 
+  const { data: kandelSteps } = useKandelSteps({
+    liquiditySourcing: strategy?.sendFrom,
+    kandelAddress: data?.kandelAddress,
+  })
+
+  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
+
   const approveToken = useInfiniteApproveToken()
   const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
 
   let steps = [
     "Summary",
     "Create strategy instance",
-    baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
-    quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
+    !baseApprove?.done ? `Approve ${baseToken?.symbol}` : "",
+    !quoteApprove?.done ? `Approve ${quoteToken?.symbol}` : "",
     "Launch strategy",
   ].filter(Boolean)
-
-  console.log(baseApprove)
 
   const [currentStep, helpers] = useStep(steps.length)
   const { goToNextStep, reset, goToPrevStep } = helpers
@@ -136,7 +136,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    baseApprove?.done && {
+    !baseApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -164,7 +164,7 @@ export default function DeployStrategyDialog({
       ),
     },
 
-    quoteApprove?.done && {
+    !quoteApprove?.done && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
