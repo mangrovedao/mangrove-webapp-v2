@@ -236,12 +236,6 @@ export function useSwap() {
           receive: formatUnits(quoteAmount, receiveToken?.decimals ?? 18),
           slippage: 0.05,
         },
-        // marketClient,
-        // baseAmount,
-        // quoteAmount,
-        // receiveToken,
-        // receiveValue: fields.receiveValue,
-        // sendToken: payToken,
       },
       {
         onSuccess: () => {
