@@ -227,16 +227,21 @@ export function useSwap() {
     const quoteAmount = isBasePay
       ? parseUnits(fields.receiveValue, currentMarket?.quote.decimals ?? 18)
       : parseUnits(fields.payValue, currentMarket?.quote.decimals ?? 18)
+
     await postMarketOrder.mutate(
       {
-        marketClient,
-        baseAmount,
-        quoteAmount,
-        bs: isBasePay ? BS.sell : BS.buy,
-        slippage: 0.05,
-        receiveToken,
-        receiveValue: fields.receiveValue,
-        sendToken: payToken,
+        form: {
+          bs: isBasePay ? BS.sell : BS.buy,
+          send: formatUnits(baseAmount, payToken.decimals ?? 18),
+          receive: formatUnits(quoteAmount, receiveToken?.decimals ?? 18),
+          slippage: 0.05,
+        },
+        // marketClient,
+        // baseAmount,
+        // quoteAmount,
+        // receiveToken,
+        // receiveValue: fields.receiveValue,
+        // sendToken: payToken,
       },
       {
         onSuccess: () => {
