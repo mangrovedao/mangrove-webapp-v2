@@ -17,8 +17,8 @@ import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
 export enum TradeTables {
-  ORDERS = "orders",
-  FILLS = "fills",
+  ORDERS = "Open Orders",
+  FILLS = "Orders History",
 }
 
 const TABS_CONTENT = {

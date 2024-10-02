@@ -36,7 +36,6 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     receiveToken,
     spender,
     feeInPercentageAsString,
-    tickSize,
     spotPrice,
   } = useTradeInfos("market", form.bs)
 
@@ -188,11 +187,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
         <div className="space-y-2">
           {stepInfos[currentStep - 1]?.body ?? undefined}
           <div className="bg-[#041010] rounded-lg p-4 flex items-center">
-            <MarketDetails
-              spotPrice={spotPrice}
-              takerFee={feeInPercentageAsString}
-              tickSize={tickSize}
-            />
+            <MarketDetails takerFee={feeInPercentageAsString} />
           </div>
         </div>
       </Dialog.Description>
