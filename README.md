@@ -1,5 +1,5 @@
 # Configuration
-
+  
 ## Env vars
 
 This web app supports the following env vars:
