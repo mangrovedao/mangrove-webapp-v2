@@ -42,7 +42,6 @@ export function Market() {
     send,
     quote,
     avgPrice,
-    tickSize,
     feeInPercentageAsString,
     spotPrice,
   } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
@@ -275,11 +274,7 @@ export function Market() {
             </form.Field>
             <Separator className="!my-6" />
 
-            <MarketDetails
-              takerFee={feeInPercentageAsString}
-              tickSize={tickSize}
-              spotPrice={spotPrice}
-            />
+            <MarketDetails takerFee={feeInPercentageAsString} />
 
             <form.Subscribe
               selector={(state) => [
