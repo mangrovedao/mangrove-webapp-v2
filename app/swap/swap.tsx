@@ -98,15 +98,6 @@ export default function Swap() {
         onSelect={onReceiveTokenSelected}
         onOpenChange={setReceiveTokenDialogOpen}
       />
-
-      <Button variant={"link"} asChild>
-        <a
-          className="text-center mt-10 max-w-56 mx-auto"
-          href="https://app.mangrove.exchange"
-        >
-          Go to desktop web app
-        </a>
-      </Button>
     </>
   )
 }
