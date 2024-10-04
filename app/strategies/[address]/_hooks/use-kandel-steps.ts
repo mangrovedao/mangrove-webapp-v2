@@ -1,19 +1,29 @@
 import { kandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
-import { useMangroveAddresses } from "@/hooks/use-addresses"
+import {
+  useAaveKandelSeeder,
+  useKandelSeeder,
+  useMangroveAddresses,
+} from "@/hooks/use-addresses"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { Address } from "viem"
 import { useAccount, useClient, usePublicClient } from "wagmi"
 import useKandel from "../_providers/kandel-strategy"
 
-export function useKandelSteps() {
+type Props = {
+  liquiditySourcing?: string
+  kandelAddress?: string
+}
+
+export function useKandelSteps({ liquiditySourcing, kandelAddress }: Props) {
   const { address } = useAccount()
   const { markets } = useMarket()
   const { baseToken, quoteToken } = useKandel()
   const client = useClient()
-
+  const kandelSeeder = useKandelSeeder()
+  const kandelAaveSeeder = useAaveKandelSeeder()
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
 
@@ -25,9 +35,13 @@ export function useKandelSteps() {
         quoteToken?.address.toLocaleLowerCase(),
   )
 
+  const isAave = liquiditySourcing === "Aave"
+  const kandelSeederAddress = isAave ? kandelAaveSeeder : kandelSeeder
+
   return useQuery({
     queryKey: [
       "kandel-steps",
+      isAave,
       address,
       baseToken?.address,
       quoteToken?.address,
@@ -40,19 +54,19 @@ export function useKandelSteps() {
           !publicClient ||
           !addresses ||
           !client ||
-          !currentMarket
+          !currentMarket ||
+          !kandelSeederAddress ||
+          !kandelAddress
         )
           throw new Error("Could not fetch kandel steps, missing params")
 
-        const kandelInstance = client?.extend(
-          kandelActions(
-            addresses,
-            currentMarket, // the market object
-            address as Address, // the kandel seeder address
-          ),
-        )
+        const actions = kandelActions(
+          addresses,
+          currentMarket,
+          kandelAddress as Address,
+        )(client)
 
-        const currentSteps = await kandelInstance.getKandelSteps({
+        const currentSteps = await actions.getKandelSteps({
           user: address,
         })
 
@@ -62,10 +76,10 @@ export function useKandelSteps() {
         throw new Error("Unable to retrieve kandel steps")
       }
     },
-    enabled: !!address,
+    enabled: !!currentMarket,
     meta: {
       error: "Unable to retrieve kandel steps",
     },
-    staleTime: 1 * 60 * 1000, // 1 minute
+    // staleTime: 1 * 60 * 1000, // 1 minute
   })
 }

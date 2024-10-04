@@ -3,7 +3,6 @@ import React from "react"
 import { useAccount, useBalance } from "wagmi"
 
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
-import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
@@ -24,6 +23,7 @@ type StrategyDetails = Omit<
   "isChangingFrom" | "globalError" | "errors" | "priceRange"
 > & {
   riskAppetite?: string
+  strategyType?: string
   priceRange?: [number, number]
   kandelParams?: KandelParams
 }
@@ -48,20 +48,23 @@ export default function DeployStrategyDialog({
   const { address } = useAccount()
   const { currentMarket } = useMarket()
   const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
-  const { data: kandelSteps } = useKandelSteps()
-
-  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
   })
-  const { data: spender } = useSpenderAddress("kandel")
 
   const {
     mutate: createKandelStrategy,
     isPending: createKandelStrategyPending,
     data,
-  } = useCreateKandelStrategy()
+  } = useCreateKandelStrategy({ liquiditySourcing: strategy?.sendFrom })
+
+  const { data: kandelSteps } = useKandelSteps({
+    liquiditySourcing: strategy?.sendFrom,
+    kandelAddress: data?.kandelAddress,
+  })
+
+  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const approveToken = useInfiniteApproveToken()
   const launchKandelStrategy = useLaunchKandelStrategy(data?.kandelAddress)
@@ -108,7 +111,7 @@ export default function DeployStrategyDialog({
         </div>
       ),
       button: (
-        <div className="grid gap-2 w-full">
+        <div className="grid gap-2 w-full ">
           <Button
             {...btnProps}
             disabled={createKandelStrategyPending}
@@ -121,13 +124,13 @@ export default function DeployStrategyDialog({
           >
             Create kandel instance
           </Button>
-
           <Button
+            size={"lg"}
             variant={"secondary"}
-            disabled={createKandelStrategyPending}
             onClick={() => goToPrevStep()}
+            disabled={createKandelStrategyPending}
           >
-            Back
+            Return
           </Button>
         </div>
       ),
@@ -148,7 +151,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: baseToken,
-                spender: baseApprove?.params.spender,
+                spender: data?.kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -176,7 +179,7 @@ export default function DeployStrategyDialog({
             approveToken.mutate(
               {
                 token: quoteToken,
-                spender: quoteApprove?.params.spender,
+                spender: data?.kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -302,8 +305,10 @@ const Summary = ({
     bountyDeposit,
     priceRange,
     riskAppetite,
+    sendFrom,
   } = strategy ?? {}
 
+  const onAave = sendFrom === "Aave"
   const [minPrice, maxPrice] = priceRange ?? []
 
   return (
@@ -319,7 +324,7 @@ const Summary = ({
 
         <SummaryLine
           title="Liquidity source"
-          value={<Text>{false ? "Aave" : "Wallet"}</Text>}
+          value={<Text>{onAave ? "Aave" : "Wallet"}</Text>}
         />
 
         <SummaryLine title="Risk appetite" value={<Text>Medium</Text>} />

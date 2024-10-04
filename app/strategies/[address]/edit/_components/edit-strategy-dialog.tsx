@@ -5,7 +5,6 @@ import { useAccount, useBalance } from "wagmi"
 import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
 
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
-import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
@@ -47,16 +46,20 @@ export default function EditStrategyDialog({
   strategy,
 }: Props) {
   const { address } = useAccount()
-  const { data: kandelSteps } = useKandelSteps()
-  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const { data: nativeBalance } = useBalance({
     address,
   })
-  const { data: spender } = useSpenderAddress("kandel")
 
   const { strategyQuery, baseToken, quoteToken } = useKandel()
   const kandelAddress = strategyQuery.data?.address
+
+  const { data: kandelSteps } = useKandelSteps({
+    liquiditySourcing: strategy?.sendFrom,
+    kandelAddress: kandelAddress,
+  })
+
+  const [sow, baseApprove, quoteApprove, populateParams] = kandelSteps ?? [{}]
 
   const approveBaseToken = useInfiniteApproveToken()
   const approveQuoteToken = useInfiniteApproveToken()
@@ -115,7 +118,7 @@ export default function EditStrategyDialog({
             approveBaseToken.mutate(
               {
                 token: baseToken,
-                spender: baseApprove?.params.spender,
+                spender: kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -143,7 +146,7 @@ export default function EditStrategyDialog({
             approveQuoteToken.mutate(
               {
                 token: quoteToken,
-                spender: quoteApprove?.params.spender,
+                spender: kandelAddress,
               },
               {
                 onSuccess: goToNextStep,
@@ -184,6 +187,7 @@ export default function EditStrategyDialog({
             Activate
           </Button>
           <Button
+            size={"lg"}
             variant={"secondary"}
             disabled={isRetractingOffers}
             onClick={() => goToPrevStep()}
@@ -309,6 +313,7 @@ const Summary = ({
     bountyDeposit,
     priceRange,
     riskAppetite,
+    onAave,
   } = strategy ?? {}
 
   const [minPrice, maxPrice] = priceRange ?? []
@@ -326,7 +331,7 @@ const Summary = ({
 
         <SummaryLine
           title="Liquidity source"
-          value={<Text>{false ? "Aave" : "Wallet"}</Text>}
+          value={<Text>{onAave ? "Aave" : "Wallet"}</Text>}
         />
 
         <SummaryLine title="Risk appetite" value={<Text>Medium</Text>} />

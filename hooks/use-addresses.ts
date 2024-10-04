@@ -1,7 +1,10 @@
+import { RoutingLogicBalance, RoutingLogicOverlying } from "@mangrovedao/mgv"
 import {
+  aaveLogicABI,
   arbitrumMangrove,
   arbitrumMarkets,
   arbitrumTokens,
+  balanceLogicABI,
   baseSepoliaLogics,
   baseSepoliaMangrove,
   baseSepoliaMarkets,
@@ -14,6 +17,8 @@ import {
 import { arbitrum, baseSepolia, blast } from "viem/chains"
 import { useAccount } from "wagmi"
 
+export const aaveKandelSeeder = "0x55B12De431C6e355b56b79472a3632faec58FB5a"
+
 export function useMangroveAddresses() {
   const { chainId } = useAccount()
   switch (chainId) {
@@ -23,6 +28,34 @@ export function useMangroveAddresses() {
       return arbitrumMangrove
     case baseSepolia.id:
       return baseSepoliaMangrove
+    default:
+      return undefined
+  }
+}
+
+export function useAaveKandelRouter() {
+  const { chainId } = useAccount()
+  switch (chainId) {
+    case blast.id:
+      return "" // no aave on blast
+    case arbitrum.id:
+      return "0xb3be00f615239b8553D725dC9F418e27a874d4dC"
+    case baseSepolia.id:
+      return "0x2f05f5586D2A72CE5F0BE37DdD38B053aB616D60"
+    default:
+      return undefined
+  }
+}
+
+export function useAaveKandelSeeder() {
+  const { chainId } = useAccount()
+  switch (chainId) {
+    case blast.id:
+      return "" // no aave on blast
+    case arbitrum.id:
+      return "0x55B12De431C6e355b56b79472a3632faec58FB5a"
+    case baseSepolia.id:
+      return "0xCb62cD0Ea7aD46d5B630C1068C7bED2cBd2b7E23"
     default:
       return undefined
   }
@@ -62,7 +95,23 @@ export function useLogics() {
     case blast.id:
       return blastLogics
     case arbitrum.id:
-      return []
+      return [
+        {
+          name: "Aave",
+          logic: "0xF1E3f817fF9CaAF7083a58C50a3c4a05f80dE565",
+          gasreq: "1300000" as unknown as bigint,
+          logicOverlying: {} as RoutingLogicOverlying<
+            typeof aaveLogicABI,
+            "view",
+            "overlying"
+          >,
+          logicBalance: {} as RoutingLogicBalance<
+            typeof balanceLogicABI,
+            "view",
+            "balanceLogic"
+          >,
+        },
+      ]
     case baseSepolia.id:
       return baseSepoliaLogics
     default:

@@ -40,6 +40,8 @@ export function useLaunchKandelStrategy(kandelAddress?: string) {
 
         const { request } = await kandelClient.simulatePopulate({
           ...kandelParams,
+          fromIndex: 0n,
+          toIndex: kandelParams.pricePoints,
           account: address as Address,
           value: parseEther(bountyDeposit),
         })
