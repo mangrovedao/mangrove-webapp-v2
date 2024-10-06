@@ -7,7 +7,7 @@ import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-net
 import { RootProvider } from "@/providers/root"
 
 import { Navbar } from "@/components/navbar"
-import Sidebar from "@/components/sidebar"
+import Sidebar from "@/components/sidebar/sidebar"
 import "./globals.css"
 
 const toastClasses =

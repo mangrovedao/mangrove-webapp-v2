@@ -193,6 +193,8 @@ export default {
         success: "0 0 0 16px rgba(3, 34, 33, 0.25)",
       },
       backgroundImage: {
+        "gradient-radial":
+          "radial-gradient(69.86% 175.89% at 51.06% 50%, #1C3A40 0%, #12272B 72.5%)",
         "level-chart":
           "linear-gradient(180deg, rgba(3, 98, 76, 0.00) 57.96%, rgba(3, 98, 76, 0.30) 99.5%)",
       },
