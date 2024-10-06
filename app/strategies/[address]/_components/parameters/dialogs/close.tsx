@@ -3,7 +3,7 @@ import { AlertCircle } from "lucide-react"
 import Dialog from "@/components/dialogs/dialog"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Close } from "@/svgs"
 import { useCloseStrategy } from "../../../_hooks/use-close-strategy"
 

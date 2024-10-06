@@ -9,7 +9,7 @@ import {
 import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Label } from "@/components/ui/label"
 import {
   Select,

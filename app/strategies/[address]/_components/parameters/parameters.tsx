@@ -10,7 +10,7 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Skeleton } from "@/components/ui/skeleton"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import PriceRangeInfos from "../shared/price-range-infos"
 import { Bounty } from "./dialogs/bounty"
 import { Withdraw } from "./dialogs/withdraw"

@@ -4,7 +4,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useAccount } from "wagmi"
 
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import BoxContainer from "./box-container"
 
 export default function ConnectBanner() {

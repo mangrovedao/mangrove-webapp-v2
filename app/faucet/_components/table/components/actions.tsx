@@ -10,7 +10,7 @@ import {
 } from "wagmi"
 import * as wagmiChains from "wagmi/chains"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 
 import TestTokenAbi from "../../../_abis/test-token.json"

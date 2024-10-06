@@ -8,28 +8,28 @@ import { Spinner } from "./spinner"
 
 const buttonVariants = cva(
   [
-    "rounded-xl transition-all border border-solid border-transparent",
-    "outline-offset-2 ring-red-200 outline-transparent disabled:bg-bg-disabled-subtle disabled:text-text-disabled",
+    "rounded-2xl text-black-rich box-border transition-colors disabled:text-gray-scale-400 group/button font-medium",
+    "focus-visible:ring-4 focus-visible:ring-primary-dark-green focus-visible:outline-0 focus-visible:ring-offset-0",
   ],
   {
     variants: {
       variant: {
         primary:
-          "bg-button-primary-bg hover:bg-button-primary-bg-hover text-button-primary-fg",
+          "bg-green-caribbean hover:bg-green-bangladesh hover:text-white",
         secondary:
-          "bg-button-secondary-bg hover:bg-button-secondary-bg-hover border-border-primary text-button-secondary-fg",
-        tertiary: ["", ""],
+          "border border-green-caribbean hover:border-green-bangladesh text-white disabled:border-gray-scale-500",
+        tertiary: [
+          "bg-primary-dark-green border border-primary-dark-green text-green-caribbean",
+          "focus:bg-primary-solid-black hover:bg-green-bangladesh active:text-primary-solid-black active:bg-green-bangladesh",
+        ],
         link: "text-primary underline-offset-4 hover:underline",
         invisible: "text-white hover:opacity-80 transition-opacity",
       },
       size: {
-        xxs: "text-sm px-0.5",
-        xs: "text-sm px-1",
-        sm: "text-sm px-3 py-[6px]",
-        md: "text-sm",
-        lg: "text-base",
-        xl: "text-lg px-[18px] py-3",
-        only: "",
+        sm: "px-3 pb-1 pt-[6px] leading-[14px]",
+        md: "px-3 py-2 text-sm leading-[14px]",
+        lg: "px-5 py-3 leading-5 rounded-[32px]",
+        icon: "flex justify-center items-center aspect-square p-0 h-6",
       },
       rightIcon: {
         true: "flex items-center justify-center space-x-1",
@@ -40,8 +40,17 @@ const buttonVariants = cva(
     },
     compoundVariants: [
       {
-        size: ["lg", "md"],
-        className: "px-[14px] py-[10px]",
+        size: ["sm", "md"],
+        variant: "secondary",
+        className: "leading-3",
+      },
+      {
+        variant: ["primary", "secondary"],
+        className: "active:text-gray-scale-100",
+      },
+      {
+        variant: ["primary", "tertiary"],
+        className: "disabled:bg-gray-scale-200 disabled:border-transparent",
       },
     ],
     defaultVariants: {

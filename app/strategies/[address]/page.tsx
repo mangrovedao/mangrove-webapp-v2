@@ -3,7 +3,7 @@
 import React from "react"
 
 import { TokenPair } from "@/components/token-pair"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { useRouter } from "next/navigation"
 import Status from "../(shared)/_components/status"
 import useStrategyStatus from "../(shared)/_hooks/use-strategy-status"

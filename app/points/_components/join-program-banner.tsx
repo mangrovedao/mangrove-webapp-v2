@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import Link from "next/link"
 import { useUserVolume } from "./leaderboard/use-leaderboard"
 

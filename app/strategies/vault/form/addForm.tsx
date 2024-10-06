@@ -1,7 +1,7 @@
 "use client"
 
 import { EnhancedNumericInput } from "@/components/token-input"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
 import React from "react"

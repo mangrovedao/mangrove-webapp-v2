@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/utils"

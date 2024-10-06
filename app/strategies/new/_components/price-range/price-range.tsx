@@ -4,7 +4,7 @@ import React from "react"
 import { Address } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import withClientOnly from "@/hocs/withClientOnly"
 import { useBook } from "@/hooks/use-book"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"

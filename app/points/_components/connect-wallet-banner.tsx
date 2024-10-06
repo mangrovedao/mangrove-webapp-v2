@@ -3,7 +3,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit"
 
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 
 export function ConnectWalletBanner() {
   const { openConnectModal } = useConnectModal()

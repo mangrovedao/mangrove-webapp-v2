@@ -3,7 +3,7 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import Dialog from "@/components/dialogs/alert-dialog"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 

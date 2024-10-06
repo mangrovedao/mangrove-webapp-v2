@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { KANDEL_DOC_URL, STRATEGIES_DOC_URL } from "@/constants/docs"
 import Link from "next/link"
 

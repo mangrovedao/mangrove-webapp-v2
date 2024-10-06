@@ -7,7 +7,7 @@ import {
   titleClasses,
 } from "@/components/dialogs/styles"
 import * as Root from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { useAlertDialogStore } from "@/stores/alert-dialog.store"
 
 export function AlertDialog() {

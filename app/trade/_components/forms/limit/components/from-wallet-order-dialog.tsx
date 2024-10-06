@@ -3,7 +3,7 @@ import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
-import { Button, type ButtonProps } from "@/components/ui/button"
+import { Button, type ButtonProps } from "@/components/ui/button-old"
 import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"

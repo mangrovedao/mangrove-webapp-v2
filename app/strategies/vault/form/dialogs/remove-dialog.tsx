@@ -1,6 +1,6 @@
 import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
 import Dialog from "@/components/dialogs/dialog"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { parseAbi } from "viem"

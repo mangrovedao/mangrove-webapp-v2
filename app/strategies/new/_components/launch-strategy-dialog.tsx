@@ -7,7 +7,7 @@ import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spend
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
-import { Button, type ButtonProps } from "@/components/ui/button"
+import { Button, type ButtonProps } from "@/components/ui/button-old"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"

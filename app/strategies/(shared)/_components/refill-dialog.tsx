@@ -1,5 +1,5 @@
 import Dialog from "@/components/dialogs/dialog"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 
 import { OfferParsed } from "@mangrovedao/mgv"
 import { useRefillOffer } from "../_hooks/use-refill-offer"
