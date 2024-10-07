@@ -1,32 +1,31 @@
-import type { Address } from "viem"
-
+import { Text } from "@/components/typography/text"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useTokenFromAddress } from "@/hooks/use-token-from-address"
+import { CheckIcon } from "lucide-react"
 
 type Props = {
-  base: string
-  baseValue: string
-  quote: string
-  quoteValue: string
+  value: string
+  trusted?: boolean
+  symbol?: string
 }
-export function Value({ base, baseValue, quote, quoteValue }: Props) {
-  const { data: baseToken } = useTokenFromAddress(base as Address)
-  const { data: quoteToken } = useTokenFromAddress(quote as Address)
-
-  if (!quoteToken) {
+export function Value({ value, trusted, symbol }: Props) {
+  if (!value) {
     return <Skeleton className="h-6 w-full" />
   }
 
   return (
-    <div>
-      <div>
-        {Number(baseValue).toFixed(baseToken?.displayDecimals)}{" "}
-        {baseToken?.symbol}
-      </div>
-      <div>
-        {Number(quoteValue).toFixed(quoteToken?.displayDecimals)}{" "}
-        {quoteToken?.symbol}
-      </div>
+    <div className="flex space-x-3 items-center">
+      <Text variant={"text2"} className=" text-xs">
+        {value}{" "}
+        {symbol ? (
+          <span className=" text-xs text-text-secondary">{symbol}</span>
+        ) : undefined}
+      </Text>
+      {trusted ? (
+        <div className="relative h-4 w-4">
+          <div className="absolute inset-0 bg-green-700 rounded-full"></div>
+          <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
+        </div>
+      ) : undefined}
     </div>
   )
 }

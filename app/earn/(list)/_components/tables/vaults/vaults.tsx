@@ -3,9 +3,10 @@ import { useRouter } from "next/navigation"
 import React from "react"
 
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
-import { DataTable } from "@/components/ui/data-table/data-table"
+import { DataTable } from "@/components/ui/data-table-new/data-table"
 import useMarket from "@/providers/market"
 import type { Strategy } from "../../../_schemas/kandels"
+import { Vault } from "../../../_schemas/vaults"
 import { useTable } from "./hooks/use-table"
 import { useVaults } from "./hooks/use-vaults"
 
@@ -40,7 +41,12 @@ export function Vaults({ type }: Props) {
 
   const table = useTable({
     type,
+    pageSize,
     data,
+    onManage: (vault: Vault) => {
+      push(`/earn/${vault.address}/edit`)
+    },
+    onDeposit: (vault: Vault) => undefined,
   })
 
   return (
@@ -52,7 +58,7 @@ export function Vaults({ type }: Props) {
         onRowClick={
           (vault) => {
             if (vault) {
-              push(`/strategies/vault?id=${vault.address}`)
+              push(`/earn?id=${vault.address}`)
             }
           }
           // note: lost of context after redirecting with push method here

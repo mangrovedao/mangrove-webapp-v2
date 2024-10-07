@@ -47,7 +47,7 @@ export function Tables({
         <Strategies type="user" />
       </div>
       <div className="grid gap-y-4">
-        <div className="flex gap-2 w-full justify-between ">
+        <div className="flex gap-2 w-full justify-between items-center">
           <Title variant={"title3"} className="pl-4">
             All Vaults
           </Title>

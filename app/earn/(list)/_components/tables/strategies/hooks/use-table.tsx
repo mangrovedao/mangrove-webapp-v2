@@ -135,7 +135,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
           const hasLiveOffers = row.original.offers.some((x) => x.live)
 
           return (
-            <div className="w-full h-full flex justify-end space-x-1">
+            <div className="w-full h-full flex justify-end space-x-1 items-center">
               <Button className="text-text-tertiary" variant={"invisible"}>
                 Manage
               </Button>

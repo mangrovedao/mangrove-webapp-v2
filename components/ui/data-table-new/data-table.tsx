@@ -50,27 +50,28 @@ export function DataTable<TData>({
 
   return (
     <div className="grid -gap-1">
-      <Table className="font-unbuntu">
+      <Table>
         <TableHeader className={`sticky z-40 text-xs ${rows.length}`}>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    key={`${tableName}-head-${header.id}`}
-                    className="text-text-tertiary text-xs"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
+          {rows.length > 0 &&
+            table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={`${tableName}-head-${header.id}`}
+                      className="text-text-tertiary text-xs"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
         </TableHeader>
         <TableBody>
           {isLoading ? (
@@ -128,10 +129,13 @@ export function DataTable<TData>({
               </>
             ))
           ) : (
-            <TableRow key={`${tableName}-bodyrow-${Math.random()}`}>
+            <TableRow
+              key={`${tableName}-bodyrow-${Math.random()}`}
+              className="rounded-xl"
+            >
               <TableCell
                 colSpan={leafColumns.length}
-                className="h-24 text-center text-muted-foreground"
+                className="h-19 text-center bg-gradient-to-t from-bg-primary to-bg-secondary rounded-xl text-text-tertiary"
               >
                 {isError
                   ? "Due to excessive demand, we are unable to return your data. Please try again later."

@@ -38,24 +38,18 @@ export default function Page() {
         {false ? (
           <Button
             size={"lg"}
-            rightIcon
             onClick={handleNext}
             suppressHydrationWarning
             disabled={hideCreateStrat}
           >
-            Create position
+            New position
           </Button>
         ) : (
           <TooltipProvider>
             <Tooltip delayDuration={200}>
               <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                <Button
-                  size={"lg"}
-                  rightIcon
-                  suppressHydrationWarning
-                  disabled={true}
-                >
-                  Create position
+                <Button size={"lg"} suppressHydrationWarning disabled={true}>
+                  New position
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
