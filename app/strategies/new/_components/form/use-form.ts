@@ -10,6 +10,8 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
+import { MarketParams } from "@mangrovedao/mgv"
+import { useCanUseAave } from "../../_hooks/use-aave-check"
 import { ChangingFrom, useNewStratStore } from "../../_stores/new-strat.store"
 
 export const MIN_NUMBER_OF_OFFERS = 1
@@ -17,7 +19,7 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const { address } = useAccount()
-  const logics = useLogics()
+
   const { currentMarket: market } = useMarket()
   const baseToken = market?.base
   const quoteToken = market?.quote
@@ -27,6 +29,14 @@ export default function useForm() {
   const { data: nativeBalance } = useBalance({
     address,
   })
+
+  const { data: canUseAave } = useCanUseAave(market as MarketParams)
+
+  const logics = useLogics()
+
+  const usableLogics = !canUseAave
+    ? logics.filter((item) => item.name !== "Aave")
+    : logics
 
   const {
     priceRange: [minPrice, maxPrice],
@@ -90,7 +100,7 @@ export default function useForm() {
 
   const minBase = formatUnits(minBaseAmount || 0n, baseToken?.decimals || 18)
   const minQuote = formatUnits(minQuoteAmount || 0n, quoteToken?.decimals || 18)
-  const minProv = formatUnits(minProvision || 0n, quoteToken?.decimals || 18)
+  const minProv = formatUnits(minProvision || 0n, 18)
 
   // I need the params to be set in the store to share it with the price range component
   React.useEffect(() => {
@@ -291,7 +301,7 @@ export default function useForm() {
     stepSize,
     sendFrom,
     receiveTo,
-    logics,
+    logics: usableLogics,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     handleNumberOfOffersChange,

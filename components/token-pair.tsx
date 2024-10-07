@@ -40,7 +40,7 @@ export function TokenPair({
       ) : (
         <Title
           {...titleProps}
-        >{`${baseToken.symbol} / ${quoteToken.symbol}`}</Title>
+        >{`${baseToken.symbol} - ${quoteToken.symbol}`}</Title>
       )}
     </div>
   )

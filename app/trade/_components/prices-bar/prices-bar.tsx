@@ -90,10 +90,6 @@ export function PricesBar() {
   const { book } = useBook({})
   const lowestAskPrice = book?.asks[0]?.price
   const highestBidPrice = book?.bids[0]?.price
-  const priceDecimals = determineDecimals(
-    lowestAskPrice,
-    quote?.priceDisplayDecimals,
-  )
 
   let spotPrice =
     lowestAskPrice && highestBidPrice

@@ -1,9 +1,21 @@
 "use client"
 
 import MarketSelector from "@/app/strategies/(shared)/_components/market-selector/market-selector"
+import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
+import InfoTooltip from "@/components/info-tooltip"
 import { CustomBalance } from "@/components/stateful/token-balance/custom-balance"
 import { TokenBalance } from "@/components/stateful/token-balance/token-balance"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Caption } from "@/components/typography/caption"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
@@ -60,6 +72,55 @@ export function Form({ className }: { className?: string }) {
     >
       <Fieldset legend="Select market">
         <MarketSelector />
+      </Fieldset>
+
+      <Fieldset legend="Liquidity sourcing">
+        <div className="flex justify-between space-x-2 pt-2">
+          <div className="flex flex-col w-full">
+            <Label className="flex items-center">
+              Source
+              <InfoTooltip>
+                <Caption>Select the origin of the assets</Caption>
+              </InfoTooltip>
+            </Label>
+
+            <Select
+              name={"SendFrom"}
+              value={sendFrom}
+              onValueChange={(value: string) => {
+                handleSendFromChange(value)
+              }}
+              disabled={fieldsDisabled}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem key={"simple"} value={"simple"}>
+                    <div className="flex gap-2 w-full items-center">
+                      <SourceIcon sourceId={"simple"} />
+                      <Caption className="capitalize">{"Wallet"}</Caption>
+                    </div>
+                  </SelectItem>
+                  {logics?.map(
+                    (logic) =>
+                      logic && (
+                        <SelectItem key={logic.name} value={logic.name}>
+                          <div className="flex gap-2 w-full items-center">
+                            <SourceIcon sourceId={logic.name} />
+                            <Caption className="capitalize">
+                              {logic.name}
+                            </Caption>
+                          </div>
+                        </SelectItem>
+                      ),
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </Fieldset>
 
       <Fieldset className="space-y-4" legend="Set initial inventory">
@@ -170,7 +231,7 @@ export function Form({ className }: { className?: string }) {
           />
           <MinimumRecommended
             token={nativeBalance?.symbol}
-            value={minProvision?.toString()}
+            value={minProvision}
             action={{
               onClick: handleBountyDepositChange,
               text: "Update",

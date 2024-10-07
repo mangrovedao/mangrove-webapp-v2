@@ -13,6 +13,7 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
+import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
 import { IconButton } from "@/components/icon-button"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
@@ -91,6 +92,22 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         },
       }),
       columnHelper.display({
+        header: "Liquidity source",
+        cell: ({ row }) => {
+          const sourceInfo =
+            row.original.type === "KandelAAVE"
+              ? { id: "Aave", name: "Aave" }
+              : { id: "simple", name: "Wallet" }
+
+          return (
+            <div className="flex items-center space-x-2">
+              <SourceIcon sourceId={sourceInfo.id} />
+              <span>{sourceInfo.name}</span>
+            </div>
+          )
+        },
+      }),
+      columnHelper.display({
         header: "Value",
         cell: ({ row }) => {
           const { base, quote, offers } = row.original
@@ -137,6 +154,8 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
+          const hasLiveOffers = row.original.offers.some((x) => x.live)
+
           return (
             <div className="w-full h-full flex justify-end space-x-1">
               <IconButton
@@ -153,6 +172,7 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
               <IconButton
                 tooltip="Cancel strategy"
                 className="aspect-square w-6 rounded-full"
+                disabled={!hasLiveOffers}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
