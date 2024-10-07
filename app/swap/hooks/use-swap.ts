@@ -31,12 +31,12 @@ export function useSwap() {
   const postMarketOrder = usePostMarketOrder()
   const markets = useMarkets()
   const [payTknAddress, setPayTknAddress] = useQueryState("payTkn", {
-    defaultValue: markets[0].base.address,
+    defaultValue: markets[0]?.base?.address,
   })
   const [receiveTknAddress, setReceiveTknAddress] = useQueryState(
     "receiveTkn",
     {
-      defaultValue: markets[0].quote.address,
+      defaultValue: markets[0]?.quote?.address,
     },
   )
   const [fields, setFields] = React.useState({

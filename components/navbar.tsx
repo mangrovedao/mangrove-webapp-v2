@@ -7,7 +7,7 @@ import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { toast } from "sonner"
 import { useAccount, useDisconnect } from "wagmi"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,18 +22,13 @@ import withClientOnly from "@/hocs/withClientOnly"
 import { BurgerIcon, ChevronDown } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
-import {
-  useAccountModal,
-  useChainModal,
-  useConnectModal,
-} from "@rainbow-me/rainbowkit"
+import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit"
 
 import { useMenuStore } from "@/stores/menu.store"
 import { arbitrum, baseSepolia, blast, blastSepolia } from "viem/chains"
 import ChainSelector from "./chain-selector"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
-import { Separator } from "./ui/separator"
 
 type Props = React.ComponentProps<"nav"> & {
   innerClasses?: string
@@ -45,7 +40,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
   return (
     <nav
       className={cn(
-        "flex w-full justify-between items-center border-b text-sm grid-in-header min-h-[var(--bar-height)]",
+        "flex w-full justify-between items-center text-sm grid-in-header min-h-[var(--bar-height)]",
         className,
       )}
       {...props}
@@ -69,7 +64,6 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
 }
 
 const RightPart = withClientOnly(() => {
-  const { openChainModal } = useChainModal()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
   const { isConnected, connector, address, isConnecting } = useAccount()
@@ -110,8 +104,6 @@ const RightPart = withClientOnly(() => {
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
       <ChainSelector />
-
-      <Separator orientation="vertical" />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

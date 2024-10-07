@@ -3,7 +3,7 @@ import { blast } from "viem/chains"
 import { useAccount, useSwitchChain } from "wagmi"
 
 import { Caption } from "@/components/typography/caption"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Info } from "@/svgs"
 import { cn } from "@/utils"
 

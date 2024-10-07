@@ -3,7 +3,7 @@
 import type { Token } from "@mangrovedao/mgv"
 import React from "react"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"

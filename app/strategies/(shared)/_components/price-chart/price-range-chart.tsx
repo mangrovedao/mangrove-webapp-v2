@@ -13,7 +13,7 @@ import useResizeObserver from "use-resize-observer"
 import { useAccount } from "wagmi"
 
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useKeyPress } from "@/hooks/use-key-press"
 import { useHoveredOfferStore } from "@/stores/hovered-offer.store"

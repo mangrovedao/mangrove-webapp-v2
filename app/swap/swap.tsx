@@ -4,7 +4,7 @@ import type { Token } from "@mangrovedao/mgv"
 import { MoveVertical } from "lucide-react"
 
 import { TokenIcon } from "@/components/token-icon"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import {
   Dialog,
   DialogContent,

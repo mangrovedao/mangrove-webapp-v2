@@ -4,7 +4,7 @@ import Big from "big.js"
 import { Info } from "lucide-react"
 
 import { useRefillOffer } from "@/app/strategies/(shared)/_hooks/use-refill-offer"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TableCell } from "@/components/ui/table"
 import { cn } from "@/utils"

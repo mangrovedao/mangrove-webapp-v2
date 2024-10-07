@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Skeleton } from "@/components/ui/skeleton"
 import withClientOnly from "@/hocs/withClientOnly"
 import { shortenAddress } from "@/utils/wallet"

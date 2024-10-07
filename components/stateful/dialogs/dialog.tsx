@@ -5,9 +5,9 @@ import {
   getContentClasses,
   titleClasses,
 } from "@/components/dialogs/styles"
+import { Button } from "@/components/ui/button-old"
 import * as Root from "@/components/ui/dialog"
 import { useDialogStore } from "@/stores/dialog.store"
-import { Button } from "@components/ui/button"
 
 export function Dialog() {
   const { opened, setOpened, title, children, actionButtons, type } =

@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation"
 import { Address } from "viem"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ExclamationMark } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"

@@ -5,7 +5,7 @@ import { isMobile } from "react-device-detect"
 
 import Dialog from "@/components/dialogs/alert-dialog"
 import MobileOverlay from "@/components/mobile-overlay"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Checkbox } from "@/components/ui/checkbox"
 import withClientOnly from "@/hocs/withClientOnly"
 import useLocalStorage from "@/hooks/use-local-storage"

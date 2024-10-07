@@ -2,7 +2,7 @@
 
 import Dialog from "@/components/dialogs/alert-dialog"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { useAccount } from "wagmi"
 import useKandel from "../../../_providers/kandel-strategy"
 import BlockExplorer from "../../block-explorer"

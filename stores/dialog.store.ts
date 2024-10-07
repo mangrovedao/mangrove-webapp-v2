@@ -2,7 +2,7 @@ import type React from "react"
 import { create, type StateCreator } from "zustand"
 
 import type { DialogType } from "@/components/dialogs/types"
-import type { Button } from "@/components/ui/button"
+import type { Button } from "@/components/ui/button-old"
 
 export type ActionButton = React.ComponentProps<typeof Button> & {
   isClosing?: boolean

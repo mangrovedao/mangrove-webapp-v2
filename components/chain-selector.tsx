@@ -6,7 +6,7 @@ import Dialog from "@/components/dialogs/dialog"
 import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 import { getChainObjectById } from "@/utils/chains"
-import { Button } from "./ui/button"
+import { Button } from "./ui/button-old"
 import { XClose } from "./ui/dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 

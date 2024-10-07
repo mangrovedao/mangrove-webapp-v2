@@ -3,7 +3,7 @@ import Link from "next/link"
 import React from "react"
 
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Info } from "@/svgs"
 import { cn } from "@/utils"
 import useKandel from "../../_providers/kandel-strategy"

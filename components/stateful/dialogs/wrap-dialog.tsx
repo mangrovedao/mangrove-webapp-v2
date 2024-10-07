@@ -12,7 +12,7 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import { Close } from "@/svgs"
 
 type Props = {

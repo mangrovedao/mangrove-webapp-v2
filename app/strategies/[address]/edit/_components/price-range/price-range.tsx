@@ -4,7 +4,7 @@ import { debounce } from "radash"
 import React from "react"
 
 import { EnhancedNumericInput } from "@/components/token-input"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button-old"
 import withClientOnly from "@/hocs/withClientOnly"
 
 import { PriceRangeChart } from "@/app/strategies/(shared)/_components/price-chart/price-range-chart"
