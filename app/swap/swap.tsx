@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { ChevronDown } from "@/svgs"
 import { useSwap } from "./hooks/use-swap"
@@ -39,6 +40,8 @@ export default function Swap() {
     isReverseDisabled,
     onMaxClicked,
     swapButtonText,
+    payDollar,
+    receiveDollar,
   } = useSwap()
 
   return (
@@ -50,6 +53,7 @@ export default function Swap() {
           token={payToken}
           value={fields.payValue}
           onChange={onPayValueChange}
+          dollarValue={payDollar}
           onTokenClicked={() => setPayTokenDialogOpen(true)}
           onMaxClicked={onMaxClicked}
         />
@@ -64,6 +68,7 @@ export default function Swap() {
           type="receive"
           token={receiveToken}
           value={fields.receiveValue}
+          dollarValue={receiveDollar}
           onChange={onReceiveValueChange}
           onTokenClicked={() => setReceiveTokenDialogOpen(true)}
         />
@@ -141,6 +146,7 @@ type TokenContainerProps = {
   token?: Token
   type: "pay" | "receive"
   value: string
+  dollarValue: number
   onTokenClicked?: () => void
   onMaxClicked?: () => void
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -153,8 +159,10 @@ function TokenContainer({
   onMaxClicked,
   value,
   onChange,
+  dollarValue,
 }: TokenContainerProps) {
   const tokenBalance = useTokenBalance(token)
+  const dollars = (Number(value) * (dollarValue ?? 0)).toString()
 
   return (
     <div className="flex bg-primary-solid-black rounded-md px-6 py-4 flex-col border border-transparent transition-all focus-within:border-green-caribbean">
@@ -188,21 +196,30 @@ function TokenContainer({
           )}
         </span>
       </div>
-      <div className="text-xs text-right opacity-70">
-        {token ? (
-          <>
-            Balance: <span>{tokenBalance.formattedWithSymbol}</span>{" "}
-          </>
-        ) : null}
-        {tokenBalance.balance && type === "pay" && (
-          <Button
-            variant={"link"}
-            onClick={onMaxClicked}
-            className="text-green-caribbean hover:opacity-80 transition-all px-0 ml-1 text-sm"
-          >
-            Max
-          </Button>
+      <div className="flex justify-between items-center opacity-70">
+        {token && Number(dollars) !== 0 ? (
+          <div className="text-xs text-left">
+            ≈ <span>{dollars.slice(0, dollars.indexOf(".") + 3) ?? "0"}</span> $
+          </div>
+        ) : (
+          <Skeleton className="w-10 h-3 bg-gray" />
         )}
+        <div className="text-xs text-right opacity-70">
+          {token ? (
+            <>
+              Balance: <span>{tokenBalance.formattedWithSymbol}</span>{" "}
+            </>
+          ) : null}
+          {tokenBalance.balance && type === "pay" && (
+            <Button
+              variant={"link"}
+              onClick={onMaxClicked}
+              className="text-green-caribbean hover:opacity-80 transition-all px-0 ml-1 text-sm"
+            >
+              Max
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )
