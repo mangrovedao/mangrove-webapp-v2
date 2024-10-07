@@ -53,6 +53,7 @@ export function Vaults({ type }: Props) {
     <>
       <DataTable
         table={table}
+        emptyArrayMessage="No positions yet."
         isError={!!error}
         isLoading={isLoading || !market}
         onRowClick={
