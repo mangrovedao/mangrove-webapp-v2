@@ -38,7 +38,6 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         id: "blockchain-explorer",
         header: () => "",
-
         cell: ({ row }) => {
           const { address, owner } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
@@ -51,7 +50,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
           return (
             <div className="flex flex-col underline">
               <Link
-                className="hover:opacity-80 transition-opacity bg-[#284061] p-2 rounded-md"
+                className="hover:opacity-80 transition-opacity bg-[#284061] p-1 rounded-md"
                 href={`${blockExplorerUrl}/address/${address}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -82,7 +81,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
           const value = `Kandel - ${sourceInfo.name}`
 
           return (
-            <div className="pr-40">
+            <div className="mr-20">
               <Value value={value} trusted={isTrusted} />
             </div>
           )
@@ -92,7 +91,6 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Manager",
         cell: ({ row }) => {
-          const { base, quote } = row.original
           return <Value value="Redacted Labs" />
         },
       }),
@@ -100,7 +98,6 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const { base, quote, offers } = row.original
           const value = "1.525.246,42"
           const symbol = "$"
           return <Value value={value} symbol={symbol} />
@@ -126,19 +123,15 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "My APY",
         cell: ({ row }) => {
-          const { base, quote } = row.original
           return <Value value="7.3%" />
         },
       }),
 
       columnHelper.display({
         id: "actions",
-        header: () => "",
         cell: ({ row }) => {
-          const hasLiveOffers = row.original.offers.some((x) => x.live)
-
           return (
-            <div className="w-full h-full flex justify-end space-x-1 items-center">
+            <div className="w-full h-full flex justify-end space-x-1 items-center z-50">
               <Button className="text-text-tertiary" variant={"invisible"}>
                 Manage
               </Button>

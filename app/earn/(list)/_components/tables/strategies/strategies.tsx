@@ -58,13 +58,14 @@ export function Strategies({ type }: Props) {
     <>
       <DataTable
         table={table}
+        emptyArrayMessage="No positions yet."
         isError={!!strategiesQuery.error}
         isLoading={strategiesQuery.isLoading || !market}
-        onRowClick={(strategy) =>
-          // note: lost of context after redirecting with push method here
-          // push(`/strategies/${strategy?.address}`)
-          (window.location.href = `/strategies/${strategy?.address}`)
-        }
+        // onRowClick={(earn) =>
+        //   // note: lost of context after redirecting with push method here
+        //   // push(`/earn/${strategy?.address}`)
+        //   (window.location.href = `/earn/${strategy?.address}`)
+        // }
         pagination={{
           onPageChange: setPageDetails,
           page,
