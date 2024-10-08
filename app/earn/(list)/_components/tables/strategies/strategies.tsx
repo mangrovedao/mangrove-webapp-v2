@@ -16,8 +16,9 @@ export function Strategies({ type }: Props) {
   const { push } = useRouter()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
-    pageSize: 2,
+    pageSize: 10,
   })
+
   const { currentMarket: market, markets } = useMarket()
   const { data: count } = useStrategies({
     select: (strategies) => strategies.length,

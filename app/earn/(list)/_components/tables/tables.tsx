@@ -48,7 +48,7 @@ export function Tables({
       </div>
       <div className="grid gap-y-4">
         <div className="flex gap-2 w-full justify-between items-center">
-          <Title variant={"title3"} className="pl-4">
+          <Title variant={"title2"} className="pl-4">
             All Vaults
           </Title>
 

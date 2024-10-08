@@ -38,6 +38,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         id: "blockchain-explorer",
         header: () => "",
+
         cell: ({ row }) => {
           const { address, owner } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
@@ -72,8 +73,6 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
 
       columnHelper.display({
         header: "Strategy",
-        minSize: 300,
-
         cell: ({ row }) => {
           const sourceInfo =
             row.original.type === "KandelAAVE"
@@ -82,7 +81,11 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
           const isTrusted = true
           const value = `Kandel - ${sourceInfo.name}`
 
-          return <Value value={value} trusted={isTrusted} />
+          return (
+            <div className="pr-40">
+              <Value value={value} trusted={isTrusted} />
+            </div>
+          )
         },
       }),
 

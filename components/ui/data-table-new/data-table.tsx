@@ -51,7 +51,7 @@ export function DataTable<TData>({
     .filter((column) => column.getIsVisible())
 
   return (
-    <div className="grid -gap-1">
+    <>
       <Table>
         <TableHeader className={`sticky z-40 text-xs ${rows.length}`}>
           {rows.length > 0 &&
@@ -88,7 +88,7 @@ export function DataTable<TData>({
                   key={`${tableName}-body-row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    " hover:text-white transition-colors group/row",
+                    "hover:text-white transition-colors group/row",
                     {
                       "cursor-pointer": !!onRowClick,
                       "text-white hover:opacity-80 transition-all":
@@ -151,6 +151,6 @@ export function DataTable<TData>({
         </TableBody>
       </Table>
       <Pagination {...pagination} />
-    </div>
+    </>
   )
 }
