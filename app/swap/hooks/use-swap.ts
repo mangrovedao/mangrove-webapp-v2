@@ -18,6 +18,7 @@ import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spend
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
+import { accPrices } from "@/utils/market-pathing"
 import {
   getAllTokens,
   getMarketFromTokens,
@@ -25,7 +26,7 @@ import {
 } from "@/utils/tokens"
 
 export function useSwap() {
-  const { isConnected, address } = useAccount()
+  const { isConnected, address, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const postMarketOrder = usePostMarketOrder()
@@ -184,6 +185,24 @@ export function useSwap() {
       !!address,
   })
 
+  const getMarketPriceQuery = useQuery({
+    queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
+    queryFn: async () => {
+      if (!marketClient || !payTknAddress || !receiveTknAddress) return null
+
+      return accPrices({
+        chainId,
+        receiveTknAddress,
+        payTknAddress,
+        markets,
+        addresses,
+        publicClient,
+      })
+    },
+    refetchInterval: 3_000,
+    enabled: !!marketClient && !!markets && !!payToken && !!receiveToken,
+  })
+
   const hasToApprove = simulateQuery.data?.approvalStep?.done === false
 
   const swapButtonText = !hasEnoughBalance
@@ -289,5 +308,7 @@ export function useSwap() {
     onReceiveTokenSelected,
     onMaxClicked,
     swapButtonText,
+    payDollar: getMarketPriceQuery.data?.payDollar ?? 0,
+    receiveDollar: getMarketPriceQuery.data?.receiveDollar ?? 0,
   }
 }

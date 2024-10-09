@@ -108,6 +108,7 @@ export default {
         // New variables
         bg: {
           active: "hsl(var(--bg-active))",
+          disabled: "hsl(var(--bg-disabled))",
           "disabled-subtle": "hsl(var(--bg-disabled-subtle))",
           primary: "hsl(var(--bg-primary))",
           "primary-hover": "hsl(var(--bg-primary-hover))",
@@ -133,6 +134,7 @@ export default {
             "bg-hover": "hsl(var(--button-primary-bg-hover))",
             fg: "hsl(var(--button-primary-fg))",
             "fg-hover": "hsl(var(--button-primary-fg-hover))",
+            fg_disabled: "hsl(var(--button-primary-fg_disabled))",
           },
           secondary: {
             bg: "hsl(var(--button-secondary-bg))",
