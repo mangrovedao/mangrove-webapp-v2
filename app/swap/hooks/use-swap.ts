@@ -18,7 +18,7 @@ import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spend
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
-import { accPrices } from "@/utils/market-pathing"
+import { accPrices, type ValidChains } from "@/utils/market-pathing"
 import {
   getAllTokens,
   getMarketFromTokens,
@@ -191,9 +191,9 @@ export function useSwap() {
       if (!marketClient || !payTknAddress || !receiveTknAddress) return null
 
       return accPrices({
-        chainId,
-        receiveTknAddress,
-        payTknAddress,
+        chainId: chainId as ValidChains,
+        receiveTknAddress: receiveTknAddress as `0x${string}`,
+        payTknAddress: payTknAddress as `0x${string}`,
         markets,
         addresses,
         publicClient,

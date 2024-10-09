@@ -101,6 +101,8 @@ export const USD_TOKENS = {
   [baseSepolia.id]: [baseSepoliaUSDC.address],
 }
 
+export type ValidChains = keyof typeof USD_TOKENS
+
 export const accPrice = (
   path: `0x${string}`[],
   chainId: keyof typeof USD_TOKENS,
