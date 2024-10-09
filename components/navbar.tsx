@@ -7,7 +7,7 @@ import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { toast } from "sonner"
 import { useAccount, useDisconnect } from "wagmi"
 
-import { Button } from "@/components/ui/button-old"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
