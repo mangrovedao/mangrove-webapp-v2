@@ -8,8 +8,8 @@ import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
 import React from "react"
-import { formatUnits, parseUnits } from "viem"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { Address, formatUnits, parseUnits } from "viem"
+import { useAccount, useConfig, usePublicClient, useWalletClient } from "wagmi"
 
 import { useMangroveAddresses, useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
@@ -18,6 +18,7 @@ import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spend
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
+import { accPrices, USD_TOKENS } from "@/utils/market-pathing"
 import {
   getAllTokens,
   getMarketFromTokens,
@@ -25,7 +26,8 @@ import {
 } from "@/utils/tokens"
 
 export function useSwap() {
-  const { isConnected, address } = useAccount()
+  const config = useConfig()
+  const { isConnected, address, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const postMarketOrder = usePostMarketOrder()
@@ -184,6 +186,25 @@ export function useSwap() {
       !!address,
   })
 
+  const getMarketPriceQuery = useQuery({
+    queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
+    queryFn: async () => {
+      if (!marketClient || !chainId || !payTknAddress || !receiveTknAddress)
+        return null
+
+      return accPrices({
+        chainId: chainId as keyof typeof USD_TOKENS,
+        receiveTknAddress: receiveTknAddress as Address,
+        payTknAddress: payTknAddress as Address,
+        markets,
+        addresses,
+        publicClient,
+      })
+    },
+    refetchInterval: 3_000,
+    enabled: !!marketClient && !!markets && !!payToken && !!receiveToken,
+  })
+
   const hasToApprove = simulateQuery.data?.approvalStep?.done === false
 
   const swapButtonText = !hasEnoughBalance
@@ -289,5 +310,7 @@ export function useSwap() {
     onReceiveTokenSelected,
     onMaxClicked,
     swapButtonText,
+    payDollar: getMarketPriceQuery.data?.payDollar ?? 0,
+    receiveDollar: getMarketPriceQuery.data?.receiveDollar ?? 0,
   }
 }

@@ -136,6 +136,7 @@
     --color-success-950: 156.5, 82.1%, 11%;
 
     --bg-active: var(--color-bluegray-800);
+    --bg-disabled: var(--color-bluegray-800);
     --bg-disabled-subtle: var(--color-bluegray-900);
     --bg-primary: var(--color-bluegray-950);
     --bg-primary-hover: var(--color-bluegray-900);
@@ -156,6 +157,7 @@
     --button-primary-bg-hover: var(--color-brand-500);
     --button-primary-fg: var(--color-brand-25);
     --button-primary-fg-hover: var(--color-brand-25);
+    --button-primary-fg_disabled: var(--fg-quaternary);
 
     --button-secondary-bg: var(--color-bluegray-900);
     --button-secondary-bg-hover: var(--color-bluegray-700);

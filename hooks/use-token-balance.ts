@@ -12,6 +12,8 @@ export function useTokenBalance(token?: Token) {
   return {
     balance: data?.value,
     formatted: data?.formatted,
+    formattedAndFixed:
+      data && Number(data?.formatted).toFixed(token?.displayDecimals ?? 6),
     formattedWithSymbol:
       data &&
       `${Number(data?.formatted).toFixed(
