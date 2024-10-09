@@ -1,7 +1,7 @@
 import React, { useMemo } from "react"
 import { useAccount } from "wagmi"
 
-import { useSearchParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 
 import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits, parseUnits } from "viem"
@@ -13,10 +13,11 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const searchParams = useSearchParams()
-  const vaultId = searchParams.get("id")
+  const params = useParams<{ address: string }>()
+
   const {
     data: { vault },
-  } = useVault(vaultId)
+  } = useVault(params.address)
 
   const { data, isLoading, isError, setBaseAmount, setQuoteAmount } =
     useMintAmounts({ vault })

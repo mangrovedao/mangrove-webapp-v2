@@ -1,7 +1,7 @@
 "use client"
 
 import { Coins, ExternalLink, Gauge, Percent } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 import {
   CustomRadioGroup,
@@ -42,13 +42,12 @@ export default function Page() {
   const [tab, setTab] = React.useState(Tabs.Details)
   const [action, setAction] = React.useState(Action.Add)
 
-  const searchParams = useSearchParams()
-  const vaultId =
-    searchParams.get("id") ?? "0xbC766847aB3b36F7012037f11Cd05B187F51Fc23"
+  const params = useParams<{ address: string }>()
+
   const {
     data: { vault, kandelState },
     refetch,
-  } = useVault(vaultId)
+  } = useVault(params.address)
 
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
