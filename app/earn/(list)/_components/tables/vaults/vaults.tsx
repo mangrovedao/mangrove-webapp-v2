@@ -43,9 +43,6 @@ export function Vaults({ type }: Props) {
     type,
     pageSize,
     data,
-    onManage: (vault: Vault) => {
-      push(`/earn/${vault.address}/edit`)
-    },
     onDeposit: (vault: Vault) => undefined,
   })
 
@@ -58,7 +55,7 @@ export function Vaults({ type }: Props) {
         onRowClick={
           (vault) => {
             if (vault) {
-              push(`/earn?id=${vault.address}`)
+              push(`/earn/${vault.address}`)
             }
           }
           // note: lost of context after redirecting with push method here

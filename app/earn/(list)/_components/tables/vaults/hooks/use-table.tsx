@@ -25,7 +25,6 @@ type Params = {
   data?: Vault[]
   pageSize: number
   onDeposit: (vault: Vault) => void
-  onManage: (vault: Vault) => void
 }
 
 export function useTable({ type, pageSize, data, onDeposit }: Params) {

@@ -12,7 +12,7 @@ import { useTable } from "./hooks/use-table"
 type Props = {
   type: "user" | "all"
 }
-export function Strategies({ type }: Props) {
+export function MyVaults({ type }: Props) {
   const { push } = useRouter()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,

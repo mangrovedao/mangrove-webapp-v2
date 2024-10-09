@@ -1,13 +1,6 @@
 "use client"
 
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { useMarkets } from "@/hooks/use-addresses"
 import { getFeatureFlagConfig } from "@/schemas/feature-flag"
 import { useRouter } from "next/navigation"
@@ -19,15 +12,6 @@ export default function Page() {
   const markets = useMarkets()
   const featureFlagConfig = getFeatureFlagConfig()
   const [hideCreateStrat, setHideCreateStrat] = React.useState(false)
-  function handleNext() {
-    if (!markets[0]) return
-    router.push(
-      `/strategies/new?market=${markets[0].base.address},${markets[0].quote.address},${markets[0].tickSpacing}`,
-      {
-        scroll: false,
-      },
-    )
-  }
 
   return (
     <main className=" md:pl-[160px] md:pr-[88px]">
@@ -35,29 +19,6 @@ export default function Page() {
         <Title variant={"header1"} className="pl-4">
           Earn
         </Title>
-        {false ? (
-          <Button
-            size={"lg"}
-            onClick={handleNext}
-            suppressHydrationWarning
-            disabled={hideCreateStrat}
-          >
-            New position
-          </Button>
-        ) : (
-          <TooltipProvider>
-            <Tooltip delayDuration={200}>
-              <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                <Button size={"lg"} suppressHydrationWarning disabled={true}>
-                  New position
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {featureFlagConfig?.strategy.create.message}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
       </div>
       <Tables hideCreateStrat={setHideCreateStrat} />
     </main>
