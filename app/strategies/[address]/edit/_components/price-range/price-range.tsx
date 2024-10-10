@@ -37,6 +37,7 @@ export const PriceRange = withClientOnly(function ({
     quoteToken,
     kandelState,
   } = useKandel()
+  const onAave = strategyQuery.data?.type === "KandelAAVE"
   const priceDecimals = quoteToken?.decimals
 
   const [summaryDialog, setSummaryDialog] = React.useState(false)
@@ -347,6 +348,7 @@ export const PriceRange = withClientOnly(function ({
             hasLiveOffers,
             sendFrom,
             receiveTo,
+            onAave,
           }}
           isOpen={summaryDialog}
           onClose={() => setSummaryDialog(false)}

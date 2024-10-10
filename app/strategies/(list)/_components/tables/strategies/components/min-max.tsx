@@ -32,15 +32,11 @@ export function MinMax({ min, max, quote, base }: Props) {
   return (
     <div>
       <div>
-        {Number(formatUnits(minBigInt, quoteToken?.decimals)).toFixed(
-          displayedDecimals,
-        )}{" "}
+        {Number(formatUnits(minBigInt, decimals)).toFixed(displayedDecimals)}{" "}
         {symbol}
       </div>
       <div>
-        {Number(formatUnits(maxBigInt, quoteToken?.decimals)).toFixed(
-          displayedDecimals,
-        )}{" "}
+        {Number(formatUnits(maxBigInt, decimals)).toFixed(displayedDecimals)}{" "}
         {symbol}
       </div>
     </div>

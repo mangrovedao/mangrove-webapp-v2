@@ -1,6 +1,7 @@
 import useMarket from "@/providers/market"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
+  Address,
   BaseError,
   ContractFunctionRevertedError,
   TransactionReceipt,
@@ -108,8 +109,8 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
               : undefined, // 1 hour
           restingOrderGasreq,
           // logics can be left to undefined (meaning no logic)
-          takerGivesLogic,
-          takerWantsLogic,
+          takerGivesLogic: takerGivesLogic as Address,
+          takerWantsLogic: takerWantsLogic as Address,
           gas: 20_000_000n,
         })
 
