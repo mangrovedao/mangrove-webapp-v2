@@ -3,11 +3,12 @@ import * as React from "react"
 
 import { cn } from "@/utils"
 
-const textStyles = cva("font-normal", {
+const textStyles = cva("font-unbuntu", {
   variants: {
     variant: {
       text1: "text-sm lg:text-base leading-[22px]",
       text2: "text-xs lg:text-sm leading-[22px]",
+      text3: "text-lg",
     },
   },
   defaultVariants: {
