@@ -27,10 +27,10 @@ const ACTIONS = [
 
 export default function Page() {
   return (
-    <main className="flex flex-col min-h-screen mx-auto">
+    <main className="flex flex-col min-h-screen mx-auto max-w-7xl">
       <h1 className="text-2xl font-bold">More</h1>
       <hr />
-      <div className="grid grid-cols-6 gap-4 mt-8 max-w-7xl mx-auto">
+      <div className="grid grid-cols-6 gap-4 mt-8">
         {ACTIONS.map((action) => (
           <div className="w-full bg-bg-secondary rounded-2xl overflow-hidden col-span-6 sm:col-span-3 md:col-span-2">
             <img
