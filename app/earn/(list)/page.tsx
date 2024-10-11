@@ -30,7 +30,7 @@ export default function Page() {
   }
 
   return (
-    <main className=" md:pl-[160px] md:pr-[88px]">
+    <main>
       <div className="mt-[56px] flex justify-between items-center">
         <Title variant={"header1"} className="pl-4">
           Earn

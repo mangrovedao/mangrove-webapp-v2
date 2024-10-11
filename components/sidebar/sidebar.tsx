@@ -1,6 +1,13 @@
 "use client"
 import { useMenuStore } from "@/stores/menu.store"
-import { EarnIcon, HelpIcon, RewardsIcon, SwapIcon, TradeIcon } from "@/svgs"
+import {
+  EarnIcon,
+  HelpIcon,
+  MoreIcon,
+  RewardsIcon,
+  SwapIcon,
+  TradeIcon,
+} from "@/svgs"
 import { cn } from "@/utils"
 import {
   Dialog,
@@ -33,6 +40,11 @@ const MENUS = [
     href: "/rewards",
     icon: RewardsIcon,
     text: "Rewards",
+  },
+  {
+    href: "/more",
+    icon: MoreIcon,
+    text: "More",
   },
 ]
 

@@ -40,13 +40,13 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
   return (
     <nav
       className={cn(
-        "flex w-full justify-between items-center text-sm grid-in-header min-h-[var(--bar-height)]",
+        "flex w-full justify-between items-center text-sm grid-in-header",
         className,
       )}
       {...props}
     >
       <button
-        className="ml-4 bg-button-secondary-bg hover:bg-button-secondary-bg-hover rounded-md transition-colors p-2"
+        className="ml-4 bg-button-secondary-bg hover:bg-button-secondary-bg-hover rounded-md transition-colors p-2 md:hidden"
         onClick={toggle}
       >
         <BurgerIcon />
@@ -99,7 +99,7 @@ const RightPart = withClientOnly(() => {
   }
 
   return (
-    <div className="flex space-x-4 items-center h-8 py-1 mt-6">
+    <div className="flex space-x-4 items-center h-8 py-1 mt-6 mb-8">
       <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
