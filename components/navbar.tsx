@@ -99,7 +99,7 @@ const RightPart = withClientOnly(() => {
   }
 
   return (
-    <div className="flex space-x-4 items-center h-8 py-1">
+    <div className="flex space-x-4 items-center h-8 py-1 mt-6">
       <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
@@ -108,9 +108,8 @@ const RightPart = withClientOnly(() => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="invisible"
-            className="space-x-4 flex items-center"
-            size="sm"
+            variant="secondary"
+            className="space-x-2 flex items-center border-transparent"
           >
             <span className="inline-flex items-center space-x-2">
               <span className="bg-gray-500 h-[18px] w-[18px] rounded-full relative overflow-hidden">
