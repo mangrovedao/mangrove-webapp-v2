@@ -158,7 +158,6 @@ export const accPrices = async ({
   let receiveDollar = 0
 
   if (!payPath || !receivePath) return null
-
   const simpleSwapPay = cmpAddr(payPath[1], receiveTknAddress)
   const simpleSwapReceive = cmpAddr(receivePath[1], payTknAddress)
 
@@ -191,8 +190,8 @@ export const accPrices = async ({
   )
 
   return {
-    payDollar: payDollar || accPrice(payPath, chainId, prices),
-    receiveDollar: receiveDollar || accPrice(receivePath, chainId, prices),
+    payDollar: accPrice(payPath, chainId, prices),
+    receiveDollar: accPrice(receivePath, chainId, prices),
   }
 }
 
