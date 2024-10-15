@@ -80,11 +80,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
           const isTrusted = true
           const value = `Kandel - ${sourceInfo.name}`
 
-          return (
-            <div className="mr-[131px]">
-              <Value value={value} trusted={isTrusted} />
-            </div>
-          )
+          return <Value value={value} trusted={isTrusted} />
         },
       }),
 

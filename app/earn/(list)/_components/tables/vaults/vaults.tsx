@@ -42,7 +42,7 @@ export function Vaults({ type }: Props) {
   const table = useTable({
     type,
     pageSize,
-    data,
+    data: data ?? [{ address: "0xbC766847aB3b36F7012037f11Cd05B187F51Fc23" }],
     onDeposit: (vault: Vault) => undefined,
   })
 
