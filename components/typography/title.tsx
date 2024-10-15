@@ -3,7 +3,7 @@ import * as React from "react"
 
 import { cn } from "@/utils"
 
-const titleStyles = cva("text-current font-medium", {
+const titleStyles = cva("text-current", {
   variants: {
     variant: {
       header1: "text-xl lg:text-2xl",
@@ -11,9 +11,14 @@ const titleStyles = cva("text-current font-medium", {
       title2: "text-sm lg:text-base leading-5",
       title3: "text-xs lg:text-sm leading-[14px]",
     },
+    weight: {
+      bold: "font-bold",
+      medium: "font-medium",
+    },
   },
   defaultVariants: {
     variant: "title1",
+    weight: "medium",
   },
 })
 

@@ -6,15 +6,17 @@ type Props = {
   value: string
   trusted?: boolean
   symbol?: string
+  variant?: "text2" | "text3"
 }
+
 export function Value({ value, trusted, symbol }: Props) {
   if (!value) {
     return <Skeleton className="h-6 w-full" />
   }
 
   return (
-    <div className="flex space-x-3 items-center text-center justify-center">
-      <Text variant={"text2"} className="text-xs">
+    <div className="flex space-x-3 items-center">
+      <Text variant={"text3"}>
         {value}{" "}
         {symbol ? (
           <span className=" text-xs text-text-secondary">{symbol}</span>

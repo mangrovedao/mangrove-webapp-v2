@@ -6,7 +6,7 @@ import Dialog from "@/components/dialogs/dialog"
 import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 import { getChainObjectById } from "@/utils/chains"
-import { Button } from "./ui/button-old"
+import { Button } from "./ui/button"
 import { XClose } from "./ui/dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
@@ -86,9 +86,8 @@ export default function ChainSelector() {
         </Dialog.Description>
       </Dialog>
       <Button
-        variant="invisible"
-        className={"!space-x-4 lg:flex items-center hidden"}
-        size="sm"
+        variant="secondary"
+        className={"!space-x-4 lg:flex items-center hidden border-transparent"}
         onClick={openDialog}
       >
         <span className="flex space-x-2">

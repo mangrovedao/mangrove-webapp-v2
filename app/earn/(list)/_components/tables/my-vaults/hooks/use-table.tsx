@@ -48,9 +48,9 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
           // )
 
           return (
-            <div className="flex flex-col underline">
+            <div className="flex flex-col underline ml-2">
               <Link
-                className="hover:opacity-80 transition-opacity bg-[#284061] p-1 rounded-md"
+                className="hover:opacity-80 transition-opacity bg-[#284061] size-6 rounded-md flex items-center justify-center"
                 href={`${blockExplorerUrl}/address/${address}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -81,7 +81,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
           const value = `Kandel - ${sourceInfo.name}`
 
           return (
-            <div className="mr-20">
+            <div className="mr-[131px]">
               <Value value={value} trusted={isTrusted} />
             </div>
           )

@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
 import React from "react"
 import { Address, formatUnits, parseUnits } from "viem"
-import { useAccount, useConfig, usePublicClient, useWalletClient } from "wagmi"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { useMangroveAddresses, useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
@@ -26,7 +26,6 @@ import {
 } from "@/utils/tokens"
 
 export function useSwap() {
-  const config = useConfig()
   const { isConnected, address, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
@@ -189,10 +188,15 @@ export function useSwap() {
   const getMarketPriceQuery = useQuery({
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
     queryFn: async () => {
-      if (!marketClient || !chainId || !payTknAddress || !receiveTknAddress)
+      if (
+        !marketClient?.chain ||
+        !chainId ||
+        !payTknAddress ||
+        !receiveTknAddress
+      )
         return null
 
-      return accPrices({
+      return await accPrices({
         chainId: chainId as keyof typeof USD_TOKENS,
         receiveTknAddress: receiveTknAddress as Address,
         payTknAddress: payTknAddress as Address,
@@ -202,7 +206,11 @@ export function useSwap() {
       })
     },
     refetchInterval: 3_000,
-    enabled: !!marketClient && !!markets && !!payToken && !!receiveToken,
+    enabled:
+      !!marketClient?.name &&
+      !!markets &&
+      !!payToken?.address &&
+      !!receiveToken?.address,
   })
 
   const hasToApprove = simulateQuery.data?.approvalStep?.done === false
@@ -312,5 +320,6 @@ export function useSwap() {
     swapButtonText,
     payDollar: getMarketPriceQuery.data?.payDollar ?? 0,
     receiveDollar: getMarketPriceQuery.data?.receiveDollar ?? 0,
+    isFetchingPrices: getMarketPriceQuery.isFetching,
   }
 }

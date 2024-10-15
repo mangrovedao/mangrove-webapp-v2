@@ -17,8 +17,9 @@ export function Market({ base, quote }: Props) {
       <TokenPair
         titleProps={{
           variant: "title3",
-          className: "text-sm text-text-primary font-normal",
+          className: "text-sm text-text-primary",
           as: "span",
+          weight: "bold",
         }}
         tokenClasses="w-6 h-6"
         baseToken={baseToken}

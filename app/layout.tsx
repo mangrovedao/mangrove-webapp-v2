@@ -1,12 +1,12 @@
 import React from "react"
 import { Toaster } from "sonner"
 
+import { Navbar } from "@/components/navbar"
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
 import DisclaimerDialog from "@/components/stateful/dialogs/disclaimer-dialog"
 import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-network-dialog"
 import { RootProvider } from "@/providers/root"
 
-import { Navbar } from "@/components/navbar"
 import Sidebar from "@/components/sidebar/sidebar"
 import "./globals.css"
 
@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="md:pl-[6.5rem] px-4">
         <RootProvider>
           <Sidebar />
           <Navbar />
