@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function Layout({ children }: React.PropsWithChildren) {
-  return <main className="max-w-4xl mx-auto px-4 pt-20 mb-10">{children}</main>
+  return <main className="">{children}</main>
 }

@@ -1,27 +1,12 @@
 "use client"
 
-import { useState } from "react"
-
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { RaccoonIllustration } from "@/svgs"
+import { cn } from "@/utils"
 import Timer from "./_components/timer"
 
 export default function Page() {
-  const [percentage, setPercentage] = useState(0)
-  const timeLeft = 30
-  const radius = 50
-  const circumference = 2 * Math.PI * radius
-  const offset = circumference - (percentage / 100) * circumference
-
-  // useEffect(() => {
-  //   // Simuler une progression
-  //   const interval = setInterval(() => {
-  //     setPercentage((prev) => (prev + 1) % 101)
-  //   }, 100)
-  //   return () => clearInterval(interval)
-  // }, [])
-
   return (
     <main className="mt-8 px-4">
       <Title variant={"header1"} className="pl-5">
@@ -30,7 +15,7 @@ export default function Page() {
       <div className="grid grid-cols-6 gap-10 mt-8">
         <div className="lg:col-span-4 col-span-6">
           <div className="rounded-2xl bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 relative">
-            <RaccoonIllustration className="absolute top-0 right-0 -translate-x-1/2 -translate-y-2/3" />
+            <RaccoonIllustration className="absolute top-0 right-0 hidden sm:block md:-translate-x-1/2 -translate-y-2/3" />
             <Timer />
             <div>
               <h2 className="font-semibold text-2xl">Epoch #5</h2>
@@ -48,36 +33,73 @@ export default function Page() {
           <div className="px-8">
             <hr className="px-6" />
           </div>
+          <div className="px-4 md:px-16 py-5 flex">
+            <div className="flex flex-col flex-1">
+              <Label>Total Epoch Reward</Label>
+              <Value>3,259</Value>
+            </div>
+            <div className="flex flex-col flex-1 space-y-2">
+              <div className="flex justify-between">
+                <Label>Taker Rewards</Label>
+                <Value size="small">200</Value>
+              </div>
+              <div className="flex justify-between">
+                <Label>Maker Rewards</Label>
+                <Value size="small">0</Value>
+              </div>
+              <div className="flex justify-between">
+                <Label>Kandel Rewards</Label>
+                <Value size="small">3,059</Value>
+              </div>
+            </div>
+          </div>
+
+          <Title variant={"title1"} className="pl-5 mt-8 mb-4">
+            Season 1 Points program
+          </Title>
         </div>
         <div className="lg:col-span-2 col-span-6 h-20">
           <NeonContainer className="space-y-5">
             <div className="flex justify-between">
-              <span className="text-sm text-text-secondary">
-                Available rewards
-              </span>
-              <span className="text-2xl">
-                71.675 <span className="text-text-secondary">MGV</span>
-              </span>
+              <Label>Available rewards</Label>
+              <Value>71.675</Value>
             </div>
 
             <Button variant={"primary"} size={"xl"} className="w-full">
               Claim rewards
             </Button>
           </NeonContainer>
+          <div className="flex justify-between my-5">
+            <Label>Claimed rewards</Label>
+            <Value>11,396</Value>
+          </div>
+          <div className="flex justify-between mt-5">
+            <Label>Total rewards</Label>
+            <Value>71.68˝5</Value>
+          </div>
         </div>
       </div>
     </main>
   )
 }
 
-function LabelValue({}) {
+function Label({ children }: React.ComponentProps<"span">) {
+  return <span className="text-sm text-text-secondary">{children}</span>
+}
+
+function Value({
+  children,
+  size = "normal",
+}: React.ComponentProps<"span"> & { size?: "small" | "normal" }) {
   return (
-    <div className="flex justify-between">
-      <span className="text-sm text-text-secondary">Available rewards</span>
-      <span className="text-2xl">
-        71.675 <span className="text-text-secondary">MGV</span>
-      </span>
-    </div>
+    <span
+      className={cn({
+        "text-2xl": size === "normal",
+        "text-sm": size === "small",
+      })}
+    >
+      {children} <span className="text-text-secondary">MGV</span>
+    </span>
   )
 }
 

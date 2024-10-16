@@ -6,8 +6,8 @@ import { cn } from "@/utils"
 const titleStyles = cva("text-current", {
   variants: {
     variant: {
-      header1: "text-xl lg:text-2xl",
-      title1: "text-lg lg:text-xl leading-8",
+      header1: "text-3xl",
+      title1: "text-lg lg:text-lg leading-8",
       title2: "text-sm lg:text-base leading-5",
       title3: "text-xs lg:text-sm leading-[14px]",
     },
