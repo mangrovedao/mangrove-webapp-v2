@@ -40,7 +40,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
   return (
     <nav
       className={cn(
-        "flex w-full justify-between items-center text-sm grid-in-header",
+        "flex w-full justify-between items-center text-sm grid-in-header py-1 mt-6 mb-8",
         className,
       )}
       {...props}
@@ -99,7 +99,7 @@ const RightPart = withClientOnly(() => {
   }
 
   return (
-    <div className="flex space-x-4 items-center h-8 py-1 mt-6 mb-8">
+    <div className="flex space-x-4 items-center h-8">
       <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
