@@ -2,11 +2,10 @@
 
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useTokenBalance } from "@/hooks/use-balances"
 import { cn } from "@/utils"
+import { Token } from "@mangrovedao/mgv"
 import React from "react"
-import AddToVaultDialog from "./dialogs/add-dialog"
+import { vault } from "../page"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
@@ -20,38 +19,18 @@ export function DepositForm({ className }: { className?: string }) {
     baseDeposit,
     quoteDeposit,
     mintAmount,
-    vault,
     errors,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     isLoading,
   } = useForm()
-  const { balance: baseBalance, isLoading: baseBalanceIsLoading } =
-    useTokenBalance({
-      token: baseToken?.address,
-    })
 
-  const baseDepositSliderValue =
-    Number(baseDeposit) !== 0
-      ? ((Number(baseDeposit) / Number(baseBalance)) * 100).toFixed(0)
-      : 0
-
-  const { balance: quoteBalance, isLoading: quoteBalanceIsLoading } =
-    useTokenBalance({
-      token: quoteToken?.address,
-    })
-
-  const quoteDepositSliderValue =
-    Number(quoteDeposit) !== 0
-      ? ((Number(quoteDeposit) / Number(quoteBalance)) * 100).toFixed(0)
-      : 0
-
-  if (!baseToken || !quoteToken)
-    return (
-      <div className={"p-0.5"}>
-        <Skeleton className="w-full h-40" />
-      </div>
-    )
+  // if (!baseToken || !quoteToken)
+  //   return (
+  //     <div className={"p-0.5"}>
+  //       <Skeleton className="w-full h-40" />
+  //     </div>
+  //   )
 
   return (
     <form
@@ -62,7 +41,7 @@ export function DepositForm({ className }: { className?: string }) {
     >
       <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
         <EnhancedNumericInput
-          token={baseToken}
+          token={vault?.market.base as Token}
           label={`Deposit 80%`}
           inputClassName="bg-bg-primary"
           value={baseDeposit}
@@ -119,7 +98,7 @@ export function DepositForm({ className }: { className?: string }) {
 
       <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
         <EnhancedNumericInput
-          token={quoteToken}
+          token={vault?.market.quote as Token}
           label={`Deposit 20%`}
           value={quoteDeposit}
           inputClassName="bg-bg-primary"
@@ -180,16 +159,16 @@ export function DepositForm({ className }: { className?: string }) {
       >
         Deposit
       </Button>
-      <AddToVaultDialog
+      {/* <AddToVaultDialog
         isOpen={addDialog}
         baseAmount={baseDeposit}
         quoteAmount={quoteDeposit}
         vault={vault}
-        baseToken={baseToken}
-        quoteToken={quoteToken}
+        baseToken={baseToken!}
+        quoteToken={quoteToken!}
         mintAmount={mintAmount}
         onClose={() => setAddDialog(false)}
-      />
+      /> */}
     </form>
   )
 }

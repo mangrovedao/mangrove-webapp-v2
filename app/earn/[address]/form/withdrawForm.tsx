@@ -4,12 +4,11 @@ import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
 import React, { ReactNode } from "react"
 import { erc20Abi, type Address } from "viem"
 import { useAccount, useReadContract } from "wagmi"
-import RemoveFromVaultDialog from "./dialogs/remove-dialog"
+import { vault } from "../page"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
@@ -18,7 +17,7 @@ export function WithdrawForm({ className }: { className?: string }) {
   const [sliderValue, setSliderValue] = React.useState<number | undefined>(0)
   const [removeDialog, setRemoveDialog] = React.useState(false)
 
-  const { vault, baseToken, quoteToken } = useForm()
+  const { baseToken, quoteToken } = useForm()
 
   const { address } = useAccount()
 
@@ -34,12 +33,12 @@ export function WithdrawForm({ className }: { className?: string }) {
 
   const amount = balance ? (balance * BigInt(sliderValue || 0)) / 100n : 0n
 
-  if (!baseToken || !quoteToken || !vault || !address)
-    return (
-      <div className={"p-0.5"}>
-        <Skeleton className="w-full h-40" />
-      </div>
-    )
+  // if (!baseToken || !quoteToken || !vault || !address)
+  //   return (
+  //     <div className={"p-0.5"}>
+  //       <Skeleton className="w-full h-40" />
+  //     </div>
+  //   )
 
   return (
     <form
@@ -56,14 +55,14 @@ export function WithdrawForm({ className }: { className?: string }) {
           </Title>
           <div className="grid gap-2">
             <Line
-              icon={baseToken.symbol}
-              title={baseToken.symbol}
+              icon={vault?.market.base.symbol!}
+              title={vault?.market.base.symbol!}
               value={0.266}
             />
             <Line
-              title={quoteToken.symbol}
+              title={vault?.market.quote.symbol!}
               value={0.266}
-              icon={quoteToken.symbol}
+              icon={vault?.market.quote.symbol!}
             />
           </div>
           {/* Buttons loop */}
@@ -112,12 +111,12 @@ export function WithdrawForm({ className }: { className?: string }) {
       >
         Withdraw
       </Button>
-      <RemoveFromVaultDialog
-        vault={vault}
+      {/* <RemoveFromVaultDialog
+        vault={vault!}
         amount={amount}
         onClose={() => setRemoveDialog(false)}
         isOpen={removeDialog}
-      />
+      /> */}
     </form>
   )
 }
