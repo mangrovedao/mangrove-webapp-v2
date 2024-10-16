@@ -8,8 +8,8 @@ import { cn } from "@/utils"
 import React, { ReactNode } from "react"
 import { erc20Abi, type Address } from "viem"
 import { useAccount, useReadContract } from "wagmi"
-import { vault } from "../page"
-import useForm from "./use-form"
+
+import useForm, { vault } from "./use-form"
 
 const sliderValues = [25, 50, 75]
 

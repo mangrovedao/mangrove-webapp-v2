@@ -38,6 +38,7 @@ import { useAccount, useClient } from "wagmi"
 import { Vault } from "../(list)/_schemas/vaults"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/depositForm"
+import { vault } from "./form/use-form"
 import { WithdrawForm } from "./form/withdrawForm"
 
 enum Tabs {
@@ -48,38 +49,6 @@ enum Tabs {
 enum Action {
   Deposit = "Deposit",
   Withdraw = "Withdraw",
-}
-
-export const vault = {
-  address: "0xbC766847aB3b36F7012037f11Cd05B187F51Fc23",
-  kandel: "0x2341561eaC01D79e184eaCF09f380EB8A0e3408b",
-  market: {
-    base: {
-      address: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-      symbol: "WETH",
-      decimals: 18,
-      displayDecimals: 3,
-      priceDisplayDecimals: 4,
-      mgvTestToken: false,
-    },
-    quote: {
-      address: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-      symbol: "USDC",
-      decimals: 18,
-      displayDecimals: 2,
-      priceDisplayDecimals: 4,
-      mgvTestToken: false,
-    },
-    tickSpacing: "1" as unknown as bigint,
-  },
-  strategist: "SKATEFI",
-  fees: 0.01,
-  totalBase: "20280219438420489" as unknown as bigint,
-  totalQuote: "70870059437845227129" as unknown as bigint,
-  balanceBase: "0" as unknown as bigint,
-  balanceQuote: "0" as unknown as bigint,
-  pnl: 0,
-  baseIsToken0: false,
 }
 
 export default function Page() {

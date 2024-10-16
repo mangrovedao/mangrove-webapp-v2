@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/utils"
 import { Token } from "@mangrovedao/mgv"
 import React from "react"
-import { vault } from "../page"
-import useForm from "./use-form"
+
+import useForm, { vault } from "./use-form"
 
 const sliderValues = [25, 50, 75]
 
