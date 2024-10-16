@@ -14,8 +14,10 @@ export default function InfoTooltip({
   children,
   side,
   className,
+  iconSize = 16,
 }: PropsWithChildren<{
   className?: string
+  iconSize?: number
   side?: "top" | "right" | "bottom" | "left"
 }>) {
   return (
@@ -31,7 +33,7 @@ export default function InfoTooltip({
             className,
           )}
         >
-          <CircleHelp size={16} />
+          <CircleHelp size={iconSize ?? 16} />
         </TooltipTrigger>
         <TooltipPortal>
           <TooltipContent side={side}>{children}</TooltipContent>

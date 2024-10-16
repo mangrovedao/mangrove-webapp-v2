@@ -1,12 +1,22 @@
 "use client"
 
-import { CheckIcon, ChevronRight, Coins, ExternalLink } from "lucide-react"
+import {
+  CheckIcon,
+  ChevronRight,
+  Coins,
+  ExternalLink,
+  Globe,
+  Mail,
+  Send,
+  SquareArrowOutUpRight,
+  Twitter,
+} from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
-} from "@/components/custom-radio-group"
+} from "@/components/custom-radio-group-new"
 import InfoTooltip from "@/components/info-tooltip-new"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
@@ -15,6 +25,7 @@ import { Title } from "@/components/typography/title"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
+import { MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
 import { chainsIcons } from "@/utils/chainsIcons"
 import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
@@ -26,9 +37,9 @@ import { formatUnits } from "viem"
 import { useAccount, useClient } from "wagmi"
 import { Vault } from "../(list)/_schemas/vaults"
 import { useVault } from "./_hooks/useVault"
-import { AddForm } from "./form/addForm"
 import { Accordion } from "./form/components/accordion"
-import { RemoveForm } from "./form/removeForm"
+import { DepositForm } from "./form/depositForm"
+import { WithdrawForm } from "./form/withdrawForm"
 
 enum Tabs {
   Details = "Details",
@@ -36,13 +47,13 @@ enum Tabs {
 }
 
 enum Action {
-  Add = "Add",
-  Remove = "Remove",
+  Deposit = "Deposit",
+  Withdraw = "Withdraw",
 }
 
 export default function Page() {
   const [tab, setTab] = React.useState(Tabs.Details)
-  const [action, setAction] = React.useState(Action.Add)
+  const [action, setAction] = React.useState(Action.Deposit)
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()
 
@@ -67,6 +78,7 @@ export default function Page() {
         </Link>
         <Caption className="text-text-secondary">Vault details</Caption>
       </div>
+      {/* Market details */}
       <div className="flex items-center gap-2">
         <div className="flex -space-x-2 items-center">
           {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
@@ -118,10 +130,10 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="grid grid-flow-col mt-5">
+      <div className="grid grid-flow-col mt-5 gap-5">
         <div className="col-span-2 w-full space-y-6">
           {/* Infos Card */}
-          <div className="flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary">
+          <div className="xs:grid md:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary">
             <GridLine title={"TVL"} value={"1.202.418,52"} symbol={"$"} />
             <GridLine title={"APY"} value={"9.00"} symbol={"%"} />
             <GridLine
@@ -153,7 +165,7 @@ export default function Page() {
           {/* Graphs  */}
           {/* ********TODO*********/}
           <div className="border-2 border-bg-tertiary p-6 rounded-lg h-96 w-full">
-            Incoming graphs...
+            Incoming graph...
           </div>
 
           {/* Vault details */}
@@ -162,67 +174,123 @@ export default function Page() {
               Vault details
             </Title>
             <div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="xs:grid-cols-1 grid md:grid-cols-3 gap-4">
                 <div>
-                  <GridLine title="Strategy" value="Passive" />
-                  <GridLine title="Rebalancing" value="Automatic" />
-                  <GridLine title="Leverage" value="1x" />
+                  <GridLine
+                    title="Strategy"
+                    value="Kandel Aave"
+                    icon={
+                      <div className="relative h-4 w-4">
+                        <div className="absolute inset-0 bg-green-700 rounded-full"></div>
+                        <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
+                      </div>
+                    }
+                  />
+                  <GridLine
+                    title="Chain"
+                    value={chain?.name}
+                    icon={chainsIcons[chain?.id ?? 1]}
+                    iconFirst
+                  />
+                  <GridLine
+                    title="Vault Manager"
+                    value="Asterion"
+                    icon={
+                      <div className="flex gap-1 text-text-secondary">
+                        <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        <Send className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        <Mail className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                      </div>
+                    }
+                  />
                 </div>
                 <div>
-                  <GridLine title="Min deposit" value="100" symbol="$" />
-                  <GridLine title="Max deposit" value="1,000,000" symbol="$" />
-                  <GridLine title="Lockup period" value="None" />
+                  <GridLine
+                    title="Performance Fee"
+                    value="8.00"
+                    symbol="%"
+                    info="Tooltip to be defined"
+                  />
+                  <GridLine
+                    title="Strategy Address"
+                    value="0x123...76b6"
+                    icon={
+                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                    }
+                  />
+                  <GridLine
+                    title="Vault Address"
+                    value="0x123...76b6"
+                    icon={
+                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                    }
+                  />
                 </div>
+
                 <div>
-                  <GridLine title="Withdrawal fee" value="0" symbol="%" />
-                  <GridLine title="Management fee" value="2" symbol="%" />
-                  <GridLine title="Performance fee" value="20" symbol="%" />
+                  <GridLine
+                    title="Exit Fee"
+                    value="1.00%"
+                    info="Tooltip to be defined"
+                  />
+                  <GridLine
+                    title="Audit Address"
+                    value="0x123...76b6"
+                    icon={
+                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                    }
+                  />
+                  <GridLine title="Vault Created on" value="March 2024" />
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="row-span-4 ">
-          <div className="grid gap-8 p-6">
-            <div className="w-80">
-              <CustomRadioGroup
-                name={"action"}
-                value={action}
-                onValueChange={(e: Action) => {
-                  console.log(e)
-                  setAction(e)
-                }}
-              >
-                {Object.values(Action).map((action) => (
-                  <CustomRadioGroupItem
-                    key={action}
-                    value={action}
-                    id={action}
-                    className="capitalize"
-                  >
-                    {action}
-                  </CustomRadioGroupItem>
-                ))}
-              </CustomRadioGroup>
+        <div className="row-span-4">
+          <div className="grid gap-8">
+            <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
+              <div className="flex w-2/3 justify-between items-center align-middle">
+                <GridLine
+                  title={"Your deposit"}
+                  value={"1.202.418,52"}
+                  symbol={"$"}
+                />
+                <GridLine title={"Your APY"} value={"6.42"} symbol={"%"} />
+              </div>
             </div>
-            {action === Action.Add ? <AddForm /> : <RemoveForm />}
+            <div className="grid space-y-5 bg-bg-secondary p-3 rounded-lg">
+              <div className="w-full ">
+                <CustomRadioGroup
+                  name={"action"}
+                  value={action}
+                  onValueChange={(e: Action) => {
+                    console.log(e)
+                    setAction(e)
+                  }}
+                >
+                  {Object.values(Action).map((action) => (
+                    <CustomRadioGroupItem
+                      key={action}
+                      value={action}
+                      id={action}
+                      className="capitalize"
+                    >
+                      {action}
+                    </CustomRadioGroupItem>
+                  ))}
+                </CustomRadioGroup>
+              </div>
+              {action === Action.Deposit ? <DepositForm /> : <WithdrawForm />}
+            </div>
           </div>
 
-          <Separator className="my-6" />
-
-          <div className="grid gap-4 px-6">
-            <div className="flex gap-2 items-center">
-              <div className="rounded-lg bg-primary-dark-green w-8 h-8 flex justify-center items-center">
-                <Coins className="h-4 w-4" />
-              </div>
-              <Title>Position</Title>
-            </div>
-
-            <Separator />
+          <div className="grid gap-4 px-6 mt-6">
+            <Title variant={"title3"}>My Position</Title>
 
             <div>
-              <Title>Current Balance</Title>
+              <Caption className="text-text-secondary">Current Balance</Caption>
               <Line
                 title={
                   <div className="flex gap-2">
@@ -230,7 +298,7 @@ export default function Page() {
                       symbol={vault?.market.base.symbol}
                       className="h-4 w-4"
                     />
-                    <Caption className="text-gray text-xs">
+                    <Caption className="text-text-secondary text-xs">
                       {vault?.market.base.symbol}
                     </Caption>
                   </div>
@@ -252,7 +320,7 @@ export default function Page() {
                       symbol={vault?.market.quote.symbol}
                       className="h-4 w-4"
                     />
-                    <Caption className="text-gray text-xs">
+                    <Caption className="text-text-secondary text-xs">
                       {vault?.market.quote.symbol}
                     </Caption>
                   </div>
@@ -269,6 +337,22 @@ export default function Page() {
                   }) || "0"
                 }
               />
+            </div>
+          </div>
+
+          <div className="grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-lg">
+            <Title variant={"title3"}>Rewards</Title>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex gap-2 items-center">
+                <MangroveLogo className="w-16 h-16 flex justify-center items-center" />
+                <Caption>Mangrove Rewards</Caption>
+              </div>
+
+              <div>
+                <Line title={"Claimable"} value={"0.00"} />
+                <Line title={"Earned"} value={"0.00"} />
+                <Line title={"All time"} value={"0.00"} />
+              </div>
             </div>
           </div>
         </div>
@@ -412,26 +496,39 @@ const GridLine = ({
   value,
   symbol,
   info,
+  icon,
+  iconFirst,
 }: {
   title: ReactNode
   value: ReactNode
   symbol?: ReactNode
+  icon?: ReactNode
+  iconFirst?: boolean
   info?: string
 }) => {
   return (
-    <div className="grid mt-2 items-center">
+    <div className="grid mt-2 items-center space-y-2">
       <div className="flex items-center -gap-1">
         <Caption className="text-text-secondary text-xs">{title}</Caption>
         {info ? (
-          <InfoTooltip className="text-text-secondary">{info}</InfoTooltip>
+          <InfoTooltip className="text-text-secondary" iconSize={14}>
+            {info}
+          </InfoTooltip>
         ) : undefined}
       </div>
-      <Text className="text-text-primary font-axiforma">
-        {value}
-        {symbol ? (
-          <span className="text-text-tertiary">{symbol}</span>
-        ) : undefined}
-      </Text>
+      <div
+        className={cn("flex items-center gap-2 ", {
+          "flex-row-reverse justify-end": iconFirst,
+        })}
+      >
+        <Text className="text-text-primary font-axiforma">
+          {value}
+          {symbol ? (
+            <span className="text-text-tertiary">{symbol}</span>
+          ) : undefined}
+        </Text>
+        <span className="text-text-secondary">{icon}</span>
+      </div>
     </div>
   )
 }
