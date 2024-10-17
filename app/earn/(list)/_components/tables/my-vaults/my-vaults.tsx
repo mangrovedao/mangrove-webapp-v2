@@ -12,12 +12,13 @@ import { useTable } from "./hooks/use-table"
 type Props = {
   type: "user" | "all"
 }
-export function Strategies({ type }: Props) {
+export function MyVaults({ type }: Props) {
   const { push } = useRouter()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
-    pageSize: 2,
+    pageSize: 10,
   })
+
   const { currentMarket: market, markets } = useMarket()
   const { data: count } = useStrategies({
     select: (strategies) => strategies.length,
@@ -57,13 +58,14 @@ export function Strategies({ type }: Props) {
     <>
       <DataTable
         table={table}
+        emptyArrayMessage="No positions yet."
         isError={!!strategiesQuery.error}
         isLoading={strategiesQuery.isLoading || !market}
-        onRowClick={(strategy) =>
-          // note: lost of context after redirecting with push method here
-          // push(`/strategies/${strategy?.address}`)
-          (window.location.href = `/strategies/${strategy?.address}`)
-        }
+        // onRowClick={(earn) =>
+        //   // note: lost of context after redirecting with push method here
+        //   // push(`/earn/${strategy?.address}`)
+        //   (window.location.href = `/earn/${strategy?.address}`)
+        // }
         pagination={{
           onPageChange: setPageDetails,
           page,

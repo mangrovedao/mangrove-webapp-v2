@@ -22,7 +22,7 @@ export function TokenPair({
 }: Props) {
   return (
     <div className={cn("flex items-center space-x-2", className)}>
-      <div className="flex -space-x-2">
+      <div className="flex -space-x-2 items-center">
         {!baseToken || !quoteToken ? (
           <>
             <Skeleton className={cn(tokenClasses, "rounded-full")} />
@@ -40,7 +40,7 @@ export function TokenPair({
       ) : (
         <Title
           {...titleProps}
-        >{`${baseToken.symbol} - ${quoteToken.symbol}`}</Title>
+        >{`${baseToken.symbol}-${quoteToken.symbol}`}</Title>
       )}
     </div>
   )

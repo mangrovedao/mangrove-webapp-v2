@@ -14,7 +14,7 @@ enum InputType {
 }
 
 const inputClasses =
-  "flex h-11 w-full rounded-2xl focus: group-hover/input:!bg-button-secondary-bg-hover active:!border-border-tertiary transition-all bg-bg-secondary text-md placeholder:text-text-placeholder focus-visible:!outline-none disabled:cursor-not-allowed disabled:bg-gray-scale-600 disabled:!border-transparent disabled:text-gray-scale-300"
+  "flex h-11 w-full rounded-2xl border-none focus: group-hover/input: active: transition-all bg-bg-secondary text-md placeholder:text-text-placeholder focus-visible: disabled:cursor-not-allowed disabled:bg-gray-scale-600 disabled:!border-transparent disabled:text-gray-scale-300"
 const errorClasses = "!border-red-100 group-hover/input:!border-red-100"
 const disabledClasses = "border-none"
 

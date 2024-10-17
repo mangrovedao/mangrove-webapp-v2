@@ -18,6 +18,7 @@ import { Pagination, type PaginationProps } from "./pagination"
 interface DataTableProps<TData> {
   table: TableType<TData>
   isError?: boolean
+  emptyArrayMessage?: string
   isLoading?: boolean
   pagination?: PaginationProps
   isRowHighlighted?: (row: TData) => boolean
@@ -32,6 +33,7 @@ interface DataTableProps<TData> {
 export function DataTable<TData>({
   table,
   isError,
+  emptyArrayMessage,
   isLoading,
   pagination,
   isRowHighlighted = () => false,
@@ -49,12 +51,15 @@ export function DataTable<TData>({
     .filter((column) => column.getIsVisible())
 
   return (
-    <div className="grid -gap-1">
+    <>
       <Table>
         <TableHeader className={`sticky z-40 text-xs ${rows.length}`}>
           {rows.length > 0 &&
             table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>
+              <TableRow
+                key={`${tableName}-head-row-${headerGroup.id}`}
+                className="hover:bg-transparent"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -83,7 +88,7 @@ export function DataTable<TData>({
                   key={`${tableName}-body-row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    " hover:text-white transition-colors group/row",
+                    "hover:text-white transition-colors group/row",
                     {
                       "cursor-pointer": !!onRowClick,
                       "text-white hover:opacity-80 transition-all":
@@ -115,7 +120,7 @@ export function DataTable<TData>({
                           },
                         )}
                       >
-                        <div className="px-2 h-6 flex items-center">
+                        <div className="px-2 h-6 flex items-center justify-center">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),
@@ -131,7 +136,7 @@ export function DataTable<TData>({
           ) : (
             <TableRow
               key={`${tableName}-bodyrow-${Math.random()}`}
-              className="rounded-xl"
+              className="hover:bg-transparent"
             >
               <TableCell
                 colSpan={leafColumns.length}
@@ -139,13 +144,13 @@ export function DataTable<TData>({
               >
                 {isError
                   ? "Due to excessive demand, we are unable to return your data. Please try again later."
-                  : "No results."}
+                  : emptyArrayMessage ?? "No results."}
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
       <Pagination {...pagination} />
-    </div>
+    </>
   )
 }
