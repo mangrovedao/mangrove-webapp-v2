@@ -72,8 +72,6 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
 
       columnHelper.display({
         header: "Strategy",
-        minSize: 300,
-
         cell: ({ row }) => {
           const sourceInfo =
             row.original.type === "KandelAAVE"
@@ -89,7 +87,6 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Manager",
         cell: ({ row }) => {
-          const { base, quote } = row.original
           return <Value value="Redacted Labs" />
         },
       }),
@@ -97,7 +94,6 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const { base, quote, offers } = row.original
           const value = "1.525.246,42"
           const symbol = "$"
           return <Value value={value} symbol={symbol} />
@@ -123,19 +119,15 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "My APY",
         cell: ({ row }) => {
-          const { base, quote } = row.original
           return <Value value="7.3%" />
         },
       }),
 
       columnHelper.display({
         id: "actions",
-        header: () => "",
         cell: ({ row }) => {
-          const hasLiveOffers = row.original.offers.some((x) => x.live)
-
           return (
-            <div className="w-full h-full flex justify-end space-x-1 items-center">
+            <div className="w-full h-full flex justify-end space-x-1 items-center z-50">
               <Button className="text-text-tertiary" variant={"invisible"}>
                 Manage
               </Button>

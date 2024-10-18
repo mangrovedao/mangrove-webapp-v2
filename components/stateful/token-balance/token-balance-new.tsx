@@ -1,6 +1,5 @@
 import type { Token } from "@mangrovedao/mgv"
 
-import InfoTooltip from "@/components/info-tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -9,28 +8,38 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useTokenBalance } from "@/hooks/use-balances"
+import { formatUnits } from "viem"
+import { useAccount, useBalance } from "wagmi"
 
-export function CustomBalance(props: {
+export function TokenBalance(props: {
   token?: Token | string
-  balance?: string
   label?: string
-  tooltip?: string
   action?: {
     onClick: (value: string) => void
     text?: string
   }
 }) {
   const token = typeof props.token === "string" ? undefined : props.token
+  const { address } = useAccount()
+  const { data: nativeBalance } = useBalance({ address })
+  const { balance, isLoading } = useTokenBalance({
+    token: token?.address,
+  })
+
+  const symbol = !token ? nativeBalance?.symbol : token.symbol
+  const amount = !token
+    ? formatUnits(nativeBalance?.value || 0n, nativeBalance?.decimals || 18)
+    : formatUnits(balance?.balance || 0n, token?.decimals || 18)
+  const decimals = !token ? nativeBalance?.decimals : token.decimals
+  const formatted = amount
 
   return (
     <div className="flex justify-between items-center mt-1">
-      <div className="flex items-center">
-        <span className="text-xs text-secondary float-left">
-          {props.label ?? "Balance"}
-        </span>
-        <InfoTooltip>{props.tooltip ?? "Formatted Wallet balance"}</InfoTooltip>
-      </div>
-      {!props.balance || !props.token ? (
+      <span className="text-xs text-text-placeholder float-left">
+        {props.label ?? "Balance:"}
+      </span>
+      {!props.token || isLoading ? (
         <Skeleton className="w-24 h-4" />
       ) : (
         <span className="text-xs space-x-1">
@@ -41,21 +50,14 @@ export function CustomBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
-
-                  props.action?.onClick(props.balance || "")
+                  props.action?.onClick(formatted || "")
                 }}
               >
-                <span>
-                  {!token ? (
-                    `${props.balance} ${props.token}`
-                  ) : (
-                    <>
-                      {Number(props.balance).toFixed(token?.displayDecimals)}{" "}
-                      {token?.symbol}
-                    </>
-                  )}
+                <span className="text-text-secondary">
+                  {Number(formatted).toFixed(token?.displayDecimals ?? 8)}{" "}
                 </span>
               </TooltipTrigger>
+
               <TooltipPortal>
                 <TooltipContent
                   onClick={(e) => {
@@ -63,8 +65,7 @@ export function CustomBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {Number(props.balance).toFixed(token?.decimals)}{" "}
-                  {token?.symbol}
+                  {Number(formatted).toFixed(Number(decimals))} {symbol}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>
