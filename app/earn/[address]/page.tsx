@@ -226,11 +226,19 @@ export default function Page() {
                       </div>
                     }
                   />
+                  <GridLine title="Vault Created on" value="March 2024" />
                 </div>
                 <div>
                   <GridLine
                     title="Performance Fee"
                     value={vault?.performanceFee}
+                    symbol="%"
+                    info="Tooltip to be defined"
+                  />
+
+                  <GridLine
+                    title="Management Fee"
+                    value={vault?.managementFee}
                     symbol="%"
                     info="Tooltip to be defined"
                   />
@@ -242,7 +250,6 @@ export default function Page() {
                       <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                     }
                   />
-                  <GridLine title="Vault Created on" value="March 2024" />
                 </div>
               </div>
             </div>

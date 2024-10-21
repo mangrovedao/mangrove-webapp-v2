@@ -1,4 +1,4 @@
-import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
+import { Vault } from "@/app/earn/(shared)/types"
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button-old"
 import { useQueryClient } from "@tanstack/react-query"

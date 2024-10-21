@@ -3,10 +3,11 @@
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/utils"
-import { Token } from "@mangrovedao/mgv"
 import React from "react"
 
-import useForm, { vault } from "./use-form"
+import { Skeleton } from "@/components/ui/skeleton"
+import AddToVaultDialog from "./dialogs/add-dialog"
+import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
 
@@ -23,14 +24,15 @@ export function DepositForm({ className }: { className?: string }) {
     handleBaseDepositChange,
     handleQuoteDepositChange,
     isLoading,
+    vault,
   } = useForm()
 
-  // if (!baseToken || !quoteToken)
-  //   return (
-  //     <div className={"p-0.5"}>
-  //       <Skeleton className="w-full h-40" />
-  //     </div>
-  //   )
+  if (!baseToken || !quoteToken)
+    return (
+      <div className={"p-0.5"}>
+        <Skeleton className="w-full h-40" />
+      </div>
+    )
 
   return (
     <form
@@ -41,7 +43,7 @@ export function DepositForm({ className }: { className?: string }) {
     >
       <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
         <EnhancedNumericInput
-          token={vault?.market.base as Token}
+          token={baseToken}
           label={`Deposit 80%`}
           inputClassName="bg-bg-primary"
           value={baseDeposit}
@@ -98,7 +100,7 @@ export function DepositForm({ className }: { className?: string }) {
 
       <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
         <EnhancedNumericInput
-          token={vault?.market.quote as Token}
+          token={quoteToken}
           label={`Deposit 20%`}
           value={quoteDeposit}
           inputClassName="bg-bg-primary"
@@ -159,16 +161,16 @@ export function DepositForm({ className }: { className?: string }) {
       >
         Deposit
       </Button>
-      {/* <AddToVaultDialog
+      <AddToVaultDialog
         isOpen={addDialog}
         baseAmount={baseDeposit}
         quoteAmount={quoteDeposit}
         vault={vault}
-        baseToken={baseToken!}
-        quoteToken={quoteToken!}
+        baseToken={baseToken}
+        quoteToken={quoteToken}
         mintAmount={mintAmount}
         onClose={() => setAddDialog(false)}
-      /> */}
+      />
     </form>
   )
 }

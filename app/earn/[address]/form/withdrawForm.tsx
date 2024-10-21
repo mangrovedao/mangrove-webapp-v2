@@ -9,7 +9,9 @@ import React, { ReactNode } from "react"
 import { erc20Abi, type Address } from "viem"
 import { useAccount, useReadContract } from "wagmi"
 
-import useForm, { vault } from "./use-form"
+import { Skeleton } from "@/components/ui/skeleton"
+import RemoveFromVaultDialog from "./dialogs/remove-dialog"
+import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
 
@@ -17,7 +19,7 @@ export function WithdrawForm({ className }: { className?: string }) {
   const [sliderValue, setSliderValue] = React.useState<number | undefined>(0)
   const [removeDialog, setRemoveDialog] = React.useState(false)
 
-  const { baseToken, quoteToken } = useForm()
+  const { baseToken, quoteToken, vault } = useForm()
 
   const { address } = useAccount()
 
@@ -33,12 +35,12 @@ export function WithdrawForm({ className }: { className?: string }) {
 
   const amount = balance ? (balance * BigInt(sliderValue || 0)) / 100n : 0n
 
-  // if (!baseToken || !quoteToken || !vault || !address)
-  //   return (
-  //     <div className={"p-0.5"}>
-  //       <Skeleton className="w-full h-40" />
-  //     </div>
-  //   )
+  if (!baseToken || !quoteToken || !vault || !address)
+    return (
+      <div className={"p-0.5"}>
+        <Skeleton className="w-full h-40" />
+      </div>
+    )
 
   return (
     <form
@@ -111,12 +113,12 @@ export function WithdrawForm({ className }: { className?: string }) {
       >
         Withdraw
       </Button>
-      {/* <RemoveFromVaultDialog
-        vault={vault!}
+      <RemoveFromVaultDialog
+        vault={vault}
         amount={amount}
         onClose={() => setRemoveDialog(false)}
         isOpen={removeDialog}
-      /> */}
+      />
     </form>
   )
 }

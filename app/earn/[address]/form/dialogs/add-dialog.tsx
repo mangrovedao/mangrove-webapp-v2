@@ -1,7 +1,7 @@
 import type { Token } from "@mangrovedao/mgv"
 import React, { useEffect, useMemo } from "react"
 
-import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
+import { Vault } from "@/app/earn/(shared)/types"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
@@ -136,11 +136,11 @@ export default function AddToVaultDialog({
     : 1
 
   const amount0 = useMemo(() => {
-    return vault?.baseIsToken0 ? baseAmount : quoteAmount
-  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+    return baseAmount
+  }, [baseAmount, quoteAmount])
   const amount1 = useMemo(() => {
-    return vault?.baseIsToken0 ? quoteAmount : baseAmount
-  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+    return quoteAmount
+  }, [baseAmount, quoteAmount])
 
   const result = useSimulateContract({
     address: vault?.address,
