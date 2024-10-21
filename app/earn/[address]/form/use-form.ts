@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from "next/navigation"
 import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits, parseUnits } from "viem"
 import { useMintAmounts } from "../_hooks/use-mint-amounts"
-import { useVault } from "../_hooks/useVault"
+import { useVault } from "../_hooks/use-vault"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
@@ -51,7 +51,7 @@ export default function useForm() {
   } = useVault(params.address)
 
   const { data, isLoading, isError, setBaseAmount, setQuoteAmount } =
-    useMintAmounts({ vault })
+    useMintAmounts({ vault: vault })
 
   const { address } = useAccount()
   // const { currentMarket: market } = useMarket()

@@ -5,7 +5,7 @@ import { useAccount } from "wagmi"
 
 import { useTokens } from "@/hooks/use-addresses"
 import useIndexerSdk from "@/providers/mangrove-indexer"
-import { parseStrategies, type Strategy } from "../../../../_schemas/kandels"
+import { type Strategy } from "../../../../_schemas/kandels"
 
 type Params<T> = {
   filters?: {
@@ -15,7 +15,7 @@ type Params<T> = {
   select?: (data: Strategy[]) => T
 }
 
-export function useStrategies<T = Strategy[]>({
+export function useMyVaults<T = Strategy[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
@@ -29,13 +29,8 @@ export function useStrategies<T = Strategy[]>({
     queryFn: async () => {
       try {
         if (!(indexerSdk && address && tokensList && chainId)) return []
-        const result = await indexerSdk.getKandels({
-          owner: address.toLowerCase(),
-          first,
-          skip,
-          knownTokens: tokensList,
-        })
-        return parseStrategies(result)
+
+        return []
       } catch (error) {
         console.error(error)
         return []

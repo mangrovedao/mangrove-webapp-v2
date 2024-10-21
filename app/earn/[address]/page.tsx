@@ -22,12 +22,13 @@ import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
+import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
-import { chainsIcons } from "@/utils/chainsIcons"
+import { shortenAddress } from "@/utils/wallet"
 import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
 import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
 import { useQuery } from "@tanstack/react-query"
@@ -36,9 +37,9 @@ import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
 import { useAccount, useClient } from "wagmi"
 import { Vault } from "../(list)/_schemas/vaults"
+import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/depositForm"
-import { vault } from "./form/use-form"
 import { WithdrawForm } from "./form/withdrawForm"
 
 enum Tabs {
@@ -57,10 +58,10 @@ export default function Page() {
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()
 
-  // const {
-  //   data: { vault, kandelState },
-  //   refetch,
-  // } = useVault(params.address)
+  const {
+    data: { vault },
+    refetch,
+  } = useVault(params.address)
 
   // React.useEffect(() => {
   //   setTimeout(() => refetch?.(), 1)
@@ -110,13 +111,22 @@ export default function Page() {
             <Subline
               title={"Chain"}
               value={chain?.name}
-              icon={chainsIcons[chain?.id ?? 1]}
+              icon={
+                <ImageWithHideOnError
+                  src={`/assets/chains/${chain?.id}.webp`}
+                  width={16}
+                  height={16}
+                  className="h-4 rounded-sm size-4"
+                  key={chain?.id}
+                  alt={`${chain?.name}-logo`}
+                />
+              }
             />
 
             <Separator className="h-4 self-center" orientation="vertical" />
             <Subline
               title={"Strategy"}
-              value={"Kandel Aave"}
+              value={vault?.type}
               icon={
                 <div className="relative h-4 w-4">
                   <div className="absolute inset-0 bg-green-700 rounded-full"></div>
@@ -126,7 +136,7 @@ export default function Page() {
             />
 
             <Separator className="h-4 self-center" orientation="vertical" />
-            <Subline title={"Manager"} value={"Asterion"} />
+            <Subline title={"Manager"} value={vault?.manager} />
           </div>
         </div>
       </div>
@@ -135,11 +145,15 @@ export default function Page() {
         <div className="col-span-2 w-full space-y-6">
           {/* Infos Card */}
           <div className="xs:grid md:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary">
-            <GridLine title={"TVL"} value={"1.202.418,52"} symbol={"$"} />
+            <GridLine
+              title={"TVL"}
+              value={vault?.tvl}
+              symbol={vault?.market.quote.symbol}
+            />
             <GridLine title={"APY"} value={"9.00"} symbol={"%"} />
             <GridLine
               title={"Performance Fee"}
-              value={"8.00"}
+              value={vault?.performanceFee}
               symbol={"%"}
               info="Tooltip to be defined"
             />
@@ -151,15 +165,13 @@ export default function Page() {
               Vault description
             </Title>
             <Caption className="font-axiforma text-text-secondary text-xs">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo ed ut perspiciatis unde omnis iste
-              natus error sit voluptatem perspiciatis ...
+              {vault?.description}
             </Caption>
 
             <Accordion title="Read more">
-              <Caption className="font-axiforma">Text...</Caption>
+              <Caption className="font-axiforma">
+                {vault?.descriptionBonus}
+              </Caption>
             </Accordion>
           </div>
 
@@ -175,11 +187,11 @@ export default function Page() {
               Vault details
             </Title>
             <div>
-              <div className="xs:grid-cols-1 grid md:grid-cols-3 gap-4">
+              <div className="xs:grid-cols-1 grid md:grid-cols-2 gap-4">
                 <div>
                   <GridLine
                     title="Strategy"
-                    value="Kandel Aave"
+                    value={vault?.strategyType}
                     icon={
                       <div className="relative h-4 w-4">
                         <div className="absolute inset-0 bg-green-700 rounded-full"></div>
@@ -190,12 +202,21 @@ export default function Page() {
                   <GridLine
                     title="Chain"
                     value={chain?.name}
-                    icon={chainsIcons[chain?.id ?? 1]}
+                    icon={
+                      <ImageWithHideOnError
+                        src={`/assets/chains/${chain?.id}.webp`}
+                        width={16}
+                        height={16}
+                        className="h-4 rounded-sm size-4"
+                        key={chain?.id}
+                        alt={`${chain?.name}-logo`}
+                      />
+                    }
                     iconFirst
                   />
                   <GridLine
                     title="Vault Manager"
-                    value="Asterion"
+                    value={vault?.manager}
                     icon={
                       <div className="flex gap-1 text-text-secondary">
                         <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
@@ -209,35 +230,14 @@ export default function Page() {
                 <div>
                   <GridLine
                     title="Performance Fee"
-                    value="8.00"
+                    value={vault?.performanceFee}
                     symbol="%"
                     info="Tooltip to be defined"
                   />
-                  <GridLine
-                    title="Strategy Address"
-                    value="0x123...76b6"
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
-                  />
+
                   <GridLine
                     title="Vault Address"
-                    value="0x123...76b6"
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
-                  />
-                </div>
-
-                <div>
-                  <GridLine
-                    title="Exit Fee"
-                    value="1.00%"
-                    info="Tooltip to be defined"
-                  />
-                  <GridLine
-                    title="Audit Address"
-                    value="0x123...76b6"
+                    value={shortenAddress(vault?.address || "")}
                     icon={
                       <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                     }

@@ -2,7 +2,6 @@ import React from "react"
 
 import { CustomTabs } from "@/components/custom-tabs"
 import { useAccount } from "wagmi"
-import { MyVaults } from "./my-vaults/my-vaults"
 import { Vaults } from "./vaults/vaults"
 
 import { Title } from "@/components/typography/title"
@@ -44,7 +43,7 @@ export function Tables({
         <Title variant={"title2"} className="pl-4">
           My positions
         </Title>
-        <MyVaults type="user" />
+        {/* <MyVaults type="user" /> */}
       </div>
       <div className="grid gap-y-4">
         <div className="flex gap-2 w-full justify-between items-center">

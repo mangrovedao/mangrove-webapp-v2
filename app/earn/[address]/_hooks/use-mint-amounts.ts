@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useDebounceCallback } from "usehooks-ts"
 import { usePublicClient } from "wagmi"
-import type { Vault } from "../../(list)/_schemas/vaults"
+
+import { Vault } from "../../(shared)/types"
 import { getMintAmount } from "../_service/skate-vault"
 
 export type MintAmountsArgs = {
@@ -60,8 +61,8 @@ export function useMintAmounts({ vault }: MintAmountsArgs) {
           : quoteBalance.balance
       const { amount0, amount1, mintAmount } = await getMintAmount(client, {
         vault: vault.address,
-        amount0: vault.baseIsToken0 ? baseAmount : quoteAmount,
-        amount1: vault.baseIsToken0 ? quoteAmount : baseAmount,
+        amount0: baseAmount,
+        amount1: quoteAmount,
       })
       //
       // Mock impl
@@ -78,8 +79,8 @@ export function useMintAmounts({ vault }: MintAmountsArgs) {
       // const mintAmount = amount0
       // end mock impl
 
-      baseAmount = vault.baseIsToken0 ? amount0 : amount1
-      quoteAmount = vault.baseIsToken0 ? amount1 : amount0
+      baseAmount = amount0
+      quoteAmount = amount1
       return {
         amount0,
         amount1,

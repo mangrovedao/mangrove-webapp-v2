@@ -11,26 +11,23 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
-import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
-
+import { Vault } from "@/app/earn/(shared)/types"
 import { Button } from "@/components/ui/button"
 import { chainsIcons } from "@/utils/chainsIcons"
-import type { Strategy } from "../../../../_schemas/kandels"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
-const columnHelper = createColumnHelper<Strategy>()
-const DEFAULT_DATA: Strategy[] = []
+const columnHelper = createColumnHelper<Vault>()
+const DEFAULT_DATA: Vault[] = []
 
 type Params = {
   type: "user" | "all"
-  data?: Strategy[]
+  data?: Vault[]
   pageSize: number
-  onCancel: (strategy: Strategy) => void
-  onManage: (strategy: Strategy) => void
+  onManage: (vault: Vault) => void
 }
 
-export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
+export function useTable({ type, pageSize, data, onManage }: Params) {
   const { chain } = useAccount()
 
   const columns = React.useMemo(
@@ -39,7 +36,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
         id: "blockchain-explorer",
         header: () => "",
         cell: ({ row }) => {
-          const { address, owner } = row.original
+          const { address } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
 
           // note: check if we can retrive logos from library directly
@@ -65,8 +62,10 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Market",
         cell: ({ row }) => {
-          const { base, quote } = row.original
-          return <Market base={base} quote={quote} />
+          const { market } = row.original
+          return (
+            <Market base={market.base.address} quote={market.quote.address} />
+          )
         },
       }),
 
@@ -74,7 +73,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
         header: "Strategy",
         cell: ({ row }) => {
           const sourceInfo =
-            row.original.type === "KandelAAVE"
+            row.original.type === "Aave"
               ? { id: "Aave", name: "Aave" }
               : { id: "simple", name: "Wallet" }
           const isTrusted = true
@@ -103,13 +102,8 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Deposited",
         cell: ({ row }) => {
-          const { base, quote, address, offers } = row.original
-          const { data } = useStrategyStatus({
-            address,
-            base,
-            quote,
-            offers,
-          })
+          const { address } = row.original
+
           const value = "625.246,42"
           const symbol = "$"
           return <Value value={value} symbol={symbol} />
@@ -136,7 +130,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
         },
       }),
     ],
-    [onManage, onCancel],
+    [onManage],
   )
 
   return useReactTable({
