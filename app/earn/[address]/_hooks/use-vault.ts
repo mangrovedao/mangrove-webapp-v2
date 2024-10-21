@@ -16,7 +16,9 @@ export function useVault(id?: string | null) {
     queryFn: async () => {
       if (!publicClient || !params || !user || !chainId)
         throw new Error("Public client is not enabled")
+
       if (id && !isAddress(id)) throw new Error("Invalid address")
+
       const vaultAddress = id ? getAddress(id) : id
       const vault = VAULTS_WHITELIST.find((v) => v.address == vaultAddress)
       if (!vault) return { vault: undefined }

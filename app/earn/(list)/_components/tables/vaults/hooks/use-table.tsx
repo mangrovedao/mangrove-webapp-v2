@@ -12,8 +12,8 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { Vault } from "@/app/earn/(shared)/types"
+import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
-import { chainsIcons } from "@/utils/chainsIcons"
 import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
@@ -53,7 +53,7 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {chainsIcons[chain?.id || 1]}
+                {getChainImage(chain?.id, chain?.name)}
               </Link>
             </div>
           )
@@ -94,7 +94,7 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "APY",
         cell: ({ row }) => {
-          const value = "13.19%"
+          const value = "-"
           return <Value value={value} />
         },
       }),
@@ -102,7 +102,7 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "30 D",
         cell: ({ row }) => {
-          const value = "7.13%"
+          const value = "-"
           return <Value value={value} />
         },
       }),
@@ -114,7 +114,9 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
 
           return (
             <Value
-              value={formatUnits(tvl, market.quote.decimals)}
+              value={Number(
+                formatUnits(tvl || 0n, market.quote.decimals || 18),
+              ).toFixed(market.quote.displayDecimals || 3)}
               symbol={market.quote.symbol}
             />
           )

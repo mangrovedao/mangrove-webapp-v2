@@ -22,7 +22,6 @@ import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
@@ -37,6 +36,7 @@ import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
 import { useAccount, useClient } from "wagmi"
 import { Vault } from "../(list)/_schemas/vaults"
+import { getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/depositForm"
@@ -63,9 +63,9 @@ export default function Page() {
     refetch,
   } = useVault(params.address)
 
-  // React.useEffect(() => {
-  //   setTimeout(() => refetch?.(), 1)
-  // }, [refetch])
+  React.useEffect(() => {
+    setTimeout(() => refetch?.(), 1)
+  }, [refetch])
 
   const { push } = useRouter()
 
@@ -111,16 +111,7 @@ export default function Page() {
             <Subline
               title={"Chain"}
               value={chain?.name}
-              icon={
-                <ImageWithHideOnError
-                  src={`/assets/chains/${chain?.id}.webp`}
-                  width={16}
-                  height={16}
-                  className="h-4 rounded-sm size-4"
-                  key={chain?.id}
-                  alt={`${chain?.name}-logo`}
-                />
-              }
+              icon={getChainImage(chain?.id, chain?.name)}
             />
 
             <Separator className="h-4 self-center" orientation="vertical" />
@@ -147,8 +138,13 @@ export default function Page() {
           <div className="xs:grid md:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary">
             <GridLine
               title={"TVL"}
-              value={vault?.tvl}
-              symbol={vault?.market.quote.symbol}
+              value={Number(
+                formatUnits(
+                  vault?.tvl || 0n,
+                  vault?.market.quote.decimals || 18,
+                ),
+              ).toFixed(vault?.market.quote.displayDecimals || 3)}
+              symbol={` ${vault?.market.quote.symbol}`}
             />
             <GridLine title={"APY"} value={"9.00"} symbol={"%"} />
             <GridLine
@@ -202,16 +198,7 @@ export default function Page() {
                   <GridLine
                     title="Chain"
                     value={chain?.name}
-                    icon={
-                      <ImageWithHideOnError
-                        src={`/assets/chains/${chain?.id}.webp`}
-                        width={16}
-                        height={16}
-                        className="h-4 rounded-sm size-4"
-                        key={chain?.id}
-                        alt={`${chain?.name}-logo`}
-                      />
-                    }
+                    icon={getChainImage(chain?.id, chain?.name)}
                     iconFirst
                   />
                   <GridLine

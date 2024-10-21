@@ -12,8 +12,8 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { Vault } from "@/app/earn/(shared)/types"
+import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
-import { chainsIcons } from "@/utils/chainsIcons"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -52,7 +52,7 @@ export function useTable({ type, pageSize, data, onManage }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {chainsIcons[chain?.id || 1]}
+                {getChainImage(chain?.id, chain?.name)}
               </Link>
             </div>
           )

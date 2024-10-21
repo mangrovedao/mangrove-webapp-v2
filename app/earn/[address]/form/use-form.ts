@@ -1,7 +1,7 @@
 import React, { useMemo } from "react"
 import { useAccount } from "wagmi"
 
-import { useSearchParams } from "next/navigation"
+import { useParams } from "next/navigation"
 
 import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits, parseUnits } from "viem"
@@ -12,29 +12,17 @@ export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
-  const searchParams = useSearchParams()
-  const vaultId = searchParams.get("id")
+  const params = useParams<{ address: string }>()
   const {
     data: { vault },
-  } = useVault(vaultId)
+  } = useVault(params.address)
 
   const { data, isLoading, isError, setBaseAmount, setQuoteAmount } =
     useMintAmounts({ vault })
 
   const { address } = useAccount()
-  // const { currentMarket: market } = useMarket()
-  // const baseToken = market?.base
-  // const quoteToken = market?.quote
 
-  // const [baseDeposit, setBaseDeposit] = React.useState("")
-  // const [quoteDeposit, setQuoteDeposit] = React.useState("")
   const [errors, setErrors] = React.useState<Record<string, string>>({})
-
-  // const baseBalance = useTokenBalance(baseToken)
-  // const quoteBalance = useTokenBalance(quoteToken)
-  // const { data: nativeBalance } = useBalance({
-  //   address,
-  // })
 
   const baseToken = vault?.market.base
   const quoteToken = vault?.market.quote
