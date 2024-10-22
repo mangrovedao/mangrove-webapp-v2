@@ -2,11 +2,12 @@
 import { useRouter } from "next/navigation"
 import React from "react"
 
-import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault } from "@/app/earn/(shared)/types"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import useMarket from "@/providers/market"
+import { useAccount } from "wagmi"
+import { useMyVaults } from "./hooks/use-my-vaults"
 import { useTable } from "./hooks/use-table"
 
 type Props = {
@@ -14,13 +15,28 @@ type Props = {
 }
 export function MyVaults({ type }: Props) {
   const { push } = useRouter()
+  const { chainId } = useAccount()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
   })
 
   const { currentMarket: market, markets } = useMarket()
-  const vaults = useVaultsWhitelist()
+  const {
+    data: vaults,
+    isLoading,
+    error,
+    refetch,
+  } = useMyVaults({
+    chainId,
+    filters: {
+      skip: (page - 1) * pageSize,
+    },
+  })
+
+  const { data: count } = useMyVaults({
+    select: (vaults) => vaults.length,
+  })
 
   // selected strategy to cancel
   const [closeStrategy, setCloseStrategy] = React.useState<Vault>()
@@ -28,7 +44,7 @@ export function MyVaults({ type }: Props) {
   const table = useTable({
     type,
     pageSize,
-    data: [],
+    data: vaults,
     onManage: (vault: Vault) => {
       push(`/vault/${vault.address}`)
     },
@@ -41,11 +57,11 @@ export function MyVaults({ type }: Props) {
         emptyArrayMessage="No positions yet."
         isError={!!vaults}
         isLoading={!vaults || !market}
-        // onRowClick={(earn) =>
-        //   // note: lost of context after redirecting with push method here
-        //   // push(`/earn/${strategy?.address}`)
-        //   (window.location.href = `/earn/${strategy?.address}`)
-        // }
+        onRowClick={(vault) =>
+          // note: lost of context after redirecting with push method here
+          // push(`/earn/${strategy?.address}`)
+          (window.location.href = `/earn/${vault?.address}`)
+        }
         pagination={{
           onPageChange: setPageDetails,
           page,

@@ -4,7 +4,10 @@ import { Vault } from "@/app/earn/(shared)/types"
 import { useMarkets } from "@/hooks/use-addresses"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
-import { getChainVaults, getVaultsInformation } from "../services/vaults-infos"
+import {
+  getChainVaults,
+  getVaultsInformation,
+} from "../../../../../(shared)/_service/vaults-infos"
 
 type Params<T> = {
   chainId?: number

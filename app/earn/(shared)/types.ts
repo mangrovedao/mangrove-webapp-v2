@@ -22,4 +22,7 @@ export type Vault = {
   tvl: bigint
   strategist: string
   type: string
+  isActive: boolean
+  userBaseBalance: bigint
+  userQuoteBalance: bigint
 }

@@ -2,8 +2,8 @@ import { useMangroveAddresses, useMarkets } from "@/hooks/use-addresses"
 import { useQuery } from "@tanstack/react-query"
 import { getAddress, isAddress } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
-import { getVaultsInformation } from "../../(list)/_components/tables/vaults/services/vaults-infos"
 import { VAULTS_WHITELIST } from "../../(shared)/_hooks/use-vaults-addresses"
+import { getVaultsInformation } from "../../(shared)/_service/vaults-infos"
 
 export function useVault(id?: string | null) {
   const { chainId } = useAccount()

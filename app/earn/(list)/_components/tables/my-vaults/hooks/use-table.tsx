@@ -14,6 +14,7 @@ import { useAccount } from "wagmi"
 import { Vault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
+import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -72,41 +73,53 @@ export function useTable({ type, pageSize, data, onManage }: Params) {
       columnHelper.display({
         header: "Strategy",
         cell: ({ row }) => {
-          const sourceInfo =
-            row.original.type === "Aave"
-              ? { id: "Aave", name: "Aave" }
-              : { id: "simple", name: "Wallet" }
+          const { type } = row.original
           const isTrusted = true
-          const value = `Kandel - ${sourceInfo.name}`
-
-          return <Value value={value} trusted={isTrusted} />
+          return <Value value={type} trusted={isTrusted} />
         },
       }),
 
       columnHelper.display({
         header: "Manager",
         cell: ({ row }) => {
-          return <Value value="Redacted Labs" />
+          const { strategist } = row.original
+          return <Value value={strategist} />
         },
       }),
 
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const value = "1.525.246,42"
-          const symbol = "$"
-          return <Value value={value} symbol={symbol} />
+          const { tvl, market } = row.original
+
+          return (
+            <Value
+              value={Number(
+                formatUnits(tvl || 0n, market.quote.decimals || 18),
+              ).toFixed(market.quote.displayDecimals || 3)}
+              symbol={market.quote.symbol}
+            />
+          )
         },
       }),
 
       columnHelper.display({
         header: "Deposited",
         cell: ({ row }) => {
-          const { address } = row.original
+          const { userBaseBalance, userQuoteBalance, market } = row.original
 
-          const value = "625.246,42"
-          const symbol = "$"
-          return <Value value={value} symbol={symbol} />
+          return (
+            <div className="grid items-center justify-center">
+              <Value
+                value={formatUnits(userBaseBalance, market.base.decimals)}
+                symbol={market.base.symbol}
+              />
+              <Value
+                value={formatUnits(userQuoteBalance, market.quote.decimals)}
+                symbol={market.quote.symbol}
+              />
+            </div>
+          )
         },
       }),
 

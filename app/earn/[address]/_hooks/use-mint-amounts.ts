@@ -5,8 +5,8 @@ import React from "react"
 import { useDebounceCallback } from "usehooks-ts"
 import { usePublicClient } from "wagmi"
 
+import { getMintAmount } from "../../(shared)/_service/mint-vault"
 import { Vault } from "../../(shared)/types"
-import { getMintAmount } from "../_service/skate-vault"
 
 export type MintAmountsArgs = {
   vault?: Vault
