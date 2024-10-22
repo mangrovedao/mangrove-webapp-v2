@@ -5,7 +5,6 @@ import React from "react"
 import { Vault } from "@/app/earn/(shared)/types"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
-import useMarket from "@/providers/market"
 import { useAccount } from "wagmi"
 import { useMyVaults } from "./hooks/use-my-vaults"
 import { useTable } from "./hooks/use-table"
@@ -21,7 +20,6 @@ export function MyVaults({ type }: Props) {
     pageSize: 10,
   })
 
-  const { currentMarket: market, markets } = useMarket()
   const {
     data: vaults,
     isLoading,
@@ -55,8 +53,8 @@ export function MyVaults({ type }: Props) {
       <DataTable
         table={table}
         emptyArrayMessage="No positions yet."
-        isError={!!vaults}
-        isLoading={!vaults || !market}
+        isError={!!error}
+        isLoading={!vaults}
         onRowClick={(vault) =>
           // note: lost of context after redirecting with push method here
           // push(`/earn/${strategy?.address}`)

@@ -30,7 +30,7 @@ type Params = {
 
 export function useTable({ type, pageSize, data, onDeposit }: Params) {
   const { chain } = useAccount()
-  console.log(data)
+
   const columns = React.useMemo(
     () => [
       columnHelper.display({

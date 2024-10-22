@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button-old"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
 import React from "react"
-import AddToVaultDialog from "./dialogs/add-dialog"
+import AddToVaultDialog from "./dialogs/deposit-dialog"
 import useForm from "./use-form"
 
 export function AddForm({ className }: { className?: string }) {

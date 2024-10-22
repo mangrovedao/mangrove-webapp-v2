@@ -3,10 +3,10 @@ import React, { useEffect, useMemo } from "react"
 
 import { Vault } from "@/app/earn/(shared)/types"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
-import Dialog from "@/components/dialogs/dialog"
+import Dialog from "@/components/dialogs/dialog-new"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
-import { Button, type ButtonProps } from "@/components/ui/button-old"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useQueryClient } from "@tanstack/react-query"
@@ -32,34 +32,15 @@ type Props = {
 }
 
 const btnProps: ButtonProps = {
-  rightIcon: true,
   className: "w-full",
   size: "lg",
 }
 
 const mintABI = parseAbi([
-  "function mint(uint mintAmount,uint[2] calldata maxAmountsIn) external returns (uint amount0, uint amount1)",
-  "error MintHasAlreadyStarted()",
-  "error MintHasNotStarted()",
-  "error MintNotAllowed()",
-  "error NotInPosition()",
-  "error AlreadyInPosition()",
-  "error ZeroUnderlyingBalance()",
-  "error MaxFeeExceeded()",
-  "error SlippageExceedThreshold()",
-  "error OnlyFactoryAllowed()",
-  "error ZeroMintAmount()",
-  "error ZeroBurnAmount()",
-  "error SwapRouterIsWhitelisted()",
-  "error SwapRouterIsNotWhitelisted()",
-  "error OnlyFactoryOwnerAllowed()",
-  "error ManagerBalanceCannotBeSwapped()",
-  "error InvalidSwap()",
-  "error MinDensityRequirementIsNotMet()",
-  "error NotEnoughBountyForThePricePoints()",
+  "function mint(uint256 mintAmount, uint256 baseAmountMax, uint256 quoteAmountMax) external returns (uint256 shares, uint256 baseAmount, uint256 quoteAmount)",
 ])
 
-export default function AddToVaultDialog({
+export default function DepToVaultDialog({
   isOpen,
   onClose,
   baseAmount: baseAmountRaw,
@@ -115,9 +96,8 @@ export default function AddToVaultDialog({
   const [started, setStarted] = React.useState(false)
 
   const steps = [
-    "Summary",
-    `Approve ${baseToken?.symbol}`,
-    `Approve ${quoteToken?.symbol}`,
+    missingBaseAllowance > 0n && `Approve ${baseToken?.symbol}`,
+    missingQuoteAllowance > 0n && `Approve ${quoteToken?.symbol}`,
     "Mint",
   ].filter(Boolean)
 
@@ -127,12 +107,10 @@ export default function AddToVaultDialog({
 
   const currentStep = started
     ? isFetched
-      ? missingBaseAllowance === 0n
-        ? missingQuoteAllowance === 0n
-          ? 4
-          : 3
+      ? missingBaseAllowance === 0n && missingQuoteAllowance === 0n
+        ? 3
         : 2
-      : 2
+      : 1
     : 1
 
   const amount0 = useMemo(() => {
@@ -146,7 +124,7 @@ export default function AddToVaultDialog({
     address: vault?.address,
     abi: mintABI,
     functionName: "mint",
-    args: [mintAmount, [amount0, amount1]],
+    args: [mintAmount, amount0, amount1],
   })
 
   // console.log(
@@ -161,7 +139,7 @@ export default function AddToVaultDialog({
 
   useEffect(() => {
     if (isConfirmed) {
-      if (currentStep === 4) {
+      if (currentStep === 3) {
         queryClient.refetchQueries({
           queryKey: ["vault"],
         })
@@ -202,13 +180,17 @@ export default function AddToVaultDialog({
           disabled={isPending || isConfirming || isLoadingAllowance}
           loading={isPending || isConfirming || isLoadingAllowance}
           onClick={() => {
-            if (!vault) return
-            writeContract({
-              address: baseToken.address,
-              abi: erc20Abi,
-              functionName: "approve",
-              args: [vault.address, baseAmount],
-            })
+            try {
+              if (!vault) return
+              writeContract({
+                address: baseToken.address,
+                abi: erc20Abi,
+                functionName: "approve",
+                args: [vault.address, baseAmount],
+              })
+            } catch (error) {
+              console.error(error)
+            }
           }}
         >
           Approve {baseToken?.symbol}
@@ -227,13 +209,17 @@ export default function AddToVaultDialog({
           disabled={isPending || isConfirming || isLoadingAllowance}
           loading={isPending || isConfirming || isLoadingAllowance}
           onClick={() => {
-            if (!vault) return
-            writeContract({
-              address: quoteToken.address,
-              abi: erc20Abi,
-              functionName: "approve",
-              args: [vault.address, quoteAmount],
-            })
+            try {
+              if (!vault) return
+              writeContract({
+                address: quoteToken.address,
+                abi: erc20Abi,
+                functionName: "approve",
+                args: [vault.address, quoteAmount],
+              })
+            } catch (error) {
+              console.error(error)
+            }
           }}
         >
           Approve {quoteToken?.symbol}
@@ -255,13 +241,17 @@ export default function AddToVaultDialog({
           loading={isPending || isConfirming || result.isLoading}
           disabled={isPending || isConfirming || result.isLoading}
           onClick={() => {
-            if (!vault) return
-            writeContract({
-              address: vault.address,
-              abi: mintABI,
-              functionName: "mint",
-              args: [mintAmount, [amount0, amount1]],
-            })
+            try {
+              if (!vault) return
+              writeContract({
+                address: vault.address,
+                abi: mintABI,
+                functionName: "mint",
+                args: [mintAmount, amount0, amount1],
+              })
+            } catch (error) {
+              console.error(error)
+            }
           }}
         >
           Mint
@@ -296,9 +286,9 @@ export default function AddToVaultDialog({
       showCloseButton={false}
     >
       <Dialog.Title className="text-xl text-left" close>
-        Add to vault
+        Review deposit
       </Dialog.Title>
-      <Steps steps={steps} currentStep={currentStep} />
+      <Steps steps={steps as string[]} currentStep={currentStep} />
       <Dialog.Description>
         <ScrollArea className="h-full" scrollHideDelay={200}>
           <ScrollBar orientation="vertical" className="z-50" />

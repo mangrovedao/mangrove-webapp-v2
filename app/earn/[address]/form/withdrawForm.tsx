@@ -10,7 +10,7 @@ import { erc20Abi, type Address } from "viem"
 import { useAccount, useReadContract } from "wagmi"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import RemoveFromVaultDialog from "./dialogs/remove-dialog"
+import WithdrawFromVaultDialog from "./dialogs/withdraw-dialog"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
@@ -113,7 +113,7 @@ export function WithdrawForm({ className }: { className?: string }) {
       >
         Withdraw
       </Button>
-      <RemoveFromVaultDialog
+      <WithdrawFromVaultDialog
         vault={vault}
         amount={amount}
         onClose={() => setRemoveDialog(false)}

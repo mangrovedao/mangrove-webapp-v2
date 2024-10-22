@@ -59,7 +59,7 @@ const mintABI = parseAbi([
   "error NotEnoughBountyForThePricePoints()",
 ])
 
-export default function AddToVaultDialog({
+export default function DepositToVaultDialog({
   isOpen,
   onClose,
   baseAmount: baseAmountRaw,

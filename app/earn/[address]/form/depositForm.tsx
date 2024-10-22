@@ -7,7 +7,7 @@ import React from "react"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatUnits } from "viem"
-import AddToVaultDialog from "./dialogs/add-dialog"
+import DepositToVaultDialog from "./dialogs/deposit-dialog"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
@@ -186,10 +186,10 @@ export function DepositForm({ className }: { className?: string }) {
       >
         Deposit
       </Button>
-      <AddToVaultDialog
+      <DepositToVaultDialog
         isOpen={addDialog}
-        baseAmount={baseDeposit || ""}
-        quoteAmount={quoteDeposit || ""}
+        baseAmount={baseDeposit}
+        quoteAmount={quoteDeposit}
         vault={vault}
         baseToken={baseToken}
         quoteToken={quoteToken}

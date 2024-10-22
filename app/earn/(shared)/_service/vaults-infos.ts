@@ -211,7 +211,7 @@ export async function getVaultsInformation(
         tvl: totalInQuote[0],
         strategist: v.manager,
         type: v.strategyType,
-        isActive: balanceOf > 0n,
+        isActive: userBaseBalance > 0n || userQuoteBalance > 0n,
         userBaseBalance,
         userQuoteBalance,
       }
