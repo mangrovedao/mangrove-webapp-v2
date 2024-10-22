@@ -4,7 +4,6 @@ import { useMarkets } from "@/hooks/use-addresses"
 import { MarketParams } from "@mangrovedao/mgv"
 
 import {
-  formatUnits,
   isAddress,
   maxUint128,
   parseAbi,
@@ -133,16 +132,17 @@ export async function getVaultsInformation(
         market: _market,
       })
 
-      const value = await client.getStorageAt({
+      const storageValue = await client.getStorageAt({
         address: v.address,
         slot: "0xb",
       })
 
-      if (!value) {
+      if (!storageValue) {
         throw new Error("Failed to get storage")
       }
+
       // lastTotalInQuote()
-      const lastTotalInQuote = BigInt(value) & maxUint128
+      const lastTotalInQuote = BigInt(storageValue) & maxUint128
 
       // lastTimestamp()
       const lastTimestamp = BigInt(Math.floor(Date.now() / 1000 - 100))
@@ -189,11 +189,6 @@ export async function getVaultsInformation(
         tickSpacing: market[2],
       }
 
-      console.log(
-        formatUnits(userBaseBalance, vaultMarket.base?.decimals || 18),
-        formatUnits(userQuoteBalance, vaultMarket.quote?.decimals || 18),
-      )
-
       const totalBase = underlyingBalances[0] || 0n
       const totalQuote = underlyingBalances[1] || 0n
       let balanceBase =
@@ -205,8 +200,8 @@ export async function getVaultsInformation(
 
       return {
         ...v,
-        performanceFee: (Number(feeData[0]) / 1e5) * 100, // according to the precision of the fee
-        managementFee: (Number(feeData[1]) / 1e5) * 1e3, // convert to annual rate
+        performanceFee: (Number(feeData[0]) / 1e5) * 100,
+        managementFee: (Number(feeData[1]) / 1e5) * 100,
         totalBase,
         totalQuote,
         balanceBase,

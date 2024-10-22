@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { useAccount } from "wagmi"
+import { useAccount, usePublicClient } from "wagmi"
 
 import { useParams } from "next/navigation"
 
@@ -13,16 +13,18 @@ export const MIN_STEP_SIZE = 1
 
 export default function useForm() {
   const params = useParams<{ address: string }>()
+  const client = usePublicClient()
+  const { address } = useAccount()
   const {
     data: { vault },
   } = useVault(params.address)
 
   const { data, isLoading, isError, setBaseAmount, setQuoteAmount } =
-    useMintAmounts({ vault })
-
-  const { address } = useAccount()
+    useMintAmounts({ vault, client })
 
   const [errors, setErrors] = React.useState<Record<string, string>>({})
+  const [baseAmount, setBaseSliderAmount] = React.useState("")
+  const [quoteAmount, setQuoteSliderAmount] = React.useState("")
 
   const baseToken = vault?.market.base
   const quoteToken = vault?.market.quote
@@ -35,9 +37,18 @@ export default function useForm() {
   })
 
   const baseDeposit = useMemo(() => {
+    if (data?.side !== "quote") return
+
+    setBaseSliderAmount(formatUnits(data.baseAmount, baseToken?.decimals || 18))
     return formatUnits(data.baseAmount, baseToken?.decimals || 18)
   }, [data.baseAmount, baseToken?.decimals])
+
   const quoteDeposit = useMemo(() => {
+    if (data?.side !== "base") return
+
+    setQuoteSliderAmount(
+      formatUnits(data.quoteAmount, quoteToken?.decimals || 18),
+    )
     return formatUnits(data.quoteAmount, quoteToken?.decimals || 18)
   }, [data.quoteAmount, quoteToken?.decimals])
 
@@ -46,6 +57,7 @@ export default function useForm() {
   ) => {
     const value = typeof e === "string" ? e : e.target.value
     setBaseAmount(parseUnits(value, baseToken?.decimals || 18))
+    setBaseSliderAmount(value)
   }
 
   const handleQuoteDepositChange = (
@@ -53,6 +65,7 @@ export default function useForm() {
   ) => {
     const value = typeof e === "string" ? e : e.target.value
     setQuoteAmount(parseUnits(value, quoteToken?.decimals || 18))
+    setQuoteSliderAmount(value)
   }
 
   React.useEffect(() => {
@@ -97,8 +110,8 @@ export default function useForm() {
     address,
     baseToken,
     quoteToken,
-    baseDeposit,
-    quoteDeposit,
+    baseDeposit: baseAmount,
+    quoteDeposit: quoteAmount,
     baseBalance,
     quoteBalance,
     errors,
@@ -106,6 +119,6 @@ export default function useForm() {
     handleQuoteDepositChange,
     isLoading,
     vault,
-    mintAmount: data.mintAmount,
+    mintAmount: data.baseAmount + data.quoteAmount,
   }
 }
