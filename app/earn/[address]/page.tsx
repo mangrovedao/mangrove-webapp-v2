@@ -33,8 +33,8 @@ import { useAccount } from "wagmi"
 import { Line, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
-import { DepositForm } from "./form/depositForm"
-import { WithdrawForm } from "./form/withdrawForm"
+import { DepositForm } from "./form/deposit-form"
+import { WithdrawForm } from "./form/withdraw-form"
 
 enum Tabs {
   Details = "Details",

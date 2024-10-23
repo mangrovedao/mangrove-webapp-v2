@@ -9,6 +9,7 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useStep } from "@/hooks/use-step"
 import { useQueryClient } from "@tanstack/react-query"
 import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 import {
@@ -88,34 +89,31 @@ export default function DepositToVaultDialog({
   const missingQuoteAllowance =
     (data?.[1] || 0n) > quoteAmount ? 0n : quoteAmount - (data?.[1] || 0n)
 
-  const { data: hash, isPending, writeContract, reset } = useWriteContract()
+  const {
+    data: hash,
+    isPending,
+    writeContract,
+    reset,
+    error,
+  } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
       hash,
     })
 
-  const [started, setStarted] = React.useState(false)
-
   const steps = [
     "Summary",
     missingBaseAllowance > 0n && `Approve ${baseToken?.symbol}`,
     missingQuoteAllowance > 0n && `Approve ${quoteToken?.symbol}`,
-    "Mint",
+    "Deposit",
   ].filter(Boolean)
+  const [started, setStarted] = React.useState(false)
+  const [currentStep, helpers] = useStep(steps.length)
+  const { goToNextStep, goToPrevStep, reset: resetStep } = helpers
 
   // BigInt.prototype.toJSON = function () {
   //   return this.toString()
   // }
-
-  const currentStep = started
-    ? isFetched
-      ? missingBaseAllowance === 0n
-        ? missingQuoteAllowance === 0n
-          ? 4
-          : 3
-        : 2
-      : 2
-    : 1
 
   const amount0 = useMemo(() => {
     return baseAmount
@@ -142,19 +140,29 @@ export default function DepositToVaultDialog({
   // console.log(result)
 
   useEffect(() => {
-    if (isConfirmed) {
-      if (currentStep === 4) {
-        queryClient.refetchQueries({
-          queryKey: ["vault"],
-        })
-        setStarted(false)
-        onClose()
-      } else {
-        reset()
-        refetch()
-      }
+    if (!error && isConfirmed && currentStep !== steps.length) {
+      console.log("go to next step")
+      reset()
+      goToNextStep()
+    } else if (isConfirmed && currentStep === steps.length) {
+      console.log("refetch vault")
+      queryClient.refetchQueries({
+        queryKey: ["vault"],
+      })
+      queryClient.refetchQueries({
+        queryKey: ["user-vaults"],
+      })
+      onClose()
+      setStarted(false)
+      resetStep()
     }
-  }, [isConfirmed, currentStep, refetch, onClose, reset, queryClient])
+
+    if (error) {
+      reset()
+      resetStep()
+      setStarted(false)
+    }
+  }, [isConfirmed, error])
 
   const stepInfos = [
     {
@@ -167,12 +175,18 @@ export default function DepositToVaultDialog({
         />
       ),
       button: (
-        <Button {...btnProps} onClick={() => setStarted(true)}>
+        <Button
+          {...btnProps}
+          onClick={() => {
+            setStarted(true)
+            goToNextStep()
+          }}
+        >
           Proceed
         </Button>
       ),
     },
-    {
+    missingBaseAllowance > 0n && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -201,7 +215,7 @@ export default function DepositToVaultDialog({
         </Button>
       ),
     },
-    {
+    missingQuoteAllowance > 0n && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
@@ -284,16 +298,13 @@ export default function DepositToVaultDialog({
     <Dialog
       open={!!isOpen}
       onClose={() => {
-        setStarted(false)
         onClose()
       }}
       showCloseButton={false}
     >
-      <Dialog.Title className="text-xl text-left" close>
-        Deposit to ault
-      </Dialog.Title>
+      <Dialog.Title className="flex end">Deposit to vault</Dialog.Title>
       <Steps steps={steps as string[]} currentStep={currentStep} />
-      <Dialog.Description>
+      <Dialog.Description className="p-4 space-y-2">
         <ScrollArea className="h-full" scrollHideDelay={200}>
           <ScrollBar orientation="vertical" className="z-50" />
 
@@ -334,8 +345,21 @@ const Summary = ({
   nativeBalance?: string
 }) => {
   return (
-    <div className="space-y-2">
-      <div className="rounded-lg p-4 border border-border-secondary">
+    <div>
+      {/* <Caption className="flex justify-start">You will deposit</Caption>
+      <DialogAmountLine
+        amount={Number(baseAmount).toFixed(baseToken?.displayDecimals) || "0"}
+        estimationAmount={"..."}
+        symbol={baseToken?.symbol || ""}
+      />
+
+      <DialogAmountLine
+        amount={Number(quoteAmount).toFixed(quoteToken?.displayDecimals) || "0"}
+        estimationAmount={"..."}
+        symbol={quoteToken?.symbol || ""}
+      /> */}
+
+      <div className="rounded-lg p-3 border border-border-secondary">
         <TokenPair
           baseToken={baseToken}
           quoteToken={quoteToken}

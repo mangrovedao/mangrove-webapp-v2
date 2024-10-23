@@ -6,7 +6,7 @@ type Props = {
 
 export function ApproveStep({ tokenSymbol }: Props) {
   return (
-    <div className="border border-border-secondary rounded-lg p-20 space-y-8">
+    <div className="border border-border-secondary rounded-lg p-4 space-y-8">
       <div className="flex justify-center items-center">
         <TokenIcon
           className="w-12 h-12 flex justify-center items-center"
