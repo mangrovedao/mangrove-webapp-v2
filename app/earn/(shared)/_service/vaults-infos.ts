@@ -33,6 +33,8 @@ export const VaultABI = parseAbi([
   "function feeData() external view returns (uint16 performanceFee, uint16 managementFee, address feeRecipient)",
   "function market() external view returns (address base, address quote, uint256 tickSpacing)",
   "function getTotalInQuote() public view returns (uint256 quoteAmount, uint256 tick)",
+  "function decimals() public view returns (uint8)",
+  "function symbol() public view returns (string)",
 ])
 
 const addressSchema = z.custom<Address>((v) => isAddress(v))
@@ -44,6 +46,8 @@ const multicallSchema = z.object({
   balanceOf: z.bigint(),
   feeData: z.tuple([z.number(), z.number(), z.string()]),
   market: z.tuple([z.string(), z.string(), z.bigint()]),
+  symbol: z.string(),
+  decimals: z.number(),
 })
 
 export function getChainVaults(chainId: number): VaultWhitelist[] {
@@ -100,6 +104,16 @@ export async function getVaultsInformation(
             abi: VaultABI,
             functionName: "market",
           },
+          {
+            address: v.address,
+            abi: VaultABI,
+            functionName: "symbol",
+          },
+          {
+            address: v.address,
+            abi: VaultABI,
+            functionName: "decimals",
+          },
         ] satisfies MulticallParameters["contracts"],
     ),
     allowFailure: false,
@@ -114,7 +128,9 @@ export async function getVaultsInformation(
         _balanceOf,
         _feeData,
         _market,
-      ] = result.slice(i * 6)
+        _symbol,
+        _decimals,
+      ] = result.slice(i * 8)
 
       const {
         totalInQuote,
@@ -123,6 +139,8 @@ export async function getVaultsInformation(
         balanceOf,
         feeData,
         market,
+        symbol,
+        decimals,
       } = multicallSchema.parse({
         totalInQuote: _totalInQuote,
         underlyingBalances: _underlyingBalances,
@@ -130,6 +148,8 @@ export async function getVaultsInformation(
         balanceOf: _balanceOf,
         feeData: _feeData,
         market: _market,
+        symbol: _symbol,
+        decimals: _decimals,
       })
 
       const storageValue = await client.getStorageAt({
@@ -200,6 +220,9 @@ export async function getVaultsInformation(
 
       return {
         ...v,
+        symbol,
+        decimals,
+        mintedAmount: balanceOf,
         performanceFee: (Number(feeData[0]) / 1e5) * 100,
         managementFee: (Number(feeData[1]) / 1e5) * 100,
         totalBase,

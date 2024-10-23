@@ -10,6 +10,9 @@ export type VaultWhitelist = {
 }
 
 export type Vault = {
+  symbol: string
+  decimals: number
+  mintedAmount: bigint
   managementFee: number
   performanceFee: number
   address: Address

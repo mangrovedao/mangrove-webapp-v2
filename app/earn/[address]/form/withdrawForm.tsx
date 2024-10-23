@@ -19,11 +19,18 @@ export function WithdrawForm({ className }: { className?: string }) {
   const [sliderValue, setSliderValue] = React.useState<number>(0)
   const [baseWithdraw, setBaseWithdraw] = React.useState<string>("0")
   const [quoteWithdraw, setQuoteWithdraw] = React.useState<string>("0")
+  const [withdrawAmount, setWithdrawAmount] = React.useState<string>("0")
 
   const [removeDialog, setRemoveDialog] = React.useState(false)
 
-  const { baseToken, quoteToken, vault, quoteDeposited, baseDeposited } =
-    useForm()
+  const {
+    baseToken,
+    quoteToken,
+    vault,
+    quoteDeposited,
+    baseDeposited,
+    isLoading,
+  } = useForm()
 
   const { address } = useAccount()
 
@@ -33,10 +40,13 @@ export function WithdrawForm({ className }: { className?: string }) {
       (BigInt(value * 100) * (vault?.userBaseBalance || 0n)) / 10_000n
     const quoteAmount =
       (BigInt(value * 100) * (vault?.userQuoteBalance || 0n)) / 10_000n
+    const mintedAmunt =
+      (BigInt(value * 100) * (vault?.mintedAmount || 0n)) / 10_000n
 
     setSliderValue(value)
     setBaseWithdraw(formatUnits(baseAmount, baseToken?.decimals ?? 18))
     setQuoteWithdraw(formatUnits(quoteAmount, quoteToken?.decimals ?? 18))
+    setWithdrawAmount(formatUnits(mintedAmunt, vault?.decimals ?? 18))
   }
 
   // const { data: balance, isLoading } = useReadContract({
@@ -84,6 +94,12 @@ export function WithdrawForm({ className }: { className?: string }) {
                 quoteToken?.displayDecimals ?? 4,
               )}
             />
+            <span className="text-text-tertiary text-xs">Withdraw:</span>
+            <Line
+              title={vault?.symbol}
+              icon={vault?.symbol}
+              value={Number(withdrawAmount).toFixed(4)}
+            />
           </div>
           {/* Buttons loop */}
           <div className="flex justify-center space-x-2 mt-2">
@@ -127,13 +143,19 @@ export function WithdrawForm({ className }: { className?: string }) {
       <Button
         className="w-full"
         onClick={() => setRemoveDialog(!removeDialog)}
-        // disabled={amount === 0n || isLoading}
+        disabled={Number(withdrawAmount) === 0}
       >
         Withdraw
       </Button>
+
       <WithdrawFromVaultDialog
+        infos={{
+          baseWithdraw,
+          quoteWithdraw,
+          withdrawAmount,
+        }}
+        amount={withdrawAmount}
         vault={vault}
-        amount={0n}
         onClose={() => setRemoveDialog(false)}
         isOpen={removeDialog}
       />

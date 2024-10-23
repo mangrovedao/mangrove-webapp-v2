@@ -254,25 +254,25 @@ export default function Page() {
                   title={"Your deposit"}
                   value={
                     <div className="flex items-center justify-center gap-2">
-                      <span>
+                      <span className="text-xs flex gap-1">
                         {Number(
                           formatUnits(
                             vault?.userBaseBalance || 0n,
                             vault?.market.base.decimals || 18,
                           ),
                         ).toFixed(vault?.market.base.displayDecimals || 4)}
-                        <span className="text-text-secondary">
+                        <span className="text-text-secondary text-xs">
                           {vault?.market.base.symbol}
                         </span>
                       </span>
-                      <span>
+                      <span className="text-xs flex gap-1">
                         {Number(
                           formatUnits(
                             vault?.userQuoteBalance || 0n,
                             vault?.market.quote.decimals || 18,
                           ),
                         ).toFixed(vault?.market.quote.displayDecimals || 4)}
-                        <span className="text-text-secondary">
+                        <span className="text-text-secondary text-xs">
                           {vault?.market.quote.symbol}
                         </span>
                       </span>
@@ -363,6 +363,30 @@ export default function Page() {
                   ).toLocaleString(undefined, {
                     maximumFractionDigits:
                       vault?.market.quote.displayDecimals || 3,
+                  }) || "0"
+                }
+              />
+              <Caption className="text-text-secondary mt-5">
+                Amount minted
+              </Caption>
+
+              <Line
+                title={
+                  <div className="flex gap-2">
+                    <TokenIcon symbol={vault?.symbol} className="h-4 w-4" />
+                    <Caption className="text-text-secondary text-xs">
+                      {vault?.symbol}
+                    </Caption>
+                  </div>
+                }
+                value={
+                  Number(
+                    formatUnits(
+                      vault?.mintedAmount || 0n,
+                      vault?.decimals || 18,
+                    ),
+                  ).toLocaleString(undefined, {
+                    maximumFractionDigits: 4,
                   }) || "0"
                 }
               />
@@ -511,7 +535,13 @@ const Details = ({
   )
 }
 
-const Line = ({ title, value }: { title: ReactNode; value: ReactNode }) => {
+export const Line = ({
+  title,
+  value,
+}: {
+  title: ReactNode
+  value: ReactNode
+}) => {
   return (
     <div className="flex justify-between mt-2 items-center">
       <Caption className="text-gray text-xs"> {title}</Caption>
