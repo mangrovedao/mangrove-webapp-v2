@@ -18,6 +18,7 @@ import {
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
 import InfoTooltip from "@/components/info-tooltip-new"
+import NeonContainer from "@/components/neon-container"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
@@ -27,7 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { MangroveLogo } from "@/svgs"
 import { cn } from "@/utils"
-import { chainsIcons } from "@/utils/chainsIcons"
+import { shortenAddress } from "@/utils/wallet"
 import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
 import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
 import { useQuery } from "@tanstack/react-query"
@@ -36,9 +37,10 @@ import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
 import { useAccount, useClient } from "wagmi"
 import { Vault } from "../(list)/_schemas/vaults"
+import { Line, getChainImage } from "../(shared)/utils"
+import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/depositForm"
-import { vault } from "./form/use-form"
 import { WithdrawForm } from "./form/withdrawForm"
 
 enum Tabs {
@@ -57,19 +59,19 @@ export default function Page() {
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()
 
-  // const {
-  //   data: { vault, kandelState },
-  //   refetch,
-  // } = useVault(params.address)
+  const {
+    data: { vault },
+    refetch,
+  } = useVault(params.address)
 
-  // React.useEffect(() => {
-  //   setTimeout(() => refetch?.(), 1)
-  // }, [refetch])
+  React.useEffect(() => {
+    setTimeout(() => refetch?.(), 1)
+  }, [refetch])
 
   const { push } = useRouter()
 
   return (
-    <div className="max-w-full mx-auto px-20 pb-4">
+    <div className="max-w-full mx-auto lg:px-20 md:px-10 pb-4">
       {/* BreadCrumb   */}
       <div className="flex items-center gap-2 pb-4">
         <Link href={"/"} className="flex items-center gap-2">
@@ -110,13 +112,13 @@ export default function Page() {
             <Subline
               title={"Chain"}
               value={chain?.name}
-              icon={chainsIcons[chain?.id ?? 1]}
+              icon={getChainImage(chain?.id, chain?.name)}
             />
 
             <Separator className="h-4 self-center" orientation="vertical" />
             <Subline
               title={"Strategy"}
-              value={"Kandel Aave"}
+              value={vault?.type}
               icon={
                 <div className="relative h-4 w-4">
                   <div className="absolute inset-0 bg-green-700 rounded-full"></div>
@@ -126,7 +128,7 @@ export default function Page() {
             />
 
             <Separator className="h-4 self-center" orientation="vertical" />
-            <Subline title={"Manager"} value={"Asterion"} />
+            <Subline title={"Manager"} value={vault?.manager} />
           </div>
         </div>
       </div>
@@ -135,11 +137,22 @@ export default function Page() {
         <div className="col-span-2 w-full space-y-6">
           {/* Infos Card */}
           <div className="xs:grid md:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary">
-            <GridLine title={"TVL"} value={"1.202.418,52"} symbol={"$"} />
+            <GridLine
+              title={"TVL"}
+              value={
+                Number(
+                  formatUnits(
+                    vault?.tvl || 0n,
+                    vault?.market.quote.decimals || 18,
+                  ),
+                ).toFixed(vault?.market.quote.displayDecimals || 3) ?? "0"
+              }
+              symbol={` ${vault?.market.quote.symbol}`}
+            />
             <GridLine title={"APY"} value={"9.00"} symbol={"%"} />
             <GridLine
               title={"Performance Fee"}
-              value={"8.00"}
+              value={vault?.performanceFee}
               symbol={"%"}
               info="Tooltip to be defined"
             />
@@ -151,15 +164,13 @@ export default function Page() {
               Vault description
             </Title>
             <Caption className="font-axiforma text-text-secondary text-xs">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo ed ut perspiciatis unde omnis iste
-              natus error sit voluptatem perspiciatis ...
+              {vault?.description}
             </Caption>
 
             <Accordion title="Read more">
-              <Caption className="font-axiforma">Text...</Caption>
+              <Caption className="font-axiforma">
+                {vault?.descriptionBonus}
+              </Caption>
             </Accordion>
           </div>
 
@@ -175,11 +186,11 @@ export default function Page() {
               Vault details
             </Title>
             <div>
-              <div className="xs:grid-cols-1 grid md:grid-cols-3 gap-4">
+              <div className="xs:grid-cols-1 grid md:grid-cols-2 gap-4">
                 <div>
                   <GridLine
                     title="Strategy"
-                    value="Kandel Aave"
+                    value={vault?.strategyType}
                     icon={
                       <div className="relative h-4 w-4">
                         <div className="absolute inset-0 bg-green-700 rounded-full"></div>
@@ -190,12 +201,12 @@ export default function Page() {
                   <GridLine
                     title="Chain"
                     value={chain?.name}
-                    icon={chainsIcons[chain?.id ?? 1]}
+                    icon={getChainImage(chain?.id, chain?.name)}
                     iconFirst
                   />
                   <GridLine
                     title="Vault Manager"
-                    value="Asterion"
+                    value={vault?.manager}
                     icon={
                       <div className="flex gap-1 text-text-secondary">
                         <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
@@ -205,44 +216,30 @@ export default function Page() {
                       </div>
                     }
                   />
+                  <GridLine title="Vault Created on" value="March 2024" />
                 </div>
                 <div>
                   <GridLine
                     title="Performance Fee"
-                    value="8.00"
+                    value={vault?.performanceFee}
                     symbol="%"
                     info="Tooltip to be defined"
                   />
-                  <GridLine
-                    title="Strategy Address"
-                    value="0x123...76b6"
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
-                  />
-                  <GridLine
-                    title="Vault Address"
-                    value="0x123...76b6"
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
-                  />
-                </div>
 
-                <div>
                   <GridLine
-                    title="Exit Fee"
-                    value="1.00%"
+                    title="Management Fee"
+                    value={vault?.managementFee}
+                    symbol="%"
                     info="Tooltip to be defined"
                   />
+
                   <GridLine
-                    title="Audit Address"
-                    value="0x123...76b6"
+                    title="Vault Address"
+                    value={shortenAddress(vault?.address || "")}
                     icon={
                       <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                     }
                   />
-                  <GridLine title="Vault Created on" value="March 2024" />
                 </div>
               </div>
             </div>
@@ -251,16 +248,47 @@ export default function Page() {
 
         <div className="row-span-4">
           <div className="grid gap-8">
-            <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
-              <div className="flex w-2/3 justify-between items-center align-middle">
+            <NeonContainer>
+              <div className="flex w-2/3 justify-between items-center ">
                 <GridLine
                   title={"Your deposit"}
-                  value={"1.202.418,52"}
-                  symbol={"$"}
+                  value={
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-xs flex gap-1">
+                        {Number(
+                          formatUnits(
+                            vault?.userBaseBalance || 0n,
+                            vault?.market.base.decimals || 18,
+                          ),
+                        ).toFixed(vault?.market.base.displayDecimals || 4)}
+                        <span className="text-text-secondary text-xs">
+                          {vault?.market.base.symbol}
+                        </span>
+                      </span>
+                      <span className="text-xs flex gap-1">
+                        {Number(
+                          formatUnits(
+                            vault?.userQuoteBalance || 0n,
+                            vault?.market.quote.decimals || 18,
+                          ),
+                        ).toFixed(vault?.market.quote.displayDecimals || 4)}
+                        <span className="text-text-secondary text-xs">
+                          {vault?.market.quote.symbol}
+                        </span>
+                      </span>
+                    </div>
+                  }
                 />
-                <GridLine title={"Your APY"} value={"6.42"} symbol={"%"} />
+                <GridLine
+                  title={"Your APY"}
+                  value={"Incoming..."}
+                  symbol={""}
+                />
               </div>
-            </div>
+            </NeonContainer>
+            {/* <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
+             
+            </div> */}
             <div className="grid space-y-5 bg-bg-secondary p-3 rounded-lg">
               <div className="w-full ">
                 <CustomRadioGroup
@@ -306,7 +334,7 @@ export default function Page() {
                 }
                 value={Number(
                   formatUnits(
-                    vault?.balanceBase || 0n,
+                    vault?.userBaseBalance || 0n,
                     vault?.market.base.decimals || 18,
                   ),
                 ).toLocaleString(undefined, {
@@ -329,12 +357,36 @@ export default function Page() {
                 value={
                   Number(
                     formatUnits(
-                      vault?.balanceQuote || 0n,
+                      vault?.userQuoteBalance || 0n,
                       vault?.market.quote.decimals || 18,
                     ),
                   ).toLocaleString(undefined, {
                     maximumFractionDigits:
                       vault?.market.quote.displayDecimals || 3,
+                  }) || "0"
+                }
+              />
+              <Caption className="text-text-secondary mt-5">
+                Amount minted
+              </Caption>
+
+              <Line
+                title={
+                  <div className="flex gap-2">
+                    <TokenIcon symbol={vault?.symbol} className="h-4 w-4" />
+                    <Caption className="text-text-secondary text-xs">
+                      {vault?.symbol}
+                    </Caption>
+                  </div>
+                }
+                value={
+                  Number(
+                    formatUnits(
+                      vault?.mintedAmount || 0n,
+                      vault?.decimals || 18,
+                    ),
+                  ).toLocaleString(undefined, {
+                    maximumFractionDigits: 4,
                   }) || "0"
                 }
               />
@@ -480,15 +532,6 @@ const Details = ({
         </Caption>
       </div>
     </>
-  )
-}
-
-const Line = ({ title, value }: { title: ReactNode; value: ReactNode }) => {
-  return (
-    <div className="flex justify-between mt-2 items-center">
-      <Caption className="text-gray text-xs"> {title}</Caption>
-      <Caption className="text-gray text-xs">{value}</Caption>
-    </div>
   )
 }
 

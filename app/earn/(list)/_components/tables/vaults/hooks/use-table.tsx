@@ -11,9 +11,10 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
-import { Vault } from "@/app/earn/(list)/_schemas/vaults"
+import { Vault } from "@/app/earn/(shared)/types"
+import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
-import { chainsIcons } from "@/utils/chainsIcons"
+import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -52,7 +53,7 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {chainsIcons[chain?.id || 1]}
+                {getChainImage(chain?.id, chain?.name)}
               </Link>
             </div>
           )
@@ -62,46 +63,38 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "Market",
         cell: ({ row }) => {
-          const {
-            market: {
-              base: { address: base },
-              quote: { address: quote },
-            },
-          } = row.original
-
-          return <Market base={base} quote={quote} />
+          return (
+            <Market
+              base={row.original.market.base.address}
+              quote={row.original.market.quote.address}
+            />
+          )
         },
       }),
 
       columnHelper.display({
         header: "Strategy",
         minSize: 300,
-
         cell: ({ row }) => {
+          const { type } = row.original
           const isTrusted = true
-          const value = `Kandel - ...`
 
-          return <Value value={value} trusted={isTrusted} />
+          return <Value value={type} trusted={isTrusted} />
         },
       }),
 
       columnHelper.display({
         header: "Manager",
         cell: ({ row }) => {
-          const {
-            market: {
-              base: { address: base },
-              quote: { address: quote },
-            },
-          } = row.original
-          return <Value value="Redacted Labs" />
+          const { strategist } = row.original
+          return <Value value={strategist} />
         },
       }),
 
       columnHelper.display({
         header: "APY",
         cell: ({ row }) => {
-          const value = "13.19%"
+          const value = "-"
           return <Value value={value} />
         },
       }),
@@ -109,7 +102,7 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "30 D",
         cell: ({ row }) => {
-          const value = "7.13%"
+          const value = "-"
           return <Value value={value} />
         },
       }),
@@ -117,9 +110,16 @@ export function useTable({ type, pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const value = "1.525.246,42"
-          const symbol = "$"
-          return <Value value={value} symbol={symbol} />
+          const { tvl, market } = row.original
+
+          return (
+            <Value
+              value={Number(
+                formatUnits(tvl || 0n, market.quote.decimals || 18),
+              ).toFixed(market.quote.displayDecimals || 3)}
+              symbol={market.quote.symbol}
+            />
+          )
         },
       }),
 

@@ -3,34 +3,58 @@
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/utils"
-import { Token } from "@mangrovedao/mgv"
 import React from "react"
 
-import useForm, { vault } from "./use-form"
+import { Skeleton } from "@/components/ui/skeleton"
+import { formatUnits } from "viem"
+import DepositToVaultDialog from "./dialogs/deposit-dialog"
+import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
 
 export function DepositForm({ className }: { className?: string }) {
   const [addDialog, setAddDialog] = React.useState(false)
 
+  const [baseSliderValue, setBaseSliderValue] = React.useState(0)
+  const [quoteSliderValue, setQuoteSliderValue] = React.useState(0)
+
   const {
     baseToken,
     quoteToken,
     baseDeposit,
     quoteDeposit,
+    baseBalance,
+    quoteBalance,
     mintAmount,
     errors,
     handleBaseDepositChange,
     handleQuoteDepositChange,
     isLoading,
+    vault,
   } = useForm()
 
-  // if (!baseToken || !quoteToken)
-  //   return (
-  //     <div className={"p-0.5"}>
-  //       <Skeleton className="w-full h-40" />
-  //     </div>
-  //   )
+  const handleBaseSliderChange = (value: number) => {
+    if (!baseBalance) return
+    const amount = (BigInt(value * 100) * baseBalance.balance) / 10_000n
+
+    setBaseSliderValue(value)
+    handleBaseDepositChange(formatUnits(amount, baseBalance.token.decimals))
+  }
+
+  const handleQuoteSliderChange = (value: number) => {
+    if (!quoteBalance) return
+    const amount = (BigInt(value * 100) * quoteBalance.balance) / 10_000n
+
+    setQuoteSliderValue(value)
+    handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
+  }
+
+  if (!baseToken || !quoteToken)
+    return (
+      <div className={"p-0.5"}>
+        <Skeleton className="w-full h-40" />
+      </div>
+    )
 
   return (
     <form
@@ -41,13 +65,14 @@ export function DepositForm({ className }: { className?: string }) {
     >
       <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
         <EnhancedNumericInput
-          token={vault?.market.base as Token}
-          label={`Deposit 80%`}
+          token={baseToken}
+          label={`Deposit ${baseSliderValue}%`}
           inputClassName="bg-bg-primary"
           value={baseDeposit}
           onChange={handleBaseDepositChange}
           error={errors.baseDeposit}
           showBalance
+          disabled={isLoading}
           balanceAction={{ onClick: handleBaseDepositChange, text: "MAX" }}
         />
         <div className="grid -mt-1">
@@ -59,17 +84,18 @@ export function DepositForm({ className }: { className?: string }) {
 
           <div className="space-y-5 px-3">
             <div className="flex justify-center space-x-2">
-              {sliderValues.map((value) => (
+              {sliderValues.map((value, i) => (
                 <Button
                   key={`percentage-button-${value}`}
                   variant={"secondary"}
                   size={"xs"}
+                  value={value}
                   className={cn(
                     "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none",
                   )}
                   onClick={(e) => {
                     e.preventDefault()
-                    console.log(e)
+                    handleBaseSliderChange(Number(value))
                   }}
                   // disabled={!currentMarket}
                 >
@@ -84,8 +110,7 @@ export function DepositForm({ className }: { className?: string }) {
                   "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none",
                 )}
                 onClick={(e) => {
-                  e.preventDefault()
-                  console.log(e)
+                  handleBaseSliderChange(100)
                 }}
                 // disabled={!currentMarket}
               >
@@ -96,15 +121,16 @@ export function DepositForm({ className }: { className?: string }) {
         </div>
       </div>
 
-      <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
+      <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 border border-transparent focus-within:border focus-within:border-border-brand ">
         <EnhancedNumericInput
-          token={vault?.market.quote as Token}
-          label={`Deposit 20%`}
+          token={quoteToken}
+          label={`Deposit ${quoteSliderValue}%`}
           value={quoteDeposit}
           inputClassName="bg-bg-primary"
           onChange={handleQuoteDepositChange}
           error={errors.quoteDeposit}
           showBalance
+          disabled={isLoading}
           balanceAction={{ onClick: handleQuoteDepositChange, text: "MAX" }}
         />
         <div className="grid -mt-1">
@@ -124,9 +150,10 @@ export function DepositForm({ className }: { className?: string }) {
                   className={cn(
                     "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none",
                   )}
+                  value={value}
                   onClick={(e) => {
                     e.preventDefault()
-                    console.log(e)
+                    handleQuoteSliderChange(Number(value))
                   }}
                   // disabled={!currentMarket}
                 >
@@ -142,7 +169,7 @@ export function DepositForm({ className }: { className?: string }) {
                 )}
                 onClick={(e) => {
                   e.preventDefault()
-                  console.log(e)
+                  handleQuoteSliderChange(Number(100))
                 }}
                 // disabled={!currentMarket}
               >
@@ -159,16 +186,19 @@ export function DepositForm({ className }: { className?: string }) {
       >
         Deposit
       </Button>
-      {/* <AddToVaultDialog
+      <DepositToVaultDialog
         isOpen={addDialog}
         baseAmount={baseDeposit}
         quoteAmount={quoteDeposit}
         vault={vault}
-        baseToken={baseToken!}
-        quoteToken={quoteToken!}
+        baseToken={baseToken}
+        quoteToken={quoteToken}
         mintAmount={mintAmount}
-        onClose={() => setAddDialog(false)}
-      /> */}
+        onClose={() => {
+          setAddDialog(false)
+          handleBaseDepositChange("0")
+        }}
+      />
     </form>
   )
 }

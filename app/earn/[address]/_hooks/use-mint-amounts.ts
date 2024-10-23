@@ -1,101 +1,63 @@
 "use client"
-import { useTokenBalance } from "@/hooks/use-balances"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { useDebounceCallback } from "usehooks-ts"
-import { usePublicClient } from "wagmi"
-import type { Vault } from "../../(list)/_schemas/vaults"
-import { getMintAmount } from "../_service/skate-vault"
+
+import { maxUint256, parseAbi, PublicClient } from "viem"
+import { Vault } from "../../(shared)/types"
 
 export type MintAmountsArgs = {
   vault?: Vault
+  client?: PublicClient
 }
 
 export type MintAmountsResult = {
   setBaseAmount: (amount: bigint) => void
   setQuoteAmount: (amount: bigint) => void
-  amount0: bigint
-  amount1: bigint
   mintAmount: bigint
   baseAmount: bigint
   quoteAmount: bigint
 }
 
-export function useMintAmounts({ vault }: MintAmountsArgs) {
-  const { balance: baseBalance, isLoading: loadingBase } = useTokenBalance({
-    token: vault?.market.base.address,
-  })
-  const { balance: quoteBalance, isLoading: loadingQuote } = useTokenBalance({
-    token: vault?.market.quote.address,
-  })
-
+export function useMintAmounts({ vault, client }: MintAmountsArgs) {
   const [amountAndSide, setAmountAndSide] = React.useState<{
     amount: bigint
     side: "base" | "quote"
   }>()
 
-  const client = usePublicClient()
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: [
-      "mint-amounts",
-      vault?.address,
-      amountAndSide?.amount.toString(),
-      amountAndSide?.side,
-      baseBalance?.balance?.toString(),
-      quoteBalance?.balance?.toString(),
-      client,
-    ],
+  //
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["mint-amounts", vault?.address, amountAndSide?.side, client],
     queryFn: async () => {
-      if (!amountAndSide || !baseBalance || !quoteBalance || !vault)
-        throw new Error("Invalid state")
+      if (!amountAndSide || !vault) throw new Error("Invalid state")
       if (!client) return undefined
-      let baseAmount =
-        amountAndSide.side === "base"
-          ? amountAndSide.amount
-          : baseBalance.balance
-      let quoteAmount =
-        amountAndSide.side === "quote"
-          ? amountAndSide.amount
-          : quoteBalance.balance
-      const { amount0, amount1, mintAmount } = await getMintAmount(client, {
-        vault: vault.address,
-        amount0: vault.baseIsToken0 ? baseAmount : quoteAmount,
-        amount1: vault.baseIsToken0 ? quoteAmount : baseAmount,
-      })
-      //
-      // Mock impl
-      // let baseAmount =
-      //   amountAndSide.side === "base"
-      //     ? amountAndSide.amount
-      //     : amountAndSide.amount / 3000n
-      // let quoteAmount =
-      //   amountAndSide.side === "quote"
-      //     ? amountAndSide.amount
-      //     : amountAndSide.amount * 3000n
-      // const amount0 = vault.baseIsToken0 ? baseAmount : quoteAmount
-      // const amount1 = vault.baseIsToken0 ? quoteAmount : baseAmount
-      // const mintAmount = amount0
-      // end mock impl
 
-      baseAmount = vault.baseIsToken0 ? amount0 : amount1
-      quoteAmount = vault.baseIsToken0 ? amount1 : amount0
-      return {
-        amount0,
-        amount1,
-        mintAmount,
-        baseAmount,
-        quoteAmount,
-      }
+      const args: [bigint, bigint] =
+        amountAndSide.side === "base"
+          ? [amountAndSide.amount, maxUint256]
+          : [maxUint256, amountAndSide.amount]
+
+      const mintAmounts = await client.readContract({
+        address: vault.address,
+        abi: parseAbi([
+          "function getMintAmounts(uint256 baseAmountMax, uint256 quoteAmountMax) external view returns (uint256 baseAmountOut, uint256 quoteAmountOut, uint256 shares)",
+        ]),
+        functionName: "getMintAmounts",
+        args,
+      })
+
+      const baseAmount = mintAmounts[0]
+      const quoteAmount = mintAmounts[1]
+      const mintAmount = mintAmounts[2]
+
+      return { baseAmount, quoteAmount, mintAmount, side: amountAndSide.side }
     },
-    enabled:
-      !!amountAndSide &&
-      !!baseBalance &&
-      !!quoteBalance &&
-      !loadingBase &&
-      !!vault &&
-      !loadingQuote,
+    enabled: !!amountAndSide?.amount && !!vault?.address,
   })
+
+  React.useEffect(() => {
+    refetch()
+  }, [amountAndSide])
 
   const [undebouncedAmountAndSide, setUndebouncedAmountAndSide] =
     React.useState<{
@@ -117,9 +79,6 @@ export function useMintAmounts({ vault }: MintAmountsArgs) {
 
   return {
     data: data || {
-      amount0: 0n,
-      amount1: 0n,
-      mintAmount: 0n,
       baseAmount:
         undebouncedAmountAndSide?.side === "base"
           ? undebouncedAmountAndSide.amount
@@ -128,13 +87,10 @@ export function useMintAmounts({ vault }: MintAmountsArgs) {
         undebouncedAmountAndSide?.side === "quote"
           ? undebouncedAmountAndSide.amount
           : 0n,
+      mintAmount: 0n,
+      side: undebouncedAmountAndSide?.side,
     },
-    isLoading:
-      isLoading ||
-      loadingBase ||
-      loadingQuote ||
-      amountAndSide?.side !== undebouncedAmountAndSide?.side ||
-      amountAndSide?.amount !== undebouncedAmountAndSide?.amount,
+    isLoading,
     isError,
     setBaseAmount: (amount: bigint) => setAmountAndSideCallback(amount, "base"),
     setQuoteAmount: (amount: bigint) =>

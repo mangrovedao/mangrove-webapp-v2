@@ -6,39 +6,65 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/utils"
 import React, { ReactNode } from "react"
-import { erc20Abi, type Address } from "viem"
-import { useAccount, useReadContract } from "wagmi"
+import { useAccount } from "wagmi"
 
-import useForm, { vault } from "./use-form"
+import { Skeleton } from "@/components/ui/skeleton"
+import { formatUnits } from "viem"
+import WithdrawFromVaultDialog from "./dialogs/withdraw-dialog"
+import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
 
 export function WithdrawForm({ className }: { className?: string }) {
-  const [sliderValue, setSliderValue] = React.useState<number | undefined>(0)
+  const [sliderValue, setSliderValue] = React.useState<number>(0)
+  const [baseWithdraw, setBaseWithdraw] = React.useState<string>("0")
+  const [quoteWithdraw, setQuoteWithdraw] = React.useState<string>("0")
+  const [withdrawAmount, setWithdrawAmount] = React.useState<string>("0")
+
   const [removeDialog, setRemoveDialog] = React.useState(false)
 
-  const { baseToken, quoteToken } = useForm()
+  const {
+    baseToken,
+    quoteToken,
+    vault,
+    quoteDeposited,
+    baseDeposited,
+    isLoading,
+  } = useForm()
 
   const { address } = useAccount()
 
-  const { data: balance, isLoading } = useReadContract({
-    address: vault?.address as Address,
-    abi: erc20Abi,
-    functionName: "balanceOf",
-    args: [address as Address],
-    query: {
-      enabled: !!address || !!vault,
-    },
-  })
+  const handleSliderChange = (value: number) => {
+    if (!quoteDeposited || !baseDeposited) return
+    const baseAmount =
+      (BigInt(value * 100) * (vault?.userBaseBalance || 0n)) / 10_000n
+    const quoteAmount =
+      (BigInt(value * 100) * (vault?.userQuoteBalance || 0n)) / 10_000n
+    const mintedAmunt =
+      (BigInt(value * 100) * (vault?.mintedAmount || 0n)) / 10_000n
 
-  const amount = balance ? (balance * BigInt(sliderValue || 0)) / 100n : 0n
+    setSliderValue(value)
+    setBaseWithdraw(formatUnits(baseAmount, baseToken?.decimals ?? 18))
+    setQuoteWithdraw(formatUnits(quoteAmount, quoteToken?.decimals ?? 18))
+    setWithdrawAmount(formatUnits(mintedAmunt, vault?.decimals ?? 18))
+  }
 
-  // if (!baseToken || !quoteToken || !vault || !address)
-  //   return (
-  //     <div className={"p-0.5"}>
-  //       <Skeleton className="w-full h-40" />
-  //     </div>
-  //   )
+  // const { data: balance, isLoading } = useReadContract({
+  //   address: vault?.address as Address,
+  //   abi: erc20Abi,
+  //   functionName: "balanceOf",
+  //   args: [address as Address],
+  //   query: {
+  //     enabled: !!address || !!vault,
+  //   },
+  // })
+
+  if (!baseToken || !quoteToken || !vault || !address)
+    return (
+      <div className={"p-0.5"}>
+        <Skeleton className="w-full h-40" />
+      </div>
+    )
 
   return (
     <form
@@ -50,19 +76,29 @@ export function WithdrawForm({ className }: { className?: string }) {
       <div>
         <div className="grid bg-bg-primary rounded-lg p-2 gap-1 ">
           <Title className="mb-1">
-            50
+            {sliderValue}
             <span className="text-text-tertiary text-xs"> %</span>
           </Title>
           <div className="grid gap-2">
             <Line
-              icon={vault?.market.base.symbol!}
-              title={vault?.market.base.symbol!}
-              value={0.266}
+              icon={vault?.market.base.symbol}
+              title={vault?.market.base.symbol}
+              value={Number(baseWithdraw).toFixed(
+                baseToken?.displayDecimals ?? 4,
+              )}
             />
             <Line
-              title={vault?.market.quote.symbol!}
-              value={0.266}
-              icon={vault?.market.quote.symbol!}
+              title={vault?.market.quote.symbol}
+              icon={vault?.market.quote.symbol}
+              value={Number(quoteWithdraw).toFixed(
+                quoteToken?.displayDecimals ?? 4,
+              )}
+            />
+            <span className="text-text-tertiary text-xs">Withdraw:</span>
+            <Line
+              title={vault?.symbol}
+              icon={vault?.symbol}
+              value={Number(withdrawAmount).toFixed(4)}
             />
           </div>
           {/* Buttons loop */}
@@ -77,7 +113,7 @@ export function WithdrawForm({ className }: { className?: string }) {
                 )}
                 onClick={(e) => {
                   e.preventDefault()
-                  console.log(e)
+                  handleSliderChange(value)
                 }}
                 // disabled={!currentMarket}
               >
@@ -94,7 +130,7 @@ export function WithdrawForm({ className }: { className?: string }) {
               )}
               onClick={(e) => {
                 e.preventDefault()
-                console.log(e)
+                handleSliderChange(100)
               }}
               // disabled={!currentMarket}
             >
@@ -107,16 +143,25 @@ export function WithdrawForm({ className }: { className?: string }) {
       <Button
         className="w-full"
         onClick={() => setRemoveDialog(!removeDialog)}
-        disabled={amount === 0n || isLoading}
+        disabled={Number(withdrawAmount) === 0}
       >
         Withdraw
       </Button>
-      {/* <RemoveFromVaultDialog
-        vault={vault!}
-        amount={amount}
-        onClose={() => setRemoveDialog(false)}
+
+      <WithdrawFromVaultDialog
+        infos={{
+          baseWithdraw,
+          quoteWithdraw,
+          withdrawAmount,
+        }}
+        amount={withdrawAmount}
+        vault={vault}
+        onClose={() => {
+          setRemoveDialog(false)
+          handleSliderChange(0)
+        }}
         isOpen={removeDialog}
-      /> */}
+      />
     </form>
   )
 }

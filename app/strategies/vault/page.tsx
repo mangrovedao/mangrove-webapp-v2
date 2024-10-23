@@ -1,7 +1,14 @@
 "use client"
 
+import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
+import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
+import { useQuery } from "@tanstack/react-query"
 import { Coins, ExternalLink, Gauge, Percent } from "lucide-react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+import React, { ReactNode } from "react"
+import { formatUnits } from "viem"
+import { useClient } from "wagmi"
 
 import {
   CustomRadioGroup,
@@ -15,18 +22,11 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Separator } from "@/components/ui/separator"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
-import { MarketParams, publicMarketActions } from "@mangrovedao/mgv"
-import type { GetKandelStateResult } from "@mangrovedao/mgv/actions/kandel/view"
-import { useQuery } from "@tanstack/react-query"
-import Link from "next/link"
-import React, { ReactNode } from "react"
-import { formatUnits } from "viem"
-import { useClient } from "wagmi"
 import { Badge } from "../(list)/_components/badge"
 import { Vault } from "../(list)/_schemas/vaults"
 import { useVault } from "./_hooks/useVault"
-import { AddForm } from "./form/addForm"
-import { RemoveForm } from "./form/removeForm"
+import { AddForm } from "./form/depositForm"
+import { RemoveForm } from "./form/withdrawForm"
 
 enum Tabs {
   Details = "Details",

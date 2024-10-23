@@ -18,7 +18,7 @@ type Params<T> = {
   select?: (data: Vault[]) => T
 }
 
-export function useVaults<T = Vault[]>({
+export function useMyVaults<T = Vault[]>({
   chainId,
   filters: { first = 10, skip = 0 } = {},
   select,
@@ -34,14 +34,15 @@ export function useVaults<T = Vault[]>({
         if (!chainId) return []
         const plainVaults = getChainVaults(chainId)
         // .slice(skip, skip + first)
-        return await getVaultsInformation(
+        const vaults = await getVaultsInformation(
           publicClient,
           plainVaults,
           markets,
           user,
         )
+
+        return vaults.filter((v) => v.isActive)
       } catch (error) {
-        console.log("error", error)
         console.error(error)
         return []
       }
