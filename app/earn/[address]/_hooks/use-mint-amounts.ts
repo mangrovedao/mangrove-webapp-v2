@@ -25,6 +25,7 @@ export function useMintAmounts({ vault, client }: MintAmountsArgs) {
     side: "base" | "quote"
   }>()
 
+  //
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["mint-amounts", vault?.address, amountAndSide?.side, client],
     queryFn: async () => {
@@ -49,6 +50,7 @@ export function useMintAmounts({ vault, client }: MintAmountsArgs) {
       const quoteAmount = mintAmounts[1]
       const mintAmount = mintAmounts[2]
 
+      console.log("mintAmounts hook", baseAmount, quoteAmount, mintAmount)
       return { baseAmount, quoteAmount, mintAmount, side: amountAndSide.side }
     },
     enabled: !!amountAndSide?.amount && !!vault?.address,

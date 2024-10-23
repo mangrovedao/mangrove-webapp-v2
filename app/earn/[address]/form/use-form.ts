@@ -119,6 +119,6 @@ export default function useForm() {
     handleQuoteDepositChange,
     isLoading,
     vault,
-    mintAmount: data.baseAmount + data.quoteAmount,
+    mintAmount: data.mintAmount,
   }
 }

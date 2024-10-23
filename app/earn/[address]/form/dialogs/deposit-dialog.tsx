@@ -2,7 +2,7 @@ import type { Token } from "@mangrovedao/mgv"
 import React, { useEffect, useMemo } from "react"
 
 import { Vault } from "@/app/earn/(shared)/types"
-import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
+
 import Dialog from "@/components/dialogs/dialog-new"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
@@ -18,6 +18,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi"
+import { ApproveStep } from "../components/approve-step-new"
 import { Steps } from "../components/steps"
 
 type Props = {
@@ -40,7 +41,7 @@ const mintABI = parseAbi([
   "function mint(uint256 mintAmount, uint256 baseAmountMax, uint256 quoteAmountMax) external returns (uint256 shares, uint256 baseAmount, uint256 quoteAmount)",
 ])
 
-export default function DepToVaultDialog({
+export default function DepositToVaultDialog({
   isOpen,
   onClose,
   baseAmount: baseAmountRaw,
@@ -96,6 +97,7 @@ export default function DepToVaultDialog({
   const [started, setStarted] = React.useState(false)
 
   const steps = [
+    "Summary",
     missingBaseAllowance > 0n && `Approve ${baseToken?.symbol}`,
     missingQuoteAllowance > 0n && `Approve ${quoteToken?.symbol}`,
     "Mint",
@@ -108,9 +110,9 @@ export default function DepToVaultDialog({
   const currentStep = started
     ? isFetched
       ? missingBaseAllowance === 0n && missingQuoteAllowance === 0n
-        ? 3
-        : 2
-      : 1
+        ? 4
+        : 3
+      : 2
     : 1
 
   const amount0 = useMemo(() => {
@@ -127,6 +129,8 @@ export default function DepToVaultDialog({
     args: [mintAmount, amount0, amount1],
   })
 
+  console.log(mintAmount, amount0, amount1)
+
   // console.log(
   //   `cast call ${vault?.address} ${encodeFunctionData({
   //     abi: mintABI,
@@ -139,7 +143,7 @@ export default function DepToVaultDialog({
 
   useEffect(() => {
     if (isConfirmed) {
-      if (currentStep === 3) {
+      if (currentStep === 4) {
         queryClient.refetchQueries({
           queryKey: ["vault"],
         })
@@ -153,21 +157,6 @@ export default function DepToVaultDialog({
   }, [isConfirmed, currentStep, refetch, onClose, reset, queryClient])
 
   const stepInfos = [
-    {
-      body: (
-        <Summary
-          baseAmount={baseAmountRaw}
-          quoteAmount={quoteAmountRaw}
-          baseToken={baseToken}
-          quoteToken={quoteToken}
-        />
-      ),
-      button: (
-        <Button {...btnProps} onClick={() => setStarted(true)}>
-          Proceed
-        </Button>
-      ),
-    },
     {
       body: (
         <div className="text-center">
