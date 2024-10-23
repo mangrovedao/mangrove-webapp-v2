@@ -60,6 +60,8 @@ export function MyVaults({ type }: Props) {
           // push(`/earn/${strategy?.address}`)
           (window.location.href = `/earn/${vault?.address}`)
         }
+        cellClasses="font-ubuntuLight"
+        tableRowClasses="font-ubuntuLight"
         pagination={{
           onPageChange: setPageDetails,
           page,

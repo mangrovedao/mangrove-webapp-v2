@@ -194,7 +194,10 @@ export function DepositForm({ className }: { className?: string }) {
         baseToken={baseToken}
         quoteToken={quoteToken}
         mintAmount={mintAmount}
-        onClose={() => setAddDialog(false)}
+        onClose={() => {
+          setAddDialog(false)
+          handleBaseDepositChange("0")
+        }}
       />
     </form>
   )

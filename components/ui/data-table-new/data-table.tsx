@@ -88,7 +88,7 @@ export function DataTable<TData>({
                   key={`${tableName}-body-row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    "hover:text-white transition-colors group/row",
+                    "hover:text-white transition-colors group/row ",
                     {
                       "cursor-pointer": !!onRowClick,
                       "text-white hover:opacity-80 transition-all":
@@ -106,7 +106,7 @@ export function DataTable<TData>({
                     <TableCell
                       key={`${tableName}-body-cell-${cell.id}`}
                       className={cn(
-                        "px-0 py-2 group/cell whitespace-nowrap",
+                        "px-0 py-2 group/cell whitespace-nowrap font-normal font-unbuntu text-xs",
                         cellClasses,
                       )}
                     >

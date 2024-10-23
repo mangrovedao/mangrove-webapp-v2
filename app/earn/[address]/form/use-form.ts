@@ -36,6 +36,16 @@ export default function useForm() {
     token: quoteToken?.address,
   })
 
+  const baseDeposited = formatUnits(
+    vault?.userBaseBalance || 0n,
+    vault?.market.base.decimals || 18,
+  )
+
+  const quoteDeposited = formatUnits(
+    vault?.userQuoteBalance || 0n,
+    vault?.market.quote.decimals || 18,
+  )
+
   const baseDeposit = useMemo(() => {
     if (data?.side !== "quote") return
 
@@ -107,6 +117,8 @@ export default function useForm() {
   }, [baseDeposit, quoteDeposit])
 
   return {
+    baseDeposited,
+    quoteDeposited,
     address,
     baseToken,
     quoteToken,

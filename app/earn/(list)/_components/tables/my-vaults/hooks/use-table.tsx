@@ -111,11 +111,21 @@ export function useTable({ type, pageSize, data, onManage }: Params) {
           return (
             <div className="grid items-center justify-center">
               <Value
-                value={formatUnits(userBaseBalance, market.base.decimals)}
+                value={Number(
+                  formatUnits(
+                    userBaseBalance || 0n,
+                    market.base.decimals || 18,
+                  ),
+                ).toFixed(market.base.displayDecimals || 4)}
                 symbol={market.base.symbol}
               />
               <Value
-                value={formatUnits(userQuoteBalance, market.quote.decimals)}
+                value={Number(
+                  formatUnits(
+                    userQuoteBalance || 0n,
+                    market.quote.decimals || 18,
+                  ),
+                ).toFixed(market.quote.displayDecimals || 4)}
                 symbol={market.quote.symbol}
               />
             </div>

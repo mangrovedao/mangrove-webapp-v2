@@ -14,7 +14,7 @@ type Props = {
 }
 
 const burnABI = parseAbi([
-  "function burn(uint256 burnAmount,uint256[2] calldata minAmountsOut) external returns (uint256 amount0, uint256 amount1)",
+  "function burn(uint256 shares, uint256 minAmountBaseOut, uint256 minAmountQuoteOut) external returns (uint256 amountBaseOut, uint256 amountQuoteOut)",
 ])
 
 export default function RemoveFromVaultDialog({
@@ -55,11 +55,11 @@ export default function RemoveFromVaultDialog({
                 address: vault.address,
                 abi: burnABI,
                 functionName: "burn",
-                args: [amount, [0n, 0n]],
+                args: [amount, 0n, 0n],
               })
             }}
           >
-            Yes, remove liquidity
+            Yes, remove position
           </Button>
           <Dialog.Close>
             <Button variant={"secondary"} className="w-full" size="lg">

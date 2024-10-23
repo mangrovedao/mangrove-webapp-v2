@@ -34,11 +34,11 @@ function Step({ children, number, active = false }: StepProps) {
         })}
       ></div>
       <div className="space-y-1">
-        <div className="text-[10px] text-gray-scale-300">Step {number}</div>
+        <div className="text-[10px] text-text-secondary">Step {number}</div>
         <div
           className={cn("text-xs transition-colors", {
-            "text-white": active,
-            "text-gray-scale-400": !active,
+            "text-text-primary": active,
+            "text-text-tertiary": !active,
           })}
         >
           {children}

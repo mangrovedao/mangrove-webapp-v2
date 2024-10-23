@@ -18,6 +18,7 @@ import {
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
 import InfoTooltip from "@/components/info-tooltip-new"
+import NeonContainer from "@/components/neon-container"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
@@ -138,12 +139,14 @@ export default function Page() {
           <div className="xs:grid md:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary">
             <GridLine
               title={"TVL"}
-              value={Number(
-                formatUnits(
-                  vault?.tvl || 0n,
-                  vault?.market.quote.decimals || 18,
-                ),
-              ).toFixed(vault?.market.quote.displayDecimals || 3)}
+              value={
+                Number(
+                  formatUnits(
+                    vault?.tvl || 0n,
+                    vault?.market.quote.decimals || 18,
+                  ),
+                ).toFixed(vault?.market.quote.displayDecimals || 3) ?? "0"
+              }
               symbol={` ${vault?.market.quote.symbol}`}
             />
             <GridLine title={"APY"} value={"9.00"} symbol={"%"} />
@@ -245,16 +248,47 @@ export default function Page() {
 
         <div className="row-span-4">
           <div className="grid gap-8">
-            <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
-              <div className="flex w-2/3 justify-between items-center align-middle">
+            <NeonContainer>
+              <div className="flex w-2/3 justify-between items-center ">
                 <GridLine
                   title={"Your deposit"}
-                  value={"1.202.418,52"}
-                  symbol={"$"}
+                  value={
+                    <div className="flex items-center justify-center gap-2">
+                      <span>
+                        {Number(
+                          formatUnits(
+                            vault?.userBaseBalance || 0n,
+                            vault?.market.base.decimals || 18,
+                          ),
+                        ).toFixed(vault?.market.base.displayDecimals || 4)}
+                        <span className="text-text-secondary">
+                          {vault?.market.base.symbol}
+                        </span>
+                      </span>
+                      <span>
+                        {Number(
+                          formatUnits(
+                            vault?.userQuoteBalance || 0n,
+                            vault?.market.quote.decimals || 18,
+                          ),
+                        ).toFixed(vault?.market.quote.displayDecimals || 4)}
+                        <span className="text-text-secondary">
+                          {vault?.market.quote.symbol}
+                        </span>
+                      </span>
+                    </div>
+                  }
                 />
-                <GridLine title={"Your APY"} value={"6.42"} symbol={"%"} />
+                <GridLine
+                  title={"Your APY"}
+                  value={"Incoming..."}
+                  symbol={""}
+                />
               </div>
-            </div>
+            </NeonContainer>
+            {/* <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
+             
+            </div> */}
             <div className="grid space-y-5 bg-bg-secondary p-3 rounded-lg">
               <div className="w-full ">
                 <CustomRadioGroup
@@ -300,7 +334,7 @@ export default function Page() {
                 }
                 value={Number(
                   formatUnits(
-                    vault?.balanceBase || 0n,
+                    vault?.userBaseBalance || 0n,
                     vault?.market.base.decimals || 18,
                   ),
                 ).toLocaleString(undefined, {
@@ -323,7 +357,7 @@ export default function Page() {
                 value={
                   Number(
                     formatUnits(
-                      vault?.balanceQuote || 0n,
+                      vault?.userQuoteBalance || 0n,
                       vault?.market.quote.decimals || 18,
                     ),
                   ).toLocaleString(undefined, {

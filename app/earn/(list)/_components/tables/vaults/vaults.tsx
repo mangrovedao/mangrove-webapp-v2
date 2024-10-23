@@ -65,6 +65,8 @@ export function Vaults({ type }: Props) {
           // push(`/strategies/${strategy?.address}`)
           // (window.location.href = `/strategies/${strategy?.address}`)
         }
+        cellClasses="font-ubuntuLight"
+        tableRowClasses="font-ubuntuLight"
         pagination={{
           onPageChange: setPageDetails,
           page,

@@ -109,9 +109,11 @@ export default function DepositToVaultDialog({
 
   const currentStep = started
     ? isFetched
-      ? missingBaseAllowance === 0n && missingQuoteAllowance === 0n
-        ? 4
-        : 3
+      ? missingBaseAllowance === 0n
+        ? missingQuoteAllowance === 0n
+          ? 4
+          : 3
+        : 2
       : 2
     : 1
 
@@ -128,8 +130,6 @@ export default function DepositToVaultDialog({
     functionName: "mint",
     args: [mintAmount, amount0, amount1],
   })
-
-  console.log(mintAmount, amount0, amount1)
 
   // console.log(
   //   `cast call ${vault?.address} ${encodeFunctionData({
@@ -159,6 +159,21 @@ export default function DepositToVaultDialog({
   const stepInfos = [
     {
       body: (
+        <Summary
+          baseAmount={baseAmountRaw}
+          quoteAmount={quoteAmountRaw}
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+        />
+      ),
+      button: (
+        <Button {...btnProps} onClick={() => setStarted(true)}>
+          Proceed
+        </Button>
+      ),
+    },
+    {
+      body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
         </div>
@@ -182,7 +197,7 @@ export default function DepositToVaultDialog({
             }
           }}
         >
-          Approve {baseToken?.symbol}
+          Approve
         </Button>
       ),
     },
@@ -211,7 +226,7 @@ export default function DepositToVaultDialog({
             }
           }}
         >
-          Approve {quoteToken?.symbol}
+          Approve
         </Button>
       ),
     },
@@ -243,7 +258,7 @@ export default function DepositToVaultDialog({
             }
           }}
         >
-          Mint
+          Deposit
         </Button>
       ),
     },
@@ -275,7 +290,7 @@ export default function DepositToVaultDialog({
       showCloseButton={false}
     >
       <Dialog.Title className="text-xl text-left" close>
-        Review deposit
+        Deposit to ault
       </Dialog.Title>
       <Steps steps={steps as string[]} currentStep={currentStep} />
       <Dialog.Description>
@@ -320,7 +335,7 @@ const Summary = ({
 }) => {
   return (
     <div className="space-y-2">
-      <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
+      <div className="rounded-lg p-4 border border-border-secondary">
         <TokenPair
           baseToken={baseToken}
           quoteToken={quoteToken}
