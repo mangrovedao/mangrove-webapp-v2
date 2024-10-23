@@ -1,31 +1,18 @@
 "use client"
-import { Coins, Copy, ExternalLink, LogOut, Route, Wallet } from "lucide-react"
-import Link from "next/link"
 import posthog from "posthog-js"
 import React from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
-import { toast } from "sonner"
 import { useAccount, useDisconnect } from "wagmi"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import withClientOnly from "@/hocs/withClientOnly"
 
-import { BurgerIcon, ChevronDown } from "@/svgs"
+import { BurgerIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit"
 
 import { useMenuStore } from "@/stores/menu.store"
-import { arbitrum, baseSepolia, blast, blastSepolia } from "viem/chains"
 import ChainSelector from "./chain-selector"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
@@ -40,7 +27,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
   return (
     <nav
       className={cn(
-        "flex w-full justify-between items-center text-sm grid-in-header",
+        "flex w-full justify-between items-center text-sm grid-in-header py-1 mt-6 mb-8",
         className,
       )}
       {...props}
@@ -104,102 +91,24 @@ const RightPart = withClientOnly(() => {
   }
 
   return (
-    <div className="flex space-x-4 items-center h-8 py-1 mt-6 mb-8">
+    <div className="flex space-x-4 items-center h-8">
       <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
       <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
 
       <ChainSelector />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="secondary"
-            className="space-x-2 flex items-center border-transparent"
-          >
-            <span className="inline-flex items-center space-x-2">
-              <span className="bg-gray-500 h-[18px] w-[18px] rounded-full relative overflow-hidden">
-                {address && <Jazzicon seed={jsNumberForAddress(address)} />}
-              </span>
-              <span className="text-sm">{shortenAddress(address ?? "")}</span>
-            </span>
-            <ChevronDown className="w-3" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 mt-1">
-          <DropdownMenuLabel>Wallet: {connector?.name}</DropdownMenuLabel>
-          <DropdownMenuItem onClick={handleAccount}>
-            <Wallet className="mr-2 h-4 w-4" />
-            <span>Account</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Chain: {chain?.name}</DropdownMenuLabel>
-          <DropdownMenuItem asChild>
-            <Link href={"/bridge"}>
-              <Route className="mr-2 h-4 w-4" />
-              <span>Bridge assets</span>
-            </Link>
-          </DropdownMenuItem>
-          {chain?.testnet && (
-            <DropdownMenuItem asChild>
-              <Link href={"/faucet"}>
-                <Coins className="mr-2 h-4 w-4" />
-                <span>Faucet</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-
-          {(chain?.id == blastSepolia.id ||
-            chain?.id == blast.id ||
-            chain?.id == baseSepolia.id ||
-            chain?.id == arbitrum.id) && (
-            <>
-              <DropdownMenuItem asChild onClick={() => setWrapETH(!wrapETH)}>
-                <div>
-                  <Coins className="mr-2 h-4 w-4" />
-                  <span>Wrap ETH</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                asChild
-                onClick={() => setUnWrapETH(!unWrapETH)}
-              >
-                <div>
-                  <Coins className="mr-2 h-4 w-4" />
-                  <span>Unwrap wETH</span>
-                </div>
-              </DropdownMenuItem>
-            </>
-          )}
-
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => {
-                address && navigator.clipboard.writeText(address)
-                toast.success("Address copied to clipboard")
-              }}
-            >
-              <Copy className="mr-2 h-4 w-4" />
-              <span>Copy address</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link
-                href={`${chain?.blockExplorers?.default.url}/address/${address}`}
-                target="_blank"
-                className="inline-flex"
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                <span>Open in {chain?.blockExplorers?.default.name}</span>
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-
-          <DropdownMenuItem onClick={() => disconnect()}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Disconnect</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        variant="secondary"
+        className="space-x-2 flex items-center border-transparent"
+        onClick={handleAccount}
+      >
+        <span className="inline-flex items-center space-x-2">
+          <span className="bg-gray-500 h-[18px] w-[18px] rounded-full relative overflow-hidden">
+            {address && <Jazzicon seed={jsNumberForAddress(address)} />}
+          </span>
+          <span className="text-sm">{shortenAddress(address ?? "")}</span>
+        </span>
+      </Button>
     </div>
   )
 })

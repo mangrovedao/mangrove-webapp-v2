@@ -41,14 +41,14 @@ export function Tables({
   return (
     <div className="pt-4 space-y-4">
       <div className="grid gap-y-4">
-        <Title variant={"title2"} className="pl-4">
+        <Title variant={"title1"} className="pl-4">
           My positions
         </Title>
         <MyVaults type="user" />
       </div>
       <div className="grid gap-y-4">
         <div className="flex gap-2 w-full justify-between items-center">
-          <Title variant={"title2"} className="pl-4">
+          <Title variant={"title1"} className="pl-4">
             All Vaults
           </Title>
 

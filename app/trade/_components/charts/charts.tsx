@@ -29,7 +29,7 @@ export function Market({
     <CustomTabs
       {...props}
       defaultValue={Object.values(ChartType)[0]}
-      className={cn(className, "h-full")}
+      className={cn("h-full flex flex-col", className)}
     >
       <CustomTabsList className="w-full flex justify-start border-b">
         {Object.values(ChartType).map((table) => (
@@ -42,7 +42,7 @@ export function Market({
           </CustomTabsTrigger>
         ))}
       </CustomTabsList>
-      <div className="h-full w-full p-1">
+      <div className="w-full p-1 flex-1">
         {Object.values(ChartType).map((chart) => (
           <CustomTabsContent key={`${chart}-content`} value={chart}>
             {renderElement(TABS_CONTENT[chart])}

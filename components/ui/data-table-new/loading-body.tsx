@@ -7,12 +7,9 @@ type LoadingBodyProps = {
 
 export function LoadingBody({ cells, rows = 5 }: LoadingBodyProps) {
   return Array.from({ length: rows }).map((_, i) => (
-    <tr key={i}>
+    <tr key={i} className="">
       {Array.from({ length: cells }).map((_, j) => (
-        <td
-          key={j}
-          className="py-2 px-2 first:pl-0 last:pr-0 border-b hover:bg-muted/50"
-        >
+        <td key={j} className="py-2 px-2 hover:bg-muted/50">
           <Skeleton className="h-10" />
         </td>
       ))}

@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="md:pl-[6.5rem] px-4">
+      <body className="pl-[6.5rem] px-4">
         <RootProvider>
           <Sidebar />
           <Navbar />

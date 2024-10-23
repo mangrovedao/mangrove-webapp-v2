@@ -18,7 +18,13 @@ export default function Page() {
       <div className="max-w-md m-auto">
         <Bridge
           web3Provider={signer.provider}
-          customTheme={{ bgColor: "hsl(180deg 86% 3%)" }}
+          customTheme={{
+            "--synapse-text": "hsl(var(--text-primary))",
+            "--synapse-secondary": "hsl(var(--text-secondary))",
+            "--synapse-root": "hsl(var(--bg-secondary))",
+            "--synapse-surface": "hsl(var(--bg-primary))",
+            "--synapse-border": "transparent",
+          }}
           targetChainIds={[blast.id]}
         />
       </div>
