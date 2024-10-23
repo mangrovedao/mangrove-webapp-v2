@@ -7,7 +7,7 @@ type StepsProps = {
 
 export function Steps({ currentStep = 1, steps }: StepsProps) {
   return (
-    <div className="flex w-full gap-2 !my-8">
+    <div className="flex w-full gap-2 p-3">
       {steps?.map((value, i) => (
         <Step key={value} number={i + 1} active={currentStep >= i + 1}>
           {value}
@@ -26,7 +26,7 @@ type StepProps = {
 function Step({ children, number, active = false }: StepProps) {
   if (!children) return
   return (
-    <div className="flex-1 space-y-4">
+    <div className="flex-1 space-y-2">
       <div
         className={cn("w-full h-[2px] rounded-full transition-colors", {
           "bg-green-caribbean": active,

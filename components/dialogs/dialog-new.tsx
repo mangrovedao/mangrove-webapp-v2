@@ -6,7 +6,7 @@ import {
   footerClasses,
   getContentClasses,
   titleClasses,
-} from "./styles"
+} from "./styles-new"
 import type { DialogProps, Nodes } from "./types"
 
 export default function Dialog({

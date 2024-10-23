@@ -1,13 +1,13 @@
 import { Vault } from "@/app/earn/(shared)/types"
-import { Line } from "@/app/earn/(shared)/utils"
 import Dialog from "@/components/dialogs/dialog-new"
-import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { parseAbi, parseUnits } from "viem"
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
+import { DialogAmountLine } from "./utils"
 
 type Props = {
   infos: {
@@ -44,66 +44,60 @@ export default function RemoveFromVaultDialog({
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })
+      queryClient.refetchQueries({
+        queryKey: ["user-vaults"],
+      })
       onClose()
     }
   }, [isConfirmed, onClose, queryClient])
 
   return (
-    <Dialog open={!!isOpen} onClose={onClose}>
-      <Dialog.Title className="flex end-1">Review Withdraw </Dialog.Title>
-      <Dialog.Footer>
-        <div className="flex flex-col gap-4 flex-1">
-          <div>
-            <Line
-              title={
-                <div className="flex gap-2 items-center">
-                  <TokenIcon
-                    symbol={vault?.market.base.symbol}
-                    className="h-8 w-8"
-                  />
-                  <Caption className="text-text-secondary text-lg">
-                    {vault?.market.base.symbol}
-                  </Caption>
-                </div>
-              }
-              value={Number(infos.baseWithdraw).toLocaleString(undefined, {
-                maximumFractionDigits: vault?.market.base.displayDecimals || 4,
-              })}
-            />
-            <Line
-              title={
-                <div className="flex gap-2 items-center">
-                  <TokenIcon
-                    symbol={vault?.market.quote.symbol}
-                    className="h-8 w-8"
-                  />
-                  <Caption className="text-text-secondary text-lg">
-                    {vault?.market.quote.symbol}
-                  </Caption>
-                </div>
-              }
-              value={Number(infos.quoteWithdraw).toLocaleString(undefined, {
-                maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
-              })}
-            />
-            <Line
-              title={
-                <div className="flex gap-2 items-center">
-                  <TokenIcon symbol={vault?.symbol} className="h-8 w-8" />
-                  <Caption className="text-text-secondary text-lg">
-                    {vault?.symbol}
-                  </Caption>
-                </div>
-              }
-              value={Number(infos.withdrawAmount).toLocaleString(undefined, {
-                maximumFractionDigits: 4,
-              })}
-            />
-          </div>
+    <Dialog open={!!isOpen} onClose={onClose} showCloseButton={false}>
+      <Dialog.Title className="flex end">Review Withdraw </Dialog.Title>
+      <Dialog.Description className="p-3 space-y-2">
+        <Caption className="flex justify-start">You will receive</Caption>
+        <DialogAmountLine
+          amount={Number(infos.baseWithdraw).toLocaleString(undefined, {
+            maximumFractionDigits: vault?.market.base.displayDecimals || 4,
+          })}
+          estimationAmount={"30.333"}
+          symbol={vault?.market.base.symbol}
+        />
+        <DialogAmountLine
+          amount={Number(infos.quoteWithdraw).toLocaleString(undefined, {
+            maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
+          })}
+          estimationAmount={"30.333"}
+          symbol={vault?.market.quote.symbol}
+        />
 
+        <Separator className="my-4" />
+
+        <Caption className="flex justify-start">You will withdraw</Caption>
+
+        <DialogAmountLine
+          amount={Number(infos.withdrawAmount).toLocaleString(undefined, {
+            maximumFractionDigits: 4,
+          })}
+          estimationAmount={"30.333"}
+          symbol={vault?.symbol}
+        />
+      </Dialog.Description>
+      <Dialog.Footer>
+        <div className="flex w-full gap-4">
+          <Dialog.Close className="w-full">
+            <Button
+              variant={"secondary"}
+              size="md"
+              className="w-full"
+              disabled={isPending || isConfirming}
+            >
+              Cancel
+            </Button>
+          </Dialog.Close>
           <Button
+            size="md"
             className="w-full"
-            size="lg"
             disabled={isPending || isConfirming}
             loading={isPending || isConfirming}
             onClick={() => {
@@ -118,11 +112,6 @@ export default function RemoveFromVaultDialog({
           >
             Confirm
           </Button>
-          <Dialog.Close>
-            <Button variant={"secondary"} className="w-full" size="lg">
-              Cancel
-            </Button>
-          </Dialog.Close>
         </div>
       </Dialog.Footer>
     </Dialog>

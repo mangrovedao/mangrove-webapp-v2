@@ -78,7 +78,7 @@ export function DepositForm({ className }: { className?: string }) {
         <div className="grid -mt-1">
           <div className="flex items-center gap-1 ">
             <i className="text-text-quaternary">≈</i>
-            <span className="text-xs text-text-secondary">0</span>
+            <span className="text-xs text-text-secondary">...</span>
             <span className="text-xs text-text-quaternary">$</span>
           </div>
 
@@ -136,7 +136,7 @@ export function DepositForm({ className }: { className?: string }) {
         <div className="grid -mt-1">
           <div className="flex items-center gap-1 ">
             <i className="text-text-quaternary">≈</i>
-            <span className="text-xs text-text-secondary">0</span>
+            <span className="text-xs text-text-secondary">...</span>
             <span className="text-xs text-text-quaternary">$</span>
           </div>
 
