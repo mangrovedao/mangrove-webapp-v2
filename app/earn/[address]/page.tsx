@@ -71,7 +71,7 @@ export default function Page() {
   const { push } = useRouter()
 
   return (
-    <div className="max-w-full mx-auto px-20 pb-4">
+    <div className="max-w-full mx-auto lg:px-20 md:px-10 pb-4">
       {/* BreadCrumb   */}
       <div className="flex items-center gap-2 pb-4">
         <Link href={"/"} className="flex items-center gap-2">
