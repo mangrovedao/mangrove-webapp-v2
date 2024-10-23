@@ -37,7 +37,7 @@ import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
 import { useAccount, useClient } from "wagmi"
 import { Vault } from "../(list)/_schemas/vaults"
-import { getChainImage } from "../(shared)/utils"
+import { Line, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/depositForm"
@@ -532,21 +532,6 @@ const Details = ({
         </Caption>
       </div>
     </>
-  )
-}
-
-export const Line = ({
-  title,
-  value,
-}: {
-  title: ReactNode
-  value: ReactNode
-}) => {
-  return (
-    <div className="flex justify-between mt-2 items-center">
-      <Caption className="text-gray text-xs"> {title}</Caption>
-      <Caption className="text-gray text-xs">{value}</Caption>
-    </div>
   )
 }
 

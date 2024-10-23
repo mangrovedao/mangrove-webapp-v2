@@ -1,4 +1,5 @@
 import { Vault } from "@/app/earn/(shared)/types"
+import { Line } from "@/app/earn/(shared)/utils"
 import Dialog from "@/components/dialogs/dialog-new"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
@@ -7,7 +8,6 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { parseAbi, parseUnits } from "viem"
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
-import { Line } from "../../page"
 
 type Props = {
   infos: {

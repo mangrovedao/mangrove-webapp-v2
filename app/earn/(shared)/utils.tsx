@@ -1,4 +1,6 @@
+import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
+import { ReactNode } from "react"
 
 export function getIconFromChainlist(name: string) {
   let icon = name
@@ -20,5 +22,20 @@ export function getChainImage(chainId?: number, chainName?: string) {
       key={chainId}
       alt={`${chainName}-logo`}
     />
+  )
+}
+
+export const Line = ({
+  title,
+  value,
+}: {
+  title: ReactNode
+  value: ReactNode
+}) => {
+  return (
+    <div className="flex justify-between mt-2 items-center">
+      <Caption className="text-gray text-xs"> {title}</Caption>
+      <Caption className="text-gray text-xs">{value}</Caption>
+    </div>
   )
 }
