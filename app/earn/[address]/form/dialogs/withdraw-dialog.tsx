@@ -60,14 +60,14 @@ export default function RemoveFromVaultDialog({
           amount={Number(infos.baseWithdraw).toLocaleString(undefined, {
             maximumFractionDigits: vault?.market.base.displayDecimals || 4,
           })}
-          estimationAmount={"30.333"}
+          estimationAmount={"..."}
           symbol={vault?.market.base.symbol}
         />
         <DialogAmountLine
           amount={Number(infos.quoteWithdraw).toLocaleString(undefined, {
             maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
           })}
-          estimationAmount={"30.333"}
+          estimationAmount={"..."}
           symbol={vault?.market.quote.symbol}
         />
 
@@ -79,7 +79,7 @@ export default function RemoveFromVaultDialog({
           amount={Number(infos.withdrawAmount).toLocaleString(undefined, {
             maximumFractionDigits: 4,
           })}
-          estimationAmount={"30.333"}
+          estimationAmount={"..."}
           symbol={vault?.symbol}
         />
       </Dialog.Description>
