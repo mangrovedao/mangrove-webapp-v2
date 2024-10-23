@@ -242,8 +242,15 @@ export default function Page() {
 
         <div className="col-span-2">
           <div className="grid gap-8">
-            <NeonContainer>
-              <div className="flex w-2/3 justify-between items-center ">
+            <NeonContainer className="relative">
+              <ImageWithHideOnError
+                className="absolute -top-[17px] -right-[17px] rounded-xl"
+                src={`/assets/illustrations/earn-leaf.png`}
+                width={100}
+                height={90}
+                alt={`mangrove-logo`}
+              />
+              <div className="flex w-2/3 justify-between items-center">
                 <GridLine
                   title={"Your deposit"}
                   value={
