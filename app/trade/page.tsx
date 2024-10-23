@@ -1,41 +1,36 @@
 "use client"
 import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
 import { Market } from "./_components/charts/charts"
-import { Forms } from "./_components/forms/forms"
 import { OrderBook } from "./_components/orderbook/orderbook"
 import { PricesBar } from "./_components/prices-bar/prices-bar"
-import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
   return (
-    <main className="border-t border-l -mt-3">
-      <section className="trade-section">
-        <div className="px-4 border-b h-[var(--bar-height)] flex items-center relative">
-          <MarketSelector />
-        </div>
-        <Forms />
+    <main className="-mt-3 px-2 h-[calc(100vh-96px)] overflow-hidden">
+      <section className="flex items-center relative">
+        <MarketSelector />
+        <PricesBar />
       </section>
 
-      <section className="border-x book-and-chart">
+      <section className="grid grid-cols-4 gap-5 h-full">
+        <div className="col-span-3 border rounded-2xl h-full flex flex-col">
+          <Market className="h-2/3" />
+          <OrderBook className="overflow-hidden" />
+        </div>
+        <div className="col-span-1 bg-red-200"></div>
+      </section>
+
+      {/* <section className="border-x book-and-chart">
         <OrderBook
           className="overflow-hidden border-r book-container"
           style={{ gridArea: "book" }}
         />
-        <div
-          className="market-chart-container"
-          style={{
-            gridArea: "chart",
-          }}
-        >
-          <PricesBar />
-          <Market className="w-full border-t h-full" />
-        </div>
       </section>
 
       <section className="border-x border-t tables-section z-50 bg-background">
-        <Tables className="h-full" />
-      </section>
-      <style jsx global>{`
+        <Tables className="h-1/3" />
+      </section> */}
+      {/* <style jsx global>{`
         body {
           position: absolute;
           top: 0;
@@ -44,9 +39,9 @@ export default function Page() {
           bottom: 0;
           overflow: hidden;
         }
-      `}</style>
+      `}</style> */}
 
-      <style jsx>{`
+      {/* <style jsx>{`
         main {
           display: grid;
           grid-area: main;
@@ -82,8 +77,8 @@ export default function Page() {
             grid-template-rows: calc(50vh - var(--bar-height) + 38px);
           }
         }
-      `}</style>
-      <style global jsx>{`
+      `}</style> */}
+      {/* <style global jsx>{`
         .market-chart-container div[role="tabpanel"] {
           height: calc(100% - var(--bar-height) * 2);
         }
@@ -96,7 +91,7 @@ export default function Page() {
             --history-table-content-height: calc(50vh - var(--bar-height) * 2);
           }
         }
-      `}</style>
+      `}</style> */}
     </main>
   )
 }

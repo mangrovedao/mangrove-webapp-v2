@@ -61,7 +61,7 @@ export const TVChartContainer = (
         "hide_main_series_symbol_from_indicator_legend",
       ],
       overrides: {
-        "paneProperties.background": "#010e0e",
+        "paneProperties.background": "#0B1819",
         "paneProperties.backgroundType": "solid",
       },
     }

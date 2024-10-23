@@ -102,7 +102,7 @@ export default function ChainSelector() {
           <span className="text-sm whitespace-nowrap">{chain?.name}</span>
         </span>
         <div className="pl-2">
-          <ChevronDown className="w-3" />
+          <ChevronDown className="w-5" />
         </div>
       </Button>
     </>

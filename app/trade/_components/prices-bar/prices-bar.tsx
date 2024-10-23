@@ -3,7 +3,6 @@
 import type { Token } from "@mangrovedao/mgv"
 import React from "react"
 
-import { Button } from "@/components/ui/button-old"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -13,7 +12,6 @@ import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
 import { determineDecimals, formatNumber } from "@/utils/numbers"
-import { ArrowLeftRight } from "lucide-react"
 
 function Container({ children }: React.PropsWithChildren) {
   return <span className="text-xs font-medium space-y-[2px]">{children}</span>
@@ -65,7 +63,7 @@ function Item({
           {rightElement}
         </Value>
       ) : (
-        <span className="text-red">N/A</span>
+        <span>-</span>
       )}
     </Container>
   )
@@ -170,7 +168,7 @@ export function PricesBar() {
           skeleton={mangroveTokenPriceLoading}
         />
 
-        <Button
+        {/* <Button
           variant={"secondary"}
           size={"icon"}
           className="p-1"
@@ -179,7 +177,7 @@ export function PricesBar() {
           }}
         >
           <ArrowLeftRight />
-        </Button>
+        </Button> */}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
