@@ -128,7 +128,7 @@ export default function Page() {
 
       {/* Main Columns */}
       <div className="grid md:grid-flow-col grid-cols-2 mt-5 gap-5">
-        <div className="col-span-2 w-full space-y-6">
+        <div className="col-span-2 space-y-6">
           {/* Infos Card */}
           <div className="grid sm:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
             <GridLine
@@ -169,9 +169,13 @@ export default function Page() {
           </div>
 
           {/* Graphs  */}
-          {/* ********TODO*********/}
-          <div className="border-2 border-bg-tertiary p-6 rounded-lg h-96 w-full">
-            Incoming graph...
+          <div className="flex justify-center items-center">
+            <ImageWithHideOnError
+              src={`/assets/illustrations/vault-graph-placeholder.png`}
+              width={832}
+              height={382}
+              alt={`vault-graph-placeholder`}
+            />
           </div>
 
           {/* Vault details */}
