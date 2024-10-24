@@ -43,7 +43,6 @@ export default function Swap() {
     swapButtonText,
     payDollar,
     receiveDollar,
-    isFetchingPrices,
   } = useSwap()
 
   return (
@@ -59,7 +58,6 @@ export default function Swap() {
             token={payToken}
             value={fields.payValue}
             onChange={onPayValueChange}
-            isFetchingPrices={isFetchingPrices}
             dollarValue={payDollar}
             onTokenClicked={() => setPayTokenDialogOpen(true)}
             onMaxClicked={onMaxClicked}
@@ -77,7 +75,6 @@ export default function Swap() {
             token={receiveToken}
             value={fields.receiveValue}
             dollarValue={receiveDollar}
-            isFetchingPrices={isFetchingPrices}
             onChange={onReceiveValueChange}
             onTokenClicked={() => setReceiveTokenDialogOpen(true)}
           />
@@ -157,7 +154,6 @@ type TokenContainerProps = {
   type: "pay" | "receive"
   value: string
   dollarValue: number
-  isFetchingPrices: boolean
   onTokenClicked?: () => void
   onMaxClicked?: () => void
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -171,7 +167,6 @@ function TokenContainer({
   value,
   onChange,
   dollarValue,
-  isFetchingPrices,
 }: TokenContainerProps) {
   const { isConnected } = useAccount()
   const tokenBalance = useTokenBalance(token)
@@ -242,14 +237,6 @@ function TokenContainer({
       </div>
       <div className="flex justify-between items-center opacity-70">
         {token && Number(dollars) !== 0 ? (
-          <div className="text-sm text-left text-text-quaternary">
-            ≈{" "}
-            <span className="text-text-secondary">
-              {dollars.slice(0, dollars.indexOf(".") + 3) ?? "0"}
-            </span>{" "}
-            $
-          </div>
-        ) : !isFetchingPrices ? (
           <div className="text-sm text-left text-text-quaternary">
             ≈{" "}
             <span className="text-text-secondary">
