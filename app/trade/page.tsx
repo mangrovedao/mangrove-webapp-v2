@@ -6,19 +6,34 @@ import { PricesBar } from "./_components/prices-bar/prices-bar"
 
 export default function Page() {
   return (
-    <main className="-mt-3 px-2 h-[calc(100vh-96px)] overflow-hidden">
-      <section className="flex items-center relative">
+    <main className="px-2 gap-x-5">
+      {/* <section
+        className="flex items-center relative"
+        style={{ gridArea: "content" }}
+      >
         <MarketSelector />
         <PricesBar />
+      </section> */}
+
+      <section
+        className="space-y-3 flex flex-col"
+        style={{ gridArea: "content" }}
+      >
+        <div className="col-span-full flex items-center h-10">
+          <div>
+            <MarketSelector />
+          </div>
+          <PricesBar />
+        </div>
+        <div className="col-span-full border border-b-transparent rounded-t-2xl h-full flex flex-col">
+          <Market className="" />
+        </div>
       </section>
 
-      <section className="grid grid-cols-4 gap-5 h-full">
-        <div className="col-span-3 border rounded-2xl h-full flex flex-col">
-          <Market className="h-2/3" />
-          <OrderBook className="overflow-hidden" />
-        </div>
-        <div className="col-span-1 bg-red-200"></div>
-      </section>
+      <section
+        className=" bg-red-200 h-full"
+        style={{ gridArea: "trade" }}
+      ></section>
 
       {/* <section className="border-x book-and-chart">
         <OrderBook
@@ -30,7 +45,10 @@ export default function Page() {
       <section className="border-x border-t tables-section z-50 bg-background">
         <Tables className="h-1/3" />
       </section> */}
-      {/* <style jsx global>{`
+      <section className="border-x border-b rounded-b-2xl tables-section z-50 bg-background">
+        <OrderBook className="overflow-hidden" />
+      </section>
+      <style jsx global>{`
         body {
           position: absolute;
           top: 0;
@@ -39,7 +57,26 @@ export default function Page() {
           bottom: 0;
           overflow: hidden;
         }
-      `}</style> */}
+      `}</style>
+      <style jsx>{`
+        main {
+          display: grid;
+          grid-area: main;
+          grid-template-columns: minmax(0, 1fr) 20.5rem;
+          grid-template-areas:
+            "content trade"
+            "tables trade";
+          grid-template-rows: 1fr var(--history-table-height);
+          height: calc(100vh - 112px);
+        }
+        .tables-section {
+          grid-area: tables;
+        }
+
+        .trade-section {
+          grid-area: trade;
+        }
+      `}</style>
 
       {/* <style jsx>{`
         main {
@@ -78,7 +115,7 @@ export default function Page() {
           }
         }
       `}</style> */}
-      {/* <style global jsx>{`
+      <style global jsx>{`
         .market-chart-container div[role="tabpanel"] {
           height: calc(100% - var(--bar-height) * 2);
         }
@@ -91,7 +128,7 @@ export default function Page() {
             --history-table-content-height: calc(50vh - var(--bar-height) * 2);
           }
         }
-      `}</style> */}
+      `}</style>
     </main>
   )
 }
