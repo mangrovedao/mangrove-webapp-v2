@@ -129,8 +129,8 @@ export default function Page() {
       </div>
 
       {/* Main Columns */}
-      <div className="grid md:grid-flow-col grid-cols-2 mt-5 gap-5">
-        <div className="col-span-2 space-y-6 ">
+      <div className="grid grid-cols-1 sm:grid-cols-12 mt-5 gap-5 ">
+        <div className="col-span-12 sm:col-span-8 space-y-6">
           {/* Infos Card */}
           <div className="mx-1 grid sm:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
             <GridLineHeader
@@ -264,7 +264,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="col-span-2">
+        <div className=" col-span-12 sm:col-span-4">
           <div className="grid gap-8">
             <NeonContainer className="relative">
               <ImageWithHideOnError

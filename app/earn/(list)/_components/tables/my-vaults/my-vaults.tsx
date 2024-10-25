@@ -42,8 +42,9 @@ export function MyVaults() {
     },
   })
 
+  // temporary fix
   React.useEffect(() => {
-    refetch()
+    refetch?.()
   }, [chainId])
 
   return (

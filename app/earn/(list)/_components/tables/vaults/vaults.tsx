@@ -11,10 +11,7 @@ import { Vault } from "@/app/earn/(shared)/types"
 import { useTable } from "./hooks/use-table"
 import { useVaults } from "./hooks/use-vaults"
 
-type Props = {
-  type: "user" | "all"
-}
-export function Vaults({ type }: Props) {
+export function Vaults() {
   const { push } = useRouter()
   const { chainId } = useAccount()
 
@@ -43,7 +40,6 @@ export function Vaults({ type }: Props) {
   const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
 
   const table = useTable({
-    type,
     pageSize,
     data,
     onDeposit: (vault: Vault) => undefined,
