@@ -16,10 +16,10 @@ import useForm from "./use-form"
 const sliderValues = [25, 50, 75]
 
 export function WithdrawForm({ className }: { className?: string }) {
-  const [sliderValue, setSliderValue] = React.useState<number>(0)
-  const [baseWithdraw, setBaseWithdraw] = React.useState<string>("0")
-  const [quoteWithdraw, setQuoteWithdraw] = React.useState<string>("0")
-  const [withdrawAmount, setWithdrawAmount] = React.useState<string>("0")
+  const [sliderValue, setSliderValue] = React.useState(0)
+  const [baseWithdraw, setBaseWithdraw] = React.useState("0")
+  const [quoteWithdraw, setQuoteWithdraw] = React.useState("0")
+  const [withdrawAmount, setWithdrawAmount] = React.useState("0")
 
   const [removeDialog, setRemoveDialog] = React.useState(false)
 
@@ -49,15 +49,9 @@ export function WithdrawForm({ className }: { className?: string }) {
     setWithdrawAmount(formatUnits(mintedAmunt, vault?.decimals ?? 18))
   }
 
-  // const { data: balance, isLoading } = useReadContract({
-  //   address: vault?.address as Address,
-  //   abi: erc20Abi,
-  //   functionName: "balanceOf",
-  //   args: [address as Address],
-  //   query: {
-  //     enabled: !!address || !!vault,
-  //   },
-  // })
+  React.useEffect(() => {
+    handleSliderChange(25)
+  }, [quoteDeposited, baseDeposited])
 
   if (!baseToken || !quoteToken || !vault || !address)
     return (
@@ -75,9 +69,9 @@ export function WithdrawForm({ className }: { className?: string }) {
     >
       <div>
         <div className="grid bg-bg-primary rounded-lg p-2 gap-1 ">
-          <Title className="mb-1">
+          <Title className="mb-1" variant={"header1"}>
             {sliderValue}
-            <span className="text-text-tertiary text-xs"> %</span>
+            <span className="text-text-tertiary text-sm"> %</span>
           </Title>
           <div className="grid gap-2">
             <Line
@@ -94,7 +88,7 @@ export function WithdrawForm({ className }: { className?: string }) {
                 quoteToken?.displayDecimals ?? 4,
               )}
             />
-            <span className="text-text-tertiary text-xs">Withdraw:</span>
+            <span className="text-text-tertiary text-xs">Burn:</span>
             <Line
               title={vault?.symbol}
               icon={vault?.symbol}
@@ -110,6 +104,9 @@ export function WithdrawForm({ className }: { className?: string }) {
                 size={"xs"}
                 className={cn(
                   "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none ",
+                  {
+                    "bg-bg-tertiary": sliderValue === value,
+                  },
                 )}
                 onClick={(e) => {
                   e.preventDefault()

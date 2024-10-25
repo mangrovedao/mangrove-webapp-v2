@@ -1,12 +1,12 @@
 "use client"
 
+import React from "react"
+import { formatUnits } from "viem"
+
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/utils"
-import React from "react"
-
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatUnits } from "viem"
+import { cn } from "@/utils"
 import DepositToVaultDialog from "./dialogs/deposit-dialog"
 import useForm from "./use-form"
 
@@ -49,6 +49,11 @@ export function DepositForm({ className }: { className?: string }) {
     handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
   }
 
+  React.useEffect(() => {
+    handleBaseSliderChange(25)
+    handleQuoteSliderChange(25)
+  }, [baseBalance, quoteBalance])
+
   if (!baseToken || !quoteToken)
     return (
       <div className={"p-0.5"}>
@@ -68,11 +73,10 @@ export function DepositForm({ className }: { className?: string }) {
           token={baseToken}
           label={`Deposit ${baseSliderValue}%`}
           inputClassName="bg-bg-primary"
-          value={baseDeposit}
+          value={Number(baseDeposit).toFixed(baseToken.displayDecimals)}
           onChange={handleBaseDepositChange}
           error={errors.baseDeposit}
           showBalance
-          disabled={isLoading}
           balanceAction={{ onClick: handleBaseDepositChange, text: "MAX" }}
         />
         <div className="grid -mt-1">
@@ -88,16 +92,18 @@ export function DepositForm({ className }: { className?: string }) {
                 <Button
                   key={`percentage-button-${value}`}
                   variant={"secondary"}
-                  size={"xs"}
-                  value={value}
+                  size={"md"}
+                  value={baseSliderValue}
                   className={cn(
                     "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none",
+                    {
+                      "bg-bg-tertiary": baseSliderValue === value,
+                    },
                   )}
                   onClick={(e) => {
                     e.preventDefault()
                     handleBaseSliderChange(Number(value))
                   }}
-                  // disabled={!currentMarket}
                 >
                   {value}%
                 </Button>
@@ -125,12 +131,11 @@ export function DepositForm({ className }: { className?: string }) {
         <EnhancedNumericInput
           token={quoteToken}
           label={`Deposit ${quoteSliderValue}%`}
-          value={quoteDeposit}
+          value={Number(quoteDeposit).toFixed(quoteToken.displayDecimals)}
           inputClassName="bg-bg-primary"
           onChange={handleQuoteDepositChange}
           error={errors.quoteDeposit}
           showBalance
-          disabled={isLoading}
           balanceAction={{ onClick: handleQuoteDepositChange, text: "MAX" }}
         />
         <div className="grid -mt-1">
@@ -146,11 +151,14 @@ export function DepositForm({ className }: { className?: string }) {
                 <Button
                   key={`percentage-button-${value}`}
                   variant={"secondary"}
-                  size={"xs"}
+                  size={"md"}
                   className={cn(
                     "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none",
+                    {
+                      "bg-bg-tertiary": quoteSliderValue === value,
+                    },
                   )}
-                  value={value}
+                  value={quoteSliderValue}
                   onClick={(e) => {
                     e.preventDefault()
                     handleQuoteSliderChange(Number(value))

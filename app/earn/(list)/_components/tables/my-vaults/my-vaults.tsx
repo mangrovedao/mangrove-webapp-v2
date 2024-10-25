@@ -9,10 +9,7 @@ import { useAccount } from "wagmi"
 import { useMyVaults } from "./hooks/use-my-vaults"
 import { useTable } from "./hooks/use-table"
 
-type Props = {
-  type: "user" | "all"
-}
-export function MyVaults({ type }: Props) {
+export function MyVaults() {
   const { push } = useRouter()
   const { chainId } = useAccount()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
@@ -40,7 +37,6 @@ export function MyVaults({ type }: Props) {
   const [closeStrategy, setCloseStrategy] = React.useState<Vault>()
 
   const table = useTable({
-    type,
     pageSize,
     data: vaults,
     onManage: (vault: Vault) => {

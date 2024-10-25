@@ -64,9 +64,10 @@ export default function Page() {
   const { push } = useRouter()
 
   return (
-    <div className="max-w-full mx-auto lg:px-3 pb-4">
+    <div className="max-w-7xl mx-auto lg:px-3 pb-4">
       {/* BreadCrumb   */}
-      <div className="flex items-center gap-2 pb-4">
+
+      <div className="flex items-center gap-2 pb-4 ml-4">
         <Link href={"/earn"} className="flex items-center gap-2">
           <Caption className="text-text-quaternary">Earn</Caption>
           <ChevronRight className="h-4 w-4 text-text-disabled" />
@@ -74,7 +75,7 @@ export default function Page() {
         <Caption className="text-text-secondary">Vault details</Caption>
       </div>
       {/* Market details */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap ml-4">
         <div className="flex -space-x-2 items-center">
           {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
             <>
@@ -128,10 +129,10 @@ export default function Page() {
 
       {/* Main Columns */}
       <div className="grid md:grid-flow-col grid-cols-2 mt-5 gap-5">
-        <div className="col-span-2 space-y-6">
+        <div className="col-span-2 space-y-6 ">
           {/* Infos Card */}
-          <div className="grid sm:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
-            <GridLine
+          <div className="mx-1 grid sm:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
+            <GridLineHeader
               title={"TVL"}
               value={
                 Number(
@@ -143,9 +144,9 @@ export default function Page() {
               }
               symbol={` ${vault?.market.quote.symbol}`}
             />
-            <GridLine title={"APY"} value={"9.00"} symbol={"%"} />
-            <GridLine
-              title={"Performance Fee"}
+            <GridLineHeader title={"APY"} value={"9.00"} symbol={"%"} />
+            <GridLineHeader
+              title={"Performances fees"}
               value={vault?.performanceFee}
               symbol={"%"}
               info="Tooltip to be defined"
@@ -153,7 +154,7 @@ export default function Page() {
           </div>
 
           {/* Description */}
-          <div className="space-y-3">
+          <div className="mx-5 space-y-3">
             <Title variant={"title2"} className="text-text-primary ">
               Vault description
             </Title>
@@ -286,7 +287,9 @@ export default function Page() {
                 />
                 <GridLine
                   title={"Your APY"}
-                  value={"Incoming..."}
+                  value={
+                    <span className="text-xs flex gap-1">Incoming...</span>
+                  }
                   symbol={""}
                 />
               </div>
@@ -372,7 +375,7 @@ export default function Page() {
                 }
               />
               <Caption className="text-text-secondary mt-5">
-                Amount minted
+                Minted amount
               </Caption>
 
               <Line
@@ -461,6 +464,53 @@ const GridLine = ({
             <span className="text-text-tertiary">{symbol}</span>
           ) : undefined}
         </Text>
+        <span className="text-text-secondary">{icon}</span>
+      </div>
+    </div>
+  )
+}
+
+const GridLineHeader = ({
+  title,
+  value,
+  symbol,
+  info,
+  icon,
+  iconFirst,
+}: {
+  title: ReactNode
+  value: ReactNode
+  symbol?: ReactNode
+  icon?: ReactNode
+  iconFirst?: boolean
+  info?: string
+}) => {
+  return (
+    <div className="grid mt-2 items-center space-y-2">
+      <div className="flex items-center -gap-1">
+        <Title
+          className="text-text-secondary font-unbuntuLight"
+          variant={"title3"}
+        >
+          {title}
+        </Title>
+        {info ? (
+          <InfoTooltip className="text-text-secondary" iconSize={14}>
+            {info}
+          </InfoTooltip>
+        ) : undefined}
+      </div>
+      <div
+        className={cn("flex items-center gap-2 ", {
+          "flex-row-reverse justify-end": iconFirst,
+        })}
+      >
+        <Title className="text-text-primary font-axiforma text-md">
+          {value}
+          {symbol ? (
+            <span className="text-text-tertiary">{symbol}</span>
+          ) : undefined}
+        </Title>
         <span className="text-text-secondary">{icon}</span>
       </div>
     </div>
