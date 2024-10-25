@@ -38,6 +38,7 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * baseBalance.balance) / 10_000n
 
     setBaseSliderValue(value)
+    setQuoteSliderValue(0)
     handleBaseDepositChange(formatUnits(amount, baseBalance.token.decimals))
   }
 
@@ -46,6 +47,7 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * quoteBalance.balance) / 10_000n
 
     setQuoteSliderValue(value)
+    setBaseSliderValue(0)
     handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
   }
 

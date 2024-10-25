@@ -39,3 +39,18 @@ export const Line = ({
     </div>
   )
 }
+
+export const LineRewards = ({
+  title,
+  value,
+}: {
+  title: ReactNode
+  value: ReactNode
+}) => {
+  return (
+    <div className="flex justify-between items-center">
+      <Caption className="text-text-secondary text-xs"> {title}</Caption>
+      <Caption className="text-text-primary text-xs">{value}</Caption>
+    </div>
+  )
+}

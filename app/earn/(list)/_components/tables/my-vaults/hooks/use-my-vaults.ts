@@ -10,7 +10,6 @@ import {
 } from "../../../../../(shared)/_service/vaults-infos"
 
 type Params<T> = {
-  chainId?: number
   filters?: {
     first?: number
     skip?: number
