@@ -25,10 +25,6 @@ type SemiBookProps = {
   priceDecimals: number
 }
 
-// interface WindowEventMap {
-//   "on-orderbook-offer-clicked": CustomEvent<{ price: string }>
-// }
-
 export const SemiBook = React.forwardRef<
   React.ElementRef<typeof TableRow>,
   SemiBookProps
@@ -65,72 +61,72 @@ export const SemiBook = React.forwardRef<
             )
           }}
         >
-          <OrderBookTableCell
-            className={cn(
-              "",
-              type === "bids" ? "text-green-caribbean" : "text-red-100",
-            )}
-          >
-            <TooltipProvider>
-              <Tooltip delayDuration={200}>
-                <TooltipTrigger
-                  className={cn("hover:opacity-80 transition-opacity ml-1")}
-                >
-                  <span className="!font-roboto">
-                    {volume.toFixed(pDecimals)}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent className="">
-                  {volume.toFixed(currentMarket?.base.decimals)}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </OrderBookTableCell>
+          {type === "bids" ? (
+            <>
+              <OrderBookTableCell className="text-muted-foreground">
+                <Cell
+                  value={price * volume}
+                  pDecimals={pDecimals}
+                  priceDecimals={priceDecimals}
+                />
+              </OrderBookTableCell>
+              <OrderBookTableCell>
+                <Cell
+                  value={volume}
+                  priceDecimals={currentMarket?.base.decimals}
+                  pDecimals={pDecimals}
+                />
+              </OrderBookTableCell>
+              <OrderBookTableCell
+                className={cn(
+                  "text-right",
+                  type === "bids" ? "text-green-caribbean" : "text-red-100",
+                )}
+              >
+                <Cell
+                  value={price}
+                  priceDecimals={priceDecimals}
+                  pDecimals={pDecimals}
+                />
+              </OrderBookTableCell>
+            </>
+          ) : (
+            <>
+              <OrderBookTableCell className={cn("text-right", "text-red-100")}>
+                <Cell
+                  value={price}
+                  priceDecimals={priceDecimals}
+                  pDecimals={pDecimals}
+                />
+              </OrderBookTableCell>
+              <OrderBookTableCell>
+                <Cell
+                  value={volume}
+                  priceDecimals={currentMarket?.base.decimals}
+                  pDecimals={pDecimals}
+                />
+              </OrderBookTableCell>
+              <OrderBookTableCell className="text-muted-foreground">
+                <Cell
+                  value={price * volume}
+                  pDecimals={pDecimals}
+                  priceDecimals={priceDecimals}
+                />
+              </OrderBookTableCell>
+            </>
+          )}
 
-          <OrderBookTableCell className="text-right">
-            <TooltipProvider>
-              <Tooltip delayDuration={200}>
-                <TooltipTrigger
-                  className={cn("hover:opacity-80 transition-opacity ml-1")}
-                >
-                  <span className="!font-roboto">
-                    {price.toFixed(pDecimals)}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {" "}
-                  {price.toFixed(currentMarket?.quote.decimals)}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </OrderBookTableCell>
-
-          <OrderBookTableCell className="text-gray">
-            <TooltipProvider>
-              <Tooltip delayDuration={200}>
-                <TooltipTrigger
-                  className={cn("hover:opacity-80 transition-opacity ml-1")}
-                >
-                  <span className="!font-roboto">
-                    {(price * volume).toFixed(priceDecimals)}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent className="">
-                  {(price * volume).toFixed(currentMarket?.quote.decimals)}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </OrderBookTableCell>
           <td
             className={cn(
-              "absolute inset-y-[2px] left-0 w-full -z-10 rounded-[2px] order-book-line-bg",
+              "absolute inset-y-[2px] w-full -z-10 rounded-[2px] order-book-line-bg",
+              type === "bids" ? "right-0" : "left-0",
             )}
           ></td>
           <style jsx>{`
             .order-book-line-bg {
               width: ${cumulatedVolumePercentage}%;
               background: ${type === "bids"
-                ? "#021B1A"
+                ? "#003D12"
                 : "rgba(255, 0, 0, 0.15)"};
             }
           `}</style>
@@ -139,5 +135,26 @@ export const SemiBook = React.forwardRef<
     )
   })
 })
+
+function Cell({
+  value,
+  priceDecimals,
+  pDecimals,
+}: {
+  value: number
+  priceDecimals?: number
+  pDecimals: number
+}) {
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger>
+          <span>{value.toFixed(pDecimals)}</span>
+        </TooltipTrigger>
+        <TooltipContent>{value.toFixed(priceDecimals)}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
 
 SemiBook.displayName = "SemiBook"

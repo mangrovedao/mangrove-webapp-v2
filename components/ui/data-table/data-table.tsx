@@ -84,7 +84,7 @@ export function DataTable<TData>({
                   key={`${tableName}-body-row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    "text-gray-scale-300 hover:text-white transition-colors group/row",
+                    "text-muted-foreground hover:text-white transition-colors group/row",
                     {
                       "cursor-pointer": !!onRowClick,
                       "text-white hover:opacity-80 transition-all":
