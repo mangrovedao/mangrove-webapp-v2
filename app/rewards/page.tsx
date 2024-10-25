@@ -5,6 +5,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { RaccoonIllustration } from "@/svgs"
 import { cn } from "@/utils"
+import { Tables } from "./_components/tables/tables"
 import Timer from "./_components/timer"
 
 export default function Page() {
@@ -58,6 +59,7 @@ export default function Page() {
           <Title variant={"title1"} className="pl-5 mt-8 mb-4">
             Season 1 Points program
           </Title>
+          <Tables />
         </div>
         <div className="lg:col-span-2 col-span-6 h-20">
           <NeonContainer className="space-y-5">
