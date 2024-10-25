@@ -52,7 +52,7 @@ export function DepositForm({ className }: { className?: string }) {
   React.useEffect(() => {
     handleBaseSliderChange(25)
     handleQuoteSliderChange(25)
-  }, [])
+  }, [baseBalance, quoteBalance])
 
   if (!baseToken || !quoteToken)
     return (
@@ -73,7 +73,7 @@ export function DepositForm({ className }: { className?: string }) {
           token={baseToken}
           label={`Deposit ${baseSliderValue}%`}
           inputClassName="bg-bg-primary"
-          value={baseDeposit}
+          value={Number(baseDeposit).toFixed(baseToken.displayDecimals)}
           onChange={handleBaseDepositChange}
           error={errors.baseDeposit}
           showBalance
@@ -92,10 +92,13 @@ export function DepositForm({ className }: { className?: string }) {
                 <Button
                   key={`percentage-button-${value}`}
                   variant={"secondary"}
-                  size={"xs"}
+                  size={"md"}
                   value={baseSliderValue}
                   className={cn(
                     "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none",
+                    {
+                      "bg-bg-tertiary": baseSliderValue === value,
+                    },
                   )}
                   onClick={(e) => {
                     e.preventDefault()
@@ -128,7 +131,7 @@ export function DepositForm({ className }: { className?: string }) {
         <EnhancedNumericInput
           token={quoteToken}
           label={`Deposit ${quoteSliderValue}%`}
-          value={quoteDeposit}
+          value={Number(quoteDeposit).toFixed(quoteToken.displayDecimals)}
           inputClassName="bg-bg-primary"
           onChange={handleQuoteDepositChange}
           error={errors.quoteDeposit}
@@ -148,9 +151,12 @@ export function DepositForm({ className }: { className?: string }) {
                 <Button
                   key={`percentage-button-${value}`}
                   variant={"secondary"}
-                  size={"xs"}
+                  size={"md"}
                   className={cn(
                     "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none",
+                    {
+                      "bg-bg-tertiary": quoteSliderValue === value,
+                    },
                   )}
                   value={quoteSliderValue}
                   onClick={(e) => {

@@ -51,7 +51,7 @@ export function WithdrawForm({ className }: { className?: string }) {
 
   React.useEffect(() => {
     handleSliderChange(25)
-  }, [])
+  }, [quoteDeposited, baseDeposited])
 
   if (!baseToken || !quoteToken || !vault || !address)
     return (
@@ -69,9 +69,9 @@ export function WithdrawForm({ className }: { className?: string }) {
     >
       <div>
         <div className="grid bg-bg-primary rounded-lg p-2 gap-1 ">
-          <Title className="mb-1">
+          <Title className="mb-1" variant={"header1"}>
             {sliderValue}
-            <span className="text-text-tertiary text-xs"> %</span>
+            <span className="text-text-tertiary text-sm"> %</span>
           </Title>
           <div className="grid gap-2">
             <Line
@@ -88,7 +88,7 @@ export function WithdrawForm({ className }: { className?: string }) {
                 quoteToken?.displayDecimals ?? 4,
               )}
             />
-            <span className="text-text-tertiary text-xs">Withdraw:</span>
+            <span className="text-text-tertiary text-xs">Burn:</span>
             <Line
               title={vault?.symbol}
               icon={vault?.symbol}
@@ -104,6 +104,9 @@ export function WithdrawForm({ className }: { className?: string }) {
                 size={"xs"}
                 className={cn(
                   "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none ",
+                  {
+                    "bg-bg-tertiary": sliderValue === value,
+                  },
                 )}
                 onClick={(e) => {
                   e.preventDefault()
