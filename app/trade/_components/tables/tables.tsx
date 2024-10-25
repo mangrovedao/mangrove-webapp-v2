@@ -68,7 +68,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
           <CustomTabsContent
             key={`${table}-content`}
             value={table}
-            style={{ height: "var(--history-table-content-height)" }}
+            // style={{ height: "var(--history-table-content-height)" }}
           >
             <ScrollArea className="h-full" scrollHideDelay={200}>
               <div className="px-2">{renderElement(TABS_CONTENT[table])}</div>
