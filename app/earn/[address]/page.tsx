@@ -372,7 +372,7 @@ export default function Page() {
                 }
               />
               <Caption className="text-text-secondary mt-5">
-                Amount minted
+                Minted amount
               </Caption>
 
               <Line

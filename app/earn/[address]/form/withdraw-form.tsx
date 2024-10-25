@@ -16,10 +16,10 @@ import useForm from "./use-form"
 const sliderValues = [25, 50, 75]
 
 export function WithdrawForm({ className }: { className?: string }) {
-  const [sliderValue, setSliderValue] = React.useState<number>(0)
-  const [baseWithdraw, setBaseWithdraw] = React.useState<string>("0")
-  const [quoteWithdraw, setQuoteWithdraw] = React.useState<string>("0")
-  const [withdrawAmount, setWithdrawAmount] = React.useState<string>("0")
+  const [sliderValue, setSliderValue] = React.useState(0)
+  const [baseWithdraw, setBaseWithdraw] = React.useState("0")
+  const [quoteWithdraw, setQuoteWithdraw] = React.useState("0")
+  const [withdrawAmount, setWithdrawAmount] = React.useState("0")
 
   const [removeDialog, setRemoveDialog] = React.useState(false)
 
@@ -49,15 +49,9 @@ export function WithdrawForm({ className }: { className?: string }) {
     setWithdrawAmount(formatUnits(mintedAmunt, vault?.decimals ?? 18))
   }
 
-  // const { data: balance, isLoading } = useReadContract({
-  //   address: vault?.address as Address,
-  //   abi: erc20Abi,
-  //   functionName: "balanceOf",
-  //   args: [address as Address],
-  //   query: {
-  //     enabled: !!address || !!vault,
-  //   },
-  // })
+  React.useEffect(() => {
+    handleSliderChange(25)
+  }, [])
 
   if (!baseToken || !quoteToken || !vault || !address)
     return (

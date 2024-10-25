@@ -22,13 +22,12 @@ const columnHelper = createColumnHelper<Vault>()
 const DEFAULT_DATA: Vault[] = []
 
 type Params = {
-  type: "user" | "all"
   data?: Vault[]
   pageSize: number
   onManage: (vault: Vault) => void
 }
 
-export function useTable({ type, pageSize, data, onManage }: Params) {
+export function useTable({ pageSize, data, onManage }: Params) {
   const { chain } = useAccount()
 
   const columns = React.useMemo(
