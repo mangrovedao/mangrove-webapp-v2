@@ -3,9 +3,9 @@ import { CheckedState } from "@radix-ui/react-checkbox"
 import React from "react"
 import { isMobile } from "react-device-detect"
 
-import Dialog from "@/components/dialogs/alert-dialog"
+import Dialog from "@/components/dialogs/alert-dialog-new"
 import MobileOverlay from "@/components/mobile-overlay"
-import { Button } from "@/components/ui/button-old"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import withClientOnly from "@/hocs/withClientOnly"
 import useLocalStorage from "@/hooks/use-local-storage"
@@ -31,7 +31,7 @@ function DisclaimerDialog() {
   async function handleAcceptTerms() {
     await signature.signMessageAsync({
       message:
-        "By signing this message:\nYou confirm that you are not accessing this app from,\nor are a resident of the USA or any other restricted country.",
+        "By signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
     })
 
     setHideDisclaimer(true)
@@ -68,14 +68,24 @@ function DisclaimerDialog() {
             <div className="grid gap-1.5 leading-none hover:opacity-80">
               <label
                 htmlFor="terms1"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-cloud-300 !cursor-pointer"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-text-secondary !cursor-pointer"
               >
-                By signing this messag you confirm that you are not accessing
-                this app from, or are a resident of the USA or any other
+                By signing this message you confirm that you are not accessing
+                this app from or are a resident of the USA or any other
                 restricted country.
                 <span>
+                  {" "}
                   For more information, please read our{" "}
-                  <span>Terms of service</span>
+                  <a
+                    href="https://mangrove.exchange/terms-of-use"
+                    target="_blank"
+                    rel="noreferrer"
+                    className={
+                      "text-green-caribbean no-underline hover:underline"
+                    }
+                  >
+                    Terms of Use.
+                  </a>
                 </span>
               </label>
             </div>
@@ -85,7 +95,6 @@ function DisclaimerDialog() {
               loading={signature.isPending && !signature.error}
               size={"lg"}
               className="w-full flex-1"
-              rightIcon
               onClick={handleAcceptTerms}
               disabled={!isChecked || (signature.isPending && !signature.error)}
             >

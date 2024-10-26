@@ -186,7 +186,7 @@ export default function Page() {
               Vault details
             </Title>
             <div>
-              <div className="xs:grid-cols-1 grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
                 <div>
                   <GridLine
                     title="Strategy"
