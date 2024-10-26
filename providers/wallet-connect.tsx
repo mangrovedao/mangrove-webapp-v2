@@ -17,7 +17,7 @@ import { getWhitelistedChainObjects } from "@/utils/chains"
 const queryClient = new QueryClient()
 const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
-const config = getDefaultConfig({
+export const config = getDefaultConfig({
   appName: "Mangrove dApp",
   projectId,
   // @ts-ignore

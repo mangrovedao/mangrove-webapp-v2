@@ -9,18 +9,31 @@ import { Button } from "@/components/ui/button-old"
 import { Checkbox } from "@/components/ui/checkbox"
 import withClientOnly from "@/hocs/withClientOnly"
 import useLocalStorage from "@/hooks/use-local-storage"
+import { config } from "@/providers/wallet-connect"
 import { cn } from "@/utils"
+import { useAccount, useSignMessage } from "wagmi"
 
 function DisclaimerDialog() {
+  const { isConnected } = useAccount()
   const [isChecked, setIsChecked] = React.useState<CheckedState | undefined>(
     false,
   )
+
   const [hideDisclaimer, setHideDisclaimer] = useLocalStorage<boolean | null>(
     "hideDisclaimer",
     null,
   )
 
-  function handleAcceptTerms() {
+  const signature = useSignMessage({
+    config,
+  })
+
+  async function handleAcceptTerms() {
+    await signature.signMessageAsync({
+      message:
+        "By signing this message:\nYou confirm that you are not accessing this app from,\nor are a resident of the USA or any other restricted country.",
+    })
+
     setHideDisclaimer(true)
   }
 
@@ -29,7 +42,7 @@ function DisclaimerDialog() {
   }
 
   return (
-    <Dialog open={!hideDisclaimer} type="mangrove">
+    <Dialog open={isConnected && !hideDisclaimer} type="mangrove">
       <Dialog.Title>Welcome to the Mangrove dApp!</Dialog.Title>
       <Dialog.Description>
         <div>
@@ -57,18 +70,24 @@ function DisclaimerDialog() {
                 htmlFor="terms1"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-cloud-300 !cursor-pointer"
               >
-                By checking this box, I verify that I'm not part of USA or any
-                sanctioned country.
+                By signing this messag you confirm that you are not accessing
+                this app from, or are a resident of the USA or any other
+                restricted country.
+                <span>
+                  For more information, please read our{" "}
+                  <span>Terms of service</span>
+                </span>
               </label>
             </div>
           </div>
           <div className={cn("flex space-x-2 justify-center")}>
             <Button
+              loading={signature.isPending && !signature.error}
               size={"lg"}
               className="w-full flex-1"
               rightIcon
               onClick={handleAcceptTerms}
-              disabled={!isChecked}
+              disabled={!isChecked || (signature.isPending && !signature.error)}
             >
               Accept terms
             </Button>
