@@ -230,3 +230,6 @@ body.mouse-down *:focus {
 .success-shadow {
   box-shadow: 0 0 0 16px rgba(3, 34, 33, 0.25);
 }
+.visx-group.visx-axis-tick svg text tspan {
+  @apply fill-muted-foreground !font-ubuntu !font-semibold;
+}
