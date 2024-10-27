@@ -84,7 +84,10 @@ function BookContent() {
   return (
     <div className="-mx-1">
       <div className="text-center text-muted-foreground text-xs border-b py-2">
-        Spread: {spread?.toFixed(currentMarket.quote.displayDecimals)}
+        Spread:{" "}
+        <span className="font-ubuntu">
+          {spread?.toFixed(currentMarket.quote.displayDecimals)}
+        </span>
       </div>
       <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
         <div className="flex">
