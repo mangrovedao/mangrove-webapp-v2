@@ -50,7 +50,7 @@ export function OrderBook({
   )
 }
 
-function BookContent() {
+export function BookContent() {
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
   const { book, isLoading } = useBook({
@@ -131,24 +131,6 @@ function BookContent() {
                 data={book}
                 priceDecimals={currentMarket.quote.priceDisplayDecimals}
               />
-              {/* {book.bids.length && book.asks.length ? (
-            <TableRow className="border-none" ref={spreadRef}>
-              <OrderBookTableCell className="text-gray">
-                Spread
-              </OrderBookTableCell>
-              <OrderBookTableCell>
-                {spread?.toFixed(currentMarket.quote.displayDecimals)}
-              </OrderBookTableCell>
-              <OrderBookTableCell className="text-gray">
-                {spreadPercentString}
-              </OrderBookTableCell>
-            </TableRow>
-          ) : undefined} */}
-              {/* <SemiBook
-            type={BA.bids}
-            data={book}
-            priceDecimals={currentMarket.quote.priceDisplayDecimals}
-          /> */}
             </TableBody>
           </Table>
         </div>

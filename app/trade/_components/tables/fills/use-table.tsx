@@ -76,13 +76,14 @@ export function useTable({ data }: Params) {
           const [received, sent] = isBid ? [base, quote] : [quote, base]
 
           return (
-            <div className={cn("flex flex-col")}>
-              <span className="text-sm">
+            <div className={cn("flex flex-col font-semibold")}>
+              <span className="text-sm font-ubuntu">
                 {Big(takerGot).toFixed(received.displayDecimals)}{" "}
-                {received.symbol}
+                <span className="text-muted-foreground">{received.symbol}</span>
               </span>
-              <span className="text-xs opacity-50">
-                {Big(takerGave).toFixed(sent.displayDecimals)} {sent.symbol}
+              <span className="text-xs opacity-50 font-ubuntu">
+                {Big(takerGave).toFixed(sent.displayDecimals)}{" "}
+                <span className="text-muted-foreground">{sent.symbol}</span>
               </span>
             </div>
           )
@@ -93,9 +94,11 @@ export function useTable({ data }: Params) {
         cell: (row) =>
           market ? (
             row.getValue() ? (
-              <span>
+              <span className="font-ubuntu font-semibold">
                 {Big(row.getValue()).toFixed(market.quote.displayDecimals)}{" "}
-                {market.quote.symbol}
+                <span className="text-muted-foreground">
+                  {market.quote.symbol}
+                </span>
               </span>
             ) : (
               <span>-</span>

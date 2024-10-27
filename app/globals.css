@@ -190,6 +190,11 @@
   * {
     @apply border-border font-axiforma;
   }
+
+  table tbody * {
+    @apply font-ubuntu text-white;
+  }
+
   body {
     @apply overflow-x-hidden bg-background text-foreground;
   }

@@ -22,7 +22,11 @@ function Label({ children }: React.PropsWithChildren) {
 }
 
 function Value({ children }: React.PropsWithChildren) {
-  return <div className="flex items-center">{children}</div>
+  return (
+    <div className="flex items-center font-ubuntu font-semibold text-sm">
+      {children}
+    </div>
+  )
 }
 
 function Item({

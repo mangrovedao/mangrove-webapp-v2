@@ -13,15 +13,21 @@ import { TRADE } from "../../_constants/loading-keys"
 import { Fills } from "./fills/fills"
 import { useFills } from "./fills/use-fills"
 
+import { BookContent } from "../orderbook/orderbook"
+import { Trades } from "../orderbook/trade-history/trades"
 import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
 export enum TradeTables {
+  BOOK = "Book",
+  TRADES = "Trades",
   ORDERS = "Open Orders",
   FILLS = "Orders History",
 }
 
 const TABS_CONTENT = {
+  [TradeTables.BOOK]: BookContent,
+  [TradeTables.TRADES]: Trades,
   [TradeTables.ORDERS]: Orders,
   [TradeTables.FILLS]: Fills,
 }
@@ -63,7 +69,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
           </CustomTabsTrigger>
         ))}
       </CustomTabsList>
-      <div className="w-full py-4 px-1 h-full">
+      <div className="w-full pb-4 px-1 h-[calc(100%-var(--bar-height))]">
         {Object.values(TradeTables).map((table) => (
           <CustomTabsContent
             key={`${table}-content`}

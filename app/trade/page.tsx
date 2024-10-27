@@ -1,8 +1,8 @@
 "use client"
 import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
 import { Market } from "./_components/charts/charts"
-import { OrderBook } from "./_components/orderbook/orderbook"
 import { PricesBar } from "./_components/prices-bar/prices-bar"
+import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
   return (
@@ -22,11 +22,11 @@ export default function Page() {
       </section>
 
       <section className="border-x border-t border-b rounded-b-2xl tables-section z-50 bg-background">
-        {/* <Tables className="h-full" /> */}
-        <OrderBook
+        <Tables className="h-full" />
+        {/* <OrderBook
           className="overflow-hidden"
           // style={{ gridArea: "book" }}
-        />
+        /> */}
       </section>
 
       <section className="trade-section">
