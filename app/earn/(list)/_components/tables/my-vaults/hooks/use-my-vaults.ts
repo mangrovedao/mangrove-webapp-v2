@@ -18,35 +18,36 @@ type Params<T> = {
   select?: (data: Vault[]) => T
 }
 
-export function useVaults<T = Vault[]>({
-  chainId,
+export function useMyVaults<T = Vault[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
   const publicClient = usePublicClient()
-  const { address: user } = useAccount()
+  const { address: user, chainId } = useAccount()
   const markets = useMarkets()
+
   const { data, ...rest } = useQuery({
-    queryKey: ["vaults", publicClient, user, chainId, first, skip],
+    queryKey: ["vaults", publicClient?.key, user, chainId, first, skip],
     queryFn: async (): Promise<Vault[]> => {
       try {
-        if (!publicClient) throw new Error("Public client is not enabled")
+        if (!publicClient?.key) throw new Error("Public client is not enabled")
         if (!chainId) return []
         const plainVaults = getChainVaults(chainId)
         // .slice(skip, skip + first)
-        return await getVaultsInformation(
+        const vaults = await getVaultsInformation(
           publicClient,
           plainVaults,
           markets,
           user,
         )
+
+        return vaults.filter((v) => v.isActive)
       } catch (error) {
-        console.log("error", error)
         console.error(error)
         return []
       }
     },
-    enabled: !!publicClient && !!chainId,
+    enabled: !!publicClient?.key && !!chainId,
     initialData: [],
   })
   return {

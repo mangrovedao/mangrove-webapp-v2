@@ -27,16 +27,24 @@
   font-display: swap;
 }
 @font-face {
-  font-family: "UbuntuMono";
-  src: url("./UbuntuMono-Regular.ttf") format("truetype");
+  font-family: "UbuntuMedium";
+  src: url("./Ubuntu-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: medium;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "UbuntuLight";
+  src: url("./Ubuntu-Light.ttf") format("truetype");
   font-weight: 400;
-  font-style: normal;
+  font-style: light;
   font-display: swap;
 }
 @font-face {
-  font-family: "UbuntuMono";
-  src: url("./UbuntuMono-Bold.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
+  font-family: "UbuntuBold";
+  src: url("./Ubuntu-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: bold;
   font-display: swap;
 }

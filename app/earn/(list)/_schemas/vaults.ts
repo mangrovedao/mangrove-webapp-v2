@@ -10,7 +10,6 @@ export type VaultInfos = {
 
 export type Vault = {
   address: Address
-  kandel: Address
   market: MarketParams
   fees: number
   totalBase: bigint
@@ -19,5 +18,4 @@ export type Vault = {
   balanceQuote: bigint
   pnl: number
   strategist: string
-  baseIsToken0: boolean
 }

@@ -17,7 +17,7 @@ const burnABI = parseAbi([
   "function burn(uint256 burnAmount,uint256[2] calldata minAmountsOut) external returns (uint256 amount0, uint256 amount1)",
 ])
 
-export default function RemoveFromVaultDialog({
+export default function WithdrawFromVaultDialog({
   isOpen,
   vault,
   amount,

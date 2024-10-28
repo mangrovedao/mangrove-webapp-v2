@@ -1,14 +1,15 @@
 import type { Token } from "@mangrovedao/mgv"
 import React, { useEffect, useMemo } from "react"
 
-import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
-import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
-import Dialog from "@/components/dialogs/dialog"
+import { Vault } from "@/app/earn/(shared)/types"
+
+import Dialog from "@/components/dialogs/dialog-new"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
-import { Button, type ButtonProps } from "@/components/ui/button-old"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useStep } from "@/hooks/use-step"
 import { useQueryClient } from "@tanstack/react-query"
 import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 import {
@@ -18,6 +19,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi"
+import { ApproveStep } from "../components/approve-step-new"
 import { Steps } from "../components/steps"
 
 type Props = {
@@ -32,34 +34,15 @@ type Props = {
 }
 
 const btnProps: ButtonProps = {
-  rightIcon: true,
   className: "w-full",
   size: "lg",
 }
 
 const mintABI = parseAbi([
-  "function mint(uint mintAmount,uint[2] calldata maxAmountsIn) external returns (uint amount0, uint amount1)",
-  "error MintHasAlreadyStarted()",
-  "error MintHasNotStarted()",
-  "error MintNotAllowed()",
-  "error NotInPosition()",
-  "error AlreadyInPosition()",
-  "error ZeroUnderlyingBalance()",
-  "error MaxFeeExceeded()",
-  "error SlippageExceedThreshold()",
-  "error OnlyFactoryAllowed()",
-  "error ZeroMintAmount()",
-  "error ZeroBurnAmount()",
-  "error SwapRouterIsWhitelisted()",
-  "error SwapRouterIsNotWhitelisted()",
-  "error OnlyFactoryOwnerAllowed()",
-  "error ManagerBalanceCannotBeSwapped()",
-  "error InvalidSwap()",
-  "error MinDensityRequirementIsNotMet()",
-  "error NotEnoughBountyForThePricePoints()",
+  "function mint(uint256 mintAmount, uint256 baseAmountMax, uint256 quoteAmountMax) external returns (uint256 shares, uint256 baseAmount, uint256 quoteAmount)",
 ])
 
-export default function AddToVaultDialog({
+export default function DepositToVaultDialog({
   isOpen,
   onClose,
   baseAmount: baseAmountRaw,
@@ -106,47 +89,44 @@ export default function AddToVaultDialog({
   const missingQuoteAllowance =
     (data?.[1] || 0n) > quoteAmount ? 0n : quoteAmount - (data?.[1] || 0n)
 
-  const { data: hash, isPending, writeContract, reset } = useWriteContract()
+  const {
+    data: hash,
+    isPending,
+    writeContract,
+    reset,
+    error,
+  } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
       hash,
     })
 
-  const [started, setStarted] = React.useState(false)
-
   const steps = [
     "Summary",
-    `Approve ${baseToken?.symbol}`,
-    `Approve ${quoteToken?.symbol}`,
-    "Mint",
+    missingBaseAllowance > 0n && `Approve ${baseToken?.symbol}`,
+    missingQuoteAllowance > 0n && `Approve ${quoteToken?.symbol}`,
+    "Deposit",
   ].filter(Boolean)
+  const [started, setStarted] = React.useState(false)
+  const [currentStep, helpers] = useStep(steps.length)
+  const { goToNextStep, goToPrevStep, reset: resetStep } = helpers
 
   // BigInt.prototype.toJSON = function () {
   //   return this.toString()
   // }
 
-  const currentStep = started
-    ? isFetched
-      ? missingBaseAllowance === 0n
-        ? missingQuoteAllowance === 0n
-          ? 4
-          : 3
-        : 2
-      : 2
-    : 1
-
   const amount0 = useMemo(() => {
-    return vault?.baseIsToken0 ? baseAmount : quoteAmount
-  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+    return baseAmount
+  }, [baseAmount, quoteAmount])
   const amount1 = useMemo(() => {
-    return vault?.baseIsToken0 ? quoteAmount : baseAmount
-  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+    return quoteAmount
+  }, [baseAmount, quoteAmount])
 
   const result = useSimulateContract({
     address: vault?.address,
     abi: mintABI,
     functionName: "mint",
-    args: [mintAmount, [amount0, amount1]],
+    args: [mintAmount, amount0, amount1],
   })
 
   // console.log(
@@ -160,19 +140,29 @@ export default function AddToVaultDialog({
   // console.log(result)
 
   useEffect(() => {
-    if (isConfirmed) {
-      if (currentStep === 4) {
-        queryClient.refetchQueries({
-          queryKey: ["vault"],
-        })
-        setStarted(false)
-        onClose()
-      } else {
-        reset()
-        refetch()
-      }
+    if (!error && isConfirmed && currentStep !== steps.length) {
+      console.log("go to next step")
+      reset()
+      goToNextStep()
+    } else if (isConfirmed && currentStep === steps.length) {
+      console.log("refetch vault")
+      queryClient.refetchQueries({
+        queryKey: ["vault"],
+      })
+      queryClient.refetchQueries({
+        queryKey: ["user-vaults"],
+      })
+      onClose()
+      setStarted(false)
+      resetStep()
     }
-  }, [isConfirmed, currentStep, refetch, onClose, reset, queryClient])
+
+    if (error) {
+      reset()
+      resetStep()
+      setStarted(false)
+    }
+  }, [isConfirmed, error])
 
   const stepInfos = [
     {
@@ -185,12 +175,18 @@ export default function AddToVaultDialog({
         />
       ),
       button: (
-        <Button {...btnProps} onClick={() => setStarted(true)}>
+        <Button
+          {...btnProps}
+          onClick={() => {
+            setStarted(true)
+            goToNextStep()
+          }}
+        >
           Proceed
         </Button>
       ),
     },
-    {
+    missingBaseAllowance > 0n && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
@@ -202,20 +198,24 @@ export default function AddToVaultDialog({
           disabled={isPending || isConfirming || isLoadingAllowance}
           loading={isPending || isConfirming || isLoadingAllowance}
           onClick={() => {
-            if (!vault) return
-            writeContract({
-              address: baseToken.address,
-              abi: erc20Abi,
-              functionName: "approve",
-              args: [vault.address, baseAmount],
-            })
+            try {
+              if (!vault) return
+              writeContract({
+                address: baseToken.address,
+                abi: erc20Abi,
+                functionName: "approve",
+                args: [vault.address, baseAmount],
+              })
+            } catch (error) {
+              console.error(error)
+            }
           }}
         >
-          Approve {baseToken?.symbol}
+          Approve
         </Button>
       ),
     },
-    {
+    missingQuoteAllowance > 0n && {
       body: (
         <div className="text-center">
           <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
@@ -227,16 +227,20 @@ export default function AddToVaultDialog({
           disabled={isPending || isConfirming || isLoadingAllowance}
           loading={isPending || isConfirming || isLoadingAllowance}
           onClick={() => {
-            if (!vault) return
-            writeContract({
-              address: quoteToken.address,
-              abi: erc20Abi,
-              functionName: "approve",
-              args: [vault.address, quoteAmount],
-            })
+            try {
+              if (!vault) return
+              writeContract({
+                address: quoteToken.address,
+                abi: erc20Abi,
+                functionName: "approve",
+                args: [vault.address, quoteAmount],
+              })
+            } catch (error) {
+              console.error(error)
+            }
           }}
         >
-          Approve {quoteToken?.symbol}
+          Approve
         </Button>
       ),
     },
@@ -255,16 +259,20 @@ export default function AddToVaultDialog({
           loading={isPending || isConfirming || result.isLoading}
           disabled={isPending || isConfirming || result.isLoading}
           onClick={() => {
-            if (!vault) return
-            writeContract({
-              address: vault.address,
-              abi: mintABI,
-              functionName: "mint",
-              args: [mintAmount, [amount0, amount1]],
-            })
+            try {
+              if (!vault) return
+              writeContract({
+                address: vault.address,
+                abi: mintABI,
+                functionName: "mint",
+                args: [mintAmount, amount0, amount1],
+              })
+            } catch (error) {
+              console.error(error)
+            }
           }}
         >
-          Mint
+          Deposit
         </Button>
       ),
     },
@@ -290,16 +298,13 @@ export default function AddToVaultDialog({
     <Dialog
       open={!!isOpen}
       onClose={() => {
-        setStarted(false)
         onClose()
       }}
       showCloseButton={false}
     >
-      <Dialog.Title className="text-xl text-left" close>
-        Add to vault
-      </Dialog.Title>
-      <Steps steps={steps} currentStep={currentStep} />
-      <Dialog.Description>
+      <Dialog.Title className="flex end">Deposit to vault</Dialog.Title>
+      <Steps steps={steps as string[]} currentStep={currentStep} />
+      <Dialog.Description className="p-4 space-y-2">
         <ScrollArea className="h-full" scrollHideDelay={200}>
           <ScrollBar orientation="vertical" className="z-50" />
 
@@ -340,8 +345,21 @@ const Summary = ({
   nativeBalance?: string
 }) => {
   return (
-    <div className="space-y-2">
-      <div className="bg-[#041010] rounded-lg px-4 pt-0.5 pb-3">
+    <div>
+      {/* <Caption className="flex justify-start">You will deposit</Caption>
+      <DialogAmountLine
+        amount={Number(baseAmount).toFixed(baseToken?.displayDecimals) || "0"}
+        estimationAmount={"..."}
+        symbol={baseToken?.symbol || ""}
+      />
+
+      <DialogAmountLine
+        amount={Number(quoteAmount).toFixed(quoteToken?.displayDecimals) || "0"}
+        estimationAmount={"..."}
+        symbol={quoteToken?.symbol || ""}
+      /> */}
+
+      <div className="rounded-lg p-3 border border-border-secondary">
         <TokenPair
           baseToken={baseToken}
           quoteToken={quoteToken}

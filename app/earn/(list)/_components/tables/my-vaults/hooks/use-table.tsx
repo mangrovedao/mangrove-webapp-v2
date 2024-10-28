@@ -11,26 +11,23 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
-import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
-
+import { Vault } from "@/app/earn/(shared)/types"
+import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
-import { chainsIcons } from "@/utils/chainsIcons"
-import type { Strategy } from "../../../../_schemas/kandels"
+import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
-const columnHelper = createColumnHelper<Strategy>()
-const DEFAULT_DATA: Strategy[] = []
+const columnHelper = createColumnHelper<Vault>()
+const DEFAULT_DATA: Vault[] = []
 
 type Params = {
-  type: "user" | "all"
-  data?: Strategy[]
+  data?: Vault[]
   pageSize: number
-  onCancel: (strategy: Strategy) => void
-  onManage: (strategy: Strategy) => void
+  onManage: (vault: Vault) => void
 }
 
-export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
+export function useTable({ pageSize, data, onManage }: Params) {
   const { chain } = useAccount()
 
   const columns = React.useMemo(
@@ -39,7 +36,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
         id: "blockchain-explorer",
         header: () => "",
         cell: ({ row }) => {
-          const { address, owner } = row.original
+          const { address } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
 
           // note: check if we can retrive logos from library directly
@@ -55,7 +52,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {chainsIcons[chain?.id || 1]}
+                {getChainImage(chain?.id, chain?.name)}
               </Link>
             </div>
           )
@@ -65,54 +62,73 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
       columnHelper.display({
         header: "Market",
         cell: ({ row }) => {
-          const { base, quote } = row.original
-          return <Market base={base} quote={quote} />
+          const { market } = row.original
+          return (
+            <Market base={market.base.address} quote={market.quote.address} />
+          )
         },
       }),
 
       columnHelper.display({
         header: "Strategy",
         cell: ({ row }) => {
-          const sourceInfo =
-            row.original.type === "KandelAAVE"
-              ? { id: "Aave", name: "Aave" }
-              : { id: "simple", name: "Wallet" }
+          const { type } = row.original
           const isTrusted = true
-          const value = `Kandel - ${sourceInfo.name}`
-
-          return <Value value={value} trusted={isTrusted} />
+          return <Value value={type} trusted={isTrusted} />
         },
       }),
 
       columnHelper.display({
         header: "Manager",
         cell: ({ row }) => {
-          return <Value value="Redacted Labs" />
+          const { strategist } = row.original
+          return <Value value={strategist} />
         },
       }),
 
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const value = "1.525.246,42"
-          const symbol = "$"
-          return <Value value={value} symbol={symbol} />
+          const { tvl, market } = row.original
+
+          return (
+            <Value
+              value={Number(
+                formatUnits(tvl || 0n, market.quote.decimals || 18),
+              ).toFixed(market.quote.displayDecimals || 3)}
+              symbol={market.quote.symbol}
+            />
+          )
         },
       }),
 
       columnHelper.display({
         header: "Deposited",
         cell: ({ row }) => {
-          const { base, quote, address, offers } = row.original
-          const { data } = useStrategyStatus({
-            address,
-            base,
-            quote,
-            offers,
-          })
-          const value = "625.246,42"
-          const symbol = "$"
-          return <Value value={value} symbol={symbol} />
+          const { userBaseBalance, userQuoteBalance, market } = row.original
+
+          return (
+            <div className="grid items-center justify-center">
+              <Value
+                value={Number(
+                  formatUnits(
+                    userBaseBalance || 0n,
+                    market.base.decimals || 18,
+                  ),
+                ).toFixed(market.base.displayDecimals || 4)}
+                symbol={market.base.symbol}
+              />
+              <Value
+                value={Number(
+                  formatUnits(
+                    userQuoteBalance || 0n,
+                    market.quote.decimals || 18,
+                  ),
+                ).toFixed(market.quote.displayDecimals || 4)}
+                symbol={market.quote.symbol}
+              />
+            </div>
+          )
         },
       }),
 
@@ -136,7 +152,7 @@ export function useTable({ type, pageSize, data, onCancel, onManage }: Params) {
         },
       }),
     ],
-    [onManage, onCancel],
+    [onManage],
   )
 
   return useReactTable({

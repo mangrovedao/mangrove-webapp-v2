@@ -7,7 +7,7 @@ import { cn } from "@/utils"
 import React from "react"
 import { erc20Abi, type Address } from "viem"
 import { useAccount, useReadContract } from "wagmi"
-import RemoveFromVaultDialog from "./dialogs/remove-dialog"
+import RemoveFromVaultDialog from "./dialogs/withdraw-dialog"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75, 100]

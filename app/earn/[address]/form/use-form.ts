@@ -1,72 +1,30 @@
 import React, { useMemo } from "react"
-import { useAccount } from "wagmi"
+import { useAccount, usePublicClient } from "wagmi"
 
-import { useParams, useSearchParams } from "next/navigation"
+import { useParams } from "next/navigation"
 
 import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits, parseUnits } from "viem"
 import { useMintAmounts } from "../_hooks/use-mint-amounts"
-import { useVault } from "../_hooks/useVault"
+import { useVault } from "../_hooks/use-vault"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
-export const vault = {
-  address: "0xbC766847aB3b36F7012037f11Cd05B187F51Fc23",
-  kandel: "0x2341561eaC01D79e184eaCF09f380EB8A0e3408b",
-  market: {
-    base: {
-      address: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-      symbol: "WETH",
-      decimals: 18,
-      displayDecimals: 3,
-      priceDisplayDecimals: 4,
-      mgvTestToken: false,
-    },
-    quote: {
-      address: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-      symbol: "USDC",
-      decimals: 18,
-      displayDecimals: 2,
-      priceDisplayDecimals: 4,
-      mgvTestToken: false,
-    },
-    tickSpacing: "1" as unknown as bigint,
-  },
-  strategist: "SKATEFI",
-  fees: 0.01,
-  totalBase: "20280219438420489" as unknown as bigint,
-  totalQuote: "70870059437845227129" as unknown as bigint,
-  balanceBase: "0" as unknown as bigint,
-  balanceQuote: "0" as unknown as bigint,
-  pnl: 0,
-  baseIsToken0: false,
-}
 
 export default function useForm() {
-  const searchParams = useSearchParams()
   const params = useParams<{ address: string }>()
-
+  const client = usePublicClient()
+  const { address } = useAccount()
   const {
     data: { vault },
   } = useVault(params.address)
 
   const { data, isLoading, isError, setBaseAmount, setQuoteAmount } =
-    useMintAmounts({ vault })
+    useMintAmounts({ vault, client })
 
-  const { address } = useAccount()
-  // const { currentMarket: market } = useMarket()
-  // const baseToken = market?.base
-  // const quoteToken = market?.quote
-
-  // const [baseDeposit, setBaseDeposit] = React.useState("")
-  // const [quoteDeposit, setQuoteDeposit] = React.useState("")
   const [errors, setErrors] = React.useState<Record<string, string>>({})
-
-  // const baseBalance = useTokenBalance(baseToken)
-  // const quoteBalance = useTokenBalance(quoteToken)
-  // const { data: nativeBalance } = useBalance({
-  //   address,
-  // })
+  const [baseAmount, setBaseSliderAmount] = React.useState("")
+  const [quoteAmount, setQuoteSliderAmount] = React.useState("")
 
   const baseToken = vault?.market.base
   const quoteToken = vault?.market.quote
@@ -78,10 +36,29 @@ export default function useForm() {
     token: quoteToken?.address,
   })
 
+  const baseDeposited = formatUnits(
+    vault?.userBaseBalance || 0n,
+    vault?.market.base.decimals || 18,
+  )
+
+  const quoteDeposited = formatUnits(
+    vault?.userQuoteBalance || 0n,
+    vault?.market.quote.decimals || 18,
+  )
+
   const baseDeposit = useMemo(() => {
+    if (data?.side !== "quote") return
+
+    setBaseSliderAmount(formatUnits(data.baseAmount, baseToken?.decimals || 18))
     return formatUnits(data.baseAmount, baseToken?.decimals || 18)
   }, [data.baseAmount, baseToken?.decimals])
+
   const quoteDeposit = useMemo(() => {
+    if (data?.side !== "base") return
+
+    setQuoteSliderAmount(
+      formatUnits(data.quoteAmount, quoteToken?.decimals || 18),
+    )
     return formatUnits(data.quoteAmount, quoteToken?.decimals || 18)
   }, [data.quoteAmount, quoteToken?.decimals])
 
@@ -90,6 +67,7 @@ export default function useForm() {
   ) => {
     const value = typeof e === "string" ? e : e.target.value
     setBaseAmount(parseUnits(value, baseToken?.decimals || 18))
+    setBaseSliderAmount(value)
   }
 
   const handleQuoteDepositChange = (
@@ -97,6 +75,7 @@ export default function useForm() {
   ) => {
     const value = typeof e === "string" ? e : e.target.value
     setQuoteAmount(parseUnits(value, quoteToken?.decimals || 18))
+    setQuoteSliderAmount(value)
   }
 
   React.useEffect(() => {
@@ -138,11 +117,13 @@ export default function useForm() {
   }, [baseDeposit, quoteDeposit])
 
   return {
+    baseDeposited,
+    quoteDeposited,
     address,
     baseToken,
     quoteToken,
-    baseDeposit,
-    quoteDeposit,
+    baseDeposit: baseAmount,
+    quoteDeposit: quoteAmount,
     baseBalance,
     quoteBalance,
     errors,

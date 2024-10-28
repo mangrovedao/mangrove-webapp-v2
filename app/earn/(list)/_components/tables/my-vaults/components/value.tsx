@@ -1,4 +1,3 @@
-import { Text } from "@/components/typography/text"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CheckIcon } from "lucide-react"
 
@@ -16,12 +15,12 @@ export function Value({ value, trusted, symbol }: Props) {
 
   return (
     <div className="flex space-x-3 items-center">
-      <Text variant={"text3"}>
+      <span>
         {value}{" "}
         {symbol ? (
           <span className=" text-xs text-text-secondary">{symbol}</span>
         ) : undefined}
-      </Text>
+      </span>
       {trusted ? (
         <div className="relative h-4 w-4">
           <div className="absolute inset-0 bg-green-700 rounded-full"></div>
