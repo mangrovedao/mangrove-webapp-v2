@@ -15,10 +15,10 @@ export function Value({ value, trusted, symbol }: Props) {
 
   return (
     <div className="flex space-x-3 items-center">
-      <span>
+      <span className="font-ubuntu font-normal">
         {value}{" "}
         {symbol ? (
-          <span className=" text-xs text-text-secondary">{symbol}</span>
+          <span className="text-xs text-text-secondary">{symbol}</span>
         ) : undefined}
       </span>
       {trusted ? (

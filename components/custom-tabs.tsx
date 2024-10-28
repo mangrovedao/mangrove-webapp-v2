@@ -66,7 +66,7 @@ const CustomTabsTrigger = React.forwardRef<
     >
       <span className="">{children}</span>
       {count ? (
-        <span className="font-ubuntuLight bg-text-tertiary rounded-full p-1 text-xs text-white no-underline decoration-0">
+        <span className="font-ubuntu bg-text-tertiary rounded-full p-1 text-xs text-white no-underline decoration-0">
           {count}
         </span>
       ) : undefined}

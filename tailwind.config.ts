@@ -21,10 +21,7 @@ export default {
       fontFamily: {
         axiforma: ["Axiforma", ...defaultTheme.fontFamily.sans],
         roboto: ["RobotoMono", ...defaultTheme.fontFamily.sans],
-        unbuntu: ["Ubuntu", ...defaultTheme.fontFamily.sans],
-        ubuntuLight: ["UbuntuLight", ...defaultTheme.fontFamily.sans],
-        ubuntuMedium: ["UbuntuMedium", ...defaultTheme.fontFamily.sans],
-        ubuntuBold: ["UbuntuBold", ...defaultTheme.fontFamily.sans],
+        ubuntu: ["Ubuntu", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         input: "hsl(var(--input))",

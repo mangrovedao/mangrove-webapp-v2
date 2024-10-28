@@ -23,7 +23,7 @@ function Label({ children }: React.PropsWithChildren) {
 
 function Value({ children }: React.PropsWithChildren) {
   return (
-    <div className="flex items-center font-ubuntuLight font-semibold text-sm">
+    <div className="flex items-center font-ubuntu font-semibold text-sm">
       {children}
     </div>
   )

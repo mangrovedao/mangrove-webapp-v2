@@ -106,7 +106,7 @@ export function DataTable<TData>({
                     <TableCell
                       key={`${tableName}-body-cell-${cell.id}`}
                       className={cn(
-                        "px-0 py-2 group/cell whitespace-nowrap font-normal font-unbuntu text-xs",
+                        "px-0 py-2 group/cell whitespace-nowrap !text-red-500",
                         cellClasses,
                       )}
                     >
