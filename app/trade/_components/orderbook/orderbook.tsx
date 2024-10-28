@@ -85,7 +85,7 @@ export function BookContent() {
     <div className="-mx-1">
       <div className="text-center text-muted-foreground text-xs border-b py-2">
         Spread:{" "}
-        <span className="font-ubuntu">
+        <span className="font-ubuntuLight">
           {spread?.toFixed(currentMarket.quote.displayDecimals)}
         </span>
       </div>
