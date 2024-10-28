@@ -5,7 +5,7 @@ import { formatUnits } from "viem"
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
-} from "@/components/custom-radio-group"
+} from "@/components/custom-radio-group-new"
 import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
@@ -106,7 +106,6 @@ export function Limit() {
                     key={action}
                     value={action}
                     id={action}
-                    variant={action === BS.sell ? "secondary" : "primary"}
                     className="capitalize"
                   >
                     {action}

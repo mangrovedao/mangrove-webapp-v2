@@ -163,7 +163,6 @@
     --button-secondary-bg-hover: var(--color-bluegray-700);
     --button-secondary-fg: var(--color-bluegray-100);
     --button-secondary-fg-hover: var(--color-bluegray-25);
-
     --button-tertiary-bg: var(--color-bluegray-950);
     --button-tertiary-bg-hover: var(--color-bluegray-700);
     --button-tertiary-fg: var(--text-tertiary);
