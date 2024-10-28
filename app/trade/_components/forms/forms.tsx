@@ -30,20 +30,22 @@ export function Forms({
     <CustomTabs
       {...props}
       defaultValue={Object.values(FormType)[0]}
-      className={className}
+      className={
+        "bg-bg-secondary border border-bg-secondary rounded-2xl overflow-hidden"
+      }
     >
-      <CustomTabsList className="w-full py-0 justify-start border-b">
+      <CustomTabsList className="w-full p-0 space-x-0">
         {Object.values(FormType).map((form) => (
           <CustomTabsTrigger
             key={`${form}-tab`}
             value={form}
-            className="capitalize"
+            className="capitalize w-full data-[state=active]:bg-bg-secondary data-[state=active]:text-text-brand bg-bg-primary rounded-none"
           >
             {form}
           </CustomTabsTrigger>
         ))}
       </CustomTabsList>
-      <ScrollArea className="h-[calc(100vh-(var(--bar-height)*3))] overflow-hidden">
+      <ScrollArea className="overflow-hidden">
         <div className="px-4 space-y-4 mt-[24px]">
           {Object.values(FormType).map((form) => (
             <CustomTabsContent key={`${form}-content`} value={form}>

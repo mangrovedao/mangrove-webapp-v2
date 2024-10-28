@@ -48,3 +48,11 @@
   font-style: bold;
   font-display: swap;
 }
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./Ubuntu-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: medium;
+  font-display: swap;
+}
