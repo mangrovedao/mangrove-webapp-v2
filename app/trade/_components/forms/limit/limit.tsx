@@ -9,7 +9,7 @@ import {
 import InfoTooltip from "@/components/info-tooltip"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Caption } from "@/components/typography/caption"
-import { Button } from "@/components/ui/button-old"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -470,7 +470,6 @@ export function Limit() {
                     className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
                     size={"lg"}
                     disabled={!canSubmit || !currentMarket}
-                    rightIcon
                     loading={!!isSubmitting}
                   >
                     {tradeAction}
