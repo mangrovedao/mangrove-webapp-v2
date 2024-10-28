@@ -22,17 +22,15 @@ const CustomRadioGroup = React.forwardRef<
 CustomRadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 
 const customRadioGroupItemVariants = cva(
-  `w-full text-secondary rounded-xl border border-transparent aria-checked:text-primary
+  `w-full rounded-xl border border-transparent aria-checked:text-primary
   hover:cursor-pointer hover:text-secondary transition-colors text-text-secondary
   ring-offset-primary-dark-green focus:outline-none focus-visible:ring-2 py-2 px-3
   focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-sm font-medium `,
   {
     variants: {
       variant: {
-        primary:
-          "aria-checked:bg-bg-active hover:text-text-brand focus-visible:ring-ring",
-        secondary:
-          "aria-checked:border-red-100 hover:bg-red-100 focus-visible:ring-red-950",
+        primary: "aria-checked:bg-bg-active focus-visible:ring-ring",
+        secondary: "aria-checked:border-red-100",
       },
     },
     defaultVariants: {

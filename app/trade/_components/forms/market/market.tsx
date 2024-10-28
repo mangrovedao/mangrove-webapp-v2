@@ -7,7 +7,7 @@ import { formatUnits } from "viem"
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
-} from "@/components/custom-radio-group"
+} from "@/components/custom-radio-group-new"
 import { Button } from "@/components/ui/button-old"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -88,9 +88,6 @@ export function Market() {
                     key={action}
                     value={action}
                     id={action}
-                    variant={
-                      action === TradeAction.SELL ? "secondary" : "primary"
-                    }
                     className="capitalize"
                   >
                     {action}

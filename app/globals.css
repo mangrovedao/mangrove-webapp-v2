@@ -163,7 +163,6 @@
     --button-secondary-bg-hover: var(--color-bluegray-700);
     --button-secondary-fg: var(--color-bluegray-100);
     --button-secondary-fg-hover: var(--color-bluegray-25);
-
     --button-tertiary-bg: var(--color-bluegray-950);
     --button-tertiary-bg-hover: var(--color-bluegray-700);
     --button-tertiary-fg: var(--text-tertiary);
@@ -190,6 +189,11 @@
   * {
     @apply border-border font-axiforma;
   }
+
+  table tbody * {
+    @apply font-ubuntuLight text-white;
+  }
+
   body {
     @apply overflow-x-hidden bg-background text-foreground;
   }
@@ -229,4 +233,7 @@ body.mouse-down *:focus {
 }
 .success-shadow {
   box-shadow: 0 0 0 16px rgba(3, 34, 33, 0.25);
+}
+.visx-group.visx-axis-tick svg text tspan {
+  @apply !font-ubuntuLight fill-muted-foreground !font-semibold;
 }

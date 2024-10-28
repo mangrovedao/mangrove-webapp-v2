@@ -15,7 +15,6 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { BA } from "@mangrovedao/mgv/lib"
 import { SemiBook } from "./semibook"
-import { OrderBookTableCell } from "./table-cell"
 import { OrderBookTableHead } from "./table-head"
 import { Trades } from "./trade-history/trades"
 import useScrollToMiddle from "./use-scroll-to-middle"
@@ -51,7 +50,7 @@ export function OrderBook({
   )
 }
 
-function BookContent() {
+export function BookContent() {
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
   const { book, isLoading } = useBook({
@@ -83,47 +82,60 @@ function BookContent() {
   }).format(spreadPercent / 100)
 
   return (
-    <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
-      <Table className="text-sm leading-5 h-full select-none relative">
-        <TableHeader className="sticky top-0 bg-background z-40 py-2 text-xs h-[var(--bar-height)]">
-          <TableRow className="border-none">
-            <OrderBookTableHead className="text-left">
-              Size ({currentMarket.base.symbol})
-            </OrderBookTableHead>
-            <OrderBookTableHead>
-              Price ({currentMarket.quote.symbol})
-            </OrderBookTableHead>
-            <OrderBookTableHead>Total</OrderBookTableHead>
-          </TableRow>
-          <TableRow className="border-b absolute top-11 inset-x-3"></TableRow>
-        </TableHeader>
-        <TableBody className="overflow-scroll" ref={bodyRef}>
-          <SemiBook
-            type={BA.asks}
-            data={book}
-            priceDecimals={currentMarket.quote.priceDisplayDecimals}
-          />
-          {book.bids.length && book.asks.length ? (
-            <TableRow className="border-none" ref={spreadRef}>
-              <OrderBookTableCell className="text-gray">
-                Spread
-              </OrderBookTableCell>
-              <OrderBookTableCell>
-                {spread?.toFixed(currentMarket.quote.displayDecimals)}
-              </OrderBookTableCell>
-              <OrderBookTableCell className="text-gray">
-                {spreadPercentString}
-              </OrderBookTableCell>
-            </TableRow>
-          ) : undefined}
-          <SemiBook
-            type={BA.bids}
-            data={book}
-            priceDecimals={currentMarket.quote.priceDisplayDecimals}
-          />
-        </TableBody>
-      </Table>
-      <ScrollBar orientation="vertical" className="z-50" />
-    </ScrollArea>
+    <div className="-mx-1">
+      <div className="text-center text-muted-foreground text-xs border-b py-2">
+        Spread:{" "}
+        <span className="font-ubuntuLight">
+          {spread?.toFixed(currentMarket.quote.displayDecimals)}
+        </span>
+      </div>
+      <ScrollArea className="h-full" scrollHideDelay={200} ref={scrollAreaRef}>
+        <div className="flex">
+          <Table className="text-sm leading-5 h-full select-none relative">
+            <TableHeader className="sticky top-0 bg-background z-40 py-2 text-xs h-[var(--bar-height)]">
+              <TableRow className="border-none">
+                <OrderBookTableHead>Total</OrderBookTableHead>
+                <OrderBookTableHead className="text-right">
+                  Size ({currentMarket.base.symbol})
+                </OrderBookTableHead>
+                <OrderBookTableHead>
+                  Price ({currentMarket.quote.symbol})
+                </OrderBookTableHead>
+              </TableRow>
+              <TableRow className="border-b absolute top-11 inset-x-3"></TableRow>
+            </TableHeader>
+            <TableBody className="overflow-scroll" ref={bodyRef}>
+              <SemiBook
+                type={BA.bids}
+                data={book}
+                priceDecimals={currentMarket.quote.priceDisplayDecimals}
+              />
+            </TableBody>
+          </Table>
+          <Table className="text-sm leading-5 h-full select-none relative">
+            <TableHeader className="sticky top-0 bg-background z-40 py-2 text-xs h-[var(--bar-height)]">
+              <TableRow className="border-none">
+                <OrderBookTableHead>
+                  Price ({currentMarket.quote.symbol})
+                </OrderBookTableHead>
+                <OrderBookTableHead className="text-right">
+                  Size ({currentMarket.base.symbol})
+                </OrderBookTableHead>
+                <OrderBookTableHead>Total</OrderBookTableHead>
+              </TableRow>
+              <TableRow className="border-b absolute top-11 inset-x-3"></TableRow>
+            </TableHeader>
+            <TableBody className="overflow-scroll" ref={bodyRef}>
+              <SemiBook
+                type={BA.asks}
+                data={book}
+                priceDecimals={currentMarket.quote.priceDisplayDecimals}
+              />
+            </TableBody>
+          </Table>
+        </div>
+        <ScrollBar orientation="vertical" className="z-50" />
+      </ScrollArea>
+    </div>
   )
 }

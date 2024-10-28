@@ -27,7 +27,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
   return (
     <nav
       className={cn(
-        "flex w-full justify-between items-center text-sm grid-in-header py-1 mt-6 mb-8",
+        "flex w-full justify-between items-center text-sm grid-in-header py-1 my-6",
         className,
       )}
       {...props}

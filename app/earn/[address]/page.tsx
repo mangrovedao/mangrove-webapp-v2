@@ -264,6 +264,7 @@ export default function Page() {
           </div>
         </div>
 
+
         <div className="col-span-12 md:col-span-4">
           <div className="grid gap-8">
             <NeonContainer className="relative">
