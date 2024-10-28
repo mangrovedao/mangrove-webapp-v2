@@ -149,7 +149,7 @@ function Cell({
     <TooltipProvider>
       <Tooltip delayDuration={200}>
         <TooltipTrigger>
-          <span className="font-ubuntuLight text-sm font-semibold">
+          <span className="font-ubuntu text-sm font-semibold">
             {value.toFixed(pDecimals)}
           </span>
         </TooltipTrigger>

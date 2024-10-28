@@ -77,11 +77,11 @@ export function useTable({ data }: Params) {
 
           return (
             <div className={cn("flex flex-col font-semibold")}>
-              <span className="text-sm font-ubuntuLight">
+              <span className="text-sm font-ubuntu">
                 {Big(takerGot).toFixed(received.displayDecimals)}{" "}
                 <span className="text-muted-foreground">{received.symbol}</span>
               </span>
-              <span className="text-xs opacity-50 font-ubuntuLight">
+              <span className="text-xs opacity-50 font-ubuntu">
                 {Big(takerGave).toFixed(sent.displayDecimals)}{" "}
                 <span className="text-muted-foreground">{sent.symbol}</span>
               </span>
@@ -94,7 +94,7 @@ export function useTable({ data }: Params) {
         cell: (row) =>
           market ? (
             row.getValue() ? (
-              <span className="font-ubuntuLight font-semibold">
+              <span className="font-ubuntu font-semibold">
                 {Big(row.getValue()).toFixed(market.quote.displayDecimals)}{" "}
                 <span className="text-muted-foreground">
                   {market.quote.symbol}

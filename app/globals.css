@@ -191,7 +191,7 @@
   }
 
   table tbody * {
-    @apply font-ubuntuLight text-white;
+    @apply font-ubuntu font-bold text-white;
   }
 
   body {
@@ -235,5 +235,5 @@ body.mouse-down *:focus {
   box-shadow: 0 0 0 16px rgba(3, 34, 33, 0.25);
 }
 .visx-group.visx-axis-tick svg text tspan {
-  @apply !font-ubuntuLight fill-muted-foreground !font-semibold;
+  @apply !font-ubuntu fill-muted-foreground !font-semibold;
 }

@@ -3,7 +3,7 @@ import * as React from "react"
 
 import { cn } from "@/utils"
 
-const textStyles = cva("font-ubuntuLight", {
+const textStyles = cva("font-ubuntu", {
   variants: {
     variant: {
       text1: "text-sm lg:text-base leading-[22px]",

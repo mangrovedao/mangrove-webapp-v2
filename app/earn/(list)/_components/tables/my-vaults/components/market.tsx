@@ -16,10 +16,9 @@ export function Market({ base, quote }: Props) {
     <div className="flex items-center space-x-2">
       <TokenPair
         titleProps={{
-          variant: "title3",
-          className: "text-sm text-text-primary font-ubuntuLight",
+          variant: "title1",
+          className: "text-sm text-text-primary font-ubuntu font-normal",
           as: "span",
-          weight: "bold",
         }}
         tokenClasses="w-6 h-6"
         baseToken={baseToken}
