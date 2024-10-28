@@ -2,6 +2,7 @@
 import { useMenuStore } from "@/stores/menu.store"
 import {
   EarnIcon,
+  GouvernanceIcon,
   HelpIcon,
   MoreIcon,
   RewardsIcon,
@@ -40,6 +41,12 @@ const MENUS = [
     href: "/rewards",
     icon: RewardsIcon,
     text: "Rewards",
+  },
+  {
+    href: "",
+    icon: GouvernanceIcon,
+    text: "Gouvernance",
+    disabled: true,
   },
   {
     href: "/more",
@@ -94,11 +101,13 @@ export function MobileOverlay() {
                   </button>
                 </DialogTrigger>
               </div>
-              {MENUS.map(({ href, icon: Icon, text }) => (
+              {MENUS.map(({ href, disabled, icon: Icon, text }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="flex items-center w-full gap-2 py-3 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover active:text-nav-item-button-icon-fg-active"
+                  className={
+                    "flex items-center w-full gap-2 py-3 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover active:text-nav-item-button-icon-fg-active"
+                  }
                 >
                   <span className="w-[39px] flex justify-center items-center">
                     <Icon />
@@ -172,12 +181,17 @@ export default function Sidebar() {
           <div className="overflow-hidden overscroll-contain flex flex-col flex-1">
             <div className="@container flex flex-col flex-1">
               <div className="grid w-full overflow-hidden gap-y-2">
-                {MENUS.map(({ href, icon: Icon, text }) => (
+                {MENUS.map(({ href, disabled, icon: Icon, text }) => (
                   <Link
+                    aria-disabled
                     key={href}
                     href={href}
                     className={cn(
                       "w-full px-4 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover active:text-nav-item-button-icon-fg-active",
+                      {
+                        "text-text-quaternary hover:text-text-quaternary active:text-text-quaternary":
+                          disabled,
+                      },
                     )}
                   >
                     <MouseHoverEffectContainer

@@ -972,3 +972,22 @@ export function RaccoonIllustration(props: React.ComponentProps<"svg">) {
     </svg>
   )
 }
+
+export function GouvernanceIcon(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke="#2B5B64"
+        strokeLinecap="round"
+        strokeWidth="1.5"
+        d="M6 9h12m-2-4h3.676a1 1 0 01.982.809l1.323 6.796a.998.998 0 01.019.191V16M8 5H4.775a1 1 0 00-.968.751l-1.775 6.904a1 1 0 00-.032.25V15m1 6h18a1 1 0 001-1v-6a1 1 0 00-1-1H3a1 1 0 00-1 1v6a1 1 0 001 1zM9 9h6a1 1 0 001-1V2a1 1 0 00-1-1H9a1 1 0 00-1 1v6a1 1 0 001 1z"
+      ></path>
+    </svg>
+  )
+}

@@ -21,6 +21,7 @@ import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
+import { Button } from "@/components/ui/button"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -30,7 +31,7 @@ import Link from "next/link"
 import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
 import { useAccount } from "wagmi"
-import { Line, getChainImage } from "../(shared)/utils"
+import { Line, LineRewards, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/deposit-form"
@@ -128,8 +129,8 @@ export default function Page() {
       </div>
 
       {/* Main Columns */}
-      <div className="grid md:grid-flow-col grid-cols-2 mt-5 gap-5">
-        <div className="col-span-2 space-y-6 ">
+      <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5 ">
+        <div className="col-span-12 md:col-span-8 space-y-6">
           {/* Infos Card */}
           <div className="mx-1 grid sm:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
             <GridLineHeader
@@ -180,12 +181,12 @@ export default function Page() {
           </div>
 
           {/* Vault details */}
-          <div>
+          <div className="mx-5 ">
             <Title variant={"title2"} className="text-text-primary ">
               Vault details
             </Title>
             <div>
-              <div className="xs:grid-cols-1 grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
                 <div>
                   <GridLine
                     title="Strategy"
@@ -215,7 +216,6 @@ export default function Page() {
                       </div>
                     }
                   />
-                  <GridLine title="Vault Created on" value="March 2024" />
                 </div>
                 <div>
                   <GridLine
@@ -226,10 +226,11 @@ export default function Page() {
                   />
 
                   <GridLine
-                    title="Management Fee"
-                    value={vault?.managementFee}
-                    symbol="%"
-                    info="Tooltip to be defined"
+                    title="Strategy Address"
+                    value={shortenAddress(vault?.address || "")}
+                    icon={
+                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                    }
                   />
 
                   <GridLine
@@ -240,12 +241,31 @@ export default function Page() {
                     }
                   />
                 </div>
+                <div>
+                  <GridLine
+                    title="Management Fee"
+                    value={vault?.managementFee}
+                    symbol="%"
+                    info="Tooltip to be defined"
+                  />
+
+                  <GridLine
+                    title="Audit"
+                    value={"Website"}
+                    icon={
+                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                    }
+                  />
+
+                  <GridLine title="Vault Created on" value={"March 2024"} />
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="col-span-2">
+
+        <div className="col-span-12 md:col-span-4">
           <div className="grid gap-8">
             <NeonContainer className="relative">
               <ImageWithHideOnError
@@ -404,23 +424,28 @@ export default function Page() {
           <div className="grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-lg">
             <Title variant={"title3"}>Rewards</Title>
             <div className="grid xs:grid-cols-1 grid-cols-2 gap-4">
-              <div className="flex gap-2 items-center">
-                <ImageWithHideOnError
-                  src={`/assets/illustrations/mangrove-logo.png`}
-                  width={48}
-                  height={48}
-                  key={`mangrove-logo`}
-                  alt={`mangrove-logo`}
-                />
-                <Caption>Mangrove Rewards</Caption>
+              <div className="flex gap-2 items-start">
+                <div className="flex items-center gap-2">
+                  <ImageWithHideOnError
+                    src={`/assets/illustrations/mangrove-logo.png`}
+                    width={24}
+                    height={26}
+                    key={`mangrove-logo`}
+                    alt={`mangrove-logo`}
+                  />
+                  <Caption className="text-text-secondary">MGV</Caption>
+                </div>
               </div>
 
               <div>
-                <Line title={"Claimable"} value={"0.00"} />
-                <Line title={"Earned"} value={"0.00"} />
-                <Line title={"All time"} value={"0.00"} />
+                <LineRewards title={"Claimable"} value={"0.00"} />
+                <LineRewards title={"Earned"} value={"0.00"} />
+                <LineRewards title={"All time"} value={"0.00"} />
               </div>
             </div>
+            <Button variant={"primary"} size={"lg"} className="w-full">
+              Claim rewards
+            </Button>
           </div>
         </div>
       </div>
@@ -444,7 +469,7 @@ const GridLine = ({
   info?: string
 }) => {
   return (
-    <div className="grid mt-2 items-center space-y-2">
+    <div className="grid items-center mt-2">
       <div className="flex items-center -gap-1">
         <Caption className="text-text-secondary text-xs">{title}</Caption>
         {info ? (
@@ -458,7 +483,7 @@ const GridLine = ({
           "flex-row-reverse justify-end": iconFirst,
         })}
       >
-        <Text className="text-text-primary font-axiforma">
+        <Text className="text-text-primary font-axiforma !text-sm">
           {value}
           {symbol ? (
             <span className="text-text-tertiary">{symbol}</span>

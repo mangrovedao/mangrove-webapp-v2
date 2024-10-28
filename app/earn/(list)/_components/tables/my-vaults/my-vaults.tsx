@@ -16,14 +16,12 @@ export function MyVaults() {
     page: 1,
     pageSize: 10,
   })
-
   const {
     data: vaults,
     isLoading,
     error,
     refetch,
   } = useMyVaults({
-    chainId,
     filters: {
       skip: (page - 1) * pageSize,
     },
@@ -43,6 +41,11 @@ export function MyVaults() {
       push(`/vault/${vault.address}`)
     },
   })
+
+  // temporary fix
+  React.useEffect(() => {
+    refetch?.()
+  }, [chainId])
 
   return (
     <>

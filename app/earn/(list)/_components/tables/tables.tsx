@@ -95,7 +95,7 @@ export function Tables({
             </DropdownMenu>
           </div>
         </div>
-        <Vaults type="all" />
+        <Vaults />
       </div>
     </div>
   )
