@@ -176,7 +176,10 @@ const Line = ({
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
         <TokenIcon symbol={icon} className="w-5 h-5" />
-        <Caption className="text-gray text-xs"> {title}</Caption>
+        <Caption className="text-gray text-xs text-text-secondary">
+          {" "}
+          {title}
+        </Caption>
       </div>
       <Caption className="text-text-primary text-xs">{value} </Caption>
     </div>

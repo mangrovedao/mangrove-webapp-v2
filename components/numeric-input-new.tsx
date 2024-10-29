@@ -12,7 +12,7 @@ export type NumericInputProps = {
 const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
   ({ className, icon, symbol, ...props }, ref) => {
     return (
-      <div className="w-full relative group/input ">
+      <div className="w-full relative group/input">
         {icon && (
           <div className="flex items-center absolute inset-y-0 right-4 gap-2">
             <TokenIcon symbol={icon} />
@@ -22,7 +22,7 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
         <Input
           ref={ref}
           className={cn(
-            "text-text-secondary text-3xl w-2/3",
+            "text-text-secondary text-3xl w-2/3 bg-bg-primary !outline-none transition-none",
             { "pl-1": !!icon, "pr-24": !!symbol },
             className,
           )}

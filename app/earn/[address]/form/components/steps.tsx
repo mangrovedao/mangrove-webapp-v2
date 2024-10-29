@@ -26,7 +26,7 @@ type StepProps = {
 function Step({ children, number, active = false }: StepProps) {
   if (!children) return
   return (
-    <div className="flex-1 space-y-2">
+    <div className="flex-1 space-y-4">
       <div
         className={cn("w-full h-[2px] rounded-full transition-colors", {
           "bg-green-caribbean": active,

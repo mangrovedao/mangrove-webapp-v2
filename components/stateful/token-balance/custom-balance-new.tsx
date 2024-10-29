@@ -1,6 +1,5 @@
 import type { Token } from "@mangrovedao/mgv"
 
-import InfoTooltip from "@/components/info-tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -25,15 +24,15 @@ export function CustomBalance(props: {
   return (
     <div className="flex justify-between items-center mt-1">
       <div className="flex items-center">
-        <span className="text-xs text-secondary float-left">
-          {props.label ?? "Balance"}
+        <span className="text-xs text-text-placeholder float-left">
+          {props.label ?? "Balance: "}
         </span>
-        <InfoTooltip>{props.tooltip ?? "Formatted Wallet balance"}</InfoTooltip>
+        {/* <InfoTooltip>{props.tooltip ?? "Formatted Wallet balance"}</InfoTooltip> */}
       </div>
       {!props.balance || !props.token ? (
         <Skeleton className="w-24 h-4" />
       ) : (
-        <span className="text-xs space-x-1">
+        <span className="text-xs text-text-secondary space-x-1">
           <TooltipProvider>
             <Tooltip delayDuration={200}>
               <TooltipTrigger

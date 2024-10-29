@@ -2,7 +2,7 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
-import Dialog from "@/components/dialogs/dialog"
+import Dialog from "@/components/dialogs/dialog-new"
 import { Button, type ButtonProps } from "@/components/ui/button-old"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
@@ -179,7 +179,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
 
   return (
     <Dialog open={!!form} onClose={onClose} showCloseButton={false}>
-      <Dialog.Title className="text-xl text-left" close>
+      <Dialog.Title className="flex end" close>
         Proceed transaction
       </Dialog.Title>
       <Steps steps={steps} currentStep={currentStep} />

@@ -23,7 +23,7 @@ export function SummaryStep({
   form,
 }: Props) {
   return (
-    <div className="bg-[#041010] rounded-lg p-4 space-y-4">
+    <div className="rounded-lg p-4 space-y-4">
       <div className="flex items-center space-x-2">
         <div className="flex -space-x-2">
           <TokenIcon className="w-7 h-auto" symbol={baseToken?.symbol} />

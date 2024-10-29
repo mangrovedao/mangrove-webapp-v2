@@ -9,7 +9,7 @@ type StepsProps = {
 
 export function Steps({ currentStep = 1, steps }: StepsProps) {
   return (
-    <div className="flex w-full gap-2 !my-8">
+    <div className="flex w-full gap-2 p-3">
       {steps.map((value, i) => (
         <Step
           key={value}

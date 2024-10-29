@@ -202,6 +202,7 @@ export function useMarketForm(props: Props) {
     tickSize,
     feeInPercentageAsString,
     hasEnoughVolume,
+    slippage: form.useStore((state) => state.values.slippage),
     spotPrice,
   }
 }

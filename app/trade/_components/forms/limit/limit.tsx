@@ -6,8 +6,8 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
-import InfoTooltip from "@/components/info-tooltip"
-import { EnhancedNumericInput } from "@/components/token-input"
+import InfoTooltip from "@/components/info-tooltip-new"
+import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Caption } from "@/components/typography/caption"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -19,8 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { enumKeys } from "@/utils/enums"
@@ -32,10 +30,10 @@ import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
 import { isGreaterThanZeroValidator, sendVolumeValidator } from "./validators"
 
-const sliderValues = [25, 50, 75, 100]
-
 export function Limit() {
   const [formData, setFormData] = React.useState<Form>()
+  const [sendSliderValue, setSendSliderValue] = React.useState(0)
+
   const { currentMarket } = useMarket()
   const {
     computeReceiveAmount,
@@ -61,6 +59,7 @@ export function Limit() {
   const handleSliderChange = (value: number) => {
     if (!sendTokenBalance) return
     const amount = (BigInt(value * 100) * sendTokenBalance.balance) / 10_000n
+    setSendSliderValue(value)
     form.setFieldValue(
       "send",
       formatUnits(amount, sendTokenBalance.token.decimals),
@@ -88,7 +87,6 @@ export function Limit() {
 
   return (
     <>
-      <span className="font-ubuntu font-medium">toto 00000</span>
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
           <form.Field name="bs">
@@ -116,13 +114,14 @@ export function Limit() {
             )}
           </form.Field>
 
-          <div className="space-y-4 !mt-6">
+          <div className="space-y-2 !mt-6">
             <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
               {(field) => (
                 <EnhancedNumericInput
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
+                  inputClassName="text-text-primary text-lg h-8"
                   onChange={(e) => {
                     field.handleChange(e.target.value)
                     computeReceiveAmount()
@@ -134,119 +133,7 @@ export function Limit() {
                 />
               )}
             </form.Field>
-            <div className="flex justify-between space-x-2 pt-2">
-              <form.Field name="sendFrom">
-                {(field) => (
-                  <div className="flex flex-col w-full">
-                    <Label className="flex items-center">
-                      Send from
-                      <InfoTooltip>
-                        <Caption>Select the origin of the assets</Caption>
-                      </InfoTooltip>
-                    </Label>
 
-                    <Select
-                      name={field.name}
-                      value={field.state.value}
-                      onValueChange={(value: string) => {
-                        field.handleChange(value)
-                      }}
-                      disabled={!currentMarket}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {sendLogics?.map(
-                            (source) =>
-                              source && (
-                                <SelectItem
-                                  key={source.logic.name}
-                                  value={source.logic.name}
-                                >
-                                  <div className="flex gap-2 w-full items-center">
-                                    <SourceIcon sourceId={source.logic.name} />
-                                    <Caption className="capitalize">
-                                      {source.logic.name.toUpperCase()}
-                                    </Caption>
-                                  </div>
-                                </SelectItem>
-                              ),
-                          )}
-                          {/* Wallet */}
-                          <SelectItem key="simple" value="simple">
-                            <div className="flex gap-2 w-full items-center">
-                              <SourceIcon sourceId={"simple"} />
-                              <Caption className="capitalize">Wallet</Caption>
-                            </div>
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="receiveTo">
-                {(field) => (
-                  <div className="flex flex-col w-full z-50">
-                    <Label className="flex items-center">
-                      Receive to
-                      <InfoTooltip className="ml-2" side="left">
-                        <div>
-                          <Caption>
-                            Select the destination of the assets
-                          </Caption>
-
-                          <Caption>(after the trade is executed)</Caption>
-                        </div>
-                      </InfoTooltip>
-                    </Label>
-
-                    <Select
-                      name={field.name}
-                      value={field.state.value}
-                      onValueChange={(value: string) => {
-                        field.handleChange(value)
-                      }}
-                      disabled={!currentMarket}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {receiveLogics?.map(
-                            (source) =>
-                              source && (
-                                <SelectItem
-                                  key={source.logic.name}
-                                  value={source.logic.name}
-                                >
-                                  <div className="flex gap-2 w-full items-center">
-                                    <SourceIcon sourceId={source.logic.name} />
-                                    <Caption className="capitalize">
-                                      {source.logic.name.toUpperCase()}
-                                    </Caption>
-                                  </div>
-                                </SelectItem>
-                              ),
-                          )}
-                          {/* Wallet */}
-                          <SelectItem key="simple" value="simple">
-                            <div className="flex gap-2 w-full items-center">
-                              <SourceIcon sourceId={"simple"} />
-                              <Caption className="capitalize">Wallet</Caption>
-                            </div>
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </form.Field>
-            </div>
             <form.Field
               name="send"
               onChange={sendVolumeValidator(
@@ -265,37 +152,46 @@ export function Limit() {
               )}
             >
               {(field) => (
-                <EnhancedNumericInput
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={({ target: { value } }) => {
-                    field.handleChange(value)
-                    computeReceiveAmount()
-                  }}
-                  minimumVolume={formatUnits(
-                    minVolume,
-                    sendToken?.decimals || 18,
-                  )}
-                  volumeAction={{
-                    onClick: () => {
-                      field.handleChange(minVolumeFormatted),
-                        computeReceiveAmount()
-                    },
-                  }}
-                  balanceAction={{
-                    onClick: () => {
-                      field.handleChange(sendTokenBalanceFormatted),
-                        computeReceiveAmount()
-                    },
-                  }}
-                  token={sendToken}
-                  customBalance={sendTokenBalanceFormatted}
-                  label="Send amount"
-                  disabled={!currentMarket || sendTokenBalanceFormatted === "0"}
-                  showBalance
-                  error={field.state.meta.touchedErrors}
-                />
+                <>
+                  <EnhancedNumericInput
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={({ target: { value } }) => {
+                      field.handleChange(value)
+                      computeReceiveAmount()
+                    }}
+                    // dollarAmount={"..."}
+                    inputClassName="text-text-primary text-lg h-8"
+                    sendSliderValue={sendSliderValue}
+                    setSendSliderValue={handleSliderChange}
+                    // minimumVolume={formatUnits(
+                    //   minVolume,
+                    //   sendToken?.decimals || 18,
+                    // )}
+                    // volumeAction={{
+                    //   onClick: () => {
+                    //     field.handleChange(minVolumeFormatted),
+                    //       computeReceiveAmount()
+                    //   },
+                    // }}
+                    balanceAction={{
+                      onClick: () => {
+                        field.handleChange(sendTokenBalanceFormatted),
+                          computeReceiveAmount()
+                      },
+                    }}
+                    token={sendToken}
+                    customBalance={sendTokenBalanceFormatted}
+                    label="Send amount"
+                    disabled={
+                      !currentMarket || sendTokenBalanceFormatted === "0"
+                    }
+                    showBalance
+                    error={field.state.meta.touchedErrors}
+                  />
+                </>
+                // <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
               )}
             </form.Field>
 
@@ -310,50 +206,134 @@ export function Limit() {
                     computeSendAmount()
                   }}
                   token={receiveToken}
-                  label="Receive amount"
+                  inputClassName="text-text-primary text-lg h-8"
+                  label="Total"
                   disabled={!(currentMarket && form.state.isFormValid)}
                   error={field.state.meta.touchedErrors}
-                  showBalance
                   customBalance={receiveTokenBalanceFormatted}
                 />
               )}
             </form.Field>
-            {/* Slider component */}
-            <div className="space-y-5 pt-2 px-3">
-              <Slider
-                name={"sliderPercentage"}
-                defaultValue={[0]}
-                value={[Number(sliderValue)]}
-                step={5}
-                min={0}
-                max={100}
-                onValueChange={([value]) => {
-                  handleSliderChange(Number(value))
-                }}
-                disabled={!(currentMarket && form.state.isFormValid)}
-              />
-              <div className="flex justify-center space-x-3">
-                {sliderValues.map((value) => (
-                  <Button
-                    key={`percentage-button-${value}`}
-                    variant={"secondary"}
-                    size={"sm"}
-                    className={cn("text-xs w-full", {
-                      "opacity-10": Number(sliderValue) !== value,
-                    })}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleSliderChange(Number(value))
-                    }}
-                    disabled={!currentMarket}
-                  >
-                    {value}%
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <Separator className="!my-6" />
 
+            <Accordion title="Liquidity sourcing" disabled={true}>
+              <div className="flex justify-between space-x-2 pt-2">
+                <form.Field name="sendFrom">
+                  {(field) => (
+                    <div className="flex flex-col w-full">
+                      <Label className="flex items-center">
+                        Send from
+                        <InfoTooltip>
+                          <Caption>Select the origin of the assets</Caption>
+                        </InfoTooltip>
+                      </Label>
+
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!currentMarket}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {sendLogics?.map(
+                              (source) =>
+                                source && (
+                                  <SelectItem
+                                    key={source.logic.name}
+                                    value={source.logic.name}
+                                  >
+                                    <div className="flex gap-2 w-full items-center">
+                                      <SourceIcon
+                                        sourceId={source.logic.name}
+                                      />
+                                      <Caption className="capitalize">
+                                        {source.logic.name.toUpperCase()}
+                                      </Caption>
+                                    </div>
+                                  </SelectItem>
+                                ),
+                            )}
+                            {/* Wallet */}
+                            <SelectItem key="simple" value="simple">
+                              <div className="flex gap-2 w-full items-center">
+                                <SourceIcon sourceId={"simple"} />
+                                <Caption className="capitalize">Wallet</Caption>
+                              </div>
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="receiveTo">
+                  {(field) => (
+                    <div className="flex flex-col w-full z-50">
+                      <Label className="flex items-center">
+                        Receive to
+                        <InfoTooltip className="ml-2" side="left">
+                          <div>
+                            <Caption>
+                              Select the destination of the assets
+                            </Caption>
+
+                            <Caption>(after the trade is executed)</Caption>
+                          </div>
+                        </InfoTooltip>
+                      </Label>
+
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: string) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!currentMarket}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {receiveLogics?.map(
+                              (source) =>
+                                source && (
+                                  <SelectItem
+                                    key={source.logic.name}
+                                    value={source.logic.name}
+                                  >
+                                    <div className="flex gap-2 w-full items-center">
+                                      <SourceIcon
+                                        sourceId={source.logic.name}
+                                      />
+                                      <Caption className="capitalize">
+                                        {source.logic.name.toUpperCase()}
+                                      </Caption>
+                                    </div>
+                                  </SelectItem>
+                                ),
+                            )}
+                            {/* Wallet */}
+                            <SelectItem key="simple" value="simple">
+                              <div className="flex gap-2 w-full items-center">
+                                <SourceIcon sourceId={"simple"} />
+                                <Caption className="capitalize">Wallet</Caption>
+                              </div>
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </form.Field>
+              </div>
+            </Accordion>
             <Accordion title="Advanced">
               <form.Field name="timeInForce">
                 {(field) => {
@@ -448,8 +428,6 @@ export function Limit() {
                 </form.Field>
               </div>
             </Accordion>
-
-            <Separator className="!my-6" />
 
             {/* <MarketDetails
               minVolume={minVolume}
