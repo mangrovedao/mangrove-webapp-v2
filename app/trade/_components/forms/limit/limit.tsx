@@ -297,10 +297,10 @@ export function Limit() {
                         }}
                         disabled={!currentMarket}
                       >
-                        <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
+                        <SelectTrigger>
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
-                        <SelectContent className="w-full bg-bg-primary rounded-xl">
+                        <SelectContent>
                           <SelectGroup>
                             {receiveLogics?.map(
                               (source) =>
@@ -348,10 +348,10 @@ export function Limit() {
                         }}
                         disabled={!currentMarket}
                       >
-                        <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
+                        <SelectTrigger>
                           <SelectValue placeholder="Select time in force" />
                         </SelectTrigger>
-                        <SelectContent className="w-full bg-bg-primary rounded-xl">
+                        <SelectContent>
                           <SelectGroup>
                             {enumKeys(TimeInForce).map((timeInForce) => (
                               <SelectItem
@@ -408,10 +408,10 @@ export function Limit() {
                       }}
                       disabled={!currentMarket}
                     >
-                      <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
+                      <SelectTrigger>
                         <SelectValue placeholder="Select time unit" />
                       </SelectTrigger>
-                      <SelectContent className="w-full bg-bg-primary rounded-xl">
+                      <SelectContent>
                         <SelectGroup>
                           {Object.values(TimeToLiveUnit).map(
                             (timeToLiveUnit) => (
