@@ -57,7 +57,7 @@ export default function Page() {
     data: { vault },
     refetch,
   } = useVault(params.address)
-
+  console.log(vault)
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])

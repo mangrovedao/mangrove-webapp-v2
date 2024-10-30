@@ -1,4 +1,7 @@
-import { VAULTS_WHITELIST } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import {
+  VAULTS_WHITELIST_ARBITRUM,
+  VAULTS_WHITELIST_BASE_SEPOLIA,
+} from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { useMarkets } from "@/hooks/use-addresses"
 import { MarketParams } from "@mangrovedao/mgv"
@@ -53,11 +56,11 @@ const multicallSchema = z.object({
 export function getChainVaults(chainId: number): VaultWhitelist[] {
   switch (chainId) {
     case blast.id:
-      return VAULTS_WHITELIST
+      return VAULTS_WHITELIST_BASE_SEPOLIA
     case arbitrum.id:
-      return VAULTS_WHITELIST
+      return VAULTS_WHITELIST_ARBITRUM
     case baseSepolia.id:
-      return VAULTS_WHITELIST
+      return VAULTS_WHITELIST_BASE_SEPOLIA
     default:
       return []
   }
@@ -195,13 +198,20 @@ export async function getVaultsInformation(
       const fee = performanceFeeAmount + managementFeeAmount
 
       // fee shares
-      const feeShares = (fee * totalSupply) / (totalInQuote[0] - fee)
+      const feeShares =
+        totalInQuote[0] <= 0n
+          ? 0n
+          : (fee * totalSupply) / (totalInQuote[0] - fee)
       const newTotalSupply = totalSupply + feeShares
 
       const userBaseBalance =
-        (underlyingBalances[0] * balanceOf) / newTotalSupply
+        newTotalSupply <= 0n
+          ? 0n
+          : (underlyingBalances[0] * balanceOf) / newTotalSupply
       const userQuoteBalance =
-        (underlyingBalances[1] * balanceOf) / newTotalSupply
+        newTotalSupply <= 0n
+          ? 0n
+          : (underlyingBalances[1] * balanceOf) / newTotalSupply
 
       const vaultMarket = {
         base: markets.find((item) => market[0] === item.base.address)?.base,
