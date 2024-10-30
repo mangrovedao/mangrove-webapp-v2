@@ -11,6 +11,7 @@ import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Caption } from "@/components/typography/caption"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+
 import {
   Select,
   SelectContent,
@@ -18,7 +19,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select-new"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { enumKeys } from "@/utils/enums"
@@ -215,7 +216,7 @@ export function Limit() {
               )}
             </form.Field>
 
-            <Accordion title="Liquidity sourcing" disabled={true}>
+            <Accordion title="Liquidity sourcing">
               <div className="flex justify-between space-x-2 pt-2">
                 <form.Field name="sendFrom">
                   {(field) => (
@@ -296,10 +297,10 @@ export function Limit() {
                         }}
                         disabled={!currentMarket}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="w-full bg-bg-primary rounded-xl">
                           <SelectGroup>
                             {receiveLogics?.map(
                               (source) =>
@@ -350,7 +351,7 @@ export function Limit() {
                         <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
                           <SelectValue placeholder="Select time in force" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="w-full bg-bg-primary rounded-xl">
                           <SelectGroup>
                             {enumKeys(TimeInForce).map((timeInForce) => (
                               <SelectItem
@@ -410,11 +411,12 @@ export function Limit() {
                       <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
                         <SelectValue placeholder="Select time unit" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="w-full bg-bg-primary rounded-xl">
                         <SelectGroup>
                           {Object.values(TimeToLiveUnit).map(
                             (timeToLiveUnit) => (
                               <SelectItem
+                                className="hover:bg-bg-secondary active:bg-bg-secondary focus:bg-bg-secondary"
                                 key={timeToLiveUnit}
                                 value={timeToLiveUnit}
                               >

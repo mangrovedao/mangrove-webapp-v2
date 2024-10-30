@@ -10,8 +10,6 @@ import { cn } from "@/utils"
 import DepositToVaultDialog from "./dialogs/deposit-dialog"
 import useForm from "./use-form"
 
-const sliderValues = [25, 50, 75]
-
 export function DepositForm({ className }: { className?: string }) {
   const [addDialog, setAddDialog] = React.useState(false)
 
@@ -105,19 +103,21 @@ export function DepositForm({ className }: { className?: string }) {
       >
         Deposit
       </Button>
-      <DepositToVaultDialog
-        isOpen={addDialog}
-        baseAmount={baseDeposit}
-        quoteAmount={quoteDeposit}
-        vault={vault}
-        baseToken={baseToken}
-        quoteToken={quoteToken}
-        mintAmount={mintAmount}
-        onClose={() => {
-          setAddDialog(false)
-          handleBaseDepositChange("0")
-        }}
-      />
+      {addDialog ? (
+        <DepositToVaultDialog
+          isOpen={addDialog}
+          baseAmount={baseDeposit}
+          quoteAmount={quoteDeposit}
+          vault={vault}
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+          mintAmount={mintAmount}
+          onClose={() => {
+            setAddDialog(false)
+            handleBaseDepositChange("0")
+          }}
+        />
+      ) : undefined}
     </form>
   )
 }

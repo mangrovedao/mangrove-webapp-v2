@@ -2,13 +2,14 @@ import type { Token } from "@mangrovedao/mgv"
 import Big from "big.js"
 
 import { TokenIcon } from "@/components/token-icon"
-import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
+import { BS } from "@mangrovedao/mgv/lib"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 
 type Props = {
   form: Form
+  fee: string
   baseToken?: Token
   quoteToken?: Token
   sendToken?: Token
@@ -16,6 +17,7 @@ type Props = {
 }
 
 export function SummaryStep({
+  fee,
   baseToken,
   quoteToken,
   sendToken,
@@ -35,7 +37,7 @@ export function SummaryStep({
     form.timeInForce === TimeInForce.PO
 
   return (
-    <div className="bg-[#041010] rounded-lg p-4 space-y-4">
+    <>
       <div className="flex items-center space-x-2">
         <div className="flex -space-x-2">
           <TokenIcon className="w-7 h-auto" symbol={baseToken?.symbol} />
@@ -45,41 +47,57 @@ export function SummaryStep({
           {baseToken?.symbol} / {quoteToken?.symbol}
         </span>
       </div>
-      <Separator />
-      <div className="space-y-4">
-        <Line title="Limit Price">
-          {Big(form.limitPrice ?? 0).toFixed(quoteToken?.priceDisplayDecimals)}{" "}
-          <Unit>{quoteToken?.symbol}</Unit>
-        </Line>
-        <Line title={`Send from ${sendFrom}`}>
-          {Big(form.send ?? 0).toFixed(sendToken?.displayDecimals)}{" "}
-          <Unit>{sendToken?.symbol}</Unit>
-        </Line>
-        <Line title={`Receive to ${receiveTo}`}>
-          {Big(form.receive ?? 0).toFixed(receiveToken?.displayDecimals)}{" "}
-          <Unit>{receiveToken?.symbol}</Unit>
-        </Line>
-        {/* TODO: estimated provision */}
-        {/* <Line title="Est. Provision">
+      <div className="rounded-lg p-4 space-y-4 border border-border-secondary">
+        <div className="space-y-4">
+          <Line title="Side">
+            <span
+              className={cn(
+                form.bs === BS.sell && "text-red-100",
+                form.bs === BS.buy && "text-green-500",
+              )}
+            >
+              {form.bs === BS.sell ? "Sell" : "Buy"}
+            </span>
+          </Line>
+          <Line title="Type">Limit</Line>
+          <Line title="Liquidity source">Wallet</Line>
+          <Line title="Limit Price">
+            {Big(form.limitPrice ?? 0).toFixed(
+              quoteToken?.priceDisplayDecimals,
+            )}{" "}
+            <Unit>{quoteToken?.symbol}</Unit>
+          </Line>
+          <Line title={`Send from ${sendFrom}`}>
+            {Big(form.send ?? 0).toFixed(sendToken?.displayDecimals)}{" "}
+            <Unit>{sendToken?.symbol}</Unit>
+          </Line>
+          <Line title={`Receive to ${receiveTo}`}>
+            {Big(form.receive ?? 0).toFixed(receiveToken?.displayDecimals)}{" "}
+            <Unit>{receiveToken?.symbol}</Unit>
+          </Line>
+          <Line title="Fee">{fee}</Line>
+          {/* TODO: estimated provision */}
+          {/* <Line title="Est. Provision">
           0.2503 <Unit>MATIC</Unit>
         </Line> */}
-        <Line title="Time in force">
-          <div className="flex flex-col items-end">
-            {timeInForceKey}{" "}
-            {showTimeToLive && (
-              <Unit>
-                {form.timeToLive}{" "}
-                <span className="lowercase">
-                  {Number(form.timeToLive) > 1
-                    ? `${form.timeToLiveUnit}s`
-                    : form.timeToLiveUnit}
-                </span>
-              </Unit>
-            )}
-          </div>
-        </Line>
+          <Line title="Time in force">
+            <div className="flex flex-col items-end">
+              {timeInForceKey}{" "}
+              {showTimeToLive && (
+                <Unit>
+                  {form.timeToLive}{" "}
+                  <span className="lowercase">
+                    {Number(form.timeToLive) > 1
+                      ? `${form.timeToLiveUnit}s`
+                      : form.timeToLiveUnit}
+                  </span>
+                </Unit>
+              )}
+            </div>
+          </Line>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -100,5 +118,5 @@ function Line({
 }
 
 function Unit({ children }: { children: React.ReactNode }) {
-  return <span className="text-gray-scale-300">{children}</span>
+  return <span className="text-text-primary">{children}</span>
 }

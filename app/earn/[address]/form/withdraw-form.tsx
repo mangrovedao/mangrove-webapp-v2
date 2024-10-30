@@ -144,21 +144,22 @@ export function WithdrawForm({ className }: { className?: string }) {
       >
         Withdraw
       </Button>
-
-      <WithdrawFromVaultDialog
-        infos={{
-          baseWithdraw,
-          quoteWithdraw,
-          withdrawAmount,
-        }}
-        amount={withdrawAmount}
-        vault={vault}
-        onClose={() => {
-          setRemoveDialog(false)
-          handleSliderChange(0)
-        }}
-        isOpen={removeDialog}
-      />
+      {removeDialog ? (
+        <WithdrawFromVaultDialog
+          infos={{
+            baseWithdraw,
+            quoteWithdraw,
+            withdrawAmount,
+          }}
+          amount={withdrawAmount}
+          vault={vault}
+          onClose={() => {
+            setRemoveDialog(false)
+            handleSliderChange(0)
+          }}
+          isOpen={removeDialog}
+        />
+      ) : undefined}
     </form>
   )
 }
