@@ -109,11 +109,6 @@ export function useLimit(props: Props) {
         !isNaN(Number(state.values.receive)) &&
         isFinite(Number(state.values.receive))
 
-      console.log({
-        sendIsValid,
-        values: state.values,
-        send: state.values.send,
-      })
       const sendAmount = parseUnits(
         sendIsValid ? state.values.send ?? 0 : "0",
         sendToken?.decimals || 18,

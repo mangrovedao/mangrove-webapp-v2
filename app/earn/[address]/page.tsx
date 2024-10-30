@@ -264,7 +264,6 @@ export default function Page() {
           </div>
         </div>
 
-
         <div className="col-span-12 md:col-span-4">
           <div className="grid gap-8">
             <NeonContainer className="relative">
@@ -421,7 +420,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-lg">
+          <div className="z-20 grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-lg">
             <Title variant={"title3"}>Rewards</Title>
             <div className="grid xs:grid-cols-1 grid-cols-2 gap-4">
               <div className="flex gap-2 items-start">

@@ -2,15 +2,14 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
-import Dialog from "@/components/dialogs/dialog"
-import { Button, type ButtonProps } from "@/components/ui/button-old"
+import Dialog from "@/components/dialogs/dialog-new"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { Logic } from "@mangrovedao/mgv"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
-import { MarketDetails } from "../../components/market-details"
 import { Steps } from "../../components/steps"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { usePostLimitOrder } from "../hooks/use-post-limit-order"
@@ -26,7 +25,6 @@ type Props = {
 }
 
 const btnProps: ButtonProps = {
-  rightIcon: true,
   className: "w-full",
   size: "lg",
 }
@@ -104,6 +102,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     !limitOrderSteps?.[0].done && {
       body: (
         <SummaryStep
+          fee={feeInPercentageAsString}
           form={form}
           baseToken={baseToken}
           quoteToken={quoteToken}
@@ -120,7 +119,16 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     !limitOrderSteps?.[0].done && {
       body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
       button: (
-        <div className="grid gap-2 w-full ">
+        <div className="flex gap-2 w-full">
+          <Button
+            size={"lg"}
+            variant={"secondary"}
+            onClick={() => goToPrevStep()}
+            disabled={approve.isPending}
+            loading={approve.isPending}
+          >
+            Back
+          </Button>
           <Button
             {...btnProps}
             disabled={approve.isPending}
@@ -139,15 +147,6 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
             }}
           >
             Approve
-          </Button>
-          <Button
-            size={"lg"}
-            variant={"secondary"}
-            onClick={() => goToPrevStep()}
-            disabled={approve.isPending}
-            loading={approve.isPending}
-          >
-            Back
           </Button>
         </div>
       ),
@@ -189,6 +188,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
     {
       body: (
         <SummaryStep
+          fee={feeInPercentageAsString}
           form={form}
           baseToken={baseToken}
           quoteToken={quoteToken}
@@ -236,15 +236,15 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
         Proceed transaction
       </Dialog.Title>
       <Steps steps={steps} currentStep={currentStep} />
-      <Dialog.Description>
-        <div className="space-y-2">
+      <Dialog.Description className="p-4 ">
+        <div className="space-y-4">
           {stepInfos[currentStep - 1]?.body ?? undefined}
-          <div className="bg-[#041010] rounded-lg p-4 flex items-center">
+          {/* <div className="bg-[#041010] rounded-lg p-4 flex items-center">
             <MarketDetails
               takerFee={feeInPercentageAsString}
               minVolume={form.minVolume}
             />
-          </div>
+          </div> */}
         </div>
       </Dialog.Description>
       <Dialog.Footer>{stepInfos[currentStep - 1]?.button}</Dialog.Footer>

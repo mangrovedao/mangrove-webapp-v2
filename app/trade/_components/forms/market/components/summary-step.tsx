@@ -2,9 +2,9 @@ import type { Token } from "@mangrovedao/mgv"
 import Big from "big.js"
 
 import { TokenIcon } from "@/components/token-icon"
-import { Separator } from "@/components/ui/separator"
 import { cn } from "@/utils"
 
+import { BS } from "@mangrovedao/mgv/lib"
 import type { Form } from "../types"
 
 type Props = {
@@ -23,7 +23,7 @@ export function SummaryStep({
   form,
 }: Props) {
   return (
-    <div className="bg-[#041010] rounded-lg p-4 space-y-4">
+    <>
       <div className="flex items-center space-x-2">
         <div className="flex -space-x-2">
           <TokenIcon className="w-7 h-auto" symbol={baseToken?.symbol} />
@@ -33,22 +33,31 @@ export function SummaryStep({
           {baseToken?.symbol} / {quoteToken?.symbol}
         </span>
       </div>
-      <Separator />
-      <div className="space-y-4">
-        <Line title="Send from wallet">
-          {Big(form.send ?? 0).toFixed(sendToken?.displayDecimals)}{" "}
-          <Unit>{sendToken?.symbol}</Unit>
-        </Line>
-        <Line title="Receive to wallet">
-          {Big(form.receive ?? 0).toFixed(receiveToken?.displayDecimals)}{" "}
-          <Unit>{receiveToken?.symbol}</Unit>
-        </Line>
-        {/* TODO: estimated provision */}
-        {/* <Line title="Est. Provision">
-          0.2503 <Unit>MATIC</Unit>
-        </Line> */}
+      <div className="rounded-lg p-3 space-y-4 border border-border-secondary">
+        <div className="space-y-4">
+          <Line title="Side">
+            <span
+              className={cn(
+                form.bs === BS.sell && "text-red-100",
+                form.bs === BS.buy && "text-green-500",
+              )}
+            >
+              {form.bs === BS.sell ? "Sell" : "Buy"}
+            </span>
+          </Line>
+          <Line title="Type">Market</Line>
+          <Line title="Liquidity source">Wallet</Line>
+          <Line title="Base amount">
+            {Big(form.send ?? 0).toFixed(sendToken?.displayDecimals)}{" "}
+            <Unit>{sendToken?.symbol}</Unit>
+          </Line>
+          <Line title="Quote amount">
+            {Big(form.receive ?? 0).toFixed(receiveToken?.displayDecimals)}{" "}
+            <Unit>{receiveToken?.symbol}</Unit>
+          </Line>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -61,7 +70,7 @@ function Line({
   className,
 }: LineProps & { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("w-full flex justify-between text-base", className)}>
+    <div className={cn("w-full flex justify-between text-sm", className)}>
       <span>{title}</span>
       <span className="text-white">{children}</span>
     </div>
@@ -69,5 +78,5 @@ function Line({
 }
 
 function Unit({ children }: { children: React.ReactNode }) {
-  return <span className="text-gray-scale-300">{children}</span>
+  return <span className="text-text-primary">{children}</span>
 }

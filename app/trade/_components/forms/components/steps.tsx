@@ -9,7 +9,7 @@ type StepsProps = {
 
 export function Steps({ currentStep = 1, steps }: StepsProps) {
   return (
-    <div className="flex w-full gap-2 !my-8">
+    <div className="flex w-full gap-2 p-3">
       {steps.map((value, i) => (
         <Step
           key={value}
@@ -41,7 +41,7 @@ function Step({ title, children, number, active = false }: StepProps) {
         })}
       ></div>
       <div className="space-y-1">
-        <div className="text-[10px] text-gray-scale-300 flex items-center">
+        <div className="text-[10px] text-text-secondary flex items-center">
           Step {number}
           {title?.includes("deployment") ? (
             <InfoTooltip side="right">
@@ -65,8 +65,8 @@ function Step({ title, children, number, active = false }: StepProps) {
         </div>
         <div
           className={cn("text-xs transition-colors", {
-            "text-white": active,
-            "text-gray-scale-400": !active,
+            "text-text-primary": active,
+            "text-text-tertiary": !active,
           })}
         >
           {children}
