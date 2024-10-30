@@ -88,7 +88,6 @@ export function Limit() {
 
   return (
     <>
-      <span className="font-ubuntu font-medium">toto 00000</span>
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
           <form.Field name="bs">
