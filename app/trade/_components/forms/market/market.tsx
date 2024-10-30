@@ -183,7 +183,7 @@ export function Market() {
             >
               <form.Field name="slippage">
                 {(field) => (
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-1">
                     <div className="flex justify-around bg-bg-primary rounded-lg">
                       {slippageValues.map((value) => (
                         <Button
