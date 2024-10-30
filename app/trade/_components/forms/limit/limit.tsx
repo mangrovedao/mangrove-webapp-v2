@@ -334,12 +334,11 @@ export function Limit() {
                 </form.Field>
               </div>
             </Accordion>
-            <Accordion title="Advanced">
+            <Accordion title="Time in force">
               <form.Field name="timeInForce">
                 {(field) => {
                   return (
-                    <div className="grid text-md space-y-2">
-                      <Label>Time in force</Label>
+                    <div className="grid text-md space-y-2 mt-2">
                       <Select
                         name={field.name}
                         value={field.state.value.toString()}
@@ -348,7 +347,7 @@ export function Limit() {
                         }}
                         disabled={!currentMarket}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
                           <SelectValue placeholder="Select time in force" />
                         </SelectTrigger>
                         <SelectContent>
@@ -382,6 +381,8 @@ export function Limit() {
                 >
                   {(field) => (
                     <EnhancedNumericInput
+                      className="h-10 py-0"
+                      inputClassName="h-full text-sm"
                       placeholder="1"
                       name={field.name}
                       value={field.state.value}
@@ -406,7 +407,7 @@ export function Limit() {
                       }}
                       disabled={!currentMarket}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full bg-bg-primary rounded-xl flex justify-between text-muted-foreground">
                         <SelectValue placeholder="Select time unit" />
                       </SelectTrigger>
                       <SelectContent>

@@ -60,10 +60,10 @@ export const EnhancedNumericInput = React.forwardRef<
     const tokenSymbol = isNativeToken ? token : token?.symbol
 
     return (
-      <div className=" grid">
+      <div className="grid">
         <div
           className={cn(
-            "grid z-10 px-3 pt-[14px] pb-[14px] -gap-4 flex-col bg-bg-primary rounded-2xl border border-transparent",
+            "grid z-10 px-3 pt-[14px] pb-[14px] -gap-4 flex-col bg-bg-primary rounded-2xl border border-transparent transition-all",
             !error?.length &&
               "focus-within:border focus-within:border-border-brand",
             error?.length && "border-red-600 border-2",
