@@ -221,9 +221,9 @@ export function Limit() {
                 <form.Field name="sendFrom">
                   {(field) => (
                     <div className="flex flex-col w-full">
-                      <Label className="flex items-center">
+                      <Label className="flex items-center text-muted-foreground">
                         Send from
-                        <InfoTooltip>
+                        <InfoTooltip className="text-muted-foreground">
                           <Caption>Select the origin of the assets</Caption>
                         </InfoTooltip>
                       </Label>
@@ -276,9 +276,9 @@ export function Limit() {
                 <form.Field name="receiveTo">
                   {(field) => (
                     <div className="flex flex-col w-full z-50">
-                      <Label className="flex items-center">
+                      <Label className="flex items-center text-muted-foreground">
                         Receive to
-                        <InfoTooltip className="ml-2" side="left">
+                        <InfoTooltip className="ml-2 text-muted-foreground">
                           <div>
                             <Caption>
                               Select the destination of the assets
