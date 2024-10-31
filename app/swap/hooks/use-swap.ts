@@ -198,8 +198,6 @@ export function useSwap() {
         `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${receiveTknAddress}`,
       ).then((res) => res.json())
 
-      console.log({ payDollar, receiveDollar })
-
       return { payDollar: payDollar.price, receiveDollar: receiveDollar.price }
     },
     refetchInterval: 3_000,
