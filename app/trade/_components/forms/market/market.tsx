@@ -237,7 +237,8 @@ export function Market(props: { bs: BS }) {
                     className={cn(
                       "w-full flex items-center justify-center !mb-4 capitalize !mt-6",
                       {
-                        "bg-[#FF5555]": tradeAction === BS.sell,
+                        "bg-[#FF5555] hover:bg-[#ff6363]":
+                          tradeAction === BS.sell,
                       },
                     )}
                     size={"lg"}
