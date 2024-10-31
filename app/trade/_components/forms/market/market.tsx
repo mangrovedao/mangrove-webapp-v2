@@ -4,26 +4,20 @@ import React from "react"
 import { formatUnits } from "viem"
 
 import { CustomInput } from "@/components/custom-input-new"
-import {
-  CustomRadioGroup,
-  CustomRadioGroupItem,
-} from "@/components/custom-radio-group-new"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
 import { EnhancedNumericInput } from "@components/token-input-new"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
-import { TradeAction } from "../enums"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
 import { useMarketForm } from "./hooks/use-market"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
-const sliderValues = [25, 50, 75, 100]
 const slippageValues = ["0.1", "0.5", "1"]
 
-export function Market() {
+export function Market(props: { bs: BS }) {
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
 
@@ -43,7 +37,10 @@ export function Market() {
     feeInPercentageAsString,
     spotPrice,
     slippage,
-  } = useMarketForm({ onSubmit: (formData) => setFormData(formData) })
+  } = useMarketForm({
+    onSubmit: (formData) => setFormData(formData),
+    bs: props.bs,
+  })
 
   const sendBalance = formatUnits(
     sendTokenBalance.balance?.balance || 0n,
@@ -70,32 +67,6 @@ export function Market() {
     <>
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <form.Field name="bs">
-            {(field) => (
-              <CustomRadioGroup
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onValueChange={(e: BS) => {
-                  field.handleChange(e)
-                  computeReceiveAmount()
-                }}
-                disabled={!market}
-              >
-                {Object.values(TradeAction).map((action) => (
-                  <CustomRadioGroupItem
-                    key={action}
-                    value={action}
-                    id={action}
-                    className="capitalize"
-                  >
-                    {action}
-                  </CustomRadioGroupItem>
-                ))}
-              </CustomRadioGroup>
-            )}
-          </form.Field>
-
           <div className="space-y-4 !mt-6">
             <form.Field
               name="send"
@@ -263,7 +234,12 @@ export function Market() {
               {([canSubmit, isSubmitting, tradeAction]) => {
                 return (
                   <Button
-                    className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
+                    className={cn(
+                      "w-full flex items-center justify-center !mb-4 capitalize !mt-6",
+                      {
+                        "bg-[#FF5555]": tradeAction === BS.sell,
+                      },
+                    )}
                     size={"lg"}
                     type="submit"
                     disabled={!canSubmit || !market}

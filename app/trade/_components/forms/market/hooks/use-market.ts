@@ -23,6 +23,7 @@ import type { Form } from "../types"
 
 type Props = {
   onSubmit: (data: Form) => void
+  bs: BS
 }
 
 const determinePrices = (
@@ -56,7 +57,7 @@ export function useMarketForm(props: Props) {
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      bs: BS.buy,
+      bs: props.bs,
       sliderPercentage: 25,
       slippage: 0.5,
       send: "",
@@ -65,7 +66,7 @@ export function useMarketForm(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const bs = form.useStore((state) => state.values.bs)
+  const bs = props.bs
   const send = form.useStore((state) => state.values.send)
   const receive = form.useStore((state) => state.values.receive)
 

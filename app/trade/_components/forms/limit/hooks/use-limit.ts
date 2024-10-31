@@ -16,13 +16,14 @@ import type { Form } from "../types"
 
 type Props = {
   onSubmit: (data: Form) => void
+  bs: BS
 }
 
 export function useLimit(props: Props) {
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
-      bs: BS.buy,
+      bs: props.bs,
       limitPrice: "",
       send: "",
       sendFrom: "simple",
@@ -38,7 +39,7 @@ export function useLimit(props: Props) {
   const { currentMarket } = useMarket()
   const logics = useLogics()
 
-  const bs = form.useStore((state) => state.values.bs)
+  const bs = props.bs
   const send = form.useStore((state) => state.values.send)
 
   const timeInForce = form.useStore((state) => state.values.timeInForce)

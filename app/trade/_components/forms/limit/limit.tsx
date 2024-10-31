@@ -2,10 +2,6 @@ import { BS } from "@mangrovedao/mgv/lib"
 import React from "react"
 import { formatUnits } from "viem"
 
-import {
-  CustomRadioGroup,
-  CustomRadioGroupItem,
-} from "@/components/custom-radio-group-new"
 import InfoTooltip from "@/components/info-tooltip-new"
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Caption } from "@/components/typography/caption"
@@ -31,7 +27,7 @@ import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
 import { isGreaterThanZeroValidator, sendVolumeValidator } from "./validators"
 
-export function Limit() {
+export function Limit(props: { bs: BS }) {
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
 
@@ -55,6 +51,7 @@ export function Limit() {
     minVolumeFormatted,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
+    bs: props.bs,
   })
 
   const handleSliderChange = (value: number) => {
@@ -81,40 +78,10 @@ export function Limit() {
   )
   const sendAsNumber = Number(send)
 
-  const sliderValue =
-    sendBalanceAsNumber !== 0
-      ? ((sendAsNumber / sendBalanceAsNumber) * 100).toFixed(0)
-      : 0
-
   return (
     <>
       <form.Provider>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <form.Field name="bs">
-            {(field) => (
-              <CustomRadioGroup
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onValueChange={(e: BS) => {
-                  field.handleChange(e)
-                  computeReceiveAmount()
-                }}
-              >
-                {Object.values(BS).map((action) => (
-                  <CustomRadioGroupItem
-                    key={action}
-                    value={action}
-                    id={action}
-                    className="capitalize"
-                  >
-                    {action}
-                  </CustomRadioGroupItem>
-                ))}
-              </CustomRadioGroup>
-            )}
-          </form.Field>
-
           <div className="space-y-2 !mt-6">
             <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
               {(field) => (
@@ -449,7 +416,12 @@ export function Limit() {
               {([canSubmit, isSubmitting, tradeAction]) => {
                 return (
                   <Button
-                    className="w-full flex items-center justify-center !mb-4 capitalize !mt-6"
+                    className={cn(
+                      "w-full flex items-center justify-center !mb-4 capitalize !mt-6",
+                      {
+                        "bg-[#FF5555]": tradeAction === BS.sell,
+                      },
+                    )}
                     size={"lg"}
                     disabled={!canSubmit || !currentMarket}
                     loading={!!isSubmitting}
