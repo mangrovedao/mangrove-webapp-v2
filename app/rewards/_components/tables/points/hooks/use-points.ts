@@ -26,8 +26,6 @@ export function usePoints<T = { data: PointsRow[]; totalRows: number }>({
           res.json(),
         )
 
-        console.log(url)
-
         const pointsData = leaderboard.map((row) => {
           return {
             address: row.account,

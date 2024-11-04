@@ -23,6 +23,22 @@ type Params = {
   pageSize: number
 }
 
+const formatNumber = (num: number) => {
+  if (num < 1000) {
+    return num.toFixed(0)
+  }
+  if (num < 1_000_000) {
+    return `${(num / 1_000).toFixed(2)}K`
+  }
+  if (num < 1_000_000_000) {
+    return `${(num / 1_000_000).toFixed(2)}M`
+  }
+  if (num < 1_000_000_000_000) {
+    return `${(num / 1_000_000_000).toFixed(2)}B`
+  }
+  return `${(num / 1_000_000_000_000).toFixed(2)}T`
+}
+
 export function useTable({ pageSize, data }: Params) {
   const { chain, address: user } = useAccount()
 
@@ -70,7 +86,7 @@ export function useTable({ pageSize, data }: Params) {
               <Button
                 variant={"primary"}
                 size={"xs"}
-                className="w-full ml-2 px-2"
+                className="w-16 ml-1 px-2"
               >
                 You
               </Button>
@@ -85,8 +101,7 @@ export function useTable({ pageSize, data }: Params) {
       header: "LP points",
       cell: ({ row }) => {
         const { lpPoints } = row.original
-        const lp = (lpPoints ?? 0).toString()
-        return <Value value={lp} />
+        return <Value value={formatNumber(lpPoints ?? 0)} />
       },
     }),
 
@@ -94,7 +109,7 @@ export function useTable({ pageSize, data }: Params) {
       header: "Trading points",
       cell: ({ row }) => {
         const { tradingPoints } = row.original
-        return <Value value={(tradingPoints ?? 0).toString()} />
+        return <Value value={formatNumber(tradingPoints ?? 0)} />
       },
     }),
 
@@ -102,7 +117,7 @@ export function useTable({ pageSize, data }: Params) {
       header: "Referral points",
       cell: ({ row }) => {
         const { referralPoints } = row.original
-        return <Value value={(referralPoints ?? 0).toString()} />
+        return <Value value={formatNumber(referralPoints ?? 0)} />
       },
     }),
 
@@ -110,7 +125,7 @@ export function useTable({ pageSize, data }: Params) {
       header: "Community points",
       cell: ({ row }) => {
         const { communityPoints } = row.original
-        return <Value value={(communityPoints ?? 0).toString()} />
+        return <Value value={formatNumber(communityPoints ?? 0)} />
       },
     }),
 
@@ -118,7 +133,8 @@ export function useTable({ pageSize, data }: Params) {
       header: "Total points",
       cell: ({ row }) => {
         const { totalPoints } = row.original
-        return <Value value={(totalPoints ?? 0).toString()} />
+
+        return <Value value={formatNumber(totalPoints ?? 0)} />
       },
     }),
   ])
