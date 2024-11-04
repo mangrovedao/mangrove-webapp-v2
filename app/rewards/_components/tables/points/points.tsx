@@ -9,7 +9,8 @@ import { useTable } from "./hooks/use-table"
 
 export function Points() {
   const { push } = useRouter()
-  const { chainId } = useAccount()
+  const { address: user } = useAccount()
+
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
@@ -29,13 +30,13 @@ export function Points() {
   // temporary fix
   React.useEffect(() => {
     refetch?.()
-  }, [chainId])
-
-  const { data: count } = usePoints({
-    select: (points) => points.length,
   })
 
-  const table = useTable({ pageSize, data: points })
+  const { data: count } = usePoints({
+    select: (points) => points.totalRows,
+  })
+
+  const table = useTable({ pageSize, data: points.data })
 
   return (
     <DataTable
@@ -43,13 +44,20 @@ export function Points() {
       emptyArrayMessage="No points data yet."
       isError={!!error}
       isLoading={!points}
+      isRowHighlighted={(row) =>
+        row.address.toLowerCase() === user.toLowerCase()
+      }
+      rowHighlightedClasses={{
+        row: "text-white hover:opacity-80 transition-all",
+        inner: "!bg-[#1c3a40]",
+      }}
       cellClasses="font-roboto"
       tableRowClasses="font-ubuntuLight"
       pagination={{
         onPageChange: setPageDetails,
         page,
         pageSize,
-        count: points?.length,
+        count: points?.totalRows,
       }}
     />
   )

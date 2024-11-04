@@ -9,49 +9,44 @@ type Params<T> = {
     first?: number
     skip?: number
   }
-  select?: (data: PointsRow[]) => T
+  select?: (data: { data: PointsRow[]; totalRows: number }) => T
 }
 
-export function usePoints<T = PointsRow[]>({
+export function usePoints<T = { data: PointsRow[]; totalRows: number }>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
   const { address: user } = useAccount()
   const { data, ...rest } = useQuery({
     queryKey: ["points", user, first, skip],
-    queryFn: async (): Promise<PointsRow[]> => {
+    queryFn: async (): Promise<{ data: PointsRow[]; totalRows: number }> => {
       try {
-        const { leaderboard } = await fetch(
-          "https://points.mgvinfra.com/42161/maker-leaderboard",
-        ).then((res) => res.json())
-
-        const pointsData = await Promise.all(
-          leaderboard.map(async (item: any, i) => {
-            const tradingPoints = await fetch(
-              `https://points.mgvinfra.com/42161/${item.makerAddress}/taker`,
-            )
-              .then((res) => res.json())
-              .then((x) => x.takerRewardTotal.value.replace("n", ""))
-            return {
-              address: item.makerAddress,
-              tradingPoints,
-              lpPoints: item.reward,
-              rank: i + 1,
-              totalPoints: (
-                BigInt(tradingPoints) + BigInt(item.reward)
-              ).toString(),
-            }
-          }),
+        const url = `https://ms1.mgvinfra.com/leaderboard?count=100&offset=${skip ?? 0}&sort=total&sort_direction=desc&include_user=${user?.toLowerCase()}`
+        const { data: leaderboard, totalRows } = await fetch(url).then((res) =>
+          res.json(),
         )
 
-        return pointsData
+        console.log(url)
+
+        const pointsData = leaderboard.map((row) => {
+          return {
+            address: row.account,
+            totalPoints: row.total,
+            tradingPoints: row.taker,
+            lpPoints: row.maker,
+            rank: row.rank,
+            communityPoints: row.community,
+          }
+        })
+
+        return { data: pointsData, totalRows }
       } catch (error) {
         console.error(error)
-        return []
+        return { data: [], totalRows: 0 }
       }
     },
     enabled: !!user,
-    initialData: [],
+    initialData: { data: [], totalRows: 0 },
   })
   return {
     data: (select ? select(data) : data) as unknown as T,
