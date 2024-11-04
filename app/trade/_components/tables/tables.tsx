@@ -77,7 +77,9 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
             // style={{ height: "var(--history-table-content-height)" }}
           >
             <ScrollArea className="h-full" scrollHideDelay={200}>
-              <div className="px-2">{renderElement(TABS_CONTENT[table])}</div>
+              <div className="px-2 h-full">
+                {renderElement(TABS_CONTENT[table])}
+              </div>
               <ScrollBar orientation="vertical" className="z-50" />
               <ScrollBar orientation="horizontal" className="z-50" />
             </ScrollArea>

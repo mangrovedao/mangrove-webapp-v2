@@ -62,8 +62,8 @@ export function DepthChart() {
 
   if (asks?.length === 0 && bids?.length === 0 && !isLoading && !!market) {
     return (
-      <div className="w-full h-full flex justify-center items-center">
-        Empty market
+      <div className="w-full h-full flex justify-center items-center text-muted-foreground font-ubuntu text-sm font-bold">
+        Empty market.
       </div>
     )
   }

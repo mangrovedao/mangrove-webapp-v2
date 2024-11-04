@@ -65,8 +65,8 @@ export function BookContent() {
 
   if (book.asks.length === 0 && book.bids.length === 0) {
     return (
-      <div className="w-full h-full flex justify-center items-center">
-        Empty market
+      <div className="w-full h-full flex justify-center items-center mt-4 text-muted-foreground font-ubuntu text-sm font-bold">
+        Empty market.
       </div>
     )
   }

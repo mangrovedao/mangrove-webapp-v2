@@ -60,6 +60,7 @@ export default function Page() {
 
         .trade-section {
           grid-area: trade;
+          max-height: 100%;
         }
 
         .chart-container {

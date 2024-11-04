@@ -28,7 +28,7 @@ export function Forms({
       {...props}
       defaultValue={Object.values(BS)[0]}
       className={
-        "bg-bg-secondary border border-bg-secondary rounded-2xl overflow-hidden"
+        "bg-bg-secondary border border-bg-secondary rounded-2xl h-full max-h-fit"
       }
     >
       <CustomTabsList className="w-full p-0 space-x-0">
@@ -39,8 +39,9 @@ export function Forms({
             className={cn(
               "capitalize w-full data-[state=active]:bg-bg-secondary data-[state=active]:text-text-brand bg-bg-primary rounded-none",
               {
-                "data-[state=active]:border-[#FF5555] data-[state=active]:text-[#FF5555]":
+                "data-[state=active]:border-[#FF5555] data-[state=active]:text-[#FF5555] rounded-tr-2xl":
                   form === BS.sell,
+                "rounded-tl-2xl": form === BS.buy,
               },
             )}
           >
@@ -48,7 +49,10 @@ export function Forms({
           </CustomTabsTrigger>
         ))}
       </CustomTabsList>
-      <ScrollArea className="overflow-hidden">
+      <ScrollArea
+        scrollHideDelay={200}
+        className="h-[calc(100%-var(--bar-height))]"
+      >
         <div className="px-4 space-y-4 mt-[24px]">
           {Object.values(BS).map((form) => (
             <CustomTabsContent key={`${form}-content`} value={form}>
