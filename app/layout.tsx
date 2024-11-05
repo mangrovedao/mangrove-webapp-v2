@@ -11,7 +11,7 @@ import Sidebar from "@/components/sidebar/sidebar"
 import "./globals.css"
 
 const toastClasses =
-  "!border !border-dark-green !text-sm !font-axiforma !text-white !bg-gray-scale-700 !font-normal"
+  "!border !border-dark-green !text-sm !font-axiforma !text-white !bg-bg-secondary !font-normal"
 const titleClasses = "!font-medium"
 
 export default function RootLayout({
@@ -38,14 +38,15 @@ export default function RootLayout({
               classNames: {
                 toast: toastClasses,
                 title: titleClasses,
-                error: "!fill-red-100",
-                success: "!fill-green-caribbean",
+                error: "!fill-red-100 border-red-100",
+                success: "!fill-green-caribbean border-border-brand",
               },
               style: {
+                backgroundColor: "bg-bg-secondary",
                 fontFamily: "Axiforma",
                 fontSize: "14px",
-                border: "1px solid #032221",
-                borderRadius: "8px",
+                borderRadius: "16px",
+                border: "3px solid border-border-tertiary",
               },
             }}
           />

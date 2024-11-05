@@ -147,7 +147,7 @@ export default function Page() {
             />
             <GridLineHeader title={"APY"} value={"9.00"} symbol={"%"} />
             <GridLineHeader
-              title={"Performances fees"}
+              title={"Performance fee"}
               value={vault?.performanceFee}
               symbol={"%"}
               info="Tooltip to be defined"

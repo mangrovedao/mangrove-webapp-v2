@@ -7,7 +7,9 @@ export const isGreaterThanZeroValidator = z.coerce
   .gt(0, FIELD_ERRORS.fieldRequired)
 
 export const sendValidator = (value: number) =>
-  z.coerce
-    .number()
-    .gt(0, FIELD_ERRORS.fieldRequired)
-    .lte(value, FIELD_ERRORS.insufficientBalance)
+  value == 0
+    ? z.coerce.number().gt(0, FIELD_ERRORS.insufficientBalance)
+    : z.coerce
+        .number()
+        .lte(value, FIELD_ERRORS.insufficientBalance)
+        .gt(0, FIELD_ERRORS.fieldRequired)

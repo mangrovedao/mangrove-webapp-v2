@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select-new"
+import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { enumKeys } from "@/utils/enums"
@@ -25,7 +26,11 @@ import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
-import { isGreaterThanZeroValidator, sendVolumeValidator } from "./validators"
+import {
+  isGreaterThanZeroValidator,
+  sendValidator,
+  sendVolumeValidator,
+} from "./validators"
 
 export function Limit(props: { bs: BS }) {
   const [formData, setFormData] = React.useState<Form>()
@@ -70,14 +75,6 @@ export function Limit(props: { bs: BS }) {
     computeReceiveAmount()
   }
 
-  const sendBalanceAsNumber = Number(
-    formatUnits(
-      sendTokenBalance?.balance || 0n,
-      sendTokenBalance?.token.decimals || 18,
-    ),
-  )
-  const sendAsNumber = Number(send)
-
   return (
     <>
       <form.Provider>
@@ -104,20 +101,24 @@ export function Limit(props: { bs: BS }) {
 
             <form.Field
               name="send"
-              onChange={sendVolumeValidator(
-                Number(
-                  formatUnits(
-                    sendTokenBalance?.balance || 0n,
-                    sendTokenBalance?.token.decimals || 18,
-                  ),
-                ),
-                Number(
-                  formatUnits(
-                    minVolume ?? 0n,
-                    sendTokenBalance?.token.decimals || 18,
-                  ),
-                ),
-              )}
+              onChange={
+                Number(sendTokenBalanceFormatted) === 0
+                  ? sendValidator(Number(sendTokenBalanceFormatted))
+                  : sendVolumeValidator(
+                      Number(
+                        formatUnits(
+                          sendTokenBalance?.balance || 0n,
+                          sendTokenBalance?.token.decimals || 18,
+                        ),
+                      ),
+                      Number(
+                        Number(minVolumeFormatted).toFixed(
+                          sendToken?.displayDecimals || 18,
+                        ),
+                      ),
+                      sendToken?.symbol || "",
+                    )
+              }
             >
               {(field) => (
                 <>
@@ -182,222 +183,242 @@ export function Limit(props: { bs: BS }) {
                 />
               )}
             </form.Field>
-
-            <Accordion title="Liquidity sourcing">
-              <div className="flex justify-between space-x-2 pt-2">
-                <form.Field name="sendFrom">
-                  {(field) => (
-                    <div className="flex flex-col w-full">
-                      <Label className="flex items-center text-muted-foreground">
-                        Send from
-                        <InfoTooltip className="text-muted-foreground">
-                          <Caption>Select the origin of the assets</Caption>
-                        </InfoTooltip>
-                      </Label>
-
-                      <Select
-                        name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: string) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!currentMarket}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {sendLogics?.map(
-                              (source) =>
-                                source && (
-                                  <SelectItem
-                                    key={source.logic.name}
-                                    value={source.logic.name}
-                                  >
-                                    <div className="flex gap-2 w-full items-center">
-                                      <SourceIcon
-                                        sourceId={source.logic.name}
-                                      />
-                                      <Caption className="capitalize">
-                                        {source.logic.name.toUpperCase()}
-                                      </Caption>
-                                    </div>
-                                  </SelectItem>
-                                ),
-                            )}
-                            {/* Wallet */}
-                            <SelectItem key="simple" value="simple">
-                              <div className="flex gap-2 w-full items-center">
-                                <SourceIcon sourceId={"simple"} />
-                                <Caption className="capitalize">Wallet</Caption>
-                              </div>
-                            </SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </form.Field>
-
-                <form.Field name="receiveTo">
-                  {(field) => (
-                    <div className="flex flex-col w-full z-50">
-                      <Label className="flex items-center text-muted-foreground">
-                        Receive to
-                        <InfoTooltip className="ml-2 text-muted-foreground">
-                          <div>
-                            <Caption>
-                              Select the destination of the assets
-                            </Caption>
-
-                            <Caption>(after the trade is executed)</Caption>
-                          </div>
-                        </InfoTooltip>
-                      </Label>
-
-                      <Select
-                        name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: string) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!currentMarket}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {receiveLogics?.map(
-                              (source) =>
-                                source && (
-                                  <SelectItem
-                                    key={source.logic.name}
-                                    value={source.logic.name}
-                                  >
-                                    <div className="flex gap-2 w-full items-center">
-                                      <SourceIcon
-                                        sourceId={source.logic.name}
-                                      />
-                                      <Caption className="capitalize">
-                                        {source.logic.name.toUpperCase()}
-                                      </Caption>
-                                    </div>
-                                  </SelectItem>
-                                ),
-                            )}
-                            {/* Wallet */}
-                            <SelectItem key="simple" value="simple">
-                              <div className="flex gap-2 w-full items-center">
-                                <SourceIcon sourceId={"simple"} />
-                                <Caption className="capitalize">Wallet</Caption>
-                              </div>
-                            </SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </form.Field>
+            <div className="grid space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground text-sm">
+                  Minimum volume
+                </span>
+                {Number(minVolumeFormatted) == 0 ? (
+                  <Skeleton className="w-16 h-4" />
+                ) : (
+                  <span className="text-xs text-text-secondary">
+                    {Number(minVolumeFormatted).toFixed(
+                      sendToken?.displayDecimals || 18,
+                    )}{" "}
+                    {sendToken?.symbol}
+                  </span>
+                )}
               </div>
-            </Accordion>
-            <Accordion title="Time in force">
-              <form.Field name="timeInForce">
-                {(field) => {
-                  return (
-                    <div className="grid text-md space-y-2 mt-2">
-                      <Select
-                        name={field.name}
-                        value={field.state.value.toString()}
-                        onValueChange={(value) => {
-                          field.handleChange(Number(value))
-                        }}
-                        disabled={!currentMarket}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select time in force" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {enumKeys(TimeInForce).map((timeInForce) => (
-                              <SelectItem
-                                key={timeInForce}
-                                value={TimeInForce[timeInForce].toString()}
-                              >
-                                {timeInForce}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )
-                }}
-              </form.Field>
+              <Accordion title="Liquidity sourcing">
+                <div className="flex justify-between space-x-2 pt-2">
+                  <form.Field name="sendFrom">
+                    {(field) => (
+                      <div className="flex flex-col w-full">
+                        <Label className="flex items-center text-muted-foreground">
+                          Send from
+                          <InfoTooltip className="text-muted-foreground">
+                            <Caption>Select the origin of the assets</Caption>
+                          </InfoTooltip>
+                        </Label>
 
-              <div
-                className={cn("flex justify-between space-x-2", {
-                  hidden:
-                    timeInForce !== TimeInForce.GTC &&
-                    timeInForce !== TimeInForce.PO,
-                })}
-              >
-                <form.Field
-                  name="timeToLive"
-                  onChange={isGreaterThanZeroValidator}
+                        <Select
+                          name={field.name}
+                          value={field.state.value}
+                          onValueChange={(value: string) => {
+                            field.handleChange(value)
+                          }}
+                          disabled={!currentMarket}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {sendLogics?.map(
+                                (source) =>
+                                  source && (
+                                    <SelectItem
+                                      key={source.logic.name}
+                                      value={source.logic.name}
+                                    >
+                                      <div className="flex gap-2 w-full items-center">
+                                        <SourceIcon
+                                          sourceId={source.logic.name}
+                                        />
+                                        <Caption className="capitalize">
+                                          {source.logic.name.toUpperCase()}
+                                        </Caption>
+                                      </div>
+                                    </SelectItem>
+                                  ),
+                              )}
+                              {/* Wallet */}
+                              <SelectItem key="simple" value="simple">
+                                <div className="flex gap-2 w-full items-center">
+                                  <SourceIcon sourceId={"simple"} />
+                                  <Caption className="capitalize">
+                                    Wallet
+                                  </Caption>
+                                </div>
+                              </SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </form.Field>
+
+                  <form.Field name="receiveTo">
+                    {(field) => (
+                      <div className="flex flex-col w-full z-50">
+                        <Label className="flex items-center text-muted-foreground">
+                          Receive to
+                          <InfoTooltip className="ml-2 text-muted-foreground">
+                            <div>
+                              <Caption>
+                                Select the destination of the assets
+                              </Caption>
+
+                              <Caption>(after the trade is executed)</Caption>
+                            </div>
+                          </InfoTooltip>
+                        </Label>
+
+                        <Select
+                          name={field.name}
+                          value={field.state.value}
+                          onValueChange={(value: string) => {
+                            field.handleChange(value)
+                          }}
+                          disabled={!currentMarket}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {receiveLogics?.map(
+                                (source) =>
+                                  source && (
+                                    <SelectItem
+                                      key={source.logic.name}
+                                      value={source.logic.name}
+                                    >
+                                      <div className="flex gap-2 w-full items-center">
+                                        <SourceIcon
+                                          sourceId={source.logic.name}
+                                        />
+                                        <Caption className="capitalize">
+                                          {source.logic.name.toUpperCase()}
+                                        </Caption>
+                                      </div>
+                                    </SelectItem>
+                                  ),
+                              )}
+                              {/* Wallet */}
+                              <SelectItem key="simple" value="simple">
+                                <div className="flex gap-2 w-full items-center">
+                                  <SourceIcon sourceId={"simple"} />
+                                  <Caption className="capitalize">
+                                    Wallet
+                                  </Caption>
+                                </div>
+                              </SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </form.Field>
+                </div>
+              </Accordion>
+              <Accordion title="Time in force">
+                <form.Field name="timeInForce">
+                  {(field) => {
+                    return (
+                      <div className="grid text-md space-y-2 mt-2">
+                        <Select
+                          name={field.name}
+                          value={field.state.value.toString()}
+                          onValueChange={(value) => {
+                            field.handleChange(Number(value))
+                          }}
+                          disabled={!currentMarket}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select time in force" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {enumKeys(TimeInForce).map((timeInForce) => (
+                                <SelectItem
+                                  key={timeInForce}
+                                  value={TimeInForce[timeInForce].toString()}
+                                >
+                                  {timeInForce}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )
+                  }}
+                </form.Field>
+
+                <div
+                  className={cn("flex justify-between space-x-2", {
+                    hidden:
+                      timeInForce !== TimeInForce.GTC &&
+                      timeInForce !== TimeInForce.PO,
+                  })}
                 >
-                  {(field) => (
-                    <EnhancedNumericInput
-                      className="h-10 py-0"
-                      inputClassName="h-full text-sm"
-                      placeholder="1"
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={({ target: { value } }) => {
-                        if (!value) return
-                        field.handleChange(value)
-                      }}
-                      disabled={!(currentMarket && form.state.isFormValid)}
-                      error={field.state.meta.touchedErrors}
-                    />
-                  )}
-                </form.Field>
+                  <form.Field
+                    name="timeToLive"
+                    onChange={isGreaterThanZeroValidator}
+                  >
+                    {(field) => (
+                      <EnhancedNumericInput
+                        className="h-10 py-0"
+                        inputClassName="h-full text-sm"
+                        placeholder="1"
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={({ target: { value } }) => {
+                          if (!value) return
+                          field.handleChange(value)
+                        }}
+                        disabled={!(currentMarket && form.state.isFormValid)}
+                        error={field.state.meta.touchedErrors}
+                      />
+                    )}
+                  </form.Field>
 
-                <form.Field name="timeToLiveUnit">
-                  {(field) => (
-                    <Select
-                      name={field.name}
-                      value={field.state.value}
-                      onValueChange={(value: TimeToLiveUnit) => {
-                        field.handleChange(value)
-                      }}
-                      disabled={!currentMarket}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select time unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          {Object.values(TimeToLiveUnit).map(
-                            (timeToLiveUnit) => (
-                              <SelectItem
-                                className="hover:bg-bg-secondary active:bg-bg-secondary focus:bg-bg-secondary"
-                                key={timeToLiveUnit}
-                                value={timeToLiveUnit}
-                              >
-                                {timeToLiveUnit}
-                              </SelectItem>
-                            ),
-                          )}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  )}
-                </form.Field>
-              </div>
-            </Accordion>
+                  <form.Field name="timeToLiveUnit">
+                    {(field) => (
+                      <Select
+                        name={field.name}
+                        value={field.state.value}
+                        onValueChange={(value: TimeToLiveUnit) => {
+                          field.handleChange(value)
+                        }}
+                        disabled={!currentMarket}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select time unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {Object.values(TimeToLiveUnit).map(
+                              (timeToLiveUnit) => (
+                                <SelectItem
+                                  className="hover:bg-bg-secondary active:bg-bg-secondary focus:bg-bg-secondary"
+                                  key={timeToLiveUnit}
+                                  value={timeToLiveUnit}
+                                >
+                                  {timeToLiveUnit}
+                                </SelectItem>
+                              ),
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </form.Field>
+                </div>
+              </Accordion>
+            </div>
 
             {/* <MarketDetails
               minVolume={minVolume}

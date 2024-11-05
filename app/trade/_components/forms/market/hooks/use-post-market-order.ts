@@ -48,8 +48,6 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         const { base, quote } = market
         const { bs, send: gives, receive: wants, slippage } = form
 
-        const receiveToken = bs === "buy" ? base : quote
-        const sendToken = bs === "buy" ? quote : base
         const baseAmount =
           bs === "buy"
             ? parseUnits(wants, base.decimals)
@@ -82,7 +80,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
             bs,
           },
         )
-        toast.success("Market order posted")
+        toast.success("Market order executed")
 
         // successToast(
         //   TradeMode.MARKET,

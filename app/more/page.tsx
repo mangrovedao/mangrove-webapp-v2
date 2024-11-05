@@ -1,69 +1,77 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import {
+  CustomTabs,
+  CustomTabsContent,
+  CustomTabsList,
+  CustomTabsTrigger,
+} from "@/components/custom-tabs"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { renderElement } from "@/utils/render"
+import QuickActions from "./components/quick-actions"
 
-const ACTIONS = [
-  {
-    title: "Kandel",
-    description:
-      "Take advantage of market volatility with your own instances of Kandel",
-    href: "/strategies",
-    imageUrl: "/assets/more/kandel.webp",
-  },
-  {
-    title: "Bridge",
-    description: "Send your assets accross chains, without leaving the app",
-    href: "/bridge",
-    imageUrl: "/assets/more/bridge.webp",
-  },
-  {
-    title: "Wrap",
-    description: "Wrap ETH into wETH, in order to trade ETH as an ERC20 token",
-    href: "/wrap",
-    imageUrl: "/assets/more/wrap.webp",
-  },
-]
+export enum ActionsTabs {
+  QUICKACTIONS = "Quick Actions",
+  KANDEL = "Kandel",
+  BRIDGE = "Bridge",
+  WRAP = "Wrap",
+}
+
+const TABS_CONTENT = {
+  [ActionsTabs.QUICKACTIONS]: QuickActions,
+  [ActionsTabs.KANDEL]: <div>TODO</div>,
+  [ActionsTabs.BRIDGE]: <div>TODO</div>,
+  [ActionsTabs.WRAP]: <div>TODO</div>,
+}
 
 export default function Page() {
   return (
     <main className="flex flex-col min-h-screen mx-auto max-w-7xl">
-      <h1 className="text-2xl font-bold">More</h1>
-      <hr />
-      <div className="grid grid-cols-6 gap-4 mt-8">
-        {ACTIONS.map((action) => (
-          <div className="w-full bg-bg-secondary rounded-2xl overflow-hidden col-span-6 sm:col-span-3 md:col-span-2">
-            <img
-              src={action.imageUrl}
-              alt="Kandel"
-              className="object-cover scale-[1.02] w-full max-h-[200px] md:max-h-none"
-            />
-            <div className="flex flex-col items-center text-center px-3 py-4 md:px-5 md:py-6">
-              <h1 className="font-semibold text-lg md:text-[25px]">
-                {action.title}
-              </h1>
-              <p className="md:text-base text-sm md:mt-5 md:mb-6 mt-3 mb-4 text-text-secondary">
-                {action.description}
-              </p>
-              <Button asChild>
-                <Link href={action.href}>Start</Link>
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <CustomTabs defaultValue={Object.values(ActionsTabs)[0]}>
+        <CustomTabsList className="w-full flex justify-start border-b">
+          <CustomTabsTrigger
+            key={`more-tab`}
+            disabled={true}
+            value={"more"}
+            className="capitalize !text-primary"
+          >
+            <h1 className="text-2xl font-bold !text-primary">More</h1>
+          </CustomTabsTrigger>
+          {Object.values(ActionsTabs).map((table) => (
+            <CustomTabsTrigger
+              key={`${table}-tab`}
+              value={table}
+              className="capitalize"
+              count={
+                table === ActionsTabs.KANDEL
+                  ? 0
+                  : table === ActionsTabs.BRIDGE
+                    ? 0
+                    : 0
+              }
+            >
+              {table}
+            </CustomTabsTrigger>
+          ))}
+        </CustomTabsList>
+        <div className="w-full pb-4 px-1 mt-8">
+          {Object.values(ActionsTabs).map((table) => (
+            <CustomTabsContent
+              key={`${table}-content`}
+              value={table}
+              // style={{ height: "var(--history-table-content-height)" }}
+            >
+              <ScrollArea className="h-full" scrollHideDelay={200}>
+                <div className="px-2 h-full">
+                  {renderElement(TABS_CONTENT[table])}
+                </div>
+                <ScrollBar orientation="vertical" className="z-50" />
+                <ScrollBar orientation="horizontal" className="z-50" />
+              </ScrollArea>
+            </CustomTabsContent>
+          ))}
+        </div>
+      </CustomTabs>
     </main>
   )
-}
-
-function ActionCard({
-  title,
-  description,
-  href,
-}: {
-  title: string
-  description: string
-  href: string
-}) {
-  return <div className="h-48 w-full bg-red-300"></div>
 }
