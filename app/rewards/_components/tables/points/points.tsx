@@ -10,6 +10,7 @@ import { useTable } from "./hooks/use-table"
 export function Points() {
   const { push } = useRouter()
   const { address: user } = useAccount()
+  const { chainId } = useAccount()
 
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
@@ -30,11 +31,7 @@ export function Points() {
   // temporary fix
   React.useEffect(() => {
     refetch?.()
-  })
-
-  const { data: count } = usePoints({
-    select: (points) => points.totalRows,
-  })
+  }, [chainId])
 
   const table = useTable({ pageSize, data: points.data })
 
@@ -45,7 +42,7 @@ export function Points() {
       isError={!!error}
       isLoading={!points}
       isRowHighlighted={(row) =>
-        row.address.toLowerCase() === user.toLowerCase()
+        row.address.toLowerCase() === user?.toLowerCase()
       }
       rowHighlightedClasses={{
         row: "text-white hover:opacity-80 transition-all",

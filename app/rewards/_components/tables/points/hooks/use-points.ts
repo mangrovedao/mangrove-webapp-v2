@@ -21,12 +21,19 @@ export function usePoints<T = { data: PointsRow[]; totalRows: number }>({
     queryKey: ["points", user, first, skip],
     queryFn: async (): Promise<{ data: PointsRow[]; totalRows: number }> => {
       try {
+        console.log("START")
         const url = `https://ms1.mgvinfra.com/leaderboard?count=100&offset=${skip ?? 0}&sort=total&sort_direction=desc&include_user=${user?.toLowerCase()}`
+        if (!user) {
+          return {
+            data: [],
+            totalRows: 0,
+          }
+        }
         const { data: leaderboard, totalRows } = await fetch(url).then((res) =>
           res.json(),
         )
 
-        const pointsData = leaderboard.map((row) => {
+        const pointsData = leaderboard.map((row: any) => {
           return {
             address: row.account,
             totalPoints: row.total,
@@ -39,15 +46,13 @@ export function usePoints<T = { data: PointsRow[]; totalRows: number }>({
 
         return { data: pointsData, totalRows }
       } catch (error) {
-        console.error(error)
         return { data: [], totalRows: 0 }
       }
     },
     enabled: !!user,
-    initialData: { data: [], totalRows: 0 },
   })
   return {
-    data: (select ? select(data) : data) as unknown as T,
+    data: data ?? [],
     ...rest,
   }
 }
