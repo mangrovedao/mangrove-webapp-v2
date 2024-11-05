@@ -51,7 +51,7 @@ export function Forms({
       </CustomTabsList>
       <ScrollArea
         scrollHideDelay={200}
-        className="h-[calc(100%-var(--bar-height))]"
+        className="max-h-[calc(100%-var(--bar-height))] h-full"
       >
         <div className="px-4 space-y-4 mt-[24px]">
           {Object.values(BS).map((form) => (
