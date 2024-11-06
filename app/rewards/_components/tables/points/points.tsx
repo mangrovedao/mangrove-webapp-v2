@@ -1,5 +1,4 @@
 "use client"
-import { useRouter } from "next/navigation"
 import React from "react"
 
 import { DataTable } from "@/components/ui/data-table-new/data-table"
@@ -8,17 +7,14 @@ import { usePoints } from "./hooks/use-points"
 import { useTable } from "./hooks/use-table"
 
 export function Points() {
-  const { push } = useRouter()
-  const { address: user } = useAccount()
-  const { chainId } = useAccount()
-
+  const { address: user, chainId, isConnected } = useAccount()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
   })
 
   const {
-    data: points,
+    data: { data, totalRows },
     isLoading,
     error,
     refetch,
@@ -28,19 +24,22 @@ export function Points() {
     },
   })
 
-  // temporary fix
   React.useEffect(() => {
     refetch?.()
   }, [chainId])
 
-  const table = useTable({ pageSize, data: points.data })
+  const table = useTable({ pageSize, data })
 
   return (
     <DataTable
       table={table}
-      emptyArrayMessage="No points data yet."
+      emptyArrayMessage={
+        !isConnected
+          ? "Connect your wallet to see your points"
+          : "No points data yet."
+      }
       isError={!!error}
-      isLoading={!points}
+      isLoading={!data || isLoading}
       isRowHighlighted={(row) =>
         row.address.toLowerCase() === user?.toLowerCase()
       }
@@ -54,7 +53,7 @@ export function Points() {
         onPageChange: setPageDetails,
         page,
         pageSize,
-        count: points?.totalRows,
+        count: totalRows,
       }}
     />
   )
