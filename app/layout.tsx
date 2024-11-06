@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="">
-        <div className="pl-[6.5rem] px-4">
+        <div className="md:pl-[6.5rem] px-4">
           <RootProvider>
             <Sidebar />
             <Navbar />
