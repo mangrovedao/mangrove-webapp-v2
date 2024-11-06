@@ -28,6 +28,7 @@ interface DataTableProps<TData> {
   tableRowClasses?: string
   skeletonRows?: number
   cellClasses?: string
+  rowHighlightedClasses?: { row?: string; inner?: string }
 }
 
 export function DataTable<TData>({
@@ -43,6 +44,7 @@ export function DataTable<TData>({
   tableRowClasses,
   skeletonRows = 2,
   cellClasses,
+  rowHighlightedClasses,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const tableName = Object.keys(table._getAllFlatColumnsById()).join("-")
@@ -91,7 +93,8 @@ export function DataTable<TData>({
                     "hover:text-white transition-colors group/row ",
                     {
                       "cursor-pointer": !!onRowClick,
-                      "text-white hover:opacity-80 transition-all":
+                      [rowHighlightedClasses?.row ??
+                      "text-white hover:opacity-80 transition-all"]:
                         isRowHighlighted?.(row.original),
                     },
                     tableRowClasses,
@@ -114,7 +117,8 @@ export function DataTable<TData>({
                         className={cn(
                           " py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
                           {
-                            "!bg-primary-dark-green": isRowHighlighted?.(
+                            [rowHighlightedClasses?.inner ??
+                            "!bg-primary-dark-green"]: isRowHighlighted?.(
                               row.original,
                             ),
                           },
