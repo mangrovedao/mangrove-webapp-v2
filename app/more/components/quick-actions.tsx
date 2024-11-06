@@ -34,7 +34,7 @@ const ACTIONS = [
 
 export default function QuickActions() {
   return (
-    <div className="grid grid-cols-6 gap-4 mt-8">
+    <div className="grid grid-cols-6 gap-4">
       {ACTIONS.map((action) => (
         <Card action={action} key={action.title} />
       ))}
@@ -56,10 +56,12 @@ function Card({ action }: { action: (typeof ACTIONS)[number] }) {
           src={action.riveUrl}
           stateMachines="Timeline 1"
           autoplay={false}
-          layout={Layout.new({
-            fit: Fit.Cover,
-            alignment: Alignment.TopCenter,
-          })}
+          layout={
+            new Layout({
+              fit: Fit.Cover,
+              alignment: Alignment.TopCenter,
+            })
+          }
           isHovered={isHovered}
         />
       </div>
