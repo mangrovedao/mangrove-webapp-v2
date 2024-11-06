@@ -1,6 +1,11 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { Alignment, Fit, Layout, useRive } from "@rive-app/react-canvas-lite"
+import Rive, {
+  Alignment,
+  Fit,
+  Layout,
+  useRive,
+} from "@rive-app/react-canvas-lite"
 import Link from "next/link"
 import React from "react"
 
@@ -35,6 +40,10 @@ const ACTIONS = [
 export default function QuickActions() {
   return (
     <div className="grid grid-cols-6 gap-4">
+      <Rive
+        src="https://cdn.rive.app/animations/vehicles.riv"
+        stateMachines="bumpy"
+      />
       {ACTIONS.map((action) => (
         <Card action={action} key={action.title} />
       ))}

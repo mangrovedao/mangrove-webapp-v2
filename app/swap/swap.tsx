@@ -46,71 +46,74 @@ export default function Swap() {
   } = useSwap()
 
   return (
-    <div className="bg-bg-secondary rounded-2xl p-5 relative mt-16">
-      {!isConnected && (
+    <>
+      <div className="bg-bg-secondary rounded-2xl p-5 relative mt-16">
+        {/* <div className="absolute max-w-[234px] top-0 right-0 -translate-y-[73px] translate-x-[15px] w-full h-[121px]">
+          <Rive src="/assets/rive/iguane.riv" stateMachines="Timeline 1" />
+        </div> */}
         <ChameleonIllustration className="absolute max-w-[234px] top-0 right-0 -translate-y-[73px] translate-x-[15px]" />
-      )}
-      <h1 className="text-2xl mb-4">Swap</h1>
-      <div className="space-y-4 relative">
-        <div className="space-y-0.5">
-          <TokenContainer
-            type="pay"
-            token={payToken}
-            value={fields.payValue}
-            onChange={onPayValueChange}
-            dollarValue={payDollar}
-            onTokenClicked={() => setPayTokenDialogOpen(true)}
-            onMaxClicked={onMaxClicked}
-          />
-          <Button
-            variant={"secondary"}
-            onClick={reverseTokens}
-            className="absolute left-1/2 -translate-y-1/2 -translate-x-1/2 !p-1"
-            disabled={isReverseDisabled}
-          >
-            <SwapArrowIcon className="size-6" />
-          </Button>
-          <TokenContainer
-            type="receive"
-            token={receiveToken}
-            value={fields.receiveValue}
-            dollarValue={receiveDollar}
-            onChange={onReceiveValueChange}
-            onTokenClicked={() => setReceiveTokenDialogOpen(true)}
-          />
+        <h1 className="text-2xl mb-4">Swap</h1>
+        <div className="space-y-4 relative">
+          <div className="space-y-0.5">
+            <TokenContainer
+              type="pay"
+              token={payToken}
+              value={fields.payValue}
+              onChange={onPayValueChange}
+              dollarValue={payDollar}
+              onTokenClicked={() => setPayTokenDialogOpen(true)}
+              onMaxClicked={onMaxClicked}
+            />
+            <Button
+              variant={"secondary"}
+              onClick={reverseTokens}
+              className="absolute left-1/2 -translate-y-1/2 -translate-x-1/2 !p-1"
+              disabled={isReverseDisabled}
+            >
+              <SwapArrowIcon className="size-6" />
+            </Button>
+            <TokenContainer
+              type="receive"
+              token={receiveToken}
+              value={fields.receiveValue}
+              dollarValue={receiveDollar}
+              onChange={onReceiveValueChange}
+              onTokenClicked={() => setReceiveTokenDialogOpen(true)}
+            />
+          </div>
+          {!isConnected ? (
+            <Button
+              className="w-full text-lg"
+              size={"lg"}
+              onClick={openConnectModal}
+            >
+              Connect wallet
+            </Button>
+          ) : (
+            <Button
+              className="w-full text-lg"
+              size={"lg"}
+              onClick={swap}
+              disabled={isSwapDisabled}
+            >
+              {swapButtonText}
+            </Button>
+          )}
         </div>
-        {!isConnected ? (
-          <Button
-            className="w-full text-lg"
-            size={"lg"}
-            onClick={openConnectModal}
-          >
-            Connect wallet
-          </Button>
-        ) : (
-          <Button
-            className="w-full text-lg"
-            size={"lg"}
-            onClick={swap}
-            disabled={isSwapDisabled}
-          >
-            {swapButtonText}
-          </Button>
-        )}
+        <TokenSelectorDialog
+          open={payTokenDialogOpen}
+          tokens={allTokens}
+          onSelect={onPayTokenSelected}
+          onOpenChange={setPayTokenDialogOpen}
+        />
+        <TokenSelectorDialog
+          open={receiveTokenDialogOpen}
+          tokens={tradableTokens}
+          onSelect={onReceiveTokenSelected}
+          onOpenChange={setReceiveTokenDialogOpen}
+        />
       </div>
-      <TokenSelectorDialog
-        open={payTokenDialogOpen}
-        tokens={allTokens}
-        onSelect={onPayTokenSelected}
-        onOpenChange={setPayTokenDialogOpen}
-      />
-      <TokenSelectorDialog
-        open={receiveTokenDialogOpen}
-        tokens={tradableTokens}
-        onSelect={onReceiveTokenSelected}
-        onOpenChange={setReceiveTokenDialogOpen}
-      />
-    </div>
+    </>
   )
 }
 
