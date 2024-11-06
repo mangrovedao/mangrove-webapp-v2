@@ -9,13 +9,7 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { renderElement } from "@/utils/render"
 import QuickActions from "./components/quick-actions"
-
-export enum ActionsTabs {
-  QUICKACTIONS = "Quick Actions",
-  KANDEL = "Kandel",
-  BRIDGE = "Bridge",
-  WRAP = "Wrap",
-}
+import { ActionsTabs } from "./utils/types"
 
 const TABS_CONTENT = {
   [ActionsTabs.QUICKACTIONS]: QuickActions,

@@ -30,14 +30,14 @@ export function Points() {
 
   const table = useTable({ pageSize, data })
 
+  const emptyMessage = !isConnected
+    ? "Connect your wallet to see your points"
+    : "No points data yet."
+
   return (
     <DataTable
       table={table}
-      emptyArrayMessage={
-        !isConnected
-          ? "Connect your wallet to see your points"
-          : "No points data yet."
-      }
+      emptyArrayMessage={emptyMessage}
       isError={!!error}
       isLoading={!data || isLoading}
       isRowHighlighted={(row) =>
