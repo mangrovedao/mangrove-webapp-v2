@@ -28,7 +28,7 @@ export function Points() {
     refetch?.()
   }, [chainId])
 
-  const table = useTable({ pageSize, data })
+  const table = useTable({ pageSize, data, user })
 
   const emptyMessage = !isConnected
     ? "Connect your wallet to see your points"

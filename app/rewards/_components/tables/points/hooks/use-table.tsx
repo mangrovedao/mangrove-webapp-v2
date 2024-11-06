@@ -8,11 +8,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import React from "react"
-import { useAccount } from "wagmi"
 
 import { PointsRow } from "@/app/rewards/types"
-import { Button } from "@/components/ui/button"
+import { Text } from "@/components/typography/text"
 import { shortenAddress } from "@/utils/wallet"
+import { Address } from "viem"
 import { Value, ValueLeft } from "../components/value"
 
 const columnHelper = createColumnHelper<PointsRow>()
@@ -21,6 +21,7 @@ const DEFAULT_DATA: PointsRow[] = []
 type Params = {
   data?: PointsRow[]
   pageSize: number
+  user?: Address
 }
 
 const formatNumber = (num: number) => {
@@ -39,9 +40,7 @@ const formatNumber = (num: number) => {
   return `${(num / 1_000_000_000_000).toFixed(2)}T`
 }
 
-export function useTable({ pageSize, data }: Params) {
-  const { address: user } = useAccount()
-
+export function useTable({ pageSize, data, user }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.display({
@@ -73,7 +72,6 @@ export function useTable({ pageSize, data }: Params) {
           }
         },
       }),
-
       columnHelper.display({
         header: "Address",
         cell: ({ row }) => {
@@ -82,16 +80,15 @@ export function useTable({ pageSize, data }: Params) {
           if (user?.toLowerCase() === address.toLowerCase()) {
             // Add a special style for the user's address
             return (
-              <>
+              <div className="flex gap-4">
                 <ValueLeft value={shortenAddress(address)} />
-                <Button
-                  variant={"primary"}
-                  size={"xs"}
-                  className="w-16 ml-1 px-2"
+                <Text
+                  variant={"text1"}
+                  className="flex justify-center font-light items-center bg-button-primary-bg p-2 h-7 w-12 rounded-full"
                 >
                   You
-                </Button>
-              </>
+                </Text>
+              </div>
             )
           }
           return <ValueLeft value={shortenAddress(address)} />
@@ -139,7 +136,7 @@ export function useTable({ pageSize, data }: Params) {
         },
       }),
     ],
-    [],
+    [user],
   )
 
   return useReactTable({
