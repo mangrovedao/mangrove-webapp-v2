@@ -13,8 +13,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
-import { ChameleonIllustration, ChevronDown, SwapArrowIcon } from "@/svgs"
+import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
+import Rive from "@rive-app/react-canvas-lite"
 import { useAccount } from "wagmi"
 import { useSwap } from "./hooks/use-swap"
 
@@ -48,10 +49,9 @@ export default function Swap() {
   return (
     <>
       <div className="bg-bg-secondary rounded-2xl p-5 relative mt-16">
-        {/* <div className="absolute max-w-[234px] top-0 right-0 -translate-y-[73px] translate-x-[15px] w-full h-[121px]">
-          <Rive src="/assets/rive/iguane.riv" stateMachines="Timeline 1" />
-        </div> */}
-        <ChameleonIllustration className="absolute max-w-[234px] top-0 right-0 -translate-y-[73px] translate-x-[15px]" />
+        <div className="absolute max-w-[234px] top-0 -right-4 -translate-y-[73px] translate-x-[15px] w-full h-[121px]">
+          <Rive src="/assets/rive/iguane.riv" animations="Timeline 1" />
+        </div>
         <h1 className="text-2xl mb-4">Swap</h1>
         <div className="space-y-4 relative">
           <div className="space-y-0.5">
