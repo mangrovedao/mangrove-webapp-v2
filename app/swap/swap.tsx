@@ -101,14 +101,14 @@ export default function Swap() {
           )}
         </div>
         <TokenSelectorDialog
-          type="send"
+          type="sell"
           open={payTokenDialogOpen}
           tokens={allTokens}
           onSelect={onPayTokenSelected}
           onOpenChange={setPayTokenDialogOpen}
         />
         <TokenSelectorDialog
-          type="receive"
+          type="buy"
           open={receiveTokenDialogOpen}
           tokens={tradableTokens}
           onSelect={onReceiveTokenSelected}
@@ -130,7 +130,7 @@ function TokenSelectorDialog({
   tokens: Token[]
   onSelect: (token: Token) => void
   onOpenChange: (open: boolean) => void
-  type: "send" | "receive"
+  type: "buy" | "sell"
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
