@@ -24,7 +24,7 @@ export default withMouseHoverEffect(function ({
       <span className={cn("w-[39px] flex justify-center items-center")}>
         {children}
       </span>
-      <div className="hidden @[120px]:block opacity-0 @[120px]:opacity-100 transition ease-out duration-300 text-base z-50">
+      <div className="hidden @[120px]:block opacity-0 @[120px]:!opacity-100 transition ease-out duration-300 text-base z-50">
         {text}
       </div>
     </div>
