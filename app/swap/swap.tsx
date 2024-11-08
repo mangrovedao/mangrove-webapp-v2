@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog-new"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTokenBalance } from "@/hooks/use-token-balance"
@@ -101,12 +101,14 @@ export default function Swap() {
           )}
         </div>
         <TokenSelectorDialog
+          type="send"
           open={payTokenDialogOpen}
           tokens={allTokens}
           onSelect={onPayTokenSelected}
           onOpenChange={setPayTokenDialogOpen}
         />
         <TokenSelectorDialog
+          type="receive"
           open={receiveTokenDialogOpen}
           tokens={tradableTokens}
           onSelect={onReceiveTokenSelected}
@@ -122,31 +124,33 @@ function TokenSelectorDialog({
   onSelect,
   open = false,
   onOpenChange,
+  type,
 }: {
   open?: boolean
   tokens: Token[]
   onSelect: (token: Token) => void
   onOpenChange: (open: boolean) => void
+  type: "send" | "receive"
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Select a token</DialogTitle>
+          <DialogTitle>Select a token to {type}</DialogTitle>
         </DialogHeader>
-        <ul className="mt-6 flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4 justify-center p-3">
           {tokens.map((token) => (
-            <li key={token.address}>
+            <div key={token.address}>
               <Button
                 onClick={() => onSelect(token)}
-                className="px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
+                className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
               >
                 <TokenIcon symbol={token.symbol} />
                 <span className="font-semibold text-lg">{token.symbol}</span>
               </Button>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -160,6 +164,7 @@ type TokenContainerProps = {
   onTokenClicked?: () => void
   onMaxClicked?: () => void
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  isFetchingDollarValue?: boolean
 }
 
 function TokenContainer({
@@ -170,6 +175,7 @@ function TokenContainer({
   value,
   onChange,
   dollarValue,
+  isFetchingDollarValue,
 }: TokenContainerProps) {
   const { isConnected } = useAccount()
   const tokenBalance = useTokenBalance(token)
@@ -218,9 +224,7 @@ function TokenContainer({
           onChange={onChange}
         />
         <span>
-          {!isConnected ? (
-            <Skeleton className="w-32 h-8 bg-gray rounded-full" />
-          ) : token ? (
+          {token ? (
             <Button
               onClick={onTokenClicked}
               className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-full text-sm flex items-center space-x-1"
@@ -239,16 +243,18 @@ function TokenContainer({
         </span>
       </div>
       <div className="flex justify-between items-center opacity-70">
-        {token && Number(dollars) !== 0 ? (
+        {isFetchingDollarValue ? (
+          <Skeleton className="w-10 h-3 bg-gray" />
+        ) : (
           <div className="text-sm text-left text-text-quaternary">
             ≈{" "}
             <span className="text-text-secondary">
-              {dollars.slice(0, dollars.indexOf(".") + 3) ?? "0"}
+              {token && Number(dollars) !== 0
+                ? dollars.slice(0, dollars.indexOf(".") + 3)
+                : "0"}
             </span>{" "}
             $
           </div>
-        ) : (
-          <Skeleton className="w-10 h-3 bg-gray" />
         )}
       </div>
     </div>

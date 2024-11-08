@@ -55,7 +55,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {showCloseButton && (
-        <div className="flex justify-end">
+        <div className="absolute right-2 top-3">
           <XClose />
         </div>
       )}
@@ -123,7 +123,7 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 function XClose() {
   return (
     <DialogClose className="rounded-sm opacity-70 ring-offset-primary-dark-green transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground flex">
-      <X className="h-6 w-6 text-gray-scale-300" />
+      <X className="h-6 w-6 text-text-secondary" />
       <span className="sr-only">Close</span>
     </DialogClose>
   )
