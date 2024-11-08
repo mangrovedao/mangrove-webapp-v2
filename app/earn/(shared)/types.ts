@@ -23,6 +23,8 @@ export type Vault = {
   balanceQuote: bigint
   pnl: number
   tvl: bigint
+  baseDollarPrice: number
+  quoteDollarPrice: number
   strategist: string
   type: string
   isActive: boolean

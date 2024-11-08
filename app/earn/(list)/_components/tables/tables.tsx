@@ -1,7 +1,6 @@
 import React from "react"
 
 import { CustomTabs } from "@/components/custom-tabs"
-import { useAccount } from "wagmi"
 import { MyVaults } from "./my-vaults/my-vaults"
 import { Vaults } from "./vaults/vaults"
 
@@ -10,34 +9,17 @@ import { Button } from "@/components/ui/button-new"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SearchInput } from "@/components/ui/search-input-new"
 import { ChevronDown } from "@/svgs"
 import { ListFilter } from "lucide-react"
 
-enum StrategyType {
-  PASSIVE = "Passive",
-  PRO = "Pro",
-}
-
-export function Tables({
-  className,
-  hideCreateStrat,
-  ...props
-}: React.ComponentProps<typeof CustomTabs> & {
-  hideCreateStrat: (bool: boolean) => void
-}) {
-  const [strategiesType, setStrategiesType] = React.useState(StrategyType.PRO)
-  const { chain } = useAccount()
-  React.useEffect(() => {
-    if (strategiesType === "Passive") {
-      hideCreateStrat(true)
-    } else {
-      hideCreateStrat(false)
-    }
-  }, [strategiesType])
-
+export function Tables({ className }: React.ComponentProps<typeof CustomTabs>) {
   return (
     <div className="pt-4 space-y-4">
       <div className="grid gap-y-4">
@@ -71,18 +53,17 @@ export function Tables({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 mt-1">
-                {/* <DropdownMenuLabel>Addresses:....</DropdownMenuLabel>
+                <DropdownMenuLabel>Addresses:....</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => undefined}>
                   <span>Account</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Chain: {chain?.name}</DropdownMenuLabel>
+                <DropdownMenuLabel>Chain: </DropdownMenuLabel>
                 <DropdownMenuItem asChild> test</DropdownMenuItem>
 
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem onClick={() => undefined}>
-                    <Copy className="mr-2 h-4 w-4" />
                     <span>Copy address</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>test</DropdownMenuItem>
@@ -90,7 +71,7 @@ export function Tables({
 
                 <DropdownMenuItem onClick={() => undefined}>
                   <span>Reset</span>
-                </DropdownMenuItem> */}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

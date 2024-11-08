@@ -109,14 +109,15 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const { tvl, market } = row.original
+          const { tvl, market, quoteDollarPrice } = row.original
 
           return (
             <Value
-              value={Number(
-                formatUnits(tvl || 0n, market.quote.decimals || 18),
+              value={(
+                Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
+                quoteDollarPrice
               ).toFixed(market.quote.displayDecimals || 3)}
-              symbol={market.quote.symbol}
+              symbol={"$"}
             />
           )
         },

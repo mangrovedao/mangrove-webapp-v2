@@ -89,14 +89,15 @@ export function useTable({ pageSize, data, onManage }: Params) {
       columnHelper.display({
         header: "TVL",
         cell: ({ row }) => {
-          const { tvl, market } = row.original
+          const { tvl, market, quoteDollarPrice } = row.original
 
           return (
             <Value
-              value={Number(
-                formatUnits(tvl || 0n, market.quote.decimals || 18),
-              ).toFixed(market.quote.displayDecimals || 3)}
-              symbol={market.quote.symbol}
+              value={(
+                Number(formatUnits(tvl, market.quote.decimals)) *
+                quoteDollarPrice
+              ).toFixed(2)}
+              symbol={"$"}
             />
           )
         },
@@ -105,28 +106,23 @@ export function useTable({ pageSize, data, onManage }: Params) {
       columnHelper.display({
         header: "Deposited",
         cell: ({ row }) => {
-          const { userBaseBalance, userQuoteBalance, market } = row.original
+          const {
+            userBaseBalance,
+            userQuoteBalance,
+            market,
+            baseDollarPrice,
+            quoteDollarPrice,
+          } = row.original
+
+          const value =
+            Number(formatUnits(userBaseBalance, market.base.decimals)) *
+              baseDollarPrice +
+            Number(formatUnits(userQuoteBalance, market.quote.decimals)) *
+              quoteDollarPrice
 
           return (
             <div className="grid items-center justify-center">
-              <Value
-                value={Number(
-                  formatUnits(
-                    userBaseBalance || 0n,
-                    market.base.decimals || 18,
-                  ),
-                ).toFixed(market.base.displayDecimals || 4)}
-                symbol={market.base.symbol}
-              />
-              <Value
-                value={Number(
-                  formatUnits(
-                    userQuoteBalance || 0n,
-                    market.quote.decimals || 18,
-                  ),
-                ).toFixed(market.quote.displayDecimals || 4)}
-                symbol={market.quote.symbol}
-              />
+              <Value value={Number(value).toFixed(2)} symbol={"$"} />
             </div>
           )
         },

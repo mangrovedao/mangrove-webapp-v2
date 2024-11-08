@@ -16,6 +16,7 @@ export function MyVaults() {
     page: 1,
     pageSize: 10,
   })
+
   const {
     data: vaults,
     isLoading,
@@ -53,7 +54,7 @@ export function MyVaults() {
         table={table}
         emptyArrayMessage="No positions yet."
         isError={!!error}
-        isLoading={!vaults}
+        isLoading={!vaults || isLoading}
         onRowClick={(vault) =>
           // note: lost of context after redirecting with push method here
           // push(`/earn/${strategy?.address}`)
@@ -65,7 +66,7 @@ export function MyVaults() {
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count: vaults?.length,
+          count,
         }}
       />
       <CloseStrategyDialog

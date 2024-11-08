@@ -138,7 +138,7 @@ function TokenSelectorDialog({
         <DialogHeader>
           <DialogTitle>Select a token to {type}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col space-y-4 justify-center p-3">
+        <div className="flex flex-col space-y-2 justify-center p-3">
           {tokens.map((token) => (
             <div key={token.address}>
               <Button

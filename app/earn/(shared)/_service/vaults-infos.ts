@@ -7,7 +7,6 @@ import { useMarkets } from "@/hooks/use-addresses"
 import { MarketParams } from "@mangrovedao/mgv"
 
 import {
-  isAddress,
   maxUint128,
   parseAbi,
   zeroAddress,
@@ -17,17 +16,6 @@ import {
 } from "viem"
 import { arbitrum, baseSepolia, blast } from "viem/chains"
 import * as z from "zod"
-
-// // Get data onchain
-// const balanceOf = parseEther("1");
-// const totalSupply = parseEther("10")
-// // getUnderlyingBalances()
-// const baseBalance = parseEther("1"); // ETH
-// const quoteBalance = parseEther("3000"); // DAI
-// // lastTotalInQuote()
-// const lastTotalInQuote = parseEther("10000");
-// // getTotalInQuote()
-// const totalInQuote = lastTotalInQuote + parseEther("1000");
 
 export const VaultABI = parseAbi([
   "function getUnderlyingBalances() public view returns (uint256 amount0Current, uint256 amount1Current)",
@@ -40,7 +28,7 @@ export const VaultABI = parseAbi([
   "function symbol() public view returns (string)",
 ])
 
-const addressSchema = z.custom<Address>((v) => isAddress(v))
+// const addressSchema = z.custom<Address>((v) => isAddress(v))
 
 const multicallSchema = z.object({
   totalInQuote: z.tuple([z.bigint(), z.bigint()]),
@@ -51,6 +39,13 @@ const multicallSchema = z.object({
   market: z.tuple([z.string(), z.string(), z.bigint()]),
   symbol: z.string(),
   decimals: z.number(),
+})
+
+const priceSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  price: z.number(),
+  symbol: z.string(),
 })
 
 export function getChainVaults(chainId: number): VaultWhitelist[] {
@@ -155,6 +150,20 @@ export async function getVaultsInformation(
         decimals: _decimals,
       })
 
+      const baseDollarPrice = await fetch(
+        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[0]}`,
+      )
+        .then((res) => res.json())
+        .then((data) => priceSchema.parse(data))
+        .then((data) => data.price)
+
+      const quoteDollarPrice = await fetch(
+        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[1]}`,
+      )
+        .then((res) => res.json())
+        .then((data) => priceSchema.parse(data))
+        .then((data) => data.price)
+
       const storageValue = await client.getStorageAt({
         address: v.address,
         slot: "0xb",
@@ -242,6 +251,8 @@ export async function getVaultsInformation(
         market: vaultMarket as MarketParams,
         pnl: 0,
         tvl: totalInQuote[0],
+        baseDollarPrice,
+        quoteDollarPrice,
         strategist: v.manager,
         type: v.strategyType,
         isActive: userBaseBalance > 0n || userQuoteBalance > 0n,

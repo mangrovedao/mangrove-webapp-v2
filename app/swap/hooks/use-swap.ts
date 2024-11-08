@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
 import React from "react"
 import { formatUnits, parseUnits } from "viem"
-import { useAccount, useConfig, usePublicClient, useWalletClient } from "wagmi"
+import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { useMangroveAddresses, useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
@@ -25,7 +25,6 @@ import {
 } from "@/utils/tokens"
 
 export function useSwap() {
-  const config = useConfig()
   const { isConnected, address, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
@@ -141,7 +140,7 @@ export function useSwap() {
       currentMarket?.base.address,
       currentMarket?.quote.address,
       fields.payValue,
-      marketClient,
+      marketClient?.key,
       address,
     ],
     queryFn: async () => {
