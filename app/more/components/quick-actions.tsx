@@ -13,6 +13,7 @@ const ACTIONS = [
     imageUrl: "/assets/more/kandel.webp",
     riveUrl: "/assets/rive/kandel.riv",
     timeline: "Timeline 1",
+    disabled: true,
   },
   {
     title: "Bridge",
@@ -70,9 +71,13 @@ function Card({ action }: { action: (typeof ACTIONS)[number] }) {
         <p className="md:text-base text-sm md:mt-5 md:mb-6 mt-3 mb-4 text-text-secondary">
           {action.description}
         </p>
-        <Button asChild>
-          <Link href={action.href}>Start</Link>
-        </Button>
+        {action.disabled ? (
+          <Button disabled={true}>Start</Button>
+        ) : (
+          <Button asChild>
+            <Link href={action.href}>Start</Link>
+          </Button>
+        )}
       </div>
     </div>
   )
