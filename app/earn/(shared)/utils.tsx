@@ -1,6 +1,7 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { ReactNode } from "react"
+import { arbitrum } from "viem/chains"
 
 export function getIconFromChainlist(name: string) {
   let icon = name
@@ -13,14 +14,17 @@ export function getIconFromChainlist(name: string) {
 }
 
 export function getChainImage(chainId?: number, chainName?: string) {
+  const id = chainId || arbitrum.id
+  const name = chainName || arbitrum.name
+
   return (
     <ImageWithHideOnError
-      src={`/assets/chains/${chainId}.webp`}
+      src={`/assets/chains/${id}.webp`}
       width={16}
       height={16}
       className="h-4 rounded-sm size-4"
-      key={chainId}
-      alt={`${chainName}-logo`}
+      key={id}
+      alt={`${name}-logo`}
     />
   )
 }

@@ -9,7 +9,7 @@ import {
   SquareArrowOutUpRight,
   Twitter,
 } from "lucide-react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 
 import {
   CustomRadioGroup,
@@ -57,12 +57,10 @@ export default function Page() {
     data: { vault },
     refetch,
   } = useVault(params.address)
-  console.log(vault)
+
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])
-
-  const { push } = useRouter()
 
   return (
     <div className="max-w-7xl mx-auto lg:px-3 pb-4">
@@ -143,7 +141,7 @@ export default function Page() {
                   ),
                 ).toFixed(vault?.market.quote.displayDecimals || 3) ?? "0"
               }
-              symbol={` ${vault?.market.quote.symbol}`}
+              symbol={` ${vault?.market.quote.symbol || ""}`}
             />
             <GridLineHeader title={"APY"} value={"9.00"} symbol={"%"} />
             <GridLineHeader
@@ -322,7 +320,6 @@ export default function Page() {
                   name={"action"}
                   value={action}
                   onValueChange={(e: Action) => {
-                    console.log(e)
                     setAction(e)
                   }}
                 >

@@ -72,7 +72,11 @@ export function DepositForm({ className }: { className?: string }) {
         sendSliderValue={baseSliderValue}
         setSendSliderValue={handleBaseSliderChange}
         token={baseToken}
-        dollarAmount={"..."}
+        dollarAmount={
+          (Number(baseDeposit) * (vault?.baseDollarPrice || 0)).toFixed(
+            baseToken.displayDecimals,
+          ) || "..."
+        }
         label={`Deposit ${baseSliderValue}%`}
         inputClassName="bg-bg-primary"
         value={Number(baseDeposit).toFixed(baseToken.displayDecimals)}
@@ -86,7 +90,11 @@ export function DepositForm({ className }: { className?: string }) {
         sendSliderValue={quoteSliderValue}
         setSendSliderValue={handleQuoteSliderChange}
         token={quoteToken}
-        dollarAmount={"..."}
+        dollarAmount={
+          (Number(quoteDeposit) * (vault?.quoteDollarPrice || 0)).toFixed(
+            quoteToken.displayDecimals,
+          ) || "..."
+        }
         label={`Deposit ${quoteSliderValue}%`}
         value={Number(quoteDeposit).toFixed(quoteToken.displayDecimals)}
         inputClassName="bg-bg-primary"
