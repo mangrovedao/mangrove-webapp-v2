@@ -37,6 +37,6 @@ export function useVaultsWhitelist() {
     case baseSepolia.id:
       return VAULTS_WHITELIST_BASE_SEPOLIA
     default:
-      return undefined
+      return VAULTS_WHITELIST_ARBITRUM
   }
 }

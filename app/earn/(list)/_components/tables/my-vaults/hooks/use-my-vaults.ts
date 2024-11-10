@@ -1,13 +1,11 @@
 "use client"
 
+import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault } from "@/app/earn/(shared)/types"
 import { useMarkets } from "@/hooks/use-addresses"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
-import {
-  getChainVaults,
-  getVaultsInformation,
-} from "../../../../../(shared)/_service/vaults-infos"
+import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
 
 type Params<T> = {
   filters?: {
@@ -24,14 +22,14 @@ export function useMyVaults<T = Vault[]>({
   const publicClient = usePublicClient()
   const { address: user, chainId } = useAccount()
   const markets = useMarkets()
+  const plainVaults = useVaultsWhitelist()
 
   const { data, ...rest } = useQuery({
-    queryKey: ["vaults", publicClient?.key, user, chainId, first, skip],
+    queryKey: ["my-vaults", publicClient?.key, user, chainId, first, skip],
     queryFn: async (): Promise<Vault[]> => {
       try {
         if (!publicClient?.key) throw new Error("Public client is not enabled")
-        if (!chainId) return []
-        const plainVaults = getChainVaults(chainId)
+        if (!plainVaults) return []
         // .slice(skip, skip + first)
         const vaults = await getVaultsInformation(
           publicClient,

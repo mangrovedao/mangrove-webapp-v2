@@ -1,6 +1,3 @@
-import React from "react"
-
-import { CustomTabs } from "@/components/custom-tabs"
 import { MyVaults } from "./my-vaults/my-vaults"
 import { Vaults } from "./vaults/vaults"
 
@@ -8,18 +5,13 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button-new"
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SearchInput } from "@/components/ui/search-input-new"
 import { ChevronDown } from "@/svgs"
 import { ListFilter } from "lucide-react"
 
-export function Tables({ className }: React.ComponentProps<typeof CustomTabs>) {
+export function Tables() {
   return (
     <div className="pt-4 space-y-4">
       <div className="grid gap-y-4">
@@ -52,7 +44,7 @@ export function Tables({ className }: React.ComponentProps<typeof CustomTabs>) {
                   <ChevronDown className="w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 mt-1">
+              {/* <DropdownMenuContent className="w-56 mt-1">
                 <DropdownMenuLabel>Addresses:....</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => undefined}>
                   <span>Account</span>
@@ -72,7 +64,7 @@ export function Tables({ className }: React.ComponentProps<typeof CustomTabs>) {
                 <DropdownMenuItem onClick={() => undefined}>
                   <span>Reset</span>
                 </DropdownMenuItem>
-              </DropdownMenuContent>
+              </DropdownMenuContent> */}
             </DropdownMenu>
           </div>
         </div>

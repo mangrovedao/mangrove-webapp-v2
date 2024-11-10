@@ -1,7 +1,3 @@
-import {
-  VAULTS_WHITELIST_ARBITRUM,
-  VAULTS_WHITELIST_BASE_SEPOLIA,
-} from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { useMarkets } from "@/hooks/use-addresses"
 import { MarketParams } from "@mangrovedao/mgv"
@@ -14,7 +10,6 @@ import {
   type MulticallParameters,
   type PublicClient,
 } from "viem"
-import { arbitrum, baseSepolia, blast } from "viem/chains"
 import * as z from "zod"
 
 export const VaultABI = parseAbi([
@@ -47,19 +42,6 @@ const priceSchema = z.object({
   price: z.number(),
   symbol: z.string(),
 })
-
-export function getChainVaults(chainId: number): VaultWhitelist[] {
-  switch (chainId) {
-    case blast.id:
-      return VAULTS_WHITELIST_BASE_SEPOLIA
-    case arbitrum.id:
-      return VAULTS_WHITELIST_ARBITRUM
-    case baseSepolia.id:
-      return VAULTS_WHITELIST_BASE_SEPOLIA
-    default:
-      return []
-  }
-}
 
 export async function getVaultsInformation(
   client: PublicClient,

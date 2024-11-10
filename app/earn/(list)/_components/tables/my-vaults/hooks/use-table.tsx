@@ -63,6 +63,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
         header: "Market",
         cell: ({ row }) => {
           const { market } = row.original
+
           return (
             <Market base={market.base.address} quote={market.quote.address} />
           )

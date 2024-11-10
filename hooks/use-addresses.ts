@@ -110,6 +110,6 @@ export function useTokens() {
     case baseSepolia.id:
       return baseSepoliaTokens
     default:
-      return []
+      return arbitrumTokens
   }
 }

@@ -53,7 +53,7 @@ export function WithdrawForm({ className }: { className?: string }) {
     handleSliderChange(25)
   }, [quoteDeposited, baseDeposited])
 
-  if (!baseToken || !quoteToken || !vault || !address)
+  if (!baseToken || !quoteToken || !vault)
     return (
       <div className={"p-0.5"}>
         <Skeleton className="w-full h-40" />
