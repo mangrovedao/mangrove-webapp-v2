@@ -24,6 +24,8 @@ import {
   getTradableTokens,
 } from "@/utils/tokens"
 
+export const SLIPPAGES = ["0.1", "0.5", "1"]
+
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
@@ -39,6 +41,9 @@ export function useSwap() {
       defaultValue: markets[0]?.quote?.address,
     },
   )
+
+  const [showCustomInput, setShowCustomInput] = React.useState(false)
+  const [slippage, setSlippage] = React.useState(SLIPPAGES[1])
   const [fields, setFields] = React.useState({
     payValue: "",
     receiveValue: "",
@@ -253,7 +258,7 @@ export function useSwap() {
           bs: isBasePay ? BS.sell : BS.buy,
           send: formatUnits(baseAmount, payToken.decimals ?? 18),
           receive: formatUnits(quoteAmount, receiveToken?.decimals ?? 18),
-          slippage: 0.05,
+          slippage: Number(slippage),
         },
       },
       {
@@ -310,5 +315,9 @@ export function useSwap() {
     swapButtonText,
     payDollar: getMarketPriceQuery.data?.payDollar ?? 0,
     receiveDollar: getMarketPriceQuery.data?.receiveDollar ?? 0,
+    showCustomInput,
+    slippage,
+    setShowCustomInput,
+    setSlippage,
   }
 }

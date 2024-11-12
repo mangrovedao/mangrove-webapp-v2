@@ -1,7 +1,9 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
+import React from "react"
 
+import { CustomInput } from "@/components/custom-input-new"
 import { TokenIcon } from "@/components/token-icon"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,7 +19,8 @@ import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
 import Rive from "@rive-app/react-canvas-lite"
 import { useAccount } from "wagmi"
-import { useSwap } from "./hooks/use-swap"
+import { Accordion } from "../trade/_components/forms/components/accordion"
+import { SLIPPAGES, useSwap } from "./hooks/use-swap"
 
 export default function Swap() {
   const {
@@ -44,6 +47,10 @@ export default function Swap() {
     swapButtonText,
     payDollar,
     receiveDollar,
+    slippage,
+    showCustomInput,
+    setShowCustomInput,
+    setSlippage,
   } = useSwap()
 
   return (
@@ -99,6 +106,68 @@ export default function Swap() {
               {swapButtonText}
             </Button>
           )}
+          <Accordion
+            title="Slippage tolerance"
+            tooltip="How much price slippage you're willing to accept so that your order can be executed?"
+            chevronValue={`${slippage}%`}
+          >
+            <div className="space-y-2 mt-1">
+              <div className="flex justify-around bg-bg-primary rounded-lg">
+                {SLIPPAGES.map((value) => (
+                  <Button
+                    key={`percentage-button-${value}`}
+                    variant={"secondary"}
+                    size={"sm"}
+                    className={cn(
+                      "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                      {
+                        "opacity-10":
+                          Number(slippage) !== Number(value) || showCustomInput,
+                        "border-none bg-bg-tertiary rounded-lg":
+                          Number(slippage) === Number(value) &&
+                          !showCustomInput,
+                      },
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      showCustomInput && setShowCustomInput(!showCustomInput)
+                      setSlippage(value)
+                    }}
+                  >
+                    {value}%
+                  </Button>
+                ))}
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setShowCustomInput(!showCustomInput)
+                  }}
+                  variant={"secondary"}
+                  size={"sm"}
+                  className={cn(
+                    "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                    {
+                      "opacity-10": !showCustomInput,
+                      "border-none bg-bg-tertiary rounded-lg": showCustomInput,
+                    },
+                  )}
+                >
+                  Custom
+                </Button>
+              </div>
+              {/* Render the custom input component */}
+              {showCustomInput && (
+                <CustomInput
+                  symbol={"%"}
+                  maxLength={2}
+                  value={slippage}
+                  onChange={({ target: { value } }) => {
+                    setSlippage(value)
+                  }}
+                />
+              )}
+            </div>
+          </Accordion>
         </div>
         <TokenSelectorDialog
           type="sell"
