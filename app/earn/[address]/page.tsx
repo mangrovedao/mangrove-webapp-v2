@@ -148,7 +148,7 @@ export default function Page() {
               title={"Performance fee"}
               value={vault?.performanceFee}
               symbol={"%"}
-              info="Tooltip to be defined"
+              info="A fee based on the profits generated from your deposit."
             />
           </div>
 
@@ -220,7 +220,7 @@ export default function Page() {
                     title="Performance Fee"
                     value={vault?.performanceFee}
                     symbol="%"
-                    info="Tooltip to be defined"
+                    info="A fee based on the profits generated from your deposit."
                   />
 
                   <GridLine
@@ -244,7 +244,7 @@ export default function Page() {
                     title="Management Fee"
                     value={vault?.managementFee}
                     symbol="%"
-                    info="Tooltip to be defined"
+                    info="A fee for overseeing and managing the vault."
                   />
 
                   <GridLine
