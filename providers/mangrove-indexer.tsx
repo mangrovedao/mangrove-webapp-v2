@@ -9,20 +9,22 @@ import { useAccount } from "wagmi"
 
 import { useTokens } from "@/hooks/use-addresses"
 import { useTokenPricesInUsb } from "@/hooks/use-orderbook-price-per-block"
+import { arbitrum } from "viem/chains"
 
 const useIndexerSdkContext = () => {
   const tokenPrices = useTokenPricesInUsb()
   const { chain } = useAccount()
   const tokens = useTokens()
+  const chainId = chain?.id || arbitrum.id
 
   const indexerSdkQuery = useQuery({
-    queryKey: ["indexer-sdk", chain, tokenPrices.dataUpdatedAt],
+    queryKey: ["indexer-sdk", chainId, tokenPrices.dataUpdatedAt],
     queryFn: () => {
       try {
-        if (!chain) return null
+        if (!chainId) return null
 
         return getSdk({
-          chainId: chain.id as ChainsIds,
+          chainId: chainId as ChainsIds,
           helpers: {
             getTokenDecimals: async (address) => {
               if (!tokens)
@@ -81,7 +83,7 @@ const useIndexerSdkContext = () => {
     meta: {
       error: "Error when initializing the indexer sdk",
     },
-    enabled: !!chain?.id,
+    enabled: !!chainId,
     staleTime: 15 * 60 * 1000,
   })
   return {

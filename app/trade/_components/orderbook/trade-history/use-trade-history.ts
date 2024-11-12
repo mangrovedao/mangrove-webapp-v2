@@ -1,7 +1,6 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { useAccount } from "wagmi"
 
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import useMarket from "@/providers/market"
@@ -21,7 +20,6 @@ export function useTradeHistory<T = TradeHistory[]>({
   filters: { first = 100, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const { isConnected } = useAccount()
   const { currentMarket: market } = useMarket()
   const { indexerSdk } = useIndexerSdk()
 
@@ -65,7 +63,7 @@ export function useTradeHistory<T = TradeHistory[]>({
     meta: {
       error: "Unable to retrieve trade history",
     },
-    enabled: !!(isConnected && indexerSdk),
+    enabled: !!indexerSdk,
     retry: false,
     staleTime: 1 * 20 * 1000, // 20 secondes
   })

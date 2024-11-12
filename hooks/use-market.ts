@@ -8,6 +8,6 @@ export function useMarketClient() {
   const addresses = useMangroveAddresses()
   const { currentMarket } = useMarket()
 
-  if (!publicClient || !addresses || !currentMarket) return undefined
+  if (!publicClient?.key || !addresses || !currentMarket) return undefined
   return publicClient.extend(publicMarketActions(addresses, currentMarket))
 }

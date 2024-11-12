@@ -2,6 +2,7 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 import useMarket from "@/providers/market"
+import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
 import { useTable } from "./use-table"
@@ -9,10 +10,7 @@ import { useTradeHistory } from "./use-trade-history"
 
 export function Trades() {
   const { chain } = useAccount()
-  // const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
-  //   page: 1,
-  //   pageSize: 5,
-  // })
+
   const { currentMarket: market } = useMarket()
   const tradesHistoryQuery = useTradeHistory()
 
@@ -20,7 +18,8 @@ export function Trades() {
     data: tradesHistoryQuery.data,
   })
 
-  const blockExplorerUrl = chain?.blockExplorers?.default.url
+  const blockExplorerUrl =
+    chain?.blockExplorers?.default.url || arbitrum.blockExplorers.default.url
 
   return (
     <ScrollArea className="h-full" scrollHideDelay={200}>

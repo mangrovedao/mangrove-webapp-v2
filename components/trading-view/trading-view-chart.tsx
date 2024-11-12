@@ -4,6 +4,7 @@
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import React from "react"
+import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import {
   ResolutionString,
@@ -36,7 +37,7 @@ export const TVChartContainer = (
         quote: currentMarket?.quote.symbol,
         baseAddress: currentMarket?.base.address,
         quoteAddress: currentMarket?.quote.address,
-        chainId,
+        chainId: chainId ?? arbitrum.id,
       }),
       timeframe: "1M",
       interval: "1W" as ResolutionString,
