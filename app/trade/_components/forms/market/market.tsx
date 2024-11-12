@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
 import { EnhancedNumericInput } from "@components/token-input-new"
+import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
@@ -18,6 +19,7 @@ import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 const slippageValues = ["0.1", "0.5", "1"]
 
 export function Market(props: { bs: BS }) {
+  const { isConnected } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
 
@@ -243,7 +245,7 @@ export function Market(props: { bs: BS }) {
                     )}
                     size={"lg"}
                     type="submit"
-                    disabled={!canSubmit || !market}
+                    disabled={!canSubmit || !market || !isConnected}
                   >
                     {isSubmitting ? "Processing..." : tradeAction}
                   </Button>

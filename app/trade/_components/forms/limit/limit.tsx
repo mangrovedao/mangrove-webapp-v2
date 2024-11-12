@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { enumKeys } from "@/utils/enums"
+import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"
@@ -33,6 +34,7 @@ import {
 } from "./validators"
 
 export function Limit(props: { bs: BS }) {
+  const { isConnected } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
 
@@ -445,7 +447,7 @@ export function Limit(props: { bs: BS }) {
                       },
                     )}
                     size={"lg"}
-                    disabled={!canSubmit || !currentMarket}
+                    disabled={!canSubmit || !currentMarket || !isConnected}
                     loading={!!isSubmitting}
                   >
                     {tradeAction}
