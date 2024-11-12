@@ -8,7 +8,7 @@ import { useTable } from "./hooks/use-table"
 export function FaucetTable() {
   const tokens = useTokens()
   const table = useTable({
-    data: (tokens as Token[]) ?? [],
+    data: (tokens as unknown as Token[]) ?? [],
   })
 
   return (

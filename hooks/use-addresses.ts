@@ -26,7 +26,7 @@ export function useMangroveAddresses() {
     case baseSepolia.id:
       return baseSepoliaMangrove
     default:
-      return undefined
+      return arbitrumMangrove
   }
 }
 
