@@ -1,12 +1,12 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Alignment, Fit, Layout, useRive } from "@rive-app/react-canvas-lite"
-import Link from "next/link"
 import React from "react"
+import { ActionsTabs } from "../utils/types"
 
-const ACTIONS = [
+export const ACTIONS = [
   {
-    title: "Kandel",
+    title: ActionsTabs.KANDEL,
     description:
       "Take advantage of market volatility with your own instances of Kandel",
     href: "/strategies",
@@ -16,7 +16,7 @@ const ACTIONS = [
     disabled: true,
   },
   {
-    title: "Bridge",
+    title: ActionsTabs.BRIDGE,
     description: "Send your assets accross chains, without leaving the app",
     href: "/bridge",
     imageUrl: "/assets/more/bridge.webp",
@@ -24,7 +24,7 @@ const ACTIONS = [
     timeline: "Timeline 1",
   },
   {
-    title: "Wrap",
+    title: ActionsTabs.WRAP,
     description: "Wrap ETH into wETH, in order to trade ETH as an ERC20 token",
     href: "/wrap",
     imageUrl: "/assets/more/wrap.webp",
@@ -74,8 +74,16 @@ function Card({ action }: { action: (typeof ACTIONS)[number] }) {
         {action.disabled ? (
           <Button disabled={true}>Start</Button>
         ) : (
-          <Button asChild>
-            <Link href={action.href}>Start</Link>
+          <Button
+            onClick={() => {
+              dispatchEvent(
+                new CustomEvent("on-more-tab-clicked", {
+                  detail: { tab: action.title },
+                }),
+              )
+            }}
+          >
+            Start
           </Button>
         )}
       </div>

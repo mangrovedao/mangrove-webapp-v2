@@ -3,10 +3,10 @@
 import { Bridge } from "@synapsecns/widget"
 
 import { blast } from "viem/chains"
-import WarningBanner from "./_components/warning-banner"
 import { useEthersSigner } from "./_hooks/use-ethers-signer"
+import WarningBanner from "./warning-banner"
 
-export default function Page() {
+export default function BridgeComponent() {
   const signer = useEthersSigner()
 
   if (!signer) {
