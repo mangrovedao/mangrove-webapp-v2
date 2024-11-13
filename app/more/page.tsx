@@ -9,13 +9,14 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { renderElement } from "@/utils/render"
 import QuickActions from "./components/quick-actions"
+import Wrap from "./components/wrap"
 import { ActionsTabs } from "./utils/types"
 
 const TABS_CONTENT = {
   [ActionsTabs.QUICKACTIONS]: QuickActions,
-  [ActionsTabs.KANDEL]: <div>TODO</div>,
+  // [ActionsTabs.KANDEL]: <div>TODO</div>,
   [ActionsTabs.BRIDGE]: <div>TODO</div>,
-  [ActionsTabs.WRAP]: <div>TODO</div>,
+  [ActionsTabs.WRAP]: Wrap,
 }
 
 export default function Page() {
