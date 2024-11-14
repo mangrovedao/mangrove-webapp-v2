@@ -29,6 +29,7 @@ export function DepositForm({ className }: { className?: string }) {
     handleQuoteDepositChange,
     isLoading,
     vault,
+    hasErrors,
   } = useForm()
 
   const handleBaseSliderChange = (value: number) => {
@@ -107,7 +108,7 @@ export function DepositForm({ className }: { className?: string }) {
       <Button
         className="w-full"
         onClick={() => setAddDialog(!addDialog)}
-        disabled={isLoading || mintAmount === 0n}
+        disabled={isLoading || mintAmount === 0n || hasErrors}
       >
         Deposit
       </Button>

@@ -132,5 +132,6 @@ export default function useForm() {
     isLoading,
     vault,
     mintAmount: data.mintAmount,
+    hasErrors: !!Object.keys(errors).length,
   }
 }
