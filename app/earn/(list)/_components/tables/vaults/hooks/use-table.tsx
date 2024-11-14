@@ -66,7 +66,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
             <Market
               base={row.original.market.base.address}
               quote={row.original.market.quote.address}
-              tokenPairClasses="font-bold"
+              tokenPairClasses="font-bold text-lg"
             />
           )
         },

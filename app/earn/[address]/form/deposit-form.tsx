@@ -55,6 +55,8 @@ export function DepositForm({ className }: { className?: string }) {
     handleQuoteSliderChange(25)
   }, [baseBalance, quoteBalance])
 
+  console.log(errors, quoteDeposit)
+
   if (!baseToken || !quoteToken)
     return (
       <div className={"p-0.5"}>

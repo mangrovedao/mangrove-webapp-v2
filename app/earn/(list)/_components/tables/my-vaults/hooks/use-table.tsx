@@ -66,7 +66,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
 
           return (
             <Market
-              tokenPairClasses="font-bold"
+              tokenPairClasses="font-bold text-lg"
               base={market.base.address}
               quote={market.quote.address}
             />
