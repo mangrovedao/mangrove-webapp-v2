@@ -23,11 +23,11 @@ export default function Page() {
               <h2 className="font-semibold text-2xl">Epoch #5</h2>
               <div className="text-text-secondary text-xs flex space-x-4">
                 <span>
-                  Ends in <span className="text-white">0d:12h:14m</span>
+                  Ends in <span className="text-white">-</span>
                 </span>
                 <div className="w-0.5 h-5 bg-text-secondary"></div>
                 <span>
-                  Current p: <span className="text-white">200</span>
+                  Current p: <span className="text-white">-</span>
                 </span>
               </div>
             </div>
@@ -38,20 +38,20 @@ export default function Page() {
           <div className="px-4 md:px-16 py-5 flex">
             <div className="flex flex-col flex-1">
               <Label>Total Epoch Reward</Label>
-              <Value>3,259</Value>
+              <Value>-</Value>
             </div>
             <div className="flex flex-col flex-1 space-y-2">
               <div className="flex justify-between">
                 <Label>Taker Rewards</Label>
-                <Value size="small">200</Value>
+                <Value size="small">-</Value>
               </div>
               <div className="flex justify-between">
                 <Label>Maker Rewards</Label>
-                <Value size="small">0</Value>
+                <Value size="small">-</Value>
               </div>
               <div className="flex justify-between">
                 <Label>Kandel Rewards</Label>
-                <Value size="small">3,059</Value>
+                <Value size="small">-</Value>
               </div>
             </div>
           </div>
@@ -65,20 +65,25 @@ export default function Page() {
           <NeonContainer className="space-y-5">
             <div className="flex justify-between">
               <Label>Available rewards</Label>
-              <Value>71.675</Value>
+              <Value>-</Value>
             </div>
 
-            <Button variant={"primary"} size={"xl"} className="w-full">
+            <Button
+              variant={"primary"}
+              size={"xl"}
+              className="w-full"
+              disabled={true}
+            >
               Claim rewards
             </Button>
           </NeonContainer>
           <div className="flex justify-between my-5">
             <Label>Claimed rewards</Label>
-            <Value>11,396</Value>
+            <Value>-</Value>
           </div>
           <div className="flex justify-between mt-5">
             <Label>Total rewards</Label>
-            <Value>71.68˝5</Value>
+            <Value>-</Value>
           </div>
         </div>
       </div>
