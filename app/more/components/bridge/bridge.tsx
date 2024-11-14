@@ -10,7 +10,7 @@ export default function BridgeComponent() {
   const signer = useEthersSigner()
 
   if (!signer) {
-    return null
+    return <div>You need to connect your wallet</div>
   }
 
   return (

@@ -20,7 +20,7 @@ export const wethAdresses: { [key: number]: Address | undefined } = {
 }
 
 export default function Wrap() {
-  const { chain, address } = useAccount()
+  const { chain, address, isConnected } = useAccount()
   const { data: nativeBalance } = useBalance({
     address,
   })
@@ -87,7 +87,9 @@ export default function Wrap() {
         className="w-full"
         size={"lg"}
         onClick={wrapETH}
-        disabled={isLoading || isPending || !amount || !!amountError}
+        disabled={
+          isLoading || isPending || !amount || !!amountError || !isConnected
+        }
         loading={isLoading || isPending}
       >
         Wrap ETH
