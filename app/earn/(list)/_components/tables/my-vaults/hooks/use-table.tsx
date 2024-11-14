@@ -45,7 +45,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
           // )
 
           return (
-            <div className="flex flex-col underline ml-2">
+            <div className="flex flex-col underline">
               <Link
                 className="hover:opacity-80 transition-opacity bg-[#284061] size-6 rounded-md flex items-center justify-center"
                 href={`${blockExplorerUrl}/address/${address}`}
@@ -65,7 +65,11 @@ export function useTable({ pageSize, data, onManage }: Params) {
           const { market } = row.original
 
           return (
-            <Market base={market.base.address} quote={market.quote.address} />
+            <Market
+              tokenPairClasses="font-bold"
+              base={market.base.address}
+              quote={market.quote.address}
+            />
           )
         },
       }),
@@ -87,25 +91,28 @@ export function useTable({ pageSize, data, onManage }: Params) {
         },
       }),
 
-      columnHelper.display({
-        header: "TVL",
+      columnHelper.accessor("tvl", {
+        header: () => <div className="text-right">TVL</div>,
         cell: ({ row }) => {
           const { tvl, market, quoteDollarPrice } = row.original
 
           return (
-            <Value
-              value={(
-                Number(formatUnits(tvl, market.quote.decimals)) *
-                quoteDollarPrice
-              ).toFixed(2)}
-              symbol={"$"}
-            />
+            <div className="w-full h-full flex justify-end">
+              <Value
+                value={(
+                  Number(formatUnits(tvl, market.quote.decimals)) *
+                  quoteDollarPrice
+                ).toFixed(2)}
+                symbol={"$"}
+              />
+            </div>
           )
         },
       }),
 
       columnHelper.display({
-        header: "Deposited",
+        id: "Deposited",
+        header: () => <div className="text-right">Deposited</div>,
         cell: ({ row }) => {
           const {
             userBaseBalance,
@@ -122,7 +129,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
               quoteDollarPrice
 
           return (
-            <div className="grid items-center justify-center">
+            <div className="w-full h-full flex justify-end">
               <Value value={Number(value).toFixed(2)} symbol={"$"} />
             </div>
           )
@@ -130,9 +137,14 @@ export function useTable({ pageSize, data, onManage }: Params) {
       }),
 
       columnHelper.display({
-        header: "My APY",
+        id: "My APY",
+        header: () => <div className="text-right">My APY</div>,
         cell: ({ row }) => {
-          return <Value value="7.3%" />
+          return (
+            <div className="w-full h-full flex justify-end">
+              <Value value={"-"} />
+            </div>
+          )
         },
       }),
 
@@ -141,7 +153,10 @@ export function useTable({ pageSize, data, onManage }: Params) {
         cell: ({ row }) => {
           return (
             <div className="w-full h-full flex justify-end space-x-1 items-center z-50">
-              <Button className="text-text-tertiary" variant={"invisible"}>
+              <Button
+                className="text-text-tertiary text-lg"
+                variant={"invisible"}
+              >
                 Manage
               </Button>
             </div>

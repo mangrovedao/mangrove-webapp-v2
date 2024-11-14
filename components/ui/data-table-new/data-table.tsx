@@ -124,7 +124,7 @@ export function DataTable<TData>({
                           },
                         )}
                       >
-                        <div className="px-2 h-6 flex items-center ">
+                        <div className="px-4 h-6 flex items-center ">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),

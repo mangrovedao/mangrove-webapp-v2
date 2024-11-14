@@ -66,6 +66,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
             <Market
               base={row.original.market.base.address}
               quote={row.original.market.quote.address}
+              tokenPairClasses="font-bold"
             />
           )
         },
@@ -73,7 +74,6 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
 
       columnHelper.display({
         header: "Strategy",
-        minSize: 300,
         cell: ({ row }) => {
           const { type } = row.original
           const isTrusted = true
@@ -91,34 +91,47 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
       }),
 
       columnHelper.display({
-        header: "APY",
+        id: "APY",
+        header: () => <div className="text-right">APY</div>,
         cell: ({ row }) => {
           const value = "-"
-          return <Value value={value} />
+          return (
+            <div className="w-full h-full flex justify-end">
+              <Value value={value} />
+            </div>
+          )
         },
       }),
 
       columnHelper.display({
-        header: "30 D",
+        id: "30 D",
+        header: () => <div className="text-right">30 D</div>,
         cell: ({ row }) => {
           const value = "-"
-          return <Value value={value} />
+          return (
+            <div className="w-full h-full flex justify-end">
+              <Value value={value} />
+            </div>
+          )
         },
       }),
 
       columnHelper.display({
-        header: "TVL",
+        id: "TVL",
+        header: () => <div className="text-right">TVL</div>,
         cell: ({ row }) => {
           const { tvl, market, quoteDollarPrice } = row.original
 
           return (
-            <Value
-              value={(
-                Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
-                quoteDollarPrice
-              ).toFixed(market.quote.displayDecimals || 3)}
-              symbol={"$"}
-            />
+            <div className="w-full h-full flex justify-end">
+              <Value
+                value={(
+                  Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
+                  quoteDollarPrice
+                ).toFixed(market.quote.displayDecimals || 3)}
+                symbol={"$"}
+              />
+            </div>
           )
         },
       }),
@@ -129,7 +142,10 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
         cell: ({ row }) => {
           return (
             <div className="w-full h-full flex justify-end space-x-1 items-center">
-              <Button className="text-text-tertiary" variant={"invisible"}>
+              <Button
+                className="text-text-tertiary text-lg"
+                variant={"invisible"}
+              >
                 Deposit
               </Button>
             </div>

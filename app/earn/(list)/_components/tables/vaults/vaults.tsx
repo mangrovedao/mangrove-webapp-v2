@@ -61,7 +61,7 @@ export function Vaults() {
           // push(`/strategies/${strategy?.address}`)
           // (window.location.href = `/strategies/${strategy?.address}`)
         }
-        cellClasses="font-ubuntu"
+        cellClasses="font-ubuntu text-lg"
         tableRowClasses="font-ubuntu"
         pagination={{
           onPageChange: setPageDetails,
