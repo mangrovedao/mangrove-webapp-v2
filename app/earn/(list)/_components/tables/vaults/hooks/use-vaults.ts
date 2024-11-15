@@ -8,7 +8,6 @@ import { useAccount, usePublicClient } from "wagmi"
 import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
 
 type Params<T> = {
-  chainId?: number
   filters?: {
     first?: number
     skip?: number
@@ -17,39 +16,37 @@ type Params<T> = {
 }
 
 export function useVaults<T = Vault[]>({
-  chainId,
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
   const publicClient = usePublicClient()
-  const { address: user } = useAccount()
+  const { address: user, chainId } = useAccount()
   const markets = useMarkets()
   const plainVaults = useVaultsWhitelist()
 
   const { data, ...rest } = useQuery({
-    queryKey: ["vaults", publicClient?.key, user, chainId, first, skip],
+    queryKey: ["vaults", publicClient?.key, user, chainId, plainVaults.length],
     queryFn: async (): Promise<Vault[]> => {
       try {
         if (!publicClient?.key) throw new Error("Public client is not enabled")
         if (!plainVaults) return []
-        // .slice(skip, skip + first)
-        return await getVaultsInformation(
+        const vaults = await getVaultsInformation(
           publicClient,
           plainVaults,
           markets,
           user,
         )
+        return vaults
       } catch (error) {
         console.log("error", error)
         console.error(error)
         return []
       }
     },
-    enabled: !!publicClient && !!chainId,
-    initialData: [],
+    enabled: !!publicClient && !!chainId && !!plainVaults.length,
   })
   return {
-    data: (select ? select(data) : data) as unknown as T,
+    data: (select ? select(data ?? []) : data) as unknown as T,
     ...rest,
   }
 }

@@ -21,7 +21,6 @@ export function Vaults() {
   })
 
   const { data, isLoading, error, refetch } = useVaults({
-    chainId,
     filters: {
       skip: (page - 1) * pageSize,
     },
@@ -32,9 +31,9 @@ export function Vaults() {
   })
 
   // temporary fix
-  React.useEffect(() => {
-    refetch?.()
-  }, [chainId])
+  // React.useEffect(() => {
+  //   refetch?.()
+  // }, [chainId])
 
   // selected strategy to cancel
   const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()

@@ -1,3 +1,4 @@
+"use client"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { useMarkets } from "@/hooks/use-addresses"
 import { MarketParams } from "@mangrovedao/mgv"

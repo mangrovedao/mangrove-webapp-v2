@@ -24,31 +24,36 @@ export function useMyVaults<T = Vault[]>({
   const markets = useMarkets()
   const plainVaults = useVaultsWhitelist()
 
+  console.log("useMyVaults", {
+    chainId,
+    user,
+    plainVaults,
+  })
+
   const { data, ...rest } = useQuery({
     queryKey: ["my-vaults", publicClient?.key, user, chainId, first, skip],
     queryFn: async (): Promise<Vault[]> => {
       try {
         if (!publicClient?.key) throw new Error("Public client is not enabled")
         if (!plainVaults) return []
-        // .slice(skip, skip + first)
         const vaults = await getVaultsInformation(
           publicClient,
           plainVaults,
           markets,
           user,
         )
-
         return vaults.filter((v) => v.isActive)
       } catch (error) {
         console.error(error)
         return []
       }
     },
-    enabled: !!publicClient?.key && !!chainId,
-    initialData: [],
+    enabled: !!publicClient?.key && !!user && !!chainId && !!plainVaults.length,
+    gcTime: 0,
+    // initialData: [],
   })
   return {
-    data: (select ? select(data) : data) as unknown as T,
+    data: (select ? select(data || []) : data) as unknown as T,
     ...rest,
   }
 }
