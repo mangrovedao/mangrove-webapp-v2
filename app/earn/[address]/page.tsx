@@ -439,7 +439,12 @@ export default function Page() {
                 <LineRewards title={"All time"} value={"0.00"} />
               </div>
             </div>
-            <Button variant={"primary"} size={"lg"} className="w-full">
+            <Button
+              variant={"primary"}
+              size={"lg"}
+              className="w-full"
+              disabled={true}
+            >
               Claim rewards
             </Button>
           </div>

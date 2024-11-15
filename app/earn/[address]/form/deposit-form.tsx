@@ -50,13 +50,6 @@ export function DepositForm({ className }: { className?: string }) {
     handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
   }
 
-  React.useEffect(() => {
-    handleBaseSliderChange(25)
-    handleQuoteSliderChange(25)
-  }, [baseBalance, quoteBalance])
-
-  console.log(errors, quoteDeposit)
-
   if (!baseToken || !quoteToken)
     return (
       <div className={"p-0.5"}>

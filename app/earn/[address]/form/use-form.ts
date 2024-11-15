@@ -26,6 +26,8 @@ export default function useForm() {
   const [baseAmount, setBaseSliderAmount] = React.useState("")
   const [quoteAmount, setQuoteSliderAmount] = React.useState("")
 
+  console.log({ baseAmount })
+
   const baseToken = vault?.market.base
   const quoteToken = vault?.market.quote
 
