@@ -26,8 +26,6 @@ export default function useForm() {
   const [baseAmount, setBaseSliderAmount] = React.useState("")
   const [quoteAmount, setQuoteSliderAmount] = React.useState("")
 
-  console.log({ baseAmount })
-
   const baseToken = vault?.market.base
   const quoteToken = vault?.market.quote
 
@@ -82,13 +80,8 @@ export default function useForm() {
 
   React.useEffect(() => {
     const newErrors = { ...errors }
-
     // Base Deposit Validation
-    if (
-      baseBalance?.balance &&
-      data.baseAmount > baseBalance?.balance &&
-      baseDeposit
-    ) {
+    if (baseBalance?.balance && data.baseAmount > baseBalance?.balance) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
     } else if (Number(baseDeposit) > 0 && Number(baseDeposit) === 0) {
@@ -98,11 +91,7 @@ export default function useForm() {
     }
 
     // Quote Deposit Validation
-    if (
-      quoteBalance?.balance &&
-      data.quoteAmount > quoteBalance?.balance &&
-      quoteDeposit
-    ) {
+    if (quoteBalance?.balance && data.quoteAmount > quoteBalance?.balance) {
       newErrors.quoteDeposit =
         "Quote deposit cannot be greater than wallet balance"
     } else if (
