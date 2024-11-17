@@ -48,7 +48,6 @@ enum Action {
 }
 
 export default function Page() {
-  const [tab, setTab] = React.useState(Tabs.Details)
   const [action, setAction] = React.useState(Action.Deposit)
   const { chain } = useAccount()
   const params = useParams<{ address: string }>()

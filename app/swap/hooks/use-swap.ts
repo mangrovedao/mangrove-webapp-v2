@@ -227,7 +227,8 @@ export function useSwap() {
   // slippage -> valeur en % dans marketOrderSimulation -> min slippage + petit % genre x1,1
 
   async function swap() {
-    if (!(marketClient && address && walletClient && payToken)) return
+    if (!(marketClient && address && walletClient && payToken && receiveToken))
+      return
 
     if (hasToApprove) {
       await approvePayToken.mutate(
@@ -244,20 +245,17 @@ export function useSwap() {
       return
     }
 
-    const isBasePay = currentMarket?.base.address === payToken?.address
-    const baseAmount = isBasePay
-      ? parseUnits(fields.payValue, currentMarket?.base.decimals ?? 18)
-      : parseUnits(fields.receiveValue, currentMarket?.base.decimals ?? 18)
-    const quoteAmount = isBasePay
-      ? parseUnits(fields.receiveValue, currentMarket?.quote.decimals ?? 18)
-      : parseUnits(fields.payValue, currentMarket?.quote.decimals ?? 18)
+    const isBasePay = currentMarket?.base.address === payToken.address
+
+    const baseAmount = parseUnits(fields.payValue, payToken.decimals)
+    const quoteAmount = parseUnits(fields.receiveValue, receiveToken.decimals)
 
     await postMarketOrder.mutate(
       {
         form: {
           bs: isBasePay ? BS.sell : BS.buy,
-          send: formatUnits(baseAmount, payToken.decimals ?? 18),
-          receive: formatUnits(quoteAmount, receiveToken?.decimals ?? 18),
+          send: formatUnits(baseAmount, payToken.decimals),
+          receive: formatUnits(quoteAmount, receiveToken.decimals),
           slippage: Number(slippage),
         },
       },

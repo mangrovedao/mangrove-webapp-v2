@@ -129,16 +129,6 @@ export default function DepositToVaultDialog({
     args: [mintAmount, amount0, amount1],
   })
 
-  // console.log(
-  //   `cast call ${vault?.address} ${encodeFunctionData({
-  //     abi: mintABI,
-  //     functionName: "mint",
-  //     args: [mintAmount, [amount0, amount1]],
-  //   })} --from ${address} --rpc-url https://rpc.blast.io --trace`,
-  // )
-
-  // console.log(result)
-
   useEffect(() => {
     if (!error && isConfirmed && currentStep !== steps.length) {
       console.log("go to next step")
