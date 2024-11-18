@@ -85,7 +85,6 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
             bs,
           },
         )
-        // toast.success("Market order executed")
 
         successToast(
           TradeMode.MARKET,
