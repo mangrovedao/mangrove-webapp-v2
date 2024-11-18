@@ -11,6 +11,8 @@ import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { toast } from "sonner"
 import { parseUnits } from "viem"
+import { TradeMode } from "../../enums"
+import { successToast } from "../../utils"
 import type { Form } from "../types"
 
 type Props = {
@@ -46,7 +48,10 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           throw new Error("Market order post, is missing params")
 
         const { base, quote } = market
+
         const { bs, send: gives, receive: wants, slippage } = form
+        const receiveToken = bs === "buy" ? base : quote
+        const sendToken = bs === "buy" ? quote : base
 
         const baseAmount =
           bs === "buy"
@@ -80,17 +85,19 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
             bs,
           },
         )
-        toast.success("Market order executed")
+        // toast.success("Market order executed")
 
-        // successToast(
-        //   TradeMode.MARKET,
-        //   bs,
-        //   base,
-        //   quote,
-        //   result,
-        //   receiveToken,
-        //   sendToken,
-        // )
+        successToast(
+          TradeMode.MARKET,
+          bs,
+          base,
+          quote,
+          wants,
+          result,
+          receiveToken,
+          sendToken,
+        )
+
         return { result, receipt }
       } catch (error) {
         console.error(error)

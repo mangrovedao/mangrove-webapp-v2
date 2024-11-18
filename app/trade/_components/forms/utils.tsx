@@ -22,6 +22,10 @@ export function successToast(
       result.takerGot,
       tradeAction === BS.sell ? quoteToken.decimals : baseToken.decimals,
     ),
+  ).toFixed(
+    tradeAction === BS.sell
+      ? quoteToken.displayDecimals
+      : baseToken.displayDecimals,
   )} ${tradeAction === BS.sell ? quoteToken.symbol : baseToken.symbol}`
 
   const notFilledOrder =
@@ -30,7 +34,10 @@ export function successToast(
       : "Market order not filled (slippage too low)"
 
   const fillText = Number(result.takerGot) > 0 ? filledOrder : notFilledOrder
-
+  console.log(
+    formatUnits(result.feePaid, receiveToken.decimals),
+    formatUnits(result.feePaid, sendToken.decimals),
+  )
   toast(
     <div className="grid gap-2 w-full">
       <div className="flex space-x-2 items-center">
@@ -77,6 +84,10 @@ export function successToast(
           <div className="flex justify-between">
             <span className="text-muted-foreground">FEE</span>
             <span>
+              {Number(formatUnits(result.feePaid, receiveToken.decimals)) <=
+              0.0001
+                ? "~ "
+                : ""}
               {Number(
                 formatUnits(result.feePaid, receiveToken.decimals),
               ).toFixed(receiveToken.displayDecimals)}{" "}
