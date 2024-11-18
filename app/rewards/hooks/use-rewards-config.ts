@@ -1,17 +1,17 @@
 import { useQuery } from "@tanstack/react-query"
+import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import { configurationSchema } from "../schemas/rewards-configuration"
 
 export const useConfiguration = () => {
   const { chain } = useAccount()
+
+  const chainId = chain?.id ?? arbitrum.id
+
   return useQuery({
-    queryKey: ["rewards-configuration", chain?.id],
-    enabled: !!chain?.id,
+    queryKey: ["rewards-configuration", chainId],
     queryFn: async () => {
       try {
-        if (!chain?.id) {
-          throw new Error("No chain found")
-        }
         const response = await fetch(
           "https://points.mgvinfra.com/configuration",
         )
@@ -20,18 +20,18 @@ export const useConfiguration = () => {
         }
 
         const epochs = configurationSchema.parse(await response.json()).chains[
-          chain.id
+          chainId
         ]
 
         if (!epochs) {
           throw new Error("No epochs found")
         }
 
-        const epochId = Object.keys(epochs?.rewardsLimit ?? {})[0]
+        const epochId = Object.keys(epochs.rewardsLimit)[0]
 
         return {
           epochId: epochId,
-          totalBudget: epochs.rewardsLimit,
+          totalBudget: epochs.rewardsLimit[epochId || 0]?.budget,
         }
       } catch (error) {
         console.error(error)

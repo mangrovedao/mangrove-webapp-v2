@@ -5,6 +5,7 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { RaccoonIllustration } from "@/svgs"
 import { cn } from "@/utils"
+import { formatUnits } from "viem"
 import { Tables } from "./_components/tables/tables"
 import Timer from "./_components/timer"
 import { useRewards } from "./hooks/use-rewards"
@@ -12,28 +13,11 @@ import { useConfiguration } from "./hooks/use-rewards-config"
 
 export default function Page() {
   const { data: configuration } = useConfiguration()
-  const { data: rewards } = useRewards()
+  const { data: rewards } = useRewards({
+    epochId: configuration?.epochId ?? "1",
+  })
 
-  // TODO: fetch rewards list from backend
-  const rewardsList: {
-    epochId: number
-    startDate: bigint
-  }[] = [
-    {
-      epochId: 1,
-      startDate: 0n,
-    },
-  ]
-  // TODO: fetch rewards config from backend with epochId and user address if connected other wise empty string for claimable rewards
-  const rewardsConfig = {
-    epochId: 1,
-    takerRewards: "",
-    makerRewards: "",
-    kandelRewards: "",
-    claimableRewards: "",
-  }
-
-  console.log("is cors", configuration, rewards)
+  console.log("rewards config", configuration, rewards)
 
   return (
     <main className="mt-8 px-4">
@@ -51,7 +35,7 @@ export default function Page() {
               </h2>
               <div className="text-text-secondary text-xs flex space-x-4">
                 <span>
-                  Ends in <span className="text-white">-</span>
+                  Ends in <span className="text-white">...</span>
                 </span>
                 <div className="w-0.5 h-5 bg-text-secondary"></div>
                 <span>
@@ -67,20 +51,29 @@ export default function Page() {
           <div className="px-4 md:px-16 py-5 flex">
             <div className="flex flex-col flex-1">
               <Label>Total Epoch Reward</Label>
-              <Value>{0}</Value>
+              <Value className="flex-wrap text-wrap">
+                {/* {formatUnits(BigInt(configuration?.totalBudget ?? 0n), 18)} */}
+                ...
+              </Value>
             </div>
             <div className="flex flex-col flex-1 space-y-2">
               <div className="flex justify-between">
                 <Label>Taker Rewards</Label>
-                <Value size="small">-</Value>
+                <Value size="small">
+                  {formatUnits(BigInt(rewards?.takerReward ?? 0n), 8)}
+                </Value>
               </div>
               <div className="flex justify-between">
                 <Label>Maker Rewards</Label>
-                <Value size="small">-</Value>
+                <Value size="small">
+                  {formatUnits(BigInt(rewards?.makerReward ?? 0n), 8)}
+                </Value>
               </div>
               <div className="flex justify-between">
                 <Label>Kandel Rewards</Label>
-                <Value size="small">-</Value>
+                <Value size="small">
+                  {formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 8)}
+                </Value>
               </div>
             </div>
           </div>
@@ -94,7 +87,9 @@ export default function Page() {
           <NeonContainer className="space-y-5">
             <div className="flex justify-between">
               <Label>Available rewards</Label>
-              <Value>-</Value>
+              <Value>
+                {formatUnits(BigInt(rewards?.claimableRewards ?? 0n), 8)}
+              </Value>
             </div>
 
             <Button
@@ -106,14 +101,14 @@ export default function Page() {
               Claim rewards
             </Button>
           </NeonContainer>
-          <div className="flex justify-between my-5">
+          {/* <div className="flex justify-between my-5">
             <Label>Claimed rewards</Label>
             <Value>-</Value>
           </div>
           <div className="flex justify-between mt-5">
             <Label>Total rewards</Label>
             <Value>-</Value>
-          </div>
+          </div> */}
         </div>
       </div>
     </main>
