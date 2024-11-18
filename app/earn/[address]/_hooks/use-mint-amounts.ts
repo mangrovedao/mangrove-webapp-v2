@@ -49,12 +49,7 @@ export function useMintAmounts({ vault, client }: MintAmountsArgs) {
       const baseAmount = mintAmounts[0]
       const quoteAmount = mintAmounts[1]
       const mintAmount = mintAmounts[2]
-      console.log({
-        baseAmount,
-        quoteAmount,
-        mintAmount,
-        side: amountAndSide.side,
-      })
+
       return { baseAmount, quoteAmount, mintAmount, side: amountAndSide.side }
     },
     enabled: !!amountAndSide?.amount && !!vault?.address,

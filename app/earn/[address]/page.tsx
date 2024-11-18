@@ -71,6 +71,12 @@ export default function Page() {
       vault.quoteDollarPrice
     : 0
 
+  // React.useEffect(() => {
+  //   if (chain?.id !== vault?.chainId) {
+  //     redirect(`/earn`)
+  //   }
+  // }, [chain?.id])
+
   return (
     <div className="max-w-7xl mx-auto lg:px-3 pb-4">
       {/* BreadCrumb   */}

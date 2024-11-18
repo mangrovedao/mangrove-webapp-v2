@@ -149,16 +149,6 @@ export default function AddToVaultDialog({
     args: [mintAmount, [amount0, amount1]],
   })
 
-  // console.log(
-  //   `cast call ${vault?.address} ${encodeFunctionData({
-  //     abi: mintABI,
-  //     functionName: "mint",
-  //     args: [mintAmount, [amount0, amount1]],
-  //   })} --from ${address} --rpc-url https://rpc.blast.io --trace`,
-  // )
-
-  // console.log(result)
-
   useEffect(() => {
     if (isConfirmed) {
       if (currentStep === 4) {

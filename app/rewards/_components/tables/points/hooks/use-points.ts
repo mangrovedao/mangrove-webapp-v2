@@ -11,7 +11,7 @@ type Params<T> = {
     first?: number
     skip?: number
   }
-  select?: (data: { data: PointsRow[]; totalRows: number }) => T
+  select?: (data: PointsRow[]) => T
 }
 const addressSchema = z.custom<Address>((v) => isAddress(v))
 const leaderboardSchema = z.object({
@@ -24,7 +24,7 @@ const leaderboardSchema = z.object({
 })
 type LeaderboardRow = z.infer<typeof leaderboardSchema>
 
-export function usePoints<T = { data: PointsRow[]; totalRows: number }>({
+export function usePoints<T = PointsRow[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
@@ -32,52 +32,38 @@ export function usePoints<T = { data: PointsRow[]; totalRows: number }>({
 
   const { data, ...rest } = useQuery({
     queryKey: ["points", user, first, skip],
-    queryFn: async (): Promise<{ data: PointsRow[]; totalRows: number }> => {
+    queryFn: async (): Promise<PointsRow[]> => {
       try {
-        if (!user) {
-          return {
-            data: [],
-            totalRows: 0,
-          }
-        }
-        console.log("filters", user, first, skip)
-        const url = `https://ms1.mgvinfra.com/leaderboard?count=100&offset=${skip ?? 0}&sort=total&sort_direction=desc&include_user=${user?.toLowerCase()}`
+        const url = `https://ms1.mgvinfra.com/leaderboard?count=100&offset=${skip}&sort=total&sort_direction=desc&include_user=${user?.toLowerCase()}`
         const { data: leaderboard, totalRows } = await fetch(url).then((res) =>
           res.json(),
         )
 
-        const pointsData = leaderboard.map((row: LeaderboardRow) => {
-          const parsedRow = leaderboardSchema.parse(row)
-          return {
-            address: parsedRow.account,
-            totalPoints: parsedRow.total,
-            tradingPoints: parsedRow.taker,
-            lpPoints: parsedRow.maker,
-            rank: parsedRow.rank,
-            referralPoints: 0,
-            communityPoints: parsedRow.community,
-          }
-        })
-        return { data: pointsData, totalRows }
+        const pointsData: PointsRow[] = leaderboard.map(
+          (row: LeaderboardRow) => {
+            const parsedRow = leaderboardSchema.parse(row)
+            return {
+              address: parsedRow.account,
+              totalPoints: parsedRow.total,
+              tradingPoints: parsedRow.taker,
+              lpPoints: parsedRow.maker,
+              rank: parsedRow.rank,
+              referralPoints: 0,
+              communityPoints: parsedRow.community,
+            }
+          },
+        )
 
-        const fakeData = Array.from({ length: 20 }, (_, i) => ({
-          address: `0x${Math.random().toString(16).slice(2, 42)}` as Address,
-          totalPoints: Math.floor(Math.random() * 1000000),
-          tradingPoints: Math.floor(Math.random() * 500000),
-          lpPoints: Math.floor(Math.random() * 300000),
-          rank: i + 1,
-          referralPoints: Math.floor(Math.random() * 100000),
-          communityPoints: Math.floor(Math.random() * 100000),
-        }))
-        return { data: fakeData, totalRows: 100 }
+        return pointsData
       } catch (error) {
-        return { data: [], totalRows: 0 }
+        console.error(error)
+        return []
       }
     },
     enabled: !!user,
   })
   return {
-    data: data ?? { data: [], totalRows: 0 },
+    data: (select ? select(data ?? ([] as PointsRow[])) : data) as unknown as T,
     ...rest,
   }
 }

@@ -131,11 +131,9 @@ export default function DepositToVaultDialog({
 
   useEffect(() => {
     if (!error && isConfirmed && currentStep !== steps.length) {
-      console.log("go to next step")
       reset()
       goToNextStep()
     } else if (isConfirmed && currentStep === steps.length) {
-      console.log("refetch vault")
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })

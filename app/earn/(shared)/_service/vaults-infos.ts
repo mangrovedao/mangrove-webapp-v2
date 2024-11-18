@@ -233,6 +233,7 @@ export async function getVaultsInformation(
         balanceQuote,
         market: vaultMarket as MarketParams,
         pnl: 0,
+        chainId: client.chain?.id,
         tvl: totalInQuote[0],
         baseDollarPrice,
         quoteDollarPrice,

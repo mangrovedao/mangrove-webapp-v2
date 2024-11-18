@@ -38,7 +38,6 @@ export function useVaults<T = Vault[]>({
         )
         return vaults
       } catch (error) {
-        console.log("error", error)
         console.error(error)
         return []
       }

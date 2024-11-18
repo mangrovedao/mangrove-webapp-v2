@@ -7,8 +7,34 @@ import { RaccoonIllustration } from "@/svgs"
 import { cn } from "@/utils"
 import { Tables } from "./_components/tables/tables"
 import Timer from "./_components/timer"
+import { useRewards } from "./hooks/use-rewards"
+import { useConfiguration } from "./hooks/use-rewards-config"
 
 export default function Page() {
+  const { data: configuration } = useConfiguration()
+  const { data: rewards } = useRewards()
+
+  // TODO: fetch rewards list from backend
+  const rewardsList: {
+    epochId: number
+    startDate: bigint
+  }[] = [
+    {
+      epochId: 1,
+      startDate: 0n,
+    },
+  ]
+  // TODO: fetch rewards config from backend with epochId and user address if connected other wise empty string for claimable rewards
+  const rewardsConfig = {
+    epochId: 1,
+    takerRewards: "",
+    makerRewards: "",
+    kandelRewards: "",
+    claimableRewards: "",
+  }
+
+  console.log("is cors", configuration, rewards)
+
   return (
     <main className="mt-8 px-4">
       <Title variant={"header1"} className="pl-5">
@@ -20,14 +46,17 @@ export default function Page() {
             <RaccoonIllustration className="absolute top-0 right-0 hidden sm:block md:-translate-x-1/2 -translate-y-2/3" />
             <Timer />
             <div>
-              <h2 className="font-semibold text-2xl">Epoch #5</h2>
+              <h2 className="font-semibold text-2xl">
+                Epoch #{configuration?.epochId}
+              </h2>
               <div className="text-text-secondary text-xs flex space-x-4">
                 <span>
                   Ends in <span className="text-white">-</span>
                 </span>
                 <div className="w-0.5 h-5 bg-text-secondary"></div>
                 <span>
-                  Current p: <span className="text-white">-</span>
+                  Current p:{" "}
+                  <span className="text-white">{configuration?.epochId}</span>
                 </span>
               </div>
             </div>
@@ -38,7 +67,7 @@ export default function Page() {
           <div className="px-4 md:px-16 py-5 flex">
             <div className="flex flex-col flex-1">
               <Label>Total Epoch Reward</Label>
-              <Value>-</Value>
+              <Value>{0}</Value>
             </div>
             <div className="flex flex-col flex-1 space-y-2">
               <div className="flex justify-between">

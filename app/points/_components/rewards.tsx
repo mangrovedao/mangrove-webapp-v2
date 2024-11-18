@@ -8,13 +8,16 @@ import { useEpochLeaderboard } from "./leaderboard/use-epoch-leaderboard"
 
 export default function Rewards() {
   const { address: account } = useAccount()
+
   const totalLeaderboardQuery = useEpochLeaderboard({
     epoch: "total",
   })
+
   const accountTotalQuery = useEpochLeaderboard({
     epoch: "total",
     account,
   })
+
   const totalPoints = Number(
     accountTotalQuery.data?.leaderboard?.[0]?.total ?? 0,
   )
@@ -39,9 +42,7 @@ export default function Rewards() {
       <div className="text-xs text-cloud-200 flex items-center pt-11">
         update every 7 days
         {/* update in {timeUntilNextUpdate} */}
-        <InfoTooltip>
-          Your total points, recalculated every 7 days.
-        </InfoTooltip>
+        <InfoTooltip>Your total points, recalculated every 7 days.</InfoTooltip>
       </div>
     </div>
   )

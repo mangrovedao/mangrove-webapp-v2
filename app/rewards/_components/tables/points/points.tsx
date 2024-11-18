@@ -13,20 +13,19 @@ export function Points() {
     pageSize: 10,
   })
 
-  const {
-    data: { data, totalRows },
-    isLoading,
-    error,
-    refetch,
-  } = usePoints({
+  const { data, isLoading, error, refetch } = usePoints({
     filters: {
       skip: (page - 1) * pageSize,
     },
   })
 
+  const { data: count } = usePoints({
+    select: (points) => points.length ?? 0,
+  })
+
   React.useEffect(() => {
     refetch?.()
-  }, [chainId])
+  }, [chainId, page])
 
   const table = useTable({ pageSize, data, user })
 
@@ -53,7 +52,7 @@ export function Points() {
         onPageChange: setPageDetails,
         page,
         pageSize,
-        count: totalRows,
+        count,
       }}
     />
   )
