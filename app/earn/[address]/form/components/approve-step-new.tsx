@@ -24,13 +24,13 @@ export function ApproveStep({
         Allow Mangrove to access your {tokenSymbol}?
       </h1>
       <p className="text-base text-gray-scale-300">
-        By granting permission, you are allowing the following{" "}
+        By granting permission, you are allowing{" "}
         <a
           href={`${explorerUrl}/address/${contractAddress}`}
           target="_blank"
           className="text-text-brand"
         >
-          contract
+          this contract
         </a>{" "}
         to access your funds.
       </p>

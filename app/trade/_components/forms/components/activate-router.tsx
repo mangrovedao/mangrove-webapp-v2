@@ -8,8 +8,8 @@ export function ActivateRouter() {
       </div>
       <h1 className="text-2xl text-white text-center">Activate router</h1>
       <p className="text-base text-gray-scale-300">
-        By granting permission, you are allowing the following contract to
-        access your funds.
+        By approving this transaction you're activating the liquidity sourcing
+        router
       </p>
     </div>
   )

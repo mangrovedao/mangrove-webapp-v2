@@ -105,8 +105,7 @@ export default function DeployStrategyDialog({
             Allow Mangrove to create your kandel instance?
           </h1>
           <p className="text-base text-gray-scale-300">
-            By granting permission, you are allowing the following contract to
-            access your funds.
+            By approving this transaction you're deploying a new kandel contract
           </p>
         </div>
       ),

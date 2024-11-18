@@ -7,6 +7,8 @@ type Props = {
   baseDeposit?: string
   quoteToken?: Token
   quoteDeposit?: string
+  contractAddress?: string
+  explorerUrl?: string
 }
 
 export function ApproveStep({
@@ -14,6 +16,8 @@ export function ApproveStep({
   baseDeposit,
   quoteToken,
   quoteDeposit,
+  contractAddress,
+  explorerUrl,
 }: Props) {
   const isFullySided = Number(baseDeposit) > 0 && Number(quoteDeposit) > 0
   const isOnlyBase = Number(baseDeposit) > 0
@@ -45,8 +49,15 @@ export function ApproveStep({
         Allow Mangrove to access your {tokens}?
       </h1>
       <p className="text-base text-gray-scale-300">
-        By granting permission, you are allowing the following contract to
-        access your funds.
+        By granting permission, you are allowing{" "}
+        <a
+          href={`${explorerUrl}/address/${contractAddress}`}
+          target="_blank"
+          className="text-text-brand"
+        >
+          this contract
+        </a>{" "}
+        to access your funds.
       </p>
     </div>
   )
