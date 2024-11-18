@@ -116,7 +116,7 @@ export function MobileOverlay() {
                 </Link>
               ))}
               <Link
-                href={"https://docs.mangrove.exchange/"}
+                href={"https://mangrove-1.gitbook.io/mangrove/"}
                 target="_blank"
                 className="flex items-center w-full gap-2 pr-6 py-4 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover"
               >
@@ -207,7 +207,7 @@ export default function Sidebar() {
               <div className="grid overflow-hidden mt-auto w-[239px]">
                 <Link
                   target="_blank"
-                  href={"https://docs.mangrove.exchange/"}
+                  href={"https://mangrove-1.gitbook.io/mangrove/"}
                   className="w-full px-4 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover active:text-nav-item-button-icon-fg-active"
                 >
                   <MouseHoverEffectContainer text={"Help"}>
