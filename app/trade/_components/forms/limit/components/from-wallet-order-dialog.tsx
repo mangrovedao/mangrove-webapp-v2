@@ -117,7 +117,13 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
       ),
     },
     !limitOrderSteps?.[0].done && {
-      body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
+      body: (
+        <ApproveStep
+          tokenSymbol={sendToken?.symbol ?? ""}
+          contractAddress={spender ?? ""}
+          explorerUrl={chain?.blockExplorers?.default.url}
+        />
+      ),
       button: (
         <div className="flex gap-2 w-full">
           <Button

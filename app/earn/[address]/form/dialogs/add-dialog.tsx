@@ -69,7 +69,7 @@ export default function AddToVaultDialog({
   baseToken,
   mintAmount,
 }: Props) {
-  const { address } = useAccount()
+  const { address, chain } = useAccount()
 
   const baseAmount = parseUnits(baseAmountRaw, baseToken.decimals)
   const quoteAmount = parseUnits(quoteAmountRaw, quoteToken.decimals)
@@ -193,7 +193,11 @@ export default function AddToVaultDialog({
     {
       body: (
         <div className="text-center">
-          <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
+          <ApproveStep
+            tokenSymbol={baseToken?.symbol || ""}
+            contractAddress={vault?.address}
+            explorerUrl={chain?.blockExplorers?.default.url}
+          />
         </div>
       ),
       button: (
@@ -218,7 +222,11 @@ export default function AddToVaultDialog({
     {
       body: (
         <div className="text-center">
-          <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
+          <ApproveStep
+            tokenSymbol={quoteToken?.symbol || ""}
+            contractAddress={vault?.address}
+            explorerUrl={chain?.blockExplorers?.default.url}
+          />
         </div>
       ),
       button: (

@@ -24,12 +24,6 @@ export function useMyVaults<T = Vault[]>({
   const markets = useMarkets()
   const plainVaults = useVaultsWhitelist()
 
-  console.log("useMyVaults", {
-    chainId,
-    user,
-    plainVaults,
-  })
-
   const { data, ...rest } = useQuery({
     queryKey: ["my-vaults", publicClient?.key, user, chainId, first, skip],
     queryFn: async (): Promise<Vault[]> => {

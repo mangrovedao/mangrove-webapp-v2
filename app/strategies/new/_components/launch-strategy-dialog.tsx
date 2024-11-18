@@ -45,7 +45,7 @@ export default function DeployStrategyDialog({
   onClose,
   strategy,
 }: Props) {
-  const { address } = useAccount()
+  const { address, chain } = useAccount()
   const { currentMarket } = useMarket()
   const { base: baseToken, quote: quoteToken } = currentMarket ?? {}
 
@@ -139,7 +139,11 @@ export default function DeployStrategyDialog({
     !baseApprove?.done && {
       body: (
         <div className="text-center">
-          <ApproveStep tokenSymbol={baseToken?.symbol || ""} />
+          <ApproveStep
+            tokenSymbol={baseToken?.symbol || ""}
+            contractAddress={data?.kandelAddress}
+            explorerUrl={chain?.blockExplorers?.default.url}
+          />
         </div>
       ),
       button: (
@@ -167,7 +171,11 @@ export default function DeployStrategyDialog({
     !quoteApprove?.done && {
       body: (
         <div className="text-center">
-          <ApproveStep tokenSymbol={quoteToken?.symbol || ""} />
+          <ApproveStep
+            tokenSymbol={quoteToken?.symbol || ""}
+            contractAddress={data?.kandelAddress}
+            explorerUrl={chain?.blockExplorers?.default.url}
+          />
         </div>
       ),
       button: (

@@ -12,13 +12,18 @@ export function successToast(
   tradeAction: BS,
   baseToken: Token,
   quoteToken: Token,
+  wants: string,
   result: LimitOrderResult,
   receiveToken: Token,
   sendToken: Token,
 ) {
-  const baseValue = tradeAction === BS.buy ? result.takerGot : result.takerGave
-  const quoteValue = tradeAction === BS.buy ? result.takerGave : result.takerGot
-  const filledOrder = `Filled with ${Number(formatUnits(quoteValue, quoteToken.decimals)).toFixed(quoteToken.displayDecimals)} ${quoteToken.symbol}`
+  const filledOrder = `Filled with ${Number(
+    formatUnits(
+      result.takerGot,
+      tradeAction === BS.sell ? quoteToken.decimals : baseToken.decimals,
+    ),
+  )} ${tradeAction === BS.sell ? quoteToken.symbol : baseToken.symbol}`
+
   const notFilledOrder =
     tradeMode == TradeMode.LIMIT
       ? "Limit order posted"
@@ -47,23 +52,40 @@ export function successToast(
             {tradeAction.toUpperCase()}
           </span>
           <span>
-            {Number(formatUnits(baseValue, baseToken.decimals)).toFixed(
-              baseToken.priceDisplayDecimals,
-            )}{" "}
-            {baseToken.symbol}
+            {Number(result.takerGot) <= 0
+              ? Number(wants).toFixed(
+                  tradeAction === BS.sell
+                    ? quoteToken.displayDecimals
+                    : baseToken.displayDecimals,
+                )
+              : Number(
+                  formatUnits(
+                    result.takerGot,
+                    tradeAction === BS.sell
+                      ? quoteToken.decimals
+                      : baseToken.decimals,
+                  ),
+                ).toFixed(
+                  tradeAction === BS.sell
+                    ? quoteToken.displayDecimals
+                    : baseToken.displayDecimals,
+                )}{" "}
+            {tradeAction === BS.sell ? quoteToken.symbol : baseToken.symbol}
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">FEE</span>
-          <span>
-            {Number(formatUnits(result.feePaid, receiveToken.decimals)).toFixed(
-              receiveToken.displayDecimals + 2,
-            )}{" "}
-            {receiveToken.symbol}
-          </span>
-        </div>
+        {Number(result.feePaid) > 0 ? (
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">FEE</span>
+            <span>
+              {Number(
+                formatUnits(result.feePaid, receiveToken.decimals),
+              ).toFixed(receiveToken.displayDecimals)}{" "}
+              {receiveToken.symbol}
+            </span>
+          </div>
+        ) : undefined}
       </div>
     </div>,
-    { duration: 5000, dismissible: true },
+    { duration: 1000000, dismissible: true },
   )
 }

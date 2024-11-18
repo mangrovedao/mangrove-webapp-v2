@@ -61,6 +61,16 @@ export default function Page() {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])
 
+  const baseDepositDollar = vault
+    ? Number(formatUnits(vault.userBaseBalance, vault.market.base.decimals)) *
+      vault.baseDollarPrice
+    : 0
+
+  const quoteDepositDollar = vault?.quoteDollarPrice
+    ? Number(formatUnits(vault.userQuoteBalance, vault.market.quote.decimals)) *
+      vault.quoteDollarPrice
+    : 0
+
   return (
     <div className="max-w-7xl mx-auto lg:px-3 pb-4">
       {/* BreadCrumb   */}
@@ -277,26 +287,8 @@ export default function Page() {
                   value={
                     <div className="flex items-center justify-center gap-2">
                       <span className="text-xs flex gap-1">
-                        {Number(
-                          formatUnits(
-                            vault?.userBaseBalance || 0n,
-                            vault?.market.base.decimals || 18,
-                          ),
-                        ).toFixed(vault?.market.base.displayDecimals || 4)}
-                        <span className="text-text-secondary text-xs">
-                          {vault?.market.base.symbol}
-                        </span>
-                      </span>
-                      <span className="text-xs flex gap-1">
-                        {Number(
-                          formatUnits(
-                            vault?.userQuoteBalance || 0n,
-                            vault?.market.quote.decimals || 18,
-                          ),
-                        ).toFixed(vault?.market.quote.displayDecimals || 4)}
-                        <span className="text-text-secondary text-xs">
-                          {vault?.market.quote.symbol}
-                        </span>
+                        {(baseDepositDollar + quoteDepositDollar).toFixed(2)}
+                        <span className="text-text-secondary text-xs">$</span>
                       </span>
                     </div>
                   }

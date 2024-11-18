@@ -166,7 +166,13 @@ export default function EditOrderSteps({
       ),
     },
     !limitOrderSteps?.[0].done && {
-      body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
+      body: (
+        <ApproveStep
+          tokenSymbol={sendToken?.symbol ?? ""}
+          contractAddress={spender ?? ""}
+          explorerUrl={chain?.blockExplorers?.default.url}
+        />
+      ),
       button: (
         <Button
           {...btnProps}

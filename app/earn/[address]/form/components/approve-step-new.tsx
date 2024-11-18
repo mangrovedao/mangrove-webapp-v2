@@ -2,9 +2,15 @@ import { TokenIcon } from "@/components/token-icon"
 
 type Props = {
   tokenSymbol: string
+  contractAddress?: string
+  explorerUrl?: string
 }
 
-export function ApproveStep({ tokenSymbol }: Props) {
+export function ApproveStep({
+  tokenSymbol,
+  contractAddress,
+  explorerUrl,
+}: Props) {
   return (
     <div className="border border-border-secondary rounded-lg p-4 space-y-8">
       <div className="flex justify-center items-center">
@@ -18,8 +24,15 @@ export function ApproveStep({ tokenSymbol }: Props) {
         Allow Mangrove to access your {tokenSymbol}?
       </h1>
       <p className="text-base text-gray-scale-300">
-        By granting permission, you are allowing the following contract to
-        access your funds.
+        By granting permission, you are allowing the following{" "}
+        <a
+          href={`${explorerUrl}/address/${contractAddress}`}
+          target="_blank"
+          className="text-text-brand"
+        >
+          contract
+        </a>{" "}
+        to access your funds.
       </p>
     </div>
   )

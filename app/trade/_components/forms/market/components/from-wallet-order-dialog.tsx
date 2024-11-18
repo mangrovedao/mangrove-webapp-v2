@@ -98,7 +98,13 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
       ),
     },
     !marketOrderSteps?.[0].done && {
-      body: <ApproveStep tokenSymbol={sendToken?.symbol ?? ""} />,
+      body: (
+        <ApproveStep
+          tokenSymbol={sendToken?.symbol ?? ""}
+          contractAddress={spender ?? ""}
+          explorerUrl={chain?.blockExplorers?.default.url}
+        />
+      ),
       button: (
         <div className="flex gap-2 w-full ">
           <Button

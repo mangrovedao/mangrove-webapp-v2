@@ -22,6 +22,8 @@ import {
 import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { TradeMode } from "../../enums"
+import { successToast } from "../../utils"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 import { estimateTimestamp } from "../utils"
@@ -87,6 +89,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           bs === "buy"
             ? parseUnits(wants, base.decimals)
             : parseUnits(gives, base.decimals)
+
         const quoteAmount =
           bs === "buy"
             ? parseUnits(gives, quote.decimals)
@@ -126,16 +129,17 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
             bs: BS.buy,
           },
         )
-        toast.success("Limit order posted")
-        // successToast(
-        //   TradeMode.LIMIT,
-        //   bs,
-        //   base,
-        //   quote,
-        //   result,
-        //   receiveToken,
-        //   sendToken,
-        // )
+
+        successToast(
+          TradeMode.LIMIT,
+          bs,
+          base,
+          quote,
+          wants,
+          result,
+          receiveToken,
+          sendToken,
+        )
 
         return { result, receipt }
       } catch (error) {

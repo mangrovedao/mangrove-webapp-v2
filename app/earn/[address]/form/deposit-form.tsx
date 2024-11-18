@@ -37,7 +37,7 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * baseBalance.balance) / 10_000n
 
     setBaseSliderValue(value)
-    setQuoteSliderValue(0)
+    // setQuoteSliderValue(0)
     handleBaseDepositChange(formatUnits(amount, baseBalance.token.decimals))
   }
 
@@ -46,7 +46,7 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * quoteBalance.balance) / 10_000n
 
     setQuoteSliderValue(value)
-    setBaseSliderValue(0)
+    // setBaseSliderValue(0)
     handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
   }
 
@@ -68,6 +68,7 @@ export function DepositForm({ className }: { className?: string }) {
         sendSliderValue={baseSliderValue}
         setSendSliderValue={handleBaseSliderChange}
         token={baseToken}
+        disabled={vault?.totalBase === 0n && vault?.totalQuote !== 0n}
         dollarAmount={
           (Number(baseDeposit) * (vault?.baseDollarPrice || 0)).toFixed(
             baseToken.displayDecimals,
@@ -86,6 +87,7 @@ export function DepositForm({ className }: { className?: string }) {
         sendSliderValue={quoteSliderValue}
         setSendSliderValue={handleQuoteSliderChange}
         token={quoteToken}
+        disabled={vault?.totalQuote === 0n && vault?.totalBase !== 0n}
         dollarAmount={
           (Number(quoteDeposit) * (vault?.quoteDollarPrice || 0)).toFixed(
             quoteToken.displayDecimals,

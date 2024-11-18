@@ -122,6 +122,7 @@ export const EnhancedNumericInput = React.forwardRef<
                       key={`percentage-button-${value}`}
                       variant={"secondary"}
                       size={"md"}
+                      disabled={inputProps.disabled}
                       value={sendSliderValue}
                       className={cn(
                         "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
@@ -141,6 +142,7 @@ export const EnhancedNumericInput = React.forwardRef<
                     key={`percentage-button-max`}
                     variant={"secondary"}
                     size={"md"}
+                    disabled={inputProps.disabled}
                     className={cn(
                       "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                     )}

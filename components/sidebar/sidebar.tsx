@@ -45,7 +45,7 @@ const MENUS = [
   {
     href: "",
     icon: GouvernanceIcon,
-    text: "Gouvernance",
+    text: "Governance",
     disabled: true,
   },
   {
@@ -116,7 +116,8 @@ export function MobileOverlay() {
                 </Link>
               ))}
               <Link
-                href={"/help"}
+                href={"https://docs.mangrove.exchange/"}
+                target="_blank"
                 className="flex items-center w-full gap-2 pr-6 py-4 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover"
               >
                 <span className="w-[39px] flex justify-center items-center">
@@ -205,7 +206,8 @@ export default function Sidebar() {
               </div>
               <div className="grid overflow-hidden mt-auto w-[239px]">
                 <Link
-                  href={"/help"}
+                  target="_blank"
+                  href={"https://docs.mangrove.exchange/"}
                   className="w-full px-4 transition relative text-nav-item-button-icon-fg hover:text-nav-item-button-icon-fg-hover active:text-nav-item-button-icon-fg-active"
                 >
                   <MouseHoverEffectContainer text={"Help"}>
