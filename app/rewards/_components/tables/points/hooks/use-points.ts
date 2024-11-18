@@ -34,7 +34,7 @@ export function usePoints<T = PointsRow[]>({
     queryKey: ["points", user, first, skip],
     queryFn: async (): Promise<PointsRow[]> => {
       try {
-        const url = `https://ms1.mgvinfra.com/leaderboard?count=100&offset=${skip}&sort=total&sort_direction=desc&include_user=${user?.toLowerCase()}`
+        const url = `https://ms1.mgvinfra.com/leaderboard?count=1000000&offset=${skip}&sort=total&sort_direction=desc&include_user=${user?.toLowerCase()}`
         const { data: leaderboard, totalRows } = await fetch(url).then((res) =>
           res.json(),
         )
