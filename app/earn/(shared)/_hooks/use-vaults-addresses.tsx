@@ -24,14 +24,11 @@ export const VAULTS_WHITELIST_BASE_SEPOLIA = [
   },
 ]
 
-// 0xae68E2f084bC5B72Dbb5Dc5bD75AF8879eDb5CBC base sepolia
-// 0x270cD0d6D6e078e968c24Ef7d0c2eB82f02b1446 arbitrum
-
 export function useVaultsWhitelist() {
   const { chainId } = useAccount()
   switch (chainId) {
     case blast.id:
-      return VAULTS_WHITELIST_BASE_SEPOLIA
+      return []
     case arbitrum.id:
       return VAULTS_WHITELIST_ARBITRUM
     case baseSepolia.id:

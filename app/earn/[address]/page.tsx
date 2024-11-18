@@ -55,11 +55,8 @@ export default function Page() {
   const {
     data: { vault },
     refetch,
+    isPending,
   } = useVault(params.address)
-
-  React.useEffect(() => {
-    setTimeout(() => refetch?.(), 1)
-  }, [refetch])
 
   const baseDepositDollar = vault
     ? Number(formatUnits(vault.userBaseBalance, vault.market.base.decimals)) *
@@ -71,11 +68,20 @@ export default function Page() {
       vault.quoteDollarPrice
     : 0
 
-  // React.useEffect(() => {
-  //   if (chain?.id !== vault?.chainId) {
-  //     redirect(`/earn`)
-  //   }
-  // }, [chain?.id])
+  React.useEffect(() => {
+    setTimeout(() => refetch?.(), 1)
+  }, [refetch])
+
+  React.useEffect(() => {
+    // Wait for initial load and check if vault is still null after
+    const timer = setTimeout(() => {
+      if (vault === null) {
+        window.location.href = "/earn"
+      }
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [vault])
 
   return (
     <div className="max-w-7xl mx-auto lg:px-3 pb-4">
