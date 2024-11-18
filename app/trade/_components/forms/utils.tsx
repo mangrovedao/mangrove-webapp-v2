@@ -86,6 +86,6 @@ export function successToast(
         ) : undefined}
       </div>
     </div>,
-    { duration: 1000000, dismissible: true },
+    { duration: 5000, dismissible: true },
   )
 }
