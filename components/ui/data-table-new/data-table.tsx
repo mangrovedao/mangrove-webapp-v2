@@ -42,7 +42,7 @@ export function DataTable<TData>({
   onRowClick,
   renderExtraRow = () => null,
   tableRowClasses,
-  skeletonRows = 2,
+  skeletonRows = 1,
   cellClasses,
   rowHighlightedClasses,
 }: DataTableProps<TData>) {
