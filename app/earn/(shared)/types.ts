@@ -7,6 +7,7 @@ export type VaultWhitelist = {
   description: string
   descriptionBonus: string
   strategyType: string
+  market: MarketParams
 }
 
 export type Vault = {

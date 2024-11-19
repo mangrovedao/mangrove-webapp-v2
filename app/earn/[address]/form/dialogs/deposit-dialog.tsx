@@ -55,8 +55,6 @@ export default function DepositToVaultDialog({
 }: Props) {
   const { address, chain } = useAccount()
 
-  const baseAmount = parseUnits(baseAmountRaw, baseToken.decimals)
-  const quoteAmount = parseUnits(quoteAmountRaw, quoteToken.decimals)
   const queryClient = useQueryClient()
 
   const {
@@ -78,12 +76,29 @@ export default function DepositToVaultDialog({
         functionName: "allowance",
         args: [address as Address, vault?.address as Address],
       },
+      {
+        address: vault?.address,
+        abi: erc20Abi,
+        functionName: "totalSupply",
+      },
     ],
     allowFailure: false,
     query: {
       enabled: !!address && !!vault,
     },
   })
+
+  const totalSupply = data?.[2] || 0n
+
+  // amounts with 1% slippage (just in case)
+  const baseAmount =
+    (parseUnits(baseAmountRaw, baseToken.decimals) *
+      (totalSupply === 0n ? 10_000n : 10_100n)) /
+    10_000n
+  const quoteAmount =
+    (parseUnits(quoteAmountRaw, quoteToken.decimals) *
+      (totalSupply === 0n ? 10_000n : 10_100n)) /
+    10_000n
 
   const missingBaseAllowance =
     (data?.[0] || 0n) > baseAmount ? 0n : baseAmount - (data?.[0] || 0n)
