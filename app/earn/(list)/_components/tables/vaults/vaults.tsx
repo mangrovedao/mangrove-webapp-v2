@@ -7,6 +7,7 @@ import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
 import type { Strategy } from "../../../_schemas/kandels"
 
+import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault } from "@/app/earn/(shared)/types"
 import { useTable } from "./hooks/use-table"
 import { useVaults } from "./hooks/use-vaults"
@@ -20,10 +21,13 @@ export function Vaults() {
     pageSize: 10,
   })
 
+  const whitelist = useVaultsWhitelist()
+
   const { data, isLoading, error, refetch } = useVaults({
     filters: {
       skip: (page - 1) * pageSize,
     },
+    whitelist,
   })
 
   const { data: count } = useVaults({
@@ -41,6 +45,7 @@ export function Vaults() {
   const table = useTable({
     pageSize,
     data,
+    whitelist,
     onDeposit: (vault: Vault) => undefined,
   })
 
