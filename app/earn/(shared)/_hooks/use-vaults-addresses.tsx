@@ -10,7 +10,7 @@ import { useAccount } from "wagmi"
 
 export const VAULTS_WHITELIST_ARBITRUM = [
   {
-    manager: "Redacted labs",
+    manager: "Redacted Labs",
     address: "0x17086132Af8d39586c25FF8eA0B0283652108402" as Address,
     market: arbitrumARBUSDCe,
     strategyType: "Kandel Aave",
@@ -19,7 +19,7 @@ export const VAULTS_WHITELIST_ARBITRUM = [
     descriptionBonus: "More infos...",
   },
   {
-    manager: "Redacted labs",
+    manager: "Redacted Labs",
     address: "0x533fcD483a7793bfC6f1D1Fe0f25158Cc60e0cC1" as Address,
     market: arbitrumWETHUSDC,
     strategyType: "Kandel Aave",
@@ -28,7 +28,7 @@ export const VAULTS_WHITELIST_ARBITRUM = [
     descriptionBonus: "More infos...",
   },
   {
-    manager: "Redacted labs",
+    manager: "Redacted Labs",
     address: "0xD97278e50aFd813C697526AaEAeC5022393d4B7B" as Address,
     market: arbitrumWBTCUSDT,
     strategyType: "Kandel Aave",
@@ -40,7 +40,7 @@ export const VAULTS_WHITELIST_ARBITRUM = [
 
 export const VAULTS_WHITELIST_BASE_SEPOLIA = [
   {
-    manager: "Redacted labs",
+    manager: "Redacted Labs",
     address: "0xae68E2f084bC5B72Dbb5Dc5bD75AF8879eDb5CBC" as Address,
     market: baseSepoliaWBTCDAI,
     strategyType: "Kandel",

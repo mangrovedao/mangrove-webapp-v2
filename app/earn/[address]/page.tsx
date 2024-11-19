@@ -151,18 +151,20 @@ export default function Page() {
       <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5 ">
         <div className="col-span-12 md:col-span-8 space-y-6">
           {/* Infos Card */}
-          <div className="mx-1 grid sm:flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
+          <div className="mx-1 flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
             <GridLineHeader
               title={"TVL"}
               value={
-                Number(
-                  formatUnits(
-                    vault?.tvl || 0n,
-                    vault?.market.quote.decimals || 18,
-                  ),
+                (
+                  Number(
+                    formatUnits(
+                      vault?.tvl || 0n,
+                      vault?.market.quote.decimals || 18,
+                    ),
+                  ) * (vault?.quoteDollarPrice ?? 1)
                 ).toFixed(vault?.market.quote.displayDecimals || 3) ?? "0"
               }
-              symbol={` ${vault?.market.quote.symbol || ""}`}
+              symbol={` $`}
             />
             <GridLineHeader title={"APY"} value={"... "} symbol={"%"} />
             <GridLineHeader
