@@ -155,14 +155,16 @@ export default function Page() {
             <GridLineHeader
               title={"TVL"}
               value={
-                Number(
-                  formatUnits(
-                    vault?.tvl || 0n,
-                    vault?.market.quote.decimals || 18,
-                  ),
+                (
+                  Number(
+                    formatUnits(
+                      vault?.tvl || 0n,
+                      vault?.market.quote.decimals || 18,
+                    ),
+                  ) * (vault?.quoteDollarPrice ?? 1)
                 ).toFixed(vault?.market.quote.displayDecimals || 3) ?? "0"
               }
-              symbol={` ${vault?.market.quote.symbol || ""}`}
+              symbol={` $`}
             />
             <GridLineHeader title={"APY"} value={"... "} symbol={"%"} />
             <GridLineHeader
