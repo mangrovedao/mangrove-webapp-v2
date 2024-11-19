@@ -34,10 +34,7 @@ export function successToast(
       : "Market order not filled (slippage too low)"
 
   const fillText = Number(result.takerGot) > 0 ? filledOrder : notFilledOrder
-  console.log(
-    formatUnits(result.feePaid, receiveToken.decimals),
-    formatUnits(result.feePaid, sendToken.decimals),
-  )
+
   toast(
     <div className="grid gap-2 w-full">
       <div className="flex space-x-2 items-center">

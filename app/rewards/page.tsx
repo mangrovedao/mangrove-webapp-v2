@@ -3,6 +3,11 @@
 import NeonContainer from "@/components/neon-container"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
 import { formatUnits } from "viem"
@@ -14,10 +19,13 @@ import { useConfiguration } from "./hooks/use-rewards-config"
 export default function Page() {
   const { data: configuration } = useConfiguration()
   const { data: rewards } = useRewards({
-    epochId: configuration?.epochId ?? "1",
+    epochId: configuration?.epochId || "1",
   })
 
-  console.log("rewards config", configuration, rewards)
+  const totalRewards =
+    BigInt(rewards?.takerReward ?? 0n) +
+    BigInt(rewards?.makerReward ?? 0n) +
+    BigInt(rewards?.kandelRewards ?? 0n)
 
   return (
     <main className="mt-8 px-4">
@@ -37,7 +45,30 @@ export default function Page() {
               </h2>
               <div className="text-text-secondary text-xs flex space-x-4">
                 <span>
-                  Ends in <span className="text-white">...</span>
+                  Ends in{" "}
+                  <span className="text-white">
+                    {configuration?.nextEpoch
+                      ? (() => {
+                          const nextEpochTime = new Date(
+                            configuration.nextEpoch ?? 0,
+                          ).getTime()
+                          const timeLeft = nextEpochTime - Date.now()
+
+                          const days = Math.floor(
+                            timeLeft / (1000 * 60 * 60 * 24),
+                          )
+                          const hours = Math.floor(
+                            (timeLeft % (1000 * 60 * 60 * 24)) /
+                              (1000 * 60 * 60),
+                          )
+                          const minutes = Math.floor(
+                            (timeLeft % (1000 * 60 * 60)) / (1000 * 60),
+                          )
+
+                          return `${days} d: ${hours} h: ${minutes} m`
+                        })()
+                      : "..."}
+                  </span>
                 </span>
                 <div className="w-0.5 h-5 bg-text-secondary"></div>
                 <span>
@@ -54,27 +85,79 @@ export default function Page() {
             <div className="flex flex-col flex-1">
               <Label>Total Epoch Reward</Label>
               <Value className="flex-wrap text-wrap">
-                {/* {formatUnits(BigInt(configuration?.totalBudget ?? 0n), 18)} */}
-                ...
+                {Number(formatUnits(totalRewards, 18)) <= 0.0001 &&
+                BigInt(totalRewards) !== 0n
+                  ? "~ "
+                  : ""}
+                <Tooltip>
+                  <TooltipTrigger>
+                    {Number(formatUnits(totalRewards, 18)).toFixed(4)}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {formatUnits(totalRewards, 18)}
+                  </TooltipContent>
+                </Tooltip>
               </Value>
             </div>
             <div className="flex flex-col flex-1 space-y-2">
               <div className="flex justify-between">
                 <Label>Taker Rewards</Label>
                 <Value size="small">
-                  {formatUnits(BigInt(rewards?.takerReward ?? 0n), 8)}
+                  {Number(
+                    formatUnits(BigInt(rewards?.takerReward ?? 0n), 18),
+                  ) <= 0.0001 && BigInt(rewards?.takerReward ?? 0n) !== 0n
+                    ? "~ "
+                    : ""}
+                  <Tooltip>
+                    <TooltipTrigger>
+                      {Number(
+                        formatUnits(BigInt(rewards?.takerReward ?? 0n), 18),
+                      ).toFixed(4)}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {formatUnits(BigInt(rewards?.takerReward ?? 0n), 18)}
+                    </TooltipContent>
+                  </Tooltip>
                 </Value>
               </div>
               <div className="flex justify-between">
                 <Label>Maker Rewards</Label>
                 <Value size="small">
-                  {formatUnits(BigInt(rewards?.makerReward ?? 0n), 8)}
+                  {Number(
+                    formatUnits(BigInt(rewards?.makerReward ?? 0n), 18),
+                  ) <= 0.0001 && BigInt(rewards?.makerReward ?? 0n) !== 0n
+                    ? "~ "
+                    : ""}
+                  <Tooltip>
+                    <TooltipTrigger>
+                      {Number(
+                        formatUnits(BigInt(rewards?.makerReward ?? 0n), 18),
+                      ).toFixed(4)}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {formatUnits(BigInt(rewards?.makerReward ?? 0n), 18)}
+                    </TooltipContent>
+                  </Tooltip>
                 </Value>
               </div>
               <div className="flex justify-between">
                 <Label>Kandel Rewards</Label>
                 <Value size="small">
-                  {formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 8)}
+                  {Number(
+                    formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 18),
+                  ) <= 0.0001 && BigInt(rewards?.kandelRewards ?? 0n) !== 0n
+                    ? "~ "
+                    : ""}
+                  <Tooltip>
+                    <TooltipTrigger>
+                      {Number(
+                        formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 18),
+                      ).toFixed(4)}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 18)}
+                    </TooltipContent>
+                  </Tooltip>
                 </Value>
               </div>
             </div>
@@ -90,7 +173,14 @@ export default function Page() {
             <div className="flex justify-between">
               <Label>Available rewards</Label>
               <Value>
-                {formatUnits(BigInt(rewards?.claimableRewards ?? 0n), 8)}
+                {Number(
+                  formatUnits(BigInt(rewards?.claimableRewards ?? 0n), 18),
+                ) <= 0.0001 && BigInt(rewards?.claimableRewards ?? 0n) !== 0n
+                  ? "~ "
+                  : ""}
+                {Number(
+                  formatUnits(BigInt(rewards?.claimableRewards ?? 0n), 18),
+                ).toFixed(4)}
               </Value>
             </div>
 

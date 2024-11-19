@@ -5,10 +5,10 @@ import { useAccount } from "wagmi"
 import { rewardsSchema } from "../schemas/rewards-configuration"
 
 type UseRewardsProps = {
-  epochId: string
+  epochId?: string
 }
 
-export const useRewards = ({ epochId }: UseRewardsProps) => {
+export const useRewards = ({ epochId = "1" }: UseRewardsProps) => {
   const { address, chain } = useAccount()
 
   return useQuery({
