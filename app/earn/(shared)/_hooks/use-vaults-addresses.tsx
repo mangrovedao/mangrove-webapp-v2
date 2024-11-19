@@ -1,9 +1,9 @@
 import {
-  arbitrumARBUSDCe,
   arbitrumWBTCUSDT,
   arbitrumWETHUSDC,
   baseSepoliaWBTCDAI,
 } from "@mangrovedao/mgv/addresses"
+import { arbitrumARBUSDCe } from "@mangrovedao/mgv/addresses/markets/arbitrum"
 import { Address } from "viem"
 import { arbitrum, baseSepolia, blast } from "viem/chains"
 import { useAccount } from "wagmi"
@@ -59,6 +59,10 @@ export const VAULTS_WHITELIST_BASE_SEPOLIA = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo ed ut perspiciatis unde omnis iste natus error sit voluptatem perspiciatis ...",
     descriptionBonus: "More infos...",
+    socials: {
+      x: "https://x.com/RedactedLabs_",
+      website: "https://www.redactedlabs.fr/",
+    },
   },
 ]
 
