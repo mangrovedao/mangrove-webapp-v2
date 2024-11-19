@@ -81,7 +81,6 @@ export default function Page() {
     return () => clearTimeout(timer)
   }, [vault])
 
-  console.log(`${chain?.blockExplorers?.default.url}/address/${vault?.address}`)
   return (
     <div className="max-w-7xl mx-auto lg:px-3 pb-4">
       {/* BreadCrumb   */}
@@ -176,18 +175,19 @@ export default function Page() {
 
           {/* Description */}
           <div className="mx-5 space-y-3">
-            <Title variant={"title2"} className="text-text-primary ">
+            <Title variant={"title1"} className="text-text-primary ">
               Vault description
             </Title>
-            <Caption className="font-axiforma text-text-secondary text-xs">
+            <Caption className="font-axiforma text-text-secondary">
               {vault?.description?.split("\n").map((line, i) => (
                 <React.Fragment key={i}>
                   {line.startsWith("- ") ? (
                     <li className="list-disc ml-4">{line.substring(2)}</li>
                   ) : line.includes(":") ? (
                     <>
-                      {line}
-                      <br />
+                      <Title variant={"title3"} className="text-text-primary">
+                        {line.split(":")[0]}
+                      </Title>
                     </>
                   ) : (
                     line

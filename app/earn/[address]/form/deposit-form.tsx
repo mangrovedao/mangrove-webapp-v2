@@ -37,7 +37,7 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * baseBalance.balance) / 10_000n
 
     setBaseSliderValue(value)
-    // setQuoteSliderValue(0)
+    setQuoteSliderValue(0)
     handleBaseDepositChange(formatUnits(amount, baseBalance.token.decimals))
   }
 
@@ -46,9 +46,19 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * quoteBalance.balance) / 10_000n
 
     setQuoteSliderValue(value)
-    // setBaseSliderValue(0)
+    setBaseSliderValue(0)
     handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
   }
+
+  React.useEffect(() => {
+    if (vault?.totalBase === 0n && vault?.totalQuote !== 0n) {
+      handleQuoteSliderChange(25)
+    } else if (vault?.totalQuote === 0n && vault?.totalBase !== 0n) {
+      handleBaseSliderChange(25)
+    } else {
+      handleBaseSliderChange(25)
+    }
+  }, [vault])
 
   if (!baseToken || !quoteToken)
     return (
