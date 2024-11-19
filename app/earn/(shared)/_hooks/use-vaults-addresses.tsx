@@ -3,14 +3,14 @@ import { arbitrum, baseSepolia, blast } from "viem/chains"
 import { useAccount } from "wagmi"
 
 export const VAULTS_WHITELIST_ARBITRUM = [
-  {
-    manager: "Redacted labs",
-    address: "0x270cD0d6D6e078e968c24Ef7d0c2eB82f02b1446" as Address,
-    strategyType: "Kandel",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo ed ut perspiciatis unde omnis iste natus error sit voluptatem perspiciatis ...",
-    descriptionBonus: "More infos...",
-  },
+  // {
+  //   manager: "Redacted labs",
+  //   address: "0x270cD0d6D6e078e968c24Ef7d0c2eB82f02b1446" as Address,
+  //   strategyType: "Kandel",
+  //   description:
+  //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo ed ut perspiciatis unde omnis iste natus error sit voluptatem perspiciatis ...",
+  //   descriptionBonus: "More infos...",
+  // },
 ]
 
 export const VAULTS_WHITELIST_BASE_SEPOLIA = [
