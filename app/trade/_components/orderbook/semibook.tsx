@@ -36,6 +36,10 @@ export const SemiBook = React.forwardRef<
   )
   const refIndex = type === "bids" ? 0 : offers?.length ? offers.length - 1 : 0
 
+  if (type === "asks") {
+    offers?.sort((a, b) => a.price - b.price)
+  }
+
   return (offers ?? []).map((offer, i) => {
     const { price, id, volume, cumulatedVolume } = offer
     const cumulatedVolumePercentage =
