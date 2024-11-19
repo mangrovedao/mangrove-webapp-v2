@@ -1,9 +1,9 @@
 import {
+  arbitrumARBUSDCe,
   arbitrumWBTCUSDT,
   arbitrumWETHUSDC,
   baseSepoliaWBTCDAI,
 } from "@mangrovedao/mgv/addresses"
-import { arbitrumARBUSDCe } from "@mangrovedao/mgv/addresses/markets/arbitrum"
 import { Address } from "viem"
 import { arbitrum, baseSepolia, blast } from "viem/chains"
 import { useAccount } from "wagmi"
