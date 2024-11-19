@@ -292,7 +292,7 @@ export default function Page() {
                     }
                   />
 
-                  <GridLine title="Vault Created on" value={"March 2024"} />
+                  <GridLine title="Vault Created on" value={"November 2024"} />
                 </div>
               </div>
             </div>
