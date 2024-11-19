@@ -54,7 +54,7 @@ export function MyVaults() {
         table={table}
         emptyArrayMessage="No positions yet."
         isError={!!error}
-        isLoading={isLoading}
+        // isLoading={isLoading}
         onRowClick={(vault) =>
           // note: lost of context after redirecting with push method here
           // push(`/earn/${strategy?.address}`)

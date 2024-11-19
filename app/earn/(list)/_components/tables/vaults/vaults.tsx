@@ -49,7 +49,7 @@ export function Vaults() {
       <DataTable
         table={table}
         isError={!!error}
-        isLoading={isLoading}
+        // isLoading={isLoading}
         onRowClick={
           (vault) => {
             if (vault) {
