@@ -35,9 +35,9 @@ export function Vaults() {
   })
 
   // temporary fix
-  // React.useEffect(() => {
-  //   refetch?.()
-  // }, [chainId])
+  React.useEffect(() => {
+    refetch?.()
+  }, [chainId])
 
   // selected strategy to cancel
   const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
@@ -54,7 +54,7 @@ export function Vaults() {
       <DataTable
         table={table}
         isError={!!error}
-        // isLoading={isLoading}
+        isLoading={isLoading}
         onRowClick={
           (vault) => {
             if (vault) {

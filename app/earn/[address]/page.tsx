@@ -4,8 +4,6 @@ import {
   CheckIcon,
   ChevronRight,
   Globe,
-  Mail,
-  Send,
   SquareArrowOutUpRight,
   Twitter,
 } from "lucide-react"
@@ -244,10 +242,22 @@ export default function Page() {
                     value={vault?.manager}
                     icon={
                       <div className="flex gap-1 text-text-secondary">
-                        <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                        <Send className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                        <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                        <Mail className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        <Link
+                          href={vault?.socials.website || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        </Link>
+                        {/* <Send className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
+                        <Link
+                          href={vault?.socials.x || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        </Link>
+                        {/* <Mail className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
                       </div>
                     }
                   />
@@ -263,6 +273,7 @@ export default function Page() {
                   <GridLine
                     title="Strategy Address"
                     value={shortenAddress(vault?.address || "")}
+                    href={`${chain?.blockExplorers?.default}/address/${vault?.address}`}
                     icon={
                       <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                     }
@@ -287,6 +298,7 @@ export default function Page() {
                   <GridLine
                     title="Audit"
                     value={"Website"}
+                    href={vault?.socials.website}
                     icon={
                       <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                     }
@@ -480,6 +492,7 @@ const GridLine = ({
   info,
   icon,
   iconFirst,
+  href,
 }: {
   title: ReactNode
   value: ReactNode
@@ -487,6 +500,7 @@ const GridLine = ({
   icon?: ReactNode
   iconFirst?: boolean
   info?: string
+  href?: string
 }) => {
   return (
     <div className="grid items-center mt-2">
@@ -509,7 +523,18 @@ const GridLine = ({
             <span className="text-text-tertiary">{symbol}</span>
           ) : undefined}
         </Text>
-        <span className="text-text-secondary">{icon}</span>
+        {href ? (
+          <Link
+            href={href || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-text-secondary"
+          >
+            {icon}
+          </Link>
+        ) : (
+          <span className="text-text-secondary">{icon}</span>
+        )}
       </div>
     </div>
   )
