@@ -81,6 +81,7 @@ export default function Page() {
     return () => clearTimeout(timer)
   }, [vault])
 
+  console.log(`${chain?.blockExplorers?.default.url}/address/${vault?.address}`)
   return (
     <div className="max-w-7xl mx-auto lg:px-3 pb-4">
       {/* BreadCrumb   */}
@@ -231,12 +232,7 @@ export default function Page() {
                       </div>
                     }
                   />
-                  <GridLine
-                    title="Chain"
-                    value={chain?.name}
-                    icon={getChainImage(chain?.id, chain?.name)}
-                    iconFirst
-                  />
+
                   <GridLine
                     title="Vault Manager"
                     value={vault?.manager}
@@ -269,40 +265,38 @@ export default function Page() {
                     symbol="%"
                     info="A fee based on the profits generated from your deposit."
                   />
-
                   <GridLine
-                    title="Strategy Address"
-                    value={shortenAddress(vault?.address || "")}
-                    href={`${chain?.blockExplorers?.default}/address/${vault?.address}`}
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
-                  />
-
-                  <GridLine
-                    title="Vault Address"
-                    value={shortenAddress(vault?.address || "")}
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
+                    title="Chain"
+                    value={chain?.name}
+                    icon={getChainImage(chain?.id, chain?.name)}
+                    iconFirst
                   />
                 </div>
                 <div>
                   <GridLine
+                    title="Vault Address"
+                    value={shortenAddress(vault?.address || "")}
+                    href={`${chain?.blockExplorers?.default.url}/address/${vault?.address}`}
+                    icon={
+                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                    }
+                  />
+
+                  {/* <GridLine
                     title="Management Fee"
                     value={vault?.managementFee}
                     symbol="%"
                     info="A fee for overseeing and managing the vault."
-                  />
+                  /> */}
 
-                  <GridLine
+                  {/* <GridLine
                     title="Audit"
                     value={"Website"}
                     href={vault?.socials.website}
                     icon={
                       <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                     }
-                  />
+                  /> */}
 
                   <GridLine title="Vault Created on" value={"November 2024"} />
                 </div>
