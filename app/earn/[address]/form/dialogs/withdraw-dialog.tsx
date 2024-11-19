@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
+import { toast } from "sonner"
 import { parseAbi, parseUnits } from "viem"
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { DialogAmountLine } from "./utils"
@@ -41,6 +42,7 @@ export default function RemoveFromVaultDialog({
 
   useEffect(() => {
     if (isConfirmed) {
+      toast.success(`Assets successfully withdrawn`)
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })

@@ -107,10 +107,13 @@ export default function AddToVaultDialog({
     (data?.[1] || 0n) > quoteAmount ? 0n : quoteAmount - (data?.[1] || 0n)
 
   const { data: hash, isPending, writeContract, reset } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    })
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    isError,
+  } = useWaitForTransactionReceipt({
+    hash,
+  })
 
   const [started, setStarted] = React.useState(false)
 

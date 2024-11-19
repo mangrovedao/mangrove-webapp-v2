@@ -11,6 +11,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useStep } from "@/hooks/use-step"
 import { useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 import {
   useAccount,
@@ -134,6 +135,7 @@ export default function DepositToVaultDialog({
       reset()
       goToNextStep()
     } else if (isConfirmed && currentStep === steps.length) {
+      toast.success(`Assets successfully deposited`)
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })
