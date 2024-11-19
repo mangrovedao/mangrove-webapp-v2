@@ -81,7 +81,7 @@ export default function Page() {
             <div className="flex flex-col flex-1">
               <Label>Total Epoch Reward</Label>
               <Value className="flex-wrap text-wrap">
-                <NumericValue value={formatUnits(totalRewards, 18)} />
+                <NumericValue value={formatUnits(totalRewards, 8)} />
               </Value>
             </div>
             <div className="flex flex-col flex-1 space-y-2">
@@ -89,7 +89,7 @@ export default function Page() {
                 <Label>Taker Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.takerReward ?? 0n), 18)}
+                    value={formatUnits(BigInt(rewards?.takerReward ?? 0n), 8)}
                   />
                 </Value>
               </div>
@@ -97,7 +97,7 @@ export default function Page() {
                 <Label>Maker Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.makerReward ?? 0n), 18)}
+                    value={formatUnits(BigInt(rewards?.makerReward ?? 0n), 8)}
                   />
                 </Value>
               </div>
@@ -105,10 +105,7 @@ export default function Page() {
                 <Label>Kandel Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(
-                      BigInt(rewards?.kandelRewards ?? 0n),
-                      18,
-                    )}
+                    value={formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 8)}
                   />
                 </Value>
               </div>
@@ -128,7 +125,7 @@ export default function Page() {
                 <NumericValue
                   value={formatUnits(
                     BigInt(rewards?.claimableRewards ?? 0n),
-                    18,
+                    8,
                   )}
                 />
               </Value>

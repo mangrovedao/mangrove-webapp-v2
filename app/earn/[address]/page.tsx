@@ -164,7 +164,7 @@ export default function Page() {
               }
               symbol={` ${vault?.market.quote.symbol || ""}`}
             />
-            <GridLineHeader title={"APY"} value={"9.00"} symbol={"%"} />
+            <GridLineHeader title={"APY"} value={"... "} symbol={"%"} />
             <GridLineHeader
               title={"Performance fee"}
               value={vault?.performanceFee}
@@ -179,7 +179,21 @@ export default function Page() {
               Vault description
             </Title>
             <Caption className="font-axiforma text-text-secondary text-xs">
-              {vault?.description}
+              {vault?.description?.split("\n").map((line, i) => (
+                <React.Fragment key={i}>
+                  {line.startsWith("- ") ? (
+                    <li className="list-disc ml-4">{line.substring(2)}</li>
+                  ) : line.includes(":") ? (
+                    <>
+                      {line}
+                      <br />
+                    </>
+                  ) : (
+                    line
+                  )}
+                  <br />
+                </React.Fragment>
+              ))}
             </Caption>
 
             <Accordion title="Read more">
