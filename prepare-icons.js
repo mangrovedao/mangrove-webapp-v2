@@ -32,6 +32,14 @@ function copyIcons() {
     "./public/custom-token-icons/blast/weeth.svg",
     "./public/cryptocurrency-icons/svg/color/weeth.svg",
   )
+  fs.copyFileSync(
+    "./public/custom-token-icons/arb.svg",
+    "./public/cryptocurrency-icons/svg/color/arb.svg",
+  )
+  fs.copyFileSync(
+    "./public/cryptocurrency-icons/svg/color/usdc.svg",
+    "./public/cryptocurrency-icons/svg/color/usde.svg",
+  )
 }
 
 function genetareDicFromManifestFile() {
@@ -47,6 +55,20 @@ function genetareDicFromManifestFile() {
         color: "#37A1F4",
         name: "Wrapped eETH (weETH)",
         symbol: "weETH",
+      },
+    },
+    {
+      ARB: {
+        symbol: "ARB",
+        name: "Arbitrum Coin",
+        color: "#B1D3E9",
+      },
+    },
+    {
+      "USD.e": {
+        symbol: "USD.e",
+        name: "USD Coin",
+        color: "#3e73c4",
       },
     },
     { WMATIC: { color: "#7F44E0", name: "Wrapped MATIC", symbol: "WMATIC" } },
