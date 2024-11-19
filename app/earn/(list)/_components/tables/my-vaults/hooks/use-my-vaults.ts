@@ -33,7 +33,6 @@ export function useMyVaults<T = Vault[]>({
         const vaults = await getVaultsInformation(
           publicClient,
           plainVaults,
-          markets,
           user,
         )
         return vaults.filter((v) => v.isActive)
