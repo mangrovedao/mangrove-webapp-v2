@@ -27,9 +27,48 @@ export const useConfiguration = () => {
           throw new Error("No epochs found")
         }
 
-        const epochId = Object.keys(epochs.rewardsLimit)[0]
+        const now = Math.floor(Date.now() / 1000)
+        const epochEntries = Object.entries(epochs.rewardsLimit)
+
+        // Find current epoch by checking if current time is within its timeframe
+        const currentEpochEntry = epochEntries.find((entry) => {
+          const epochStart = Number(entry[1].startTimestamp.replace("n", ""))
+          if (epochStart === 0) return false
+          const nextEpoch = epochEntries.find(
+            (e) => Number(e[1].startTimestamp.replace("n", "")) > epochStart,
+          )
+          const epochEnd = nextEpoch
+            ? Number(nextEpoch[1].startTimestamp.replace("n", ""))
+            : Infinity
+          return now >= epochStart && now < epochEnd
+        })
+
+        const epochId = currentEpochEntry?.[0] ?? null
+
+        const nextEpochStart = epochEntries.find((entry) => {
+          const startTimestamp = Number(
+            entry[1].startTimestamp.replace("n", ""),
+          )
+          return startTimestamp > now && startTimestamp !== 0
+        })?.[1].startTimestamp
+          ? new Date(
+              Number(
+                epochEntries
+                  .find((entry) => {
+                    const startTimestamp = Number(
+                      entry[1].startTimestamp.replace("n", ""),
+                    )
+                    return startTimestamp > now && startTimestamp !== 0
+                  })?.[1]
+                  ?.startTimestamp.replace("n", ""),
+              ) * 1000,
+            )
+          : null
+
+        console.log(currentEpochEntry, nextEpochStart)
 
         return {
+          nextEpoch: nextEpochStart,
           epochId: epochId,
           totalBudget: epochs.rewardsLimit[epochId || 0]?.budget,
         }
