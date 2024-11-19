@@ -38,7 +38,7 @@ function copyIcons() {
   )
   fs.copyFileSync(
     "./public/cryptocurrency-icons/svg/color/usdc.svg",
-    "./public/cryptocurrency-icons/svg/color/usde.svg",
+    "./public/cryptocurrency-icons/svg/color/usdc.e.svg",
   )
 }
 
@@ -65,8 +65,8 @@ function genetareDicFromManifestFile() {
       },
     },
     {
-      "USD.e": {
-        symbol: "USD.e",
+      "USDC.e": {
+        symbol: "USDC.e",
         name: "USD Coin",
         color: "#3e73c4",
       },
