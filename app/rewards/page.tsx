@@ -3,7 +3,7 @@
 import NeonContainer from "@/components/neon-container"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { RaccoonIllustration } from "@/svgs"
+import { ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
 import { formatUnits } from "viem"
 import { Tables } from "./_components/tables/tables"
@@ -27,7 +27,9 @@ export default function Page() {
       <div className="grid grid-cols-6 gap-10 mt-8">
         <div className="lg:col-span-4 col-span-6">
           <div className="rounded-2xl bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 relative">
-            <RaccoonIllustration className="absolute top-0 right-0 hidden sm:block md:-translate-x-1/2 -translate-y-2/3" />
+            <div className="absolute top-0 right-0 hidden sm:block md:-translate-x-1/2 -translate-y-2/3">
+              <ToucanIllustration />
+            </div>
             <Timer />
             <div>
               <h2 className="font-semibold text-2xl">
