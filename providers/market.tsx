@@ -50,6 +50,8 @@ export function useMarketContext() {
     }
   }, [markets, marketParam])
 
+  console.log(currentMarket)
+
   const setMarket = React.useCallback(
     (market: MarketParams) => {
       if (!markets || isMarketEqual(market, currentMarket)) return
