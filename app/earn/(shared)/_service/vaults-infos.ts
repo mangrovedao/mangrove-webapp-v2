@@ -1,10 +1,7 @@
 "use client"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
-import { useMarkets } from "@/hooks/use-addresses"
-import { MarketParams } from "@mangrovedao/mgv"
 
 import {
-  maxUint128,
   parseAbi,
   zeroAddress,
   type Address,
@@ -22,6 +19,8 @@ export const VaultABI = parseAbi([
   "function getTotalInQuote() public view returns (uint256 quoteAmount, uint256 tick)",
   "function decimals() public view returns (uint8)",
   "function symbol() public view returns (string)",
+  "function lastTotalInQuote() public view returns (uint256)",
+  "function lastTimestamp() public view returns (uint256)",
 ])
 
 // const addressSchema = z.custom<Address>((v) => isAddress(v))
@@ -35,6 +34,8 @@ const multicallSchema = z.object({
   market: z.tuple([z.string(), z.string(), z.bigint()]),
   symbol: z.string(),
   decimals: z.number(),
+  lastTotalInQuote: z.bigint(),
+  lastTimestamp: z.bigint(),
 })
 
 const priceSchema = z.object({
@@ -47,7 +48,6 @@ const priceSchema = z.object({
 export async function getVaultsInformation(
   client: PublicClient,
   vaults: VaultWhitelist[],
-  markets: ReturnType<typeof useMarkets>,
   user?: Address,
 ): Promise<(Vault & VaultWhitelist)[]> {
   const result = await client.multicall({
@@ -95,6 +95,16 @@ export async function getVaultsInformation(
             abi: VaultABI,
             functionName: "decimals",
           },
+          {
+            address: v.address,
+            abi: VaultABI,
+            functionName: "lastTotalInQuote",
+          },
+          {
+            address: v.address,
+            abi: VaultABI,
+            functionName: "lastTimestamp",
+          },
         ] satisfies MulticallParameters["contracts"],
     ),
     allowFailure: false,
@@ -111,7 +121,9 @@ export async function getVaultsInformation(
         _market,
         _symbol,
         _decimals,
-      ] = result.slice(i * 8)
+        _lastTotalInQuote,
+        _lastTimestamp,
+      ] = result.slice(i * 10)
 
       const {
         totalInQuote,
@@ -122,6 +134,8 @@ export async function getVaultsInformation(
         market,
         symbol,
         decimals,
+        lastTotalInQuote,
+        lastTimestamp,
       } = multicallSchema.parse({
         totalInQuote: _totalInQuote,
         underlyingBalances: _underlyingBalances,
@@ -131,36 +145,26 @@ export async function getVaultsInformation(
         market: _market,
         symbol: _symbol,
         decimals: _decimals,
+        lastTotalInQuote: _lastTotalInQuote,
+        lastTimestamp: _lastTimestamp,
       })
 
-      const baseDollarPrice = await fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[0]}`,
-      )
-        .then((res) => res.json())
-        .then((data) => priceSchema.parse(data))
-        .then((data) => data.price)
-
-      const quoteDollarPrice = await fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[1]}`,
-      )
-        .then((res) => res.json())
-        .then((data) => priceSchema.parse(data))
-        .then((data) => data.price)
-
-      const storageValue = await client.getStorageAt({
-        address: v.address,
-        slot: "0xb",
-      })
-
-      if (!storageValue) {
-        throw new Error("Failed to get storage")
-      }
-
-      // lastTotalInQuote()
-      const lastTotalInQuote = BigInt(storageValue) & maxUint128
-
-      // lastTimestamp()
-      const lastTimestamp = BigInt(Math.floor(Date.now() / 1000 - 100))
+      const [baseDollarPrice, quoteDollarPrice] = await Promise.all([
+        fetch(
+          `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[0]}`,
+        )
+          .then((res) => res.json())
+          .then((data) => priceSchema.parse(data))
+          .then((data) => data.price)
+          .catch(() => 1),
+        fetch(
+          `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[1]}`,
+        )
+          .then((res) => res.json())
+          .then((data) => priceSchema.parse(data))
+          .then((data) => data.price)
+          .catch(() => 1),
+      ])
 
       // feeData()
       const performanceFee = feeData[0]
@@ -205,12 +209,6 @@ export async function getVaultsInformation(
           ? 0n
           : (underlyingBalances[1] * balanceOf) / newTotalSupply
 
-      const vaultMarket = {
-        base: markets.find((item) => market[0] === item.base.address)?.base,
-        quote: markets.find((item) => market[1] === item.quote.address)?.quote,
-        tickSpacing: market[2],
-      }
-
       const totalBase = underlyingBalances[0] || 0n
       const totalQuote = underlyingBalances[1] || 0n
       let balanceBase =
@@ -231,7 +229,6 @@ export async function getVaultsInformation(
         totalQuote,
         balanceBase,
         balanceQuote,
-        market: vaultMarket as MarketParams,
         pnl: 0,
         chainId: client.chain?.id,
         tvl: totalInQuote[0],
