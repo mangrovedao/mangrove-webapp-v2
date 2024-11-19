@@ -1,5 +1,6 @@
 "use client"
 import { CheckedState } from "@radix-ui/react-checkbox"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import React from "react"
 import { isMobile } from "react-device-detect"
 
@@ -15,6 +16,8 @@ import { useAccount, useSignMessage } from "wagmi"
 
 function DisclaimerDialog() {
   const { isConnected } = useAccount()
+
+  const { openConnectModal } = useConnectModal()
   const [isChecked, setIsChecked] = React.useState<CheckedState | undefined>(
     false,
   )
@@ -23,17 +26,35 @@ function DisclaimerDialog() {
     "hideDisclaimer",
     null,
   )
+  const [hasSignedDisclaimer, setHasSignedDisclamer] = useLocalStorage<
+    boolean | null
+  >("hasSignedDisclaimer", null)
 
   const signature = useSignMessage({
     config,
   })
 
+  const buttonLabel = isConnected ? "Accept terms" : "Connect to Wallet"
+
+  React.useEffect(() => {
+    if (isConnected && !hasSignedDisclaimer) {
+      setHideDisclaimer(false)
+    }
+  }, [isConnected])
+
   async function handleAcceptTerms() {
+    if (!isConnected) {
+      setHideDisclaimer(true)
+      openConnectModal?.()
+      return
+    }
+
     await signature.signMessageAsync({
       message:
         "By signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
     })
 
+    setHasSignedDisclamer(true)
     setHideDisclaimer(true)
   }
 
@@ -42,7 +63,7 @@ function DisclaimerDialog() {
   }
 
   return (
-    <Dialog open={isConnected && !hideDisclaimer} type="mangrove">
+    <Dialog open={!hideDisclaimer} type="mangrove">
       <Dialog.Title>Welcome to the Mangrove dApp!</Dialog.Title>
       <Dialog.Description>
         <div>
@@ -98,7 +119,7 @@ function DisclaimerDialog() {
               onClick={handleAcceptTerms}
               disabled={!isChecked || (signature.isPending && !signature.error)}
             >
-              Accept terms
+              {buttonLabel}
             </Button>
           </div>
         </div>
