@@ -4,8 +4,6 @@ import {
   CheckIcon,
   ChevronRight,
   Globe,
-  Mail,
-  Send,
   SquareArrowOutUpRight,
   Twitter,
 } from "lucide-react"
@@ -177,18 +175,19 @@ export default function Page() {
 
           {/* Description */}
           <div className="mx-5 space-y-3">
-            <Title variant={"title2"} className="text-text-primary ">
+            <Title variant={"title1"} className="text-text-primary ">
               Vault description
             </Title>
-            <Caption className="font-axiforma text-text-secondary text-xs">
+            <Caption className="font-axiforma text-text-secondary">
               {vault?.description?.split("\n").map((line, i) => (
                 <React.Fragment key={i}>
                   {line.startsWith("- ") ? (
                     <li className="list-disc ml-4">{line.substring(2)}</li>
                   ) : line.includes(":") ? (
                     <>
-                      {line}
-                      <br />
+                      <Title variant={"title3"} className="text-text-primary">
+                        {line.split(":")[0]}
+                      </Title>
                     </>
                   ) : (
                     line
@@ -233,21 +232,28 @@ export default function Page() {
                       </div>
                     }
                   />
-                  <GridLine
-                    title="Chain"
-                    value={chain?.name}
-                    icon={getChainImage(chain?.id, chain?.name)}
-                    iconFirst
-                  />
+
                   <GridLine
                     title="Vault Manager"
                     value={vault?.manager}
                     icon={
                       <div className="flex gap-1 text-text-secondary">
-                        <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                        <Send className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                        <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                        <Mail className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        <Link
+                          href={vault?.socials.website || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        </Link>
+                        {/* <Send className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
+                        <Link
+                          href={vault?.socials.x || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        </Link>
+                        {/* <Mail className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
                       </div>
                     }
                   />
@@ -259,38 +265,38 @@ export default function Page() {
                     symbol="%"
                     info="A fee based on the profits generated from your deposit."
                   />
-
                   <GridLine
-                    title="Strategy Address"
-                    value={shortenAddress(vault?.address || "")}
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
-                  />
-
-                  <GridLine
-                    title="Vault Address"
-                    value={shortenAddress(vault?.address || "")}
-                    icon={
-                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                    }
+                    title="Chain"
+                    value={chain?.name}
+                    icon={getChainImage(chain?.id, chain?.name)}
+                    iconFirst
                   />
                 </div>
                 <div>
                   <GridLine
-                    title="Management Fee"
-                    value={vault?.managementFee}
-                    symbol="%"
-                    info="A fee for overseeing and managing the vault."
-                  />
-
-                  <GridLine
-                    title="Audit"
-                    value={"Website"}
+                    title="Vault Address"
+                    value={shortenAddress(vault?.address || "")}
+                    href={`${chain?.blockExplorers?.default.url}/address/${vault?.address}`}
                     icon={
                       <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                     }
                   />
+
+                  {/* <GridLine
+                    title="Management Fee"
+                    value={vault?.managementFee}
+                    symbol="%"
+                    info="A fee for overseeing and managing the vault."
+                  /> */}
+
+                  {/* <GridLine
+                    title="Audit"
+                    value={"Website"}
+                    href={vault?.socials.website}
+                    icon={
+                      <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                    }
+                  /> */}
 
                   <GridLine title="Vault Created on" value={"November 2024"} />
                 </div>
@@ -480,6 +486,7 @@ const GridLine = ({
   info,
   icon,
   iconFirst,
+  href,
 }: {
   title: ReactNode
   value: ReactNode
@@ -487,6 +494,7 @@ const GridLine = ({
   icon?: ReactNode
   iconFirst?: boolean
   info?: string
+  href?: string
 }) => {
   return (
     <div className="grid items-center mt-2">
@@ -509,7 +517,18 @@ const GridLine = ({
             <span className="text-text-tertiary">{symbol}</span>
           ) : undefined}
         </Text>
-        <span className="text-text-secondary">{icon}</span>
+        {href ? (
+          <Link
+            href={href || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-text-secondary"
+          >
+            {icon}
+          </Link>
+        ) : (
+          <span className="text-text-secondary">{icon}</span>
+        )}
       </div>
     </div>
   )

@@ -8,6 +8,10 @@ export type VaultWhitelist = {
   descriptionBonus: string
   strategyType: string
   market: MarketParams
+  socials: {
+    x: string
+    website: string
+  }
 }
 
 export type Vault = {

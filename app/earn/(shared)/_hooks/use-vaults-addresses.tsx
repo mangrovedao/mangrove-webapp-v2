@@ -17,6 +17,10 @@ export const VAULTS_WHITELIST_ARBITRUM = [
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\nAvoiding High-Volatility Phases:\nUsing predictive models or on-chain volatility indicators, the vault anticipates high-volatility periods. Before these phases, the strategy either expands the range or exits liquidity provision. This proactive measure reduces exposure during risky periods, mitigating potential impermanent loss.\n\nFee Collection from Traders:\nBy concentrating liquidity in specific ranges, the strategy enhances fee generation from trades within these ranges. The strategy dynamically adjusts liquidity based on market conditions to keep it where trading activity is highest. This ensures fee collection, even during moderate price movement, while avoiding unnecessary risk.\n\nImpermanent Loss Mitigation:\nImpermanent Loss (IL) occurs when token prices in a pool shift significantly. This strategy reduces IL through several techniques:\n- Dynamic Asset Allocation: Unlike traditional LPs with a strict 50-50 asset split, this strategy allows flexible allocation when liquidity is withdrawn from the pool. This approach lowers the risk of overexposure to a volatile asset, thus minimizing potential IL.\n- Yield Optimization through Aave: When assets are not used in the pool, they are temporarily deposited in Aave or other lending platforms. This provides additional yield from lending interest, ensuring productive use of capital even outside trading.\n- Adaptive Range Management: When asset prices move outside the initial liquidity range, the strategy adjusts or withdraws liquidity to prevent significant divergence in asset prices, which often leads to IL. By rebalancing assets only when strategically beneficial, this approach minimizes IL while maximizing returns through fee capture during favorable conditions.",
     descriptionBonus: "More infos...",
+    socials: {
+      x: "https://x.com/RedactedLabs_",
+      website: "https://www.redactedlabs.fr/",
+    },
   },
   {
     manager: "Redacted Labs",
@@ -26,6 +30,10 @@ export const VAULTS_WHITELIST_ARBITRUM = [
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\nAvoiding High-Volatility Phases:\nUsing predictive models or on-chain volatility indicators, the vault anticipates high-volatility periods. Before these phases, the strategy either expands the range or exits liquidity provision. This proactive measure reduces exposure during risky periods, mitigating potential impermanent loss.\n\nFee Collection from Traders:\nBy concentrating liquidity in specific ranges, the strategy enhances fee generation from trades within these ranges. The strategy dynamically adjusts liquidity based on market conditions to keep it where trading activity is highest. This ensures fee collection, even during moderate price movement, while avoiding unnecessary risk.\n\nImpermanent Loss Mitigation:\nImpermanent Loss (IL) occurs when token prices in a pool shift significantly. This strategy reduces IL through several techniques:\n- Dynamic Asset Allocation: Unlike traditional LPs with a strict 50-50 asset split, this strategy allows flexible allocation when liquidity is withdrawn from the pool. This approach lowers the risk of overexposure to a volatile asset, thus minimizing potential IL.\n- Yield Optimization through Aave: When assets are not used in the pool, they are temporarily deposited in Aave or other lending platforms. This provides additional yield from lending interest, ensuring productive use of capital even outside trading.\n- Adaptive Range Management: When asset prices move outside the initial liquidity range, the strategy adjusts or withdraws liquidity to prevent significant divergence in asset prices, which often leads to IL. By rebalancing assets only when strategically beneficial, this approach minimizes IL while maximizing returns through fee capture during favorable conditions.",
     descriptionBonus: "More infos...",
+    socials: {
+      x: "https://x.com/RedactedLabs_",
+      website: "https://www.redactedlabs.fr/",
+    },
   },
   {
     manager: "Redacted Labs",
@@ -35,6 +43,10 @@ export const VAULTS_WHITELIST_ARBITRUM = [
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\nAvoiding High-Volatility Phases:\nUsing predictive models or on-chain volatility indicators, the vault anticipates high-volatility periods. Before these phases, the strategy either expands the range or exits liquidity provision. This proactive measure reduces exposure during risky periods, mitigating potential impermanent loss.\n\nFee Collection from Traders:\nBy concentrating liquidity in specific ranges, the strategy enhances fee generation from trades within these ranges. The strategy dynamically adjusts liquidity based on market conditions to keep it where trading activity is highest. This ensures fee collection, even during moderate price movement, while avoiding unnecessary risk.\n\nImpermanent Loss Mitigation:\nImpermanent Loss (IL) occurs when token prices in a pool shift significantly. This strategy reduces IL through several techniques:\n- Dynamic Asset Allocation: Unlike traditional LPs with a strict 50-50 asset split, this strategy allows flexible allocation when liquidity is withdrawn from the pool. This approach lowers the risk of overexposure to a volatile asset, thus minimizing potential IL.\n- Yield Optimization through Aave: When assets are not used in the pool, they are temporarily deposited in Aave or other lending platforms. This provides additional yield from lending interest, ensuring productive use of capital even outside trading.\n- Adaptive Range Management: When asset prices move outside the initial liquidity range, the strategy adjusts or withdraws liquidity to prevent significant divergence in asset prices, which often leads to IL. By rebalancing assets only when strategically beneficial, this approach minimizes IL while maximizing returns through fee capture during favorable conditions.",
     descriptionBonus: "More infos...",
+    socials: {
+      x: "https://x.com/RedactedLabs_",
+      website: "https://www.redactedlabs.fr/",
+    },
   },
 ]
 
@@ -47,6 +59,10 @@ export const VAULTS_WHITELIST_BASE_SEPOLIA = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo ed ut perspiciatis unde omnis iste natus error sit voluptatem perspiciatis ...",
     descriptionBonus: "More infos...",
+    socials: {
+      x: "https://x.com/RedactedLabs_",
+      website: "https://www.redactedlabs.fr/",
+    },
   },
 ]
 
