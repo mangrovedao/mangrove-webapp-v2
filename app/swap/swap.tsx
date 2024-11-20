@@ -108,7 +108,7 @@ export default function Swap() {
           )}
           <Accordion
             title="Slippage tolerance"
-            tooltip="How much price slippage you're willing to accept so that your order can be executed?"
+            tooltip="How much price slippage you're willing to accept so that your order can be executed"
             chevronValue={`${slippage}%`}
           >
             <div className="space-y-2 mt-1">
