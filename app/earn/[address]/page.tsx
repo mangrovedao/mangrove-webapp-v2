@@ -71,9 +71,9 @@ export default function Page() {
   }, [refetch])
 
   React.useEffect(() => {
-    // Wait for initial load and check if vault is still null after
+    // Wait for initial load and check if vault is still undefined
     const timer = setTimeout(() => {
-      if (vault === null) {
+      if (!vault) {
         window.location.href = "/earn"
       }
     }, 3000)

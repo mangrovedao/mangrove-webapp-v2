@@ -21,12 +21,13 @@ const productionTransports = {
   [blast.id]: http(),
   [arbitrum.id]: http(),
 }
+
 const developmentTransports = {
   [baseSepolia.id]: http(),
   [blast.id]: http(),
   [arbitrum.id]: http(),
 }
-console.log(process.env.NODE_ENV)
+
 export const config = getDefaultConfig({
   appName: "Mangrove dApp",
   projectId,
