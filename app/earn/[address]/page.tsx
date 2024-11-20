@@ -178,7 +178,10 @@ export default function Page() {
             <Title variant={"title1"} className="text-text-primary ">
               Vault description
             </Title>
-            <Caption className="font-axiforma text-text-secondary">
+            <Text
+              className="font-axiforma text-text-secondary"
+              variant={"text2"}
+            >
               {vault?.description?.split("\n").map((line, i) => (
                 <React.Fragment key={i}>
                   {line.startsWith("- ") ? (
@@ -192,15 +195,32 @@ export default function Page() {
                   ) : (
                     line
                   )}
-                  <br />
                 </React.Fragment>
               ))}
-            </Caption>
+            </Text>
 
             <Accordion title="Read more">
-              <Caption className="font-axiforma">
-                {vault?.descriptionBonus}
-              </Caption>
+              <Text
+                className="font-axiforma text-text-secondary mt-2"
+                variant={"text2"}
+              >
+                {vault?.descriptionBonus?.split("\n").map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line.startsWith("- ") ? (
+                      <li className="list-disc ml-4">{line.substring(2)}</li>
+                    ) : line.includes(":") ? (
+                      <>
+                        <Title variant={"title3"} className="text-text-primary">
+                          {line.split(":")[0]}
+                        </Title>
+                      </>
+                    ) : (
+                      line
+                    )}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </Text>
             </Accordion>
           </div>
 
