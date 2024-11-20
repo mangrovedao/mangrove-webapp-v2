@@ -118,7 +118,7 @@ export default function Page() {
           {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
             <Skeleton className={cn("h-7 w-7", "rounded-full")} />
           ) : (
-            <Title>{`${vault?.market?.quote?.symbol} - ${vault?.market?.base?.symbol}`}</Title>
+            <Title>{`${vault?.market?.base?.symbol} - ${vault?.market?.quote?.symbol}`}</Title>
           )}
           <div className="flex gap-2 flex-wrap">
             <Subline
