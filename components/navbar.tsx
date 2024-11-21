@@ -27,7 +27,7 @@ export function Navbar({ className, innerClasses, ...props }: Props) {
   return (
     <nav
       className={cn(
-        "flex w-full justify-between items-center text-sm grid-in-header py-1 my-6",
+        "flex w-full justify-between items-center text-sm grid-in-header py-1 my-5",
         className,
       )}
       {...props}
@@ -82,7 +82,7 @@ const RightPart = withClientOnly(() => {
           onClick={handleConnect}
           disabled={isConnecting}
           size="sm"
-          className="mt-6"
+          className="mt-2"
         >
           Connect wallet
         </Button>
