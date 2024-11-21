@@ -1,5 +1,9 @@
 "use client"
 
+import { InfoIcon } from "lucide-react"
+import Link from "next/link"
+import { formatUnits } from "viem"
+
 import NeonContainer from "@/components/neon-container"
 import { NumericValue } from "@/components/numeric-value"
 import { Caption } from "@/components/typography/caption"
@@ -7,9 +11,6 @@ import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
-import { InfoIcon } from "lucide-react"
-import Link from "next/link"
-import { formatUnits } from "viem"
 import { Tables } from "./_components/tables/tables"
 import Timer from "./_components/timer"
 import { useRewards } from "./hooks/use-rewards"
@@ -30,13 +31,13 @@ export default function Page() {
     <main className="mt-8 px-4">
       <div className="pl-5 grid">
         <Title variant={"header1"}>Rewards</Title>
-        <Caption className="pl-0.5 text-text-secondary hover:underline">
+        <Caption className="pl-0.5 text-text-secondary hover:underline !text-sm">
           <Link
-            className="flex gap-2 items-center"
+            className="flex gap-1 items-center"
             href="https://docs.mangrove.exchange/mgv-incentives/introduction"
             target="_blank"
           >
-            How are my rewards calculated? <InfoIcon className="w-4 h-4" />
+            How are my rewards calculated ? <InfoIcon className="w-4 h-4" />
           </Link>
         </Caption>
       </div>
