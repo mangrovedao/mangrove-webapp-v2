@@ -70,17 +70,6 @@ export default function Page() {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])
 
-  React.useEffect(() => {
-    // Wait for initial load and check if vault is still undefined
-    const timer = setTimeout(() => {
-      if (!vault) {
-        window.location.href = "/earn"
-      }
-    }, 3000)
-
-    return () => clearTimeout(timer)
-  }, [vault])
-
   return (
     <div className="max-w-7xl mx-auto lg:px-3 pb-4">
       {/* BreadCrumb   */}
