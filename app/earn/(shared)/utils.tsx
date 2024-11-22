@@ -41,7 +41,7 @@ export const Line = ({
     <div className="flex justify-between mt-2 items-center">
       <Caption className="text-gray text-xs"> {title}</Caption>
       {value ? (
-        <Caption className="text-gray text-xs">{value}</Caption>
+        <Caption className="text-gray !text-sm">{value}</Caption>
       ) : (
         <Skeleton className="h-4 w-full" />
       )}

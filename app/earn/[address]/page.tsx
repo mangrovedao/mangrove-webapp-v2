@@ -517,7 +517,7 @@ const GridLine = ({
   return (
     <div className="grid items-center mt-2">
       <div className="flex items-center -gap-1">
-        <Caption className="text-text-secondary text-sm">{title}</Caption>
+        <Caption className="text-text-secondary !text-sm">{title}</Caption>
         {info ? (
           <InfoTooltip className="text-text-secondary" iconSize={14}>
             {info}
