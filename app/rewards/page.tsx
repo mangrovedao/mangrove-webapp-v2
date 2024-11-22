@@ -1,6 +1,5 @@
 "use client"
 
-import { InfoIcon } from "lucide-react"
 import Link from "next/link"
 import { formatUnits } from "viem"
 
@@ -37,7 +36,7 @@ export default function Page() {
             href="https://docs.mangrove.exchange/mgv-incentives/introduction"
             target="_blank"
           >
-            How are my rewards calculated ? <InfoIcon className="w-4 h-4" />
+            How are my rewards calculated ?
           </Link>
         </Caption>
       </div>

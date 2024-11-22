@@ -36,7 +36,7 @@ export function getSymbol(market?: ReturnType<typeof useMarket>) {
 
 export const currentDecimals = (token: Token) => {
   if (token.symbol.includes("USD")) return 6
-  return token.decimals
+  return token.displayDecimals
 }
 
 export function getValue(market: ReturnType<typeof useMarket>) {

@@ -82,3 +82,17 @@ export function useVaultsWhitelist() {
       return VAULTS_WHITELIST_ARBITRUM
   }
 }
+
+export function useVaultMidMan() {
+  const { chainId } = useAccount()
+  switch (chainId) {
+    case blast.id:
+      return ""
+    case arbitrum.id:
+      return "0xC39b5Fb38a8AcBFFB51D876f0C0DA0325b5cD440"
+    case baseSepolia.id:
+      return "0xC0Ba6baF6899686bB601effE73bFC42404B93670"
+    default:
+      return "0xC39b5Fb38a8AcBFFB51D876f0C0DA0325b5cD440"
+  }
+}

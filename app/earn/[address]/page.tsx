@@ -71,7 +71,7 @@ export default function Page() {
   }, [refetch])
 
   return (
-    <div className="max-w-7xl mx-auto lg:px-3 pb-4">
+    <div className="max-w-7xl mx-auto px-3 pb-4">
       {/* BreadCrumb   */}
 
       <div className="flex items-center gap-2 pb-4 ml-4 ">

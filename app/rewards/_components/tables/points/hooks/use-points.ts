@@ -57,14 +57,13 @@ export function usePoints<T = PointsRow[]>({
         // Move user's row to the front if it exists
         const userAddress = user?.toLowerCase()
         if (userAddress) {
-          const [userPoints] = pointsData
-            .splice(
-              pointsData.findIndex(
-                (row) => row.address.toLowerCase() === userAddress,
-              ),
-              1,
-            )
-            .filter(Boolean)
+          const userPoints = pointsData.find((row) => {
+            const rowAddress =
+              typeof row.address === "string"
+                ? row.address.toLowerCase()
+                : row.address
+            return rowAddress === userAddress
+          })
 
           if (userPoints) {
             pointsData.unshift(userPoints)
