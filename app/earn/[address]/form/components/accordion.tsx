@@ -26,7 +26,7 @@ export function Accordion({
     >
       <CollapsibleTrigger asChild>
         <button className="flex items-center  w-full hover:opacity-80 transition-opacity">
-          <Caption className="text-xs text-text-primary">{title}</Caption>
+          <Caption className="!text-sm text-text-primary ">{title}</Caption>
           <ChevronDown
             className={
               "h-6 w-6 transition-transform group-data-[state=open]:rotate-180 text-text-primary"

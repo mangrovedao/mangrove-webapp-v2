@@ -25,7 +25,7 @@ export function Points() {
 
   React.useEffect(() => {
     refetch?.()
-  }, [chainId, page])
+  }, [chainId, page, user])
 
   const table = useTable({ pageSize, data, user })
 
