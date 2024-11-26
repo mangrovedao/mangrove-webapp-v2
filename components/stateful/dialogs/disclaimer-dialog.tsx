@@ -15,7 +15,7 @@ import { cn } from "@/utils"
 import { useAccount, useSignMessage } from "wagmi"
 
 function DisclaimerDialog() {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
 
   const { openConnectModal } = useConnectModal()
   const [isChecked, setIsChecked] = React.useState<CheckedState | undefined>(
@@ -23,12 +23,12 @@ function DisclaimerDialog() {
   )
 
   const [hideDisclaimer, setHideDisclaimer] = useLocalStorage<boolean | null>(
-    "hideDisclaimer",
+    `hideDisclaimer_${address}`,
     null,
   )
   const [hasSignedDisclaimer, setHasSignedDisclamer] = useLocalStorage<
     boolean | null
-  >("hasSignedDisclaimer", null)
+  >(`hasSignedDisclaimer_${address}`, null)
 
   const signature = useSignMessage({
     config,
@@ -40,7 +40,18 @@ function DisclaimerDialog() {
     if (isConnected && !hasSignedDisclaimer) {
       setHideDisclaimer(false)
     }
-  }, [isConnected])
+  }, [isConnected, hasSignedDisclaimer])
+
+  React.useEffect(() => {
+    if (address) {
+      const storedHasSignedDisclaimer = localStorage.getItem(
+        `hasSignedDisclaimer_${address}`,
+      )
+      if (storedHasSignedDisclaimer !== "true") {
+        setHideDisclaimer(false)
+      }
+    }
+  }, [address])
 
   async function handleAcceptTerms() {
     if (!isConnected) {
