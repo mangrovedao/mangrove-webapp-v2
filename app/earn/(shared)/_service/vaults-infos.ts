@@ -9,6 +9,7 @@ import {
   type PublicClient,
 } from "viem"
 import * as z from "zod"
+import { getVaultAPR } from "../../[address]/_service/vault"
 
 export const VaultABI = parseAbi([
   "function getUnderlyingBalances() public view returns (uint256 amount0Current, uint256 amount1Current)",
@@ -218,9 +219,12 @@ export async function getVaultsInformation(
       balanceBase -= (balanceBase * BigInt(feeData[1])) / 10_000n
       balanceQuote -= (balanceQuote * BigInt(feeData[1])) / 10_000n
 
+      const apr = await getVaultAPR(client, v.address as Address)
+
       return {
         ...v,
         symbol,
+        apr,
         decimals,
         mintedAmount: balanceOf,
         performanceFee: (Number(feeData[0]) / 1e5) * 100,

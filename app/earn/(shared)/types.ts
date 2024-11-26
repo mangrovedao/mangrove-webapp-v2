@@ -16,6 +16,7 @@ export type VaultWhitelist = {
 
 export type Vault = {
   symbol: string
+  apr?: number
   chainId?: number
   decimals: number
   mintedAmount: bigint

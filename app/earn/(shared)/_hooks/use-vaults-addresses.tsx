@@ -83,7 +83,7 @@ export function useVaultsWhitelist() {
   }
 }
 
-export function useVaultMidMan() {
+export function useVaultMintHelper() {
   const { chainId } = useAccount()
   switch (chainId) {
     case blast.id:
