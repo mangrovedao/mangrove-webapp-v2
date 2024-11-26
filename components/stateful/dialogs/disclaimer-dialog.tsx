@@ -49,6 +49,8 @@ function DisclaimerDialog() {
       )
       if (storedHasSignedDisclaimer !== "true") {
         setHideDisclaimer(false)
+      } else {
+        setHideDisclaimer(true)
       }
     }
   }, [address])
