@@ -28,7 +28,7 @@ export function usePoints<T = PointsRow[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const { address: user } = useAccount()
+  const { address: user, chainId } = useAccount()
 
   const { data, ...rest } = useQuery({
     queryKey: ["points", user, first, skip],

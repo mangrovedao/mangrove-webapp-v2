@@ -102,10 +102,16 @@ export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
         id: "APY",
         header: () => <div className="text-right">APY</div>,
         cell: ({ row }) => {
-          const value = "-"
+          const apr =
+            "apr" in row.original
+              ? row.original.apr
+                ? `${row.original.apr.toFixed(2)}%`
+                : "-"
+              : "-"
+
           return (
             <div className="w-full h-full flex justify-end">
-              <Value value={value} />
+              <Value value={apr} />
             </div>
           )
         },
