@@ -56,7 +56,7 @@ export default function Page() {
     isPending,
   } = useVault(params.address)
 
-  const baseDepositDollar = vault
+  const baseDepositDollar = vault?.baseDollarPrice
     ? Number(formatUnits(vault.userBaseBalance, vault.market.base.decimals)) *
       vault.baseDollarPrice
     : 0
@@ -142,7 +142,7 @@ export default function Page() {
             <GridLineHeader
               title={"TVL"}
               value={
-                vault?.tvl && Number(vault?.tvl) > 0
+                vault?.tvl
                   ? (
                       Number(
                         formatUnits(
@@ -151,13 +151,13 @@ export default function Page() {
                         ),
                       ) * (vault?.quoteDollarPrice ?? 1)
                     ).toFixed(vault?.market.quote.displayDecimals || 3)
-                  : ""
+                  : "0"
               }
               symbol={` $`}
             />
             <GridLineHeader
               title={"APR"}
-              value={vault?.apr ? vault?.apr.toFixed(2) : "... "}
+              value={vault?.apr ? vault?.apr.toFixed(2) : "0"}
               symbol={"%"}
             />
             <GridLineHeader
