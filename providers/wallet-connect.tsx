@@ -21,6 +21,7 @@ const productionTransports = {
   [blast.id]: http(),
   [arbitrum.id]: http(),
 }
+
 const developmentTransports = {
   [baseSepolia.id]: http(),
   [blast.id]: http(),
@@ -34,7 +35,7 @@ export const config = getDefaultConfig({
   chains: getWhitelistedChainObjects(),
   ssr: true,
   transports:
-    process.env.NODE_ENV === "production"
+    process.env.NODE_ENV !== "development"
       ? productionTransports
       : developmentTransports,
 })

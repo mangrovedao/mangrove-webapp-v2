@@ -9,6 +9,9 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useBook } from "@/hooks/use-book"
+import useLocalStorage from "@/hooks/use-local-storage"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 import { Buy } from "./form-types/buy"
@@ -23,13 +26,20 @@ export function Forms({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
-  return (
+  const { book } = useBook()
+  const [orderType, setOrderType] = useLocalStorage<BS | null>(
+    "orderType",
+    null,
+  )
+
+  return book ? (
     <CustomTabs
       {...props}
-      defaultValue={Object.values(BS)[0]}
+      defaultValue={orderType ?? Object.values(BS)[0]}
       className={
         "bg-bg-secondary border border-bg-secondary rounded-2xl h-full max-h-fit"
       }
+      onValueChange={(value) => setOrderType(value as BS)}
     >
       <CustomTabsList className="w-full p-0 space-x-0">
         {Object.values(BS).map((form) => (
@@ -56,12 +66,18 @@ export function Forms({
         <div className="px-4 space-y-4 mt-[24px]">
           {Object.values(BS).map((form) => (
             <CustomTabsContent key={`${form}-content`} value={form}>
-              {renderElement(TABS_CONTENT[form])}
+              {book ? (
+                renderElement(TABS_CONTENT[form])
+              ) : (
+                <Skeleton className="w-full h-full" />
+              )}
             </CustomTabsContent>
           ))}
         </div>
         <ScrollBar orientation="vertical" />
       </ScrollArea>
     </CustomTabs>
+  ) : (
+    <Skeleton className="w-full h-full" />
   )
 }

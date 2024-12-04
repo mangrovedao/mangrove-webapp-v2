@@ -11,23 +11,25 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
-import { Vault } from "@/app/earn/(shared)/types"
+import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
-const columnHelper = createColumnHelper<Vault>()
+const columnHelper = createColumnHelper<Vault | VaultWhitelist>()
 const DEFAULT_DATA: Vault[] = []
 
 type Params = {
   data?: Vault[]
+  whitelist?: VaultWhitelist[] // local informations
   pageSize: number
   onDeposit: (vault: Vault) => void
 }
 
-export function useTable({ pageSize, data, onDeposit }: Params) {
+export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
   const { chain } = useAccount()
 
   const columns = React.useMemo(
@@ -75,7 +77,10 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "Strategy",
         cell: ({ row }) => {
-          const { type } = row.original
+          const type =
+            "type" in row.original
+              ? row.original.type
+              : row.original.strategyType
           const isTrusted = true
 
           return <Value value={type} trusted={isTrusted} />
@@ -85,7 +90,10 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
       columnHelper.display({
         header: "Manager",
         cell: ({ row }) => {
-          const { strategist } = row.original
+          const strategist =
+            "strategist" in row.original
+              ? row.original.strategist
+              : row.original.manager
           return <Value value={strategist} />
         },
       }),
@@ -94,10 +102,16 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
         id: "APY",
         header: () => <div className="text-right">APY</div>,
         cell: ({ row }) => {
-          const value = "-"
+          const apr =
+            "apr" in row.original
+              ? row.original.apr
+                ? `${row.original.apr.toFixed(2)}%`
+                : "-"
+              : "-"
+
           return (
             <div className="w-full h-full flex justify-end">
-              <Value value={value} />
+              <Value value={apr} />
             </div>
           )
         },
@@ -120,17 +134,28 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
         id: "TVL",
         header: () => <div className="text-right">TVL</div>,
         cell: ({ row }) => {
-          const { tvl, market, quoteDollarPrice } = row.original
+          const loading = !("tvl" in row.original)
+          const tvl = "tvl" in row.original ? row.original.tvl : 0n
+          const market = row.original.market
+          const quoteDollarPrice =
+            "quoteDollarPrice" in row.original
+              ? row.original.quoteDollarPrice
+              : 1
 
           return (
             <div className="w-full h-full flex justify-end">
-              <Value
-                value={(
-                  Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
-                  quoteDollarPrice
-                ).toFixed(market.quote.displayDecimals || 3)}
-                symbol={"$"}
-              />
+              {loading ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                <Value
+                  value={(
+                    Number(
+                      formatUnits(tvl || 0n, market.quote.decimals || 18),
+                    ) * quoteDollarPrice
+                  ).toFixed(market.quote.displayDecimals || 3)}
+                  symbol={"$"}
+                />
+              )}
             </div>
           )
         },
@@ -157,7 +182,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
   )
 
   return useReactTable({
-    data: data ?? DEFAULT_DATA,
+    data: data ?? whitelist ?? DEFAULT_DATA,
     columns,
     initialState: {
       pagination: {

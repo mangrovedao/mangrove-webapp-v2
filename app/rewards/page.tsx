@@ -1,12 +1,15 @@
 "use client"
 
+import Link from "next/link"
+import { formatUnits } from "viem"
+
 import NeonContainer from "@/components/neon-container"
 import { NumericValue } from "@/components/numeric-value"
+import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
-import { formatUnits } from "viem"
 import { Tables } from "./_components/tables/tables"
 import Timer from "./_components/timer"
 import { useRewards } from "./hooks/use-rewards"
@@ -25,9 +28,19 @@ export default function Page() {
 
   return (
     <main className="mt-8 px-4">
-      <Title variant={"header1"} className="pl-5">
-        Rewards
-      </Title>
+      <div className="pl-5 grid">
+        <Title variant={"header1"}>Rewards</Title>
+        <Caption className="pl-0.5 text-text-secondary hover:underline !text-sm">
+          <Link
+            className="flex gap-1 items-center"
+            href="https://docs.mangrove.exchange/mgv-incentives/introduction"
+            target="_blank"
+          >
+            How are my rewards calculated?
+          </Link>
+        </Caption>
+      </div>
+
       <div className="grid grid-cols-6 gap-10 mt-8">
         <div className="lg:col-span-4 col-span-6">
           <div className="rounded-2xl bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 relative">
@@ -65,11 +78,6 @@ export default function Page() {
                         })()
                       : "..."}
                   </span>
-                </span>
-                <div className="w-0.5 h-5 bg-text-secondary"></div>
-                <span>
-                  Current p:{" "}
-                  <span className="text-white">{configuration?.epochId}</span>
                 </span>
               </div>
             </div>

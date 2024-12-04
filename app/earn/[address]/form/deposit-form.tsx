@@ -7,6 +7,7 @@ import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
+import { currentDecimals } from "@/utils/market"
 import DepositToVaultDialog from "./dialogs/deposit-dialog"
 import useForm from "./use-form"
 
@@ -37,7 +38,7 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * baseBalance.balance) / 10_000n
 
     setBaseSliderValue(value)
-    // setQuoteSliderValue(0)
+    setQuoteSliderValue(0)
     handleBaseDepositChange(formatUnits(amount, baseBalance.token.decimals))
   }
 
@@ -46,9 +47,20 @@ export function DepositForm({ className }: { className?: string }) {
     const amount = (BigInt(value * 100) * quoteBalance.balance) / 10_000n
 
     setQuoteSliderValue(value)
-    // setBaseSliderValue(0)
+    setBaseSliderValue(0)
     handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
   }
+
+  React.useEffect(() => {
+    if (baseBalance?.balance !== 0n) {
+      handleBaseSliderChange(25)
+    } else if (quoteBalance?.balance !== 0n) {
+      handleQuoteSliderChange(25)
+    } else {
+      errors.baseDeposit = "No balance"
+      errors.quoteDeposit = "No balance"
+    }
+  }, [vault])
 
   if (!baseToken || !quoteToken)
     return (
@@ -68,15 +80,17 @@ export function DepositForm({ className }: { className?: string }) {
         sendSliderValue={baseSliderValue}
         setSendSliderValue={handleBaseSliderChange}
         token={baseToken}
-        disabled={vault?.totalBase === 0n && vault?.totalQuote !== 0n}
+        disabled={
+          (vault?.totalBase === 0n && vault?.totalQuote !== 0n) ||
+          baseBalance?.balance === 0n
+        }
         dollarAmount={
-          (Number(baseDeposit) * (vault?.baseDollarPrice || 0)).toFixed(
-            baseToken.displayDecimals,
-          ) || "..."
+          (Number(baseDeposit) * (vault?.baseDollarPrice || 0)).toFixed(3) ||
+          "..."
         }
         label={`Deposit ${baseSliderValue}%`}
         inputClassName="bg-bg-primary"
-        value={Number(baseDeposit).toFixed(baseToken.displayDecimals)}
+        value={Number(baseDeposit).toFixed(currentDecimals(baseToken))}
         onChange={handleBaseDepositChange}
         error={errors.baseDeposit}
         showBalance
@@ -87,14 +101,16 @@ export function DepositForm({ className }: { className?: string }) {
         sendSliderValue={quoteSliderValue}
         setSendSliderValue={handleQuoteSliderChange}
         token={quoteToken}
-        disabled={vault?.totalQuote === 0n && vault?.totalBase !== 0n}
+        disabled={
+          (vault?.totalQuote === 0n && vault?.totalBase !== 0n) ||
+          quoteBalance?.balance === 0n
+        }
         dollarAmount={
-          (Number(quoteDeposit) * (vault?.quoteDollarPrice || 0)).toFixed(
-            quoteToken.displayDecimals,
-          ) || "..."
+          (Number(quoteDeposit) * (vault?.quoteDollarPrice || 0)).toFixed(3) ||
+          "..."
         }
         label={`Deposit ${quoteSliderValue}%`}
-        value={Number(quoteDeposit).toFixed(quoteToken.displayDecimals)}
+        value={Number(quoteDeposit).toFixed(currentDecimals(quoteToken))}
         inputClassName="bg-bg-primary"
         onChange={handleQuoteDepositChange}
         error={errors.quoteDeposit}
@@ -120,7 +136,6 @@ export function DepositForm({ className }: { className?: string }) {
           mintAmount={mintAmount}
           onClose={() => {
             setAddDialog(false)
-            handleBaseDepositChange("0")
           }}
         />
       ) : undefined}

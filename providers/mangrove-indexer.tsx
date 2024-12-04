@@ -5,11 +5,11 @@ import type { ChainsIds } from "@mangrovedao/indexer-sdk/dist/src/types/types"
 import { useQuery } from "@tanstack/react-query"
 import Big from "big.js"
 import React from "react"
+import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 
 import { useTokens } from "@/hooks/use-addresses"
 import { useTokenPricesInUsb } from "@/hooks/use-orderbook-price-per-block"
-import { arbitrum } from "viem/chains"
 
 const useIndexerSdkContext = () => {
   const tokenPrices = useTokenPricesInUsb()

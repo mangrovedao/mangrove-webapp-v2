@@ -65,8 +65,6 @@ export const useConfiguration = () => {
             )
           : null
 
-        console.log(currentEpochEntry, nextEpochStart)
-
         return {
           nextEpoch: nextEpochStart,
           epochId: epochId,

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo } from "react"
 
 import { Vault } from "@/app/earn/(shared)/types"
 
+import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import Dialog from "@/components/dialogs/dialog-new"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
@@ -11,6 +12,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { useStep } from "@/hooks/use-step"
 import { useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 import {
   useAccount,
@@ -39,7 +41,7 @@ const btnProps: ButtonProps = {
 }
 
 const mintABI = parseAbi([
-  "function mint(uint256 mintAmount, uint256 baseAmountMax, uint256 quoteAmountMax) external returns (uint256 shares, uint256 baseAmount, uint256 quoteAmount)",
+  "function mint(address vault, uint256 mintAmount, uint256 baseAmountMax, uint256 quoteAmountMax) external returns (uint256 shares, uint256 baseAmount, uint256 quoteAmount)",
 ])
 
 export default function DepositToVaultDialog({
@@ -53,10 +55,8 @@ export default function DepositToVaultDialog({
   mintAmount,
 }: Props) {
   const { address, chain } = useAccount()
-
-  const baseAmount = parseUnits(baseAmountRaw, baseToken.decimals)
-  const quoteAmount = parseUnits(quoteAmountRaw, quoteToken.decimals)
   const queryClient = useQueryClient()
+  const mintHelperAddress = useVaultMintHelper()
 
   const {
     data,
@@ -69,13 +69,18 @@ export default function DepositToVaultDialog({
         address: baseToken.address,
         abi: erc20Abi,
         functionName: "allowance",
-        args: [address as Address, vault?.address as Address],
+        args: [address as Address, mintHelperAddress as Address],
       },
       {
         address: quoteToken.address,
         abi: erc20Abi,
         functionName: "allowance",
-        args: [address as Address, vault?.address as Address],
+        args: [address as Address, mintHelperAddress as Address],
+      },
+      {
+        address: vault?.address as Address,
+        abi: erc20Abi,
+        functionName: "totalSupply",
       },
     ],
     allowFailure: false,
@@ -83,6 +88,18 @@ export default function DepositToVaultDialog({
       enabled: !!address && !!vault,
     },
   })
+
+  const totalSupply = data?.[2] || 0n
+
+  // amounts with 1% slippage (just in case)
+  const baseAmount =
+    (parseUnits(baseAmountRaw, baseToken.decimals) *
+      (totalSupply === 0n ? 10_000n : 10_100n)) /
+    10_000n
+  const quoteAmount =
+    (parseUnits(quoteAmountRaw, quoteToken.decimals) *
+      (totalSupply === 0n ? 10_000n : 10_100n)) /
+    10_000n
 
   const missingBaseAllowance =
     (data?.[0] || 0n) > baseAmount ? 0n : baseAmount - (data?.[0] || 0n)
@@ -96,6 +113,7 @@ export default function DepositToVaultDialog({
     reset,
     error,
   } = useWriteContract()
+
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
       hash,
@@ -123,17 +141,18 @@ export default function DepositToVaultDialog({
   }, [baseAmount, quoteAmount])
 
   const result = useSimulateContract({
-    address: vault?.address,
+    address: mintHelperAddress as Address,
     abi: mintABI,
     functionName: "mint",
-    args: [mintAmount, amount0, amount1],
+    args: [vault?.address as Address, mintAmount, amount0, amount1],
   })
-
   useEffect(() => {
+    console.log(error)
     if (!error && isConfirmed && currentStep !== steps.length) {
       reset()
       goToNextStep()
     } else if (isConfirmed && currentStep === steps.length) {
+      toast.success(`Assets successfully deposited`)
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })
@@ -179,7 +198,7 @@ export default function DepositToVaultDialog({
         <div className="text-center">
           <ApproveStep
             tokenSymbol={baseToken?.symbol || ""}
-            contractAddress={vault?.address}
+            contractAddress={mintHelperAddress}
             explorerUrl={chain?.blockExplorers?.default.url}
           />
         </div>
@@ -196,7 +215,7 @@ export default function DepositToVaultDialog({
                 address: baseToken.address,
                 abi: erc20Abi,
                 functionName: "approve",
-                args: [vault.address, baseAmount],
+                args: [mintHelperAddress as Address, baseAmount],
               })
             } catch (error) {
               console.error(error)
@@ -212,7 +231,7 @@ export default function DepositToVaultDialog({
         <div className="text-center">
           <ApproveStep
             tokenSymbol={quoteToken?.symbol || ""}
-            contractAddress={vault?.address}
+            contractAddress={mintHelperAddress}
             explorerUrl={chain?.blockExplorers?.default.url}
           />
         </div>
@@ -229,7 +248,7 @@ export default function DepositToVaultDialog({
                 address: quoteToken.address,
                 abi: erc20Abi,
                 functionName: "approve",
-                args: [vault.address, quoteAmount],
+                args: [mintHelperAddress as Address, quoteAmount],
               })
             } catch (error) {
               console.error(error)
@@ -258,10 +277,15 @@ export default function DepositToVaultDialog({
             try {
               if (!vault) return
               writeContract({
-                address: vault.address,
+                address: mintHelperAddress as Address,
                 abi: mintABI,
                 functionName: "mint",
-                args: [mintAmount, amount0, amount1],
+                args: [
+                  vault.address as Address,
+                  parseUnits(baseAmountRaw, baseToken.decimals),
+                  parseUnits(quoteAmountRaw, quoteToken.decimals),
+                  0n,
+                ],
               })
             } catch (error) {
               console.error(error)

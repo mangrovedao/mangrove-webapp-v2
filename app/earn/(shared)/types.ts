@@ -7,10 +7,16 @@ export type VaultWhitelist = {
   description: string
   descriptionBonus: string
   strategyType: string
+  market: MarketParams
+  socials: {
+    x: string
+    website: string
+  }
 }
 
 export type Vault = {
   symbol: string
+  apr?: number
   chainId?: number
   decimals: number
   mintedAmount: bigint

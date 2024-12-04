@@ -24,9 +24,7 @@ export function useVault(id?: string | null) {
       if (!vault) return { vault: undefined }
 
       const [vaultInfo] = await Promise.all([
-        getVaultsInformation(publicClient, [vault], markets, user).then(
-          (v) => v[0],
-        ),
+        getVaultsInformation(publicClient, [vault], user).then((v) => v[0]),
       ])
       return {
         vault: vaultInfo,

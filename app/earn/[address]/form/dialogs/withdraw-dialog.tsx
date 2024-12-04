@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
+import { toast } from "sonner"
 import { parseAbi, parseUnits } from "viem"
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { DialogAmountLine } from "./utils"
@@ -41,6 +42,7 @@ export default function RemoveFromVaultDialog({
 
   useEffect(() => {
     if (isConfirmed) {
+      toast.success(`Assets successfully withdrawn`)
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })
@@ -60,14 +62,22 @@ export default function RemoveFromVaultDialog({
           amount={Number(infos.baseWithdraw).toLocaleString(undefined, {
             maximumFractionDigits: vault?.market.base.displayDecimals || 4,
           })}
-          estimationAmount={"..."}
+          estimationAmount={(
+            Number(infos.baseWithdraw) * vault.baseDollarPrice
+          ).toLocaleString(undefined, {
+            maximumFractionDigits: vault?.market.base.displayDecimals || 4,
+          })}
           symbol={vault?.market.base.symbol}
         />
         <DialogAmountLine
           amount={Number(infos.quoteWithdraw).toLocaleString(undefined, {
             maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
           })}
-          estimationAmount={"..."}
+          estimationAmount={(
+            Number(infos.quoteWithdraw) * vault.quoteDollarPrice
+          ).toLocaleString(undefined, {
+            maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
+          })}
           symbol={vault?.market.quote.symbol}
         />
 
@@ -79,7 +89,12 @@ export default function RemoveFromVaultDialog({
           amount={Number(infos.withdrawAmount).toLocaleString(undefined, {
             maximumFractionDigits: 4,
           })}
-          estimationAmount={"..."}
+          estimationAmount={(
+            Number(infos.baseWithdraw) * vault.baseDollarPrice +
+            Number(infos.quoteWithdraw) * vault.quoteDollarPrice
+          ).toLocaleString(undefined, {
+            maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
+          })}
           symbol={vault?.symbol}
         />
       </Dialog.Description>

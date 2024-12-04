@@ -28,7 +28,7 @@ export function usePoints<T = PointsRow[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const { address: user } = useAccount()
+  const { address: user, chainId } = useAccount()
 
   const { data, ...rest } = useQuery({
     queryKey: ["points", user, first, skip],
@@ -54,6 +54,21 @@ export function usePoints<T = PointsRow[]>({
           },
         )
 
+        // Move user's row to the front if it exists
+        const userAddress = user?.toLowerCase()
+        if (userAddress) {
+          const userPoints = pointsData.find((row) => {
+            const rowAddress =
+              typeof row.address === "string"
+                ? row.address.toLowerCase()
+                : row.address
+            return rowAddress === userAddress
+          })
+
+          if (userPoints) {
+            pointsData.unshift(userPoints)
+          }
+        }
         return pointsData
       } catch (error) {
         console.error(error)

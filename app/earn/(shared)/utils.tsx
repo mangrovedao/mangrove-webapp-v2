@@ -1,5 +1,6 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ReactNode } from "react"
 import { arbitrum } from "viem/chains"
 
@@ -39,7 +40,11 @@ export const Line = ({
   return (
     <div className="flex justify-between mt-2 items-center">
       <Caption className="text-gray text-xs"> {title}</Caption>
-      <Caption className="text-gray text-xs">{value}</Caption>
+      {value ? (
+        <Caption className="text-gray !text-sm">{value}</Caption>
+      ) : (
+        <Skeleton className="h-4 w-full" />
+      )}
     </div>
   )
 }
@@ -52,9 +57,9 @@ export const LineRewards = ({
   value: ReactNode
 }) => {
   return (
-    <div className="flex justify-between items-center">
-      <Caption className="text-text-secondary text-xs"> {title}</Caption>
-      <Caption className="text-text-primary text-xs">{value}</Caption>
+    <div className="flex justify-between items-center flex-wrap">
+      <Caption className="text-text-secondary !text-sm"> {title}</Caption>
+      <Caption className="text-text-primary !text-sm">{value}</Caption>
     </div>
   )
 }

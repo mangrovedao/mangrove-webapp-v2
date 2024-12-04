@@ -155,7 +155,6 @@ export function WithdrawForm({ className }: { className?: string }) {
           vault={vault}
           onClose={() => {
             setRemoveDialog(false)
-            handleSliderChange(0)
           }}
           isOpen={removeDialog}
         />
