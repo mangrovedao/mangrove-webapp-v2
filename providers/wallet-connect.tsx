@@ -21,7 +21,6 @@ const productionTransports = {
   [blast.id]: http(),
   [arbitrum.id]: http(),
 }
-
 const developmentTransports = {
   [baseSepolia.id]: http(),
   [blast.id]: http(),
@@ -34,7 +33,10 @@ export const config = getDefaultConfig({
   // @ts-ignore
   chains: getWhitelistedChainObjects(),
   ssr: true,
-  transports: developmentTransports,
+  transports:
+    process.env.NODE_ENV !== "development"
+      ? productionTransports
+      : developmentTransports,
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
