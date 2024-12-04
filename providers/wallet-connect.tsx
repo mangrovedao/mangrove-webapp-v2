@@ -17,27 +17,17 @@ import { getWhitelistedChainObjects } from "@/utils/chains"
 const queryClient = new QueryClient()
 const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
-const productionTransports = {
-  [blast.id]: http(),
-  [arbitrum.id]: http(),
-}
-
-const developmentTransports = {
-  [baseSepolia.id]: http(),
-  [blast.id]: http(),
-  [arbitrum.id]: http(),
-}
-
 export const config = getDefaultConfig({
   appName: "Mangrove dApp",
   projectId,
   // @ts-ignore
   chains: getWhitelistedChainObjects(),
   ssr: true,
-  transports:
-    process.env.NODE_ENV !== "development"
-      ? productionTransports
-      : developmentTransports,
+  transports: {
+    [baseSepolia.id]: http(),
+    [blast.id]: http(),
+    [arbitrum.id]: http(),
+  },
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
