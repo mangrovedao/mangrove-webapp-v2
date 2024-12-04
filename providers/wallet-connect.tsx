@@ -34,10 +34,7 @@ export const config = getDefaultConfig({
   // @ts-ignore
   chains: getWhitelistedChainObjects(),
   ssr: true,
-  transports:
-    process.env.NODE_ENV !== "development"
-      ? productionTransports
-      : developmentTransports,
+  transports: developmentTransports,
 })
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
