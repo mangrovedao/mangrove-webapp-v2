@@ -1,4 +1,4 @@
-import { marketOrderResultFromLogs } from "@mangrovedao/mgv"
+import { marketOrderResultFromLogs, MarketParams } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   BaseError,
@@ -39,19 +39,32 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
   const addresses = useMangroveAddresses()
 
   return useMutation({
-    mutationFn: async ({ form }: { form: Form }) => {
+    mutationFn: async ({
+      form,
+      swapMarket,
+      swapMarketClient,
+    }: {
+      form: Form
+      swapMarket?: MarketParams
+      swapMarketClient?: ReturnType<typeof useMarketClient>
+    }) => {
       try {
         if (
           !publicClient ||
           !walletClient ||
           !addresses ||
           !market ||
-          !marketClient ||
+          !marketClient?.uid ||
           !address
         )
           throw new Error("Market order post, is missing params")
 
-        const { base, quote } = market
+        const contextMarket = swapMarket ? swapMarket : market
+        const contextMarketClient = swapMarketClient
+          ? swapMarketClient
+          : marketClient
+
+        const { base, quote } = contextMarket
 
         const { bs, send: gives, receive: wants, slippage } = form
         const receiveToken = bs === "buy" ? base : quote
@@ -65,8 +78,9 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           bs === "buy"
             ? parseUnits(gives, quote.decimals)
             : parseUnits(wants, quote.decimals)
+
         const { request } =
-          await marketClient.simulateMarketOrderByVolumeAndMarket({
+          await contextMarketClient.simulateMarketOrderByVolumeAndMarket({
             baseAmount,
             quoteAmount,
             bs,
@@ -75,31 +89,20 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
             account: address,
           })
 
-        console.log({
-          baseAmount,
-          quoteAmount,
-          bs,
-          slippage,
-          gas: 20_000_000n,
-          account: address,
-        })
-
         const hash = await walletClient.writeContract(request)
         const receipt = await publicClient.waitForTransactionReceipt({
           hash,
         })
         //note:  might need to remove marketOrderResultfromlogs function if simulateMarketOrder returns correct values
         const result = marketOrderResultFromLogs(
-          { ...addresses, ...market },
-          market,
+          { ...addresses, ...contextMarket },
+          contextMarket,
           {
             logs: receipt.logs,
             taker: walletClient.account.address,
             bs,
           },
         )
-
-        console.log({ result })
 
         successToast(
           TradeMode.MARKET,

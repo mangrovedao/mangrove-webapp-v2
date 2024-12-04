@@ -23,6 +23,7 @@ import {
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
+import { MarketParams } from "@mangrovedao/mgv"
 
 export const SLIPPAGES = ["0.1", "0.5", "1"]
 
@@ -82,6 +83,7 @@ export function useSwap() {
     markets,
     token: payToken,
   })
+
   const [payTokenDialogOpen, setPayTokenDialogOpen] = React.useState(false)
   const [receiveTokenDialogOpen, setReceiveTokenDialogOpen] =
     React.useState(false)
@@ -145,7 +147,7 @@ export function useSwap() {
       currentMarket?.base.address,
       currentMarket?.quote.address,
       fields.payValue,
-      marketClient?.key,
+      marketClient?.uid,
       address,
     ],
     queryFn: async () => {
@@ -165,6 +167,7 @@ export function useSwap() {
             bs: BS.buy,
             book,
           }
+
       const simulation = marketOrderSimulation(params)
       setFields((fields) => ({
         ...fields,
@@ -177,15 +180,16 @@ export function useSwap() {
       const [approvalStep] = await marketClient.getMarketOrderSteps({
         bs: isBasePay ? BS.sell : BS.buy,
         user: address,
+        sendAmount: payAmount,
       })
-      console.log({ approvalStep })
+
       return { simulation, approvalStep }
     },
     enabled:
       !!payToken &&
       !!receiveToken &&
       !!getBookQuery.data &&
-      !!marketClient &&
+      !!marketClient?.uid &&
       !!address,
   })
 
@@ -229,7 +233,7 @@ export function useSwap() {
   async function swap() {
     if (!(marketClient && address && walletClient && payToken && receiveToken))
       return
-    console.log({ hasToApprove })
+
     if (hasToApprove) {
       await approvePayToken.mutate(
         {
@@ -247,19 +251,22 @@ export function useSwap() {
 
     const isBasePay = currentMarket?.base.address === payToken.address
 
-    const baseAmount = parseUnits(fields.payValue, payToken.decimals)
-    const quoteAmount = parseUnits(fields.receiveValue, receiveToken.decimals)
+    const send = fields.payValue
+    const receive = fields.receiveValue
 
     await postMarketOrder.mutate(
       {
         form: {
           bs: isBasePay ? BS.sell : BS.buy,
-          send: formatUnits(baseAmount, payToken.decimals),
-          receive: formatUnits(quoteAmount, receiveToken.decimals),
+          send,
+          receive,
           slippage: Number(slippage),
         },
+        swapMarket: currentMarket as MarketParams,
+        swapMarketClient: marketClient,
       },
       {
+        onError: () => {},
         onSuccess: () => {
           setFields(() => ({
             payValue: "",
