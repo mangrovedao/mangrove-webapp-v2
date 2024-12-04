@@ -36,7 +36,7 @@ export default function Page() {
             href="https://docs.mangrove.exchange/mgv-incentives/introduction"
             target="_blank"
           >
-            How are my rewards calculated ?
+            How are my rewards calculated?
           </Link>
         </Caption>
       </div>

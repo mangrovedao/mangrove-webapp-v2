@@ -178,7 +178,7 @@ export function useSwap() {
         bs: isBasePay ? BS.sell : BS.buy,
         user: address,
       })
-
+      console.log({ approvalStep })
       return { simulation, approvalStep }
     },
     enabled:
@@ -229,7 +229,7 @@ export function useSwap() {
   async function swap() {
     if (!(marketClient && address && walletClient && payToken && receiveToken))
       return
-
+    console.log({ hasToApprove })
     if (hasToApprove) {
       await approvePayToken.mutate(
         {

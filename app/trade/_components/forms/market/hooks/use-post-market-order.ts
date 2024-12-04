@@ -1,6 +1,10 @@
 import { marketOrderResultFromLogs } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { TransactionReceipt } from "viem"
+import {
+  BaseError,
+  ContractFunctionExecutionError,
+  TransactionReceipt,
+} from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -71,6 +75,15 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
             account: address,
           })
 
+        console.log({
+          baseAmount,
+          quoteAmount,
+          bs,
+          slippage,
+          gas: 20_000_000n,
+          account: address,
+        })
+
         const hash = await walletClient.writeContract(request)
         const receipt = await publicClient.waitForTransactionReceipt({
           hash,
@@ -86,6 +99,8 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           },
         )
 
+        console.log({ result })
+
         successToast(
           TradeMode.MARKET,
           bs,
@@ -100,6 +115,23 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         return { result, receipt }
       } catch (error) {
         console.error(error)
+
+        if (error instanceof BaseError) {
+          const revertError = error.walk(
+            (error) => error instanceof ContractFunctionExecutionError,
+          )
+
+          if (revertError instanceof ContractFunctionExecutionError) {
+            console.log(
+              revertError,
+              revertError.cause,
+              revertError.message,
+              revertError.functionName,
+              revertError.formattedArgs,
+              revertError.details,
+            )
+          }
+        }
         toast.error("Failed to post the market order")
       }
     },
