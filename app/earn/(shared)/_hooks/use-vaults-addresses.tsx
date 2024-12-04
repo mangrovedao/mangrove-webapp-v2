@@ -71,7 +71,7 @@ export const VAULTS_WHITELIST_ARBITRUM = [
     manager: "Redacted Labs",
     address: "0xa99C55E911c028d610e709603CCCA2Df7a22C19D" as Address,
     market: arbitrumUSDCUSDT,
-    strategyType: "Kandel",
+    strategyType: "Kandel Aave",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",
     descriptionBonus:
