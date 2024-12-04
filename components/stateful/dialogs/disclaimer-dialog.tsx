@@ -1,5 +1,4 @@
 "use client"
-import { CheckedState } from "@radix-ui/react-checkbox"
 import { useConnectModal } from "@rainbow-me/rainbowkit"
 import React from "react"
 import { isMobile } from "react-device-detect"
@@ -7,7 +6,6 @@ import { isMobile } from "react-device-detect"
 import Dialog from "@/components/dialogs/alert-dialog-new"
 import MobileOverlay from "@/components/mobile-overlay"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import withClientOnly from "@/hocs/withClientOnly"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { config } from "@/providers/wallet-connect"
@@ -18,9 +16,6 @@ function DisclaimerDialog() {
   const { isConnected, address } = useAccount()
 
   const { openConnectModal } = useConnectModal()
-  const [isChecked, setIsChecked] = React.useState<CheckedState | undefined>(
-    false,
-  )
 
   const [hideDisclaimer, setHideDisclaimer] = useLocalStorage<boolean | null>(
     `hideDisclaimer_${address}`,
@@ -56,19 +51,23 @@ function DisclaimerDialog() {
   }, [address])
 
   async function handleAcceptTerms() {
-    if (!isConnected) {
+    try {
+      if (!isConnected) {
+        setHideDisclaimer(true)
+        openConnectModal?.()
+        return
+      }
+
+      await signature.signMessageAsync({
+        message:
+          "Welcome to the Mangrove dApp!\nThe use of this app is subject to the terms of use\nhttps://mangrove.exchange/terms-of-use\n\nBy signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
+      })
+
+      setHasSignedDisclamer(true)
       setHideDisclaimer(true)
-      openConnectModal?.()
-      return
+    } catch (error) {
+      console.error(error)
     }
-
-    await signature.signMessageAsync({
-      message:
-        "By signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
-    })
-
-    setHasSignedDisclamer(true)
-    setHideDisclaimer(true)
   }
 
   if (isMobile) {
@@ -94,15 +93,10 @@ function DisclaimerDialog() {
       <Dialog.Footer className="!justify-center">
         <div className="flex flex-col space-y-4">
           <div className="items-top flex space-x-2">
-            <Checkbox
-              id="terms1"
-              onCheckedChange={setIsChecked}
-              checked={isChecked}
-            />
             <div className="grid gap-1.5 leading-none hover:opacity-80">
               <label
                 htmlFor="terms1"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-text-secondary !cursor-pointer"
+                className="text-sm font-medium leading-none text-text-secondary "
               >
                 By signing this message you confirm that you are not accessing
                 this app from or are a resident of the USA or any other
@@ -126,11 +120,11 @@ function DisclaimerDialog() {
           </div>
           <div className={cn("flex space-x-2 justify-center")}>
             <Button
-              loading={signature.isPending && !signature.error}
+              loading={signature.isPending}
               size={"lg"}
               className="w-full flex-1"
               onClick={handleAcceptTerms}
-              disabled={!isChecked || (signature.isPending && !signature.error)}
+              disabled={signature.isPending && !signature.error}
             >
               {buttonLabel}
             </Button>
