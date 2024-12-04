@@ -45,8 +45,8 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
       swapMarketClient,
     }: {
       form: Form
-      swapMarket: MarketParams
-      swapMarketClient: ReturnType<typeof useMarketClient>
+      swapMarket?: MarketParams
+      swapMarketClient?: ReturnType<typeof useMarketClient>
     }) => {
       try {
         if (
