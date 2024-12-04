@@ -156,7 +156,7 @@ export default function Page() {
               symbol={` $`}
             />
             <GridLineHeader
-              title={"APY"}
+              title={"APR"}
               value={vault?.apr ? vault?.apr.toFixed(2) : "0"}
               symbol={"%"}
             />
