@@ -17,8 +17,10 @@ const tradeHistorySchema = z.object({
 
 export type TradeHistory = z.infer<typeof tradeHistorySchema>
 
+const noZeroTakerAndMakerFilter = (trade: TradeHistory) => Number(trade.takerGot) !== 0 && Number(trade.takerGave) !== 0
+
 export function parseTradeHistory(data: unknown[]): TradeHistory[] {
-  return data
+  return (data
     .map((item) => {
       try {
         return tradeHistorySchema.parse(item)
@@ -27,5 +29,6 @@ export function parseTradeHistory(data: unknown[]): TradeHistory[] {
         return null
       }
     })
-    .filter(Boolean) as TradeHistory[]
+    .filter(Boolean) as TradeHistory[])
+    .filter(noZeroTakerAndMakerFilter)
 }
