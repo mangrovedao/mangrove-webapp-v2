@@ -9,16 +9,15 @@ import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 
 import { useTokens } from "@/hooks/use-addresses"
-import { useTokenPricesInUsb } from "@/hooks/use-orderbook-price-per-block"
+import { getTokenPrice } from "@/hooks/use-token-price"
 
 const useIndexerSdkContext = () => {
-  const tokenPrices = useTokenPricesInUsb()
   const { chain } = useAccount()
   const tokens = useTokens()
   const chainId = chain?.id || arbitrum.id
 
   const indexerSdkQuery = useQuery({
-    queryKey: ["indexer-sdk", chainId, tokenPrices.dataUpdatedAt],
+    queryKey: ["indexer-sdk", chainId],
     queryFn: () => {
       try {
         if (!chainId) return null
@@ -71,8 +70,8 @@ const useIndexerSdkContext = () => {
                 },
               }
             },
-            getPrice(tokenAddress) {
-              return tokenPrices.data?.[tokenAddress] ?? 1
+            getPrice: async (tokenAddress) => {
+              return await getTokenPrice(tokenAddress, chainId)
             },
           },
         })
