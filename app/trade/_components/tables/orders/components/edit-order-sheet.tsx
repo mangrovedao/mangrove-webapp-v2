@@ -20,7 +20,7 @@ import {
 import { useEditOrder } from "../hooks/use-edit-order"
 import { type Order } from "../schema"
 import { Form } from "../types"
-import { getOrderProgress } from "../utils/tables"
+import { getOrderProgress } from "../utils/edit-order"
 import EditOrderSteps from "./edit-order-steps"
 import { Timer } from "./timer"
 
@@ -33,9 +33,9 @@ type SheetLineProps = {
 const SheetLine = ({ title, item, secondaryItem }: SheetLineProps) => (
   <div className="flex justify-between items-center">
     <Text className="text-muted-foreground whitespace-nowrap">{title}</Text>
-    <div className="grid justify-items-end max-w-60">
-      {item}
-      {secondaryItem}
+    <div className="grid justify-items-end max-w-60 space-y-2">
+      <div>{item}</div>
+      <div>{secondaryItem}</div>
     </div>
   </div>
 )
@@ -85,21 +85,23 @@ export default function EditOrderSheet({
     isOrderExpired,
     formattedPrice,
     sendTokenBalance,
-
     sendFrom,
     receiveTo,
   } = useEditOrder({
     order,
     onSubmit: (formData) => setFormData(formData),
   })
+
   const { base, quote } = market.currentMarket ?? {}
 
-  const { progress, progressInPercent, volume, filled, amount } =
-    getOrderProgress(order, market)
+  const { progress, progressInPercent, gives, filled, wants } =
+    getOrderProgress(order, base, quote)
 
   React.useEffect(() => {
     if (mode === "edit") setToggleEdit(true)
   }, [])
+
+  const sendTokenDecimals = isBid ? quote?.decimals : base?.decimals
 
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
@@ -174,7 +176,7 @@ export default function EditOrderSheet({
                   <SheetLine
                     title={`Filled/Amount`}
                     item={
-                      <Text>{`${filled} / ${amount} ${
+                      <Text>{`${filled} / ${wants} ${
                         isBid ? base?.symbol : quote?.symbol
                       }`}</Text>
                     }
@@ -201,7 +203,6 @@ export default function EditOrderSheet({
                         >
                           {(field) => (
                             <EnhancedNumericInput
-                              className="h-10"
                               inputClassName="h-10"
                               name={field.name}
                               value={field.state.value}
@@ -229,7 +230,7 @@ export default function EditOrderSheet({
                     }
                     item={
                       !toggleEdit ? (
-                        <Text>{`${volume} ${
+                        <Text>{`${gives} ${
                           isBid ? quote?.symbol : base?.symbol
                         }`}</Text>
                       ) : (
@@ -239,7 +240,7 @@ export default function EditOrderSheet({
                             Number(
                               formatUnits(
                                 sendTokenBalance.balance?.balance || 0n,
-                                8,
+                                sendTokenDecimals || 18,
                               ),
                             ),
                           )}
@@ -250,7 +251,6 @@ export default function EditOrderSheet({
                               inputClassName="h-10"
                               name={field.name}
                               value={field.state.value}
-                              placeholder={volume}
                               onBlur={field.handleBlur}
                               onChange={(e) => {
                                 field.handleChange(e.target.value)
@@ -275,7 +275,7 @@ export default function EditOrderSheet({
                     }
                     item={
                       !toggleEdit ? (
-                        <Text>{`${amount} ${
+                        <Text>{`${wants} ${
                           isBid ? base?.symbol : quote?.symbol
                         }`}</Text>
                       ) : (
@@ -289,7 +289,6 @@ export default function EditOrderSheet({
                               inputClassName="h-10"
                               name={field.name}
                               value={field.state.value}
-                              placeholder={volume}
                               onBlur={field.handleBlur}
                               onChange={(e) => {
                                 field.handleChange(e.target.value)

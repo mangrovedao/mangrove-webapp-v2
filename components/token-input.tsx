@@ -66,10 +66,7 @@ export const EnhancedNumericInput = React.forwardRef<
           aria-invalid={!!error?.length}
         />
         {error?.length ? (
-          <p
-            role="aria-live"
-            className="text-red-100 text-xs leading-4 mt-1 mb-2"
-          >
+          <p role="aria-live" className="text-red-100 text-xs leading-4 mt-1">
             {error}
           </p>
         ) : undefined}
