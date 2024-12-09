@@ -67,7 +67,10 @@ export function useTable({ data }: Params) {
 
       columnHelper.accessor("creationDate", {
         header: "Date",
-        cell: (row) => <div>{formatDate(row.getValue(), "h:mm:ss")}</div>,
+        cell: ({ row }) => {
+          const date = row.original.creationDate
+          return <div>{formatDate(date, "dd/MM/yyyy, HH:mm")}</div>
+        },
       }),
     ],
     [market],
