@@ -48,7 +48,7 @@ export function useOrders<T = Order[]>({
 
       try {
         const { asksMarket, bidsMarket } = getSemibooksOLKeys(market)
-
+        
         const result = await indexerSdk.getOpenLimitOrders({
           ask: {
             token: {
