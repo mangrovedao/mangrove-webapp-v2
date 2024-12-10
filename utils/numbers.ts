@@ -88,3 +88,11 @@ export function calculatePriceFromPercentage({
 }) {
   return (percentage / 100) * basePrice + basePrice
 }
+
+// export function formatNumber(num: number, locale = "en-US", currency = "USD") {
+//   return new Intl.NumberFormat(locale, {
+//     style: "currency",
+//     currency: currency,
+//     maximumFractionDigits: 0,
+//   }).format(num)
+// }
