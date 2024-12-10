@@ -2,11 +2,8 @@ import { BS } from "@mangrovedao/mgv/lib"
 import React from "react"
 import { formatUnits } from "viem"
 
-import InfoTooltip from "@/components/info-tooltip-new"
 import { EnhancedNumericInput } from "@/components/token-input-new"
-import { Caption } from "@/components/typography/caption"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 
 import {
   Select,
@@ -23,7 +20,6 @@ import { enumKeys } from "@/utils/enums"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
-import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
@@ -201,7 +197,9 @@ export function Limit(props: { bs: BS }) {
                   </span>
                 )}
               </div>
-              <Accordion title="Liquidity sourcing">
+
+              {/* <Accordion title="Liquidity sourcing">
+                
                 <div className="flex justify-between space-x-2 pt-2">
                   <form.Field name="sendFrom">
                     {(field) => (
@@ -244,7 +242,6 @@ export function Limit(props: { bs: BS }) {
                                     </SelectItem>
                                   ),
                               )}
-                              {/* Wallet */}
                               <SelectItem key="simple" value="simple">
                                 <div className="flex gap-2 w-full items-center">
                                   <SourceIcon sourceId={"simple"} />
@@ -307,7 +304,6 @@ export function Limit(props: { bs: BS }) {
                                     </SelectItem>
                                   ),
                               )}
-                              {/* Wallet */}
                               <SelectItem key="simple" value="simple">
                                 <div className="flex gap-2 w-full items-center">
                                   <SourceIcon sourceId={"simple"} />
@@ -324,6 +320,7 @@ export function Limit(props: { bs: BS }) {
                   </form.Field>
                 </div>
               </Accordion>
+               */}
               <Accordion title="Time in force">
                 <form.Field name="timeInForce">
                   {(field) => {

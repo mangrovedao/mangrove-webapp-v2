@@ -33,6 +33,7 @@ const useMangroveTokenPricesQuery = (
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BLAST_DATA_SERVICE}/${baseAddress}/${quoteAddress}`,
       )
+
       const mangroveTokenPrices = await res.json()
       return mangrovePriceSchema.parse(mangroveTokenPrices)
     },
