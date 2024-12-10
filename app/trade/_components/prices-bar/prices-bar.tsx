@@ -21,9 +21,17 @@ function Label({ children }: React.PropsWithChildren) {
   return <div className="text-muted-foreground">{children}</div>
 }
 
-function Value({ children }: React.PropsWithChildren) {
+function Value({
+  children,
+  className,
+}: React.PropsWithChildren<{ className?: string }>) {
   return (
-    <div className="flex items-center font-ubuntu font-semibold text-sm">
+    <div
+      className={cn(
+        "flex items-center font-ubuntu font-semibold text-sm",
+        className,
+      )}
+    >
       {children}
     </div>
   )
@@ -32,6 +40,7 @@ function Value({ children }: React.PropsWithChildren) {
 function Item({
   label,
   value,
+  className,
   skeleton = true,
   showSymbol = false,
   token,
@@ -43,6 +52,7 @@ function Item({
   showSymbol?: boolean
   token?: Token
   rightElement?: React.ReactElement
+  className?: string
 }) {
   const displayedPriceDecimals = determineDecimals(
     value,
@@ -55,7 +65,7 @@ function Item({
       {skeleton ? (
         <Skeleton className="w-16 h-4" />
       ) : value ? (
-        <Value>
+        <Value className={className}>
           {formatNumber(value ?? 0, {
             style: showSymbol ? "currency" : undefined,
             currencyDisplay: showSymbol ? "symbol" : undefined,
@@ -77,15 +87,15 @@ export function PricesBar() {
   const { currentMarket } = useMarket()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
+  const tickSpacing = currentMarket?.tickSpacing
   const { data, isLoading: mangroveTokenPriceLoading } =
-    useMangroveTokenPricesQuery(base?.address, quote?.address)
+    useMangroveTokenPricesQuery(
+      base?.address,
+      quote?.address,
+      Number(tickSpacing),
+    )
 
   const [side, setSide] = React.useState<"base" | "quote">("base")
-
-  const { diffTakerGave, takerGave, totalTakerGave, minPrice, maxPrice } =
-    side === "base"
-      ? data?.[`${base?.address}-${quote?.address}`] ?? {}
-      : data?.[`${quote?.address}-${base?.address}`] ?? {}
 
   const token = side === "base" ? quote : base
 
@@ -104,16 +114,20 @@ export function PricesBar() {
     spotPrice = 1 / (spotPrice ?? 1)
   }
 
-  const fixedSpotPrice = spotPrice
+  const variation24hPercentage =
+    ((Number(data?.close) - Number(data?.open)) / Number(data?.close)) * 100
 
-  const variation24hPercentage = (diffTakerGave ?? 0 * 100) / (spotPrice ?? 1)
+  const variation24hClassnames = cn({
+    "text-green-caribbean": variation24hPercentage >= 0,
+    "text-red-100": variation24hPercentage < 0,
+  })
 
   return (
     <ScrollArea>
       <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
         <Item
           label={"Price"}
-          value={fixedSpotPrice ? Number(fixedSpotPrice ?? 0) : undefined}
+          value={spotPrice ? Number(spotPrice ?? 0) : undefined}
           token={side === "quote" ? base : quote}
           skeleton={false}
         />
@@ -122,15 +136,16 @@ export function PricesBar() {
 
         <Item
           label={`24h Change`}
-          value={diffTakerGave}
+          value={variation24hPercentage}
           token={token}
           skeleton={mangroveTokenPriceLoading}
+          className={variation24hClassnames}
           rightElement={
             <span
-              className={cn("space-x-[2px] text-xs inline-flex ml-2", {
-                "text-green-caribbean": variation24hPercentage >= 0,
-                "text-red-100": variation24hPercentage < 0,
-              })}
+              className={cn(
+                "space-x-[2px] text-xs inline-flex ml-2",
+                variation24hClassnames,
+              )}
             >
               <VariationArrow
                 className={cn("h-3", {
@@ -150,14 +165,14 @@ export function PricesBar() {
 
         <Item
           label="24h High"
-          value={maxPrice ? Number(maxPrice ?? 0) : undefined}
+          value={data?.maxPrice ? Number(data?.maxPrice ?? 0) : undefined}
           token={token}
           skeleton={mangroveTokenPriceLoading}
         />
 
         <Item
           label="24h Low"
-          value={minPrice ? Number(minPrice ?? 0) : undefined}
+          value={data?.minPrice ? Number(data?.minPrice ?? 0) : undefined}
           token={token}
           skeleton={mangroveTokenPriceLoading}
         />
@@ -166,8 +181,7 @@ export function PricesBar() {
 
         <Item
           label="24h Volume"
-          value={takerGave ? Number(takerGave ?? 0) : undefined}
-          // value={totalTakerGave ? Number(totalTakerGave ?? 0) : undefined}
+          value={data?.quoteVolume ? Number(data?.quoteVolume ?? 0) : undefined}
           token={token}
           skeleton={mangroveTokenPriceLoading}
         />

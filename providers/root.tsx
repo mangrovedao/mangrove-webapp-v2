@@ -3,7 +3,6 @@ import { ChainsProvider } from "./chains"
 import { DialogProvider } from "./dialogs"
 import { FocusOutline } from "./focus-outline"
 import { MangroveProvider } from "./mangrove"
-import { CSPostHogProvider } from "./posthog"
 import { ReactQueryProvider } from "./react-query"
 import { StyledJsxRegistry } from "./style-jsx"
 import { WalletConnectProvider } from "./wallet-connect"
@@ -18,7 +17,9 @@ export function RootProvider({ children }: React.PropsWithChildren) {
               <ChainsProvider>
                 <FocusOutline>
                   <StyledJsxRegistry>
-                    <CSPostHogProvider>{children}</CSPostHogProvider>
+                    {/* <CSPostHogProvider> */}
+                    {children}
+                    {/* </CSPostHogProvider> */}
                   </StyledJsxRegistry>
                 </FocusOutline>
               </ChainsProvider>
