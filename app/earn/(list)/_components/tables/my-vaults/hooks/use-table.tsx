@@ -141,17 +141,18 @@ export function useTable({ pageSize, data, onManage }: Params) {
         },
       }),
 
-      columnHelper.display({
-        id: "My APY",
-        header: () => <div className="text-right">My APY</div>,
-        cell: ({ row }) => {
-          return (
-            <div className="w-full h-full flex justify-end">
-              <Value value={"-"} />
-            </div>
-          )
-        },
-      }),
+      // note: not implemented yet
+      // columnHelper.display({
+      //   id: "My APY",
+      //   header: () => <div className="text-right">My APY</div>,
+      //   cell: ({ row }) => {
+      //     return (
+      //       <div className="w-full h-full flex justify-end">
+      //         <Value value={"-"} />
+      //       </div>
+      //     )
+      //   },
+      // }),
 
       columnHelper.display({
         id: "actions",
