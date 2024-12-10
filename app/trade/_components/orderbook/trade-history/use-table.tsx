@@ -48,6 +48,7 @@ export function useTable({ data }: Params) {
           )
         },
       }),
+
       columnHelper.accessor("price", {
         header: "Price",
         cell: (row) =>

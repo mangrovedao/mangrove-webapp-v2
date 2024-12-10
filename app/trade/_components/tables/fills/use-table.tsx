@@ -115,6 +115,7 @@ export function useTable({ data }: Params) {
           return <div>{formatDate(date, "dd/MM/yyyy, HH:mm")}</div>
         },
       }),
+
       columnHelper.accessor("status", {
         header: "Status",
         cell: ({ row }) =>
