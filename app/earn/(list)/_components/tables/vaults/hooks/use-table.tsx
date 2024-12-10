@@ -15,6 +15,7 @@ import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { formatNumber } from "@/utils/numbers"
 import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
@@ -117,18 +118,19 @@ export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
         },
       }),
 
-      columnHelper.display({
-        id: "30 D",
-        header: () => <div className="text-right">30 D</div>,
-        cell: ({ row }) => {
-          const value = "-"
-          return (
-            <div className="w-full h-full flex justify-end">
-              <Value value={value} />
-            </div>
-          )
-        },
-      }),
+      // note: not implemented yet
+      // columnHelper.display({
+      //   id: "30 D",
+      //   header: () => <div className="text-right">30 D</div>,
+      //   cell: ({ row }) => {
+      //     const value = "-"
+      //     return (
+      //       <div className="w-full h-full flex justify-end">
+      //         <Value value={value} />
+      //       </div>
+      //     )
+      //   },
+      // }),
 
       columnHelper.display({
         id: "TVL",
@@ -142,17 +144,16 @@ export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
               ? row.original.quoteDollarPrice
               : 1
 
+          const value =
+            Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
+            quoteDollarPrice
           return (
             <div className="w-full h-full flex justify-end">
               {loading ? (
                 <Skeleton className="h-6 w-24" />
               ) : (
                 <Value
-                  value={(
-                    Number(
-                      formatUnits(tvl || 0n, market.quote.decimals || 18),
-                    ) * quoteDollarPrice
-                  ).toFixed(market.quote.displayDecimals || 3)}
+                  value={formatNumber(Number(value.toFixed(2)))}
                   symbol={"$"}
                 />
               )}
