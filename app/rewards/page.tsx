@@ -110,7 +110,7 @@ export default function Page() {
                 </Value>
               </div>
               <div className="flex justify-between">
-                <Label>Kandel Rewards</Label>
+                <Label>Vault Rewards</Label>
                 <Value size="small">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 8)}
