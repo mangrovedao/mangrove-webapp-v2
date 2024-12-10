@@ -14,6 +14,8 @@ import { useAccount } from "wagmi"
 import { Vault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
+
+import { formatNumber } from "@/utils/numbers"
 import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
@@ -96,13 +98,13 @@ export function useTable({ pageSize, data, onManage }: Params) {
         cell: ({ row }) => {
           const { tvl, market, quoteDollarPrice } = row.original
 
+          const formattedTvl =
+            Number(formatUnits(tvl, market.quote.decimals)) * quoteDollarPrice
+
           return (
             <div className="w-full h-full flex justify-end">
               <Value
-                value={(
-                  Number(formatUnits(tvl, market.quote.decimals)) *
-                  quoteDollarPrice
-                ).toFixed(2)}
+                value={formatNumber(Number(formattedTvl.toFixed(2)))}
                 symbol={"$"}
               />
             </div>
@@ -130,23 +132,27 @@ export function useTable({ pageSize, data, onManage }: Params) {
 
           return (
             <div className="w-full h-full flex justify-end">
-              <Value value={Number(value).toFixed(2)} symbol={"$"} />
+              <Value
+                value={formatNumber(Number(value.toFixed(2)))}
+                symbol={"$"}
+              />
             </div>
           )
         },
       }),
 
-      columnHelper.display({
-        id: "My APY",
-        header: () => <div className="text-right">My APY</div>,
-        cell: ({ row }) => {
-          return (
-            <div className="w-full h-full flex justify-end">
-              <Value value={"-"} />
-            </div>
-          )
-        },
-      }),
+      // note: not implemented yet
+      // columnHelper.display({
+      //   id: "My APY",
+      //   header: () => <div className="text-right">My APY</div>,
+      //   cell: ({ row }) => {
+      //     return (
+      //       <div className="w-full h-full flex justify-end">
+      //         <Value value={"-"} />
+      //       </div>
+      //     )
+      //   },
+      // }),
 
       columnHelper.display({
         id: "actions",
