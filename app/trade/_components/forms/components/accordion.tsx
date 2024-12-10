@@ -44,7 +44,7 @@ export function Accordion({
           >
             {title}
             {tooltip && (
-              <InfoTooltip className="text-text-quaternary">
+              <InfoTooltip className="text-text-quaternary text-sm">
                 {tooltip}
               </InfoTooltip>
             )}
