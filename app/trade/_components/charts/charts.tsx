@@ -7,18 +7,17 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
-import { TVChartContainer } from "@/components/trading-view/trading-view-chart"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 
 enum ChartType {
   DEPTH = "Depth chart",
-  PRICE = "Price chart",
+  // PRICE = "Price chart",
 }
 
 const TABS_CONTENT = {
   [ChartType.DEPTH]: DepthChart,
-  [ChartType.PRICE]: <TVChartContainer />,
+  // [ChartType.PRICE]: <TVChartContainer />,
 }
 
 export function Market({

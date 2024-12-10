@@ -52,90 +52,88 @@ export const SemiBook = React.forwardRef<
         : priceDecimals
 
     return (
-      <>
-        <TableRow
-          ref={refIndex === i ? ref : null}
-          key={`${type}-${id}`}
-          className={`z-30 relative h-6 border-none hover:opacity-80 transition-opacity cursor-pointer`}
-          onClick={() => {
-            dispatchEvent(
-              new CustomEvent("on-orderbook-offer-clicked", {
-                detail: { price: price.toString() },
-              }),
-            )
-          }}
-        >
-          {type === "bids" ? (
-            <>
-              <OrderBookTableCell className="text-muted-foreground">
-                <Cell
-                  value={price * volume}
-                  pDecimals={pDecimals}
-                  priceDecimals={priceDecimals}
-                />
-              </OrderBookTableCell>
-              <OrderBookTableCell>
-                <Cell
-                  value={volume}
-                  priceDecimals={currentMarket?.base.decimals}
-                  pDecimals={pDecimals}
-                />
-              </OrderBookTableCell>
-              <OrderBookTableCell
-                className={cn(
-                  "text-right",
-                  type === "bids" ? "text-green-caribbean" : "text-red-100",
-                )}
-              >
-                <Cell
-                  value={price}
-                  priceDecimals={priceDecimals}
-                  pDecimals={pDecimals}
-                />
-              </OrderBookTableCell>
-            </>
-          ) : (
-            <>
-              <OrderBookTableCell className={cn("text-right", "text-red-100")}>
-                <Cell
-                  value={price}
-                  priceDecimals={priceDecimals}
-                  pDecimals={pDecimals}
-                />
-              </OrderBookTableCell>
-              <OrderBookTableCell>
-                <Cell
-                  value={volume}
-                  priceDecimals={currentMarket?.base.decimals}
-                  pDecimals={pDecimals}
-                />
-              </OrderBookTableCell>
-              <OrderBookTableCell className="text-muted-foreground">
-                <Cell
-                  value={price * volume}
-                  pDecimals={pDecimals}
-                  priceDecimals={priceDecimals}
-                />
-              </OrderBookTableCell>
-            </>
-          )}
+      <TableRow
+        ref={refIndex === i ? ref : null}
+        key={`${type}-${id}`}
+        className={`z-30 relative h-6 border-none hover:opacity-80 transition-opacity cursor-pointer`}
+        onClick={() => {
+          dispatchEvent(
+            new CustomEvent("on-orderbook-offer-clicked", {
+              detail: { price: price.toString() },
+            }),
+          )
+        }}
+      >
+        {type === "bids" ? (
+          <>
+            <OrderBookTableCell className="text-muted-foreground">
+              <Cell
+                value={price * volume}
+                pDecimals={pDecimals}
+                priceDecimals={priceDecimals}
+              />
+            </OrderBookTableCell>
+            <OrderBookTableCell>
+              <Cell
+                value={volume}
+                priceDecimals={currentMarket?.base.decimals}
+                pDecimals={pDecimals}
+              />
+            </OrderBookTableCell>
+            <OrderBookTableCell
+              className={cn(
+                "text-right",
+                type === "bids" ? "text-green-caribbean" : "text-red-100",
+              )}
+            >
+              <Cell
+                value={price}
+                priceDecimals={priceDecimals}
+                pDecimals={pDecimals}
+              />
+            </OrderBookTableCell>
+          </>
+        ) : (
+          <>
+            <OrderBookTableCell className={cn("text-right", "text-red-100")}>
+              <Cell
+                value={price}
+                priceDecimals={priceDecimals}
+                pDecimals={pDecimals}
+              />
+            </OrderBookTableCell>
+            <OrderBookTableCell>
+              <Cell
+                value={volume}
+                priceDecimals={currentMarket?.base.decimals}
+                pDecimals={pDecimals}
+              />
+            </OrderBookTableCell>
+            <OrderBookTableCell className="text-muted-foreground">
+              <Cell
+                value={price * volume}
+                pDecimals={pDecimals}
+                priceDecimals={priceDecimals}
+              />
+            </OrderBookTableCell>
+          </>
+        )}
 
-          <td
-            className={cn(
-              "absolute inset-y-[2px] w-full -z-10 rounded-[2px] order-book-line-bg",
-              type === "bids" ? "right-0" : "left-0",
-            )}
-          ></td>
-          <style jsx>{`
-            .order-book-line-bg {
-              width: ${cumulatedVolumePercentage}%;
-              background: ${type === "bids"
-                ? "#003D12"
-                : "rgba(255, 0, 0, 0.15)"};
-            }
-          `}</style>
-        </TableRow>
-      </>
+        <td
+          className={cn(
+            "absolute inset-y-[2px] w-full -z-10 rounded-[2px] order-book-line-bg",
+            type === "bids" ? "right-0" : "left-0",
+          )}
+        ></td>
+        <style jsx>{`
+          .order-book-line-bg {
+            width: ${cumulatedVolumePercentage}%;
+            background: ${type === "bids"
+              ? "#003D12"
+              : "rgba(255, 0, 0, 0.15)"};
+          }
+        `}</style>
+      </TableRow>
     )
   })
 })

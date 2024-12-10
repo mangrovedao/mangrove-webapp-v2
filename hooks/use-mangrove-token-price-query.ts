@@ -5,12 +5,12 @@ import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 
 const priceSchema = z.object({
-  baseVolume: z.number(),
-  quoteVolume: z.number(),
-  minPrice: z.number(),
-  maxPrice: z.number(),
-  open: z.number(),
-  close: z.number(),
+  baseVolume: z.number().nullable(),
+  quoteVolume: z.number().nullable(),
+  minPrice: z.number().nullable(),
+  maxPrice: z.number().nullable(),
+  open: z.number().nullable(),
+  close: z.number().nullable(),
 })
 
 // useTokenPrice query from Mangrove data

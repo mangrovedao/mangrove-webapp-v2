@@ -9,6 +9,8 @@ import {
   SubscribeBarsCallback,
   SymbolResolveExtension,
 } from "@/public/charting_library/charting_library"
+import { arbitrum } from "viem/chains"
+import { z } from "zod"
 
 type Params = {
   base: string
@@ -18,7 +20,29 @@ type Params = {
   chainId: number | undefined
 }
 
-export default function datafeed({ base, quote, chainId }: Params) {
+const candlesSchema = z.object({
+  candles: z.array(
+    z.object({
+      startTimestamp: z.number(),
+      endTimestamp: z.number(),
+      openTimestamp: z.number(),
+      closeTimestamp: z.number(),
+      open: z.number(),
+      high: z.number(),
+      low: z.number(),
+      close: z.number(),
+      volume: z.number(),
+    }),
+  ),
+})
+
+export default function datafeed({
+  base,
+  quote,
+  baseAddress,
+  quoteAddress,
+  chainId,
+}: Params) {
   return {
     onReady: (callback: OnReadyCallback) => {
       callback({
@@ -71,34 +95,43 @@ export default function datafeed({ base, quote, chainId }: Params) {
       onResult: HistoryCallback,
       onError: ErrorCallback,
     ) => {
-      const start = new Date(periodParams.from * 1000)
-      const end = new Date(periodParams.to * 1000)
-      const formattedStart = start.toISOString().split("T")[0]
-      const formattedEnd = end.toISOString().split("T")[0]
+      try {
+        const start = new Date(periodParams.from * 1000)
+        const end = new Date(periodParams.to * 1000)
+        const formattedStart = start.toISOString().split("T")[0]
+        const formattedEnd = end.toISOString().split("T")[0]
+        const currentChainId = chainId ?? arbitrum.id
 
-      const response = await fetch(
-        `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${chainId}&interval=${resolution}&start_time=${formattedStart}&end_time=${formattedEnd}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/1h`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        },
-      )
-      let data = await response.json()
+        )
 
-      if (data.message) {
-        data = []
+        const result = candlesSchema.safeParse(await response.json())
+
+        if (!result.success) {
+          throw new Error("Invalid candles data")
+        }
+
+        const data = result.data.candles ?? []
+
+        const bars = data.map((bar: any) => ({
+          time: bar.startTimestamp * 1000,
+          open: parseFloat(bar.open),
+          high: parseFloat(bar.high),
+          low: parseFloat(bar.low),
+          close: parseFloat(bar.close),
+        }))
+
+        console.log(bars)
+        onResult(bars, { noData: bars.length > 0 ? false : true })
+      } catch (error) {
+        console.log(error)
       }
-
-      const bars = data.map((bar: any) => ({
-        time: new Date(bar.startTime).getTime(),
-        open: parseFloat(bar.open),
-        high: parseFloat(bar.high),
-        low: parseFloat(bar.low),
-        close: parseFloat(bar.close),
-      }))
-
-      onResult(bars, { noData: !bars.length })
     },
     subscribeBars: (
       symbolInfo: LibrarySymbolInfo,

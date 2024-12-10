@@ -15,15 +15,18 @@ export default function InfoTooltip({
   side,
   className,
   iconSize = 16,
+  asChild = true,
 }: PropsWithChildren<{
   className?: string
   iconSize?: number
   side?: "top" | "right" | "bottom" | "left"
+  asChild?: boolean
 }>) {
   return (
     <TooltipProvider>
       <Tooltip delayDuration={200}>
         <TooltipTrigger
+          asChild={asChild}
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
