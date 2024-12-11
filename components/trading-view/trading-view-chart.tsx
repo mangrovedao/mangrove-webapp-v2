@@ -7,6 +7,7 @@ import React from "react"
 import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import {
+  IBasicDataFeed,
   ResolutionString,
   widget,
   type ChartingLibraryWidgetOptions,
@@ -28,23 +29,27 @@ export const TVChartContainer = (
 
   React.useEffect(() => {
     if (!currentMarket) return
+
+    const timeframe = {
+      from: 1733706000000, // 1 hour ago (3600 seconds)
+      to: 1733857200000, // current time
+    }
+
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
-      // BEWARE: no trailing slash is expected in feed URL
-      // @ts-ignore
       datafeed: datafeed({
         base: currentMarket?.base.symbol,
         quote: currentMarket?.quote.symbol,
         baseAddress: currentMarket?.base.address,
         quoteAddress: currentMarket?.quote.address,
         chainId: chainId ?? arbitrum.id,
-      }),
-      timeframe: "1M",
-      interval: "1W" as ResolutionString,
+      }) as unknown as IBasicDataFeed,
+      // timeframe,
+      interval: "60" as ResolutionString,
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
-      debug: false,
+      debug: true,
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [
@@ -71,6 +76,7 @@ export const TVChartContainer = (
     const element = chartContainerRef.current.querySelector(
       '[id^="tradingview"]',
     )
+
     if (!element) return
     element.classList.add("w-full")
     element.classList.add("h-full")

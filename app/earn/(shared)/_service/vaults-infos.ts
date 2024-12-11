@@ -8,6 +8,7 @@ import {
   type MulticallParameters,
   type PublicClient,
 } from "viem"
+import { arbitrum } from "viem/chains"
 import * as z from "zod"
 import { getVaultAPR } from "../../[address]/_service/vault"
 
@@ -46,6 +47,11 @@ const priceSchema = z.object({
   symbol: z.string(),
 })
 
+const pnlSchema = z.object({
+  currentShares: z.number(),
+  pnl: z.number(),
+  realizedPnl: z.number(),
+})
 export async function getVaultsInformation(
   client: PublicClient,
   vaults: VaultWhitelist[],
@@ -110,6 +116,7 @@ export async function getVaultsInformation(
     ),
     allowFailure: false,
   })
+  const currentChainId = client.chain?.id ?? arbitrum.id
 
   return Promise.all(
     vaults.map(async (v, i): Promise<Vault & VaultWhitelist> => {
@@ -152,20 +159,26 @@ export async function getVaultsInformation(
 
       const [baseDollarPrice, quoteDollarPrice] = await Promise.all([
         fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[0]}`,
+          `https://price.mgvinfra.com/price-by-address?chain=${currentChainId}&address=${market[0]}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
           .then((data) => data.price)
           .catch(() => 1),
         fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[1]}`,
+          `https://price.mgvinfra.com/price-by-address?chain=${currentChainId}&address=${market[1]}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
           .then((data) => data.price)
           .catch(() => 1),
       ])
+
+      const res = await fetch(
+        `https://${currentChainId}-mgv-data.mgvinfra.com/vault/pnl/${currentChainId}/${v.address}/${user ?? zeroAddress}`,
+      )
+      const data = await res.json()
+      const pnlData = pnlSchema.parse(data)
 
       // feeData()
       const performanceFee = feeData[0]
@@ -233,8 +246,7 @@ export async function getVaultsInformation(
         totalQuote,
         balanceBase,
         balanceQuote,
-        pnl: 0,
-        chainId: client.chain?.id,
+        chainId: currentChainId,
         tvl: totalInQuote[0],
         baseDollarPrice,
         quoteDollarPrice,
@@ -243,6 +255,7 @@ export async function getVaultsInformation(
         isActive: userBaseBalance > 0n || userQuoteBalance > 0n,
         userBaseBalance,
         userQuoteBalance,
+        pnlData,
       }
     }),
   )

@@ -20,6 +20,18 @@ type Params = {
   chainId: number | undefined
 }
 
+type Bar = {
+  startTimestamp: number
+  endTimestamp: number
+  openTimestamp: number
+  closeTimestamp: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
 const candlesSchema = z.object({
   candles: z.array(
     z.object({
@@ -48,10 +60,10 @@ export default function datafeed({
       callback({
         // supports_search: true,
         // supports_group_request: false,
-        supports_marks: false,
+        supports_marks: true,
         supports_timescale_marks: true,
-        supports_time: true,
-        supported_resolutions: ["1D", "1W"] as ResolutionString[],
+        supports_time: false,
+        // supported_resolutions: ["60"] as ResolutionString[],
       })
     },
     searchSymbols: (
@@ -81,7 +93,7 @@ export default function datafeed({
         has_intraday: true,
         visible_plots_set: "ohlcv",
         has_weekly_and_monthly: true,
-        supported_resolutions: ["1D", "1W"] as ResolutionString[],
+        supported_resolutions: ["60"] as ResolutionString[],
         volume_precision: 2,
         data_status: "streaming",
         listed_exchange: "",
@@ -95,43 +107,74 @@ export default function datafeed({
       onResult: HistoryCallback,
       onError: ErrorCallback,
     ) => {
-      try {
-        const start = new Date(periodParams.from * 1000)
-        const end = new Date(periodParams.to * 1000)
-        const formattedStart = start.toISOString().split("T")[0]
-        const formattedEnd = end.toISOString().split("T")[0]
-        const currentChainId = chainId ?? arbitrum.id
+      setTimeout(async () => {
+        try {
+          const start = new Date(periodParams.from * 1000)
+          const end = new Date(periodParams.to * 1000)
+          const formattedStart = start.toISOString().split("T")[0]
+          const formattedEnd = end.toISOString().split("T")[0]
+          const currentChainId = chainId ?? arbitrum.id
 
-        const response = await fetch(
-          `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/1h`,
-          {
-            headers: {
-              "Content-Type": "application/json",
+          // const old_res = await fetch(
+          //   `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${chainId}&interval=${"1W"}&start_time=${formattedStart}&end_time=${formattedEnd}`,
+          //   {
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //     },
+          //   },
+          // )
+          // let old_data = await old_res.json()
+          // if (old_data.message) {
+          //   old_data = []
+          // }
+
+          const response = await fetch(
+            `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/1h`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
             },
-          },
-        )
+          )
 
-        const result = candlesSchema.safeParse(await response.json())
+          const result = candlesSchema.safeParse(await response.json())
 
-        if (!result.success) {
-          throw new Error("Invalid candles data")
+          if (!result.success) {
+            throw new Error("Invalid candles data")
+          }
+
+          const data = result.data.candles ?? []
+          const bars = data.map((bar: Bar, i) => ({
+            time: bar.startTimestamp * 1000,
+            // time: new Date(bar.startTime).getTime(),
+            open: bar.open,
+            high: bar.high,
+            low: bar.low,
+            close: bar.close,
+            volume: bar.volume,
+          }))
+
+          // console.log(old_data)
+          // const old_bars = old_data.map((bar: any, i: number) => ({
+          //   time: new Date(bar.startTime).getTime(),
+          //   open: bar.open,
+          //   high: bar.high,
+          //   low: bar.low,
+          //   close: bar.close,
+          //   volume: bar.volume,
+          // }))
+          // console.log({old_bars})
+
+          console.log({ bars, periodParams })
+          const returnBars = bars.length < periodParams.countBack ? [] : bars
+          onResult(returnBars, {
+            noData: bars.length === 0 || bars.length < periodParams.countBack,
+          })
+        } catch (error) {
+          console.log(error)
+          // onError({})
         }
-
-        const data = result.data.candles ?? []
-
-        const bars = data.map((bar: any) => ({
-          time: bar.startTimestamp * 1000,
-          open: parseFloat(bar.open),
-          high: parseFloat(bar.high),
-          low: parseFloat(bar.low),
-          close: parseFloat(bar.close),
-        }))
-
-        console.log(bars)
-        onResult(bars, { noData: bars.length > 0 ? false : true })
-      } catch (error) {
-        console.log(error)
-      }
+      }, 0)
     },
     subscribeBars: (
       symbolInfo: LibrarySymbolInfo,

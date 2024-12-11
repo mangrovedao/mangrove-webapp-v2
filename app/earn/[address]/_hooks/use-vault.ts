@@ -1,4 +1,3 @@
-import { useMarkets } from "@/hooks/use-addresses"
 import { useQuery } from "@tanstack/react-query"
 import { isAddress } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
@@ -11,7 +10,6 @@ export function useVault(id?: string | null) {
   const publicClient = usePublicClient()
   const vaultsWhitelist = useVaultsWhitelist()
 
-  const markets = useMarkets()
   return useQuery({
     queryKey: ["vault", id, user, chainId],
     queryFn: async () => {
