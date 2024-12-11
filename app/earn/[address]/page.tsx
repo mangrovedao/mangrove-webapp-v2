@@ -344,10 +344,10 @@ export default function Page() {
                   }
                 />
                 <GridLine
-                  title={"Your APY"}
+                  title={"Your PNL"}
                   value={
                     <span className="text-2xl flex gap-1 font-axiforma">
-                      Incoming...
+                      {vault?.pnlData?.pnl}
                     </span>
                   }
                   symbol={""}
