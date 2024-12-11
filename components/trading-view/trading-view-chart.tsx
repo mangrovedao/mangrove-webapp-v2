@@ -40,7 +40,7 @@ export const TVChartContainer = (
         chainId: chainId ?? arbitrum.id,
       }) as unknown as IBasicDataFeed,
       timeframe: "1M",
-      interval: "1W" as ResolutionString,
+      interval: "1D" as ResolutionString,
       // timeframe: "1M",
       // interval: "1" as ResolutionString,
       container: chartContainerRef.current,

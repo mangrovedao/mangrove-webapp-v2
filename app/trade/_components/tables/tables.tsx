@@ -78,7 +78,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
       value={value}
     >
       <CustomTabsList
-        className="w-full flex justify-start border-b overflow-hidden"
+        className="w-full flex justify-start border-b"
         loading={ordersLoading ?? fillsLoading}
       >
         {Object.values(defaultEnum).map((table) => (

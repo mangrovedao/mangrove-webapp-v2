@@ -112,68 +112,35 @@ export default function datafeed({
     ) => {
       setTimeout(async () => {
         try {
-          const start = new Date(periodParams.from * 1000)
-          const end = new Date(periodParams.to * 1000)
-          const formattedStart = start.toISOString().split("T")[0]
-          const formattedEnd = end.toISOString().split("T")[0]
           const currentChainId = chainId ?? arbitrum.id
-
-          // const old_res = await fetch(
-          //   `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${chainId}&interval=${"1W"}&start_time=${formattedStart}&end_time=${formattedEnd}`,
-          //   {
-          //     headers: {
-          //       "Content-Type": "application/json",
-          //     },
-          //   },
-          // )
-          // let old_data = await old_res.json()
-          // if (old_data.message) {
-          //   old_data = []
-          // }
-
-          const response = await fetch(
+          console.log({ resolution })
+          const result = await fetch(
             `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/1h`,
             {
               headers: {
                 "Content-Type": "application/json",
               },
             },
-          )
-
-          const result = candlesSchema.safeParse(await response.json())
+          ).then(async (res) => candlesSchema.safeParse(await res.json()))
 
           if (!result.success) {
             throw new Error("Invalid candles data")
           }
 
-          const data = result.data.candles ?? []
-          const bars = data.map((bar: Bar, i) => {
-            console.log(new Date(bar.startTimestamp * 1000))
-            return {
-              time: bar.startTimestamp * 1000,
-              // time: new Date(bar.startTime).getTime(),
-              open: bar.open,
-              high: bar.high,
-              low: bar.low,
-              close: bar.close,
-              volume: bar.volume,
-            }
-          })
+          const bars = (result.data.candles ?? []).map((bar: Bar, i) => ({
+            time: bar.startTimestamp * 1000,
+            open: bar.open,
+            high: bar.high,
+            low: bar.low,
+            close: bar.close,
+            volume: bar.volume,
+          }))
 
-          // console.log(old_data)
-          // const old_bars = old_data.map((bar: any, i: number) => ({
-          //   time: new Date(bar.startTime).getTime(),
-          //   open: bar.open,
-          //   high: bar.high,
-          //   low: bar.low,
-          //   close: bar.close,
-          //   volume: bar.volume,
-          // }))
-          // console.log({old_bars})
+          const returnBars = bars.length < periodParams.countBack ? [] : bars
 
           console.log({ bars, periodParams })
-          const returnBars = bars.length < periodParams.countBack ? [] : bars
-          onResult(returnBars, {
+
+          onResult(bars, {
             noData: bars.length === 0 || bars.length < periodParams.countBack,
           })
         } catch (error) {
