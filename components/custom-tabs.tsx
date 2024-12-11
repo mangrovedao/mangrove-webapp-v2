@@ -23,7 +23,7 @@ const CustomTabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-baseline justify-center text-primary h-[var(--bar-height)] px-4 space-x-6 relative",
+      "flex items-baseline justify-center text-primary h-[var(--bar-height)] px-4 space-x-6 relative overflow-hidden",
       className,
     )}
     {...props}
