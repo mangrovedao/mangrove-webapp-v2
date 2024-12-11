@@ -30,11 +30,6 @@ export const TVChartContainer = (
   React.useEffect(() => {
     if (!currentMarket) return
 
-    const timeframe = {
-      from: 1733706000000, // 1 hour ago (3600 seconds)
-      to: 1733857200000, // current time
-    }
-
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
       datafeed: datafeed({
@@ -44,8 +39,10 @@ export const TVChartContainer = (
         quoteAddress: currentMarket?.quote.address,
         chainId: chainId ?? arbitrum.id,
       }) as unknown as IBasicDataFeed,
-      // timeframe,
-      interval: "60" as ResolutionString,
+      timeframe: "1M",
+      interval: "1W" as ResolutionString,
+      // timeframe: "1M",
+      // interval: "1" as ResolutionString,
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
