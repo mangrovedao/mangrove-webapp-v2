@@ -1,5 +1,4 @@
 "use client"
-import { useConnectModal } from "@rainbow-me/rainbowkit"
 import React from "react"
 import { isMobile } from "react-device-detect"
 
@@ -15,8 +14,6 @@ import { useAccount, useSignMessage } from "wagmi"
 function DisclaimerDialog() {
   const { isConnected, address } = useAccount()
 
-  const { openConnectModal } = useConnectModal()
-
   const [hideDisclaimer, setHideDisclaimer] = useLocalStorage<boolean | null>(
     `hideDisclaimer_${address}`,
     null,
@@ -28,8 +25,6 @@ function DisclaimerDialog() {
   const signature = useSignMessage({
     config,
   })
-
-  const buttonLabel = isConnected ? "Accept terms" : "Connect to Wallet"
 
   React.useEffect(() => {
     if (isConnected && !hasSignedDisclaimer) {
@@ -52,12 +47,6 @@ function DisclaimerDialog() {
 
   async function handleAcceptTerms() {
     try {
-      if (!isConnected) {
-        setHideDisclaimer(true)
-        openConnectModal?.()
-        return
-      }
-
       await signature.signMessageAsync({
         message:
           "Welcome to the Mangrove dApp!\nThe use of this app is subject to the terms of use\nhttps://mangrove.exchange/terms-of-use\n\nBy signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
@@ -72,6 +61,10 @@ function DisclaimerDialog() {
 
   if (isMobile) {
     return <MobileOverlay />
+  }
+
+  if (!isConnected) {
+    return null
   }
 
   return (
@@ -126,7 +119,7 @@ function DisclaimerDialog() {
               onClick={handleAcceptTerms}
               disabled={signature.isPending && !signature.error}
             >
-              {buttonLabel}
+              Accept terms
             </Button>
           </div>
         </div>
