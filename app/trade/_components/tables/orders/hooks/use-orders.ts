@@ -4,13 +4,12 @@ import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
-import useIndexerSdk from "@/providers/mangrove-indexer"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
-import { hash } from "@mangrovedao/mgv"
-import { getSemibooksOLKeys } from "@mangrovedao/mgv/lib"
-import { parseOrders, type Order } from "../schema"
+import { arbitrum } from "viem/chains"
+import { z } from "zod"
+import { parseOrders, rawOrderSchema, type Order } from "../schema"
 
 type Params<T> = {
   filters?: {
@@ -20,56 +19,66 @@ type Params<T> = {
   select?: (data: Order[]) => T
 }
 
+const ordersSchema = z.object({
+  orders: z.array(rawOrderSchema),
+  count: z.number(),
+  totalPages: z.number(),
+})
+
 export function useOrders<T = Order[]>({
   filters: { first = 100, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const { address, isConnected } = useAccount()
-  const { currentMarket: market } = useMarket()
-  const { indexerSdk } = useIndexerSdk()
+  const { address, isConnected, chainId } = useAccount()
+  const { markets, currentMarket } = useMarket()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
   ])
 
+  const currentChainId = chainId ?? arbitrum.id
+
+  const sortedMarkets = currentMarket
+    ? [currentMarket, ...markets.filter((m) => m !== currentMarket)]
+    : markets
+
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "orders",
-      market?.base.address,
-      market?.quote.address,
       address,
+      currentMarket?.base.address,
+      currentMarket?.quote.address,
       first,
       skip,
     ],
     queryFn: async () => {
-      if (!(indexerSdk && address && market)) return []
+      if (!(address && markets.length)) return []
       startLoading(TRADE.TABLES.ORDERS)
 
       try {
-        const { asksMarket, bidsMarket } = getSemibooksOLKeys(market)
-        
-        const result = await indexerSdk.getOpenLimitOrders({
-          ask: {
-            token: {
-              address: asksMarket.outbound_tkn,
-              decimals: market.base.decimals,
-            },
-            olKey: hash(asksMarket),
-          },
-          bid: {
-            token: {
-              address: bidsMarket.outbound_tkn,
-              decimals: market.quote.decimals,
-            },
-            olKey: hash(bidsMarket),
-          },
-          first,
-          skip,
-          maker: address.toLowerCase(),
-        })
+        const allOrders = await Promise.all(
+          sortedMarkets.map(async (market) => {
+            const response = await fetch(
+              `https://${currentChainId}-mgv-data.mgvinfra.com/orders/active/${currentChainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              },
+            ).then(async (res) => await res.json())
 
-        return parseOrders(result)
+            const result = ordersSchema.parse(response)
+
+            return result.count > 0
+              ? parseOrders(
+                  result.orders.sort((a, b) => b.expiry - a.expiry),
+                  market,
+                )
+              : []
+          }),
+        )
+
+        return allOrders.flat()
       } catch (e) {
         console.error(getErrorMessage(e))
         throw new Error()
@@ -81,7 +90,7 @@ export function useOrders<T = Order[]>({
     meta: {
       error: "Unable to retrieve orders",
     },
-    enabled: !!(isConnected && indexerSdk),
+    enabled: !!(isConnected && markets.length),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

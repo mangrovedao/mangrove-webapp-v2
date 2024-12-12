@@ -1,31 +1,68 @@
+import { MarketParams } from "@mangrovedao/mgv"
 import { z } from "zod"
 
-const orderSchema = z.object({
-  creationDate: z.date(),
-  latestUpdateDate: z.date(),
-  expiryDate: z.date().optional(),
-  transactionHash: z.string(),
-  isBid: z.boolean(),
-  takerGot: z.string(),
-  takerGave: z.string(),
-  penalty: z.string(),
-  feePaid: z.string(),
-  initialWants: z.string(),
-  initialGives: z.string(),
-  price: z.string(),
+export const rawOrderSchema = z.object({
+  side: z.string(),
+  type: z.string(),
+  received: z.number(),
+  sent: z.number(),
+  total: z.number(),
+  price: z.number(),
+  expiry: z.number(),
   offerId: z.string(),
-  inboundRoute: z.string(),
-  outboundRoute: z.string(),
+  lockedProvision: z.string(),
 })
+
+const marketSchema = z.object({
+  address: z.string(),
+  symbol: z.string(),
+  decimals: z.number(),
+  displayDecimals: z.number(),
+})
+
+export const orderSchema = z.object({
+  ...rawOrderSchema.shape,
+  market: z.object({
+    base: marketSchema,
+    quote: marketSchema,
+    tickSpacing: z.bigint(),
+  }),
+})
+
 export type Order = z.infer<typeof orderSchema>
 
-export function parseOrders(data: unknown[]): Order[] {
+export function parseOrders(data: unknown[], market: MarketParams): Order[] {
   return data
     .map((item) => {
       try {
-        return orderSchema.parse(item)
+        // First validate the raw item data
+        const rawOrder = rawOrderSchema.parse(item)
+
+        // Then construct and validate the full order with market data
+        return orderSchema.parse({
+          ...rawOrder,
+          market: {
+            base: {
+              ...market.base,
+              displayDecimals: market.base.displayDecimals,
+            },
+            quote: {
+              ...market.quote,
+              displayDecimals: market.quote.displayDecimals,
+            },
+            tickSpacing: market.tickSpacing,
+          },
+        })
       } catch (error) {
-        console.error("Invalid format for offers: ", item, error)
+        console.error(
+          "Invalid format for offers: ",
+          {
+            item,
+            base: market.base,
+            quote: market.quote,
+          },
+          error,
+        )
         return null
       }
     })

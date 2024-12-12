@@ -20,10 +20,10 @@ import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
 export enum TradeTablesLoggedIn {
-  BOOK = "Book",
-  TRADES = "Trades",
   ORDERS = "Open Orders",
   FILLS = "Orders History",
+  BOOK = "Book",
+  TRADES = "Trades",
 }
 
 export enum TradeTablesLoggedOut {
@@ -32,10 +32,10 @@ export enum TradeTablesLoggedOut {
 }
 
 const LOGGED_IN_TABS_CONTENT = {
-  [TradeTablesLoggedIn.BOOK]: BookContent,
-  [TradeTablesLoggedIn.TRADES]: Trades,
   [TradeTablesLoggedIn.ORDERS]: Orders,
   [TradeTablesLoggedIn.FILLS]: Fills,
+  [TradeTablesLoggedIn.BOOK]: BookContent,
+  [TradeTablesLoggedIn.TRADES]: Trades,
 }
 
 const LOGGED_OUT_TABS_CONTENT = {
@@ -48,12 +48,12 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const [ordersLoading, fillsLoading] = useLoadingStore((state) =>
     state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS]),
   )
+
   const [defaultEnum, setDefaultEnum] = React.useState(
     isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut,
   )
-  const [value, setValue] = React.useState(
-    Object.values(defaultEnum)[0] || "Book",
-  )
+
+  const [value, setValue] = React.useState(isConnected ? "Open Orders" : "Book")
 
   // Get the total count of orders and fills
   const { data: ordersCount } = useOrders({
@@ -66,7 +66,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
 
   React.useEffect(() => {
     setDefaultEnum(isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut)
-    setValue(Object.values(defaultEnum)[0] || "Book")
+    setValue(isConnected ? "Open Orders" : "Book")
   }, [isConnected])
 
   return (

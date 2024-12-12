@@ -15,19 +15,24 @@ export function useVault(id?: string | null) {
   return useQuery({
     queryKey: ["vault", id, user, chainId],
     queryFn: async () => {
-      if (!publicClient) throw new Error("Public client is not enabled")
-      if (id && !isAddress(id)) throw new Error("Invalid vaultaddress")
+      try {
+        if (!publicClient) throw new Error("Public client is not enabled")
+        if (id && !isAddress(id)) throw new Error("Invalid vaultaddress")
 
-      const vault = vaultsWhitelist?.find(
-        (v) => v.address.toLowerCase() == id?.toLowerCase(),
-      )
-      if (!vault) return { vault: undefined }
+        const vault = vaultsWhitelist?.find(
+          (v) => v.address.toLowerCase() == id?.toLowerCase(),
+        )
+        if (!vault) return { vault: undefined }
 
-      const [vaultInfo] = await Promise.all([
-        getVaultsInformation(publicClient, [vault], user).then((v) => v[0]),
-      ])
-      return {
-        vault: vaultInfo,
+        const [vaultInfo] = await Promise.all([
+          getVaultsInformation(publicClient, [vault], user).then((v) => v?.[0]),
+        ])
+        return {
+          vault: vaultInfo,
+        }
+      } catch (error) {
+        console.error(error)
+        return { vault: undefined }
       }
     },
     enabled: !!publicClient,
