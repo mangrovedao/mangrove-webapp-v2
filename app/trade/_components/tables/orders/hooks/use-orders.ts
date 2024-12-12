@@ -4,10 +4,11 @@ import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
+
+import { useMgvInfra } from "@/hooks/use-mgv-infra"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
-import { arbitrum } from "viem/chains"
 import { z } from "zod"
 import { parseOrders, rawOrderSchema, type Order } from "../schema"
 
@@ -29,14 +30,14 @@ export function useOrders<T = Order[]>({
   filters: { first = 100, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const { address, isConnected, chainId } = useAccount()
+  const { address, isConnected } = useAccount()
   const { markets, currentMarket } = useMarket()
+
+  const { mgvInfraUrl, chainId: currentChainId } = useMgvInfra()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
   ])
-
-  const currentChainId = chainId ?? arbitrum.id
 
   const sortedMarkets = currentMarket
     ? [currentMarket, ...markets.filter((m) => m !== currentMarket)]
@@ -59,7 +60,7 @@ export function useOrders<T = Order[]>({
         const allOrders = await Promise.all(
           sortedMarkets.map(async (market) => {
             const response = await fetch(
-              `https://${currentChainId}-mgv-data.mgvinfra.com/orders/active/${currentChainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}`,
+              `${mgvInfraUrl}/orders/active/${currentChainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}`,
               {
                 headers: {
                   "Content-Type": "application/json",

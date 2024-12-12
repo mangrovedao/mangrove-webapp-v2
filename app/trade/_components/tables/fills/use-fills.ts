@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
+import { useMgvInfra } from "@/hooks/use-mgv-infra"
 import useIndexerSdk from "@/providers/mangrove-indexer"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
@@ -26,6 +27,7 @@ export function useFills<T = Fill[]>({
   const { address, isConnected } = useAccount()
   const { currentMarket: market } = useMarket()
   const { indexerSdk } = useIndexerSdk()
+  const { mgvInfraUrl } = useMgvInfra()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
