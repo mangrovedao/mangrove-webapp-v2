@@ -33,19 +33,20 @@ import { useRewards } from "./hooks/use-rewards"
 import { useConfiguration } from "./hooks/use-rewards-config"
 
 enum MSSortValues {
-  MS2 = "Season 2 Points program",
-  MS1 = "Season 1 Points program",
+  MS2 = "MGV Incentives Program",
+  MS1 = "Season 1 Points Program",
 }
 
 export default function Page() {
   const { data: configuration } = useConfiguration()
-  const { data: rewards } = useRewards({
-    epochId: configuration?.epochId?.toString() || "1",
-  })
+  const [tab, setTab] = React.useState("1")
 
-  const [tab, setTab] = React.useState(
-    configuration?.epochId?.toString() || "1",
-  )
+  const { data: rewards } = useRewards({
+    epochId:
+      tab !== "ms1-leaderboard"
+        ? tab
+        : configuration?.epochId?.toString() || "1",
+  })
 
   const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
 
@@ -53,6 +54,10 @@ export default function Page() {
     BigInt(rewards?.takerReward ?? 0n) +
     BigInt(rewards?.makerReward ?? 0n) +
     BigInt(rewards?.kandelRewards ?? 0n)
+
+  React.useEffect(() => {
+    setTab(configuration?.epochId?.toString() || "1")
+  }, [configuration?.epochId])
 
   return (
     <main className="mt-8 px-4">
@@ -84,27 +89,7 @@ export default function Page() {
                 <span>
                   Ends in{" "}
                   <span className="text-white">
-                    {configuration?.nextEpoch
-                      ? (() => {
-                          const nextEpochTime = new Date(
-                            configuration.nextEpoch ?? 0,
-                          ).getTime()
-                          const timeLeft = nextEpochTime - Date.now()
-
-                          const days = Math.floor(
-                            timeLeft / (1000 * 60 * 60 * 24),
-                          )
-                          const hours = Math.floor(
-                            (timeLeft % (1000 * 60 * 60 * 24)) /
-                              (1000 * 60 * 60),
-                          )
-                          const minutes = Math.floor(
-                            (timeLeft % (1000 * 60 * 60)) / (1000 * 60),
-                          )
-
-                          return `${days} d: ${hours} h: ${minutes} m`
-                        })()
-                      : "..."}
+                    {configuration?.timeRemaining || "..."}
                   </span>
                 </span>
               </div>
@@ -165,7 +150,7 @@ export default function Page() {
                     }}
                     disabled={configuration?.epochEntries?.length === 0}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue
                         suppressHydrationWarning
                         placeholder={"Select program"}
@@ -184,18 +169,36 @@ export default function Page() {
                 </div>
 
                 {msSort === MSSortValues.MS2 ? (
-                  configuration?.epochEntries?.map((entry) => (
-                    <CustomTabsTrigger
-                      onClick={() => setTab(entry.epochId.toString())}
-                      key={`${entry.epochId}-tab`}
-                      value={entry.epochId.toString()}
+                  <>
+                    {/* <CustomTabsTrigger
+                      onClick={() => setTab("ms2-total-rewards")}
+                      key={`ms2-total-rewards-tab`}
+                      value={"ms2-total-rewards"}
                       className="capitalize"
-                      id={`${entry.epochId}-tab`}
-                      disabled={entry.startTimestamp > Date.now() / 1000}
+                      id={`ms2-total-rewards-tab`}
                     >
-                      Epoch {entry.epochId}
-                    </CustomTabsTrigger>
-                  ))
+                      Total rewards
+                    </CustomTabsTrigger> */}
+                    {configuration?.epochEntries
+                      ?.toReversed()
+                      .filter(
+                        (entry) =>
+                          entry.startTimestamp !== 0 &&
+                          entry.startTimestamp < Math.floor(Date.now() / 1000),
+                      )
+                      ?.map((entry) => (
+                        <CustomTabsTrigger
+                          onClick={() => setTab(entry.epochId.toString())}
+                          key={`${entry.epochId}-tab`}
+                          value={entry.epochId.toString()}
+                          className="capitalize"
+                          id={`${entry.epochId}-tab`}
+                          disabled={entry.startTimestamp > Date.now() / 1000}
+                        >
+                          Epoch {entry.epochId}
+                        </CustomTabsTrigger>
+                      ))}
+                  </>
                 ) : (
                   <CustomTabsTrigger
                     onClick={() => setTab("ms1-leaderboard")}
@@ -210,7 +213,8 @@ export default function Page() {
               </CustomTabsList>
               <ScrollBar orientation="horizontal" className="z-50" />
             </ScrollArea>
-            <div className="w-full pb-4 px-1 mt-8">
+
+            <div className="w-full pb-4 px-1 mt-3">
               {/* ms1 leaderboard */}
               <CustomTabsContent value={"ms1-leaderboard"}>
                 <ScrollArea className="h-full" scrollHideDelay={200}>
@@ -221,6 +225,16 @@ export default function Page() {
                   <ScrollBar orientation="horizontal" className="z-50" />
                 </ScrollArea>
               </CustomTabsContent>
+
+              {/* <CustomTabsContent value={"ms2-total-rewards"}>
+                <ScrollArea className="h-full" scrollHideDelay={200}>
+                  <div className="px-2 h-full">
+                    <Ms1Table />
+                  </div>
+                  <ScrollBar orientation="vertical" className="z-50" />
+                  <ScrollBar orientation="horizontal" className="z-50" />
+                </ScrollArea>
+              </CustomTabsContent> */}
 
               {/* ms2 leaderboards */}
               {configuration?.epochEntries?.map((entry) => (
@@ -240,10 +254,6 @@ export default function Page() {
               ))}
             </div>
           </CustomTabs>
-          {/* <Title variant={"title1"} className="pl-5 mt-8 mb-4">
-            Season 1 Points program
-          </Title>
-          <Ms1Table /> */}
         </div>
         <div className="lg:col-span-2 col-span-6 h-20">
           <NeonContainer className="space-y-5">

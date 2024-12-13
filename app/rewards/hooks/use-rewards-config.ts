@@ -28,13 +28,13 @@ export const useConfiguration = () => {
         }
 
         const now = Math.floor(Date.now() / 1000)
-        const epochEntries = Object.entries(epochs.rewardsLimit)
-          .map(([epochId, data]) => ({
+        const epochEntries = Object.entries(epochs.rewardsLimit).map(
+          ([epochId, data]) => ({
             epochId: Number(epochId),
             startTimestamp: Number(data.startTimestamp.replace("n", "")),
             budget: data.budget,
-          }))
-          .filter((entry) => entry.startTimestamp !== 0)
+          }),
+        )
 
         // Find current epoch by checking if current time is within its timeframe
         const currentEpochEntry = epochEntries.find((entry) => {
@@ -57,9 +57,21 @@ export const useConfiguration = () => {
           ? new Date(nextEpochEntry.startTimestamp * 1000)
           : null
 
+        const nextEpochTime = new Date(nextEpochStart ?? 0).getTime()
+        const timeLeft = nextEpochTime - Date.now()
+
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24))
+        const hours = Math.floor(
+          (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        )
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60))
+
+        const timeRemaining = `${days} d: ${hours} h: ${minutes} m`
+
         return {
           nextEpoch: nextEpochStart,
           epochId: epochId,
+          timeRemaining,
           totalBudget: epochs.rewardsLimit[epochId || 0]?.budget,
           epochEntries,
         }

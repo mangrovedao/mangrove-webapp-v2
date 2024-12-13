@@ -49,7 +49,7 @@ export function useMs2Table({ pageSize, data }: Params) {
       columnHelper.display({
         header: "Rank",
         cell: ({ row }) => {
-          const rank = row.index + 1
+          const rank = row.original.rank
 
           switch (rank) {
             case 1:
@@ -115,13 +115,13 @@ export function useMs2Table({ pageSize, data }: Params) {
         },
       }),
 
-      columnHelper.display({
-        header: "Kandel rewards",
-        cell: ({ row }) => {
-          const { kandelReward } = row.original
-          return <Value value={formatNumber(kandelReward ?? 0)} />
-        },
-      }),
+      // columnHelper.display({
+      //   header: "Kandel rewards",
+      //   cell: ({ row }) => {
+      //     const { kandelReward } = row.original
+      //     return <Value value={formatNumber(kandelReward ?? 0)} />
+      //   },
+      // }),
 
       columnHelper.display({
         header: "Vault rewards",
@@ -132,7 +132,7 @@ export function useMs2Table({ pageSize, data }: Params) {
       }),
 
       columnHelper.display({
-        header: "Total points",
+        header: "Total MGVs",
         cell: ({ row }) => {
           const { total } = row.original
 

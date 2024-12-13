@@ -1,6 +1,7 @@
 import { Address } from "viem"
 
 export type Ms2PointsRow = {
+  rank: number
   address: string
   makerReward: number
   kandelReward: number

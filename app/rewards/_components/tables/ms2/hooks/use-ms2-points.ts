@@ -9,6 +9,7 @@ import * as z from "zod"
 
 type Params<T> = {
   filters?: {
+    page?: number
     first?: number
     skip?: number
     epochId?: number
@@ -36,7 +37,7 @@ const leaderboardResponseSchema = z.object({
 })
 
 export function useMs2Points<T = Ms2PointsRow[]>({
-  filters: { first = 10, skip = 0, epochId = 1 } = {},
+  filters: { first = 10, skip = 0, epochId = 1, page = 1 } = {},
   select,
 }: Params<T> = {}) {
   const { address: user, chainId } = useAccount()
@@ -46,7 +47,7 @@ export function useMs2Points<T = Ms2PointsRow[]>({
     queryKey: ["ms2-points", user, defaultChainId, epochId, first, skip],
     queryFn: async (): Promise<Ms2PointsRow[]> => {
       try {
-        const url = `https://points.mgvinfra.com/${defaultChainId}/leaderboard?epoch=${epochId}`
+        const url = `https://points.mgvinfra.com/${defaultChainId}/leaderboard?epoch=${epochId}&page=${page}`
         const response = await fetch(url)
         const leaderboard = leaderboardResponseSchema
           .parse(await response.json())
@@ -67,19 +68,29 @@ export function useMs2Points<T = Ms2PointsRow[]>({
             total: Number(formatUnits(BigInt(row.total.replace("n", "")), 8)),
           }))
 
-        let filteredLeaderBoard = leaderboard
-        console.log(leaderboard)
+        // Sort leaderboard by total rewards and add rank
+        const rankedLeaderboard = leaderboard
+          .sort((a, b) => b.total - a.total)
+          .map((row, index) => ({
+            ...row,
+            rank: index + 1,
+          }))
+
+        let filteredLeaderBoard = rankedLeaderboard
+
         // Move user's row to the front if it exists
         const userAddress = user?.toLowerCase()
         if (userAddress) {
-          const userPoints = leaderboard.find((row) => {
-            const rowAddress = row.address.toLowerCase()
-            return rowAddress === userAddress
+          const userPoints = rankedLeaderboard.find((row, index) => {
+            if (index > 2) {
+              const rowAddress = row.address.toLowerCase()
+              return rowAddress === userAddress
+            }
           })
 
           if (userPoints) {
             // Sort by total points in descending order
-            leaderboard.sort((a, b) => {
+            rankedLeaderboard.sort((a, b) => {
               const totalA = Number(a.total)
               const totalB = Number(b.total)
               return totalB - totalA
@@ -87,14 +98,16 @@ export function useMs2Points<T = Ms2PointsRow[]>({
             // Move user to front of array
             filteredLeaderBoard = [
               userPoints,
-              ...leaderboard.filter(
+              ...rankedLeaderboard.filter(
                 (row) => row.address.toLowerCase() !== userAddress,
               ),
             ]
           }
         }
 
-        return filteredLeaderBoard
+        return skip === 0
+          ? filteredLeaderBoard
+          : filteredLeaderBoard.slice(skip, skip + first)
       } catch (error) {
         console.error(error)
         return []
