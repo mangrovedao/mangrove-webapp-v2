@@ -3,23 +3,51 @@
 import Link from "next/link"
 import { formatUnits } from "viem"
 
+import {
+  CustomTabs,
+  CustomTabsContent,
+  CustomTabsList,
+  CustomTabsTrigger,
+} from "@/components/custom-tabs"
 import NeonContainer from "@/components/neon-container"
 import { NumericValue } from "@/components/numeric-value"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
-import { Tables } from "./_components/tables/tables"
+import React from "react"
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select-new"
+import { Ms1Table } from "./_components/tables/ms1/ms1-table"
+import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 import Timer from "./_components/timer"
 import { useRewards } from "./hooks/use-rewards"
 import { useConfiguration } from "./hooks/use-rewards-config"
 
+enum MSSortValues {
+  MS2 = "Season 2 Points program",
+  MS1 = "Season 1 Points program",
+}
+
 export default function Page() {
   const { data: configuration } = useConfiguration()
   const { data: rewards } = useRewards({
-    epochId: configuration?.epochId || "1",
+    epochId: configuration?.epochId?.toString() || "1",
   })
+
+  const [tab, setTab] = React.useState(
+    configuration?.epochId?.toString() || "1",
+  )
+
+  const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
 
   const totalRewards =
     BigInt(rewards?.takerReward ?? 0n) +
@@ -120,10 +148,102 @@ export default function Page() {
             </div>
           </div>
 
-          <Title variant={"title1"} className="pl-5 mt-8 mb-4">
+          <CustomTabs value={tab}>
+            <ScrollArea className="h-full w-full" scrollHideDelay={200}>
+              <CustomTabsList className="w-full flex justify-start border-b">
+                <div key={`more-tab`} className="capitalize !text-primary">
+                  <Select
+                    value={msSort}
+                    onValueChange={(value) => {
+                      if (value === MSSortValues.MS1) {
+                        setTab("ms1-leaderboard")
+                        setMsSort(value as MSSortValues)
+                      } else {
+                        setTab(configuration?.epochId?.toString() ?? "1")
+                        setMsSort(value as MSSortValues)
+                      }
+                    }}
+                    disabled={configuration?.epochEntries?.length === 0}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        suppressHydrationWarning
+                        placeholder={"Select program"}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(MSSortValues).map((item, i) => (
+                        <SelectItem value={item} key={`select-${item}-${i}`}>
+                          <h1 className="text-2xl font-bold !text-primary">
+                            {item}
+                          </h1>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {msSort === MSSortValues.MS2 ? (
+                  configuration?.epochEntries?.map((entry) => (
+                    <CustomTabsTrigger
+                      onClick={() => setTab(entry.epochId.toString())}
+                      key={`${entry.epochId}-tab`}
+                      value={entry.epochId.toString()}
+                      className="capitalize"
+                      id={`${entry.epochId}-tab`}
+                      disabled={entry.startTimestamp > Date.now() / 1000}
+                    >
+                      Epoch {entry.epochId}
+                    </CustomTabsTrigger>
+                  ))
+                ) : (
+                  <CustomTabsTrigger
+                    onClick={() => setTab("ms1-leaderboard")}
+                    key={`ms1-leaderboard-tab`}
+                    value={"ms1-leaderboard"}
+                    className="capitalize"
+                    id={`ms1-leaderboard-tab`}
+                  >
+                    Leaderboard
+                  </CustomTabsTrigger>
+                )}
+              </CustomTabsList>
+              <ScrollBar orientation="horizontal" className="z-50" />
+            </ScrollArea>
+            <div className="w-full pb-4 px-1 mt-8">
+              {/* ms1 leaderboard */}
+              <CustomTabsContent value={"ms1-leaderboard"}>
+                <ScrollArea className="h-full" scrollHideDelay={200}>
+                  <div className="px-2 h-full">
+                    <Ms1Table />
+                  </div>
+                  <ScrollBar orientation="vertical" className="z-50" />
+                  <ScrollBar orientation="horizontal" className="z-50" />
+                </ScrollArea>
+              </CustomTabsContent>
+
+              {/* ms2 leaderboards */}
+              {configuration?.epochEntries?.map((entry) => (
+                <CustomTabsContent
+                  key={`${entry.epochId}-content`}
+                  value={entry.epochId.toString()}
+                  // style={{ height: "var(--history-table-content-height)" }}
+                >
+                  <ScrollArea className="h-full" scrollHideDelay={200}>
+                    <div className="px-2 h-full">
+                      <Ms2Table epochId={entry.epochId} />
+                    </div>
+                    <ScrollBar orientation="vertical" className="z-50" />
+                    <ScrollBar orientation="horizontal" className="z-50" />
+                  </ScrollArea>
+                </CustomTabsContent>
+              ))}
+            </div>
+          </CustomTabs>
+          {/* <Title variant={"title1"} className="pl-5 mt-8 mb-4">
             Season 1 Points program
           </Title>
-          <Tables />
+          <Ms1Table /> */}
         </div>
         <div className="lg:col-span-2 col-span-6 h-20">
           <NeonContainer className="space-y-5">

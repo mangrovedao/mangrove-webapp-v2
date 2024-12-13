@@ -3,23 +3,27 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
-import { usePoints } from "./hooks/use-points"
-import { useTable } from "./hooks/use-table"
+import { useMs2Points } from "./hooks/use-ms2-points"
+import { useMs2Table } from "./hooks/use-ms2-table"
 
-export function Points() {
+export function Ms2Table({ epochId }: { epochId: number }) {
   const { address: user, chainId, isConnected } = useAccount()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
   })
 
-  const { data, isLoading, error, refetch } = usePoints({
+  const { data, isLoading, error, refetch } = useMs2Points({
     filters: {
       skip: (page - 1) * pageSize,
+      epochId,
     },
   })
 
-  const { data: count } = usePoints({
+  const { data: count } = useMs2Points({
+    filters: {
+      epochId,
+    },
     select: (points) => points.length ?? 0,
   })
 
@@ -27,7 +31,7 @@ export function Points() {
     refetch?.()
   }, [chainId, page, user])
 
-  const table = useTable({ pageSize, data, user })
+  const table = useMs2Table({ pageSize, data, user })
 
   const emptyMessage = !isConnected
     ? "Connect your wallet to see your points"

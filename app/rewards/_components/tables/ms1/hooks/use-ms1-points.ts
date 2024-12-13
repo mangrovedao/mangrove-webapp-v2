@@ -1,6 +1,6 @@
 "use client"
 
-import { PointsRow } from "@/app/rewards/types"
+import { Ms1PointsRow } from "@/app/rewards/types"
 import { useQuery } from "@tanstack/react-query"
 import { Address, isAddress } from "viem"
 import { useAccount } from "wagmi"
@@ -11,7 +11,7 @@ type Params<T> = {
     first?: number
     skip?: number
   }
-  select?: (data: PointsRow[]) => T
+  select?: (data: Ms1PointsRow[]) => T
 }
 const addressSchema = z.custom<Address>((v) => isAddress(v))
 const leaderboardSchema = z.object({
@@ -24,22 +24,22 @@ const leaderboardSchema = z.object({
 })
 type LeaderboardRow = z.infer<typeof leaderboardSchema>
 
-export function usePoints<T = PointsRow[]>({
+export function useMs1Points<T = Ms1PointsRow[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
   const { address: user, chainId } = useAccount()
 
   const { data, ...rest } = useQuery({
-    queryKey: ["points", user, first, skip],
-    queryFn: async (): Promise<PointsRow[]> => {
+    queryKey: ["ms1-points", user, first, skip],
+    queryFn: async (): Promise<Ms1PointsRow[]> => {
       try {
         const url = `https://ms1.mgvinfra.com/leaderboard?count=1000000&offset=${skip}&sort=total&sort_direction=desc&include_user=${user?.toLowerCase()}`
         const { data: leaderboard, totalRows } = await fetch(url).then((res) =>
           res.json(),
         )
 
-        const pointsData: PointsRow[] = leaderboard.map(
+        const pointsData: Ms1PointsRow[] = leaderboard.map(
           (row: LeaderboardRow) => {
             const parsedRow = leaderboardSchema.parse(row)
             return {
@@ -78,7 +78,9 @@ export function usePoints<T = PointsRow[]>({
     enabled: !!user,
   })
   return {
-    data: (select ? select(data ?? ([] as PointsRow[])) : data) as unknown as T,
+    data: (select
+      ? select(data ?? ([] as Ms1PointsRow[]))
+      : data) as unknown as T,
     ...rest,
   }
 }

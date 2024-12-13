@@ -4,8 +4,8 @@ export const rewardsSchema = z.object({
   chainId: z.number(),
   epoch: z.number(),
   user: z.string(),
-  takerReward: z.union([z.string(), z.number()]),
-  makerReward: z.number(),
+  takerReward: z.string(),
+  makerReward: z.string(),
   kandelRewards: z.number(),
   claimableRewards: z.number(),
 })
