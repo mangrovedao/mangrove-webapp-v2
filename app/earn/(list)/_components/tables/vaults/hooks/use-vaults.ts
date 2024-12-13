@@ -29,7 +29,7 @@ export function useVaults<T = Vault[] | undefined>({
         if (!publicClient?.key) throw new Error("Public client is not enabled")
         if (!whitelist) return []
         const vaults = await getVaultsInformation(publicClient, whitelist, user)
-        return vaults
+        return vaults ?? []
       } catch (error) {
         console.error(error)
         return []

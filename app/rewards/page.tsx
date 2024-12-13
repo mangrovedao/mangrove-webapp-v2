@@ -3,28 +3,61 @@
 import Link from "next/link"
 import { formatUnits } from "viem"
 
+import {
+  CustomTabs,
+  CustomTabsContent,
+  CustomTabsList,
+  CustomTabsTrigger,
+} from "@/components/custom-tabs"
 import NeonContainer from "@/components/neon-container"
 import { NumericValue } from "@/components/numeric-value"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
-import { Tables } from "./_components/tables/tables"
+import React from "react"
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select-new"
+import { Ms1Table } from "./_components/tables/ms1/ms1-table"
+import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 import Timer from "./_components/timer"
 import { useRewards } from "./hooks/use-rewards"
 import { useConfiguration } from "./hooks/use-rewards-config"
 
+enum MSSortValues {
+  MS2 = "MGV Incentives Program",
+  MS1 = "Season 1 Points Program",
+}
+
 export default function Page() {
   const { data: configuration } = useConfiguration()
+  const [tab, setTab] = React.useState("1")
+
   const { data: rewards } = useRewards({
-    epochId: configuration?.epochId || "1",
+    epochId:
+      tab !== "ms1-leaderboard"
+        ? tab
+        : configuration?.epochId?.toString() || "1",
   })
+
+  const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
 
   const totalRewards =
     BigInt(rewards?.takerReward ?? 0n) +
     BigInt(rewards?.makerReward ?? 0n) +
     BigInt(rewards?.kandelRewards ?? 0n)
+
+  React.useEffect(() => {
+    setTab(configuration?.epochId?.toString() || "1")
+  }, [configuration?.epochId])
 
   return (
     <main className="mt-8 px-4">
@@ -56,27 +89,7 @@ export default function Page() {
                 <span>
                   Ends in{" "}
                   <span className="text-white">
-                    {configuration?.nextEpoch
-                      ? (() => {
-                          const nextEpochTime = new Date(
-                            configuration.nextEpoch ?? 0,
-                          ).getTime()
-                          const timeLeft = nextEpochTime - Date.now()
-
-                          const days = Math.floor(
-                            timeLeft / (1000 * 60 * 60 * 24),
-                          )
-                          const hours = Math.floor(
-                            (timeLeft % (1000 * 60 * 60 * 24)) /
-                              (1000 * 60 * 60),
-                          )
-                          const minutes = Math.floor(
-                            (timeLeft % (1000 * 60 * 60)) / (1000 * 60),
-                          )
-
-                          return `${days} d: ${hours} h: ${minutes} m`
-                        })()
-                      : "..."}
+                    {configuration?.timeRemaining || "..."}
                   </span>
                 </span>
               </div>
@@ -120,10 +133,127 @@ export default function Page() {
             </div>
           </div>
 
-          <Title variant={"title1"} className="pl-5 mt-8 mb-4">
-            Season 1 Points program
-          </Title>
-          <Tables />
+          <CustomTabs value={tab}>
+            <ScrollArea className="h-full w-full" scrollHideDelay={200}>
+              <CustomTabsList className="w-full flex justify-start border-b">
+                <div key={`more-tab`} className="capitalize !text-primary">
+                  <Select
+                    value={msSort}
+                    onValueChange={(value) => {
+                      if (value === MSSortValues.MS1) {
+                        setTab("ms1-leaderboard")
+                        setMsSort(value as MSSortValues)
+                      } else {
+                        setTab(configuration?.epochId?.toString() ?? "1")
+                        setMsSort(value as MSSortValues)
+                      }
+                    }}
+                    disabled={configuration?.epochEntries?.length === 0}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        suppressHydrationWarning
+                        placeholder={"Select program"}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(MSSortValues).map((item, i) => (
+                        <SelectItem value={item} key={`select-${item}-${i}`}>
+                          <h1 className="text-2xl font-bold !text-primary">
+                            {item}
+                          </h1>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {msSort === MSSortValues.MS2 ? (
+                  <>
+                    {/* <CustomTabsTrigger
+                      onClick={() => setTab("ms2-total-rewards")}
+                      key={`ms2-total-rewards-tab`}
+                      value={"ms2-total-rewards"}
+                      className="capitalize"
+                      id={`ms2-total-rewards-tab`}
+                    >
+                      Total rewards
+                    </CustomTabsTrigger> */}
+                    {configuration?.epochEntries
+                      ?.toReversed()
+                      .filter(
+                        (entry) =>
+                          entry.startTimestamp !== 0 &&
+                          entry.startTimestamp < Math.floor(Date.now() / 1000),
+                      )
+                      ?.map((entry) => (
+                        <CustomTabsTrigger
+                          onClick={() => setTab(entry.epochId.toString())}
+                          key={`${entry.epochId}-tab`}
+                          value={entry.epochId.toString()}
+                          className="capitalize"
+                          id={`${entry.epochId}-tab`}
+                          disabled={entry.startTimestamp > Date.now() / 1000}
+                        >
+                          Epoch {entry.epochId}
+                        </CustomTabsTrigger>
+                      ))}
+                  </>
+                ) : (
+                  <CustomTabsTrigger
+                    onClick={() => setTab("ms1-leaderboard")}
+                    key={`ms1-leaderboard-tab`}
+                    value={"ms1-leaderboard"}
+                    className="capitalize"
+                    id={`ms1-leaderboard-tab`}
+                  >
+                    Leaderboard
+                  </CustomTabsTrigger>
+                )}
+              </CustomTabsList>
+              <ScrollBar orientation="horizontal" className="z-50" />
+            </ScrollArea>
+
+            <div className="w-full pb-4 px-1 mt-3">
+              {/* ms1 leaderboard */}
+              <CustomTabsContent value={"ms1-leaderboard"}>
+                <ScrollArea className="h-full" scrollHideDelay={200}>
+                  <div className="px-2 h-full">
+                    <Ms1Table />
+                  </div>
+                  <ScrollBar orientation="vertical" className="z-50" />
+                  <ScrollBar orientation="horizontal" className="z-50" />
+                </ScrollArea>
+              </CustomTabsContent>
+
+              {/* <CustomTabsContent value={"ms2-total-rewards"}>
+                <ScrollArea className="h-full" scrollHideDelay={200}>
+                  <div className="px-2 h-full">
+                    <Ms1Table />
+                  </div>
+                  <ScrollBar orientation="vertical" className="z-50" />
+                  <ScrollBar orientation="horizontal" className="z-50" />
+                </ScrollArea>
+              </CustomTabsContent> */}
+
+              {/* ms2 leaderboards */}
+              {configuration?.epochEntries?.map((entry) => (
+                <CustomTabsContent
+                  key={`${entry.epochId}-content`}
+                  value={entry.epochId.toString()}
+                  // style={{ height: "var(--history-table-content-height)" }}
+                >
+                  <ScrollArea className="h-full" scrollHideDelay={200}>
+                    <div className="px-2 h-full">
+                      <Ms2Table epochId={entry.epochId} />
+                    </div>
+                    <ScrollBar orientation="vertical" className="z-50" />
+                    <ScrollBar orientation="horizontal" className="z-50" />
+                  </ScrollArea>
+                </CustomTabsContent>
+              ))}
+            </div>
+          </CustomTabs>
         </div>
         <div className="lg:col-span-2 col-span-6 h-20">
           <NeonContainer className="space-y-5">
