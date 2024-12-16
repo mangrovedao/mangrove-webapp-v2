@@ -22,7 +22,8 @@ const leaderboardResponseSchema = z.object({
   decimals: z.object({
     reward: z.number(),
   }),
-  epoch: z.number(),
+  epochs: z.array(z.number()),
+  page: z.number(),
   leaderboard: z.array(
     z.object({
       address: z.string(),
@@ -33,11 +34,10 @@ const leaderboardResponseSchema = z.object({
       total: z.string(),
     }),
   ),
-  page: z.number(),
 })
 
 export function useMs2Points<T = Ms2PointsRow[]>({
-  filters: { first = 10, skip = 0, epochId = 1, page = 1 } = {},
+  filters: { first = 10, skip = 0, epochId, page = 1 } = {},
   select,
 }: Params<T> = {}) {
   const { address: user, chainId } = useAccount()
@@ -47,7 +47,7 @@ export function useMs2Points<T = Ms2PointsRow[]>({
     queryKey: ["ms2-points", user, defaultChainId, epochId, first, skip],
     queryFn: async (): Promise<Ms2PointsRow[]> => {
       try {
-        const url = `https://points.mgvinfra.com/${defaultChainId}/leaderboard?epoch=${epochId}&page=${page}`
+        const url = `https://points.mgvinfra.com/${defaultChainId}/leaderboard?epoch=${[epochId]}&page=${page}`
         const response = await fetch(url)
         const leaderboard = leaderboardResponseSchema
           .parse(await response.json())
@@ -113,7 +113,7 @@ export function useMs2Points<T = Ms2PointsRow[]>({
         return []
       }
     },
-    enabled: !!user,
+    enabled: !!defaultChainId,
   })
   return {
     data: (select

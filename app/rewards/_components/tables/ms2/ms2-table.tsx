@@ -7,7 +7,7 @@ import { useAccount } from "wagmi"
 import { useMs2Points } from "./hooks/use-ms2-points"
 import { useMs2Table } from "./hooks/use-ms2-table"
 
-export function Ms2Table({ epochId }: { epochId: number }) {
+export function Ms2Table({ epochId }: { epochId?: number }) {
   const { address: user, chainId, isConnected } = useAccount()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
