@@ -34,7 +34,7 @@ import { useConfiguration } from "./hooks/use-rewards-config"
 
 enum MSSortValues {
   MS2 = "MGV Incentives Program",
-  MS1 = "Season 1 Points Program",
+  MS1 = "MS1",
 }
 
 export default function Page() {

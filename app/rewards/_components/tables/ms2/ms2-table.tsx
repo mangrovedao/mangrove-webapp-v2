@@ -1,7 +1,6 @@
 "use client"
 import React from "react"
 
-import { Caption } from "@/components/typography/caption"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
 import { useMs2Points } from "./hooks/use-ms2-points"
@@ -40,7 +39,7 @@ export function Ms2Table({ epochId }: { epochId?: number }) {
 
   return (
     <>
-      <aside>
+      {/* <aside>
         <div className="flex align-middle items-center space-x-2 p-2">
           <div>
             <Caption className="text-base!">
@@ -48,7 +47,7 @@ export function Ms2Table({ epochId }: { epochId?: number }) {
             </Caption>
           </div>
         </div>
-      </aside>
+      </aside> */}
       <DataTable
         table={table}
         emptyArrayMessage={emptyMessage}
