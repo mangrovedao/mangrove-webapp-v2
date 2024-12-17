@@ -28,7 +28,6 @@ const leaderboardResponseSchema = z.object({
     z.object({
       address: z.string(),
       makerReward: z.string(),
-      kandelReward: z.string(),
       takerReward: z.string(),
       vaultReward: z.string(),
       total: z.string(),
@@ -57,9 +56,6 @@ export function useMs2Points<T = Ms2PointsRow[]>({
             ),
             takerReward: Number(
               formatUnits(BigInt(row.takerReward.replace("n", "")), 8),
-            ),
-            kandelReward: Number(
-              formatUnits(BigInt(row.kandelReward.replace("n", "")), 8),
             ),
             vaultReward: Number(
               formatUnits(BigInt(row.vaultReward.replace("n", "")), 8),

@@ -155,7 +155,9 @@ export default function Page() {
                     <SelectContent>
                       {Object.values(MSSortValues).map((item, i) => (
                         <SelectItem value={item} key={`select-${item}-${i}`}>
-                          <Title variant={"title1"}>{item}</Title>
+                          <Title variant={"title1"} className="text-nowrap">
+                            {item}
+                          </Title>
                         </SelectItem>
                       ))}
                     </SelectContent>
