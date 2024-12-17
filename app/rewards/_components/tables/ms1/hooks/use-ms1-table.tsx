@@ -9,18 +9,18 @@ import {
 } from "@tanstack/react-table"
 import React from "react"
 
-import { PointsRow } from "@/app/rewards/types"
+import { Ms1PointsRow } from "@/app/rewards/types"
 import { Text } from "@/components/typography/text"
 import { shortenAddress } from "@/utils/wallet"
 import { Address } from "viem"
 import { useAccount } from "wagmi"
 import { Value, ValueLeft } from "../components/value"
 
-const columnHelper = createColumnHelper<PointsRow>()
-const DEFAULT_DATA: PointsRow[] = []
+const columnHelper = createColumnHelper<Ms1PointsRow>()
+const DEFAULT_DATA: Ms1PointsRow[] = []
 
 type Params = {
-  data?: PointsRow[]
+  data?: Ms1PointsRow[]
   pageSize: number
   user?: Address
 }
@@ -41,7 +41,7 @@ const formatNumber = (num: number) => {
   return `${(num / 1_000_000_000_000).toFixed(2)}T`
 }
 
-export function useTable({ pageSize, data }: Params) {
+export function useMs1Table({ pageSize, data }: Params) {
   const { address: user } = useAccount()
 
   const columns = React.useMemo(
