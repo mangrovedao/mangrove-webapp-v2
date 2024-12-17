@@ -90,11 +90,7 @@ export function useMs2Points<T = Ms2PointsRow[]>({
 
           if (userPoints) {
             // Sort by total points in descending order
-            rankedLeaderboard.sort((a, b) => {
-              const totalA = Number(a.total)
-              const totalB = Number(b.total)
-              return totalB - totalA
-            })
+            rankedLeaderboard.sort((a, b) => Number(b.total) - Number(a.total))
             // Move user to front of array
             filteredLeaderBoard = [
               userPoints,
