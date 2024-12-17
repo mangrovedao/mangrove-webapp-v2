@@ -207,14 +207,14 @@ function TokenSelectorDialog({
         <DialogHeader>
           <DialogTitle>Select a token to {type}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col space-y-2 justify-center p-3">
+        <div className="flex flex-col space-y-2 justify-start p-3 overflow-y-auto max-h-[400px]">
           {tokens.map((token) => (
             <div key={token.address}>
               <Button
                 onClick={() => onSelect(token)}
                 className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
               >
-                <TokenIcon symbol={token.symbol} />
+                <TokenIcon symbol={token.symbol} imgClasses="rounded-full" />
                 <span className="font-semibold text-lg">{token.symbol}</span>
               </Button>
             </div>

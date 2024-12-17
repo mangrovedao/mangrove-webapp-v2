@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { API_IMAGE_URL } from "@/hooks/use-odos"
 import { cn } from "@/utils"
 import { getSvgUrl, getTokenInfos } from "@/utils/tokens"
 
@@ -15,12 +16,20 @@ export function TokenIcon({
 
   const { color, name } = getTokenInfos(symbol)
   const src = getSvgUrl(symbol)
+  const srcFallback = API_IMAGE_URL(symbol);
   return (
     <span
       className={cn("w-6 max-h-6 rounded-full", className)}
       style={{ backgroundColor: color }}
     >
-      <img src={src} alt={`${name} token icon`} className={imgClasses} />
+      <img
+        src={srcFallback}
+        alt={`${name} token icon`}
+        className={imgClasses}
+        onError={(e) => {
+          e.currentTarget.src = src
+        }}
+      />
     </span>
   )
 }

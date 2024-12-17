@@ -17,6 +17,7 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
 import { useApproveToken } from "@/hooks/use-approve-token"
+import { useOdos } from "@/hooks/use-odos"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import {
   getAllTokens,
@@ -29,6 +30,7 @@ export const SLIPPAGES = ["0.1", "0.5", "1"]
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
+  const { odosTokens } = useOdos(chainId ?? 42161)
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const postMarketOrder = usePostMarketOrder()
@@ -49,8 +51,8 @@ export function useSwap() {
     payValue: "",
     receiveValue: "",
   })
-  const payToken = useTokenByAddress(payTknAddress)
-  const receiveToken = useTokenByAddress(receiveTknAddress)
+  const payToken = useTokenByAddress(payTknAddress, chainId ?? 42161)
+  const receiveToken = useTokenByAddress(receiveTknAddress, chainId ?? 42161)
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
   const currentMarket = getMarketFromTokens(markets, payToken, receiveToken)
@@ -78,7 +80,7 @@ export function useSwap() {
     approvePayToken.isPending ||
     postMarketOrder.isPending
 
-  const allTokens = getAllTokens(markets)
+  const allTokens = [...getAllTokens(markets), ...odosTokens]
   const tradableTokens = getTradableTokens({
     markets,
     token: payToken,

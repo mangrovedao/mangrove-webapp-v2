@@ -30,15 +30,18 @@ export function getSvgUrl(symbol: string) {
 export function getTokenByAddress(
   address: string,
   markets: ReturnType<typeof useMarkets>,
+  odosTokens: Token[],
 ): Token | undefined {
   const token =
     markets.find((m) => m.base.address === address)?.base ??
-    markets.find((m) => m.quote.address === address)?.quote
+    markets.find((m) => m.quote.address === address)?.quote ??
+    odosTokens.find((t) => t.address === address)
+
   return token
 }
 
 export function getAllTokens(markets: ReturnType<typeof useMarkets>): Token[] {
-  return markets.reduce<Token[]>((acc, market) => {
+  const mangroveTokens = markets.reduce<Token[]>((acc, market) => {
     if (!acc.some((t) => t.address === market.base.address)) {
       acc.push(market.base)
     }
@@ -47,6 +50,8 @@ export function getAllTokens(markets: ReturnType<typeof useMarkets>): Token[] {
     }
     return acc
   }, [])
+
+  return mangroveTokens
 }
 
 export function getTradableTokens({
