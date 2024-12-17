@@ -85,7 +85,7 @@ export function DataTable<TData>({
             <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
           ) : rows?.length ? (
             rows.map((row) => (
-              <>
+              <React.Fragment key={`${tableName}-fragment-${row.id}`}>
                 <TableRow
                   key={`${tableName}-body-row-${row.id}`}
                   data-state={row.getIsSelected() && "selected"}
@@ -135,11 +135,11 @@ export function DataTable<TData>({
                   ))}
                 </TableRow>
                 {renderExtraRow?.(row)}
-              </>
+              </React.Fragment>
             ))
           ) : (
             <TableRow
-              key={`${tableName}-bodyrow-${Math.random()}`}
+              key={`${tableName}-bodyrow-empty`}
               className="hover:bg-transparent"
             >
               <TableCell

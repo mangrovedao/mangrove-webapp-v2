@@ -28,47 +28,52 @@ export const useConfiguration = () => {
         }
 
         const now = Math.floor(Date.now() / 1000)
-        const epochEntries = Object.entries(epochs.rewardsLimit)
+        const epochEntries = Object.entries(epochs.rewardsLimit).map(
+          ([epochId, data]) => ({
+            epochId: Number(epochId),
+            startTimestamp: Number(data.startTimestamp.replace("n", "")),
+            budget: data.budget,
+          }),
+        )
 
         // Find current epoch by checking if current time is within its timeframe
         const currentEpochEntry = epochEntries.find((entry) => {
-          const epochStart = Number(entry[1].startTimestamp.replace("n", ""))
+          const epochStart = entry.startTimestamp
           if (epochStart === 0) return false
           const nextEpoch = epochEntries.find(
-            (e) => Number(e[1].startTimestamp.replace("n", "")) > epochStart,
+            (e) => e.startTimestamp > epochStart,
           )
-          const epochEnd = nextEpoch
-            ? Number(nextEpoch[1].startTimestamp.replace("n", ""))
-            : Infinity
+          const epochEnd = nextEpoch ? nextEpoch.startTimestamp : Infinity
           return now >= epochStart && now < epochEnd
         })
 
-        const epochId = currentEpochEntry?.[0] ?? null
+        const epochId = currentEpochEntry?.epochId ?? null
 
-        const nextEpochStart = epochEntries.find((entry) => {
-          const startTimestamp = Number(
-            entry[1].startTimestamp.replace("n", ""),
-          )
-          return startTimestamp > now && startTimestamp !== 0
-        })?.[1].startTimestamp
-          ? new Date(
-              Number(
-                epochEntries
-                  .find((entry) => {
-                    const startTimestamp = Number(
-                      entry[1].startTimestamp.replace("n", ""),
-                    )
-                    return startTimestamp > now && startTimestamp !== 0
-                  })?.[1]
-                  ?.startTimestamp.replace("n", ""),
-              ) * 1000,
-            )
+        const nextEpochEntry = epochEntries.find((entry) => {
+          return entry.startTimestamp > now && entry.startTimestamp !== 0
+        })
+
+        const nextEpochStart = nextEpochEntry
+          ? new Date(nextEpochEntry.startTimestamp * 1000)
           : null
+
+        const nextEpochTime = new Date(nextEpochStart ?? 0).getTime()
+        const timeLeft = nextEpochTime - Date.now()
+
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24))
+        const hours = Math.floor(
+          (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        )
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60))
+
+        const timeRemaining = `${days} d: ${hours} h: ${minutes} m`
 
         return {
           nextEpoch: nextEpochStart,
           epochId: epochId,
+          timeRemaining,
           totalBudget: epochs.rewardsLimit[epochId || 0]?.budget,
+          epochEntries,
         }
       } catch (error) {
         console.error(error)

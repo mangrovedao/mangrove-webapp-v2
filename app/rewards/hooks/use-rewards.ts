@@ -10,13 +10,15 @@ type UseRewardsProps = {
 
 export const useRewards = ({ epochId = "1" }: UseRewardsProps) => {
   const { address, chain } = useAccount()
+  const defaultChainId = chain?.id ?? arbitrum.id
 
   return useQuery({
     queryKey: ["rewards", address, chain?.id, epochId],
     queryFn: async () => {
       try {
+        if (!address) return null
         const response = await fetch(
-          `https://points.mgvinfra.com/rewards?epoch=${epochId}&chainId=${chain?.id ?? arbitrum.id}&user=${address ?? zeroAddress}`,
+          `https://points.mgvinfra.com/${defaultChainId}/${address ?? zeroAddress}/rewards?epoch=${epochId}`,
           {
             method: "GET",
             headers: {
