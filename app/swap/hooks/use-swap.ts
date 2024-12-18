@@ -36,6 +36,9 @@ export function useSwap() {
     odosTokens,
     getAssembledTransactionOfLastQuote,
     executeOdosTransaction,
+    hasToApproveOdos,
+    odosRouterContractAddress,
+    isOdosLoading,
   } = useOdos(chainId)
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
@@ -83,6 +86,7 @@ export function useSwap() {
     fields.receiveValue === "" ||
     Number.parseFloat(fields.payValue) <= 0 ||
     Number.parseFloat(fields.receiveValue) <= 0 ||
+    isOdosLoading ||
     approvePayToken.isPending ||
     postMarketOrder.isPending
 
@@ -161,6 +165,7 @@ export function useSwap() {
       receiveToken?.address,
       currentMarket?.base.address,
       currentMarket?.quote.address,
+      slippage,
       fields.payValue,
       marketClient?.uid,
       address,
@@ -218,6 +223,11 @@ export function useSwap() {
         slippageLimitPercent: Number(slippage),
       })
 
+      const hasToApprove = await hasToApproveOdos({
+        address: payToken?.address,
+        amount: simulation.quoteAmount,
+      })
+
       setFields((fields) => ({
         ...fields,
         receiveValue: formatUnits(
@@ -226,12 +236,13 @@ export function useSwap() {
         ),
       }))
 
-      return { simulation, approvalStep: null }
+      return { simulation, approvalStep: { done: !hasToApprove } }
     },
     refetchInterval: 10_000,
     enabled:
       !!payToken &&
       !!receiveToken &&
+      !!slippage &&
       !!fields.payValue &&
       Number(fields.payValue) > 0 &&
       (!!marketClient ? !!getBookQuery.data && !!address : true),
@@ -276,10 +287,31 @@ export function useSwap() {
   async function swapOdos() {
     if (!chainId || !payTknAddress || !receiveTknAddress) return
 
+    if (hasToApprove) {
+      await approvePayToken.mutate(
+        {
+          token: payToken,
+          spender: odosRouterContractAddress,
+        },
+        {
+          onSuccess: () => {
+            simulateQuery.refetch()
+          },
+        },
+      )
+      return
+    }
     const params = await getAssembledTransactionOfLastQuote()
     console.log("params", params)
 
     await executeOdosTransaction(params)
+
+    setFields(() => ({
+      payValue: "",
+      receiveValue: "",
+    }))
+    payTokenBalance.refetch()
+    receiveTokenBalance.refetch()
   }
 
   async function swapMangrove() {
@@ -384,5 +416,6 @@ export function useSwap() {
     slippage,
     setShowCustomInput,
     setSlippage,
+    isOdosLoading,
   }
 }

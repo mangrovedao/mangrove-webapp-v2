@@ -21,6 +21,7 @@ import Rive from "@rive-app/react-canvas-lite"
 import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
+import { Loader2 } from "lucide-react"
 
 export default function Swap() {
   const {
@@ -51,6 +52,7 @@ export default function Swap() {
     showCustomInput,
     setShowCustomInput,
     setSlippage,
+    isOdosLoading,
   } = useSwap()
 
   return (
@@ -80,6 +82,7 @@ export default function Swap() {
               <SwapArrowIcon className="size-6" />
             </Button>
             <TokenContainer
+              loadingValue={isOdosLoading}
               type="receive"
               token={receiveToken}
               value={fields.receiveValue}
@@ -201,17 +204,30 @@ function TokenSelectorDialog({
   onOpenChange: (open: boolean) => void
   type: "buy" | "sell"
 }) {
+  const [search, setSearch] = React.useState("")
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Select a token to {type}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col space-y-2 justify-start p-3 overflow-y-auto max-h-[400px]">
-          {tokens.map((token) => (
-            <div key={token.address}>
-              <Button
-                onClick={() => onSelect(token)}
+        <Input
+          placeholder="Search"
+          className="m-3 w-[90%] mr-5 h-10"
+          type="text"
+          value={search}
+          // @ts-ignore
+          onInput={(e) => setSearch(e.target.value)}
+        />
+        <div className="flex flex-col space-y-2 justify-start p-3 pt-0 overflow-y-auto max-h-[400px]">
+          {tokens
+            .filter((token) =>
+              token.symbol.toLowerCase().includes(search.toLowerCase()),
+            )
+            .map((token) => (
+              <div key={token.address}>
+                <Button
+                  onClick={() => onSelect(token)}
                 className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
               >
                 <TokenIcon symbol={token.symbol} imgClasses="rounded-full" />
@@ -234,6 +250,7 @@ type TokenContainerProps = {
   onMaxClicked?: () => void
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   isFetchingDollarValue?: boolean
+  loadingValue?: boolean
 }
 
 function TokenContainer({
@@ -245,6 +262,7 @@ function TokenContainer({
   onChange,
   dollarValue,
   isFetchingDollarValue,
+  loadingValue,
 }: TokenContainerProps) {
   const { isConnected } = useAccount()
   const tokenBalance = useTokenBalance(token)
@@ -285,13 +303,17 @@ function TokenContainer({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <Input
-          aria-label="You pay"
-          className="border-none outline-none p-0 text-3xl"
-          placeholder="0"
-          value={value}
-          onChange={onChange}
-        />
+        {loadingValue ? (
+          <Skeleton className="bg-muted-foreground w-full h-10 my-2" />
+        ) : (
+          <Input
+            aria-label="You pay"
+            className="border-none outline-none p-0 text-3xl"
+            placeholder="0"
+            value={value}
+            onChange={onChange}
+          />
+        )}
         <span>
           {token ? (
             <Button

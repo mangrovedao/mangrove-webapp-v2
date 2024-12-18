@@ -2,7 +2,7 @@ import { MarketOrderSimulationResult } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
 import { toast } from "sonner"
-import { Address } from "viem"
+import { Address, erc20Abi } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 const API_URL = "https://api.odos.xyz"
@@ -10,9 +10,11 @@ const API_ROUTES = {
   TOKEN_LIST: (chainId: number) => `/info/tokens/${chainId}`,
   QUOTE: "/sor/quote/v2",
   ASSEMBLE: "/sor/assemble",
+  ROUTER_CONTRACT: (chainId: number) => `/info/router/v2/${chainId}`,
 }
 export const API_IMAGE_URL = (symbol: string) =>
   `https://assets.odos.xyz/tokens/${symbol}.webp`
+
 export interface InputToken {
   tokenAddress: Address
   amount: string
@@ -53,6 +55,8 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
   const { address: userAddr } = useAccount()
   const [loadingQuote, setLoadingQuote] = useState(false)
   const [pathId, setPathId] = useState<string | null>(null)
+  const publicClient = usePublicClient()
+  const { data: walletClient } = useWalletClient()
 
   const tokenListQuery = useQuery({
     queryKey: ["odosTokenList", chainId],
@@ -80,8 +84,17 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
     refetchInterval: 24 * 60 * 60 * 1000,
   })
 
-  const publicClient = usePublicClient()
-  const { data: walletClient } = useWalletClient()
+  const routerContractQuery = useQuery({
+    queryKey: ["odosRouterContract", chainId],
+    queryFn: async () => {
+      const response = await fetch(
+        API_URL + API_ROUTES.ROUTER_CONTRACT(chainId),
+      )
+      const data: any = await response.json()
+      return data.address as Address
+    },
+    enabled: !!chainId,
+  })
 
   const getQuote = async (
     params: QuoteParams,
@@ -139,9 +152,8 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
 
   const executeOdosTransaction = async (params: AssembledTransaction) => {
     try {
-      if (!walletClient || !publicClient || !pathId || !userAddr) {
+      if (!walletClient || !publicClient || !pathId || !userAddr)
         throw new Error("Missing required parameters for Odos transaction")
-      }
 
       const hash = await walletClient.sendTransaction({
         to: params.to as Address,
@@ -149,6 +161,7 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
       })
 
       const receipt = await publicClient.waitForTransactionReceipt({ hash })
+
       return receipt
     } catch (error) {
       console.error("Error executing Odos transaction:", error)
@@ -157,11 +170,31 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
     }
   }
 
+  const hasToApproveOdos = async (params: {
+    address: Address
+    amount: bigint
+  }) => {
+    const { address, amount } = params
+    const allowance = await publicClient?.readContract({
+      address,
+      functionName: "allowance",
+      args: [userAddr as Address, routerContractQuery.data as Address],
+      abi: erc20Abi,
+    })
+
+    if (allowance === undefined) throw new Error("Could not get allowance")
+
+    return allowance < amount
+  }
+
   return {
     odosTokens: tokenListQuery.data ?? [],
+    odosRouterContractAddress: routerContractQuery.data,
     getAssembledTransactionOfLastQuote,
     executeOdosTransaction,
-    isLoading: tokenListQuery.isLoading,
+    hasToApproveOdos,
+    isOdosLoading:
+      tokenListQuery.isLoading || routerContractQuery.isLoading || loadingQuote,
     error: tokenListQuery.error,
     getQuote,
   }
