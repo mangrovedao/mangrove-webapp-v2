@@ -174,7 +174,7 @@ export function useSwap() {
       address,
     ],
     queryFn: async () => {
-      if (!(payToken && receiveToken)) return null
+      if (!(payToken && receiveToken && isConnected)) return null
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
 
       // Mangrove
