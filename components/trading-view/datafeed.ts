@@ -63,8 +63,8 @@ export default function datafeed({
         supports_marks: true,
         supports_timescale_marks: true,
         supports_time: false,
-        // supported_resolutions: ["60"] as ResolutionString[],
-        supported_resolutions: ["1D", "1W"] as ResolutionString[],
+        supported_resolutions: ["60"] as ResolutionString[],
+        // supported_resolutions: ["1D", "1W"] as ResolutionString[],
       })
     },
     searchSymbols: (
@@ -94,9 +94,8 @@ export default function datafeed({
         has_intraday: true,
         visible_plots_set: "ohlcv",
         has_weekly_and_monthly: true,
-        // supported_resolutions: ["60"] as ResolutionString[],
-        supported_resolutions: ["1D", "1W"] as ResolutionString[],
-
+        supported_resolutions: ["60"] as ResolutionString[],
+        // supported_resolutions: ["1D", "1W"] as ResolutionString[],
         volume_precision: 2,
         data_status: "streaming",
         listed_exchange: "",
@@ -113,7 +112,6 @@ export default function datafeed({
       setTimeout(async () => {
         try {
           const currentChainId = chainId ?? arbitrum.id
-          console.log({ resolution })
           const result = await fetch(
             `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/1h`,
             {
@@ -136,12 +134,25 @@ export default function datafeed({
             volume: bar.volume,
           }))
 
-          const returnBars = bars.length < periodParams.countBack ? [] : bars
+          const returnBars =
+            bars.length < periodParams.countBack
+              ? [
+                  ...bars,
+                  ...Array(periodParams.countBack - bars.length).fill({
+                    time: Date.now() + 5 * 60 * 1000,
+                    open: 0,
+                    high: 0,
+                    low: 0,
+                    close: 0,
+                    // volume: 0,
+                  }),
+                ]
+              : bars
 
           console.log({ bars, periodParams })
 
-          onResult(bars, {
-            noData: bars.length === 0 || bars.length < periodParams.countBack,
+          onResult(bars.length === 0 ? [] : returnBars, {
+            noData: bars.length === 0,
           })
         } catch (error) {
           console.log(error)
