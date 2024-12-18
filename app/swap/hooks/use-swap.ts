@@ -21,7 +21,7 @@ import { useOdos } from "@/hooks/use-odos"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import {
   deduplicateTokens,
-  getAllTokens,
+  getAllMangroveMarketTokens,
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
@@ -39,7 +39,7 @@ export function useSwap() {
     hasToApproveOdos,
     odosRouterContractAddress,
     isOdosLoading,
-  } = useOdos(chainId)
+  } = useOdos()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const postMarketOrder = usePostMarketOrder()
@@ -90,7 +90,10 @@ export function useSwap() {
     approvePayToken.isPending ||
     postMarketOrder.isPending
 
-  const allTokens = deduplicateTokens([...getAllTokens(markets), ...odosTokens])
+  const allTokens = deduplicateTokens([
+    ...getAllMangroveMarketTokens(markets),
+    ...odosTokens,
+  ])
   const tradableTokens = deduplicateTokens(
     getTradableTokens({
       mangroveMarkets: markets,
@@ -280,7 +283,7 @@ export function useSwap() {
             ? `Approve ${payToken?.symbol}`
             : postMarketOrder.isPending
               ? "Processing transaction..."
-              : "Swap"
+              : `Swap via ${marketClient ? "Mangrove" : "Odos"}`
 
   // slippage -> valeur en % dans marketOrderSimulation -> min slippage + petit % genre x1,1
 

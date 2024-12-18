@@ -1,6 +1,9 @@
-import { MarketOrderSimulationResult } from "@mangrovedao/mgv/lib"
+import { TradeMode } from "@/app/trade/_components/forms/enums"
+import { successToast } from "@/app/trade/_components/forms/utils"
+import { getTokenByAddressOdos } from "@/utils/tokens"
+import { BS, MarketOrderSimulationResult } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Address, erc20Abi } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
@@ -42,12 +45,27 @@ export interface AssembledTransaction {
 
 const DEFAULT_ODOS_CHAIN_ID = 42161
 
-export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
+export function useOdos() {
+  const { chainId: chainIdConnected } = useAccount()
+  const [chainId, setChainId] = useState<number>(DEFAULT_ODOS_CHAIN_ID)
   const { address: userAddr } = useAccount()
+  const [lastRequest, setLastRequest] = useState<{
+    tokenToSell: Address
+    tokenToBuy: Address
+    wants: string
+  } | null>(null)
+  const [lastQuote, setLastQuote] =
+    useState<MarketOrderSimulationResult | null>(null)
   const [loadingQuote, setLoadingQuote] = useState(false)
   const [pathId, setPathId] = useState<string | null>(null)
   const publicClient = usePublicClient()
   const { data: walletClient } = useWalletClient()
+
+  useEffect(() => {
+    if (chainIdConnected) {
+      setChainId(chainIdConnected)
+    }
+  }, [chainIdConnected])
 
   const tokenListQuery = useQuery({
     queryKey: ["odosTokenList", chainId],
@@ -94,6 +112,11 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
   ): Promise<MarketOrderSimulationResult> => {
     try {
       setLoadingQuote(true)
+      setLastRequest({
+        tokenToSell: params.inputTokens[0]!.tokenAddress,
+        tokenToBuy: params.outputTokens[0]!.tokenAddress,
+        wants: params.inputTokens[0]!.amount,
+      })
       const chainId = params.chainId ?? DEFAULT_ODOS_CHAIN_ID
       const response = await fetch(ODOS_API_URL + ODOS_API_ROUTES.QUOTE, {
         method: "POST",
@@ -116,6 +139,7 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
         fillVolume: BigInt(odosQuote.outAmounts[0]),
       }
 
+      setLastQuote(quote)
       setPathId(odosQuote.pathId)
       return quote
     } catch (error) {
@@ -145,16 +169,46 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
 
   const executeOdosTransaction = async (params: AssembledTransaction) => {
     try {
-      if (!walletClient || !publicClient || !pathId || !userAddr)
+      if (
+        !walletClient ||
+        !publicClient ||
+        !pathId ||
+        !userAddr ||
+        !lastRequest ||
+        !tokenListQuery.data ||
+        !lastQuote
+      )
         throw new Error("Missing required parameters for Odos transaction")
 
       const hash = await walletClient.sendTransaction({
         to: params.to as Address,
         data: params.data as `0x${string}`,
       })
-
       const receipt = await publicClient.waitForTransactionReceipt({ hash })
 
+      const baseToken = getTokenByAddressOdos(
+        lastRequest.tokenToSell,
+        tokenListQuery.data,
+      )!
+      const quoteToken = getTokenByAddressOdos(
+        lastRequest.tokenToBuy,
+        tokenListQuery.data,
+      )!
+      successToast(
+        TradeMode.MARKET,
+        BS.sell,
+        baseToken,
+        quoteToken,
+        lastRequest.wants,
+        {
+          bounty: BigInt(0),
+          feePaid: BigInt(0),
+          takerGot: lastQuote.quoteAmount,
+          takerGave: lastQuote.baseAmount,
+        },
+        quoteToken,
+        baseToken,
+      )
       return receipt
     } catch (error) {
       console.error("Error executing Odos transaction:", error)

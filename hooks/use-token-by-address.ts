@@ -6,6 +6,6 @@ import { useOdos } from "./use-odos"
 
 export function useTokenByAddress(address: string): Token | undefined {
   const markets = useMarkets()
-  const { odosTokens } = useOdos() // TODO manage chainId here
+  const { odosTokens } = useOdos()
   return getTokenByAddress(address, markets, odosTokens)
 }

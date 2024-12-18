@@ -21,8 +21,9 @@ import Rive from "@rive-app/react-canvas-lite"
 import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
-import { Loader2 } from "lucide-react"
 import { ODOS_API_IMAGE_URL } from "@/hooks/use-odos"
+import { isTokenInMangroveMarkets } from "@/utils/tokens"
+import { useMarkets } from "@/hooks/use-addresses"
 
 export default function Swap() {
   const {
@@ -179,6 +180,7 @@ export default function Swap() {
           tokens={allTokens}
           onSelect={onPayTokenSelected}
           onOpenChange={setPayTokenDialogOpen}
+          markets={useMarkets()}
         />
         <TokenSelectorDialog
           type="buy"
@@ -198,14 +200,17 @@ function TokenSelectorDialog({
   open = false,
   onOpenChange,
   type,
+  markets,
 }: {
   open?: boolean
   tokens: Token[]
   onSelect: (token: Token) => void
   onOpenChange: (open: boolean) => void
   type: "buy" | "sell"
+  markets?: ReturnType<typeof useMarkets>
 }) {
   const [search, setSearch] = React.useState("")
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -223,19 +228,36 @@ function TokenSelectorDialog({
         <div className="flex flex-col space-y-2 justify-start p-3 pt-0 overflow-y-auto max-h-[400px]">
           {tokens
             .filter((token) =>
-              token.symbol.toLowerCase().includes(search.toLowerCase()),
+              token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+              token.address.toLowerCase().includes(search.toLowerCase())
             )
             .map((token) => (
               <div key={token.address}>
                 <Button
                   onClick={() => onSelect(token)}
-                className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
-              >
-                <TokenIcon symbol={token.symbol} imgClasses="rounded-full" customSrc={ODOS_API_IMAGE_URL(token.symbol)} useFallback={true} />
-                <span className="font-semibold text-lg">{token.symbol}</span>
-              </Button>
-            </div>
-          ))}
+                  className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
+                >
+                  <div className="relative">
+                    <TokenIcon 
+                      symbol={token.symbol} 
+                      imgClasses="rounded-full w-7" 
+                      customSrc={ODOS_API_IMAGE_URL(token.symbol)} 
+                      useFallback={true} 
+                    />
+                    {markets && isTokenInMangroveMarkets(token, markets) && (
+                      <svg 
+                        className="absolute -top-1 -right-1 w-3 h-3 text-green-400" 
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="font-semibold text-lg">{token.symbol}</span>
+                </Button>
+              </div>
+            ))}
         </div>
       </DialogContent>
     </Dialog>
