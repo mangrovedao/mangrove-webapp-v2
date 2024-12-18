@@ -230,7 +230,7 @@ export function useOdos() {
     })
 
     if (allowance === undefined) throw new Error("Could not get allowance")
-
+    console.log({ allowance, amount })
     return allowance < amount
   }
 

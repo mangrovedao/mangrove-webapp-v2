@@ -228,7 +228,7 @@ export function useSwap() {
 
       const hasToApprove = await hasToApproveOdos({
         address: payToken?.address,
-        amount: simulation.quoteAmount,
+        amount: simulation.baseAmount,
       })
 
       setFields((fields) => ({
