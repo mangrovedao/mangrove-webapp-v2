@@ -82,7 +82,7 @@ export function useMarkets() {
     case baseSepolia.id:
       return baseSepoliaMarkets
     default:
-      return arbitrumMarkets
+      return []
   }
 }
 
