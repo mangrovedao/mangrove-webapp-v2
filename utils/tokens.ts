@@ -90,8 +90,11 @@ export function getTradableTokens({
     },
     [],
   )
+  const odosTradableTokens = odosTokens.filter(
+    (t) => t.address !== token.address,
+  )
 
-  return [...mangroveTradableTokens, ...odosTokens] // Odos accepts all tokens and displays if no route is found after searching for a quote
+  return [...mangroveTradableTokens, ...odosTradableTokens] // Odos accepts all tokens and displays if no route is found after searching for a quote
 }
 
 export function getMarketFromTokens(

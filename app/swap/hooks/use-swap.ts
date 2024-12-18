@@ -31,7 +31,12 @@ export const SLIPPAGES = ["0.1", "0.5", "1"]
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
-  const { odosTokens } = useOdos(chainId)
+  const {
+    getQuote,
+    odosTokens,
+    getAssembledTransactionOfLastQuote,
+    executeOdosTransaction,
+  } = useOdos(chainId)
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const postMarketOrder = usePostMarketOrder()
@@ -161,53 +166,81 @@ export function useSwap() {
       address,
     ],
     queryFn: async () => {
-      const book = getBookQuery.data
-      if (!(payToken && receiveToken && book && marketClient && address))
-        return null
-      const isBasePay = currentMarket?.base.address === payToken?.address
+      if (!(payToken && receiveToken)) return null
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
-      const params: MarketOrderSimulationParams = isBasePay
-        ? {
-            base: payAmount,
-            bs: BS.sell,
-            book,
-          }
-        : {
-            quote: payAmount,
-            bs: BS.buy,
-            book,
-          }
 
-      const simulation = marketOrderSimulation(params)
+      // Mangrove
+      if (marketClient) {
+        const book = getBookQuery.data
+        if (!(book && address)) return null
+
+        const isBasePay = currentMarket?.base.address === payToken?.address
+        const params: MarketOrderSimulationParams = isBasePay
+          ? {
+              base: payAmount,
+              bs: BS.sell,
+              book,
+            }
+          : {
+              quote: payAmount,
+              bs: BS.buy,
+              book,
+            }
+
+        const simulation = marketOrderSimulation(params)
+        setFields((fields) => ({
+          ...fields,
+          receiveValue: formatUnits(
+            isBasePay ? simulation.quoteAmount : simulation.baseAmount,
+            receiveToken?.decimals ?? 18,
+          ),
+        }))
+
+        const [approvalStep] = await marketClient.getMarketOrderSteps({
+          bs: isBasePay ? BS.sell : BS.buy,
+          user: address,
+          sendAmount: payAmount,
+        })
+
+        return { simulation, approvalStep }
+      }
+
+      // Odos
+      if (!payAmount) return null
+
+      const simulation = await getQuote({
+        chainId,
+        inputTokens: [
+          { tokenAddress: payToken?.address, amount: payAmount.toString() },
+        ],
+        outputTokens: [{ tokenAddress: receiveToken?.address, proportion: 1 }],
+        userAddr: address,
+        slippageLimitPercent: Number(slippage),
+      })
+
       setFields((fields) => ({
         ...fields,
         receiveValue: formatUnits(
-          isBasePay ? simulation.quoteAmount : simulation.baseAmount,
+          simulation.quoteAmount,
           receiveToken?.decimals ?? 18,
         ),
       }))
 
-      const [approvalStep] = await marketClient.getMarketOrderSteps({
-        bs: isBasePay ? BS.sell : BS.buy,
-        user: address,
-        sendAmount: payAmount,
-      })
-
-      return { simulation, approvalStep }
+      return { simulation, approvalStep: null }
     },
+    refetchInterval: 10_000,
     enabled:
       !!payToken &&
       !!receiveToken &&
-      !!getBookQuery.data &&
-      !!marketClient?.uid &&
-      !!address,
+      !!fields.payValue &&
+      Number(fields.payValue) > 0 &&
+      (!!marketClient ? !!getBookQuery.data && !!address : true),
   })
 
   const getMarketPriceQuery = useQuery({
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
     queryFn: async () => {
-      if (!marketClient || !chainId || !payTknAddress || !receiveTknAddress)
-        return null
+      if (!chainId || !payTknAddress || !receiveTknAddress) return null
 
       const payDollar = await fetch(
         `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${payTknAddress}`,
@@ -219,7 +252,7 @@ export function useSwap() {
       return { payDollar: payDollar.price, receiveDollar: receiveDollar.price }
     },
     refetchInterval: 3_000,
-    enabled: !!marketClient && !!markets && !!payToken && !!receiveToken,
+    enabled: !!markets && !!payToken && !!receiveToken,
   })
 
   const hasToApprove = simulateQuery.data?.approvalStep?.done === false
@@ -240,7 +273,16 @@ export function useSwap() {
 
   // slippage -> valeur en % dans marketOrderSimulation -> min slippage + petit % genre x1,1
 
-  async function swap() {
+  async function swapOdos() {
+    if (!chainId || !payTknAddress || !receiveTknAddress) return
+
+    const params = await getAssembledTransactionOfLastQuote()
+    console.log("params", params)
+
+    await executeOdosTransaction(params)
+  }
+
+  async function swapMangrove() {
     if (!(marketClient && address && walletClient && payToken && receiveToken))
       return
 
@@ -287,6 +329,14 @@ export function useSwap() {
         },
       },
     )
+  }
+
+  async function swap() {
+    if (marketClient) {
+      await swapMangrove()
+    } else {
+      await swapOdos()
+    }
   }
 
   function reverseTokens() {
