@@ -17,6 +17,11 @@ export type VaultWhitelist = {
 export type Vault = {
   symbol: string
   apr?: number
+  pnlData?: {
+    currentShares: number
+    pnl: number
+    realizedPnl: number
+  }
   chainId?: number
   decimals: number
   mintedAmount: bigint
@@ -28,7 +33,6 @@ export type Vault = {
   totalQuote: bigint
   balanceBase: bigint
   balanceQuote: bigint
-  pnl: number
   tvl: bigint
   baseDollarPrice: number
   quoteDollarPrice: number
