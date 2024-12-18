@@ -5,37 +5,28 @@ import { toast } from "sonner"
 import { Address, erc20Abi } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
-const API_URL = "https://api.odos.xyz"
-const API_ROUTES = {
+const ODOS_API_URL = "https://api.odos.xyz"
+const ODOS_API_ROUTES = {
   TOKEN_LIST: (chainId: number) => `/info/tokens/${chainId}`,
   QUOTE: "/sor/quote/v2",
   ASSEMBLE: "/sor/assemble",
   ROUTER_CONTRACT: (chainId: number) => `/info/router/v2/${chainId}`,
 }
-export const API_IMAGE_URL = (symbol: string) =>
+export const ODOS_API_IMAGE_URL = (symbol: string) =>
   `https://assets.odos.xyz/tokens/${symbol}.webp`
-
-export interface InputToken {
-  tokenAddress: Address
-  amount: string
-}
-
-export interface OutputToken {
-  tokenAddress: Address
-  proportion: number
-}
 
 export interface QuoteParams {
   chainId?: number
-  inputTokens: InputToken[]
-  outputTokens: OutputToken[]
+  inputTokens: {
+    tokenAddress: Address
+    amount: string
+  }[]
+  outputTokens: {
+    tokenAddress: Address
+    proportion: number
+  }[]
   userAddr?: Address
   slippageLimitPercent: number
-}
-
-export interface AssembleTransactionParams {
-  pathId: string
-  userAddr: string
 }
 
 export interface AssembledTransaction {
@@ -61,7 +52,9 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
   const tokenListQuery = useQuery({
     queryKey: ["odosTokenList", chainId],
     queryFn: async () => {
-      const response = await fetch(API_URL + API_ROUTES.TOKEN_LIST(chainId))
+      const response = await fetch(
+        ODOS_API_URL + ODOS_API_ROUTES.TOKEN_LIST(chainId),
+      )
       const data: any = await response.json()
 
       const tokenMap = data.tokenMap
@@ -88,7 +81,7 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
     queryKey: ["odosRouterContract", chainId],
     queryFn: async () => {
       const response = await fetch(
-        API_URL + API_ROUTES.ROUTER_CONTRACT(chainId),
+        ODOS_API_URL + ODOS_API_ROUTES.ROUTER_CONTRACT(chainId),
       )
       const data: any = await response.json()
       return data.address as Address
@@ -102,7 +95,7 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
     try {
       setLoadingQuote(true)
       const chainId = params.chainId ?? DEFAULT_ODOS_CHAIN_ID
-      const response = await fetch(API_URL + API_ROUTES.QUOTE, {
+      const response = await fetch(ODOS_API_URL + ODOS_API_ROUTES.QUOTE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -135,7 +128,7 @@ export function useOdos(chainId: number = DEFAULT_ODOS_CHAIN_ID) {
 
   const getAssembledTransactionOfLastQuote =
     async (): Promise<AssembledTransaction> => {
-      const response = await fetch(API_URL + API_ROUTES.ASSEMBLE, {
+      const response = await fetch(ODOS_API_URL + ODOS_API_ROUTES.ASSEMBLE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

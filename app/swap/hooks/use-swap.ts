@@ -302,7 +302,6 @@ export function useSwap() {
       return
     }
     const params = await getAssembledTransactionOfLastQuote()
-    console.log("params", params)
 
     await executeOdosTransaction(params)
 

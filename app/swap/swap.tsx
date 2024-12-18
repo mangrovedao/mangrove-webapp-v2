@@ -22,6 +22,7 @@ import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
 import { Loader2 } from "lucide-react"
+import { ODOS_API_IMAGE_URL } from "@/hooks/use-odos"
 
 export default function Swap() {
   const {
@@ -230,7 +231,7 @@ function TokenSelectorDialog({
                   onClick={() => onSelect(token)}
                 className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
               >
-                <TokenIcon symbol={token.symbol} imgClasses="rounded-full" />
+                <TokenIcon symbol={token.symbol} imgClasses="rounded-full" customSrc={ODOS_API_IMAGE_URL(token.symbol)} useFallback={true} />
                 <span className="font-semibold text-lg">{token.symbol}</span>
               </Button>
             </div>
@@ -320,7 +321,7 @@ function TokenContainer({
               onClick={onTokenClicked}
               className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-full text-sm flex items-center space-x-1"
             >
-              <TokenIcon symbol={token.symbol} />
+              <TokenIcon symbol={token.symbol} customSrc={ODOS_API_IMAGE_URL(token.symbol)} className="rounded-full" useFallback={true} />
               <span className="font-semibold text-lg text-nowrap pl-2">
                 {token.symbol}
               </span>
