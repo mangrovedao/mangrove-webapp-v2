@@ -51,9 +51,9 @@ export default function Page() {
   const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
 
   const totalRewards =
-    BigInt(rewards?.takerReward ?? 0n) +
-    BigInt(rewards?.makerReward ?? 0n) +
-    BigInt(rewards?.kandelRewards ?? 0n)
+    BigInt(rewards?.takerReward ?? 0) +
+    BigInt(rewards?.makerReward ?? 0) +
+    BigInt(rewards?.vaultRewards ?? 0)
 
   return (
     <main className="mt-8 px-4">
@@ -106,7 +106,7 @@ export default function Page() {
                 <Label>Taker Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.takerReward ?? 0n), 8)}
+                    value={formatUnits(BigInt(rewards?.takerReward ?? 0), 8)}
                   />
                 </Value>
               </div>
@@ -114,7 +114,7 @@ export default function Page() {
                 <Label>Maker Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.makerReward ?? 0n), 8)}
+                    value={formatUnits(BigInt(rewards?.makerReward ?? 0), 8)}
                   />
                 </Value>
               </div>
@@ -122,7 +122,7 @@ export default function Page() {
                 <Label>Vault Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 8)}
+                    value={formatUnits(BigInt(rewards?.vaultRewards ?? 0), 8)}
                   />
                 </Value>
               </div>
