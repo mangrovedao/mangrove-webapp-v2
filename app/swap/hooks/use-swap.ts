@@ -241,7 +241,7 @@ export function useSwap() {
 
       return { simulation, approvalStep: { done: !hasToApprove } }
     },
-    refetchInterval: 5_000,
+    refetchInterval: 7_000,
     enabled:
       !!payToken &&
       !!receiveToken &&
