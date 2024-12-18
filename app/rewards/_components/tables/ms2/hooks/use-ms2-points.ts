@@ -63,7 +63,7 @@ export function useMs2Points<T = Ms2PointsRow[]>({
             address: row.address,
             total: Number(formatUnits(BigInt(row.total.replace("n", "")), 8)),
           }))
-
+        console.log(leaderboard)
         // Sort leaderboard by total rewards and add rank
         const rankedLeaderboard = leaderboard
           .sort((a, b) => b.total - a.total)

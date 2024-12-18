@@ -26,7 +26,6 @@ export const useRewards = ({ epochId = "1" }: UseRewardsProps) => {
             },
           },
         )
-
         if (!response.ok) {
           throw new Error("Failed to fetch rewards")
         }

@@ -26,6 +26,9 @@ type Params = {
 }
 
 const formatNumber = (num: number) => {
+  if (num < 1 && num > 0) {
+    return num.toFixed(4)
+  }
   if (num < 1000) {
     return num.toFixed(0)
   }
