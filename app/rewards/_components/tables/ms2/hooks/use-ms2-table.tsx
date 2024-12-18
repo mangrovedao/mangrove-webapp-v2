@@ -26,6 +26,9 @@ type Params = {
 }
 
 const formatNumber = (num: number) => {
+  if (num < 1 && num > 0) {
+    return num.toFixed(4)
+  }
   if (num < 1000) {
     return num.toFixed(0)
   }
@@ -115,13 +118,6 @@ export function useMs2Table({ pageSize, data }: Params) {
         },
       }),
 
-      // columnHelper.display({
-      //   header: "Kandel rewards",
-      //   cell: ({ row }) => {
-      //     const { kandelReward } = row.original
-      //     return <Value value={formatNumber(kandelReward ?? 0)} />
-      //   },
-      // }),
 
       columnHelper.display({
         header: "Vault rewards",
