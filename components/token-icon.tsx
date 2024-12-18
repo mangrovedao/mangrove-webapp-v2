@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { ODOS_API_IMAGE_URL } from "@/hooks/use-odos"
 import { cn } from "@/utils"
 import { getSvgUrl, getTokenInfos } from "@/utils/tokens"
 
