@@ -54,29 +54,44 @@ export function getAllTokens(markets: ReturnType<typeof useMarkets>): Token[] {
   return mangroveTokens
 }
 
+export function deduplicateTokens(tokens: Token[]) {
+  return tokens.filter(
+    (token, index, self) =>
+      index === self.findIndex((t) => t.address === token.address),
+  )
+}
+
 export function getTradableTokens({
-  markets,
+  mangroveMarkets,
+  odosTokens,
   token,
 }: {
-  markets: ReturnType<typeof useMarkets>
+  mangroveMarkets: ReturnType<typeof useMarkets>
+  odosTokens: Token[]
   token?: Token
 }): Token[] {
   if (!token) return []
-  return markets.reduce<Token[]>((acc, market) => {
-    if (
-      market.base.address === token.address &&
-      !acc.some((t) => t.address === market.quote.address)
-    ) {
-      acc.push(market.quote)
-    }
-    if (
-      market.quote.address === token.address &&
-      !acc.some((t) => t.address === market.base.address)
-    ) {
-      acc.push(market.base)
-    }
-    return acc
-  }, [])
+
+  const mangroveTradableTokens = mangroveMarkets.reduce<Token[]>(
+    (acc, market) => {
+      if (
+        market.base.address === token.address &&
+        !acc.some((t) => t.address === market.quote.address)
+      ) {
+        acc.push(market.quote)
+      }
+      if (
+        market.quote.address === token.address &&
+        !acc.some((t) => t.address === market.base.address)
+      ) {
+        acc.push(market.base)
+      }
+      return acc
+    },
+    [],
+  )
+
+  return [...mangroveTradableTokens, ...odosTokens] // Odos accepts all tokens and displays if no route is found after searching for a quote
 }
 
 export function getMarketFromTokens(

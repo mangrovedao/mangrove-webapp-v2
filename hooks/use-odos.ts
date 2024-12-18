@@ -1,5 +1,4 @@
-import { Token } from "@mangrovedao/mgv"
-import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 
 const API_URL = "https://api.odos.xyz"
 const API_ROUTES = {
@@ -10,19 +9,17 @@ const API_ROUTES = {
 export const API_IMAGE_URL = (symbol: string) =>
   `https://assets.odos.xyz/tokens/${symbol}.webp`
 
-export function useOdos(chainId: number) {
-  const [odosTokens, setOdosTokens] = useState<Token[]>([])
-  const [error, setError] = useState<Error | null>(null)
-
-  async function fetchTokens() {
-    try {
+export function useOdos(chainId: number = 42161) {
+  const tokenListQuery = useQuery({
+    queryKey: ["odosTokenList", chainId],
+    queryFn: async () => {
       const response = await fetch(API_URL + API_ROUTES.TOKEN_LIST(chainId))
       const data: any = await response.json()
 
       const tokenMap = data.tokenMap
       const addresses = Object.keys(tokenMap)
       const tokenInfo = addresses.map((address: string) => tokenMap[address])
-      const newTokens = tokenInfo.map((token: any, index: number) => ({
+      return tokenInfo.map((token: any, index: number) => ({
         address: addresses[index] as `0x${string}`,
         symbol: token.symbol,
         decimals: token.decimals,
@@ -30,12 +27,13 @@ export function useOdos(chainId: number) {
         priceDisplayDecimals: 2,
         mgvTestToken: false,
       }))
+    },
+    refetchInterval: 24 * 60 * 60 * 1000,
+  })
 
-      setOdosTokens(newTokens)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch tokens"))
-    }
+  return {
+    odosTokens: tokenListQuery.data ?? [],
+    isLoading: tokenListQuery.isLoading,
+    error: tokenListQuery.error,
   }
-
-  return { odosTokens, error }
 }

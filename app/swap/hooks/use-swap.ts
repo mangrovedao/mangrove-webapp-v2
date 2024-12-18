@@ -20,6 +20,7 @@ import { useApproveToken } from "@/hooks/use-approve-token"
 import { useOdos } from "@/hooks/use-odos"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import {
+  deduplicateTokens,
   getAllTokens,
   getMarketFromTokens,
   getTradableTokens,
@@ -30,7 +31,7 @@ export const SLIPPAGES = ["0.1", "0.5", "1"]
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
-  const { odosTokens } = useOdos(chainId ?? 42161)
+  const { odosTokens } = useOdos(chainId)
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const postMarketOrder = usePostMarketOrder()
@@ -51,8 +52,8 @@ export function useSwap() {
     payValue: "",
     receiveValue: "",
   })
-  const payToken = useTokenByAddress(payTknAddress, chainId ?? 42161)
-  const receiveToken = useTokenByAddress(receiveTknAddress, chainId ?? 42161)
+  const payToken = useTokenByAddress(payTknAddress)
+  const receiveToken = useTokenByAddress(receiveTknAddress)
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
   const currentMarket = getMarketFromTokens(markets, payToken, receiveToken)
@@ -80,18 +81,25 @@ export function useSwap() {
     approvePayToken.isPending ||
     postMarketOrder.isPending
 
-  const allTokens = [...getAllTokens(markets), ...odosTokens]
-  const tradableTokens = getTradableTokens({
-    markets,
-    token: payToken,
-  })
+  const allTokens = deduplicateTokens([...getAllTokens(markets), ...odosTokens])
+  const tradableTokens = deduplicateTokens(
+    getTradableTokens({
+      mangroveMarkets: markets,
+      odosTokens,
+      token: payToken,
+    }),
+  )
 
   const [payTokenDialogOpen, setPayTokenDialogOpen] = React.useState(false)
   const [receiveTokenDialogOpen, setReceiveTokenDialogOpen] =
     React.useState(false)
 
   function onPayTokenSelected(token: Token) {
-    const newTradableTokens = getTradableTokens({ markets, token })
+    const newTradableTokens = getTradableTokens({
+      mangroveMarkets: markets,
+      odosTokens,
+      token,
+    })
     setPayTknAddress(token.address)
     setPayTokenDialogOpen(false)
     setFields(() => ({
