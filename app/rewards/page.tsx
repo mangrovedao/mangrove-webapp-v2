@@ -34,16 +34,16 @@ import { useConfiguration } from "./hooks/use-rewards-config"
 
 enum MSSortValues {
   MS2 = "MGV Incentives Program",
-  MS1 = "Season 1 Points Program",
+  MS1 = "MS1",
 }
 
 export default function Page() {
   const { data: configuration } = useConfiguration()
-  const [tab, setTab] = React.useState("1")
+  const [tab, setTab] = React.useState("ms2-total-rewards")
 
   const { data: rewards } = useRewards({
     epochId:
-      tab !== "ms1-leaderboard"
+      tab !== "ms1-leaderboard" && tab !== "ms2-total-rewards"
         ? tab
         : configuration?.epochId?.toString() || "1",
   })
@@ -51,13 +51,9 @@ export default function Page() {
   const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
 
   const totalRewards =
-    BigInt(rewards?.takerReward ?? 0n) +
-    BigInt(rewards?.makerReward ?? 0n) +
-    BigInt(rewards?.kandelRewards ?? 0n)
-
-  React.useEffect(() => {
-    setTab(configuration?.epochId?.toString() || "1")
-  }, [configuration?.epochId])
+    BigInt(rewards?.takerReward ?? 0) +
+    BigInt(rewards?.makerReward ?? 0) +
+    BigInt(rewards?.vaultRewards ?? 0)
 
   return (
     <main className="mt-8 px-4">
@@ -110,7 +106,7 @@ export default function Page() {
                 <Label>Taker Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.takerReward ?? 0n), 8)}
+                    value={formatUnits(BigInt(rewards?.takerReward ?? 0), 8)}
                   />
                 </Value>
               </div>
@@ -118,7 +114,7 @@ export default function Page() {
                 <Label>Maker Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.makerReward ?? 0n), 8)}
+                    value={formatUnits(BigInt(rewards?.makerReward ?? 0), 8)}
                   />
                 </Value>
               </div>
@@ -126,7 +122,7 @@ export default function Page() {
                 <Label>Vault Rewards</Label>
                 <Value size="small">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.kandelRewards ?? 0n), 8)}
+                    value={formatUnits(BigInt(rewards?.vaultRewards ?? 0), 8)}
                   />
                 </Value>
               </div>
@@ -144,7 +140,7 @@ export default function Page() {
                         setTab("ms1-leaderboard")
                         setMsSort(value as MSSortValues)
                       } else {
-                        setTab(configuration?.epochId?.toString() ?? "1")
+                        setTab("ms2-total-rewards")
                         setMsSort(value as MSSortValues)
                       }
                     }}
@@ -159,9 +155,9 @@ export default function Page() {
                     <SelectContent>
                       {Object.values(MSSortValues).map((item, i) => (
                         <SelectItem value={item} key={`select-${item}-${i}`}>
-                          <h1 className="text-2xl font-bold !text-primary">
+                          <Title variant={"title1"} className="text-nowrap">
                             {item}
-                          </h1>
+                          </Title>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -170,15 +166,14 @@ export default function Page() {
 
                 {msSort === MSSortValues.MS2 ? (
                   <>
-                    {/* <CustomTabsTrigger
+                    <CustomTabsTrigger
                       onClick={() => setTab("ms2-total-rewards")}
                       key={`ms2-total-rewards-tab`}
                       value={"ms2-total-rewards"}
-                      className="capitalize"
                       id={`ms2-total-rewards-tab`}
                     >
                       Total rewards
-                    </CustomTabsTrigger> */}
+                    </CustomTabsTrigger>
                     {configuration?.epochEntries
                       ?.toReversed()
                       .filter(
@@ -191,7 +186,6 @@ export default function Page() {
                           onClick={() => setTab(entry.epochId.toString())}
                           key={`${entry.epochId}-tab`}
                           value={entry.epochId.toString()}
-                          className="capitalize"
                           id={`${entry.epochId}-tab`}
                           disabled={entry.startTimestamp > Date.now() / 1000}
                         >
@@ -226,17 +220,17 @@ export default function Page() {
                 </ScrollArea>
               </CustomTabsContent>
 
-              {/* <CustomTabsContent value={"ms2-total-rewards"}>
+              {/* ms2 leaderboards */}
+              <CustomTabsContent value={"ms2-total-rewards"}>
                 <ScrollArea className="h-full" scrollHideDelay={200}>
                   <div className="px-2 h-full">
-                    <Ms1Table />
+                    <Ms2Table />
                   </div>
                   <ScrollBar orientation="vertical" className="z-50" />
                   <ScrollBar orientation="horizontal" className="z-50" />
                 </ScrollArea>
-              </CustomTabsContent> */}
+              </CustomTabsContent>
 
-              {/* ms2 leaderboards */}
               {configuration?.epochEntries?.map((entry) => (
                 <CustomTabsContent
                   key={`${entry.epochId}-content`}

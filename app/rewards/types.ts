@@ -4,7 +4,6 @@ export type Ms2PointsRow = {
   rank: number
   address: string
   makerReward: number
-  kandelReward: number
   takerReward: number
   vaultReward: number
   total: number
