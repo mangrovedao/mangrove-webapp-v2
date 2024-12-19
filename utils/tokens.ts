@@ -30,15 +30,27 @@ export function getSvgUrl(symbol: string) {
 export function getTokenByAddress(
   address: string,
   markets: ReturnType<typeof useMarkets>,
+  odosTokens: Token[],
 ): Token | undefined {
   const token =
     markets.find((m) => m.base.address === address)?.base ??
-    markets.find((m) => m.quote.address === address)?.quote
+    markets.find((m) => m.quote.address === address)?.quote ??
+    odosTokens.find((t) => t.address === address)
+
   return token
 }
 
-export function getAllTokens(markets: ReturnType<typeof useMarkets>): Token[] {
-  return markets.reduce<Token[]>((acc, market) => {
+export function getTokenByAddressOdos(
+  address: string,
+  odosTokens: Token[],
+): Token | undefined {
+  return odosTokens.find((t) => t.address === address)
+}
+
+export function getAllMangroveMarketTokens(
+  mangroveMarkets: ReturnType<typeof useMarkets>,
+): Token[] {
+  const mangroveTokens = mangroveMarkets.reduce<Token[]>((acc, market) => {
     if (!acc.some((t) => t.address === market.base.address)) {
       acc.push(market.base)
     }
@@ -47,31 +59,51 @@ export function getAllTokens(markets: ReturnType<typeof useMarkets>): Token[] {
     }
     return acc
   }, [])
+
+  return mangroveTokens
+}
+
+export function deduplicateTokens(tokens: Token[]) {
+  return tokens.filter(
+    (token, index, self) =>
+      index === self.findIndex((t) => t.address === token.address),
+  )
 }
 
 export function getTradableTokens({
-  markets,
+  mangroveMarkets,
+  odosTokens,
   token,
 }: {
-  markets: ReturnType<typeof useMarkets>
+  mangroveMarkets: ReturnType<typeof useMarkets>
+  odosTokens: Token[]
   token?: Token
 }): Token[] {
   if (!token) return []
-  return markets.reduce<Token[]>((acc, market) => {
-    if (
-      market.base.address === token.address &&
-      !acc.some((t) => t.address === market.quote.address)
-    ) {
-      acc.push(market.quote)
-    }
-    if (
-      market.quote.address === token.address &&
-      !acc.some((t) => t.address === market.base.address)
-    ) {
-      acc.push(market.base)
-    }
-    return acc
-  }, [])
+
+  const mangroveTradableTokens = mangroveMarkets.reduce<Token[]>(
+    (acc, market) => {
+      if (
+        market.base.address === token.address &&
+        !acc.some((t) => t.address === market.quote.address)
+      ) {
+        acc.push(market.quote)
+      }
+      if (
+        market.quote.address === token.address &&
+        !acc.some((t) => t.address === market.base.address)
+      ) {
+        acc.push(market.base)
+      }
+      return acc
+    },
+    [],
+  )
+  const odosTradableTokens = odosTokens.filter(
+    (t) => t.address !== token.address,
+  )
+
+  return [...mangroveTradableTokens, ...odosTradableTokens] // Odos accepts all tokens and displays if no route is found after searching for a quote
 }
 
 export function getMarketFromTokens(
@@ -84,5 +116,16 @@ export function getMarketFromTokens(
     (m) =>
       (m.base.address === base.address && m.quote.address === quote.address) ||
       (m.base.address === quote.address && m.quote.address === base.address),
+  )
+}
+
+export function isTokenInMangroveMarkets(
+  token: Token,
+  markets: ReturnType<typeof useMarkets>,
+): boolean {
+  return markets.some(
+    (market) =>
+      market.base.address === token.address ||
+      market.quote.address === token.address,
   )
 }
