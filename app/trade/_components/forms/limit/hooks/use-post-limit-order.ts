@@ -176,13 +176,13 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
       onResult?.(receipt)
       try {
         // Start showing loading state indicator on parts of the UI that depend on
-        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
 
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber: Number(receipt.blockNumber),
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
-        queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["order-history"] })
         queryClient.invalidateQueries({ queryKey: ["balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {
@@ -190,7 +190,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
       }
     },
     onSettled: () => {
-      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
     },
   })
 }

@@ -36,7 +36,6 @@ export function successToast(
       : "Market order not filled (slippage limit too low)"
 
   const fillText = Number(result.takerGot) > 0 ? filledOrder : notFilledOrder
-  console.log(result.feePaid)
 
   const approximateFee = (value: bigint, decimals: number) =>
     Number(formatUnits(value, decimals)) <= 0.001 ? "~ " : ""

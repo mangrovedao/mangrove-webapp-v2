@@ -147,7 +147,6 @@ export default function DepositToVaultDialog({
     args: [vault?.address as Address, mintAmount, amount0, amount1],
   })
   useEffect(() => {
-    console.log(error)
     if (!error && isConfirmed && currentStep !== steps.length) {
       reset()
       goToNextStep()

@@ -73,7 +73,8 @@ export default function EditOrderSheet({
   const [formData, setFormData] = React.useState<Form>()
   const order = orderInfos?.order
   const mode = orderInfos?.mode
-  const { expiryDate, isBid } = order
+  const { expiry, side } = order
+  const isBid = side === "buy"
   const {
     handleSubmit,
     setToggleEdit,
@@ -85,8 +86,6 @@ export default function EditOrderSheet({
     isOrderExpired,
     formattedPrice,
     sendTokenBalance,
-    sendFrom,
-    receiveTo,
   } = useEditOrder({
     order,
     onSubmit: (formData) => setFormData(formData),
@@ -141,18 +140,22 @@ export default function EditOrderSheet({
                     item={
                       <Badge
                         title={isOrderExpired ? "Closed" : "Open"}
-                        isExpired={isOrderExpired}
+                        isExpired={!!isOrderExpired}
                       />
                     }
                   />
 
-                  {expiryDate && (
+                  {expiry && (
                     <SheetLine
                       title="Order Date"
-                      item={<Text>{formatDateWithoutHours(expiryDate)}</Text>}
+                      item={
+                        <Text>
+                          {formatDateWithoutHours(new Date(expiry * 1000))}
+                        </Text>
+                      }
                       secondaryItem={
                         <Text className="text-muted-foreground">
-                          {formatHoursOnly(expiryDate)}
+                          {formatHoursOnly(new Date(expiry * 1000))}
                         </Text>
                       }
                     />
@@ -224,9 +227,7 @@ export default function EditOrderSheet({
 
                   <SheetLine
                     title={
-                      <Text className="text-wrap">
-                        Send from {sendFrom?.name || "Wallet"}
-                      </Text>
+                      <Text className="text-wrap">Send from {"Wallet"}</Text>
                     }
                     item={
                       !toggleEdit ? (
@@ -269,9 +270,7 @@ export default function EditOrderSheet({
 
                   <SheetLine
                     title={
-                      <Text className="text-wrap">
-                        Receive to {receiveTo?.name || "Wallet"}
-                      </Text>
+                      <Text className="text-wrap">Receive to {"Wallet"}</Text>
                     }
                     item={
                       !toggleEdit ? (
@@ -309,9 +308,9 @@ export default function EditOrderSheet({
                     title="Time in force"
                     item={<Text>{TimeInForce.GTC}</Text>}
                     secondaryItem={
-                      expiryDate && (
+                      expiry && (
                         <Text className="text-muted-foreground">
-                          <Timer expiry={expiryDate} />
+                          <Timer expiry={new Date(expiry * 1000)} />
                         </Text>
                       )
                     }
