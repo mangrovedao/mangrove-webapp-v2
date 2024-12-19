@@ -1,4 +1,3 @@
-import { useMarkets } from "@/hooks/use-addresses"
 import { useQuery } from "@tanstack/react-query"
 import { isAddress } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
@@ -11,9 +10,8 @@ export function useVault(id?: string | null) {
   const publicClient = usePublicClient()
   const vaultsWhitelist = useVaultsWhitelist()
 
-  const markets = useMarkets()
   return useQuery({
-    queryKey: ["vault", id, user, chainId],
+    queryKey: ["vault", id, user, chainId, vaultsWhitelist.length],
     queryFn: async () => {
       if (!publicClient) throw new Error("Public client is not enabled")
       if (id && !isAddress(id)) throw new Error("Invalid vaultaddress")
@@ -21,6 +19,7 @@ export function useVault(id?: string | null) {
       const vault = vaultsWhitelist?.find(
         (v) => v.address.toLowerCase() == id?.toLowerCase(),
       )
+
       if (!vault) return { vault: undefined }
 
       const [vaultInfo] = await Promise.all([
@@ -30,7 +29,7 @@ export function useVault(id?: string | null) {
         vault: vaultInfo,
       }
     },
-    enabled: !!publicClient,
+    enabled: !!publicClient && !!chainId && !!vaultsWhitelist.length,
     initialData: { vault: undefined },
   })
 }

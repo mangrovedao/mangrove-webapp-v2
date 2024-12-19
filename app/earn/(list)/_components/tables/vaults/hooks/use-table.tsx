@@ -25,12 +25,11 @@ const DEFAULT_DATA: Vault[] = []
 
 type Params = {
   data?: Vault[]
-  whitelist?: VaultWhitelist[] // local informations
   pageSize: number
   onDeposit: (vault: Vault) => void
 }
 
-export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
+export function useTable({ pageSize, data, onDeposit }: Params) {
   const { chain } = useAccount()
 
   const columns = React.useMemo(
@@ -183,7 +182,7 @@ export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
   )
 
   return useReactTable({
-    data: data ?? whitelist ?? DEFAULT_DATA,
+    data: data ?? DEFAULT_DATA,
     columns,
     initialState: {
       pagination: {

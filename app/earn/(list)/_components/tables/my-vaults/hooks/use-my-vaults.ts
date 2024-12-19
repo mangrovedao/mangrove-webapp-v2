@@ -2,7 +2,6 @@
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault } from "@/app/earn/(shared)/types"
-import { useMarkets } from "@/hooks/use-addresses"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
 import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
@@ -21,7 +20,6 @@ export function useMyVaults<T = Vault[]>({
 }: Params<T> = {}) {
   const publicClient = usePublicClient()
   const { address: user, chainId } = useAccount()
-  const markets = useMarkets()
   const plainVaults = useVaultsWhitelist()
 
   const { data, ...rest } = useQuery({
