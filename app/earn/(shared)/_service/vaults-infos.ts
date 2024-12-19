@@ -39,6 +39,12 @@ const multicallSchema = z.object({
   lastTimestamp: z.bigint(),
 })
 
+const pnlSchema = z.object({
+  currentShares: z.number(),
+  pnl: z.number(),
+  realizedPnl: z.number(),
+})
+
 const priceSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -167,6 +173,12 @@ export async function getVaultsInformation(
           .catch(() => 1),
       ])
 
+      const res = await fetch(
+        `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${v.address}/${user ?? zeroAddress}`,
+      )
+      const data = await res.json()
+      const pnlData = pnlSchema.parse(data)
+
       // feeData()
       const performanceFee = feeData[0]
       const managementFee = feeData[1]
@@ -225,6 +237,7 @@ export async function getVaultsInformation(
         ...v,
         symbol,
         apr,
+        pnlData,
         decimals,
         mintedAmount: balanceOf,
         performanceFee: (Number(feeData[0]) / 1e5) * 100,
@@ -233,7 +246,6 @@ export async function getVaultsInformation(
         totalQuote,
         balanceBase,
         balanceQuote,
-        pnl: 0,
         chainId: client.chain?.id,
         tvl: totalInQuote[0],
         baseDollarPrice,
