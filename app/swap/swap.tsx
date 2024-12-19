@@ -21,7 +21,7 @@ import Rive from "@rive-app/react-canvas-lite"
 import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
-import { ODOS_API_IMAGE_URL } from "@/hooks/use-odos"
+import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { isTokenInMangroveMarkets } from "@/utils/tokens"
 import { useMarkets } from "@/hooks/use-addresses"
 

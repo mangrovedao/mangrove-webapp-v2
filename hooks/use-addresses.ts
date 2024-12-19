@@ -11,7 +11,7 @@ import {
   blastMarkets,
   blastTokens,
 } from "@mangrovedao/mgv/addresses"
-import { arbitrum, baseSepolia, blast } from "viem/chains"
+import { arbitrum, base, baseSepolia, blast } from "viem/chains"
 import { useAccount } from "wagmi"
 
 export const aaveKandelSeeder = "0x55B12De431C6e355b56b79472a3632faec58FB5a"
@@ -81,8 +81,10 @@ export function useMarkets() {
       return arbitrumMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets
-    default:
+    case base.id:
       return []
+    default:
+      return arbitrumMarkets
   }
 }
 

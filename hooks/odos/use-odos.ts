@@ -7,41 +7,8 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Address, erc20Abi } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
-
-const ODOS_API_URL = "https://api.odos.xyz"
-const ODOS_API_ROUTES = {
-  TOKEN_LIST: (chainId: number) => `/info/tokens/${chainId}`,
-  QUOTE: "/sor/quote/v2",
-  ASSEMBLE: "/sor/assemble",
-  ROUTER_CONTRACT: (chainId: number) => `/info/router/v2/${chainId}`,
-}
-export const ODOS_API_IMAGE_URL = (symbol: string) =>
-  `https://assets.odos.xyz/tokens/${symbol}.webp`
-
-export interface QuoteParams {
-  chainId?: number
-  inputTokens: {
-    tokenAddress: Address
-    amount: string
-  }[]
-  outputTokens: {
-    tokenAddress: Address
-    proportion: number
-  }[]
-  userAddr?: Address
-  slippageLimitPercent: number
-}
-
-export interface AssembledTransaction {
-  gas: number
-  gasPrice: number
-  value: string
-  to: string
-  from: string
-  data: string
-  nonce: number
-  chainId: number
-}
+import { ODOS_API_ROUTES, ODOS_API_URL } from "./constants"
+import { OdosAssembledTransaction, OdosQuoteParams } from "./types"
 
 const DEFAULT_ODOS_CHAIN_ID = 42161
 
@@ -108,7 +75,7 @@ export function useOdos() {
   })
 
   const getQuote = async (
-    params: QuoteParams,
+    params: OdosQuoteParams,
   ): Promise<MarketOrderSimulationResult> => {
     try {
       setLoadingQuote(true)
@@ -135,7 +102,7 @@ export function useOdos() {
         maxTickEncountered: BigInt(0),
         minSlippage: odosQuote.priceImpact * -1,
         fillWants: true,
-        rawPrice: Number(odosQuote.netOutValue) || 0,
+        rawPrice: Number(odosQuote.netOutValue),
         fillVolume: BigInt(odosQuote.outAmounts[0]),
       }
 
@@ -151,7 +118,7 @@ export function useOdos() {
   }
 
   const getAssembledTransactionOfLastQuote =
-    async (): Promise<AssembledTransaction> => {
+    async (): Promise<OdosAssembledTransaction> => {
       const response = await fetch(ODOS_API_URL + ODOS_API_ROUTES.ASSEMBLE, {
         method: "POST",
         headers: {
@@ -164,10 +131,10 @@ export function useOdos() {
       })
       const data: any = await response.json()
 
-      return data.transaction as AssembledTransaction
+      return data.transaction as OdosAssembledTransaction
     }
 
-  const executeOdosTransaction = async (params: AssembledTransaction) => {
+  const executeOdosTransaction = async (params: OdosAssembledTransaction) => {
     try {
       if (
         !walletClient ||

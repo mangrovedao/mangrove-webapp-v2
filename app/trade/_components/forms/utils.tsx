@@ -6,7 +6,7 @@ import { formatUnits, parseUnits } from "viem"
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { TradeMode } from "./enums"
-import { ODOS_API_IMAGE_URL } from "@/hooks/use-odos"
+import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 
 export function successToast(
   tradeMode: TradeMode,
