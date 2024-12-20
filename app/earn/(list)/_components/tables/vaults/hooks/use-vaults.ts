@@ -2,6 +2,7 @@
 
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { useQuery } from "@tanstack/react-query"
+import { BaseError, ContractFunctionExecutionError } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
 import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
 
@@ -31,11 +32,26 @@ export function useVaults<T = Vault[] | undefined>({
         const vaults = await getVaultsInformation(publicClient, whitelist, user)
         return vaults ?? []
       } catch (error) {
-        console.error(error)
+        console.error(error, chainId)
+        if (error instanceof BaseError) {
+          const revertError = error.walk(
+            (error) => error instanceof ContractFunctionExecutionError,
+          )
+
+          if (revertError instanceof ContractFunctionExecutionError) {
+            console.log(
+              revertError.cause,
+              revertError.message,
+              revertError.functionName,
+              revertError.formattedArgs,
+              revertError.details,
+            )
+          }
+        }
         return []
       }
     },
-    enabled: !!publicClient && !!chainId && !!whitelist.length,
+    enabled: !!publicClient && !!whitelist.length,
   })
   return {
     data: (select ? select(data ?? []) : data) as unknown as T,

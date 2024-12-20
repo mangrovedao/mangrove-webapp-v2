@@ -57,6 +57,7 @@ export async function getVaultsInformation(
   vaults: VaultWhitelist[],
   user?: Address,
 ): Promise<(Vault & VaultWhitelist)[]> {
+  console.log(vaults, client.chain?.id)
   const result = await client.multicall({
     contracts: vaults.flatMap(
       (v) =>
@@ -173,11 +174,18 @@ export async function getVaultsInformation(
           .catch(() => 1),
       ])
 
-      const res = await fetch(
-        `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${v.address}/${user ?? zeroAddress}`,
-      )
-      const data = await res.json()
-      const pnlData = pnlSchema.parse(data)
+      let pnlData = {
+        currentShares: 0,
+        pnl: 0,
+        realizedPnl: 0,
+      }
+      if (user) {
+        const res = await fetch(
+          `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${v.address}/${user}`,
+        )
+        const data = await res.json()
+        pnlData = pnlSchema.parse(data)
+      }
 
       // feeData()
       const performanceFee = feeData[0]
