@@ -1,7 +1,6 @@
 import type { Token } from "@mangrovedao/mgv"
 import React, { useEffect, useMemo } from "react"
 
-import type { Vault } from "@/app/strategies/(list)/_schemas/vaults"
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import Dialog from "@/components/dialogs/dialog"
 import { TokenPair } from "@/components/token-pair"
@@ -19,6 +18,7 @@ import {
   useWriteContract,
 } from "wagmi"
 import { Steps } from "../components/steps"
+import { Vault } from "../types"
 
 type Props = {
   vault?: Vault

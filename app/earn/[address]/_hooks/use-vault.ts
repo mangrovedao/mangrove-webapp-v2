@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { BaseError, ContractFunctionExecutionError, isAddress } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
 import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
+import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"
 import { getVaultsInformation } from "../../(shared)/_service/vaults-infos"
 
 export function useVault(address?: string | null) {
@@ -9,9 +10,17 @@ export function useVault(address?: string | null) {
   const { address: user } = useAccount()
   const publicClient = usePublicClient()
   const vaultsWhitelist = useVaultsWhitelist()
+  const incentives = useVaultsIncentives()
 
   return useQuery({
-    queryKey: ["vault", address, user, chainId, vaultsWhitelist.length],
+    queryKey: [
+      "vault",
+      address,
+      user,
+      chainId,
+      vaultsWhitelist.length,
+      incentives.length,
+    ],
     queryFn: async () => {
       try {
         if (!publicClient) throw new Error("Public client is not enabled")
@@ -22,10 +31,19 @@ export function useVault(address?: string | null) {
           (v) => v.address.toLowerCase() == address?.toLowerCase(),
         )
 
+        const vaultIncentives = incentives?.find(
+          (v) => v.vault.toLowerCase() == address?.toLowerCase(),
+        )
+
         if (!vault) return { vault: undefined }
 
         const [vaultInfo] = await Promise.all([
-          getVaultsInformation(publicClient, [vault], user).then((v) => v[0]),
+          getVaultsInformation(
+            publicClient,
+            [vault],
+            user,
+            vaultIncentives,
+          ).then((v) => v[0]),
         ])
         return {
           vault: vaultInfo,

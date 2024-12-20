@@ -17,6 +17,7 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
+import { FlowingNumbers } from "@/components/flowing-numbers"
 import InfoTooltip from "@/components/info-tooltip-new"
 import NeonContainer from "@/components/neon-container"
 import { TokenIcon } from "@/components/token-icon-new"
@@ -318,11 +319,23 @@ export default function Page() {
           <div className="grid gap-8">
             <NeonContainer className="relative">
               <ImageWithHideOnError
-                className="absolute -top-[17px] -right-[17px] rounded-xl"
+                className="absolute -top-[24px] -right-[17px] rounded-xl"
                 src={`/assets/illustrations/earn-leaf.png`}
                 width={100}
                 height={90}
                 alt={`mangrove-logo`}
+              />
+              <GridLine
+                title={"Your incentives rewards"}
+                value={
+                  <FlowingNumbers
+                    initialValue={vault?.incentivesData?.rewards || 0}
+                    ratePerSecond={
+                      vault?.incentivesData?.currentRewardsPerSecond || 0
+                    }
+                    decimals={6}
+                  />
+                }
               />
               <div className="flex justify-start items-center gap-5">
                 <GridLine

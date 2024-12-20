@@ -1,5 +1,8 @@
+import { incentiveResponseSchema } from "@/app/rewards/schemas/rewards-configuration"
 import { MarketParams } from "@mangrovedao/mgv"
 import { Address } from "viem"
+import { z } from "zod"
+import { pnlSchema } from "./schemas"
 
 export type VaultWhitelist = {
   manager: string
@@ -16,6 +19,7 @@ export type VaultWhitelist = {
 
 export type Vault = {
   symbol: string
+  incentivesData?: z.infer<typeof incentiveResponseSchema> | null
   apr?: number
   chainId?: number
   decimals: number
@@ -28,11 +32,7 @@ export type Vault = {
   totalQuote: bigint
   balanceBase: bigint
   balanceQuote: bigint
-  pnlData?: {
-    currentShares: number
-    pnl: number
-    realizedPnl: number
-  }
+  pnlData?: z.infer<typeof pnlSchema>
   tvl: bigint
   baseDollarPrice: number
   quoteDollarPrice: number

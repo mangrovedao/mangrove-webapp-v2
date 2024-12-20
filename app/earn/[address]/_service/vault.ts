@@ -6,12 +6,8 @@ import {
   type PublicClient,
 } from "viem"
 import { arbitrum } from "viem/chains"
-import {
-  ARBITRUM_INCENTIVE_PROGRAMS,
-  BASE_SEPOLIA_INCENTIVE_PROGRAMS,
-} from "../../(shared)/_hooks/use-vaults-incentives"
-import { calculateIncentiveAPR } from "../../(shared)/_service/incentives"
-import { abi } from "./abi"
+import { abi } from "../../(shared)/_service/abi"
+import { calculateIncentiveAPR } from "../../(shared)/_service/vault-incentives-rewards"
 
 export async function getVaultAPR(client: PublicClient, vault: Address) {
   const vaultABI = parseAbi([
@@ -83,13 +79,9 @@ export async function getVaultAPR(client: PublicClient, vault: Address) {
 
     if (fundsState > 0) apr += aaveAPR
     if (fundsState > 1) {
-      const incentives =
-        client.chain?.id === arbitrum.id
-          ? ARBITRUM_INCENTIVE_PROGRAMS
-          : BASE_SEPOLIA_INCENTIVE_PROGRAMS
       apr += 3 // estimated APR for the vault fees
       // Add MGV incentive APR if vault is active
-      apr += calculateIncentiveAPR(vault, incentives)
+      apr += calculateIncentiveAPR(incentives)
     }
 
     return apr
