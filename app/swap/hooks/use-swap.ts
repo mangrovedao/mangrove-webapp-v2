@@ -22,6 +22,7 @@ import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import {
   deduplicateTokens,
   getAllMangroveMarketTokens,
+  getMangroveTradeableTokens,
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
@@ -390,6 +391,11 @@ export function useSwap() {
     setFields((fields) => ({ ...fields, receiveValue: e.target.value }))
   }
 
+  const mangroveTradeableTokensForPayToken = React.useMemo(() => {
+    if (!payToken) return []
+    return getMangroveTradeableTokens(markets, payToken).map((t) => t.address)
+  }, [markets, payToken])
+
   return {
     payToken,
     receiveToken,
@@ -419,5 +425,6 @@ export function useSwap() {
     setShowCustomInput,
     setSlippage,
     isOdosLoading,
+    mangroveTradeableTokensForPayToken,
   }
 }

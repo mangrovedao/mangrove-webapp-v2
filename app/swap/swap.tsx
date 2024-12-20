@@ -22,8 +22,9 @@ import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
-import { isTokenInMangroveMarkets } from "@/utils/tokens"
 import { useMarkets } from "@/hooks/use-addresses"
+import { Address } from "viem"
+import { getAllTokensInMarkets } from "@/utils/tokens"
 
 export default function Swap() {
   const {
@@ -55,6 +56,7 @@ export default function Swap() {
     setShowCustomInput,
     setSlippage,
     isOdosLoading,
+    mangroveTradeableTokensForPayToken,
   } = useSwap()
 
   return (
@@ -180,7 +182,7 @@ export default function Swap() {
           tokens={allTokens}
           onSelect={onPayTokenSelected}
           onOpenChange={setPayTokenDialogOpen}
-          markets={useMarkets()}
+          mangroveTradeableTokens={getAllTokensInMarkets(useMarkets()).map((t) => t.address)}
         />
         <TokenSelectorDialog
           type="buy"
@@ -188,6 +190,7 @@ export default function Swap() {
           tokens={tradableTokens}
           onSelect={onReceiveTokenSelected}
           onOpenChange={setReceiveTokenDialogOpen}
+          mangroveTradeableTokens={mangroveTradeableTokensForPayToken}
         />
       </div>
     </>
@@ -200,14 +203,14 @@ function TokenSelectorDialog({
   open = false,
   onOpenChange,
   type,
-  markets,
+  mangroveTradeableTokens,
 }: {
   open?: boolean
   tokens: Token[]
   onSelect: (token: Token) => void
   onOpenChange: (open: boolean) => void
-  type: "buy" | "sell"
-  markets?: ReturnType<typeof useMarkets>
+  type: "buy" | "sell",
+  mangroveTradeableTokens: Address[]
 }) {
   const [search, setSearch] = React.useState("")
   
@@ -231,6 +234,13 @@ function TokenSelectorDialog({
               token.symbol.toLowerCase().includes(search.toLowerCase()) ||
               token.address.toLowerCase().includes(search.toLowerCase())
             )
+            .sort((a, b) => {
+              const aIsTradeableOnMangrove = mangroveTradeableTokens.includes(a.address)
+              const bIsTradeableOnMangrove = mangroveTradeableTokens.includes(b.address)
+              if (aIsTradeableOnMangrove && !bIsTradeableOnMangrove) return -1
+              if (!aIsTradeableOnMangrove && bIsTradeableOnMangrove) return 1
+              return a.symbol.localeCompare(b.symbol)
+            })
             .map((token) => (
               <div key={token.address}>
                 <Button
@@ -244,7 +254,7 @@ function TokenSelectorDialog({
                       customSrc={ODOS_API_IMAGE_URL(token.symbol)} 
                       useFallback={true} 
                     />
-                    {markets && isTokenInMangroveMarkets(token, markets) && (
+                    {mangroveTradeableTokens.includes(token.address) && (
                       <svg 
                         className="absolute -top-1 -right-1 w-3 h-3 text-green-400" 
                         fill="currentColor"
@@ -343,7 +353,7 @@ function TokenContainer({
               onClick={onTokenClicked}
               className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-full text-sm flex items-center space-x-1"
             >
-              <TokenIcon symbol={token.symbol} customSrc={ODOS_API_IMAGE_URL(token.symbol)} className="rounded-full" useFallback={true} />
+              <TokenIcon symbol={token.symbol} customSrc={ODOS_API_IMAGE_URL(token.symbol)} imgClasses="rounded-full" useFallback={true} />
               <span className="font-semibold text-lg text-nowrap pl-2">
                 {token.symbol}
               </span>

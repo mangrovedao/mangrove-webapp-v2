@@ -70,6 +70,27 @@ export function deduplicateTokens(tokens: Token[]) {
   )
 }
 
+export function getMangroveTradeableTokens(
+  mangroveMarkets: ReturnType<typeof useMarkets>,
+  token: Token,
+): Token[] {
+  return mangroveMarkets.reduce<Token[]>((acc, market) => {
+    if (
+      market.base.address === token.address &&
+      !acc.some((t) => t.address === market.quote.address)
+    ) {
+      acc.push(market.quote)
+    }
+    if (
+      market.quote.address === token.address &&
+      !acc.some((t) => t.address === market.base.address)
+    ) {
+      acc.push(market.base)
+    }
+    return acc
+  }, [])
+}
+
 export function getTradableTokens({
   mangroveMarkets,
   odosTokens,
@@ -81,29 +102,15 @@ export function getTradableTokens({
 }): Token[] {
   if (!token) return []
 
-  const mangroveTradableTokens = mangroveMarkets.reduce<Token[]>(
-    (acc, market) => {
-      if (
-        market.base.address === token.address &&
-        !acc.some((t) => t.address === market.quote.address)
-      ) {
-        acc.push(market.quote)
-      }
-      if (
-        market.quote.address === token.address &&
-        !acc.some((t) => t.address === market.base.address)
-      ) {
-        acc.push(market.base)
-      }
-      return acc
-    },
-    [],
+  const mangroveTradableTokens = getMangroveTradeableTokens(
+    mangroveMarkets,
+    token,
   )
   const odosTradableTokens = odosTokens.filter(
     (t) => t.address !== token.address,
   )
 
-  return [...mangroveTradableTokens, ...odosTradableTokens] // Odos accepts all tokens and displays if no route is found after searching for a quote
+  return [...mangroveTradableTokens, ...odosTradableTokens]
 }
 
 export function getMarketFromTokens(
@@ -119,13 +126,14 @@ export function getMarketFromTokens(
   )
 }
 
-export function isTokenInMangroveMarkets(
-  token: Token,
-  markets: ReturnType<typeof useMarkets>,
-): boolean {
-  return markets.some(
-    (market) =>
-      market.base.address === token.address ||
-      market.quote.address === token.address,
-  )
+export function getAllTokensInMarkets(markets: ReturnType<typeof useMarkets>) {
+  return markets.reduce<Token[]>((acc, market) => {
+    if (!acc.some((t) => t.address === market.base.address)) {
+      acc.push(market.base)
+    }
+    if (!acc.some((t) => t.address === market.quote.address)) {
+      acc.push(market.quote)
+    }
+    return acc
+  }, [])
 }
