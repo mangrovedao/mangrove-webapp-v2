@@ -6,21 +6,35 @@ export function TokenIcon({
   symbol,
   className,
   imgClasses,
+  customSrc,
+  useFallback
 }: {
   symbol?: string
   className?: string
   imgClasses?: string
+  customSrc?: string
+  useFallback?: boolean
 }) {
   if (!symbol) return null
 
   const { color, name } = getTokenInfos(symbol)
   const src = getSvgUrl(symbol)
+
   return (
     <span
       className={cn("w-6 max-h-6 rounded-full", className)}
       style={{ backgroundColor: color }}
     >
-      <img src={src} alt={`${name} token icon`} className={imgClasses} />
+      <img
+        src={customSrc || src}
+        alt={`${name} token icon`}
+        className={imgClasses}
+        onError={(e) => {
+          if (useFallback) {
+            e.currentTarget.src = src
+          }
+        }}
+      />
     </span>
   )
 }

@@ -21,6 +21,10 @@ import Rive from "@rive-app/react-canvas-lite"
 import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
+import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
+import { useMarkets } from "@/hooks/use-addresses"
+import { Address } from "viem"
+import { getAllTokensInMarkets } from "@/utils/tokens"
 
 export default function Swap() {
   const {
@@ -51,6 +55,8 @@ export default function Swap() {
     showCustomInput,
     setShowCustomInput,
     setSlippage,
+    isOdosLoading,
+    mangroveTradeableTokensForPayToken,
   } = useSwap()
 
   return (
@@ -80,6 +86,7 @@ export default function Swap() {
               <SwapArrowIcon className="size-6" />
             </Button>
             <TokenContainer
+              loadingValue={isOdosLoading}
               type="receive"
               token={receiveToken}
               value={fields.receiveValue}
@@ -175,6 +182,7 @@ export default function Swap() {
           tokens={allTokens}
           onSelect={onPayTokenSelected}
           onOpenChange={setPayTokenDialogOpen}
+          mangroveTradeableTokens={getAllTokensInMarkets(useMarkets()).map((t) => t.address)}
         />
         <TokenSelectorDialog
           type="buy"
@@ -182,6 +190,7 @@ export default function Swap() {
           tokens={tradableTokens}
           onSelect={onReceiveTokenSelected}
           onOpenChange={setReceiveTokenDialogOpen}
+          mangroveTradeableTokens={mangroveTradeableTokensForPayToken}
         />
       </div>
     </>
@@ -194,31 +203,71 @@ function TokenSelectorDialog({
   open = false,
   onOpenChange,
   type,
+  mangroveTradeableTokens,
 }: {
   open?: boolean
   tokens: Token[]
   onSelect: (token: Token) => void
   onOpenChange: (open: boolean) => void
-  type: "buy" | "sell"
+  type: "buy" | "sell",
+  mangroveTradeableTokens: Address[]
 }) {
+  const [search, setSearch] = React.useState("")
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Select a token to {type}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col space-y-2 justify-center p-3">
-          {tokens.map((token) => (
-            <div key={token.address}>
-              <Button
-                onClick={() => onSelect(token)}
-                className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
-              >
-                <TokenIcon symbol={token.symbol} />
-                <span className="font-semibold text-lg">{token.symbol}</span>
-              </Button>
-            </div>
-          ))}
+        <Input
+          placeholder="Search"
+          className="m-3 w-[90%] mr-5 h-10"
+          type="text"
+          value={search}
+          // @ts-ignore
+          onInput={(e) => setSearch(e.target.value)}
+        />
+        <div className="flex flex-col space-y-2 justify-start p-3 pt-0 overflow-y-auto max-h-[400px]">
+          {tokens
+            .filter((token) =>
+              token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+              token.address.toLowerCase().includes(search.toLowerCase())
+            )
+            .sort((a, b) => {
+              const aIsTradeableOnMangrove = mangroveTradeableTokens.includes(a.address)
+              const bIsTradeableOnMangrove = mangroveTradeableTokens.includes(b.address)
+              if (aIsTradeableOnMangrove && !bIsTradeableOnMangrove) return -1
+              if (!aIsTradeableOnMangrove && bIsTradeableOnMangrove) return 1
+              return a.symbol.localeCompare(b.symbol)
+            })
+            .map((token) => (
+              <div key={token.address}>
+                <Button
+                  onClick={() => onSelect(token)}
+                  className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-1"
+                >
+                  <div className="relative">
+                    <TokenIcon 
+                      symbol={token.symbol} 
+                      imgClasses="rounded-full w-7" 
+                      customSrc={ODOS_API_IMAGE_URL(token.symbol)} 
+                      useFallback={true} 
+                    />
+                    {mangroveTradeableTokens.includes(token.address) && (
+                      <svg 
+                        className="absolute -top-1 -right-1 w-3 h-3 text-green-400" 
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="font-semibold text-lg">{token.symbol}</span>
+                </Button>
+              </div>
+            ))}
         </div>
       </DialogContent>
     </Dialog>
@@ -234,6 +283,7 @@ type TokenContainerProps = {
   onMaxClicked?: () => void
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   isFetchingDollarValue?: boolean
+  loadingValue?: boolean
 }
 
 function TokenContainer({
@@ -245,6 +295,7 @@ function TokenContainer({
   onChange,
   dollarValue,
   isFetchingDollarValue,
+  loadingValue,
 }: TokenContainerProps) {
   const { isConnected } = useAccount()
   const tokenBalance = useTokenBalance(token)
@@ -285,20 +336,24 @@ function TokenContainer({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <Input
-          aria-label="You pay"
-          className="border-none outline-none p-0 text-3xl"
-          placeholder="0"
-          value={value}
-          onChange={onChange}
-        />
+        {loadingValue ? (
+          <Skeleton className="bg-muted-foreground w-full h-10 my-2" />
+        ) : (
+          <Input
+            aria-label="You pay"
+            className="border-none outline-none p-0 text-3xl"
+            placeholder="0"
+            value={value}
+            onChange={onChange}
+          />
+        )}
         <span>
           {token ? (
             <Button
               onClick={onTokenClicked}
               className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-full text-sm flex items-center space-x-1"
             >
-              <TokenIcon symbol={token.symbol} />
+              <TokenIcon symbol={token.symbol} customSrc={ODOS_API_IMAGE_URL(token.symbol)} imgClasses="rounded-full" useFallback={true} />
               <span className="font-semibold text-lg text-nowrap pl-2">
                 {token.symbol}
               </span>
