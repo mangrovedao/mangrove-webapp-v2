@@ -39,7 +39,7 @@ export function useMyVaults<T = Vault[]>({
         return []
       }
     },
-    enabled: !!publicClient?.key && !!user && !!chainId && !!plainVaults.length,
+    enabled: !!publicClient?.key && !!user && !!plainVaults.length,
     gcTime: 0,
     // initialData: [],
   })

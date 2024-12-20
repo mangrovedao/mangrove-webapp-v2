@@ -28,7 +28,11 @@ export type Vault = {
   totalQuote: bigint
   balanceBase: bigint
   balanceQuote: bigint
-  pnl: number
+  pnlData?: {
+    currentShares: number
+    pnl: number
+    realizedPnl: number
+  }
   tvl: bigint
   baseDollarPrice: number
   quoteDollarPrice: number
