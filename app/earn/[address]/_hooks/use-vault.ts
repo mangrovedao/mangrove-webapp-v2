@@ -20,9 +20,8 @@ export function useVault(id?: string | null) {
         const vault = vaultsWhitelist?.find(
           (v) => v.address.toLowerCase() == id?.toLowerCase(),
         )
-        console.log(vault)
-        if (!vault) return { vault: undefined }
 
+        if (!vault) return { vault: undefined }
         const [vaultInfo] = await Promise.all([
           getVaultsInformation(publicClient, [vault], user).then((v) => v[0]),
         ])
