@@ -20,7 +20,7 @@ export function useVaults<T = Vault[]>({
   const publicClient = usePublicClient()
   const { address: user } = useAccount()
   const { data, ...rest } = useQuery({
-    queryKey: ["vaults", publicClient, user, chainId, first, skip],
+    queryKey: ["old-vaults", publicClient, user, chainId, first, skip],
     queryFn: async (): Promise<Vault[]> => {
       try {
         if (!publicClient) throw new Error("Public client is not enabled")

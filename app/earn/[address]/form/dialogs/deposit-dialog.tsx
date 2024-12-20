@@ -155,9 +155,6 @@ export default function DepositToVaultDialog({
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })
-      queryClient.refetchQueries({
-        queryKey: ["user-vaults"],
-      })
       onClose()
       setStarted(false)
       resetStep()

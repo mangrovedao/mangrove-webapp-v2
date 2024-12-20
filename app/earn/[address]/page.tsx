@@ -7,7 +7,11 @@ import {
   SquareArrowOutUpRight,
   Twitter,
 } from "lucide-react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
+import React, { ReactNode } from "react"
+import { formatUnits } from "viem"
+import { useAccount } from "wagmi"
 
 import {
   CustomRadioGroup,
@@ -24,21 +28,13 @@ import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/utils"
+import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
-import Link from "next/link"
-import React, { ReactNode } from "react"
-import { formatUnits } from "viem"
-import { useAccount } from "wagmi"
 import { Line, LineRewards, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/deposit-form"
 import { WithdrawForm } from "./form/withdraw-form"
-
-enum Tabs {
-  Details = "Details",
-  Positions = "Positions",
-}
 
 enum Action {
   Deposit = "Deposit",
@@ -141,20 +137,17 @@ export default function Page() {
           <div className="mx-1 flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
             <GridLineHeader
               title={"TVL"}
-              value={
-                vault?.tvl
-                  ? (
-                      Number(
-                        formatUnits(
-                          vault?.tvl || 0n,
-                          vault?.market.quote.decimals || 18,
-                        ),
-                      ) * (vault?.quoteDollarPrice ?? 1)
-                    ).toFixed(vault?.market.quote.displayDecimals || 3)
-                  : "0"
-              }
+              value={formatNumber(
+                Number(
+                  formatUnits(
+                    vault?.tvl || 0n,
+                    vault?.market.quote.decimals || 18,
+                  ),
+                ) * (vault?.quoteDollarPrice ?? 1),
+              )}
               symbol={` $`}
             />
+
             <GridLineHeader
               title={"APY"}
               value={vault?.apr ? vault?.apr.toFixed(2) : "0"}
