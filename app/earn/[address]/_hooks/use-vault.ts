@@ -16,7 +16,7 @@ export function useVault(address?: string | null) {
       try {
         if (!publicClient) throw new Error("Public client is not enabled")
         if (address && !isAddress(address))
-          throw new Error("Invalid vaultaddress")
+          throw new Error("Invalid vault address")
 
         const vault = vaultsWhitelist?.find(
           (v) => v.address.toLowerCase() == address?.toLowerCase(),
@@ -50,7 +50,7 @@ export function useVault(address?: string | null) {
         return { vault: undefined }
       }
     },
-    enabled: !!publicClient && !!chainId && !!vaultsWhitelist.length,
+    enabled: !!publicClient && !!vaultsWhitelist.length,
     initialData: { vault: undefined },
   })
 }
