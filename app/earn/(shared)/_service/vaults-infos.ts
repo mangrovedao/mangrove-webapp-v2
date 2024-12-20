@@ -57,7 +57,6 @@ export async function getVaultsInformation(
   vaults: VaultWhitelist[],
   user?: Address,
 ): Promise<(Vault & VaultWhitelist)[]> {
-  console.log(vaults, client.chain?.id)
   const result = await client.multicall({
     contracts: vaults.flatMap(
       (v) =>
