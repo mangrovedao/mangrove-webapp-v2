@@ -178,13 +178,13 @@ export async function getVaultsInformation(
         pnl: 0,
         realizedPnl: 0,
       }
-      if (user) {
-        const res = await fetch(
-          `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${v.address}/${user}`,
-        )
-        const data = await res.json()
-        pnlData = pnlSchema.parse(data)
-      }
+      // if (user) {
+      //   const res = await fetch(
+      //     `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${v.address}/${user}`,
+      //   )
+      //   const data = await res.json()
+      //   pnlData = pnlSchema.parse(data)
+      // }
 
       // feeData()
       const performanceFee = feeData[0]
