@@ -169,7 +169,7 @@ export async function getVaultAPR(
       totalAPR += aaveAPR
     }
 
-const incentivesApr = calculateIncentiveAPR(incentives)
+    const incentivesApr = calculateIncentiveAPR(incentives)
 
     // Add trading APR if vault is actively trading
     if (fundsState > 1) {
