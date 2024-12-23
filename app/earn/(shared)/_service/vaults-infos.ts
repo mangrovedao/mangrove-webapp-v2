@@ -148,7 +148,7 @@ export async function getVaultsInformation(
       // Apply fee adjustments
       balanceBase -= (balanceBase * BigInt(feeData[1])) / 10_000n
       balanceQuote -= (balanceQuote * BigInt(feeData[1])) / 10_000n
-      console.log(incentivesData)
+
       return {
         ...v,
         symbol,
