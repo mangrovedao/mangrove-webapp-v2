@@ -63,9 +63,9 @@ export const FlowingNumbers = ({
 
   return (
     <div ref={displayRef} className={className}>
-      {currentValueRef.current > 0
-        ? currentValueRef.current.toFixed(decimals)
-        : "0.00"}
+      {currentValueRef.current.toFixed(
+        currentValueRef.current > 0 ? decimals : 2,
+      )}{" "}
     </div>
   )
 }

@@ -12,12 +12,11 @@ import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
  */
 export async function getVaultIncentives(
   client: PublicClient,
-  vault: Address,
   user?: Address,
   incentives?: VaultLPProgram,
 ): Promise<z.infer<typeof incentiveResponseSchema> | null> {
   try {
-    if (!user) return null
+    if (!user || !incentives) return null
 
     const userIncentives = await fetch(
       `https://${client.chain?.id}-mgv-data.mgvinfra.com/incentives/vaults/${client.chain?.id}/${incentives?.vault}/${user}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}`,

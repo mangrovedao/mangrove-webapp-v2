@@ -114,7 +114,7 @@ export async function getVaultsInformation(
         fetchTokenPrices(client, market),
         fetchPnLData(client, v.address, user),
         getVaultAPR(client, v.address as Address, incentives),
-        getVaultIncentives(client, v.address as Address, user, incentives),
+        getVaultIncentives(client, user, incentives),
       ])
 
       // Calculate fees and shares
@@ -148,11 +148,12 @@ export async function getVaultsInformation(
       // Apply fee adjustments
       balanceBase -= (balanceBase * BigInt(feeData[1])) / 10_000n
       balanceQuote -= (balanceQuote * BigInt(feeData[1])) / 10_000n
-
+      console.log(incentivesData)
       return {
         ...v,
         symbol,
-        apr,
+        apr: apr.totalAPR,
+        incentivesApr: apr.incentivesApr,
         pnlData,
         decimals,
         mintedAmount: balanceOf,

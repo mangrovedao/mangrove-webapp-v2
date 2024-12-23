@@ -150,7 +150,7 @@ export async function getVaultAPR(
   client: PublicClient,
   vault: Address,
   incentives?: VaultLPProgram,
-): Promise<number> {
+): Promise<{ totalAPR: number; incentivesApr: number }> {
   try {
     const { base, quote, baseAmount, quoteAmount, fundsState } =
       await getVaultData(client, vault)
@@ -169,16 +169,18 @@ export async function getVaultAPR(
       totalAPR += aaveAPR
     }
 
+const incentivesApr = calculateIncentiveAPR(incentives)
+
     // Add trading APR if vault is actively trading
     if (fundsState > 1) {
       // Add estimated vault fees APR
       totalAPR += 3
-      totalAPR += calculateIncentiveAPR(incentives)
+      totalAPR += incentivesApr
     }
 
-    return totalAPR
+    return { totalAPR, incentivesApr }
   } catch (error) {
     console.error("Failed to calculate vault APR:", error)
-    return 0
+    return { totalAPR: 0, incentivesApr: 0 }
   }
 }

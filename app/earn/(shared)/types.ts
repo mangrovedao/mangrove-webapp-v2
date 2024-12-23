@@ -20,7 +20,8 @@ export type VaultWhitelist = {
 export type Vault = {
   symbol: string
   incentivesData?: z.infer<typeof incentiveResponseSchema> | null
-  apr?: number
+  incentivesApr: number
+  apr: number
   chainId?: number
   decimals: number
   mintedAmount: bigint

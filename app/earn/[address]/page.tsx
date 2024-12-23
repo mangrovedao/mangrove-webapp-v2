@@ -150,7 +150,7 @@ export default function Page() {
             />
 
             <GridLineHeader
-              title={"APY"}
+              title={"APR"}
               value={vault?.apr ? vault?.apr.toFixed(2) : "0"}
               symbol={"%"}
             />
@@ -328,13 +328,18 @@ export default function Page() {
               <GridLine
                 title={"Your incentives rewards"}
                 value={
-                  <FlowingNumbers
-                    initialValue={vault?.incentivesData?.rewards || 0}
-                    ratePerSecond={
-                      vault?.incentivesData?.currentRewardsPerSecond || 0
-                    }
-                    decimals={6}
-                  />
+                  <div className="flex items-center gap-1">
+                    <Text className="font-axiforma text-text-secondary">
+                      MGV
+                    </Text>
+                    <FlowingNumbers
+                      initialValue={vault?.incentivesData?.rewards || 0}
+                      ratePerSecond={
+                        vault?.incentivesData?.currentRewardsPerSecond || 0
+                      }
+                      decimals={6}
+                    />
+                  </div>
                 }
               />
               <div className="flex justify-start items-center gap-5">

@@ -50,7 +50,7 @@ export default function Page() {
   })
 
   const { data: incentivesRewards } = useIncentivesRewards()
-  console.log({ incentivesRewards })
+
   const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
 
   const totalRewards =
