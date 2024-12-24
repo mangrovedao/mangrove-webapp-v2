@@ -10,6 +10,13 @@ export const rewardsSchema = z.object({
   vaultRewards: z.number().or(z.string()),
 })
 
+export const incentiveResponseSchema = z.object({
+  vault: z.string(),
+  rewards: z.number(),
+  currentRewardsPerSecond: z.number(),
+  timestamp: z.number(),
+})
+
 export const configurationSchema = z.object({
   precision: z.object({
     points: z.string(),

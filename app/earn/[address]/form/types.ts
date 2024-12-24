@@ -1,5 +1,5 @@
-import type { MarketParams } from "@mangrovedao/mgv"
-import type { Address } from "viem"
+import { MarketParams } from "@mangrovedao/mgv"
+import { Address } from "viem"
 
 export type VaultInfos = {
   address: Address

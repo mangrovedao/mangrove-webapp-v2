@@ -19,12 +19,6 @@ export const useRewards = ({ epochId = "1" }: UseRewardsProps) => {
         if (!address) return null
         const response = await fetch(
           `https://points.mgvinfra.com/${defaultChainId}/${address ?? zeroAddress}/rewards?epoch=${epochId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
         )
 
         if (!response.ok) {

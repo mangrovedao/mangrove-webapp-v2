@@ -25,12 +25,11 @@ const DEFAULT_DATA: Vault[] = []
 
 type Params = {
   data?: Vault[]
-  whitelist?: VaultWhitelist[] // local informations
   pageSize: number
   onDeposit: (vault: Vault) => void
 }
 
-export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
+export function useTable({ pageSize, data, onDeposit }: Params) {
   const { chain } = useAccount()
 
   const columns = React.useMemo(
@@ -100,8 +99,8 @@ export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
       }),
 
       columnHelper.display({
-        id: "APY",
-        header: () => <div className="text-right">APY</div>,
+        id: "APR",
+        header: () => <div className="text-right">APR</div>,
         cell: ({ row }) => {
           const apr =
             "apr" in row.original
@@ -110,9 +109,32 @@ export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
                 : "-"
               : "-"
 
+          const incentivesApr =
+            "incentivesApr" in row.original
+              ? row.original.incentivesApr
+                ? `${row.original.incentivesApr.toFixed(2)}%`
+                : "-"
+              : "-"
+
           return (
-            <div className="w-full h-full flex justify-end">
+            <div className="w-full h-full flex justify-end group relative">
               <Value value={apr} />
+              <div className="absolute -top-8 left-20 border border-border-secondary bg-bg-secondary backdrop-blur-sm rounded-lg p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 mb-2">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-text-secondary">
+                      Incentives rate
+                    </span>
+                    <span className="text-sm text-text-primary">
+                      {incentivesApr}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-text-secondary">Net APR</span>
+                    <span className="text-sm text-text-primary">{apr}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           )
         },
@@ -183,7 +205,7 @@ export function useTable({ pageSize, data, whitelist, onDeposit }: Params) {
   )
 
   return useReactTable({
-    data: data ?? whitelist ?? DEFAULT_DATA,
+    data: data ?? DEFAULT_DATA,
     columns,
     initialState: {
       pagination: {
