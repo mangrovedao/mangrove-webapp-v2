@@ -8,7 +8,7 @@ import {
   getDefaultConfig,
 } from "@rainbow-me/rainbowkit"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { arbitrum, baseSepolia, blast } from "viem/chains"
+import { arbitrum, base, baseSepolia, blast } from "viem/chains"
 import { WagmiProvider, http } from "wagmi"
 
 import { env } from "@/env.mjs"
@@ -27,6 +27,7 @@ export const config = getDefaultConfig({
     [baseSepolia.id]: http(),
     [blast.id]: http(),
     [arbitrum.id]: http(),
+    [base.id]: http(),
   },
 })
 
