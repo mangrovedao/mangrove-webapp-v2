@@ -30,15 +30,27 @@ export function getSvgUrl(symbol: string) {
 export function getTokenByAddress(
   address: string,
   markets: ReturnType<typeof useMarkets>,
+  odosTokens: Token[],
 ): Token | undefined {
   const token =
     markets.find((m) => m.base.address === address)?.base ??
-    markets.find((m) => m.quote.address === address)?.quote
+    markets.find((m) => m.quote.address === address)?.quote ??
+    odosTokens.find((t) => t.address === address)
+
   return token
 }
 
-export function getAllTokens(markets: ReturnType<typeof useMarkets>): Token[] {
-  return markets.reduce<Token[]>((acc, market) => {
+export function getTokenByAddressOdos(
+  address: string,
+  odosTokens: Token[],
+): Token | undefined {
+  return odosTokens.find((t) => t.address === address)
+}
+
+export function getAllMangroveMarketTokens(
+  mangroveMarkets: ReturnType<typeof useMarkets>,
+): Token[] {
+  const mangroveTokens = mangroveMarkets.reduce<Token[]>((acc, market) => {
     if (!acc.some((t) => t.address === market.base.address)) {
       acc.push(market.base)
     }
@@ -47,17 +59,22 @@ export function getAllTokens(markets: ReturnType<typeof useMarkets>): Token[] {
     }
     return acc
   }, [])
+
+  return mangroveTokens
 }
 
-export function getTradableTokens({
-  markets,
-  token,
-}: {
-  markets: ReturnType<typeof useMarkets>
-  token?: Token
-}): Token[] {
-  if (!token) return []
-  return markets.reduce<Token[]>((acc, market) => {
+export function deduplicateTokens(tokens: Token[]) {
+  return tokens.filter(
+    (token, index, self) =>
+      index === self.findIndex((t) => t.address === token.address),
+  )
+}
+
+export function getMangroveTradeableTokens(
+  mangroveMarkets: ReturnType<typeof useMarkets>,
+  token: Token,
+): Token[] {
+  return mangroveMarkets.reduce<Token[]>((acc, market) => {
     if (
       market.base.address === token.address &&
       !acc.some((t) => t.address === market.quote.address)
@@ -74,6 +91,28 @@ export function getTradableTokens({
   }, [])
 }
 
+export function getTradableTokens({
+  mangroveMarkets,
+  odosTokens,
+  token,
+}: {
+  mangroveMarkets: ReturnType<typeof useMarkets>
+  odosTokens: Token[]
+  token?: Token
+}): Token[] {
+  if (!token) return []
+
+  const mangroveTradableTokens = getMangroveTradeableTokens(
+    mangroveMarkets,
+    token,
+  )
+  const odosTradableTokens = odosTokens.filter(
+    (t) => t.address !== token.address,
+  )
+
+  return [...mangroveTradableTokens, ...odosTradableTokens]
+}
+
 export function getMarketFromTokens(
   markets: ReturnType<typeof useMarkets>,
   base: Token | undefined,
@@ -85,4 +124,16 @@ export function getMarketFromTokens(
       (m.base.address === base.address && m.quote.address === quote.address) ||
       (m.base.address === quote.address && m.quote.address === base.address),
   )
+}
+
+export function getAllTokensInMarkets(markets: ReturnType<typeof useMarkets>) {
+  return markets.reduce<Token[]>((acc, market) => {
+    if (!acc.some((t) => t.address === market.base.address)) {
+      acc.push(market.base)
+    }
+    if (!acc.some((t) => t.address === market.quote.address)) {
+      acc.push(market.quote)
+    }
+    return acc
+  }, [])
 }
