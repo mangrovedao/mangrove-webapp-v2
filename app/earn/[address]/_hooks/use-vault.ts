@@ -1,5 +1,6 @@
+import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
-import { BaseError, ContractFunctionExecutionError, isAddress } from "viem"
+import { isAddress } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
 import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
 import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"
@@ -49,22 +50,7 @@ export function useVault(address?: string | null) {
           vault: vaultInfo,
         }
       } catch (error) {
-        console.error(error)
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
-          )
-
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-            )
-          }
-        }
+        printEvmError(error)
         return { vault: undefined }
       }
     },

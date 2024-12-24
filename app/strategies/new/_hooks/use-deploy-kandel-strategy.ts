@@ -5,8 +5,8 @@ import { useAccount, useClient, usePublicClient, useWalletClient } from "wagmi"
 
 import { useAaveKandelSeeder, useKandelSeeder } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market"
+import { printEvmError } from "@/utils/errors"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { BaseError, TransactionExecutionError } from "viem"
 type Props = {
   liquiditySourcing?: string
 }
@@ -53,25 +53,9 @@ export function useCreateKandelStrategy({ liquiditySourcing }: Props) {
         toast.success("Kandel strategy instance successfully created")
         return { kandelAddress: result, receipt }
       } catch (error) {
+        printEvmError(error)
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof TransactionExecutionError,
-          )
-
-          if (revertError instanceof TransactionExecutionError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              // revertError.functionName,
-              // revertError.formattedArgs,
-              revertError.details,
-            )
-          }
-        }
-
-        console.error(error)
         throw new Error(description)
       }
 
