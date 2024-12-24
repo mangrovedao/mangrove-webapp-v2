@@ -308,7 +308,7 @@ function TokenContainer({
   const { isConnected } = useAccount()
   const tokenBalance = useTokenBalance(token)
   const dollars = (Number(value) * (dollarValue ?? 0)).toString()
-  console.log(dollars)
+
   return (
     <div
       className={cn(
