@@ -19,6 +19,7 @@ import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/u
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
+import { getErrorMessage } from "@/utils/errors"
 import {
   deduplicateTokens,
   getAllMangroveMarketTokens,
@@ -27,8 +28,15 @@ import {
   getTradableTokens,
 } from "@/utils/tokens"
 import { MarketParams } from "@mangrovedao/mgv"
+import { z } from "zod"
 
 export const SLIPPAGES = ["0.1", "0.5", "1"]
+const priceSchema = z.object({
+  price: z.number(),
+  id: z.string(),
+  symbol: z.string(),
+  name: z.string(),
+})
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
@@ -255,16 +263,29 @@ export function useSwap() {
   const getMarketPriceQuery = useQuery({
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
     queryFn: async () => {
-      if (!chainId || !payTknAddress || !receiveTknAddress) return null
+      try {
+        if (!chainId || !payTknAddress || !receiveTknAddress) return null
 
-      const payDollar = await fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${payTknAddress}`,
-      ).then((res) => res.json())
-      const receiveDollar = await fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${receiveTknAddress}`,
-      ).then((res) => res.json())
+        const payDollar = await fetch(
+          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${payTknAddress}`,
+        )
+          .then((res) => res.json())
+          .then((data) => priceSchema.parse(data))
 
-      return { payDollar: payDollar.price, receiveDollar: receiveDollar.price }
+        const receiveDollar = await fetch(
+          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${receiveTknAddress}`,
+        )
+          .then((res) => res.json())
+          .then((data) => priceSchema.parse(data))
+
+        return {
+          payDollar: payDollar.price,
+          receiveDollar: receiveDollar.price,
+        }
+      } catch (error) {
+        console.error(getErrorMessage(error))
+        return { payDollar: -1, receiveDollar: -1 }
+      }
     },
     refetchInterval: 3_000,
     enabled: !!markets && !!payToken && !!receiveToken,

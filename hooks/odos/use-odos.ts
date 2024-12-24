@@ -7,10 +7,43 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Address, erc20Abi } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { z } from "zod"
 import { ODOS_API_ROUTES, ODOS_API_URL } from "./constants"
 import { OdosAssembledTransaction, OdosQuoteParams } from "./types"
 
 const DEFAULT_ODOS_CHAIN_ID = 42161
+
+const TokenMapSchema = z.record(
+  z.object({
+    name: z.string(),
+    symbol: z.string(),
+    decimals: z.number(),
+    assetId: z.string(),
+    assetType: z.string(),
+    protocolId: z.string().nullable(),
+    isRebasing: z.boolean(),
+  }),
+)
+
+const odosQuoteSchema = z.object({
+  inTokens: z.array(z.string()),
+  outTokens: z.array(z.string()),
+  inAmounts: z.array(z.string()),
+  outAmounts: z.array(z.string()),
+  gasEstimate: z.number(),
+  dataGasEstimate: z.number(),
+  gweiPerGas: z.number(),
+  gasEstimateValue: z.number(),
+  inValues: z.array(z.number()),
+  outValues: z.array(z.number()),
+  netOutValue: z.number(),
+  priceImpact: z.number(),
+  percentDiff: z.number(),
+  partnerFeePercent: z.number(),
+  pathId: z.string(),
+  pathViz: z.null(),
+  blockNumber: z.number(),
+})
 
 export function useOdos() {
   const { chainId: chainIdConnected } = useAccount()
@@ -40,22 +73,22 @@ export function useOdos() {
       const response = await fetch(
         ODOS_API_URL + ODOS_API_ROUTES.TOKEN_LIST(chainId),
       )
-      const data: any = await response.json()
 
-      const tokenMap = data.tokenMap
+      const data = await response.json()
+      const tokenMap = TokenMapSchema.parse(data.tokenMap)
       const addresses = Object.keys(tokenMap)
-      const tokenInfo = addresses.map((address: string) => tokenMap[address])
+      const tokenInfo = addresses.map((address) => tokenMap[address])
       return tokenInfo
-        .map((token: any, index: number) => ({
+        .map((token, index) => ({
           address: addresses[index] as `0x${string}`,
-          symbol: token.symbol,
-          decimals: token.decimals,
+          symbol: token?.symbol ?? "",
+          decimals: token?.decimals ?? 18,
           displayDecimals: 4,
           priceDisplayDecimals: 2,
           mgvTestToken: false,
         }))
         .filter(
-          (token: any) =>
+          (token) =>
             token.address !== "0x0000000000000000000000000000000000000000",
         )
     },
@@ -68,7 +101,12 @@ export function useOdos() {
       const response = await fetch(
         ODOS_API_URL + ODOS_API_ROUTES.ROUTER_CONTRACT(chainId),
       )
-      const data: any = await response.json()
+      const data = z
+        .object({
+          address: z.string(),
+        })
+        .parse(await response.json())
+
       return data.address as Address
     },
     enabled: !!chainId,
@@ -92,18 +130,19 @@ export function useOdos() {
         },
         body: JSON.stringify({ ...params, chainId }),
       })
-      const odosQuote: any = await response.json()
+
+      const odosQuote = odosQuoteSchema.parse(await response.json())
 
       const quote: MarketOrderSimulationResult = {
-        baseAmount: BigInt(odosQuote.inAmounts[0]),
-        quoteAmount: BigInt(odosQuote.outAmounts[0]),
-        gas: BigInt(odosQuote.gasEstimate),
+        baseAmount: BigInt(odosQuote?.inAmounts[0] ?? "0"),
+        quoteAmount: BigInt(odosQuote?.outAmounts[0] ?? "0"),
+        gas: BigInt(odosQuote?.gasEstimate ?? 0),
         feePaid: BigInt(0),
         maxTickEncountered: BigInt(0),
-        minSlippage: odosQuote.priceImpact * -1,
+        minSlippage: odosQuote?.priceImpact ?? 0,
         fillWants: true,
-        rawPrice: Number(odosQuote.netOutValue),
-        fillVolume: BigInt(odosQuote.outAmounts[0]),
+        rawPrice: odosQuote.netOutValue,
+        fillVolume: BigInt(odosQuote.outAmounts[0] ?? "0"),
       }
 
       setLastQuote(quote)
@@ -129,8 +168,9 @@ export function useOdos() {
           userAddr,
         }),
       })
-      const data: any = await response.json()
 
+      // TODO: fix the type of the data
+      const data: any = await response.json()
       return data.transaction as OdosAssembledTransaction
     }
 
@@ -197,7 +237,6 @@ export function useOdos() {
     })
 
     if (allowance === undefined) throw new Error("Could not get allowance")
-    console.log({ allowance, amount })
     return allowance < amount
   }
 
