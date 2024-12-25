@@ -29,6 +29,8 @@ export const TVChartContainer = (
 
   React.useEffect(() => {
     if (!currentMarket) return
+    // '1h', '1d', '1w', '1m', '1y'
+    // '1h', '1d', '1w', '1m', '1y'
 
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
@@ -39,14 +41,12 @@ export const TVChartContainer = (
         quoteAddress: currentMarket?.quote.address,
         chainId: chainId ?? arbitrum.id,
       }) as unknown as IBasicDataFeed,
-      // timeframe: "1M",
-      interval: "60" as ResolutionString,
-      // timeframe: "1M",
-      // interval: "1" as ResolutionString,
+      timeframe: "12M",
+      interval: "1W" as ResolutionString,
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
-      debug: true,
+      debug: false,
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [

@@ -63,8 +63,13 @@ export default function datafeed({
         supports_marks: true,
         supports_timescale_marks: true,
         supports_time: false,
-        supported_resolutions: ["60"] as ResolutionString[],
-        // supported_resolutions: ["1D", "1W"] as ResolutionString[],
+        supported_resolutions: [
+          "60",
+          "1D",
+          "1W",
+          "1M",
+          "12M",
+        ] as ResolutionString[],
       })
     },
     searchSymbols: (
@@ -94,8 +99,13 @@ export default function datafeed({
         has_intraday: true,
         visible_plots_set: "ohlcv",
         has_weekly_and_monthly: true,
-        supported_resolutions: ["60"] as ResolutionString[],
-        // supported_resolutions: ["1D", "1W"] as ResolutionString[],
+        supported_resolutions: [
+          "60",
+          "1D",
+          "1W",
+          "1M",
+          "12M",
+        ] as ResolutionString[],
         volume_precision: 2,
         data_status: "streaming",
         listed_exchange: "",
@@ -112,20 +122,23 @@ export default function datafeed({
       setTimeout(async () => {
         try {
           const currentChainId = chainId ?? arbitrum.id
+
+          const newRes =
+            resolution === "60"
+              ? "1h"
+              : resolution === "12M"
+                ? "1y"
+                : resolution.toLowerCase()
+
           const result = await fetch(
-            `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/1h`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
+            `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/${newRes}?count=${periodParams.countBack}&to=${periodParams.to}`,
           ).then(async (res) => candlesSchema.safeParse(await res.json()))
 
           if (!result.success) {
             throw new Error("Invalid candles data")
           }
 
-          const bars = (result.data.candles ?? []).map((bar: Bar, i) => ({
+          const bars = (result.data.candles ?? []).map((bar: Bar) => ({
             time: bar.startTimestamp * 1000,
             open: bar.open,
             high: bar.high,
@@ -134,29 +147,27 @@ export default function datafeed({
             volume: bar.volume,
           }))
 
-          const returnBars =
-            bars.length < periodParams.countBack
-              ? [
-                  ...bars,
-                  ...Array(periodParams.countBack - bars.length).fill({
-                    time: Date.now() + 5 * 60 * 1000,
-                    open: 0,
-                    high: 0,
-                    low: 0,
-                    close: 0,
-                    // volume: 0,
-                  }),
-                ]
-              : bars
+          // console.log({
+          //   date: new Date().getTime(),
+          //   bars,
+          //   from: periodParams.from,
+          //   to: periodParams.to,
+          //   countback: periodParams.countBack,
+          //   length: bars.length,
+          //   resolution,
+          //   newRes,
+          // })
 
-          console.log({ bars, periodParams })
-
-          onResult(bars.length === 0 ? [] : returnBars, {
+          onResult(bars, {
             noData: bars.length === 0,
+            nextTime: bars.length > 0 ? undefined : periodParams.from,
           })
         } catch (error) {
           console.log(error)
-          // onError({})
+          onError({
+            code: 1,
+            message: "Error loading data",
+          } as DOMException)
         }
       }, 0)
     },
@@ -246,12 +257,7 @@ export function oldDatafeed({
           const currentChainId = chainId ?? arbitrum.id
 
           const old_res = await fetch(
-            `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${currentChainId}&interval=${"1W"}&start_time=${formattedStart}&end_time=${formattedEnd}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
+            `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${currentChainId}&interval=${resolution}&start_time=${formattedStart}&end_time=${formattedEnd}`,
           )
           let old_data = await old_res.json()
 
