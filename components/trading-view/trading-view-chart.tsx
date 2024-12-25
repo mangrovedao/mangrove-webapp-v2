@@ -29,8 +29,6 @@ export const TVChartContainer = (
 
   React.useEffect(() => {
     if (!currentMarket) return
-    // '1h', '1d', '1w', '1m', '1y'
-    // '1h', '1d', '1w', '1m', '1y'
 
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
@@ -50,21 +48,21 @@ export const TVChartContainer = (
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [
-        "use_localstorage_for_settings",
         "left_toolbar",
-        "header_chart_type",
-        "popup_hints",
-        "header_screenshot",
-        "header_compare",
-        "header_symbol_search",
-        "volume_force_overlay",
-        "create_volume_indicator_by_default",
         "timezone_menu",
+        "header_symbol_search",
+        "header_compare",
         "timeframes_toolbar",
-        "hide_main_series_symbol_from_indicator_legend",
+        "use_localstorage_for_settings",
+        // "header_chart_type",
+        // "popup_hints",
+        // "header_screenshot",
+        // "volume_force_overlay",
+        // "create_volume_indicator_by_default",
+        // "hide_main_series_symbol_from_indicator_legend",
       ],
       overrides: {
-        "paneProperties.background": "#0B1819",
+        "paneProperties.background": "#0B1719",
         "paneProperties.backgroundType": "solid",
       },
     }

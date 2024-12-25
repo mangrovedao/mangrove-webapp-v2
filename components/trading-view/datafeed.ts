@@ -1,3 +1,7 @@
+/**
+ * @fileoverview TradingView datafeed implementation for Mangrove markets
+ */
+
 import {
   HistoryCallback,
   LibrarySymbolInfo,
@@ -12,6 +16,9 @@ import {
 import { arbitrum } from "viem/chains"
 import { z } from "zod"
 
+/**
+ * Parameters required to initialize the datafeed
+ */
 type Params = {
   base: string
   quote: string
@@ -20,6 +27,9 @@ type Params = {
   chainId: number | undefined
 }
 
+/**
+ * Structure of a single OHLCV bar
+ */
 type Bar = {
   startTimestamp: number
   endTimestamp: number
@@ -32,6 +42,9 @@ type Bar = {
   volume: number
 }
 
+/**
+ * Zod schema for validating candles data from API
+ */
 const candlesSchema = z.object({
   candles: z.array(
     z.object({
@@ -48,6 +61,11 @@ const candlesSchema = z.object({
   ),
 })
 
+/**
+ * Creates a TradingView datafeed implementation for Mangrove markets
+ * @param {Params} params - Configuration parameters for the datafeed
+ * @returns {Object} TradingView compatible datafeed implementation
+ */
 export default function datafeed({
   base,
   quote,
@@ -189,6 +207,10 @@ export default function datafeed({
   }
 }
 
+/**
+ * Legacy datafeed implementation for backwards compatibility
+ * @deprecated Use the default export instead
+ */
 export function oldDatafeed({
   base,
   quote,
