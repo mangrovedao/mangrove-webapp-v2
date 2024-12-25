@@ -16,19 +16,39 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 // import { useTokenByAddress } from "../../../hooks/use-token-by-address";
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
+import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
+import { getErrorMessage } from "@/utils/errors"
 import {
-  getAllTokens,
+  deduplicateTokens,
+  getAllMangroveMarketTokens,
+  getMangroveTradeableTokens,
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
 import { MarketParams } from "@mangrovedao/mgv"
+import { z } from "zod"
 
 export const SLIPPAGES = ["0.1", "0.5", "1"]
+const priceSchema = z.object({
+  price: z.number(),
+  id: z.string(),
+  symbol: z.string(),
+  name: z.string(),
+})
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
+  const {
+    getQuote,
+    odosTokens,
+    getAssembledTransactionOfLastQuote,
+    executeOdosTransaction,
+    hasToApproveOdos,
+    odosRouterContractAddress,
+    isOdosLoading,
+  } = useOdos()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const postMarketOrder = usePostMarketOrder()
@@ -75,21 +95,32 @@ export function useSwap() {
     fields.receiveValue === "" ||
     Number.parseFloat(fields.payValue) <= 0 ||
     Number.parseFloat(fields.receiveValue) <= 0 ||
+    isOdosLoading ||
     approvePayToken.isPending ||
     postMarketOrder.isPending
 
-  const allTokens = getAllTokens(markets)
-  const tradableTokens = getTradableTokens({
-    markets,
-    token: payToken,
-  })
+  const allTokens = deduplicateTokens([
+    ...getAllMangroveMarketTokens(markets),
+    ...odosTokens,
+  ])
+  const tradableTokens = deduplicateTokens(
+    getTradableTokens({
+      mangroveMarkets: markets,
+      odosTokens,
+      token: payToken,
+    }),
+  )
 
   const [payTokenDialogOpen, setPayTokenDialogOpen] = React.useState(false)
   const [receiveTokenDialogOpen, setReceiveTokenDialogOpen] =
     React.useState(false)
 
   function onPayTokenSelected(token: Token) {
-    const newTradableTokens = getTradableTokens({ markets, token })
+    const newTradableTokens = getTradableTokens({
+      mangroveMarkets: markets,
+      odosTokens,
+      token,
+    })
     setPayTknAddress(token.address)
     setPayTokenDialogOpen(false)
     setFields(() => ({
@@ -146,70 +177,118 @@ export function useSwap() {
       receiveToken?.address,
       currentMarket?.base.address,
       currentMarket?.quote.address,
+      slippage,
       fields.payValue,
       marketClient?.uid,
       address,
     ],
     queryFn: async () => {
-      const book = getBookQuery.data
-      if (!(payToken && receiveToken && book && marketClient && address))
-        return null
-      const isBasePay = currentMarket?.base.address === payToken?.address
+      if (!(payToken && receiveToken && isConnected)) return null
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
-      const params: MarketOrderSimulationParams = isBasePay
-        ? {
-            base: payAmount,
-            bs: BS.sell,
-            book,
-          }
-        : {
-            quote: payAmount,
-            bs: BS.buy,
-            book,
-          }
 
-      const simulation = marketOrderSimulation(params)
+      // Mangrove
+      if (marketClient) {
+        const book = getBookQuery.data
+        if (!(book && address)) return null
+
+        const isBasePay = currentMarket?.base.address === payToken?.address
+        const params: MarketOrderSimulationParams = isBasePay
+          ? {
+              base: payAmount,
+              bs: BS.sell,
+              book,
+            }
+          : {
+              quote: payAmount,
+              bs: BS.buy,
+              book,
+            }
+
+        const simulation = marketOrderSimulation(params)
+        setFields((fields) => ({
+          ...fields,
+          receiveValue: formatUnits(
+            isBasePay ? simulation.quoteAmount : simulation.baseAmount,
+            receiveToken?.decimals ?? 18,
+          ),
+        }))
+
+        const [approvalStep] = await marketClient.getMarketOrderSteps({
+          bs: isBasePay ? BS.sell : BS.buy,
+          user: address,
+          sendAmount: payAmount,
+        })
+
+        return { simulation, approvalStep }
+      }
+
+      // Odos
+      if (!payAmount) return null
+
+      const simulation = await getQuote({
+        chainId,
+        inputTokens: [
+          { tokenAddress: payToken?.address, amount: payAmount.toString() },
+        ],
+        outputTokens: [{ tokenAddress: receiveToken?.address, proportion: 1 }],
+        userAddr: address,
+        slippageLimitPercent: Number(slippage),
+      })
+
+      const hasToApprove = await hasToApproveOdos({
+        address: payToken?.address,
+        amount: simulation.baseAmount,
+      })
+
       setFields((fields) => ({
         ...fields,
         receiveValue: formatUnits(
-          isBasePay ? simulation.quoteAmount : simulation.baseAmount,
+          simulation.quoteAmount,
           receiveToken?.decimals ?? 18,
         ),
       }))
 
-      const [approvalStep] = await marketClient.getMarketOrderSteps({
-        bs: isBasePay ? BS.sell : BS.buy,
-        user: address,
-        sendAmount: payAmount,
-      })
-
-      return { simulation, approvalStep }
+      return { simulation, approvalStep: { done: !hasToApprove } }
     },
+    refetchInterval: 7_000,
     enabled:
       !!payToken &&
       !!receiveToken &&
-      !!getBookQuery.data &&
-      !!marketClient?.uid &&
-      !!address,
+      !!slippage &&
+      !!fields.payValue &&
+      Number(fields.payValue) > 0 &&
+      (!!marketClient ? !!getBookQuery.data && !!address : true),
   })
 
   const getMarketPriceQuery = useQuery({
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
     queryFn: async () => {
-      if (!marketClient || !chainId || !payTknAddress || !receiveTknAddress)
-        return null
+      try {
+        if (!chainId || !payTknAddress || !receiveTknAddress) return null
 
-      const payDollar = await fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${payTknAddress}`,
-      ).then((res) => res.json())
-      const receiveDollar = await fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${receiveTknAddress}`,
-      ).then((res) => res.json())
+        const payDollar = await fetch(
+          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${payTknAddress}`,
+        )
+          .then((res) => res.json())
+          .then((data) => priceSchema.parse(data))
 
-      return { payDollar: payDollar.price, receiveDollar: receiveDollar.price }
+        const receiveDollar = await fetch(
+          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${receiveTknAddress}`,
+        )
+          .then((res) => res.json())
+          .then((data) => priceSchema.parse(data))
+
+        return {
+          payDollar: payDollar.price,
+          receiveDollar: receiveDollar.price,
+        }
+      } catch (error) {
+        console.error(getErrorMessage(error))
+        return { payDollar: -1, receiveDollar: -1 }
+      }
     },
     refetchInterval: 3_000,
-    enabled: !!marketClient && !!markets && !!payToken && !!receiveToken,
+    enabled: !!markets && !!payToken && !!receiveToken,
   })
 
   const hasToApprove = simulateQuery.data?.approvalStep?.done === false
@@ -226,11 +305,40 @@ export function useSwap() {
             ? `Approve ${payToken?.symbol}`
             : postMarketOrder.isPending
               ? "Processing transaction..."
-              : "Swap"
+              : `Swap via ${marketClient ? "Mangrove" : "Odos"}`
 
   // slippage -> valeur en % dans marketOrderSimulation -> min slippage + petit % genre x1,1
 
-  async function swap() {
+  async function swapOdos() {
+    if (!chainId || !payTknAddress || !receiveTknAddress) return
+
+    if (hasToApprove) {
+      await approvePayToken.mutate(
+        {
+          token: payToken,
+          spender: odosRouterContractAddress,
+        },
+        {
+          onSuccess: () => {
+            simulateQuery.refetch()
+          },
+        },
+      )
+      return
+    }
+    const params = await getAssembledTransactionOfLastQuote()
+
+    await executeOdosTransaction(params)
+
+    setFields(() => ({
+      payValue: "",
+      receiveValue: "",
+    }))
+    payTokenBalance.refetch()
+    receiveTokenBalance.refetch()
+  }
+
+  async function swapMangrove() {
     if (!(marketClient && address && walletClient && payToken && receiveToken))
       return
 
@@ -279,6 +387,14 @@ export function useSwap() {
     )
   }
 
+  async function swap() {
+    if (marketClient) {
+      await swapMangrove()
+    } else {
+      await swapOdos()
+    }
+  }
+
   function reverseTokens() {
     setPayTknAddress(receiveTknAddress)
     setReceiveTknAddress(payTknAddress)
@@ -295,6 +411,11 @@ export function useSwap() {
   function onReceiveValueChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFields((fields) => ({ ...fields, receiveValue: e.target.value }))
   }
+
+  const mangroveTradeableTokensForPayToken = React.useMemo(() => {
+    if (!payToken) return []
+    return getMangroveTradeableTokens(markets, payToken).map((t) => t.address)
+  }, [markets, payToken])
 
   return {
     payToken,
@@ -324,5 +445,7 @@ export function useSwap() {
     slippage,
     setShowCustomInput,
     setSlippage,
+    isOdosLoading,
+    mangroveTradeableTokensForPayToken,
   }
 }

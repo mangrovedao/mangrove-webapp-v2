@@ -5,6 +5,7 @@ import { formatUnits, parseUnits } from "viem"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
+import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { TradeMode } from "./enums"
 
 export function successToast(
@@ -36,7 +37,6 @@ export function successToast(
       : "Market order not filled (slippage limit too low)"
 
   const fillText = Number(result.takerGot) > 0 ? filledOrder : notFilledOrder
-  console.log(result.feePaid)
 
   const approximateFee = (value: bigint, decimals: number) =>
     Number(formatUnits(value, decimals)) <= 0.001 ? "~ " : ""
@@ -44,7 +44,11 @@ export function successToast(
   toast(
     <div className="grid gap-2 w-full">
       <div className="flex space-x-2 items-center">
-        <TokenIcon symbol={sendToken.symbol} />
+        <TokenIcon
+          symbol={sendToken.symbol}
+          customSrc={ODOS_API_IMAGE_URL(sendToken.symbol)}
+          useFallback={true}
+        />
         <div className="grid">
           <span>{tradeMode.toUpperCase()} Order</span>
           <span className="text-muted-foreground">{fillText}</span>

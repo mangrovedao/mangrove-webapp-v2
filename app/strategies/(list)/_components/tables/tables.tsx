@@ -7,7 +7,6 @@ import {
 import { CustomTabs } from "@/components/custom-tabs"
 import { useAccount } from "wagmi"
 import { Strategies } from "./strategies/strategies"
-import { Vaults } from "./vaults/vaults"
 
 import {
   Tooltip,
@@ -76,11 +75,7 @@ export function Tables({
           </CustomRadioGroupItem>
         ))}
       </CustomRadioGroup>
-      {strategiesType === StrategyType.PASSIVE ? (
-        <Vaults type="all" />
-      ) : (
-        <Strategies type="user" />
-      )}
+      <Strategies type="user" />
     </div>
   )
 }

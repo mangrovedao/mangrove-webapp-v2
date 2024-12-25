@@ -29,6 +29,7 @@ import {
 import { Ms1Table } from "./_components/tables/ms1/ms1-table"
 import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 import Timer from "./_components/timer"
+import { useIncentivesRewards } from "./hooks/use-incentives-rewards"
 import { useRewards } from "./hooks/use-rewards"
 import { useConfiguration } from "./hooks/use-rewards-config"
 
@@ -47,6 +48,8 @@ export default function Page() {
         ? tab
         : configuration?.epochId?.toString() || "1",
   })
+
+  const { data: incentivesRewards } = useIncentivesRewards()
 
   const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
 

@@ -3,14 +3,10 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import useMarket from "@/providers/market"
+import { printEvmError } from "@/utils/errors"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { KandelParams } from "@mangrovedao/mgv"
-import {
-  Address,
-  BaseError,
-  ContractFunctionExecutionError,
-  parseEther,
-} from "viem"
+import { Address, parseEther } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import useKandelInstance from "../../(shared)/_hooks/use-kandel-instance"
 
@@ -55,24 +51,9 @@ export function useLaunchKandelStrategy(kandelAddress?: string) {
         router.push("/strategies")
         return receipt
       } catch (error) {
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
-          )
-
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-            )
-          }
-        }
+        printEvmError(error)
         const { description } = getTitleDescriptionErrorMessages(error as Error)
         toast.error(description)
-        console.error(error)
         throw new Error(description)
       }
     },

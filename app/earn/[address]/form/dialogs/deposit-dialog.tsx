@@ -147,7 +147,6 @@ export default function DepositToVaultDialog({
     args: [vault?.address as Address, mintAmount, amount0, amount1],
   })
   useEffect(() => {
-    console.log(error)
     if (!error && isConfirmed && currentStep !== steps.length) {
       reset()
       goToNextStep()
@@ -155,9 +154,6 @@ export default function DepositToVaultDialog({
       toast.success(`Assets successfully deposited`)
       queryClient.refetchQueries({
         queryKey: ["vault"],
-      })
-      queryClient.refetchQueries({
-        queryKey: ["user-vaults"],
       })
       onClose()
       setStarted(false)
