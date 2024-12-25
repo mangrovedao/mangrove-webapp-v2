@@ -86,7 +86,7 @@ export default function datafeed({
           "1D",
           "1W",
           "1M",
-          "12M",
+          // "12M",
         ] as ResolutionString[],
       })
     },
@@ -122,7 +122,7 @@ export default function datafeed({
           "1D",
           "1W",
           "1M",
-          "12M",
+          // "12M",
         ] as ResolutionString[],
         volume_precision: 2,
         data_status: "streaming",
