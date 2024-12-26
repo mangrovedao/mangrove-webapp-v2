@@ -46,9 +46,6 @@ export default function RemoveFromVaultDialog({
       queryClient.refetchQueries({
         queryKey: ["vault"],
       })
-      queryClient.refetchQueries({
-        queryKey: ["user-vaults"],
-      })
       onClose()
     }
   }, [isConfirmed, onClose, queryClient])

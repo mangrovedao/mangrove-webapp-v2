@@ -1,12 +1,6 @@
 import useMarket from "@/providers/market"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-  Address,
-  BaseError,
-  ContractFunctionRevertedError,
-  TransactionReceipt,
-  parseUnits,
-} from "viem"
+import { Address, TransactionReceipt, parseUnits } from "viem"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useLogics, useMangroveAddresses } from "@/hooks/use-addresses"
@@ -19,6 +13,7 @@ import {
   limitOrderResultFromLogs,
 } from "@mangrovedao/mgv"
 
+import { printEvmError } from "@/utils/errors"
 import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
@@ -143,22 +138,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
 
         return { result, receipt }
       } catch (error) {
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionRevertedError,
-          )
-
-          if (revertError instanceof ContractFunctionRevertedError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.details,
-              revertError.data,
-              revertError,
-            )
-          }
-        }
-        console.error(error)
+        printEvmError(error)
         toast.error("Failed to post the limit order")
       }
     },
