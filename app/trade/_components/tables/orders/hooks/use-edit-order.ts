@@ -4,8 +4,11 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
+import Big from "big.js"
 import React from "react"
 
+import { useLogics } from "@/hooks/use-addresses"
+import useMarket from "@/providers/market"
 import { hasExpired } from "@/utils/date"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
@@ -18,33 +21,36 @@ type Props = {
 }
 
 export function useEditOrder({ order, onSubmit }: Props) {
+  const { currentMarket: market } = useMarket()
   const {
+    initialGives,
+    initialWants,
     price: currentPrice,
-    expiry,
-    market,
-    total,
-    side,
-    type,
-    received,
-    sent,
+    isBid,
+    expiryDate,
+    outboundRoute,
+    inboundRoute,
   } = order
 
-  const isBid = side === "buy"
-  // const logics = useLogics()
-  // const findLogicByAddress = (address: string) =>
-  //   logics?.find((logic) => logic.logic.toLowerCase() === address.toLowerCase())
+  const logics = useLogics()
+  const findLogicByAddress = (address: string) =>
+    logics?.find((logic) => logic.logic.toLowerCase() === address.toLowerCase())
 
-  // const sendFrom = findLogicByAddress(outboundRoute)
-  // const receiveTo = findLogicByAddress(inboundRoute)
+  const sendFrom = findLogicByAddress(outboundRoute)
+  const receiveTo = findLogicByAddress(inboundRoute)
   const quoteDecimals = market?.quote.displayDecimals
   const baseDecimals = market?.base.displayDecimals
 
-  const volumeDecimals = isBid ? market?.quote.decimals : market?.base.decimals
+  const volumeDecimals = order.isBid
+    ? market?.quote.displayDecimals
+    : market?.base.displayDecimals
 
-  const amountDecimals = isBid ? market?.base.decimals : market?.quote.decimals
+  const amountDecimals = order.isBid
+    ? market?.base.displayDecimals
+    : market?.quote.displayDecimals
 
-  const volume = sent.toFixed(volumeDecimals)
-  const amount = total.toFixed(amountDecimals)
+  const volume = Big(initialGives).toFixed(volumeDecimals)
+  const amount = Big(initialWants).toFixed(amountDecimals)
 
   const form = useForm({
     validator: zodValidator,
@@ -88,7 +94,7 @@ export function useEditOrder({ order, onSubmit }: Props) {
     quoteDecimals,
   )} ${market?.quote?.symbol}`
 
-  const isOrderExpired = expiry && hasExpired(new Date(expiry * 1000))
+  const isOrderExpired = expiryDate && hasExpired(expiryDate)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -106,6 +112,8 @@ export function useEditOrder({ order, onSubmit }: Props) {
     computeReceiveAmount,
     computeSendAmount,
     form,
+    sendFrom,
+    receiveTo,
     toggleEdit,
     isOrderExpired,
     formattedPrice,

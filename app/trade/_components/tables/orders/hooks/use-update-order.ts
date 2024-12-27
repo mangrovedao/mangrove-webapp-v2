@@ -87,20 +87,20 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
        */
       try {
         // Start showing loading state indicator on parts of the UI that depend on
-        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
+        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
         const { blockNumber, transactionHash } = receipt
         onResult?.(transactionHash)
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber: Number(blockNumber),
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
-        queryClient.invalidateQueries({ queryKey: ["order-history"] })
+        queryClient.invalidateQueries({ queryKey: ["fills"] })
       } catch (error) {
         console.error(error)
       }
     },
     onSettled: () => {
-      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
+      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
     },
   })
 }
