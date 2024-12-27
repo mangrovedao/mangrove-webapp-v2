@@ -1,8 +1,6 @@
 import { env } from "@/env.mjs"
 import type { Chain } from "viem/chains"
 import * as wagmiChains from "viem/chains"
-import { arbitrum } from "viem/chains"
-import { useAccount } from "wagmi"
 
 export const bridgeableSynapseChainIds = [
   wagmiChains.blast.id,
@@ -86,9 +84,4 @@ function renameChainNames(chains: wagmiChains.Chain[]) {
     }
     return chain
   })
-}
-
-export function useDefaultChainId() {
-  const { chainId } = useAccount()
-  return chainId ?? arbitrum.id
 }

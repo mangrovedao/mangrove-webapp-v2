@@ -14,44 +14,42 @@ import { useAccount } from "wagmi"
 import BlockExplorer from "@/app/strategies/[address]/_components/block-explorer"
 import { TokenPair } from "@/components/token-pair"
 import { Skeleton } from "@/components/ui/skeleton"
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
-import { Token } from "@mangrovedao/mgv"
-import type { OrderHistory } from "./schema"
+import type { Fill } from "./schema"
 
-const columnHelper = createColumnHelper<OrderHistory>()
-const DEFAULT_DATA: OrderHistory[] = []
+const columnHelper = createColumnHelper<Fill>()
+const DEFAULT_DATA: Fill[] = []
 
 type Params = {
-  data?: OrderHistory[]
+  data?: Fill[]
 }
 
 export function useTable({ data }: Params) {
-  const { chain, address } = useAccount()
+  const { currentMarket: market } = useMarket()
+  const { chain } = useAccount()
 
   const columns = React.useMemo(
     () => [
       columnHelper.display({
         header: "Market",
-        cell: ({ row }) => {
-          const { market } = row.original
-          return (
-            <div className="flex items-center space-x-2">
-              <TokenPair
-                titleProps={{
-                  variant: "title3",
-                  className: "text-sm text-current font-normal",
-                  as: "span",
-                }}
-                tokenClasses="w-4 h-4"
-                baseToken={market?.base as Token}
-                quoteToken={market?.quote as Token}
-              />
-            </div>
-          )
-        },
+        cell: () => (
+          <div className="flex items-center space-x-2">
+            <TokenPair
+              titleProps={{
+                variant: "title3",
+                className: "text-sm text-current font-normal",
+                as: "span",
+              }}
+              tokenClasses="w-4 h-4"
+              baseToken={market?.base}
+              quoteToken={market?.quote}
+            />
+          </div>
+        ),
       }),
-      columnHelper.accessor("side", {
+      columnHelper.accessor("isBid", {
         header: "Side",
         cell: (row) => {
           const isBid = row.getValue()
@@ -65,32 +63,27 @@ export function useTable({ data }: Params) {
         },
         sortingFn: "datetime",
       }),
-      columnHelper.accessor("type", {
+      columnHelper.accessor("isMarketOrder", {
         header: "Type",
         cell: (row) => (row.getValue() ? "Market" : "Limit"),
       }),
       columnHelper.display({
         header: "Received/Sent",
         cell: ({ row }) => {
-          const { received, sent, side, market } = row.original
+          const { takerGot, takerGave, isBid } = row.original
           if (!market) return null
           const { base, quote } = market
-          const [receivedToken, sentToken] =
-            side === "buy" ? [base, quote] : [quote, base]
+          const [received, sent] = isBid ? [base, quote] : [quote, base]
 
           return (
             <div className={cn("flex flex-col font-semibold")}>
               <span className="text-sm font-ubuntu">
-                {Big(received).toFixed(receivedToken.displayDecimals)}{" "}
-                <span className="text-muted-foreground">
-                  {receivedToken.symbol}
-                </span>
+                {Big(takerGot).toFixed(received.displayDecimals)}{" "}
+                <span className="text-muted-foreground">{received.symbol}</span>
               </span>
               <span className="text-xs opacity-50 font-ubuntu">
-                {Big(sent).toFixed(sentToken.displayDecimals)}{" "}
-                <span className="text-muted-foreground">
-                  {sentToken.symbol}
-                </span>
+                {Big(takerGave).toFixed(sent.displayDecimals)}{" "}
+                <span className="text-muted-foreground">{sent.symbol}</span>
               </span>
             </div>
           )
@@ -98,14 +91,11 @@ export function useTable({ data }: Params) {
       }),
       columnHelper.accessor("price", {
         header: "Price",
-        cell: ({ row }) => {
-          const { market } = row.original
-          return market ? (
-            row?.getValue("price") ? (
+        cell: (row) =>
+          market ? (
+            row.getValue() ? (
               <span className="font-ubuntu font-semibold">
-                {Big(row.getValue("price") ?? 0).toFixed(
-                  market.quote.displayDecimals,
-                )}{" "}
+                {Big(row.getValue()).toFixed(market.quote.displayDecimals)}{" "}
                 <span className="text-muted-foreground">
                   {market.quote.symbol}
                 </span>
@@ -115,14 +105,13 @@ export function useTable({ data }: Params) {
             )
           ) : (
             <Skeleton className="w-20 h-6" />
-          )
-        },
+          ),
       }),
 
-      columnHelper.accessor("block", {
+      columnHelper.accessor("creationDate", {
         header: "Date",
         cell: ({ row }) => {
-          const date = new Date(row.original.block * 1000)
+          const date = row.original.creationDate
           return <div>{formatDate(date, "dd/MM/yyyy, HH:mm")}</div>
         },
       }),
@@ -160,7 +149,7 @@ export function useTable({ data }: Params) {
         },
       }),
     ],
-    [address, chain],
+    [market],
   )
 
   return useReactTable({

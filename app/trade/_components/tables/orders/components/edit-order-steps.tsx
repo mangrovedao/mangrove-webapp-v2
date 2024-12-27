@@ -5,6 +5,7 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button-old"
 import { Label } from "@/components/ui/label"
+import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BS } from "@mangrovedao/mgv/lib"
@@ -83,20 +84,23 @@ export default function EditOrderSteps({
   form,
   onClose,
   onCloseForm,
+
   displayDecimals,
 }: Props) {
   const { chain, address } = useAccount()
-  // const logics = useLogics()
-  const isBid = order.side === "buy" ? BS.buy : BS.sell
+  const logics = useLogics()
 
-  const { sendToken, spender } = useTradeInfos("limit", isBid)
+  const { sendToken, spender } = useTradeInfos(
+    "limit",
+    order.isBid ? BS.buy : BS.sell,
+  )
 
-  // const orderLogic = logics.find((item) => item.logic == order.outboundRoute)
+  const orderLogic = logics.find((item) => item.logic == order.outboundRoute)
 
   const { data: limitOrderSteps } = useLimitSteps({
     user: address,
     bs: BS.buy,
-    // logic: orderLogic?.name,
+    logic: orderLogic?.name,
   })
 
   let steps = ["Update order"]
@@ -144,8 +148,8 @@ export default function EditOrderSteps({
         <Summary
           displayDecimals={displayDecimals}
           oldValues={{
-            price: order.price.toString(),
-            volume: order.sent.toString(),
+            price: order.price,
+            volume: order.initialGives,
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />
@@ -195,8 +199,8 @@ export default function EditOrderSteps({
         <Summary
           displayDecimals={displayDecimals}
           oldValues={{
-            price: order.price.toString(),
-            volume: order.sent.toString(),
+            price: order.price,
+            volume: order.initialGives,
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />

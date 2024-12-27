@@ -8,19 +8,18 @@ import useIndexerSdk from "@/providers/mangrove-indexer"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
-import { hash } from "@mangrovedao/mgv"
-import { getSemibooksOLKeys } from "@mangrovedao/mgv/lib"
-import { parseOrders, type Order } from "../schema"
+import { getSemibooksOLKeys, hash } from "@mangrovedao/mgv/lib"
+import { parseFills, type Fill } from "./schema"
 
 type Params<T> = {
   filters?: {
     first?: number
     skip?: number
   }
-  select?: (data: Order[]) => T
+  select?: (data: Fill[]) => T
 }
 
-export function useOrders<T = Order[]>({
+export function useFills<T = Fill[]>({
   filters: { first = 100, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
@@ -35,7 +34,7 @@ export function useOrders<T = Order[]>({
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
-      "orders",
+      "fills",
       market?.base.address,
       market?.quote.address,
       address,
@@ -43,13 +42,11 @@ export function useOrders<T = Order[]>({
       skip,
     ],
     queryFn: async () => {
-      if (!(indexerSdk && address && market)) return []
-      startLoading(TRADE.TABLES.ORDERS)
-
       try {
+        if (!(indexerSdk && address && market)) return []
+        startLoading(TRADE.TABLES.ORDERS)
         const { asksMarket, bidsMarket } = getSemibooksOLKeys(market)
-        
-        const result = await indexerSdk.getOpenLimitOrders({
+        const result = await indexerSdk.getOrdersHistory({
           ask: {
             token: {
               address: asksMarket.outbound_tkn,
@@ -68,8 +65,7 @@ export function useOrders<T = Order[]>({
           skip,
           maker: address.toLowerCase(),
         })
-
-        return parseOrders(result)
+        return parseFills(result)
       } catch (e) {
         console.error(getErrorMessage(e))
         throw new Error()
@@ -79,10 +75,10 @@ export function useOrders<T = Order[]>({
     },
     select,
     meta: {
-      error: "Unable to retrieve orders",
+      error: "Unable to retrieve fills",
     },
     enabled: !!(isConnected && indexerSdk),
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 1 * 60 * 1000, // 1 minute
   })
 }

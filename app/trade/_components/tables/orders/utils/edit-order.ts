@@ -8,21 +8,20 @@ export function getOrderProgress(
   baseToken?: Token,
   quoteToken?: Token,
 ) {
-  const { received, total, side, sent } = order
-  const isBid = side === "buy"
+  const { takerGot, initialGives, initialWants } = order
 
-  const volumeDecimals = isBid
+  const volumeDecimals = order.isBid
     ? quoteToken?.displayDecimals
     : baseToken?.displayDecimals
 
-  const amountDecimals = isBid
+  const amountDecimals = order.isBid
     ? baseToken?.displayDecimals
     : quoteToken?.displayDecimals
 
-  const gives = sent.toFixed(volumeDecimals)
-  const wants = total.toFixed(amountDecimals)
+  const gives = Big(initialGives).toFixed(volumeDecimals)
+  const wants = Big(initialWants).toFixed(amountDecimals)
 
-  const filled = received.toFixed(baseToken?.displayDecimals)
+  const filled = Big(takerGot).toFixed(baseToken?.displayDecimals)
 
   const progress = Math.min(
     Math.round(
@@ -34,7 +33,7 @@ export function getOrderProgress(
     100,
   )
 
-  const progressInPercent = (Number(filled) / Number(sent)) * 100
+  const progressInPercent = (Number(filled) / Number(gives)) * 100
 
   return { progress, filled, gives, progressInPercent, wants }
 }
