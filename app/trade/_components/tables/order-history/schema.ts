@@ -1,16 +1,18 @@
 import { MarketParams } from "@mangrovedao/mgv"
 import { z } from "zod"
 
-export const rawOrderSchema = z.object({
+export const rawOrderHistory = z.object({
   side: z.string(),
   type: z.string(),
   received: z.number(),
   sent: z.number(),
-  total: z.number(),
-  price: z.number(),
-  expiry: z.number(),
-  offerId: z.string(),
-  lockedProvision: z.string(),
+  block: z.number(),
+  fee: z.number(),
+  price: z.number().nullable(),
+  offerId: z.string().nullable(),
+  status: z.string(),
+  transactionHash: z.string(),
+  lockedProvision: z.string().nullable(),
 })
 
 const marketSchema = z.object({
@@ -20,8 +22,8 @@ const marketSchema = z.object({
   displayDecimals: z.number(),
 })
 
-export const orderSchema = z.object({
-  ...rawOrderSchema.shape,
+export const orderHistorySchema = z.object({
+  ...rawOrderHistory.shape,
   market: z.object({
     base: marketSchema,
     quote: marketSchema,
@@ -29,17 +31,18 @@ export const orderSchema = z.object({
   }),
 })
 
-export type Order = z.infer<typeof orderSchema>
+export type OrderHistory = z.infer<typeof orderHistorySchema>
 
-export function parseOrders(data: unknown[], market: MarketParams): Order[] {
+export function parseOrderHistory(
+  data: unknown[],
+  market: MarketParams,
+): OrderHistory[] {
   return data
     .map((item) => {
       try {
-        // First validate the raw item data
-        const rawOrder = rawOrderSchema.parse(item)
+        const rawOrder = rawOrderHistory.parse(item)
 
-        // Then construct and validate the full order with market data
-        return orderSchema.parse({
+        return orderHistorySchema.parse({
           ...rawOrder,
           market: {
             base: {
@@ -54,17 +57,9 @@ export function parseOrders(data: unknown[], market: MarketParams): Order[] {
           },
         })
       } catch (error) {
-        console.error(
-          "Invalid format for offers: ",
-          {
-            item,
-            base: market.base,
-            quote: market.quote,
-          },
-          error,
-        )
+        console.error("Invalid format for order history: ", item, error)
         return null
       }
     })
-    .filter(Boolean) as Order[]
+    .filter(Boolean) as OrderHistory[]
 }
