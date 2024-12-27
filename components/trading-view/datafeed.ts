@@ -1,3 +1,7 @@
+/**
+ * @fileoverview TradingView datafeed implementation for Mangrove markets
+ */
+
 import {
   HistoryCallback,
   LibrarySymbolInfo,
@@ -12,6 +16,9 @@ import {
 import { arbitrum } from "viem/chains"
 import { z } from "zod"
 
+/**
+ * Parameters required to initialize the datafeed
+ */
 type Params = {
   base: string
   quote: string
@@ -20,6 +27,24 @@ type Params = {
   chainId: number | undefined
 }
 
+/**
+ * Structure of a single OHLCV bar
+ */
+type Bar = {
+  startTimestamp: number
+  endTimestamp: number
+  openTimestamp: number
+  closeTimestamp: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+/**
+ * Zod schema for validating candles data from API
+ */
 const candlesSchema = z.object({
   candles: z.array(
     z.object({
@@ -36,7 +61,157 @@ const candlesSchema = z.object({
   ),
 })
 
+/**
+ * Creates a TradingView datafeed implementation for Mangrove markets
+ * @param {Params} params - Configuration parameters for the datafeed
+ * @returns {Object} TradingView compatible datafeed implementation
+ */
 export default function datafeed({
+  base,
+  quote,
+  baseAddress,
+  quoteAddress,
+  chainId,
+}: Params) {
+  return {
+    onReady: (callback: OnReadyCallback) => {
+      callback({
+        // supports_search: true,
+        // supports_group_request: false,
+        supports_marks: true,
+        supports_timescale_marks: true,
+        supports_time: false,
+        supported_resolutions: [
+          "60",
+          "1D",
+          "1W",
+          "1M",
+          // "12M",
+        ] as ResolutionString[],
+      })
+    },
+    searchSymbols: (
+      userInput: string,
+      exchange: string,
+      symbolType: string,
+      onResult: SearchSymbolsCallback,
+    ) => {
+      console.log("[searchSymbols]: Method call")
+    },
+    resolveSymbol: (
+      symbolName: string,
+      onResolve: ResolveCallback,
+      onError: ErrorCallback,
+      extension?: SymbolResolveExtension,
+    ) => {
+      onResolve({
+        ticker: `${base}-${quote}`,
+        name: `${base}-${quote}`,
+        description: `${base}-${quote}`,
+        type: "stock",
+        session: "24x7",
+        timezone: "Etc/UTC",
+        exchange: "",
+        minmov: 1,
+        pricescale: 100,
+        has_intraday: true,
+        visible_plots_set: "ohlcv",
+        has_weekly_and_monthly: true,
+        supported_resolutions: [
+          "60",
+          "1D",
+          "1W",
+          "1M",
+          // "12M",
+        ] as ResolutionString[],
+        volume_precision: 2,
+        data_status: "streaming",
+        listed_exchange: "",
+        format: "price",
+      })
+    },
+    getBars: async (
+      symbolInfo: LibrarySymbolInfo,
+      resolution: ResolutionString,
+      periodParams: PeriodParams,
+      onResult: HistoryCallback,
+      onError: ErrorCallback,
+    ) => {
+      setTimeout(async () => {
+        try {
+          const currentChainId = chainId ?? arbitrum.id
+
+          const newRes =
+            resolution === "60"
+              ? "1h"
+              : resolution === "12M"
+                ? "1y"
+                : resolution.toLowerCase()
+
+          const result = await fetch(
+            `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/${newRes}?count=${periodParams.countBack}&to=${periodParams.to}`,
+          ).then(async (res) => candlesSchema.safeParse(await res.json()))
+
+          if (!result.success) {
+            throw new Error("Invalid candles data")
+          }
+
+          const bars = (result.data.candles ?? []).map((bar: Bar) => ({
+            time: bar.startTimestamp * 1000,
+            open: bar.open,
+            high: bar.high,
+            low: bar.low,
+            close: bar.close,
+            volume: bar.volume,
+          }))
+
+          // console.log({
+          //   date: new Date().getTime(),
+          //   bars,
+          //   from: periodParams.from,
+          //   to: periodParams.to,
+          //   countback: periodParams.countBack,
+          //   length: bars.length,
+          //   resolution,
+          //   newRes,
+          // })
+
+          onResult(bars, {
+            noData: bars.length === 0,
+            nextTime: bars.length > 0 ? undefined : periodParams.from,
+          })
+        } catch (error) {
+          console.log(error)
+          onError({
+            code: 1,
+            message: "Error loading data",
+          } as DOMException)
+        }
+      }, 0)
+    },
+    subscribeBars: (
+      symbolInfo: LibrarySymbolInfo,
+      resolution: ResolutionString,
+      onTick: SubscribeBarsCallback,
+      listenerGuid: string,
+      onResetCacheNeededCallback: () => void,
+    ) => {},
+    unsubscribeBars: (listenerGuid: string) => {},
+    getMarks: (
+      symbolInfo: LibrarySymbolInfo,
+      startDate: any,
+      endDate: any,
+      onDataCallback: any,
+      resolution: any,
+    ) => {},
+  }
+}
+
+/**
+ * Legacy datafeed implementation for backwards compatibility
+ * @deprecated Use the default export instead
+ */
+export function oldDatafeed({
   base,
   quote,
   baseAddress,
@@ -95,43 +270,44 @@ export default function datafeed({
       onResult: HistoryCallback,
       onError: ErrorCallback,
     ) => {
-      try {
-        const start = new Date(periodParams.from * 1000)
-        const end = new Date(periodParams.to * 1000)
-        const formattedStart = start.toISOString().split("T")[0]
-        const formattedEnd = end.toISOString().split("T")[0]
-        const currentChainId = chainId ?? arbitrum.id
+      setTimeout(async () => {
+        try {
+          const start = new Date(periodParams.from * 1000)
+          const end = new Date(periodParams.to * 1000)
+          const formattedStart = start.toISOString().split("T")[0]
+          const formattedEnd = end.toISOString().split("T")[0]
+          const currentChainId = chainId ?? arbitrum.id
 
-        const response = await fetch(
-          `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/1h`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        )
+          const old_res = await fetch(
+            `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${currentChainId}&interval=${resolution}&start_time=${formattedStart}&end_time=${formattedEnd}`,
+          )
+          let old_data = await old_res.json()
 
-        const result = candlesSchema.safeParse(await response.json())
+          if (old_data.message) {
+            old_data = []
+          }
 
-        if (!result.success) {
-          throw new Error("Invalid candles data")
+          const old_bars = old_data.map((bar: any, i: number) => ({
+            time: new Date(bar.startTime).getTime(),
+            open: parseFloat(bar.open),
+            high: parseFloat(bar.high),
+            low: parseFloat(bar.low),
+            close: parseFloat(bar.close),
+          }))
+          const returnBars =
+            old_bars.length < periodParams.countBack ? [] : old_bars
+
+          console.log({ old_bars, periodParams })
+
+          onResult(old_bars, {
+            noData:
+              old_bars.length === 0 || old_bars.length < periodParams.countBack,
+          })
+        } catch (error) {
+          console.log(error)
+          // onError({})
         }
-
-        const data = result.data.candles ?? []
-
-        const bars = data.map((bar: any) => ({
-          time: bar.startTimestamp * 1000,
-          open: parseFloat(bar.open),
-          high: parseFloat(bar.high),
-          low: parseFloat(bar.low),
-          close: parseFloat(bar.close),
-        }))
-
-        console.log(bars)
-        onResult(bars, { noData: bars.length > 0 ? false : true })
-      } catch (error) {
-        console.log(error)
-      }
+      }, 0)
     },
     subscribeBars: (
       symbolInfo: LibrarySymbolInfo,
