@@ -3,6 +3,7 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
+import { MarketParams } from "@mangrovedao/mgv"
 import CancelOfferDialog from "./components/cancel-offer-dialog"
 import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"
@@ -33,7 +34,10 @@ export function Orders() {
 
   const table = useTable({
     data: ordersQuery.data,
-    onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
+    onEdit: (order) => {
+      setMarket(order?.market as MarketParams)
+      setOrderToEdit({ order, mode: "edit" })
+    },
     onCancel: setOrderToDelete,
   })
 
@@ -43,8 +47,10 @@ export function Orders() {
         table={table}
         isError={!!ordersQuery.error}
         isLoading={ordersQuery.isLoading}
-        onRowClick={(order) =>
-          setOrderToEdit({ order: order as Order, mode: "view" })
+        onRowClick={
+          (order) => setMarket(order?.market as MarketParams)
+          // note: disabled edit order onRowClick cause we now update the market instead
+          // setOrderToEdit({ order: order as Order, mode: "view" })
         }
         pagination={{
           onPageChange: setPageDetails,
