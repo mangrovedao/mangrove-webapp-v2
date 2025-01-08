@@ -62,7 +62,7 @@ export async function getVaultsInformation(
   )
 
   const result = await client.multicall({ contracts, allowFailure: false })
-
+  
   // Process each vault's data
   return Promise.all(
     vaults.map(async (v, i): Promise<Vault & VaultWhitelist> => {

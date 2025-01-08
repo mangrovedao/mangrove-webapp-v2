@@ -7,6 +7,7 @@ import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { TradeMode } from "./enums"
+import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 
 export function successToast(
   tradeMode: TradeMode,
