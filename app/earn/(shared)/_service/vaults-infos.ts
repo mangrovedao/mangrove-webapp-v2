@@ -106,10 +106,10 @@ export async function getVaultsInformation(
 
       // Parallel fetches
       const [
-        [baseDollarPrice, quoteDollarPrice],
-        pnlData,
-        apr,
-        incentivesData,
+        [baseDollarPrice, quoteDollarPrice] = [1, 1],
+        pnlData = undefined,
+        apr = { totalAPR: 0, incentivesApr: 0 },
+        incentivesData = null,
       ] = await Promise.all([
         fetchTokenPrices(client, market),
         fetchPnLData(client, v.address, user),

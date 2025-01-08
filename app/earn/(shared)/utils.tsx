@@ -34,22 +34,27 @@ export async function fetchTokenPrices(
   client: PublicClient,
   market: [string, string, bigint],
 ) {
-  return Promise.all([
-    fetch(
-      `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[0]}`,
-    )
-      .then((res) => res.json())
-      .then((data) => priceSchema.parse(data))
-      .then((data) => data.price)
-      .catch(() => 1),
-    fetch(
-      `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${market[1]}`,
-    )
-      .then((res) => res.json())
-      .then((data) => priceSchema.parse(data))
-      .then((data) => data.price)
-      .catch(() => 1),
-  ])
+  try {
+    const [base, quote] = market
+    return Promise.all([
+      fetch(
+        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${base}`,
+      )
+        .then((res) => res.json())
+        .then((data) => priceSchema.parse(data))
+        .then((data) => data.price)
+        .catch(() => 1),
+      fetch(
+        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${quote}`,
+      )
+        .then((res) => res.json())
+        .then((data) => priceSchema.parse(data))
+        .then((data) => data.price)
+        .catch(() => 1),
+    ])
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 /**
@@ -60,13 +65,17 @@ export async function fetchPnLData(
   vaultAddress: Address,
   user?: Address,
 ) {
-  if (!user) return undefined
+  try {
+    if (!user) return undefined
 
-  const res = await fetch(
-    `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
-  )
-  const data = await res.json()
-  return pnlSchema.parse(data)
+    const res = await fetch(
+      `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
+    )
+    const data = await res.json()
+    return pnlSchema.parse(data)
+  } catch (error) {
+    return undefined
+  }
 }
 
 /**
