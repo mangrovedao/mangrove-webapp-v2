@@ -1,6 +1,6 @@
 import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
-import { BaseError, ContractFunctionExecutionError, isAddress } from "viem"
+import { isAddress } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
 import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
 import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"

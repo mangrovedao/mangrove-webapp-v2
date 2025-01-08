@@ -4,7 +4,6 @@ import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addres
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
-import { BaseError, ContractFunctionExecutionError } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
 import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
 
