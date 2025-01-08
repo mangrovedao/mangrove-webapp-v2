@@ -7,6 +7,7 @@ import React from "react"
 import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import {
+  IBasicDataFeed,
   ResolutionString,
   widget,
   type ChartingLibraryWidgetOptions,
@@ -28,18 +29,17 @@ export const TVChartContainer = (
 
   React.useEffect(() => {
     if (!currentMarket) return
+
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
-      // BEWARE: no trailing slash is expected in feed URL
-      // @ts-ignore
       datafeed: datafeed({
         base: currentMarket?.base.symbol,
         quote: currentMarket?.quote.symbol,
         baseAddress: currentMarket?.base.address,
         quoteAddress: currentMarket?.quote.address,
         chainId: chainId ?? arbitrum.id,
-      }),
-      timeframe: "1M",
+      }) as unknown as IBasicDataFeed,
+      timeframe: "12M",
       interval: "1W" as ResolutionString,
       container: chartContainerRef.current,
       library_path: "charting_library/",
@@ -48,21 +48,21 @@ export const TVChartContainer = (
       theme: "dark",
       custom_css_url: "css/styles.css",
       disabled_features: [
-        "use_localstorage_for_settings",
         "left_toolbar",
-        "header_chart_type",
-        "popup_hints",
-        "header_screenshot",
-        "header_compare",
-        "header_symbol_search",
-        "volume_force_overlay",
-        "create_volume_indicator_by_default",
         "timezone_menu",
+        "header_symbol_search",
+        "header_compare",
         "timeframes_toolbar",
-        "hide_main_series_symbol_from_indicator_legend",
+        "use_localstorage_for_settings",
+        "popup_hints",
+        // "header_chart_type",
+        // "header_screenshot",
+        // "volume_force_overlay",
+        // "create_volume_indicator_by_default",
+        // "hide_main_series_symbol_from_indicator_legend",
       ],
       overrides: {
-        "paneProperties.background": "#0B1819",
+        "paneProperties.background": "#0B1719",
         "paneProperties.backgroundType": "solid",
       },
     }
@@ -71,6 +71,7 @@ export const TVChartContainer = (
     const element = chartContainerRef.current.querySelector(
       '[id^="tradingview"]',
     )
+
     if (!element) return
     element.classList.add("w-full")
     element.classList.add("h-full")

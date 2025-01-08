@@ -1,7 +1,8 @@
 import { useAaveKandelRouter } from "@/hooks/use-addresses"
+import { printEvmError } from "@/utils/errors"
 import { MarketParams, aaveKandelActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
-import { Address, BaseError, ContractFunctionExecutionError } from "viem"
+import { Address } from "viem"
 import { usePublicClient } from "wagmi"
 
 export function useCanUseAave(market?: MarketParams) {
@@ -25,22 +26,7 @@ export function useCanUseAave(market?: MarketParams) {
 
         return canUse
       } catch (error) {
-        console.error(error)
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
-          )
-
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-            )
-          }
-        }
+        printEvmError(error)
         return null
       }
     },

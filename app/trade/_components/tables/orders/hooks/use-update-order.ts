@@ -6,8 +6,9 @@ import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
+import { printEvmError } from "@/utils/errors"
 import { BS } from "@mangrovedao/mgv/lib"
-import { BaseError, ContractFunctionExecutionError, parseUnits } from "viem"
+import { parseUnits } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import { Form } from "../types"
 
@@ -69,26 +70,7 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         })
         return { receipt }
       } catch (error) {
-        console.error(error as BaseError)
-
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
-          )
-
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log(
-              revertError.stack,
-              revertError.args,
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-              revertError,
-            )
-          }
-        }
+        printEvmError(error)
         throw new Error("Failed to update the limit order")
       }
     },

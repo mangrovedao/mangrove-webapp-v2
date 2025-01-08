@@ -2,8 +2,8 @@
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
+import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
-import { BaseError, ContractFunctionExecutionError } from "viem"
 import { useAccount, usePublicClient } from "wagmi"
 import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
 
@@ -37,22 +37,7 @@ export function useVaults<T = Vault[] | undefined>({
         )
         return vaults ?? []
       } catch (error) {
-        console.error(error, chainId)
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
-          )
-
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-            )
-          }
-        }
+        printEvmError(error)
         return []
       }
     },

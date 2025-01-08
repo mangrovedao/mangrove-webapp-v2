@@ -5,8 +5,8 @@ import { formatUnits, parseUnits } from "viem"
 
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
-import { TradeMode } from "./enums"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
+import { TradeMode } from "./enums"
 
 export function successToast(
   tradeMode: TradeMode,
@@ -37,7 +37,6 @@ export function successToast(
       : "Market order not filled (slippage limit too low)"
 
   const fillText = Number(result.takerGot) > 0 ? filledOrder : notFilledOrder
-  console.log(result.feePaid)
 
   const approximateFee = (value: bigint, decimals: number) =>
     Number(formatUnits(value, decimals)) <= 0.001 ? "~ " : ""
