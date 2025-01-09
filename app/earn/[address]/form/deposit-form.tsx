@@ -6,8 +6,10 @@ import { formatUnits } from "viem"
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { currentDecimals } from "@/utils/market"
+import { useAccount } from "wagmi"
 import DepositToVaultDialog from "./dialogs/deposit-dialog"
 import useForm from "./use-form"
 
@@ -32,6 +34,9 @@ export function DepositForm({ className }: { className?: string }) {
     vault,
     hasErrors,
   } = useForm()
+
+  const { address } = useAccount()
+  const { checkAndShowDisclaimer } = useDisclaimerDialog()
 
   const handleBaseSliderChange = (value: number) => {
     if (!baseBalance) return
@@ -120,7 +125,10 @@ export function DepositForm({ className }: { className?: string }) {
 
       <Button
         className="w-full"
-        onClick={() => setAddDialog(!addDialog)}
+        onClick={() => {
+          if (checkAndShowDisclaimer(address)) return
+          setAddDialog(!addDialog)
+        }}
         disabled={isLoading || mintAmount === 0n || hasErrors}
       >
         Deposit

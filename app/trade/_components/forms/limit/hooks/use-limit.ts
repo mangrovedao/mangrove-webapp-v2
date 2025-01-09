@@ -9,8 +9,10 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
+import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
 import { formatUnits, parseUnits } from "viem"
+import { useAccount } from "wagmi"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -20,6 +22,9 @@ type Props = {
 }
 
 export function useLimit(props: Props) {
+  const { address } = useAccount()
+  const { checkAndShowDisclaimer } = useDisclaimerDialog()
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -158,6 +163,8 @@ export function useLimit(props: Props) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     e.stopPropagation()
+    if (checkAndShowDisclaimer(address)) return
+
     void form.handleSubmit()
   }
 

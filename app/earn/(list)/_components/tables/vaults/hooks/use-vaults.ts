@@ -1,11 +1,11 @@
 "use client"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { getVaultsInformation } from "@/app/earn/(shared)/_service/vaults-infos"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
-import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
 
 type Params<T> = {
   filters?: {

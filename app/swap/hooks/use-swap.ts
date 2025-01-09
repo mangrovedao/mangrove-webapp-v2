@@ -19,6 +19,7 @@ import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/u
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
+import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
 import {
   deduplicateTokens,
@@ -40,6 +41,7 @@ const priceSchema = z.object({
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
+  const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
     getQuote,
     odosTokens,
@@ -388,6 +390,8 @@ export function useSwap() {
   }
 
   async function swap() {
+    if (checkAndShowDisclaimer(address)) return
+
     if (marketClient) {
       await swapMangrove()
     } else {
