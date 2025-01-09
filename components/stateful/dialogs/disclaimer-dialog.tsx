@@ -1,9 +1,7 @@
 "use client"
 import React from "react"
-import { isMobile } from "react-device-detect"
 
 import Dialog from "@/components/dialogs/alert-dialog-new"
-import MobileOverlay from "@/components/mobile-overlay"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
 import useLocalStorage from "@/hooks/use-local-storage"
@@ -27,10 +25,10 @@ function DisclaimerDialog() {
   })
 
   React.useEffect(() => {
-    if (isConnected && !hasSignedDisclaimer) {
+    if (isConnected && !hasSignedDisclaimer && address) {
       setHideDisclaimer(false)
     }
-  }, [isConnected, hasSignedDisclaimer])
+  }, [isConnected, hasSignedDisclaimer, address])
 
   React.useEffect(() => {
     if (address) {
@@ -59,9 +57,9 @@ function DisclaimerDialog() {
     }
   }
 
-  if (isMobile) {
-    return <MobileOverlay />
-  }
+  // if (isMobile) {
+  //   return <MobileOverlay />
+  // }
 
   if (!isConnected) {
     return null
