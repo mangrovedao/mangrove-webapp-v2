@@ -1,49 +1,28 @@
 "use client"
 import React from "react"
-import { isMobile } from "react-device-detect"
+import { useAccount, useSignMessage } from "wagmi"
 
-import Dialog from "@/components/dialogs/alert-dialog-new"
-import MobileOverlay from "@/components/mobile-overlay"
+import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
-import useLocalStorage from "@/hooks/use-local-storage"
 import { config } from "@/providers/wallet-connect"
+import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
-import { useAccount, useSignMessage } from "wagmi"
 
 function DisclaimerDialog() {
   const { isConnected, address } = useAccount()
-
-  const [hideDisclaimer, setHideDisclaimer] = useLocalStorage<boolean | null>(
-    `hideDisclaimer_${address}`,
-    null,
-  )
-  const [hasSignedDisclaimer, setHasSignedDisclamer] = useLocalStorage<
-    boolean | null
-  >(`hasSignedDisclaimer_${address}`, null)
+  const { isOpen, closeDisclaimer, hideDisclaimer, setHideDisclaimer } =
+    useDisclaimerDialog()
 
   const signature = useSignMessage({
     config,
   })
 
   React.useEffect(() => {
-    if (isConnected && !hasSignedDisclaimer) {
-      setHideDisclaimer(false)
+    if (isConnected && address && hideDisclaimer[address] === undefined) {
+      setHideDisclaimer(address, false)
     }
-  }, [isConnected, hasSignedDisclaimer])
-
-  React.useEffect(() => {
-    if (address) {
-      const storedHasSignedDisclaimer = localStorage.getItem(
-        `hasSignedDisclaimer_${address}`,
-      )
-      if (storedHasSignedDisclaimer !== "true") {
-        setHideDisclaimer(false)
-      } else {
-        setHideDisclaimer(true)
-      }
-    }
-  }, [address])
+  }, [isConnected, address])
 
   async function handleAcceptTerms() {
     try {
@@ -52,15 +31,13 @@ function DisclaimerDialog() {
           "Welcome to the Mangrove dApp!\nThe use of this app is subject to the terms of use\nhttps://mangrove.exchange/terms-of-use\n\nBy signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
       })
 
-      setHasSignedDisclamer(true)
-      setHideDisclaimer(true)
+      if (address) {
+        setHideDisclaimer(address, true)
+      }
+      closeDisclaimer()
     } catch (error) {
       console.error(error)
     }
-  }
-
-  if (isMobile) {
-    return <MobileOverlay />
   }
 
   if (!isConnected) {
@@ -68,7 +45,11 @@ function DisclaimerDialog() {
   }
 
   return (
-    <Dialog open={!hideDisclaimer} type="mangrove">
+    <Dialog
+      open={isOpen && !hideDisclaimer[address ?? ""]}
+      type="mangrove"
+      onClose={closeDisclaimer}
+    >
       <Dialog.Title>Welcome to the Mangrove dApp!</Dialog.Title>
       <Dialog.Description>
         <div>
@@ -83,7 +64,7 @@ function DisclaimerDialog() {
           </a>
         </div>
       </Dialog.Description>
-      <Dialog.Footer className="!justify-center">
+      <Dialog.Footer>
         <div className="flex flex-col space-y-4">
           <div className="items-top flex space-x-2">
             <div className="grid gap-1.5 leading-none hover:opacity-80">

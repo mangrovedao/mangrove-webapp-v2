@@ -9,6 +9,7 @@ import React, { ReactNode } from "react"
 import { useAccount } from "wagmi"
 
 import { Skeleton } from "@/components/ui/skeleton"
+import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { formatUnits } from "viem"
 import WithdrawFromVaultDialog from "./dialogs/withdraw-dialog"
 import useForm from "./use-form"
@@ -33,6 +34,7 @@ export function WithdrawForm({ className }: { className?: string }) {
   } = useForm()
 
   const { address } = useAccount()
+  const { checkAndShowDisclaimer } = useDisclaimerDialog()
 
   const handleSliderChange = (value: number) => {
     if (!quoteDeposited || !baseDeposited) return
@@ -139,7 +141,10 @@ export function WithdrawForm({ className }: { className?: string }) {
 
       <Button
         className="w-full"
-        onClick={() => setRemoveDialog(!removeDialog)}
+        onClick={() => {
+          if (checkAndShowDisclaimer(address)) return
+          setRemoveDialog(!removeDialog)
+        }}
         disabled={Number(withdrawAmount) === 0}
       >
         Withdraw

@@ -15,9 +15,11 @@ import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
+import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { Book } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
+import { useAccount } from "wagmi"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
@@ -54,6 +56,9 @@ const determinePrices = (
 }
 
 export function useMarketForm(props: Props) {
+  const { address } = useAccount()
+  const { checkAndShowDisclaimer } = useDisclaimerDialog()
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -172,6 +177,8 @@ export function useMarketForm(props: Props) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     e.stopPropagation()
+    if (checkAndShowDisclaimer(address)) return
+
     void form.handleSubmit()
   }
 
