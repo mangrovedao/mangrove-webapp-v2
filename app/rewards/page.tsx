@@ -103,11 +103,20 @@ export default function Page() {
               <Value className="flex-wrap text-wrap">
                 <NumericValue value={formatUnits(totalRewards, 8)} />
               </Value>
+              <div className="flex flex-col flex-1 mt-2">
+                <Label>Vaults LP Rewards</Label>
+                <Value className="flex-wrap text-wrap">
+                  <NumericValue
+                    value={incentivesRewards?.toFixed(6) || "0.00"}
+                  />
+                </Value>
+              </div>
             </div>
+
             <div className="flex flex-col flex-1 space-y-2">
               <div className="flex justify-between">
                 <Label>Taker Rewards</Label>
-                <Value size="small">
+                <Value size="normal">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.takerReward ?? 0), 8)}
                   />
@@ -115,7 +124,7 @@ export default function Page() {
               </div>
               <div className="flex justify-between">
                 <Label>Maker Rewards</Label>
-                <Value size="small">
+                <Value size="normal">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.makerReward ?? 0), 8)}
                   />
@@ -123,7 +132,7 @@ export default function Page() {
               </div>
               <div className="flex justify-between">
                 <Label>Vault Rewards</Label>
-                <Value size="small">
+                <Value size="normal">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.vaultRewards ?? 0), 8)}
                   />
@@ -131,6 +140,25 @@ export default function Page() {
               </div>
             </div>
           </div>
+
+          {/* <div className="rounded-2xl bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 justify-between ">
+            <div className="flex items-center gap-2">
+              <ImageWithHideOnError
+                src={`/assets/illustrations/mangrove-logo.png`}
+                width={34}
+                height={36}
+                key={`mangrove-logo`}
+                alt={`mangrove-logo`}
+              />
+              <Title variant={"title1"}>Vault LP rewards</Title>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <Value size="normal">
+                <NumericValue value={incentivesRewards?.toFixed(6) || "0.00"} />
+              </Value>
+            </div>
+          </div> */}
 
           <CustomTabs value={tab}>
             <ScrollArea className="h-full w-full" scrollHideDelay={200}>
@@ -254,15 +282,36 @@ export default function Page() {
         </div>
         <div className="lg:col-span-2 col-span-6 h-20">
           <NeonContainer className="space-y-5">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label>MS2 Rewards</Label>
+                <Value>
+                  <NumericValue
+                    value={formatUnits(
+                      BigInt(rewards?.claimableRewards ?? 0n),
+                      8,
+                    )}
+                  />
+                </Value>
+              </div>
+              <div className="flex justify-between">
+                <Label>Vaults LP Rewards</Label>
+                <Value>
+                  <NumericValue
+                    value={incentivesRewards?.toFixed(6) || "0.00"}
+                  />
+                </Value>
+              </div>
+            </div>
+
+            <div className="">
+              <hr className="px-6" />
+            </div>
+
             <div className="flex justify-between">
-              <Label>Available rewards</Label>
+              <Label>Total Rewards</Label>
               <Value>
-                <NumericValue
-                  value={formatUnits(
-                    BigInt(rewards?.claimableRewards ?? 0n),
-                    8,
-                  )}
-                />
+                <NumericValue value={incentivesRewards?.toFixed(6) || "0.00"} />
               </Value>
             </div>
 
