@@ -9,7 +9,6 @@ import { arbitrum } from "viem/chains"
 
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 import { abi } from "./abi"
-import { calculateIncentiveAPR } from "./vault-incentives-apr"
 
 /**
  * ABI definition for vault contract interactions
@@ -170,16 +169,16 @@ export async function getVaultAPR(
       totalAPR += aaveAPR
     }
 
-    const incentivesApr = calculateIncentiveAPR(incentives, fdv)
-    console.log(incentivesApr)
+    // const incentivesApr = calculateIncentiveAPR(incentives, fdv)
+
     // Add trading APR if vault is actively trading
     if (fundsState > 1) {
       // Add estimated vault fees APR
       totalAPR += 3
-      totalAPR += incentivesApr
+      // totalAPR += incentivesApr
     }
 
-    return { totalAPR, incentivesApr }
+    return { totalAPR, incentivesApr: 0 }
   } catch (error) {
     console.error("Failed to calculate vault APR:", error)
     return { totalAPR: 0, incentivesApr: 0 }
