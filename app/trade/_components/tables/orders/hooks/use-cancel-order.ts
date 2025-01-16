@@ -8,7 +8,7 @@ import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import { BaseError, ContractFunctionExecutionError } from "viem"
+import { printEvmError } from "@/utils/errors"
 import type { Order } from "../schema"
 
 type Props = {
@@ -60,22 +60,7 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
 
         return receipt
       } catch (error) {
-        console.error(error)
-        if (error instanceof BaseError) {
-          const revertError = error.walk(
-            (error) => error instanceof ContractFunctionExecutionError,
-          )
-
-          if (revertError instanceof ContractFunctionExecutionError) {
-            console.log(
-              revertError.cause,
-              revertError.message,
-              revertError.functionName,
-              revertError.formattedArgs,
-              revertError.details,
-            )
-          }
-        }
+        printEvmError(error)
         toast.error(`Failed to retract the order ${offerId ?? ""}`)
       }
     },

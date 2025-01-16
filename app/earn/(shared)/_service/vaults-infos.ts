@@ -19,7 +19,7 @@ import {
   fetchTokenPrices,
 } from "../utils"
 import { getVaultAPR } from "./vault-apr"
-import { getVaultIncentives } from "./vault-incentives-rewards"
+import { getUserVaultIncentives } from "./vault-incentives-rewards"
 // ============= MAIN FUNCTION =============
 
 /**
@@ -33,7 +33,9 @@ export async function getVaultsInformation(
   client: PublicClient,
   vaults: VaultWhitelist[],
   user?: Address,
-  incentives?: VaultLPProgram,
+  incentives?: VaultLPProgram[],
+  fdv?: number,
+  incentivesRewards?: { vault: Address; total: number }[],
 ): Promise<(Vault & VaultWhitelist)[]> {
   // Build multicall contracts array
   const contracts = vaults.flatMap(
@@ -62,7 +64,7 @@ export async function getVaultsInformation(
   )
 
   const result = await client.multicall({ contracts, allowFailure: false })
-  
+
   // Process each vault's data
   return Promise.all(
     vaults.map(async (v, i): Promise<Vault & VaultWhitelist> => {
@@ -113,8 +115,21 @@ export async function getVaultsInformation(
       ] = await Promise.all([
         fetchTokenPrices(client, market),
         fetchPnLData(client, v.address, user),
-        getVaultAPR(client, v.address as Address, incentives),
-        getVaultIncentives(client, user, incentives),
+        getVaultAPR(
+          client,
+          v.address as Address,
+          incentives?.find(
+            (item) => item.vault.toLowerCase() === v.address.toLowerCase(),
+          ),
+          fdv,
+        ),
+        getUserVaultIncentives(
+          client,
+          user,
+          incentives?.find(
+            (item) => item.vault.toLowerCase() === v.address.toLowerCase(),
+          ),
+        ),
       ])
 
       // Calculate fees and shares
@@ -161,6 +176,10 @@ export async function getVaultsInformation(
         managementFee: (Number(feeData[1]) / 1e5) * 100,
         totalBase,
         totalQuote,
+        totalRewards:
+          incentivesRewards?.find(
+            (i) => i.vault.toLowerCase() === v.address.toLowerCase(),
+          )?.total ?? 0,
         balanceBase,
         balanceQuote,
         chainId: client.chain?.id,

@@ -1,7 +1,10 @@
 "use client"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
+import { getVaultIncentives } from "@/app/earn/(shared)/_service/vault-incentives"
 import { getVaultsInformation } from "@/app/earn/(shared)/_service/vaults-infos"
+import { useMgvFdv } from "@/app/earn/(shared)/store/vault-store"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
@@ -23,18 +26,51 @@ export function useVaults<T = Vault[] | undefined>({
   const publicClient = usePublicClient()
   const { address: user, chainId } = useAccount()
   const plainVaults = useVaultsWhitelist()
+  const incentives = useVaultsIncentives()
+  const { fdv } = useMgvFdv()
 
   const { data, ...rest } = useQuery({
-    queryKey: ["vaults", publicClient?.key, user, chainId, plainVaults.length],
+    queryKey: [
+      "vaults",
+      publicClient?.key,
+      fdv,
+      user,
+      chainId,
+      plainVaults.length,
+    ],
     queryFn: async (): Promise<Vault[]> => {
       try {
         if (!publicClient?.key) throw new Error("Public client is not enabled")
         if (!plainVaults) return []
+
+        const incentivesData = await Promise.all(
+          plainVaults.map(async (vault) => {
+            const data = await getVaultIncentives(
+              publicClient,
+              incentives.find(
+                (i) => i.vault.toLowerCase() === vault.address.toLowerCase(),
+              ),
+            )
+            return {
+              vault: vault.address,
+              total:
+                data?.leaderboard.reduce(
+                  (sum, entry) => sum + entry.rewards,
+                  0,
+                ) ?? 0,
+            }
+          }),
+        )
+
         const vaults = await getVaultsInformation(
           publicClient,
           plainVaults,
           user,
+          incentives,
+          fdv,
+          incentivesData,
         )
+
         return vaults ?? []
       } catch (error) {
         printEvmError(error)
