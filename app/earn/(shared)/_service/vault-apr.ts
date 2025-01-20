@@ -5,8 +5,10 @@ import {
   type Address,
   type PublicClient,
 } from "viem"
-import { arbitrum } from "viem/chains"
+import { arbitrum, baseSepolia } from "viem/chains"
 
+import { getTokenByAddress } from "@/utils/tokens"
+import { arbitrumMarkets, baseSepoliaMarkets } from "@mangrovedao/mgv/addresses"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 import { abi } from "./abi"
 import { calculateIncentiveAPR } from "./vault-incentives-apr"
@@ -143,13 +145,14 @@ async function calculateAaveAPR(
 /**
  * Calculates the total APR for a vault, including AAVE yields, trading fees, and incentives
  * @param client - Web3 client for blockchain interaction
- * @param vault - Address of the vault contract
+ * @param vaioult - Address of the vault contract
  * @returns Total calculated APR as a number, or 0 if calculation fails
  */
 export async function getVaultAPR(
   client: PublicClient,
   vault: Address,
   incentives?: VaultLPProgram,
+  fdv?: number,
 ): Promise<{ totalAPR: number; incentivesApr: number }> {
   try {
     const { base, quote, baseAmount, quoteAmount, fundsState } =
@@ -169,7 +172,17 @@ export async function getVaultAPR(
       totalAPR += aaveAPR
     }
 
-    const incentivesApr = calculateIncentiveAPR(incentives)
+    const quoteAssetPrice =
+      getTokenByAddress(quote, getMarkets(client.chain?.id), [])?.symbol ===
+      "WETH"
+        ? await getWethPrice()
+        : 1
+
+    const incentivesApr = calculateIncentiveAPR(
+      incentives,
+      fdv,
+      quoteAssetPrice,
+    )
 
     // Add trading APR if vault is actively trading
     if (fundsState > 1) {
@@ -178,9 +191,36 @@ export async function getVaultAPR(
       totalAPR += incentivesApr
     }
 
-    return { totalAPR, incentivesApr }
+    return { totalAPR, incentivesApr: 0 }
   } catch (error) {
     console.error("Failed to calculate vault APR:", error)
     return { totalAPR: 0, incentivesApr: 0 }
   }
+}
+
+const getMarkets = (chainId?: number) => {
+  switch (chainId) {
+    case arbitrum.id:
+      return arbitrumMarkets
+    case baseSepolia.id:
+      return baseSepoliaMarkets
+    default:
+      return arbitrumMarkets
+  }
+}
+
+async function getWethPrice() {
+  let wethPrice = 3500 // fallback price
+  try {
+    const response = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd",
+    )
+    const data = await response.json()
+    if (data?.weth?.usd) {
+      wethPrice = data.weth.usd
+    }
+  } catch (error) {
+    console.error("Failed to fetch WETH price, using fallback:", error)
+  }
+  return wethPrice
 }

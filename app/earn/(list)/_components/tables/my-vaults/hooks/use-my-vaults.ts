@@ -1,6 +1,7 @@
 "use client"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
 import { Vault } from "@/app/earn/(shared)/types"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
@@ -21,6 +22,7 @@ export function useMyVaults<T = Vault[]>({
   const publicClient = usePublicClient()
   const { address: user, chainId } = useAccount()
   const plainVaults = useVaultsWhitelist()
+  const incentives = useVaultsIncentives()
 
   const { data, ...rest } = useQuery({
     queryKey: ["my-vaults", publicClient?.key, user, chainId, first, skip],
@@ -32,6 +34,7 @@ export function useMyVaults<T = Vault[]>({
           publicClient,
           plainVaults,
           user,
+          incentives,
         )
         return vaults.filter((v) => v.isActive)
       } catch (error) {

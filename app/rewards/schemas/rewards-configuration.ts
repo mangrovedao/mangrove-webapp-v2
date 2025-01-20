@@ -17,6 +17,22 @@ export const incentiveResponseSchema = z.object({
   timestamp: z.number(),
 })
 
+export const vaultIncentivesSchema = z.object({
+  leaderboard: z.array(
+    z.object({
+      position: z.number(),
+      user: z.string(),
+      vault: z.string(),
+      rewards: z.number(),
+      currentRewardsPerSecond: z.number(),
+    }),
+  ),
+  nPages: z.number(),
+  nElements: z.number(),
+  isOver: z.boolean(),
+  timestamp: z.number(),
+})
+
 export const configurationSchema = z.object({
   precision: z.object({
     points: z.string(),

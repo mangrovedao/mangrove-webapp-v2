@@ -26,6 +26,7 @@ export type Vault = {
   decimals: number
   mintedAmount: bigint
   managementFee: number
+  totalRewards: number
   performanceFee: number
   address: Address
   market: MarketParams

@@ -5,6 +5,7 @@ import { useAccount, usePublicClient } from "wagmi"
 import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
 import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"
 import { getVaultsInformation } from "../../(shared)/_service/vaults-infos"
+import { useMgvFdv } from "../../(shared)/store/vault-store"
 
 export function useVault(address?: string | null) {
   const { chainId } = useAccount()
@@ -12,6 +13,7 @@ export function useVault(address?: string | null) {
   const publicClient = usePublicClient()
   const vaultsWhitelist = useVaultsWhitelist()
   const incentives = useVaultsIncentives()
+  const { fdv } = useMgvFdv()
 
   return useQuery({
     queryKey: [
@@ -43,7 +45,8 @@ export function useVault(address?: string | null) {
             publicClient,
             [vault],
             user,
-            vaultIncentives,
+            vaultIncentives ? [vaultIncentives] : undefined,
+            fdv,
           ).then((v) => v[0]),
         ])
         return {

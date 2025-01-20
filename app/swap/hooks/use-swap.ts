@@ -34,9 +34,9 @@ import { z } from "zod"
 export const SLIPPAGES = ["0.1", "0.5", "1"]
 const priceSchema = z.object({
   price: z.number(),
-  id: z.string(),
-  symbol: z.string(),
-  name: z.string(),
+  id: z.optional(z.string()),
+  symbol: z.optional(z.string()),
+  name: z.optional(z.string()),
 })
 
 export function useSwap() {

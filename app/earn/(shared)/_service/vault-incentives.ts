@@ -1,7 +1,7 @@
-import { Address, PublicClient } from "viem"
+import { PublicClient } from "viem"
 import { z } from "zod"
 
-import { incentiveResponseSchema } from "@/app/rewards/schemas/rewards-configuration"
+import { vaultIncentivesSchema } from "@/app/rewards/schemas/rewards-configuration"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 
 /**
@@ -10,23 +10,22 @@ import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
  * @param vault - Address of the vault contract
  * @returns Total calculated APR as a number, or 0 if calculation fails
  */
-export async function getUserVaultIncentives(
+export async function getVaultIncentives(
   client: PublicClient,
-  user?: Address,
   incentives?: VaultLPProgram,
-): Promise<z.infer<typeof incentiveResponseSchema> | null> {
+): Promise<z.infer<typeof vaultIncentivesSchema> | null> {
   try {
-    if (!user || !incentives) return null
+    if (!incentives) return null
 
     const userIncentives = await fetch(
-      `https://${client.chain?.id}-mgv-data.mgvinfra.com/incentives/vaults/${client.chain?.id}/${incentives?.vault}/${user}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}`,
+      `https://${client.chain?.id}-mgv-data.mgvinfra.com/incentives/vaults/${client.chain?.id}/${incentives?.vault}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}&page=0&pageSize=100`,
     )
 
     if (!userIncentives?.ok) {
       throw new Error("Failed to fetch incentives rewards")
     }
 
-    const incentivesData = incentiveResponseSchema.parse(
+    const incentivesData = vaultIncentivesSchema.parse(
       await userIncentives.json(),
     )
 
