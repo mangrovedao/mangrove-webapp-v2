@@ -1,15 +1,14 @@
-"use client"
-
 /**
  * Types and dependencies imports
  */
-import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import {
   zeroAddress,
   type Address,
   type MulticallParameters,
   type PublicClient,
 } from "viem"
+
+import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 import { multicallSchema } from "../schemas"
 import {
@@ -20,6 +19,7 @@ import {
 } from "../utils"
 import { getVaultAPR } from "./vault-apr"
 import { getUserVaultIncentives } from "./vault-incentives-rewards"
+
 // ============= MAIN FUNCTION =============
 
 /**
@@ -64,7 +64,7 @@ export async function getVaultsInformation(
   )
 
   const result = await client.multicall({ contracts, allowFailure: false })
-  
+
   // Process each vault's data
   return Promise.all(
     vaults.map(async (v, i): Promise<Vault & VaultWhitelist> => {

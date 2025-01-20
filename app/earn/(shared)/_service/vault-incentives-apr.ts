@@ -12,6 +12,7 @@ const MGV_TOTAL_SUPPLY = 1e9 // 1B MGV
 export function calculateIncentiveAPR(
   incentives?: VaultLPProgram,
   fdv?: number,
+  quoteAssetPrice?: number,
 ): number {
   try {
     if (!incentives || !fdv) return 0
@@ -25,11 +26,18 @@ export function calculateIncentiveAPR(
     if (!activePrograms) {
       return 0
     }
-
     // Sum up daily rewards from all active programs
-    const totalDailyRewards = incentives.rewardRate
+
+    // rewardRate * 365 * FDV / (MGV_total_supply * quote_asset_price)
+    // if quote asset = USD => quote_asset_price = 1
+    // if ETH => quote_asset_price = 3500
+
     // Calculate APR: (daily rewards * 365 * MGV FDV) / MGV total supply
-    const incentiveAPR = (totalDailyRewards * 365 * fdv) / MGV_TOTAL_SUPPLY
+
+    const totalDailyRewards = incentives.rewardRate
+    const incentiveAPR =
+      (totalDailyRewards * 365 * fdv) /
+      (MGV_TOTAL_SUPPLY * (quoteAssetPrice || 0))
 
     return incentiveAPR * 100
   } catch (error) {
