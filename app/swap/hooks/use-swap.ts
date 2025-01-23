@@ -370,6 +370,7 @@ export function useSwap() {
           bs: isBasePay ? BS.sell : BS.buy,
           send,
           receive,
+          isWrapping: false,
           slippage: Number(slippage),
         },
         swapMarket: currentMarket as MarketParams,
