@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { getRegExpForTokenDecimals } from "@/utils/regexp"
 
 export function CustomBalance(props: {
   token?: Token | string
@@ -49,7 +50,10 @@ export function CustomBalance(props: {
                     `${props.balance} ${props.token}`
                   ) : (
                     <>
-                      {Number(props.balance).toFixed(token?.displayDecimals)}{" "}
+                      {getRegExpForTokenDecimals(
+                        props.balance,
+                        token.displayDecimals,
+                      )}{" "}
                       {token?.symbol}
                     </>
                   )}
@@ -62,8 +66,7 @@ export function CustomBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {Number(props.balance).toFixed(token?.decimals)}{" "}
-                  {token?.symbol}
+                  {props.balance} {token?.symbol}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>

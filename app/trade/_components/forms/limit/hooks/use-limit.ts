@@ -12,7 +12,7 @@ import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
 import { formatUnits, parseUnits } from "viem"
-import { useAccount } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -23,6 +23,9 @@ type Props = {
 
 export function useLimit(props: Props) {
   const { address } = useAccount()
+  const { data: ethBalance } = useBalance({
+    address,
+  })
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
 
   const form = useForm({
@@ -32,6 +35,7 @@ export function useLimit(props: Props) {
       limitPrice: "",
       send: "",
       sendFrom: "simple",
+      isWrapping: false,
       receive: "",
       receiveTo: "simple",
       timeInForce: TimeInForce.GTC,
@@ -48,7 +52,7 @@ export function useLimit(props: Props) {
   const send = form.useStore((state) => state.values.send)
 
   const timeInForce = form.useStore((state) => state.values.timeInForce)
-
+  const isWrapping = form.useStore((state) => state.values.isWrapping)
   const { book } = useBook()
 
   const isBid = bs === BS.buy
@@ -89,6 +93,11 @@ export function useLimit(props: Props) {
     receiveTokenBalance?.balance || 0n,
     receiveToken?.decimals || 18,
   )
+
+  const sendBalanceWithEth = isWrapping
+    ? Number(sendTokenBalanceFormatted) +
+      Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
+    : Number(sendTokenBalanceFormatted)
 
   const fee = Number(
     (isBid ? book?.asksConfig?.fee : book?.bidsConfig?.fee) ?? 0,
@@ -235,12 +244,15 @@ export function useLimit(props: Props) {
     receiveToken,
     sendTokenBalance,
     sendTokenBalanceFormatted,
+    ethBalance,
     receiveTokenBalance,
     receiveTokenBalanceFormatted,
     logics,
     sendLogics,
     spotPrice,
+    isWrapping,
     receiveLogics,
+    sendBalanceWithEth,
     feeInPercentageAsString,
     tickSize,
     minVolume: minComputedVolume,

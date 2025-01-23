@@ -1,12 +1,13 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import React from "react"
-import { formatUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 
 import InfoTooltip from "@/components/info-tooltip-new"
 import { Caption } from "@/components/typography/caption"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -20,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { enumKeys } from "@/utils/enums"
+import { FIELD_ERRORS } from "@/utils/form-errors"
 import { useAccount } from "wagmi"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
@@ -56,19 +58,22 @@ export function Limit(props: { bs: BS }) {
     sendTokenBalanceFormatted,
     receiveTokenBalanceFormatted,
     minVolumeFormatted,
+    isWrapping,
+    sendBalanceWithEth,
+    ethBalance,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
     bs: props.bs,
   })
 
   const handleSliderChange = (value: number) => {
-    if (!sendTokenBalance) return
-    const amount = (BigInt(value * 100) * sendTokenBalance.balance) / 10_000n
+    if (!sendBalanceWithEth) return
+    const amount =
+      (BigInt(value * 100) *
+        parseUnits(sendBalanceWithEth.toString(), sendToken?.decimals || 18)) /
+      10_000n
     setSendSliderValue(value)
-    form.setFieldValue(
-      "send",
-      formatUnits(amount, sendTokenBalance.token.decimals),
-    )
+    form.setFieldValue("send", formatUnits(amount, sendToken?.decimals ?? 18))
     form.validateAllFields("change")
     if (!form.state.values.limitPrice) {
       form.setFieldValue("receive", "")
@@ -104,15 +109,10 @@ export function Limit(props: { bs: BS }) {
             <form.Field
               name="send"
               onChange={
-                Number(sendTokenBalanceFormatted) === 0
-                  ? sendValidator(Number(sendTokenBalanceFormatted))
+                Number(sendBalanceWithEth) === 0
+                  ? sendValidator(Number(sendBalanceWithEth))
                   : sendVolumeValidator(
-                      Number(
-                        formatUnits(
-                          sendTokenBalance?.balance || 0n,
-                          sendTokenBalance?.token.decimals || 18,
-                        ),
-                      ),
+                      sendBalanceWithEth,
                       Number(
                         Number(minVolumeFormatted).toFixed(
                           sendToken?.displayDecimals || 18,
@@ -148,23 +148,63 @@ export function Limit(props: { bs: BS }) {
                     // }}
                     balanceAction={{
                       onClick: () => {
-                        field.handleChange(sendTokenBalanceFormatted),
+                        field.handleChange(sendBalanceWithEth.toString()),
                           computeReceiveAmount()
                       },
                     }}
                     token={sendToken}
-                    customBalance={sendTokenBalanceFormatted}
+                    customBalance={sendBalanceWithEth.toString()}
                     label="Send amount"
                     disabled={
-                      !currentMarket || sendTokenBalanceFormatted === "0"
+                      !currentMarket || sendBalanceWithEth.toString() === "0"
                     }
                     showBalance
-                    error={field.state.meta.touchedErrors}
+                    error={
+                      !isWrapping &&
+                      Number(field.state.value) >
+                        Number(
+                          formatUnits(
+                            sendTokenBalance?.balance || 0n,
+                            sendToken?.decimals ?? 18,
+                          ),
+                        )
+                        ? [FIELD_ERRORS.insufficientBalance]
+                        : field.state.meta.touchedErrors
+                    }
                   />
                 </>
-                // <div className="grid -gap-4 bg-bg-primary rounded-lg p-2 focus-within:border focus-within:border-border-brand">
               )}
             </form.Field>
+
+            {(sendToken?.symbol.includes("ETH") ||
+              quoteToken?.symbol.includes("ETH")) && (
+              <form.Field name="isWrapping">
+                {(field) => (
+                  <div className="flex justify-between items-center px-1 -mt-2">
+                    <span className="flex items-center text-muted-foreground text-xs">
+                      Use available ETH
+                      <InfoTooltip className="text-text-quaternary text-sm">
+                        Will add a wrap ETH step during transaction
+                      </InfoTooltip>
+                    </span>
+                    <div className="flex items-center gap-1 text-xs text-text-secondary">
+                      {Number(
+                        formatUnits(
+                          ethBalance?.value ?? 0n,
+                          ethBalance?.decimals ?? 18,
+                        ),
+                      ).toFixed(3)}{" "}
+                      ETH
+                      <Checkbox
+                        className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                        checked={isWrapping}
+                        onClick={() => field.handleChange(!isWrapping)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </form.Field>
+            )}
 
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
@@ -461,7 +501,20 @@ export function Limit(props: { bs: BS }) {
 
       {formData && (
         <FromWalletLimitOrderDialog
-          form={{ ...formData, minVolume: minVolumeFormatted }}
+          form={{
+            ...formData,
+            minVolume: minVolumeFormatted,
+            totalWrapping:
+              Number(formData.send) > Number(sendTokenBalance?.balance)
+                ? Number(formData.send) -
+                  Number(
+                    formatUnits(
+                      sendTokenBalance?.balance || 0n,
+                      sendToken?.decimals ?? 18,
+                    ),
+                  )
+                : 0,
+          }}
           onClose={() => setFormData(undefined)}
         />
       )}

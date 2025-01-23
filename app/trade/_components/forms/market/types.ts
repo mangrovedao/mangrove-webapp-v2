@@ -6,4 +6,5 @@ export type Form = {
   receive: string
   slippage: number
   estimatedFee?: string
+  isWrapping: boolean
 }

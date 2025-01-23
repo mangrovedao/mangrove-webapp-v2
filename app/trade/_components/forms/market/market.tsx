@@ -4,11 +4,13 @@ import React from "react"
 import { formatUnits } from "viem"
 
 import { CustomInput } from "@/components/custom-input-new"
+import InfoTooltip from "@/components/info-tooltip"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
 import { EnhancedNumericInput } from "@components/token-input-new"
-import { useAccount } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
@@ -19,15 +21,18 @@ import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 const slippageValues = ["0.1", "0.5", "1"]
 
 export function Market(props: { bs: BS }) {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
+  const { data: ethBalance } = useBalance({
+    address,
+  })
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
 
   const {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
     handleSubmit,
+    sendTokenBalance,
     form,
     market,
     sendToken,
@@ -38,20 +43,30 @@ export function Market(props: { bs: BS }) {
     avgPrice,
     feeInPercentageAsString,
     spotPrice,
+    isWrapping,
     slippage,
   } = useMarketForm({
     onSubmit: (formData) => setFormData(formData),
     bs: props.bs,
   })
 
-  const sendBalance = formatUnits(
-    sendTokenBalance.balance?.balance || 0n,
-    sendToken?.decimals || 18,
-  )
-  const sendTokenBalanceAsNumber = sendBalance ? Number(sendBalance) : 0
+  const sendBalanceWithEth = isWrapping
+    ? Number(
+        formatUnits(
+          sendTokenBalance.balance?.balance || 0n,
+          sendToken?.decimals ?? 18,
+        ),
+      ) +
+      Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
+    : Number(
+        formatUnits(
+          sendTokenBalance.balance?.balance || 0n,
+          sendToken?.decimals ?? 18,
+        ),
+      )
 
   const handleSliderChange = (value: number) => {
-    const amount = (value * sendTokenBalanceAsNumber) / 100
+    const amount = (value * sendBalanceWithEth) / 100
     form.setFieldValue("send", amount.toString())
     form.validateAllFields("change")
     computeReceiveAmount()
@@ -60,10 +75,10 @@ export function Market(props: { bs: BS }) {
   const sliderValue = Math.min(
     Big(!isNaN(Number(send)) ? Number(send) : 0)
       .mul(100)
-      .div(sendTokenBalanceAsNumber === 0 ? 1 : sendTokenBalanceAsNumber)
+      .div(sendBalanceWithEth === 0 ? 1 : sendBalanceWithEth)
       .toNumber(),
     100,
-  ).toFixed(0)
+  )
 
   return (
     <>
@@ -72,14 +87,7 @@ export function Market(props: { bs: BS }) {
           <div className="space-y-4 !mt-6">
             <form.Field
               name="send"
-              onChange={sendValidator(
-                Number(
-                  formatUnits(
-                    sendTokenBalance?.balance?.balance || 0n,
-                    sendTokenBalance?.balance?.token.decimals || 18,
-                  ),
-                ),
-              )}
+              onChange={sendValidator(sendBalanceWithEth)}
             >
               {(field) => (
                 <EnhancedNumericInput
@@ -91,33 +99,67 @@ export function Market(props: { bs: BS }) {
                     field.handleChange(value)
                     computeReceiveAmount()
                   }}
-                  sendSliderValue={Number(sliderValue)}
+                  sendSliderValue={sliderValue}
                   setSendSliderValue={handleSliderChange}
                   balanceAction={{
                     onClick: () => {
-                      field.handleChange(
-                        formatUnits(
-                          sendTokenBalance.balance?.balance || 0n,
-                          sendToken?.decimals ?? 18,
-                        ) || "0",
-                      ),
-                        computeReceiveAmount()
+                      field.handleChange(sendBalanceWithEth.toString() || "0")
+                      computeReceiveAmount()
                     },
                   }}
                   token={sendToken}
                   label="Send amount"
-                  disabled={
-                    !market ||
-                    formatUnits(
-                      sendTokenBalance.balance?.balance ?? 0n,
-                      sendToken?.decimals ?? 18,
-                    ) === "0"
+                  disabled={!market || sendBalanceWithEth.toString() === "0"}
+                  customBalance={
+                    isWrapping ? sendBalanceWithEth.toString() : undefined
                   }
                   showBalance
-                  error={field.state.meta.touchedErrors}
+                  error={
+                    !isWrapping &&
+                    Number(field.state.value) >
+                      Number(
+                        formatUnits(
+                          sendTokenBalance.balance?.balance || 0n,
+                          sendToken?.decimals ?? 18,
+                        ),
+                      )
+                      ? [FIELD_ERRORS.insufficientBalance]
+                      : field.state.meta.touchedErrors
+                  }
                 />
               )}
             </form.Field>
+
+            {(market?.base.symbol.includes("ETH") ||
+              market?.quote.symbol.includes("ETH")) && (
+              <form.Field name="isWrapping">
+                {(field) => (
+                  <div className="flex justify-between items-center px-1 -mt-2">
+                    <span className="flex items-center text-muted-foreground text-xs">
+                      Use available ETH
+                      <InfoTooltip className="text-text-quaternary text-sm">
+                        Will add a wrap ETH step during transaction
+                      </InfoTooltip>
+                    </span>
+                    <div className="flex items-center gap-1 text-xs text-text-secondary">
+                      {Number(
+                        formatUnits(
+                          ethBalance?.value ?? 0n,
+                          ethBalance?.decimals ?? 18,
+                        ),
+                      ).toFixed(3)}{" "}
+                      ETH
+                      <Checkbox
+                        className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                        checked={isWrapping}
+                        onClick={() => field.handleChange(!isWrapping)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </form.Field>
+            )}
+
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
                 <EnhancedNumericInput
@@ -214,8 +256,7 @@ export function Market(props: { bs: BS }) {
                         onBlur={field.handleBlur}
                         onChange={({ target: { value } }) => {
                           if (value.length > 2) return
-
-                          // field.handleChange(Number(value))
+                          field.handleChange(Number(value))
                         }}
                       />
                     )}
@@ -257,7 +298,26 @@ export function Market(props: { bs: BS }) {
       </form.Provider>
       {formData && (
         <FromWalletMarketOrderDialog
-          form={{ ...formData, estimatedFee: feeInPercentageAsString }}
+          form={{
+            ...formData,
+            estimatedFee: feeInPercentageAsString,
+            totalWrapping:
+              Number(formData.send) >
+              Number(
+                formatUnits(
+                  sendTokenBalance.balance?.balance || 0n,
+                  sendToken?.decimals ?? 18,
+                ),
+              )
+                ? Number(formData.send) -
+                  Number(
+                    formatUnits(
+                      sendTokenBalance.balance?.balance || 0n,
+                      sendToken?.decimals ?? 18,
+                    ),
+                  )
+                : 0,
+          }}
           onClose={() => setFormData(undefined)}
         />
       )}

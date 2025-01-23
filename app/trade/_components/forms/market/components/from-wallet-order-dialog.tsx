@@ -1,11 +1,19 @@
 import React from "react"
-import { useAccount } from "wagmi"
+import {
+  useAccount,
+  useSendTransaction,
+  useWaitForTransactionReceipt,
+} from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog-new"
+import { TokenIcon } from "@/components/token-icon-new"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { getRegExpForTokenDecimals } from "@/utils/regexp"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { toast } from "sonner"
+import { Address, parseEther } from "viem"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
 import { Steps } from "../../components/steps"
@@ -16,13 +24,19 @@ import type { Form } from "../types"
 import { SummaryStep } from "./summary-step"
 
 type Props = {
-  form: Form
+  form: Form & { totalWrapping: number }
   onClose: () => void
 }
 
 const btnProps: ButtonProps = {
   className: "w-full",
   size: "lg",
+}
+
+export const wethAdresses: { [key: number]: Address | undefined } = {
+  168587773: "0x4200000000000000000000000000000000000023",
+  81457: "0x4300000000000000000000000000000000000004",
+  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 }
 
 export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
@@ -37,6 +51,15 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     spotPrice,
   } = useTradeInfos("market", form.bs)
 
+  const {
+    data: wrappingHash,
+    isPending: isPendingWrapping,
+    sendTransaction,
+  } = useSendTransaction()
+
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: wrappingHash,
+  })
   const { data: marketOrderSteps } = useMarketSteps({
     user: address,
     bs: form.bs,
@@ -49,6 +72,10 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     steps = ["Summary", `Approve ${sendToken?.symbol}`, ...steps]
   }
 
+  if (form.totalWrapping > 0) {
+    steps = ["Wrap ETH", ...steps]
+  }
+
   const isDialogOpenRef = React.useRef(false)
   React.useEffect(() => {
     isDialogOpenRef.current = !!form
@@ -57,6 +84,13 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
       isDialogOpenRef.current = false
     }
   }, [form])
+
+  React.useEffect(() => {
+    if (wrappingHash) {
+      goToNextStep()
+      toast.success("ETH wrapped successfully!")
+    }
+  }, [wrappingHash])
 
   const approve = useInfiniteApproveToken()
   const post = usePostMarketOrder({
@@ -95,6 +129,52 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
         <Button {...btnProps} onClick={goToNextStep}>
           Proceed
         </Button>
+      ),
+    },
+    form.totalWrapping > 0 && {
+      body: (
+        <div className="border border-border-secondary rounded-lg p-4 space-y-8">
+          <div className="flex justify-center items-center">
+            <TokenIcon
+              className="w-12 h-12 flex justify-center items-center"
+              imgClasses="w-12 h-12"
+              symbol={"ETH"}
+            />
+          </div>
+          <h1 className="text-2xl text-white text-center">
+            Wrap your ETH to continue with the trade
+          </h1>
+          <p className="text-base text-gray-scale-300">
+            This step is required to convert{" "}
+            {getRegExpForTokenDecimals(form.totalWrapping.toString(), 3)} ETH to
+            WETH
+          </p>
+        </div>
+      ),
+      button: (
+        <div className="flex gap-2 w-full">
+          <Button
+            size={"lg"}
+            variant={"secondary"}
+            onClick={() => goToPrevStep()}
+            disabled={isPendingWrapping}
+          >
+            Back
+          </Button>
+          <Button
+            {...btnProps}
+            className="flex-1"
+            onClick={() =>
+              sendTransaction({
+                to: wethAdresses[chain?.id ?? 0],
+                value: parseEther(form.totalWrapping.toString()),
+              })
+            }
+            disabled={isPendingWrapping}
+          >
+            Wrap ETH
+          </Button>
+        </div>
       ),
     },
     !marketOrderSteps?.[0].done && {
@@ -155,7 +235,13 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
           onClick={() => {
             post.mutate(
               {
-                form,
+                form: {
+                  ...form,
+                  send:
+                    baseToken?.symbol === "WETH"
+                      ? (Number(form.send) - 0.0000001).toString()
+                      : form.send,
+                },
               },
               {
                 onError: (error: Error) => {
