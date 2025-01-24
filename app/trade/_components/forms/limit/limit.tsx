@@ -152,6 +152,7 @@ export function Limit(props: { bs: BS }) {
                           computeReceiveAmount()
                       },
                     }}
+                    isWrapping={isWrapping}
                     token={sendToken}
                     customBalance={sendBalanceWithEth.toString()}
                     label="Send amount"
@@ -179,7 +180,7 @@ export function Limit(props: { bs: BS }) {
             {sendToken?.symbol.includes("ETH") && (
               <form.Field name="isWrapping">
                 {(field) => (
-                  <div className="flex justify-between items-center px-1 -mt-2">
+                  <div className="flex justify-between items-center px-1">
                     <span className="flex items-center text-muted-foreground text-xs">
                       Use available ETH
                       <InfoTooltip className="text-text-quaternary text-sm">
@@ -187,14 +188,16 @@ export function Limit(props: { bs: BS }) {
                       </InfoTooltip>
                     </span>
                     <div className="flex items-center gap-1 text-xs text-text-secondary">
-                      {getExactWeiAmount(
-                        formatUnits(
-                          ethBalance?.value ?? 0n,
-                          ethBalance?.decimals ?? 18,
-                        ),
-                        3,
-                      )}{" "}
-                      ETH
+                      <span>
+                        {getExactWeiAmount(
+                          formatUnits(
+                            ethBalance?.value ?? 0n,
+                            ethBalance?.decimals ?? 18,
+                          ),
+                          3,
+                        )}{" "}
+                        ETH
+                      </span>
                       <Checkbox
                         className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
                         checked={isWrapping}
@@ -505,7 +508,13 @@ export function Limit(props: { bs: BS }) {
             ...formData,
             minVolume: minVolumeFormatted,
             totalWrapping:
-              Number(formData.send) > Number(sendTokenBalance?.balance)
+              Number(formData.send) >
+              Number(
+                formatUnits(
+                  sendTokenBalance?.balance || 0n,
+                  sendToken?.decimals ?? 18,
+                ),
+              )
                 ? Number(formData.send) -
                   Number(
                     formatUnits(

@@ -4,7 +4,7 @@ import React from "react"
 import { formatUnits } from "viem"
 
 import { CustomInput } from "@/components/custom-input-new"
-import InfoTooltip from "@/components/info-tooltip"
+import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/utils"
@@ -111,6 +111,7 @@ export function Market(props: { bs: BS }) {
                   token={sendToken}
                   label="Send amount"
                   disabled={!market || sendBalanceWithEth.toString() === "0"}
+                  isWrapping={isWrapping}
                   customBalance={
                     isWrapping ? sendBalanceWithEth.toString() : undefined
                   }
@@ -135,12 +136,12 @@ export function Market(props: { bs: BS }) {
               <form.Field name="isWrapping">
                 {(field) => (
                   <div className="flex justify-between items-center px-1 -mt-2">
-                    <span className="flex items-center text-muted-foreground text-xs">
+                    <div className="flex items-center text-muted-foreground text-xs">
                       Use available ETH
                       <InfoTooltip className="text-text-quaternary text-sm">
                         Will add a wrap ETH step during transaction
                       </InfoTooltip>
-                    </span>
+                    </div>
                     <div className="flex items-center gap-1 text-xs text-text-secondary">
                       {getExactWeiAmount(
                         formatUnits(

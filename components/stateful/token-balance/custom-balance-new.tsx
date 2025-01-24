@@ -11,6 +11,7 @@ import {
 import { getExactWeiAmount } from "@/utils/regexp"
 
 export function CustomBalance(props: {
+  isWrapping?: boolean
   token?: Token | string
   balance?: string
   label?: string
@@ -63,7 +64,7 @@ export function CustomBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {props.balance} {token?.symbol}
+                  {props.balance} {token?.symbol} + {props.isWrapping && "ETH"}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>

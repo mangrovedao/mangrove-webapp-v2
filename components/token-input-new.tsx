@@ -28,6 +28,7 @@ type EnhancedNumericInputProps = {
   volumeAction?: { onClick: (value: string) => void; text?: string }
   error?: ValidationError[] | string
   inputClassName?: string
+  isWrapping?: boolean
 } & NumericInputProps
 
 const sliderValues = [25, 50, 75]
@@ -52,6 +53,7 @@ export const EnhancedNumericInput = React.forwardRef<
       inputClassName,
       sendSliderValue,
       setSendSliderValue,
+      isWrapping,
       ...inputProps
     },
     ref,
@@ -82,6 +84,7 @@ export const EnhancedNumericInput = React.forwardRef<
             )}
             {customBalance && showBalance && (
               <CustomBalance
+                isWrapping={isWrapping}
                 action={balanceAction}
                 token={token}
                 balance={customBalance}
