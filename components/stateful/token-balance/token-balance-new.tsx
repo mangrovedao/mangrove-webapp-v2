@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useTokenBalance } from "@/hooks/use-balances"
-import { getRegExpForTokenDecimals } from "@/utils/regexp"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { formatUnits } from "viem"
 import { useAccount, useBalance } from "wagmi"
 
@@ -55,7 +55,7 @@ export function TokenBalance(props: {
                 }}
               >
                 <span className="text-text-secondary">
-                  {getRegExpForTokenDecimals(formatted, token?.displayDecimals)}
+                  {getExactWeiAmount(formatted, token?.displayDecimals)}
                 </span>
               </TooltipTrigger>
 

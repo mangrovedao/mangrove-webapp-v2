@@ -4,7 +4,7 @@ import Big from "big.js"
 import { TokenIcon } from "@/components/token-icon"
 import { cn } from "@/utils"
 
-import { getRegExpForTokenDecimals } from "@/utils/regexp"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { BS } from "@mangrovedao/mgv/lib"
 import type { Form } from "../types"
 
@@ -49,14 +49,14 @@ export function SummaryStep({
           <Line title="Type">Market</Line>
           <Line title="Liquidity source">Wallet</Line>
           <Line title="Base amount">
-            {getRegExpForTokenDecimals(
+            {getExactWeiAmount(
               Big(form.send ?? 0).toString(),
               sendToken?.displayDecimals,
             )}{" "}
             <Unit>{sendToken?.symbol}</Unit>
           </Line>
           <Line title="Quote amount">
-            {getRegExpForTokenDecimals(
+            {getExactWeiAmount(
               Big(form.receive ?? 0).toString(),
               receiveToken?.displayDecimals,
             )}{" "}

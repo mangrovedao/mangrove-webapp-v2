@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/utils"
 import { FIELD_ERRORS } from "@/utils/form-errors"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { EnhancedNumericInput } from "@components/token-input-new"
 import { useAccount, useBalance } from "wagmi"
 import { Accordion } from "../components/accordion"
@@ -130,8 +131,7 @@ export function Market(props: { bs: BS }) {
               )}
             </form.Field>
 
-            {(market?.base.symbol.includes("ETH") ||
-              market?.quote.symbol.includes("ETH")) && (
+            {sendToken?.symbol.includes("ETH") && (
               <form.Field name="isWrapping">
                 {(field) => (
                   <div className="flex justify-between items-center px-1 -mt-2">
@@ -142,12 +142,13 @@ export function Market(props: { bs: BS }) {
                       </InfoTooltip>
                     </span>
                     <div className="flex items-center gap-1 text-xs text-text-secondary">
-                      {Number(
+                      {getExactWeiAmount(
                         formatUnits(
                           ethBalance?.value ?? 0n,
                           ethBalance?.decimals ?? 18,
                         ),
-                      ).toFixed(3)}{" "}
+                        3,
+                      )}{" "}
                       ETH
                       <Checkbox
                         className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"

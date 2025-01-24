@@ -1,12 +1,12 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import React from "react"
 import { formatUnits, parseUnits } from "viem"
-
-import { EnhancedNumericInput } from "@/components/token-input-new"
-import { Button } from "@/components/ui/button"
+import { useAccount } from "wagmi"
 
 import InfoTooltip from "@/components/info-tooltip-new"
+import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Caption } from "@/components/typography/caption"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import {
@@ -22,7 +22,7 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { enumKeys } from "@/utils/enums"
 import { FIELD_ERRORS } from "@/utils/form-errors"
-import { useAccount } from "wagmi"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import SourceIcon from "./components/source-icon"
@@ -176,8 +176,7 @@ export function Limit(props: { bs: BS }) {
               )}
             </form.Field>
 
-            {(sendToken?.symbol.includes("ETH") ||
-              quoteToken?.symbol.includes("ETH")) && (
+            {sendToken?.symbol.includes("ETH") && (
               <form.Field name="isWrapping">
                 {(field) => (
                   <div className="flex justify-between items-center px-1 -mt-2">
@@ -188,12 +187,13 @@ export function Limit(props: { bs: BS }) {
                       </InfoTooltip>
                     </span>
                     <div className="flex items-center gap-1 text-xs text-text-secondary">
-                      {Number(
+                      {getExactWeiAmount(
                         formatUnits(
                           ethBalance?.value ?? 0n,
                           ethBalance?.decimals ?? 18,
                         ),
-                      ).toFixed(3)}{" "}
+                        3,
+                      )}{" "}
                       ETH
                       <Checkbox
                         className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"

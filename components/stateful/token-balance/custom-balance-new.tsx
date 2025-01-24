@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { getRegExpForTokenDecimals } from "@/utils/regexp"
+import { getExactWeiAmount } from "@/utils/regexp"
 
 export function CustomBalance(props: {
   token?: Token | string
@@ -50,10 +50,7 @@ export function CustomBalance(props: {
                     `${props.balance} ${props.token}`
                   ) : (
                     <>
-                      {getRegExpForTokenDecimals(
-                        props.balance,
-                        token.displayDecimals,
-                      )}{" "}
+                      {getExactWeiAmount(props.balance, token.displayDecimals)}{" "}
                       {token?.symbol}
                     </>
                   )}

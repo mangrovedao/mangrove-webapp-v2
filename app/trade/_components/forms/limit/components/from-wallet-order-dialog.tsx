@@ -11,7 +11,7 @@ import { TokenIcon } from "@/components/token-icon"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { getRegExpForTokenDecimals } from "@/utils/regexp"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { Logic } from "@mangrovedao/mgv"
 import { toast } from "sonner"
@@ -164,8 +164,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
           </h1>
           <p className="text-base text-gray-scale-300">
             This step is required to convert{" "}
-            {getRegExpForTokenDecimals(form.totalWrapping.toString(), 3)} ETH to
-            WETH
+            {getExactWeiAmount(form.totalWrapping.toString(), 3)} ETH to WETH
           </p>
         </div>
       ),

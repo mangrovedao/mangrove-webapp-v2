@@ -10,7 +10,7 @@ import Dialog from "@/components/dialogs/dialog-new"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { getRegExpForTokenDecimals } from "@/utils/regexp"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { toast } from "sonner"
 import { Address, parseEther } from "viem"
@@ -146,8 +146,7 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
           </h1>
           <p className="text-base text-gray-scale-300">
             This step is required to convert{" "}
-            {getRegExpForTokenDecimals(form.totalWrapping.toString(), 3)} ETH to
-            WETH
+            {getExactWeiAmount(form.totalWrapping.toString(), 3)} ETH to WETH
           </p>
         </div>
       ),
