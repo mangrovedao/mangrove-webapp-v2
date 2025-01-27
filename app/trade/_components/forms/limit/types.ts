@@ -11,4 +11,5 @@ export type Form = {
   timeToLiveUnit: TimeToLiveUnit
   sendFrom: string
   receiveTo: string
+  isWrapping: boolean
 }

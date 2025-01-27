@@ -4,8 +4,11 @@ import type { Token } from "@mangrovedao/mgv"
 import React from "react"
 
 import { CustomInput } from "@/components/custom-input-new"
+import InfoTooltip from "@/components/info-tooltip-new"
 import { TokenIcon } from "@/components/token-icon"
+import { Text } from "@/components/typography/text"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -20,9 +23,10 @@ import { useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { getAllTokensInMarkets } from "@/utils/tokens"
 import Rive from "@rive-app/react-canvas-lite"
-import { Address } from "viem"
+import { Address, formatUnits } from "viem"
 import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
@@ -56,8 +60,11 @@ export default function Swap() {
     showCustomInput,
     setShowCustomInput,
     setSlippage,
-    isOdosLoading,
     mangroveTradeableTokensForPayToken,
+    ethBalance,
+    isWrapping,
+    setIsWrapping,
+    isFieldLoading,
   } = useSwap()
 
   return (
@@ -73,6 +80,14 @@ export default function Swap() {
               type="pay"
               token={payToken}
               value={fields.payValue}
+              isWrapping={isWrapping}
+              ethBalance={getExactWeiAmount(
+                formatUnits(
+                  ethBalance?.value ?? 0n,
+                  ethBalance?.decimals ?? 18,
+                ),
+                3,
+              )}
               onChange={onPayValueChange}
               dollarValue={payDollar}
               onTokenClicked={() => setPayTokenDialogOpen(true)}
@@ -87,7 +102,7 @@ export default function Swap() {
               <SwapArrowIcon className="size-6" />
             </Button>
             <TokenContainer
-              loadingValue={isOdosLoading}
+              loadingValue={isFieldLoading}
               type="receive"
               token={receiveToken}
               value={fields.receiveValue}
@@ -96,6 +111,7 @@ export default function Swap() {
               onTokenClicked={() => setReceiveTokenDialogOpen(true)}
             />
           </div>
+
           {!isConnected ? (
             <Button
               className="w-full text-lg"
@@ -114,6 +130,35 @@ export default function Swap() {
               {swapButtonText}
             </Button>
           )}
+          {payToken?.symbol.includes("ETH") &&
+            ethBalance?.value &&
+            ethBalance.value > 0n && (
+              <div className="flex justify-between items-center px-1">
+                <Text className="flex items-center text-muted-foreground text-base">
+                  Use ETH balance
+                  <InfoTooltip className="text-text-quaternary text-sm">
+                    Will add a wrap ETH to wETH step during transaction
+                  </InfoTooltip>
+                </Text>
+                <div className="flex items-center gap-1 text-xs text-text-secondary">
+                  <span>
+                    {getExactWeiAmount(
+                      formatUnits(
+                        ethBalance?.value ?? 0n,
+                        ethBalance?.decimals ?? 18,
+                      ),
+                      3,
+                    )}{" "}
+                    ETH
+                  </span>
+                  <Checkbox
+                    className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                    checked={isWrapping}
+                    onClick={() => setIsWrapping(!isWrapping)}
+                  />
+                </div>
+              </div>
+            )}
           <Accordion
             title="Slippage tolerance"
             tooltip="How much price slippage you're willing to accept so that your order can be executed"
@@ -292,6 +337,8 @@ type TokenContainerProps = {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   isFetchingDollarValue?: boolean
   loadingValue?: boolean
+  isWrapping?: boolean
+  ethBalance?: string
 }
 
 function TokenContainer({
@@ -304,6 +351,8 @@ function TokenContainer({
   dollarValue,
   isFetchingDollarValue,
   loadingValue,
+  isWrapping,
+  ethBalance,
 }: TokenContainerProps) {
   const { isConnected } = useAccount()
   const tokenBalance = useTokenBalance(token)
@@ -330,7 +379,12 @@ function TokenContainer({
                   onClick={onMaxClicked}
                   className="hover:opacity-80 transition-all px-0 ml-1 text-sm text-text-secondary"
                 >
-                  <span className="">{tokenBalance.formattedAndFixed}</span>{" "}
+                  <span>
+                    {isWrapping
+                      ? Number(ethBalance) +
+                        Number(tokenBalance.formattedAndFixed)
+                      : tokenBalance.formattedAndFixed}
+                  </span>{" "}
                 </Button>
               ) : (
                 <span className="ml-1 text-text-secondary">

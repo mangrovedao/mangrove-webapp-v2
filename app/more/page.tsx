@@ -1,5 +1,8 @@
 "use client"
 
+import React from "react"
+import { useEventListener } from "usehooks-ts"
+
 import {
   CustomTabs,
   CustomTabsContent,
@@ -8,10 +11,9 @@ import {
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { renderElement } from "@/utils/render"
-import React from "react"
-import { useEventListener } from "usehooks-ts"
 import BridgeComponent from "./components/bridge/bridge"
 import QuickActions from "./components/quick-actions"
+import UnWrap from "./components/unwrap"
 import Wrap from "./components/wrap"
 import { ActionsTabs } from "./utils/types"
 
@@ -20,6 +22,7 @@ const TABS_CONTENT = {
   [ActionsTabs.KANDEL]: <div>TODO</div>,
   [ActionsTabs.BRIDGE]: BridgeComponent,
   [ActionsTabs.WRAP]: Wrap,
+  [ActionsTabs.UNWRAP]: UnWrap,
 }
 
 export default function Page() {

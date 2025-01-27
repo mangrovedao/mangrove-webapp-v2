@@ -67,6 +67,7 @@ export function useMarketForm(props: Props) {
       slippage: 0.5,
       send: "",
       receive: "",
+      isWrapping: false,
     },
     onSubmit: (values) => props.onSubmit(values),
   })
@@ -197,9 +198,9 @@ export function useMarketForm(props: Props) {
   return {
     computeReceiveAmount,
     computeSendAmount,
+    handleSubmit,
     sendTokenBalance,
     receiveTokenBalance,
-    handleSubmit,
     form,
     market,
     avgPrice: averagePrice.price?.toFixed(averagePrice.decimals),
@@ -211,6 +212,7 @@ export function useMarketForm(props: Props) {
     feeInPercentageAsString,
     hasEnoughVolume,
     slippage: form.useStore((state) => state.values.slippage),
+    isWrapping: form.useStore((state) => state.values.isWrapping),
     spotPrice,
   }
 }

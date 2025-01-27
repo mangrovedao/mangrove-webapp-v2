@@ -3,4 +3,5 @@ export enum ActionsTabs {
   KANDEL = "Kandel",
   BRIDGE = "Bridge",
   WRAP = "Wrap",
+  UNWRAP = "Unwrap",
 }
