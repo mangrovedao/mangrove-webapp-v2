@@ -1,17 +1,23 @@
-import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
 import React from "react"
 import { toast } from "sonner"
-import { Address, parseEther } from "viem"
+import { Address, parseUnits } from "viem"
 import {
   useAccount,
   useBalance,
-  useSendTransaction,
   useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi"
 
 import { tradeService } from "@/app/trade/_services/trade.service"
 import { EnhancedNumericInput } from "@/components/token-input"
+import { Title } from "@/components/typography/title"
+import { Button } from "@/components/ui/button-old"
+import wethAbi from "../../../app/faucet/_abis/weth.json"
+
+type Props = {
+  isOpen: boolean
+  onClose: () => void
+}
 
 export const wethAdresses: { [key: number]: Address | undefined } = {
   168587773: "0x4200000000000000000000000000000000000023",
@@ -19,31 +25,35 @@ export const wethAdresses: { [key: number]: Address | undefined } = {
   42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 }
 
-export default function Wrap() {
-  const { chain, address, isConnected } = useAccount()
-  const { data: nativeBalance } = useBalance({
-    address,
-  })
-
-  const { data: hash, isPending, sendTransaction } = useSendTransaction()
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+export default function UnWrap({ isOpen, onClose }: Props) {
+  const { chain, address } = useAccount()
+  const { data: hash, writeContract, isPending, error } = useWriteContract()
+  const { isLoading } = useWaitForTransactionReceipt({
     hash,
   })
   const [amount, setAmount] = React.useState("")
   const [amountError, setAmountError] = React.useState("")
 
-  const wrapETH = () => {
+  const { data: wethBalance } = useBalance({
+    address,
+    token: wethAdresses[chain?.id as number],
+  })
+
+  const unWrapETH = () => {
     try {
-      if (!chain?.id) return
+      if (!chain?.id || !wethBalance) return
       const wethAdress = wethAdresses[chain.id]
       if (!wethAdress) return
-      sendTransaction({
-        to: wethAdress,
-        value: parseEther(amount),
+      const parsedAmount = parseUnits(amount, wethBalance.decimals)
+      writeContract({
+        address: wethAdress,
+        abi: wethAbi,
+        functionName: "withdraw",
+        args: [parsedAmount],
       })
     } catch (error) {
       console.error(error)
-      toast.error("An error occured while wrapping ETH.")
+      toast.error("An error occured while unwrapping wETH.")
     }
   }
 
@@ -53,46 +63,46 @@ export default function Wrap() {
         address: hash as Address,
         blockExplorerUrl: chain?.blockExplorers?.default.url,
       })
-      toast.success("ETH wrapped successfully!")
+      toast.success("wETH unwrapped successfully!")
     }
   }, [hash])
 
   React.useEffect(() => {
-    if (!amount || !nativeBalance?.formatted) return
+    if (!amount || !wethBalance?.formatted) return
 
-    if (Number(amount) > Number(nativeBalance.formatted)) {
+    if (Number(amount) > Number(wethBalance.formatted)) {
       setAmountError("Insufficient balance")
     } else {
       setAmountError("")
     }
-  }, [, nativeBalance?.formatted, amount])
+  }, [, wethBalance?.formatted, amount])
 
   return (
     <div className="flex flex-col space-y-2 bg-bg-secondary rounded-2xl p-5 relative mt-16 max-w-xl mx-auto">
-      <Title>Wrap your ETH </Title>
+      <Title>Unwrap your wETH </Title>
       <div className="flex flex-col space-y-2">
         <EnhancedNumericInput
-          token={nativeBalance?.symbol}
-          label={`Amount to wrap`}
+          token={wethBalance?.symbol}
+          label={`Amount to Unwrap`}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          disabled={nativeBalance?.formatted === "0"}
+          disabled={wethBalance?.formatted === "0"}
+          customBalance={wethBalance?.formatted}
           showBalance
         />
         {amountError ? (
           <span className="text-red-600">{amountError}</span>
         ) : undefined}
       </div>
+
       <Button
         className="w-full"
         size={"lg"}
-        onClick={wrapETH}
-        disabled={
-          isLoading || isPending || !amount || !!amountError || !isConnected
-        }
+        onClick={unWrapETH}
+        disabled={isLoading || isPending || !amount || !!amountError}
         loading={isLoading || isPending}
       >
-        Wrap ETH
+        Unwrap wETH
       </Button>
     </div>
   )

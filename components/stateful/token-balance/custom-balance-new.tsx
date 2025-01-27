@@ -64,7 +64,7 @@ export function CustomBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {props.balance} {token?.symbol} + {props.isWrapping && "ETH"}
+                  {props.balance} {token?.symbol} {props.isWrapping && " + ETH"}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>

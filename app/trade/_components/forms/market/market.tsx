@@ -132,35 +132,37 @@ export function Market(props: { bs: BS }) {
               )}
             </form.Field>
 
-            {sendToken?.symbol.includes("ETH") && (
-              <form.Field name="isWrapping">
-                {(field) => (
-                  <div className="flex justify-between items-center px-1 -mt-2">
-                    <div className="flex items-center text-muted-foreground text-xs">
-                      Use available ETH
-                      <InfoTooltip className="text-text-quaternary text-sm">
-                        Will add a wrap ETH step during transaction
-                      </InfoTooltip>
+            {sendToken?.symbol.includes("ETH") &&
+              ethBalance?.value &&
+              ethBalance.value > 0n && (
+                <form.Field name="isWrapping">
+                  {(field) => (
+                    <div className="flex justify-between items-center px-1 -mt-2">
+                      <div className="flex items-center text-muted-foreground text-xs">
+                        Use ETH balance
+                        <InfoTooltip className="text-text-quaternary text-sm">
+                          Will add a wrap ETH to wETH step during transaction
+                        </InfoTooltip>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-text-secondary">
+                        {getExactWeiAmount(
+                          formatUnits(
+                            ethBalance?.value ?? 0n,
+                            ethBalance?.decimals ?? 18,
+                          ),
+                          3,
+                        )}{" "}
+                        ETH
+                        <Checkbox
+                          className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                          checked={isWrapping}
+                          onClick={() => field.handleChange(!isWrapping)}
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-text-secondary">
-                      {getExactWeiAmount(
-                        formatUnits(
-                          ethBalance?.value ?? 0n,
-                          ethBalance?.decimals ?? 18,
-                        ),
-                        3,
-                      )}{" "}
-                      ETH
-                      <Checkbox
-                        className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
-                        checked={isWrapping}
-                        onClick={() => field.handleChange(!isWrapping)}
-                      />
-                    </div>
-                  </div>
-                )}
-              </form.Field>
-            )}
+                  )}
+                </form.Field>
+              )}
 
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (

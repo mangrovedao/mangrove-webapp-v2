@@ -8,8 +8,15 @@ import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useQuery } from "@tanstack/react-query"
 import { useQueryState } from "nuqs"
 import React from "react"
-import { formatUnits, parseUnits } from "viem"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { Address, formatUnits, parseEther, parseUnits } from "viem"
+import {
+  useAccount,
+  useBalance,
+  usePublicClient,
+  useSendTransaction,
+  useWaitForTransactionReceipt,
+  useWalletClient,
+} from "wagmi"
 
 import { useMangroveAddresses, useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
@@ -21,6 +28,7 @@ import { useApproveToken } from "@/hooks/use-approve-token"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
+import { getExactWeiAmount } from "@/utils/regexp"
 import {
   deduplicateTokens,
   getAllMangroveMarketTokens,
@@ -29,7 +37,14 @@ import {
   getTradableTokens,
 } from "@/utils/tokens"
 import { MarketParams } from "@mangrovedao/mgv"
+import { toast } from "sonner"
 import { z } from "zod"
+
+export const wethAdresses: { [key: number]: Address | undefined } = {
+  168587773: "0x4200000000000000000000000000000000000023",
+  81457: "0x4300000000000000000000000000000000000004",
+  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+}
 
 export const SLIPPAGES = ["0.1", "0.5", "1"]
 const priceSchema = z.object({
@@ -41,6 +56,9 @@ const priceSchema = z.object({
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
+  const { data: ethBalance } = useBalance({
+    address,
+  })
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
     getQuote,
@@ -65,12 +83,23 @@ export function useSwap() {
     },
   )
 
+  const {
+    data: wrappingHash,
+    isPending: isPendingWrapping,
+    sendTransaction,
+  } = useSendTransaction()
+
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: wrappingHash,
+  })
+
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [slippage, setSlippage] = React.useState(SLIPPAGES[1])
   const [fields, setFields] = React.useState({
     payValue: "",
     receiveValue: "",
   })
+  const [isWrapping, setIsWrapping] = React.useState(false)
   const payToken = useTokenByAddress(payTknAddress)
   const receiveToken = useTokenByAddress(receiveTknAddress)
   const payTokenBalance = useTokenBalance(payToken)
@@ -84,22 +113,6 @@ export function useSwap() {
     addresses && currentMarket
       ? publicClient?.extend(publicMarketActions(addresses, currentMarket))
       : undefined
-
-  const hasEnoughBalance =
-    (payTokenBalance.balance ?? 0n) >=
-    parseUnits(fields.payValue, payToken?.decimals ?? 18)
-
-  const isReverseDisabled = !payToken || !receiveToken
-  const isSwapDisabled =
-    isReverseDisabled ||
-    !hasEnoughBalance ||
-    fields.payValue === "" ||
-    fields.receiveValue === "" ||
-    Number.parseFloat(fields.payValue) <= 0 ||
-    Number.parseFloat(fields.receiveValue) <= 0 ||
-    isOdosLoading ||
-    approvePayToken.isPending ||
-    postMarketOrder.isPending
 
   const allTokens = deduplicateTokens([
     ...getAllMangroveMarketTokens(markets),
@@ -146,12 +159,28 @@ export function useSwap() {
   }
 
   function onMaxClicked() {
+    const payTokenDecimals = payToken?.decimals ?? 18
+    const ethDecimals = ethBalance?.decimals ?? 18
+
+    const payTokenAmount = formatUnits(
+      payTokenBalance.balance ?? 0n,
+      payTokenDecimals,
+    )
+
+    if (!isWrapping) {
+      setFields((fields) => ({
+        ...fields,
+        payValue: payTokenAmount,
+      }))
+      return
+    }
+
+    const ethAmount = formatUnits(ethBalance?.value ?? 0n, ethDecimals)
+    const totalAmount = Number(ethAmount) + Number(payTokenAmount)
+
     setFields((fields) => ({
       ...fields,
-      payValue: formatUnits(
-        payTokenBalance.balance ?? 0n,
-        payToken?.decimals ?? 18,
-      ),
+      payValue: getExactWeiAmount(totalAmount.toString(), payTokenDecimals),
     }))
   }
 
@@ -171,6 +200,14 @@ export function useSwap() {
     refetchInterval: 3_000,
     enabled: !!marketClient,
   })
+
+  React.useEffect(() => {
+    if (wrappingHash) {
+      toast.success("ETH wrapped successfully!")
+      payTokenBalance.refetch()
+      receiveTokenBalance.refetch()
+    }
+  }, [wrappingHash])
 
   const simulateQuery = useQuery({
     queryKey: [
@@ -207,6 +244,7 @@ export function useSwap() {
             }
 
         const simulation = marketOrderSimulation(params)
+
         setFields((fields) => ({
           ...fields,
           receiveValue: formatUnits(
@@ -294,20 +332,85 @@ export function useSwap() {
   })
 
   const hasToApprove = simulateQuery.data?.approvalStep?.done === false
+  const totalWrapping = React.useMemo(() => {
+    if (!fields.payValue || !payToken) return 0
 
-  const swapButtonText = !hasEnoughBalance
-    ? "Insufficient balance"
-    : fields.payValue === ""
-      ? "Enter Pay amount"
-      : Number.parseFloat(fields.payValue) <= 0
-        ? "Amount must be greater than 0"
-        : approvePayToken.isPending
-          ? "Approval in progress..."
-          : hasToApprove
-            ? `Approve ${payToken?.symbol}`
-            : postMarketOrder.isPending
-              ? "Processing transaction..."
-              : `Swap via ${marketClient ? "Mangrove" : "Odos"}`
+    const payTokenBalanceFormatted = Number(
+      formatUnits(payTokenBalance.balance || 0n, payToken.decimals ?? 18),
+    )
+    const payValueNum = Number(fields.payValue)
+
+    if (payValueNum <= payTokenBalanceFormatted) return 0
+    console.log(
+      payValueNum - payTokenBalanceFormatted,
+      payTokenBalanceFormatted,
+    )
+    return payValueNum - payTokenBalanceFormatted
+  }, [fields.payValue, payToken, payTokenBalance.balance, ethBalance?.value])
+
+  const hasEnoughBalance = React.useMemo(() => {
+    if (!fields.payValue || !payToken) return false
+
+    try {
+      const availableBalance =
+        isWrapping && totalWrapping > 0
+          ? formatUnits(
+              (payTokenBalance.balance ?? 0n) + (ethBalance?.value ?? 0n),
+              payToken?.decimals ?? 18,
+            )
+          : formatUnits(payTokenBalance.balance ?? 0n, payToken?.decimals ?? 18)
+
+      return Number(availableBalance) >= Number(fields.payValue)
+    } catch {
+      return false
+    }
+  }, [
+    fields.payValue,
+    payToken,
+    payTokenBalance.balance,
+    ethBalance?.value,
+    totalWrapping,
+    isWrapping,
+  ])
+
+  const swapButtonText = React.useMemo(() => {
+    if (!hasEnoughBalance) return "Insufficient balance"
+    if (fields.payValue === "") return "Enter Pay amount"
+    if (Number.parseFloat(fields.payValue) <= 0)
+      return "Amount must be greater than 0"
+    if (approvePayToken.isPending) return "Approval in progress..."
+    if (totalWrapping > 0)
+      return `Wrap ${getExactWeiAmount(totalWrapping.toString(), 3)} ETH`
+    if (hasToApprove) return `Approve ${payToken?.symbol}`
+    if (postMarketOrder.isPending) return "Processing transaction..."
+    return `Swap via ${marketClient ? "Mangrove" : "Odos"}`
+  }, [
+    hasEnoughBalance,
+    fields.payValue,
+    approvePayToken.isPending,
+    totalWrapping,
+    hasToApprove,
+    payToken?.symbol,
+    postMarketOrder.isPending,
+    marketClient,
+  ])
+
+  const isReverseDisabled = !payToken || !receiveToken
+  const isSwapDisabled =
+    isReverseDisabled ||
+    !hasEnoughBalance ||
+    fields.payValue === "" ||
+    fields.receiveValue === "" ||
+    Number.parseFloat(fields.payValue) <= 0 ||
+    Number.parseFloat(fields.receiveValue) <= 0 ||
+    isOdosLoading ||
+    approvePayToken.isPending ||
+    postMarketOrder.isPending ||
+    isPendingWrapping ||
+    simulateQuery.isPending
+
+  const isFieldLoading =
+    isOdosLoading || (fields.payValue !== "" && simulateQuery.isPending)
 
   // slippage -> valeur en % dans marketOrderSimulation -> min slippage + petit % genre x1,1
 
@@ -343,6 +446,15 @@ export function useSwap() {
   async function swapMangrove() {
     if (!(marketClient && address && walletClient && payToken && receiveToken))
       return
+
+    if (totalWrapping > 0) {
+      sendTransaction({
+        to: wethAdresses[chainId ?? 0],
+        value: parseEther(totalWrapping.toString()),
+      })
+
+      return
+    }
 
     if (hasToApprove) {
       await approvePayToken.mutate(
@@ -427,6 +539,7 @@ export function useSwap() {
     receiveToken,
     reverseTokens,
     fields,
+    isFieldLoading,
     onPayValueChange,
     onReceiveValueChange,
     isConnected,
@@ -446,11 +559,16 @@ export function useSwap() {
     swapButtonText,
     payDollar: getMarketPriceQuery.data?.payDollar ?? 0,
     receiveDollar: getMarketPriceQuery.data?.receiveDollar ?? 0,
-    showCustomInput,
-    slippage,
     setShowCustomInput,
     setSlippage,
     isOdosLoading,
     mangroveTradeableTokensForPayToken,
+    // slippage
+    showCustomInput,
+    slippage,
+    // eth wrap
+    ethBalance,
+    isWrapping,
+    setIsWrapping,
   }
 }
