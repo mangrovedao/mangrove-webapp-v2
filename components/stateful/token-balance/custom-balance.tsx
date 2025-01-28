@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { getExactWeiAmount } from "@/utils/regexp"
 
 export function CustomBalance(props: {
   token?: Token | string
@@ -28,7 +29,7 @@ export function CustomBalance(props: {
         <span className="text-xs text-secondary float-left">
           {props.label ?? "Balance"}
         </span>
-        <InfoTooltip>{props.tooltip ?? "Formatted Wallet balance"}</InfoTooltip>
+        {props.tooltip && <InfoTooltip>{props.tooltip}</InfoTooltip>}
       </div>
       {!props.balance || !props.token ? (
         <Skeleton className="w-24 h-4" />
@@ -47,10 +48,10 @@ export function CustomBalance(props: {
               >
                 <span>
                   {!token ? (
-                    `${props.balance} ${props.token}`
+                    `${getExactWeiAmount(props.balance, 6)} ${props.token}`
                   ) : (
                     <>
-                      {Number(props.balance).toFixed(token?.displayDecimals)}{" "}
+                      {getExactWeiAmount(props.balance, token.displayDecimals)}{" "}
                       {token?.symbol}
                     </>
                   )}
@@ -63,8 +64,7 @@ export function CustomBalance(props: {
                     e.preventDefault()
                   }}
                 >
-                  {Number(props.balance).toFixed(token?.decimals)}{" "}
-                  {token?.symbol}
+                  {props.balance} {token?.symbol}
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>
