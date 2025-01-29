@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { Close, Pen } from "@/svgs"
 import { cn } from "@/utils"
+import { Token } from "@mangrovedao/mgv"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
 
@@ -35,25 +36,28 @@ export function useTable({ data, onCancel, onEdit }: Params) {
     () => [
       columnHelper.display({
         header: "Market",
-        cell: () => (
-          <div className="flex items-center space-x-2">
-            <TokenPair
-              titleProps={{
-                variant: "title3",
-                className: "text-sm text-current font-normal",
-                as: "span",
-              }}
-              tokenClasses="w-4 h-4"
-              baseToken={market?.base}
-              quoteToken={market?.quote}
-            />
-          </div>
-        ),
+        cell: ({ row }) => {
+          const { market } = row.original
+          return (
+            <div className="flex items-center space-x-2">
+              <TokenPair
+                titleProps={{
+                  variant: "title3",
+                  className: "text-sm text-current font-normal",
+                  as: "span",
+                }}
+                tokenClasses="w-4 h-4"
+                baseToken={market.base as Token}
+                quoteToken={market.quote as Token}
+              />
+            </div>
+          )
+        },
       }),
-      columnHelper.accessor("isBid", {
+      columnHelper.accessor("side", {
         header: "Side",
         cell: (row) => {
-          const isBid = row.getValue()
+          const isBid = row.getValue() === "buy"
           return (
             <div
               className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
@@ -71,8 +75,8 @@ export function useTable({ data, onCancel, onEdit }: Params) {
       columnHelper.display({
         header: "Filled/Amount",
         cell: ({ row }) => {
-          const { initialWants, takerGot, initialGives, isBid, takerGave } =
-            row.original
+          const { total, received, side } = row.original
+          const isBid = side === "buy"
           const baseSymbol = market?.base.symbol
           const quoteSymbol = market?.quote.symbol
           const symbol = isBid ? baseSymbol : quoteSymbol
@@ -81,8 +85,8 @@ export function useTable({ data, onCancel, onEdit }: Params) {
             ? market?.base.displayDecimals
             : market?.quote.displayDecimals
 
-          const amount = Big(initialWants).toFixed(displayDecimals)
-          const filled = Big(takerGot).toFixed(displayDecimals)
+          const amount = Big(total).toFixed(displayDecimals)
+          const filled = Big(received).toFixed(displayDecimals)
           const progress = Math.min(
             Math.round(
               Big(filled)
@@ -126,21 +130,24 @@ export function useTable({ data, onCancel, onEdit }: Params) {
             <Skeleton className="w-20 h-6" />
           ),
       }),
-      columnHelper.accessor("expiryDate", {
+      columnHelper.accessor("expiry", {
         header: "Time in force",
-        cell: (row) => {
-          const expiry = row.getValue()
-          return expiry ? <Timer expiry={expiry} /> : <div>-</div>
+        cell: ({ row }) => {
+          const { expiry } = row.original
+
+          return expiry ? (
+            <Timer expiry={new Date(expiry * 1000)} />
+          ) : (
+            <div>-</div>
+          )
         },
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Action</div>,
         cell: ({ row }) => {
-          const { expiryDate } = row.original
-          const isExpired = expiryDate
-            ? new Date(expiryDate) < new Date()
-            : true
+          const { expiry } = row.original
+          const isExpired = expiry ? new Date(expiry * 1000) < new Date() : true
 
           return (
             <div className="w-full h-full flex justify-end space-x-1">

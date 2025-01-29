@@ -36,7 +36,7 @@ export function useMyVaults<T = Vault[]>({
           user,
           incentives,
         )
-        return vaults.filter((v) => v.isActive)
+        return vaults?.filter((v) => v?.isActive) ?? []
       } catch (error) {
         console.error(error)
         return []
