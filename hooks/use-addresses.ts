@@ -2,10 +2,13 @@ import {
   arbitrumMangrove,
   arbitrumMarkets,
   arbitrumTokens,
+  baseMangrove,
+  baseMarkets,
   baseSepoliaLogics,
   baseSepoliaMangrove,
   baseSepoliaMarkets,
   baseSepoliaTokens,
+  baseTokens,
   blastLogics,
   blastMangrove,
   blastMarkets,
@@ -23,6 +26,8 @@ export function useMangroveAddresses() {
       return blastMangrove
     case arbitrum.id:
       return arbitrumMangrove
+    case base.id:
+      return baseMangrove
     case baseSepolia.id:
       return baseSepoliaMangrove
     default:
@@ -37,6 +42,8 @@ export function useAaveKandelRouter() {
       return "" // no aave on blast
     case arbitrum.id:
       return "0xb3be00f615239b8553D725dC9F418e27a874d4dC"
+    case base.id:
+      return ""
     case baseSepolia.id:
       return "0x2f05f5586D2A72CE5F0BE37DdD38B053aB616D60"
     default:
@@ -65,6 +72,8 @@ export function useKandelSeeder() {
       return "0x4bb7567303c8bde27a4b490b3e5f1593c891b03d"
     case arbitrum.id:
       return "0x89139bed90b1bfb5501f27be6d6f9901ae35745d"
+    case base.id:
+      return ""
     case baseSepolia.id:
       return "0x1a839030107167452d69d8f1a673004b2a1b8a3a"
     default:
@@ -79,10 +88,10 @@ export function useMarkets() {
       return blastMarkets
     case arbitrum.id:
       return arbitrumMarkets
+    case base.id:
+      return baseMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets
-    case base.id:
-      return []
     default:
       return arbitrumMarkets
   }
@@ -94,6 +103,8 @@ export function useLogics() {
     case blast.id:
       return blastLogics
     case arbitrum.id:
+      return []
+    case base.id:
       return []
     case baseSepolia.id:
       return baseSepoliaLogics
@@ -109,6 +120,8 @@ export function useTokens() {
       return blastTokens
     case arbitrum.id:
       return arbitrumTokens
+    case base.id:
+      return baseTokens
     case baseSepolia.id:
       return baseSepoliaTokens
     default:
