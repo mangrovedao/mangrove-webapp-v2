@@ -1,5 +1,5 @@
 import useMarket from "@/providers/market"
-import type { BookParams, CompleteOffer } from "@mangrovedao/mgv"
+import { type BookParams, type CompleteOffer } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
 import { useMarketClient } from "./use-market"
@@ -29,10 +29,10 @@ export function useBook(
   params: UseBookParams = {
     aggregateOffersWithSamePrice: false,
   },
+  uniswapQuotes?: { asks: CompleteOffer[]; bids: CompleteOffer[] },
 ) {
   const client = useMarketClient()
   const { currentMarket } = useMarket()
-
   const { data, isLoading, isError } = useQuery({
     queryKey: [
       "book",
@@ -41,18 +41,32 @@ export function useBook(
       currentMarket?.base.address,
       currentMarket?.quote.address,
       currentMarket?.tickSpacing.toString(),
+      uniswapQuotes?.asks[0]?.price.toString(),
+      uniswapQuotes?.bids[0]?.price.toString(),
     ],
     queryFn: async () => {
-      if (!client) return null
-      let book = await client.getBook(params || {})
+      try {
+        if (!client) return null
 
-      if (params?.aggregateOffersWithSamePrice) {
-        book.bids = aggregateOffers(book.bids)
-        book.asks = aggregateOffers(book.asks).reverse()
-      }
+        const book = await client.getBook(params || {})
 
-      return {
-        book,
+        if (params?.aggregateOffersWithSamePrice) {
+          book.bids = aggregateOffers(book.bids)
+          book.asks = aggregateOffers(book.asks).reverse()
+        }
+
+        if (uniswapQuotes?.asks && uniswapQuotes?.bids) {
+          console.log("uniswapQuotes", uniswapQuotes)
+          book.asks = [
+            ...aggregateOffers(book.asks).reverse(),
+            ...uniswapQuotes.asks,
+          ]
+          book.bids = [...aggregateOffers(book.bids), ...uniswapQuotes.bids]
+        }
+
+        return { book }
+      } catch (error) {
+        console.error(error)
       }
     },
     enabled: !!client?.key,

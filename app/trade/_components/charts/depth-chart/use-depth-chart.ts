@@ -2,6 +2,7 @@ import Big from "big.js"
 import React from "react"
 
 import { useBook } from "@/hooks/use-book"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { clamp } from "@/utils/interpolation"
 import type { CompleteOffer } from "@mangrovedao/mgv"
@@ -37,7 +38,12 @@ function removeCrossedOrders(
 
 export function useDepthChart() {
   const { currentMarket: market } = useMarket()
-  const { book, isLoading } = useBook({})
+  const { asks: uniswapAsks, bids: uniswapBids } = useUniswapBook()
+  const { book, isLoading } = useBook(
+    {},
+    { asks: uniswapAsks, bids: uniswapBids },
+  )
+
   const [hasScrolled, setHasScrolled] = React.useState(false)
   const [isScrolling, setIsScrolling] = React.useState(false)
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()

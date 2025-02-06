@@ -11,6 +11,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import { useBook } from "@/hooks/use-book"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { BA } from "@mangrovedao/mgv/lib"
@@ -53,9 +54,13 @@ export function OrderBook({
 export function BookContent() {
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
-  const { book, isLoading } = useBook({
-    aggregateOffersWithSamePrice: true,
-  })
+  const { asks: uniswapAsks, bids: uniswapBids } = useUniswapBook()
+  const { book, isLoading } = useBook(
+    {
+      aggregateOffersWithSamePrice: true,
+    },
+    { asks: uniswapAsks, bids: uniswapBids },
+  )
 
   if (isLoading || !book || !currentMarket) {
     return (
