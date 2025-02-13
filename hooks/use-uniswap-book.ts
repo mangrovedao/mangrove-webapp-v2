@@ -1,4 +1,4 @@
-import { Book, tickFromVolumes } from "@mangrovedao/mgv"
+import { tickFromVolumes } from "@mangrovedao/mgv"
 import { BA, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import { Address, PublicClient } from "viem"
@@ -8,11 +8,13 @@ import { quoterABI } from "@/app/abi/quoter"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 import { printEvmError } from "@/utils/errors"
+import { useMarketClient } from "./use-market"
 
 export function useUniswapBook() {
   const { currentMarket } = useMarket()
   const { book } = useBook()
   const client = usePublicClient()
+  const marketClient = useMarketClient()
 
   const { data: uniswapQuotes } = useQuery({
     queryKey: [
@@ -25,13 +27,13 @@ export function useUniswapBook() {
     ],
     queryFn: async () => {
       try {
-        if (!currentMarket || !book || !client)
+        if (!currentMarket || !client)
           throw new Error("Get quotes missing params")
 
         return await getUniswapQuotes(
           currentMarket.base.address,
           currentMarket.quote.address,
-          book,
+          marketClient,
           client,
         )
       } catch (error) {
@@ -40,8 +42,7 @@ export function useUniswapBook() {
       }
     },
     enabled: !!currentMarket,
-    staleTime: 5000,
-    refetchInterval: 10000,
+    refetchInterval: 3000,
   })
 
   return { asks: uniswapQuotes?.asks || [], bids: uniswapQuotes?.bids || [] }
@@ -50,46 +51,43 @@ export function useUniswapBook() {
 export async function getUniswapQuotes(
   base: Address,
   quote: Address,
-  book: Book,
+  marketClient: ReturnType<typeof useMarketClient>,
   client: PublicClient,
 ) {
+  if (!marketClient) return { bids: [], asks: [] }
+
   try {
-    const asksAmountStep = BigInt(book.asksConfig.density) * 10000000000n
-    const bidsAmountStep = BigInt(book.bidsConfig.density) * 10000000000n
+    const QUOTES_PER_SIDE = 50
+    const book = await marketClient.getBook({})
+    if (!book) throw new Error("Book not found")
+
+    const multiplier = 0.8 + Math.random() * 0.4
+    const asksAmountSteps = Array.from({ length: QUOTES_PER_SIDE }, () => {
+      return (
+        BigInt(Math.floor(Number(book.bidsConfig.density) * multiplier)) *
+        100000000n
+      )
+    })
+
+    const bidsAmountSteps = Array.from({ length: QUOTES_PER_SIDE }, () => {
+      return (
+        BigInt(Math.floor(Number(book.asksConfig.density) * multiplier)) *
+        100000000n
+      )
+    })
 
     //note: this is the address of the quoter on arbitrum
     const quoterAddress = "0x61fFE014bA17989E743c5F6cB21bF9697530B21e"
 
-    // Validate all required parameters before making multicall
     if (!quoterAddress) throw new Error("Quoter address is required")
     if (!quoterABI) throw new Error("Quoter ABI is required")
     if (!base) throw new Error("Base token address is required")
     if (!quote) throw new Error("Quote token address is required")
-    if (!asksAmountStep) throw new Error("Asks amount step is required")
-    if (!bidsAmountStep) throw new Error("Bids amount step is required")
 
     const quotes = await client.multicall({
       contracts: [
         ...Array.from(
-          { length: 10 },
-          (_, i) =>
-            ({
-              address: quoterAddress,
-              abi: quoterABI,
-              functionName: "quoteExactInputSingle",
-              args: [
-                {
-                  tokenIn: base,
-                  tokenOut: quote,
-                  amountIn: asksAmountStep * BigInt(i + 1),
-                  fee: 500,
-                  sqrtPriceLimitX96: 0n,
-                },
-              ],
-            }) as const,
-        ),
-        ...Array.from(
-          { length: 10 },
+          { length: QUOTES_PER_SIDE },
           (_, i) =>
             ({
               address: quoterAddress,
@@ -99,7 +97,25 @@ export async function getUniswapQuotes(
                 {
                   tokenIn: quote,
                   tokenOut: base,
-                  amountIn: bidsAmountStep * BigInt(i + 1),
+                  amountIn: (asksAmountSteps[i] as bigint) * BigInt(i + 1),
+                  fee: 500,
+                  sqrtPriceLimitX96: 0n,
+                },
+              ],
+            }) as const,
+        ),
+        ...Array.from(
+          { length: QUOTES_PER_SIDE },
+          (_, i) =>
+            ({
+              address: quoterAddress,
+              abi: quoterABI,
+              functionName: "quoteExactInputSingle",
+              args: [
+                {
+                  tokenIn: base,
+                  tokenOut: quote,
+                  amountIn: (bidsAmountSteps[i] as bigint) * BigInt(i + 1),
                   fee: 500,
                   sqrtPriceLimitX96: 0n,
                 },
@@ -107,13 +123,13 @@ export async function getUniswapQuotes(
             }) as const,
         ),
       ],
-      allowFailure: false, // Changed to true to handle potential failures gracefully
+      allowFailure: false,
     })
 
     const asks = []
     let previousAsksAmountOut = 0n
     let previousAsksGasEstimate = 0n
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < QUOTES_PER_SIDE; i++) {
       const result = quotes[i]
       if (!result) continue
       const [amountOutRaw, , , gasEstimateRaw] = result as [
@@ -122,11 +138,13 @@ export async function getUniswapQuotes(
         number,
         bigint,
       ]
-      const amountIn = asksAmountStep
+      const amountIn = asksAmountSteps[i] as bigint
       const amountOut = amountOutRaw - previousAsksAmountOut
       previousAsksAmountOut = amountOutRaw
       const gasEstimate = gasEstimateRaw - previousAsksGasEstimate
       previousAsksGasEstimate = gasEstimateRaw
+
+
       const tick = tickFromVolumes(amountIn, amountOut, 1n)
       const gives = amountOut
       const rawOffer = rpcOfferToHumanOffer({
@@ -142,13 +160,13 @@ export async function getUniswapQuotes(
         ...rawOffer,
         offer: {
           tick,
-          prev: BigInt(i - 1),
-          next: BigInt(i + 1),
+          prev: 0n,
+          next: 0n,
           gives,
         },
-        price: Number(rawOffer.price) / 1e18, // Convert from wei to ETH
-        total: Number(rawOffer.total), // Remove toFixed()
-        volume: Number(rawOffer.volume), // Remove toFixed()
+        price: Number(rawOffer.price),
+        total: Number(rawOffer.total),
+        volume: Number(rawOffer.volume),
         id: BigInt(i),
         gasEstimate: 0,
         source: "uniswap",
@@ -165,7 +183,7 @@ export async function getUniswapQuotes(
     const bids = []
     let previousBidsAmountOut = 0n
     let previousBidsGasEstimate = 0n
-    for (let i = 10; i < 20; i++) {
+    for (let i = QUOTES_PER_SIDE; i < QUOTES_PER_SIDE * 2; i++) {
       const result = quotes[i]
       if (!result) continue
       const [amountOutRaw, , , gasEstimateRaw] = result as [
@@ -174,13 +192,17 @@ export async function getUniswapQuotes(
         number,
         bigint,
       ]
-      const amountIn = bidsAmountStep
+
+      const amountIn = bidsAmountSteps[i - QUOTES_PER_SIDE] ?? 0n
       const amountOut = amountOutRaw - previousBidsAmountOut
+
       previousBidsAmountOut = amountOutRaw
       const gasEstimate = gasEstimateRaw - previousBidsGasEstimate
       previousBidsGasEstimate = gasEstimateRaw
       const tick = tickFromVolumes(amountIn, amountOut, 1n)
+
       const gives = amountOut
+
       const rawOffer = rpcOfferToHumanOffer({
         gives,
         tick,
@@ -192,10 +214,10 @@ export async function getUniswapQuotes(
       // todo: format the numbers to be more readable
       const formattedOffer = {
         ...rawOffer,
-        offer: { tick, prev: BigInt(i - 1), next: BigInt(i + 1), gives },
-        price: Number(rawOffer.price) / 1e18,
-        total: Number(rawOffer.total), // Remove toFixed()
-        volume: Number(rawOffer.volume), // Remove toFixed()
+        offer: { tick, prev: 0n, next: 0n, gives },
+        price: Number(rawOffer.price),
+        total: Number(rawOffer.total),
+        volume: Number(rawOffer.volume),
         id: BigInt(i),
         gasEstimate: 0,
         source: "uniswap",

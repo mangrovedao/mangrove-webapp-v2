@@ -13,7 +13,6 @@ import {
   XYChart,
 } from "@visx/xychart"
 
-import { Skeleton } from "@/components/ui/skeleton"
 import { lerp } from "@/utils/interpolation"
 import { CompleteOffer } from "@mangrovedao/mgv"
 import { DataKeyType } from "./enums"
@@ -68,11 +67,11 @@ export function DepthChart() {
     )
   }
 
-  if (isLoading) {
-    return (
-      <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean" />
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean" />
+  //   )
+  // }
 
   return (
     <div

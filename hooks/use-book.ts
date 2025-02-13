@@ -1,6 +1,7 @@
 import useMarket from "@/providers/market"
 import { type BookParams, type CompleteOffer } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
+import { useRef } from "react"
 
 import { useMarketClient } from "./use-market"
 
@@ -33,6 +34,11 @@ export function useBook(
 ) {
   const client = useMarketClient()
   const { currentMarket } = useMarket()
+  const prevBookRef = useRef<{
+    asks: CompleteOffer[]
+    bids: CompleteOffer[]
+  }>({ asks: [], bids: [] })
+
   const { data, isLoading, isError } = useQuery({
     queryKey: [
       "book",
@@ -51,26 +57,43 @@ export function useBook(
         const book = await client.getBook(params || {})
 
         if (params?.aggregateOffersWithSamePrice) {
-          book.bids = aggregateOffers(book.bids)
-          book.asks = aggregateOffers(book.asks).reverse()
+          book.bids = book.bids
+          book.asks = book.asks
         }
 
         if (uniswapQuotes?.asks && uniswapQuotes?.bids) {
-          console.log("uniswapQuotes", uniswapQuotes)
-          book.asks = [
-            ...aggregateOffers(book.asks).reverse(),
-            ...uniswapQuotes.asks,
-          ]
-          book.bids = [...aggregateOffers(book.bids), ...uniswapQuotes.bids]
+          book.asks = [...uniswapQuotes.asks]
+          book.bids = [...uniswapQuotes.bids]
         }
 
-        return { book }
+        const sortedBook = {
+          ...book,
+          asks: aggregateOffers(book.asks),
+          bids: aggregateOffers(book.bids),
+        }
+
+        return { book: sortedBook }
       } catch (error) {
         console.error(error)
       }
     },
     enabled: !!client?.key,
+    staleTime: 5000,
     refetchInterval: 3000,
+    select: (
+      data:
+        | { book: { asks: CompleteOffer[]; bids: CompleteOffer[] } }
+        | null
+        | undefined,
+    ): {
+      book: { asks: CompleteOffer[]; bids: CompleteOffer[] } | undefined
+    } => {
+      if (data?.book && (data.book.asks?.length || data.book.bids?.length)) {
+        prevBookRef.current = data.book
+      }
+
+      return { book: isLoading ? prevBookRef.current : data?.book }
+    },
   })
   return {
     book: data?.book,

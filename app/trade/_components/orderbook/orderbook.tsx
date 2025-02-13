@@ -62,13 +62,13 @@ export function BookContent() {
     { asks: uniswapAsks, bids: uniswapBids },
   )
 
-  if (isLoading || !book || !currentMarket) {
+  if (!book || !currentMarket) {
     return (
       <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean" />
     )
   }
 
-  if (book.asks.length === 0 && book.bids.length === 0) {
+  if (!isLoading && book?.asks.length === 0 && book?.bids.length === 0) {
     return (
       <div className="w-full h-full flex justify-center items-center mt-4 text-muted-foreground font-ubuntu text-sm font-bold">
         Empty market.
