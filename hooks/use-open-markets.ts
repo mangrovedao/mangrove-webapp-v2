@@ -15,12 +15,11 @@ export function useOpenMarkets() {
     queryFn: async () => {
       try {
         if (!client) throw new Error("No market client found")
-        console.log(client, addresses, cashnesses)
+
         return await getOpenMarkets(client, addresses, {
           cashnesses,
         })
       } catch (error) {
-        console.error("error", error)
         printEvmError(error)
         return []
       }

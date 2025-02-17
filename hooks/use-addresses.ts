@@ -133,18 +133,14 @@ export function useCashnesses() {
   const tokens = useTokens()
   const cashnesses: Record<string, number> = {}
   tokens.forEach((token) => {
-    if (
-      token.symbol === "USDC" ||
-      token.symbol === "USDT" ||
-      token.symbol === "DAI"
-    ) {
-      cashnesses[token.address] = 400 // stablecoins have highest cashness
+    if (token.symbol === "USDC" || token.symbol === "USDT") {
+      cashnesses[token.address] = 1000
     } else if (token.symbol === "WETH") {
-      cashnesses[token.address] = 1
+      cashnesses[token.address] = 900
     } else if (token.symbol === "WBTC") {
-      cashnesses[token.address] = 300
+      cashnesses[token.address] = 800
     } else {
-      cashnesses[token.address] = 100 // other tokens have lowest cashness
+      cashnesses[token.address] = 100
     }
   })
   return cashnesses
