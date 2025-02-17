@@ -12,7 +12,6 @@ import { Address, formatUnits, parseEther, parseUnits } from "viem"
 import {
   useAccount,
   useBalance,
-  usePublicClient,
   useSendTransaction,
   useWaitForTransactionReceipt,
   useWalletClient,
@@ -25,6 +24,7 @@ import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spend
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
@@ -105,7 +105,7 @@ export function useSwap() {
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
   const currentMarket = getMarketFromTokens(markets, payToken, receiveToken)
-  const publicClient = usePublicClient()
+  const publicClient = useNetworkClient()
   const addresses = useMangroveAddresses()
   const approvePayToken = useApproveToken()
   const { data: spender } = useSpenderAddress("market")

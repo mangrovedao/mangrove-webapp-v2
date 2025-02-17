@@ -128,3 +128,33 @@ export function useTokens() {
       return arbitrumTokens
   }
 }
+
+export function useCashnesses() {
+  const tokens = useTokens()
+  const cashnesses: Record<string, number> = {}
+  tokens.forEach((token) => {
+    if (
+      token.symbol === "USDC" ||
+      token.symbol === "USDT" ||
+      token.symbol === "DAI"
+    ) {
+      cashnesses[token.address] = 400 // stablecoins have highest cashness
+    } else if (token.symbol === "WETH") {
+      cashnesses[token.address] = 1
+    } else if (token.symbol === "WBTC") {
+      cashnesses[token.address] = 300
+    } else {
+      cashnesses[token.address] = 100 // other tokens have lowest cashness
+    }
+  })
+  return cashnesses
+}
+
+export function useTokensWithCashnesses() {
+  const tokens = useTokens()
+  const cashnesses = useCashnesses()
+  return tokens.map((token, index) => ({
+    ...token,
+    cashness: cashnesses[token.address],
+  }))
+}

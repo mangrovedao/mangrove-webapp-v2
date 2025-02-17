@@ -1,31 +1,76 @@
 "use client"
 
-import "@rainbow-me/rainbowkit/styles.css"
-
 import {
   RainbowKitProvider,
+  WalletList,
+  connectorsForWallets,
   darkTheme,
-  getDefaultConfig,
 } from "@rainbow-me/rainbowkit"
+import "@rainbow-me/rainbowkit/styles.css"
+import {
+  binanceWallet,
+  coinbaseWallet,
+  injectedWallet,
+  ledgerWallet,
+  magicEdenWallet,
+  metaMaskWallet,
+  mewWallet,
+  nestWallet,
+  oktoWallet,
+  okxWallet,
+  oneKeyWallet,
+  rabbyWallet,
+  rainbowWallet,
+  trustWallet,
+  walletConnectWallet,
+} from "@rainbow-me/rainbowkit/wallets"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { arbitrum, base, baseSepolia, blast } from "viem/chains"
-import { WagmiProvider, http } from "wagmi"
+import { WagmiProvider, createConfig, http } from "wagmi"
+import { arbitrum, base, baseSepolia } from "wagmi/chains"
 
 import { env } from "@/env.mjs"
-import { getWhitelistedChainObjects } from "@/utils/chains"
 
 const queryClient = new QueryClient()
 const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
-export const config = getDefaultConfig({
+const recommendedWalletList: WalletList = [
+  {
+    groupName: "Popular",
+    wallets: [
+      injectedWallet,
+      binanceWallet,
+      coinbaseWallet,
+      walletConnectWallet,
+    ],
+  },
+  {
+    groupName: "More",
+    wallets: [
+      rabbyWallet,
+      metaMaskWallet,
+      trustWallet,
+      ledgerWallet,
+      okxWallet,
+      rainbowWallet,
+      magicEdenWallet,
+      mewWallet,
+      nestWallet,
+      oktoWallet,
+      oneKeyWallet,
+    ],
+  },
+]
+const connectors = connectorsForWallets(recommendedWalletList, {
+  projectId: projectId,
   appName: "Mangrove dApp",
-  projectId,
-  // @ts-ignore
-  chains: getWhitelistedChainObjects(),
+})
+
+export const config = createConfig({
   ssr: true,
+  connectors,
+  chains: [baseSepolia, arbitrum, base],
   transports: {
     [baseSepolia.id]: http(),
-    [blast.id]: http(),
     [arbitrum.id]: http(),
     [base.id]: http(),
   },

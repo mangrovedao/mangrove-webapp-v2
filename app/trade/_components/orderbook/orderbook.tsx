@@ -11,6 +11,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
 import { useBook } from "@/hooks/use-book"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { BA } from "@mangrovedao/mgv/lib"
@@ -53,17 +54,21 @@ export function OrderBook({
 export function BookContent() {
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
-  const { book, isLoading } = useBook({
-    aggregateOffersWithSamePrice: true,
-  })
+  const { asks: uniswapAsks, bids: uniswapBids } = useUniswapBook()
+  const { book, isLoading } = useBook(
+    {
+      aggregateOffersWithSamePrice: true,
+    },
+    { asks: uniswapAsks, bids: uniswapBids },
+  )
 
-  if (isLoading || !book || !currentMarket) {
+  if (!book || !currentMarket) {
     return (
       <Skeleton className="w-full h-full flex justify-center items-center text-green-caribbean" />
     )
   }
 
-  if (book.asks.length === 0 && book.bids.length === 0) {
+  if (!isLoading && book?.asks.length === 0 && book?.bids.length === 0) {
     return (
       <div className="w-full h-full flex justify-center items-center mt-4 text-muted-foreground font-ubuntu text-sm font-bold">
         Empty market.

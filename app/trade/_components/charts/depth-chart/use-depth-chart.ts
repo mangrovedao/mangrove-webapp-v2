@@ -2,6 +2,7 @@ import Big from "big.js"
 import React from "react"
 
 import { useBook } from "@/hooks/use-book"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { clamp } from "@/utils/interpolation"
 import type { CompleteOffer } from "@mangrovedao/mgv"
@@ -37,7 +38,12 @@ function removeCrossedOrders(
 
 export function useDepthChart() {
   const { currentMarket: market } = useMarket()
-  const { book, isLoading } = useBook({})
+  const { asks: uniswapAsks, bids: uniswapBids } = useUniswapBook()
+  const { book, isLoading } = useBook(
+    {},
+    { asks: uniswapAsks, bids: uniswapBids },
+  )
+
   const [hasScrolled, setHasScrolled] = React.useState(false)
   const [isScrolling, setIsScrolling] = React.useState(false)
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
@@ -77,6 +83,7 @@ export function useDepthChart() {
     let bidIndex = OFFSET_FOR_ZOOM
     let askIndex = OFFSET_FOR_ZOOM
 
+    // Find index where bid volume increases significantly
     for (let i = OFFSET_FOR_ZOOM; i < cumulativeBidsForZoom.length - 2; i++) {
       if (
         cumulativeBidsForZoom[i + 1]! >
@@ -88,9 +95,11 @@ export function useDepthChart() {
     }
 
     if (bidIndex === OFFSET_FOR_ZOOM) {
+      // If no significant increase found, use last bid
       bidIndex = cumulativeBidsForZoom.length - 1
     }
 
+    // Find index where ask volume increases significantly
     for (let i = OFFSET_FOR_ZOOM; i < cumulativeAsksForZoom.length - 2; i++) {
       if (
         cumulativeAsksForZoom[i + 1]! >
@@ -102,12 +111,15 @@ export function useDepthChart() {
     }
 
     if (askIndex === OFFSET_FOR_ZOOM) {
+      // If no significant increase found, use last ask
       askIndex = cumulativeAsksForZoom.length - 1
     }
 
     const bidDiff = midPrice - bids[bidIndex]?.price!
     const askDiff = asks[askIndex]?.price! - midPrice
-    const maxDiff = Math.max(bidDiff, askDiff) ?? 0
+
+    // Use the smaller difference to keep zoom balanced
+    const maxDiff = Math.min(bidDiff, askDiff) ?? 0
     return { maxDiff }
   }, [market?.base.address, market?.quote.address, asks.length, bids.length])
 

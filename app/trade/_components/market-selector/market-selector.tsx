@@ -28,7 +28,7 @@ export default function MarketSelector() {
     const [baseAddress, quoteAddress, tickSpacing] = value.split("/")
     if (!baseAddress || !quoteAddress || !tickSpacing) return
     try {
-      const market = markets.find(
+      const market = markets?.find(
         (m) =>
           isAddressEqual(m.base.address, getAddress(baseAddress)) &&
           isAddressEqual(m.quote.address, getAddress(quoteAddress)) &&
@@ -47,16 +47,16 @@ export default function MarketSelector() {
           : undefined
       }
       onValueChange={onValueChange}
-      disabled={!markets.length}
+      disabled={!markets?.length}
     >
       <SelectTrigger className="">
         <SelectValue
-          placeholder={!markets.length ? "Select a market" : "No markets"}
+          placeholder={!markets?.length ? "Select a market" : "No markets"}
           suppressHydrationWarning
         />
       </SelectTrigger>
       <SelectContent>
-        {markets.map((m) => (
+        {markets?.map((m) => (
           <SelectItem
             key={`${m.base.address}/${m.quote.address}/${m.tickSpacing}`}
             value={getValue(m)}
