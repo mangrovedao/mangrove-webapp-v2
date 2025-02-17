@@ -65,7 +65,7 @@ const connectors = connectorsForWallets(recommendedWalletList, {
   appName: "Mangrove dApp",
 })
 
-const newConfig = createConfig({
+export const config = createConfig({
   ssr: true,
   connectors,
   chains: [baseSepolia, arbitrum, base],
@@ -78,7 +78,7 @@ const newConfig = createConfig({
 
 export function WalletConnectProvider({ children }: React.PropsWithChildren) {
   return (
-    <WagmiProvider config={newConfig}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={darkTheme()}>{children}</RainbowKitProvider>
       </QueryClientProvider>

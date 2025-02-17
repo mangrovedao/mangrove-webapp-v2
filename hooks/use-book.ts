@@ -3,6 +3,7 @@ import { type BookParams, type CompleteOffer } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { useRef } from "react"
 
+import { Book } from "@mangrovedao/mgv"
 import { useMarketClient } from "./use-market"
 
 export type UseBookParams = BookParams & {
@@ -52,7 +53,7 @@ export function useBook(
     ],
     queryFn: async () => {
       try {
-        if (!client) return null
+        if (!client) throw new Error("No market client found")
 
         const book = await client.getBook(params || {})
 
@@ -75,24 +76,33 @@ export function useBook(
         return { book: sortedBook }
       } catch (error) {
         console.error(error)
+        return { book: undefined }
       }
     },
     enabled: !!client?.key,
     staleTime: 5000,
     refetchInterval: 3000,
-    select: (
-      data:
-        | { book: { asks: CompleteOffer[]; bids: CompleteOffer[] } }
-        | null
-        | undefined,
-    ): {
-      book: { asks: CompleteOffer[]; bids: CompleteOffer[] } | undefined
+    select: (data: {
+      book: Book | undefined
+    }): {
+      book: Book | undefined
     } => {
-      if (data?.book && (data.book.asks?.length || data.book.bids?.length)) {
-        prevBookRef.current = data.book
+      if (!data?.book) {
+        return { book: undefined }
       }
 
-      return { book: isLoading ? prevBookRef.current : data?.book }
+      if (data?.book && (data.book.asks?.length || data.book.bids?.length)) {
+        prevBookRef.current = {
+          asks: data.book.asks,
+          bids: data.book.bids,
+        }
+      }
+
+      return {
+        book: isLoading
+          ? { ...data?.book, ...prevBookRef.current }
+          : data?.book,
+      }
     },
   })
   return {
