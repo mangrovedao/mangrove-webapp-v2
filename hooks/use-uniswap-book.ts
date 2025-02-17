@@ -2,17 +2,17 @@ import { tickFromVolumes } from "@mangrovedao/mgv"
 import { BA, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import { Address, PublicClient } from "viem"
-import { usePublicClient } from "wagmi"
 
 import { quoterABI } from "@/app/abi/quoter"
 import useMarket from "@/providers/market"
 import { printEvmError } from "@/utils/errors"
 import { Book } from "@mangrovedao/mgv"
 import { useBook } from "./use-book"
+import { useNetworkClient } from "./use-network-client"
 
 export function useUniswapBook() {
   const { currentMarket } = useMarket()
-  const client = usePublicClient()
+  const client = useNetworkClient()
   const { book } = useBook()
 
   const { data: uniswapQuotes } = useQuery({
