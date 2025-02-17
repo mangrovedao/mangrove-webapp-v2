@@ -1,4 +1,4 @@
-import { tickFromVolumes } from "@mangrovedao/mgv"
+import { tickFromVolumes, Token } from "@mangrovedao/mgv"
 import { BA, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import { Address, PublicClient } from "viem"
@@ -28,8 +28,8 @@ export function useUniswapBook() {
           throw new Error("Get quotes missing params")
 
         return await getUniswapQuotes(
-          currentMarket.base.address,
-          currentMarket.quote.address,
+          currentMarket.base,
+          currentMarket.quote,
           book,
           client,
         )
@@ -38,22 +38,22 @@ export function useUniswapBook() {
         return { asks: [], bids: [] }
       }
     },
-    enabled: !!currentMarket,
+    enabled: !!currentMarket && !!client && !!book,
     refetchInterval: 3000,
   })
 
   return { asks: uniswapQuotes?.asks || [], bids: uniswapQuotes?.bids || [] }
 }
 
-const QUOTES_PER_SIDE = 50
+const QUOTES_PER_SIDE = 20
 const DENSITY_MULTIPLIER_MIN = 0.8
 const DENSITY_MULTIPLIER_RANGE = 0.4
 const UNISWAP_FEE = 500
 const AMOUNT_MULTIPLIER = 100000000n
 
 export async function getUniswapQuotes(
-  base: Address,
-  quote: Address,
+  base: Token,
+  quote: Token,
   book: Book,
   client: PublicClient,
 ) {
@@ -69,7 +69,11 @@ export async function getUniswapQuotes(
       client,
     )
 
-    return processQuotes(quotes, { asksAmountSteps, bidsAmountSteps })
+    return processQuotes(
+      quotes,
+      { asksAmountSteps, bidsAmountSteps },
+      { base, quote },
+    )
   } catch (error) {
     printEvmError(error)
     return { bids: [], asks: [] }
@@ -107,7 +111,7 @@ function calculateAmountSteps(book: Book) {
 
 async function fetchUniswapQuotes(
   quoterConfig: { address: `0x${string}`; abi: typeof quoterABI },
-  tokens: { base: Address; quote: Address },
+  tokens: { base: Token; quote: Token },
   steps: { asksAmountSteps: bigint[]; bidsAmountSteps: bigint[] },
   client: PublicClient,
 ) {
@@ -140,16 +144,16 @@ async function fetchUniswapQuotes(
     contracts: [
       ...Array.from({ length: QUOTES_PER_SIDE }, (_, i) =>
         createQuoteContract(
-          tokens.quote,
-          tokens.base,
+          tokens.quote.address,
+          tokens.base.address,
           steps.asksAmountSteps,
           i,
         ),
       ),
       ...Array.from({ length: QUOTES_PER_SIDE }, (_, i) =>
         createQuoteContract(
-          tokens.base,
-          tokens.quote,
+          tokens.base.address,
+          tokens.quote.address,
           steps.bidsAmountSteps,
           i,
         ),
@@ -162,20 +166,22 @@ async function fetchUniswapQuotes(
 function processQuotes(
   quotes: Awaited<ReturnType<typeof fetchUniswapQuotes>>,
   steps: { asksAmountSteps: bigint[]; bidsAmountSteps: bigint[] },
+  tokens: { base: Token; quote: Token },
 ) {
   const createOffer = (
     amountIn: bigint,
     amountOut: bigint,
     id: number,
     ba: typeof BA.asks | typeof BA.bids,
+    tokens: { base: Token; quote: Token },
   ) => {
     const tick = tickFromVolumes(amountIn, amountOut, 1n)
     const rawOffer = rpcOfferToHumanOffer({
       gives: amountOut,
       tick,
       ba,
-      baseDecimals: 18,
-      quoteDecimals: 6,
+      baseDecimals: tokens.base.decimals,
+      quoteDecimals: tokens.quote.decimals,
     })
 
     return {
@@ -197,6 +203,7 @@ function processQuotes(
     startIndex: number,
     amountSteps: bigint[],
     ba: typeof BA.asks | typeof BA.bids,
+    tokens: { base: Token; quote: Token },
   ) => {
     const offers = []
     let previousAmountOut = 0n
@@ -218,13 +225,18 @@ function processQuotes(
       previousAmountOut = amountOutRaw
       previousGasEstimate = gasEstimateRaw
 
-      offers.push(createOffer(amountIn, amountOut, startIndex + i, ba))
+      offers.push(createOffer(amountIn, amountOut, startIndex + i, ba, tokens))
     }
     return offers
   }
 
   return {
-    asks: processQuoteSide(0, steps.asksAmountSteps, BA.asks),
-    bids: processQuoteSide(QUOTES_PER_SIDE, steps.bidsAmountSteps, BA.bids),
+    asks: processQuoteSide(0, steps.asksAmountSteps, BA.asks, tokens),
+    bids: processQuoteSide(
+      QUOTES_PER_SIDE,
+      steps.bidsAmountSteps,
+      BA.bids,
+      tokens,
+    ),
   }
 }

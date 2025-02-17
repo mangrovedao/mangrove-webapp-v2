@@ -6,9 +6,10 @@ import { getVaultIncentives } from "@/app/earn/(shared)/_service/vault-incentive
 import { getVaultsInformation } from "@/app/earn/(shared)/_service/vaults-infos"
 import { useMgvFdv } from "@/app/earn/(shared)/store/vault-store"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount, usePublicClient } from "wagmi"
+import { useAccount } from "wagmi"
 
 type Params<T> = {
   filters?: {
@@ -23,7 +24,7 @@ export function useVaults<T = Vault[] | undefined>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const publicClient = usePublicClient()
+  const publicClient = useNetworkClient()
   const { address: user, chainId } = useAccount()
   const plainVaults = useVaultsWhitelist()
   const incentives = useVaultsIncentives()
