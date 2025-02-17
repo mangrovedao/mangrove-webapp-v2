@@ -1,5 +1,5 @@
 import useMarket from "@/providers/market"
-import { Logic } from "@mangrovedao/mgv"
+import { Logic, MarketParams } from "@mangrovedao/mgv"
 import type { GetBalanceResult } from "@mangrovedao/mgv/actions/balances"
 import { useQuery } from "@tanstack/react-query"
 import { isAddressEqual, type Address } from "viem"
@@ -21,7 +21,7 @@ export function useUserBalances(params: UseUserBalancesParams) {
       "balances",
       generalClient?.chain.id,
       params.user,
-      markets.map((m) => `${m.base.address}-${m.quote.address}`),
+      markets?.map((m) => `${m.base.address}-${m.quote.address}`),
       logics.map((l) => l.logic),
     ],
     queryFn: async () => {
@@ -29,10 +29,10 @@ export function useUserBalances(params: UseUserBalancesParams) {
       return generalClient.getBalances({
         user: params.user,
         logics: logics as Logic[],
-        markets,
+        markets: markets as MarketParams[],
       })
     },
-    enabled: !!generalClient && !!params.user && markets.length > 0,
+    enabled: !!generalClient && !!params.user && (markets?.length ?? 0) > 0,
   })
   return { balances: data, isLoading, isError }
 }
