@@ -33,7 +33,7 @@ export function useBook(
   },
   uniswapQuotes?: { asks: CompleteOffer[]; bids: CompleteOffer[] },
 ) {
-  const client = useMarketClient()
+  const marketClient = useMarketClient()
   const { currentMarket } = useMarket()
   const prevBookRef = useRef<{
     asks: CompleteOffer[]
@@ -44,22 +44,21 @@ export function useBook(
     queryKey: [
       "book",
       params,
-      client?.key,
-      currentMarket?.base.address,
-      currentMarket?.quote.address,
-      currentMarket?.tickSpacing.toString(),
-      uniswapQuotes?.asks[0]?.price.toString(),
-      uniswapQuotes?.bids[0]?.price.toString(),
+      marketClient?.key,
+      currentMarket?.base.address.toString(),
+      currentMarket?.quote.address.toString(),
+      uniswapQuotes?.asks.length,
+      uniswapQuotes?.bids.length,
     ],
     queryFn: async () => {
       try {
-        if (!client) throw new Error("No market client found")
+        if (!marketClient) throw new Error("No client found")
 
-        const book = await client.getBook(params || {})
+        const book = await marketClient.getBook(params || {})
 
         if (params?.aggregateOffersWithSamePrice) {
-          book.bids = book.bids
-          book.asks = book.asks
+          book.bids = aggregateOffers(book.bids)
+          book.asks = aggregateOffers(book.asks).reverse()
         }
 
         if (uniswapQuotes?.asks && uniswapQuotes?.bids) {
@@ -79,7 +78,7 @@ export function useBook(
         return { book: undefined }
       }
     },
-    enabled: !!client?.key,
+    enabled: !!marketClient?.key,
     staleTime: 5000,
     refetchInterval: 3000,
     select: (data: {

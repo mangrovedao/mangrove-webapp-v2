@@ -4,6 +4,7 @@ import React from "react"
 
 import { useMarkets } from "@/hooks/use-addresses"
 import useLocalStorage from "@/hooks/use-local-storage"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { MarketParams } from "@mangrovedao/mgv"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { getAddress, isAddressEqual } from "viem"
@@ -19,6 +20,9 @@ function isMarketEqual(market1?: MarketParams, market2?: MarketParams) {
 
 export function useMarketContext() {
   const markets = useMarkets()
+  const { openMarkets } = useOpenMarkets()
+
+  console.log(openMarkets)
   const router = useRouter()
   const pathName = usePathname()
   const searchParams = useSearchParams()
@@ -29,11 +33,11 @@ export function useMarketContext() {
   )
 
   const currentMarket = React.useMemo(() => {
-    if (!markets) return undefined
+    if (!openMarkets) return undefined
     const params = persistedMarket ?? marketParam
-    if (!params) return markets[0]
+    if (!params) return openMarkets[0]
     const [base, quote, tickSpacing] = params.split(",")
-    if (!base || !quote || !tickSpacing) return markets[0]
+    if (!base || !quote || !tickSpacing) return openMarkets[0]
 
     try {
       const market = {
@@ -42,7 +46,7 @@ export function useMarketContext() {
         tickSpacing: BigInt(tickSpacing),
       }
 
-      const result = markets.find(
+      const result = openMarkets.find(
         (m) =>
           isAddressEqual(market.base, m.base.address) &&
           isAddressEqual(market.quote, m.quote.address) &&
@@ -50,18 +54,18 @@ export function useMarketContext() {
       )
 
       if (!result) {
-        return markets[0]
+        return openMarkets[0]
       } else {
         return result
       }
     } catch (e) {
-      return markets[0]
+      return openMarkets[0]
     }
-  }, [markets, marketParam])
+  }, [openMarkets, marketParam])
 
   const setMarket = React.useCallback(
     (market: MarketParams) => {
-      if (!markets || isMarketEqual(market, currentMarket)) return
+      if (!openMarkets || isMarketEqual(market, currentMarket)) return
       const marketParam = `${market.base.address},${market.quote.address},${market.tickSpacing}`
       const params = new URLSearchParams(searchParams.toString())
       setPersistedMarket(marketParam)
@@ -76,7 +80,7 @@ export function useMarketContext() {
     const [base, quote, tickSpacing] = persistedMarket.split(",")
     if (!base || !quote || !tickSpacing) return
     try {
-      const market = markets.find(
+      const market = openMarkets?.find(
         (m) =>
           isAddressEqual(m.base.address, getAddress(base)) &&
           isAddressEqual(m.quote.address, getAddress(quote)) &&
@@ -90,7 +94,7 @@ export function useMarketContext() {
   }, [])
 
   return {
-    markets,
+    markets: openMarkets,
     currentMarket,
     setMarket,
   }

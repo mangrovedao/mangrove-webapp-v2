@@ -1,4 +1,4 @@
-import { publicMarketActions, tickFromVolumes } from "@mangrovedao/mgv"
+import { tickFromVolumes } from "@mangrovedao/mgv"
 import { BA, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import { Address, PublicClient } from "viem"
@@ -8,12 +8,12 @@ import { quoterABI } from "@/app/abi/quoter"
 import useMarket from "@/providers/market"
 import { printEvmError } from "@/utils/errors"
 import { Book } from "@mangrovedao/mgv"
-import { useMangroveAddresses } from "./use-addresses"
+import { useBook } from "./use-book"
 
 export function useUniswapBook() {
   const { currentMarket } = useMarket()
   const client = usePublicClient()
-  const addresses = useMangroveAddresses()
+  const { book } = useBook()
 
   const { data: uniswapQuotes } = useQuery({
     queryKey: [
@@ -24,13 +24,8 @@ export function useUniswapBook() {
     ],
     queryFn: async () => {
       try {
-        if (!currentMarket || !client)
+        if (!currentMarket || !client || !book)
           throw new Error("Get quotes missing params")
-
-        const marketClient = client.extend(
-          publicMarketActions(addresses, currentMarket),
-        )
-        const book = await marketClient.getBook({})
 
         return await getUniswapQuotes(
           currentMarket.base.address,
@@ -73,6 +68,7 @@ export async function getUniswapQuotes(
       { asksAmountSteps, bidsAmountSteps },
       client,
     )
+
     return processQuotes(quotes, { asksAmountSteps, bidsAmountSteps })
   } catch (error) {
     printEvmError(error)
