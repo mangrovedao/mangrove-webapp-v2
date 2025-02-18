@@ -7,6 +7,7 @@ import { quoterABI } from "@/app/abi/quoter"
 import useMarket from "@/providers/market"
 import { printEvmError } from "@/utils/errors"
 import { Book } from "@mangrovedao/mgv"
+import { useAccount } from "wagmi"
 import { useBook } from "./use-book"
 import { useNetworkClient } from "./use-network-client"
 
@@ -14,12 +15,14 @@ export function useUniswapBook() {
   const { currentMarket } = useMarket()
   const client = useNetworkClient()
   const { book } = useBook()
+  const { chain } = useAccount()
 
   const { data: uniswapQuotes } = useQuery({
     queryKey: [
       "uniswap-quotes",
       currentMarket?.base.address.toString(),
       currentMarket?.quote.address.toString(),
+      chain?.id,
       client?.key,
     ],
     queryFn: async () => {
@@ -84,6 +87,7 @@ async function validateAndGetConfig(book: Book) {
   if (!book) throw new Error("Book not found")
 
   const quoterAddress = "0x61fFE014bA17989E743c5F6cB21bF9697530B21e" as const
+
   if (!quoterAddress) throw new Error("Quoter address is required")
   if (!quoterABI) throw new Error("Quoter ABI is required")
 

@@ -1,12 +1,17 @@
+import { MarketParams } from "@mangrovedao/mgv"
 import {
   arbitrumARBUSDCe,
   arbitrumUSDCUSDT,
   arbitrumWBTCUSDT,
   arbitrumWETHUSDC,
   arbitrumWETHweETH,
+  baseCBBTC,
+  baseCBBTCEURC,
   baseCBBTCUSDC,
   baseSepoliaWBTCDAI,
+  baseWETH,
   baseWETHUSDC,
+  baseWSTETHWETH,
 } from "@mangrovedao/mgv/addresses"
 import { Address } from "viem"
 
@@ -134,7 +139,7 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     address: "0xC95a225fd311E911a610D8274593C19282012119" as Address,
     oracle: "0xcF9115B12502Bb9AA9E644c83c1DcBeFbeBbc1a6" as Address,
-    // market: baseCBBTCEURC, // missing market
+    market: baseCBBTCEURC, // missing market
     strategyType: "Kandel",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",
@@ -149,7 +154,11 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     address: "0xa82cbD1D7826614D1E487541F40ce5A43e58999D" as Address,
     oracle: "0xcA8226e98B6520417c7fE12eEd2d2999EB82b873" as Address,
-    //   market:  baseCBBTCWETH, // missing market
+    market: {
+      base: baseCBBTC,
+      quote: baseWETH,
+      tickSpacing: 1n,
+    } as MarketParams, // missing market
     strategyType: "Kandel",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",
@@ -164,7 +173,7 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     address: "0x8ec6a6BB89ccF694129077954587B25b6c712bc8" as Address,
     oracle: "0xB95FfCFB01F66Bb30F6940aF5118E46F69628cb2" as Address,
-    // market: baseCBBTCWETH,
+    market: baseWSTETHWETH,
     strategyType: "Kandel Aave",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",

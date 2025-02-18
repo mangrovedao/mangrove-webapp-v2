@@ -2,7 +2,6 @@
 
 import React from "react"
 
-import { useMarkets } from "@/hooks/use-addresses"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { MarketParams } from "@mangrovedao/mgv"
@@ -19,10 +18,7 @@ function isMarketEqual(market1?: MarketParams, market2?: MarketParams) {
 }
 
 export function useMarketContext() {
-  const markets = useMarkets()
   const { openMarkets } = useOpenMarkets()
-
-  console.log(openMarkets)
   const router = useRouter()
   const pathName = usePathname()
   const searchParams = useSearchParams()
