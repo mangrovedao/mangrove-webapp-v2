@@ -2,6 +2,7 @@ import { arbitrum, base, baseSepolia, blast } from "viem/chains"
 import { useAccount } from "wagmi"
 import {
   VAULTS_WHITELIST_ARBITRUM,
+  VAULTS_WHITELIST_BASE,
   VAULTS_WHITELIST_BASE_SEPOLIA,
 } from "./vault-list"
 
@@ -11,7 +12,7 @@ export function useVaultsWhitelist() {
     case blast.id:
       return []
     case base.id:
-      return []
+      return VAULTS_WHITELIST_BASE
     case arbitrum.id:
       return VAULTS_WHITELIST_ARBITRUM
     case baseSepolia.id:
