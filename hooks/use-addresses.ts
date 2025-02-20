@@ -132,17 +132,19 @@ export function useTokens() {
 export function useCashnesses() {
   const tokens = useTokens()
   const cashnesses: Record<string, number> = {}
+
   tokens.forEach((token) => {
-    if (token.symbol === "USDC" || token.symbol === "USDT") {
-      cashnesses[token.address] = 1000
+    if (token.symbol.includes("USD")) {
+      cashnesses[token.symbol] = 1500
     } else if (token.symbol === "WETH") {
-      cashnesses[token.address] = 900
+      cashnesses[token.symbol] = 1000
     } else if (token.symbol === "WBTC") {
-      cashnesses[token.address] = 800
+      cashnesses[token.symbol] = 2000
     } else {
-      cashnesses[token.address] = 100
+      cashnesses[token.symbol] = 100
     }
   })
+
   return cashnesses
 }
 
