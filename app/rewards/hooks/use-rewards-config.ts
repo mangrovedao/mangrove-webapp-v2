@@ -48,6 +48,7 @@ export const useConfiguration = () => {
         })
 
         const epochId = currentEpochEntry?.epochId ?? null
+        const endDate = new Date(1738062000 * 1000)
 
         const nextEpochEntry = epochEntries.find((entry) => {
           return entry.startTimestamp > now && entry.startTimestamp !== 0

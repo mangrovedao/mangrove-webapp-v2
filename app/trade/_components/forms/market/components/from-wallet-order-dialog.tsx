@@ -1,4 +1,6 @@
 import React from "react"
+import { toast } from "sonner"
+import { Address, parseEther } from "viem"
 import {
   useAccount,
   useSendTransaction,
@@ -12,8 +14,6 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { toast } from "sonner"
-import { Address, parseEther } from "viem"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../components/approve-step"
 import { Steps } from "../../components/steps"

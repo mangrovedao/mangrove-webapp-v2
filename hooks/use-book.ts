@@ -31,7 +31,7 @@ export function useBook(
   params: UseBookParams = {
     aggregateOffersWithSamePrice: false,
   },
-  uniswapQuotes?: { asks: CompleteOffer[]; bids: CompleteOffer[] },
+  uniswapQuotes?: Book,
 ) {
   const marketClient = useMarketClient()
   const { currentMarket } = useMarket()
