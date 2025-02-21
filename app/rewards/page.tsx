@@ -85,12 +85,7 @@ export default function Page() {
                 Epoch #{configuration?.epochId}
               </h2>
               <div className="text-text-secondary text-xs flex space-x-4">
-                <span>
-                  Ends in{" "}
-                  <span className="text-white">
-                    {configuration?.timeRemaining || "..."}
-                  </span>
-                </span>
+                <span>Ended</span>
               </div>
             </div>
           </div>
