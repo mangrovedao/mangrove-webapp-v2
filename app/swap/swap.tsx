@@ -65,6 +65,7 @@ export default function Swap() {
     isWrapping,
     setIsWrapping,
     isFieldLoading,
+    isFetchingDollarValue,
   } = useSwap()
 
   return (
@@ -92,6 +93,7 @@ export default function Swap() {
               dollarValue={payDollar}
               onTokenClicked={() => setPayTokenDialogOpen(true)}
               onMaxClicked={onMaxClicked}
+              isFetchingDollarValue={isFetchingDollarValue}
             />
             <Button
               variant={"secondary"}
@@ -109,6 +111,7 @@ export default function Swap() {
               dollarValue={receiveDollar}
               onChange={onReceiveValueChange}
               onTokenClicked={() => setReceiveTokenDialogOpen(true)}
+              isFetchingDollarValue={isFetchingDollarValue}
             />
           </div>
 

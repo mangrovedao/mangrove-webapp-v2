@@ -11,7 +11,8 @@ import { tradeService } from "@/app/trade/_services/trade.service"
 import Dialog from "@/components/dialogs/dialog-new"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Button, type ButtonProps } from "@/components/ui/button"
-import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
+import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { useStep } from "../../../../../../hooks/use-step"
@@ -41,15 +42,9 @@ export const wethAdresses: { [key: number]: Address | undefined } = {
 
 export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
   const { chain, address } = useAccount()
-  const {
-    baseToken,
-    quoteToken,
-    sendToken,
-    receiveToken,
-    spender,
-    feeInPercentageAsString,
-    spotPrice,
-  } = useTradeInfos("market", form.bs)
+  const { baseToken, quoteToken, sendToken, receiveToken, spender } =
+    useTradeInfos("market", form.bs)
+  const { mangroveChain } = useRegistry()
 
   const {
     data: wrappingHash,
@@ -92,7 +87,14 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
     }
   }, [wrappingHash])
 
-  const approve = useInfiniteApproveToken()
+  // const approve = useInfiniteApproveToken()
+
+  const approveAmount = useApproveAmount({
+    token: sendToken,
+    spender: mangroveChain?.ghostbook ?? undefined,
+    sendAmount: form.send,
+  })
+
   const post = usePostMarketOrder({
     onResult: (result) => {
       /*
@@ -190,25 +192,19 @@ export default function FromWalletMarketOrderDialog({ form, onClose }: Props) {
             size={"lg"}
             variant={"secondary"}
             onClick={() => goToPrevStep()}
-            disabled={approve.isPending}
+            disabled={approveAmount.isPending}
           >
             Back
           </Button>
           <Button
             {...btnProps}
             className="flex-1"
-            disabled={approve.isPending}
-            loading={approve.isPending}
+            disabled={approveAmount.isPending}
+            loading={approveAmount.isPending}
             onClick={() => {
-              approve.mutate(
-                {
-                  token: sendToken,
-                  spender,
-                },
-                {
-                  onSuccess: goToNextStep,
-                },
-              )
+              approveAmount.mutate(undefined, {
+                onSuccess: goToNextStep,
+              })
             }}
           >
             Approve

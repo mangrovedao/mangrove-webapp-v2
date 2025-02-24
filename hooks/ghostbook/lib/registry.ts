@@ -31,6 +31,7 @@ export type UniClone = {
 export const uniClones = [
   // Uniswap V3 deployment on Arbitrum network
   {
+    pool: "0xC6962004f452bE9203591991D15f6b388e09E8D0",
     router: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
     quoter: "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
     factory: "0x1F98431c8aD98523631AE4a59f267346ea31F984",
@@ -38,13 +39,14 @@ export const uniClones = [
     chain: arbitrum,
   },
   {
+    pool: "0xd0b53D9277642d899DF5C87A3966A349A798F224",
     router: "0x2626664c2603336E57B271c5C0b26F421741e481",
     quoter: "0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a",
     factory: "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
     name: "Uniswap V3",
     chain: base,
   },
-] as const satisfies Array<UniClone>
+] as const satisfies Array<UniClone & { pool: Address }>
 
 export type MangroveChain = {
   ghostbook: Address
@@ -53,17 +55,17 @@ export type MangroveChain = {
   chain: Chain
 }
 
-export const mangroveChains = {
-  arbitrum: {
+export const mangroveChains = [
+  {
     ghostbook: "0xe2beB61E868661827Fa822A28080957e7136DcA9",
     univ3Module: "0x5126d161210654148445AdB3053e6DE2bbeaeefB",
     mangroveParams: arbitrumMangrove,
     chain: arbitrum,
   },
-  base: {
+  {
     ghostbook: "0xBd7189C760a8D00933DCDd42ad565FebE9b5A918",
     univ3Module: "0x1cc93D6cf0706fD482F258B549C814D531d0B5BF",
     mangroveParams: baseMangrove,
     chain: base,
   },
-} as const satisfies Record<string, MangroveChain>
+] as const satisfies Array<MangroveChain>

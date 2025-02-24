@@ -1,10 +1,12 @@
-import { marketOrderResultFromLogs, MarketParams } from "@mangrovedao/mgv"
+import { MarketParams } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { parseUnits, TransactionReceipt } from "viem"
+import { Address, TransactionReceipt, erc20Abi, parseUnits } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
+import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
+import { trade } from "@/hooks/ghostbook/lib/trade"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
@@ -33,6 +35,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
   const { data: walletClient } = useWalletClient()
   const marketClient = useMarketClient()
   const addresses = useMangroveAddresses()
+  const { uniClone, mangroveChain } = useRegistry()
 
   return useMutation({
     mutationFn: async ({
@@ -51,10 +54,14 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           !addresses ||
           !market ||
           !marketClient?.uid ||
-          !address
+          !address ||
+          !uniClone?.pool ||
+          !mangroveChain?.ghostbook ||
+          !mangroveChain?.univ3Module
         )
           throw new Error("Market order post, is missing params")
 
+        const { bs, send: gives, receive: wants, slippage } = form
         const contextMarket = swapMarket ? swapMarket : market
         const contextMarketClient = swapMarketClient
           ? swapMarketClient
@@ -62,44 +69,39 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
 
         const { base, quote } = contextMarket
 
-        const { bs, send: gives, receive: wants, slippage } = form
         const receiveToken = bs === "buy" ? base : quote
         const sendToken = bs === "buy" ? quote : base
 
-        const baseAmount =
-          bs === "buy"
-            ? parseUnits(wants, base.decimals)
-            : parseUnits(gives, base.decimals)
-        const quoteAmount =
-          bs === "buy"
-            ? parseUnits(gives, quote.decimals)
-            : parseUnits(wants, quote.decimals)
-
-        const { request } =
-          await contextMarketClient.simulateMarketOrderByVolumeAndMarket({
-            baseAmount,
-            quoteAmount,
-            bs,
-            slippage,
-            gas: 20_000_000n,
-            account: address,
-          })
-
-        const hash = await walletClient.writeContract(request)
-        const receipt = await publicClient.waitForTransactionReceipt({
-          hash,
+        // Check allowance before trade
+        const allowance = await publicClient.readContract({
+          address: sendToken.address as Address,
+          abi: erc20Abi,
+          functionName: "allowance",
+          args: [address, uniClone?.pool],
         })
-        //note:  might need to remove marketOrderResultfromlogs function if simulateMarketOrder returns correct values
-        const result = marketOrderResultFromLogs(
-          { ...addresses, ...contextMarket },
-          contextMarket,
-          {
-            logs: receipt.logs,
-            taker: walletClient.account.address,
-            bs,
-          },
-        )
 
+        console.log("Current allowance:", allowance)
+
+        const { got, gave, bounty, feePaid, receipt } = await trade({
+          client: walletClient,
+          ghostbook: mangroveChain.ghostbook,
+          market,
+          bs,
+          sendAmount: parseUnits(gives, sendToken.decimals),
+          router: uniClone.router,
+          univ3Module: mangroveChain.univ3Module,
+          fee: 500,
+          async onTrade({ got, gave, bounty, feePaid }) {
+            console.log("OnTrade callback:", {
+              got,
+              gave,
+              bounty,
+              feePaid,
+            })
+          },
+        })
+
+        const result = { takerGot: got, takerGave: gave, bounty, feePaid }
         successToast(
           TradeMode.MARKET,
           bs,

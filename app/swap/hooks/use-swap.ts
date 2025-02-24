@@ -26,6 +26,7 @@ import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -59,6 +60,8 @@ export function useSwap() {
   const { data: ethBalance } = useBalance({
     address,
   })
+
+  const { data: uniBook } = useUniswapBook()
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
     getQuote,
@@ -184,22 +187,22 @@ export function useSwap() {
     }))
   }
 
-  const getBookQuery = useQuery({
-    queryKey: [
-      "getBook",
-      marketClient,
-      currentMarket?.base.address,
-      currentMarket?.quote.address,
-    ],
-    queryFn: () => {
-      if (!marketClient) return null
-      return marketClient.getBook({
-        depth: 50n,
-      })
-    },
-    refetchInterval: 3_000,
-    enabled: !!marketClient,
-  })
+  // const getBookQuery = useQuery({
+  //   queryKey: [
+  //     "getBook",
+  //     marketClient?.key,
+  //     currentMarket?.base.address,
+  //     currentMarket?.quote.address,
+  //   ],
+  //   queryFn: () => {
+  //     if (!marketClient) return null
+  //     return marketClient.getBook({
+  //       depth: 50n,
+  //     })
+  //   },
+  //   refetchInterval: 3_000,
+  //   enabled: !!marketClient,
+  // })
 
   React.useEffect(() => {
     if (wrappingHash) {
@@ -218,7 +221,7 @@ export function useSwap() {
       currentMarket?.quote.address,
       slippage,
       fields.payValue,
-      marketClient?.uid,
+      marketClient?.key,
       address,
     ],
     queryFn: async () => {
@@ -227,7 +230,7 @@ export function useSwap() {
 
       // Mangrove
       if (marketClient) {
-        const book = getBookQuery.data
+        const book = uniBook
         if (!(book && address)) return null
 
         const isBasePay = currentMarket?.base.address === payToken?.address
@@ -245,21 +248,20 @@ export function useSwap() {
 
         const simulation = marketOrderSimulation(params)
 
-        setFields((fields) => ({
-          ...fields,
-          receiveValue: formatUnits(
-            isBasePay ? simulation.quoteAmount : simulation.baseAmount,
-            receiveToken?.decimals ?? 18,
-          ),
-        }))
-
         const [approvalStep] = await marketClient.getMarketOrderSteps({
           bs: isBasePay ? BS.sell : BS.buy,
           user: address,
           sendAmount: payAmount,
         })
 
-        return { simulation, approvalStep }
+        return {
+          simulation,
+          approvalStep,
+          receiveValue: formatUnits(
+            isBasePay ? simulation.quoteAmount : simulation.baseAmount,
+            receiveToken?.decimals ?? 18,
+          ),
+        }
       }
 
       // Odos
@@ -280,25 +282,32 @@ export function useSwap() {
         amount: simulation.baseAmount,
       })
 
-      setFields((fields) => ({
-        ...fields,
+      return {
+        simulation,
+        approvalStep: { done: !hasToApprove },
         receiveValue: formatUnits(
           simulation.quoteAmount,
           receiveToken?.decimals ?? 18,
         ),
-      }))
-
-      return { simulation, approvalStep: { done: !hasToApprove } }
+      }
     },
     refetchInterval: 7_000,
     enabled:
       !!payToken &&
       !!receiveToken &&
-      !!slippage &&
       !!fields.payValue &&
       Number(fields.payValue) > 0 &&
-      (!!marketClient ? !!getBookQuery.data && !!address : true),
+      (!marketClient || (!!uniBook && !!address)),
   })
+
+  React.useEffect(() => {
+    if (simulateQuery.data?.receiveValue) {
+      setFields((fields) => ({
+        ...fields,
+        receiveValue: simulateQuery.data?.receiveValue ?? "",
+      }))
+    }
+  }, [simulateQuery.data?.receiveValue])
 
   const getMarketPriceQuery = useQuery({
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
@@ -341,10 +350,7 @@ export function useSwap() {
     const payValueNum = Number(fields.payValue)
 
     if (payValueNum <= payTokenBalanceFormatted) return 0
-    console.log(
-      payValueNum - payTokenBalanceFormatted,
-      payTokenBalanceFormatted,
-    )
+
     return payValueNum - payTokenBalanceFormatted
   }, [fields.payValue, payToken, payTokenBalance.balance, ethBalance?.value])
 
@@ -559,6 +565,7 @@ export function useSwap() {
     swapButtonText,
     payDollar: getMarketPriceQuery.data?.payDollar ?? 0,
     receiveDollar: getMarketPriceQuery.data?.receiveDollar ?? 0,
+    isFetchingDollarValue: getMarketPriceQuery.isFetching,
     setShowCustomInput,
     setSlippage,
     isOdosLoading,

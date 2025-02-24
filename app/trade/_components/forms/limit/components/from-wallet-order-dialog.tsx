@@ -105,6 +105,7 @@ export default function FromWalletLimitOrderDialog({ form, onClose }: Props) {
   }, [wrappingHash])
 
   const approve = useInfiniteApproveToken()
+
   // const activate = useActivateSmartContract()
   // const deploy = useDeploySmartRouter()
   const post = usePostLimitOrder({
