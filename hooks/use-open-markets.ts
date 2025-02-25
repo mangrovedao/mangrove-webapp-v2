@@ -1,4 +1,5 @@
 import { printEvmError } from "@/utils/errors"
+
 import { getOpenMarkets } from "@mangrovedao/mgv/actions"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
@@ -10,6 +11,8 @@ export function useOpenMarkets() {
   const addresses = useMangroveAddresses()
   const cashnesses = useCashnesses()
   const { chain } = useAccount()
+
+  console.log(client.chain)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["open-markets", client?.key, cashnesses, addresses, chain?.id],

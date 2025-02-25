@@ -54,12 +54,12 @@ export function OrderBook({
 export function BookContent() {
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
-  const { asks: uniswapAsks, bids: uniswapBids } = useUniswapBook()
+  const { data: uniBook } = useUniswapBook()
   const { book, isLoading } = useBook(
     {
       aggregateOffersWithSamePrice: true,
     },
-    { asks: uniswapAsks, bids: uniswapBids },
+    uniBook,
   )
 
   if (!book || !currentMarket) {

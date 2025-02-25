@@ -11,14 +11,14 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 import { formatUnits, parseUnits } from "viem"
 
-import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { Book } from "@mangrovedao/mgv"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
@@ -58,6 +58,7 @@ const determinePrices = (
 export function useMarketForm(props: Props) {
   const { address } = useAccount()
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
+  const queryClient = useQueryClient()
 
   const form = useForm({
     validator: zodValidator,
@@ -88,7 +89,7 @@ export function useMarketForm(props: Props) {
     spotPrice,
   } = useTradeInfos("market", bs)
 
-  const { book } = useBook()
+  const { data: book } = useUniswapBook()
 
   const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
@@ -99,14 +100,24 @@ export function useMarketForm(props: Props) {
     book,
     Number(marketPrice?.close),
   )
+
   const [estimateFrom, setEstimateFrom] = React.useState<
     "send" | "receive" | undefined
   >()
 
-  const { data } = useQuery({
-    queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
+  const { data, refetch } = useQuery({
+    queryKey: [
+      "marketOrderSimulation",
+      estimateFrom,
+      bs,
+      receive,
+      send,
+      book?.asks?.[0]?.price,
+      book?.bids?.[0]?.price,
+    ],
     queryFn: () => {
       if (!book) return null
+
       const baseAmount =
         bs == BS.buy
           ? parseUnits(receive, market?.base.decimals ?? 18)
@@ -160,6 +171,7 @@ export function useMarketForm(props: Props) {
         bs === BS.buy ? formattedBaseEstimation : formattedQuoteEstimation
       const estimatedSend =
         bs === BS.buy ? formattedQuoteEstimation : formattedBaseEstimation
+
       estimateFrom === "receive"
         ? form.setFieldValue("send", estimatedSend)
         : form.setFieldValue("receive", estimatedReceive)

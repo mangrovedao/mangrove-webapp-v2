@@ -38,11 +38,8 @@ function removeCrossedOrders(
 
 export function useDepthChart() {
   const { currentMarket: market } = useMarket()
-  const { asks: uniswapAsks, bids: uniswapBids } = useUniswapBook()
-  const { book, isLoading } = useBook(
-    {},
-    { asks: uniswapAsks, bids: uniswapBids },
-  )
+  const { data: uniBook } = useUniswapBook()
+  const { book, isLoading } = useBook({}, uniBook)
 
   const [hasScrolled, setHasScrolled] = React.useState(false)
   const [isScrolling, setIsScrolling] = React.useState(false)

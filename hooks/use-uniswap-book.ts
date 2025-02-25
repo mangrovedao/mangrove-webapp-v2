@@ -15,7 +15,7 @@ export function useUniswapBook() {
   const { chain } = useAccount()
   const { uniClone } = useRegistry()
 
-  const { data: uniswapQuotes } = useQuery({
+  return useQuery({
     queryKey: [
       "uniswap-quotes",
       currentMarket?.base.address.toString(),
@@ -45,12 +45,9 @@ export function useUniswapBook() {
         return mergedBook
       } catch (error) {
         printEvmError(error)
-        return { asks: [], bids: [] }
       }
     },
     enabled: !!currentMarket && !!client && !!book,
     refetchInterval: 3000,
   })
-
-  return { asks: uniswapQuotes?.asks || [], bids: uniswapQuotes?.bids || [] }
 }
