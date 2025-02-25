@@ -10,7 +10,6 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table"
-import { useBook } from "@/hooks/use-book"
 import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
@@ -54,13 +53,7 @@ export function OrderBook({
 export function BookContent() {
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
-  const { data: uniBook } = useUniswapBook()
-  const { book, isLoading } = useBook(
-    {
-      aggregateOffersWithSamePrice: true,
-    },
-    uniBook,
-  )
+  const { data: book, isLoading } = useUniswapBook()
 
   if (!book || !currentMarket) {
     return (

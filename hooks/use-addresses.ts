@@ -130,29 +130,45 @@ export function useTokens() {
 }
 
 export function useCashnesses() {
-  const tokens = useTokens()
-  const cashnesses: Record<string, number> = {}
+  const { chainId } = useAccount()
 
-  tokens.forEach((token) => {
-    if (token.symbol.includes("USD")) {
-      cashnesses[token.symbol] = 1500
-    } else if (token.symbol === "WETH") {
-      cashnesses[token.symbol] = 1000
-    } else if (token.symbol === "WBTC") {
-      cashnesses[token.symbol] = 2000
-    } else {
-      cashnesses[token.symbol] = 100
-    }
-  })
-
-  return cashnesses
+  switch (chainId) {
+    case arbitrum.id:
+      return {
+        WETH: 1000,
+        WBTC: 2000,
+        USDC: 1e6,
+        USDT: 2e6,
+      }
+    case base.id:
+      return {
+        USDC: 1e6,
+        EUR: 0.5e6,
+        WETH: 1000,
+        cbBTC: 2000,
+        cbETH: 500,
+        wstETH: 600,
+      }
+    default:
+      return {
+        WETH: 1000,
+        WBTC: 2000,
+        USDC: 1e6,
+        USDT: 2e6,
+      }
+  }
 }
 
-export function useTokensWithCashnesses() {
-  const tokens = useTokens()
-  const cashnesses = useCashnesses()
-  return tokens.map((token, index) => ({
-    ...token,
-    cashness: cashnesses[token.address],
-  }))
+export function useSymbolOverrides() {
+  const { chainId } = useAccount()
+  switch (chainId) {
+    case arbitrum.id:
+      return {
+        "USD₮0": "USDT",
+      }
+    case base.id:
+      return {}
+    default:
+      return {}
+  }
 }
