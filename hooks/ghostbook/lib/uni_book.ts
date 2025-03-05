@@ -247,7 +247,7 @@ export function mergeOffers(
   // Return new book with merged offers
   return {
     ...book,
-    asks: _asks.concat(book.asks),
+    asks: _asks.concat(book.asks).reverse(),
     bids: _bids.concat(book.bids),
     // asks: _asks.reverse(),
     // bids: _bids,
