@@ -256,7 +256,7 @@ export const TVChartContainer = (
   }
 
   return (
-    <div className="w-full h-full relative bg-bg-secondary border border-bg-secondary rounded-sm">
+    <div className="w-full h-full relative border border-bg-secondary rounded-sm">
       {isLoading && <AnimatedChartSkeleton />}
       <div
         ref={chartContainerRef}

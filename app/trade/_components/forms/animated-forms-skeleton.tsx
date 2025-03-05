@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 
 export function AnimatedFormsSkeleton() {
   return (
-    <div className="w-full h-full flex flex-col bg-bg-secondary border border-bg-secondary rounded-sm">
+    <div className="w-full h-full flex flex-col  border border-bg-secondary rounded-sm">
       {/* Tabs Header */}
       <motion.div
         className="flex w-full border-b border-border-tertiary"
