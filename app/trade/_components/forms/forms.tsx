@@ -9,11 +9,11 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useBook } from "@/hooks/use-book"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
+import { AnimatedFormsSkeleton } from "./animated-forms-skeleton"
 import { Buy } from "./form-types/buy"
 import { Sell } from "./form-types/sell"
 
@@ -32,13 +32,15 @@ export function Forms({
     null,
   )
 
-  return book ? (
+  if (!book) {
+    return <AnimatedFormsSkeleton />
+  }
+
+  return (
     <CustomTabs
       {...props}
       defaultValue={orderType ?? Object.values(BS)[0]}
-      className={
-        "bg-bg-secondary border border-bg-secondary rounded-2xl h-full max-h-fit"
-      }
+      className={" border border-bg-secondary rounded-sm h-full max-h-fit"}
       onValueChange={(value) => setOrderType(value as BS)}
     >
       <CustomTabsList className="w-full p-0 space-x-0">
@@ -47,11 +49,11 @@ export function Forms({
             key={`${form}-tab`}
             value={form}
             className={cn(
-              "capitalize w-full data-[state=active]:bg-bg-secondary data-[state=active]:text-text-brand bg-bg-primary rounded-none",
+              "capitalize w-full data-[state=inactive]:bg-bg-secondary data-[state=active]:text-text-brand bg-bg-primary rounded-none",
               {
-                "data-[state=active]:border-[#FF5555] data-[state=active]:text-[#FF5555] rounded-tr-2xl":
+                "data-[state=active]:border-[#FF5555] data-[state=active]:text-[#FF5555] rounded-sm":
                   form === BS.sell,
-                "rounded-tl-2xl": form === BS.buy,
+                "rounded-sm": form === BS.buy,
               },
             )}
           >
@@ -63,21 +65,19 @@ export function Forms({
         scrollHideDelay={200}
         className="max-h-[calc(100%-var(--bar-height))] h-full"
       >
-        <div className="px-4 space-y-4 mt-[24px]">
+        <div className="px-4 space-y-4 mt-[24px] flex flex-col h-full">
           {Object.values(BS).map((form) => (
-            <CustomTabsContent key={`${form}-content`} value={form}>
-              {book ? (
-                renderElement(TABS_CONTENT[form])
-              ) : (
-                <Skeleton className="w-full h-full" />
-              )}
+            <CustomTabsContent
+              key={`${form}-content`}
+              value={form}
+              className="flex-1 flex flex-col h-full"
+            >
+              {renderElement(TABS_CONTENT[form])}
             </CustomTabsContent>
           ))}
         </div>
         <ScrollBar orientation="vertical" />
       </ScrollArea>
     </CustomTabs>
-  ) : (
-    <Skeleton className="w-full h-full" />
   )
 }

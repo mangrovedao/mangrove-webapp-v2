@@ -35,12 +35,13 @@ export function useUniswapBook() {
           500,
           BigInt(book.bidsConfig.density) * 20_000_000n,
           BigInt(book.asksConfig.density) * 20_000_000n,
-          30,
+          12,
           uniClone,
         )
 
         // Merge both orderbooks
         const mergedBook = mergeOffers(uniBook.asks, uniBook.bids, book)
+        console.log("uniBook", uniBook)
 
         return mergedBook
       } catch (error) {
@@ -48,6 +49,8 @@ export function useUniswapBook() {
       }
     },
     enabled: !!currentMarket && !!client && !!book,
-    refetchInterval: 3000,
+    refetchInterval: 5000,
+    refetchOnWindowFocus: false,
+    staleTime: 2000,
   })
 }

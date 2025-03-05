@@ -6,7 +6,7 @@ export function OrderBookTableCell({ children, className }: TableCellProps) {
   return (
     <TableCell
       className={cn(
-        "p-0 px-[13px] text-right font-roboto font-light",
+        "p-0 px-3 py-1 text-left font-mono font-light text-sm transition-all duration-200 hover:font-medium",
         className,
       )}
     >

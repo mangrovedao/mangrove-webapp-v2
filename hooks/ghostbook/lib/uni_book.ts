@@ -249,5 +249,7 @@ export function mergeOffers(
     ...book,
     asks: _asks.concat(book.asks),
     bids: _bids.concat(book.bids),
+    // asks: _asks.reverse(),
+    // bids: _bids,
   }
 }

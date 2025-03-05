@@ -3,6 +3,7 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
+import { AnimatedOrdersSkeleton } from "./animated-orders-skeleton"
 import CancelOfferDialog from "./components/cancel-offer-dialog"
 import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"
@@ -37,12 +38,17 @@ export function Orders() {
     onCancel: setOrderToDelete,
   })
 
+  if (ordersQuery.isLoading || !currentMarket) {
+    return <AnimatedOrdersSkeleton />
+  }
+
   return (
     <>
       <DataTable
         table={table}
         isError={!!ordersQuery.error}
-        isLoading={ordersQuery.isLoading}
+        isLoading={false}
+        emptyArrayMessage="No orders currently active"
         onRowClick={(order) =>
           setOrderToEdit({ order: order as Order, mode: "view" })
         }
@@ -52,6 +58,8 @@ export function Orders() {
           pageSize,
           count,
         }}
+        animated={true}
+        animationVariant="slide"
       />
       <EditOrderSheet
         orderInfos={orderToEdit}

@@ -3,6 +3,7 @@ import React from "react"
 
 import useMarket from "@/providers/market"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
+import { AnimatedFillsSkeleton } from "./animated-fills-skeleton"
 import { useFills } from "./use-fills"
 import { useTable } from "./use-table"
 
@@ -25,17 +26,24 @@ export function Fills() {
     data: fillsQuery.data,
   })
 
+  if (fillsQuery.isLoading || !market) {
+    return <AnimatedFillsSkeleton />
+  }
+
   return (
     <DataTable
+      emptyArrayMessage="No trade history"
       table={table}
       isError={!!fillsQuery.error}
-      isLoading={fillsQuery.isLoading || !market}
+      isLoading={false}
       pagination={{
         onPageChange: setPageDetails,
         page,
         pageSize,
         count,
       }}
+      animated={true}
+      animationVariant="slide"
     />
   )
 }

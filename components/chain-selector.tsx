@@ -1,4 +1,3 @@
-import { ChevronDown } from "lucide-react"
 import React from "react"
 import { useAccount, useSwitchChain } from "wagmi"
 
@@ -6,6 +5,7 @@ import Dialog from "@/components/dialogs/dialog"
 import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 import { getChainObjectById } from "@/utils/chains"
+import { arbitrum } from "viem/chains"
 import { Button } from "./ui/button"
 import { XClose } from "./ui/dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
@@ -22,9 +22,11 @@ function getIconFromChainlist(name: string) {
 
 export default function ChainSelector() {
   const { chainId } = useAccount()
+  const defaultChainId = chainId ?? arbitrum.id
+
   const { switchChain } = useSwitchChain()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
-  const chain = getChainObjectById(chainId?.toString())
+  const chain = getChainObjectById(defaultChainId?.toString())
 
   // Close dialog if the chain id has changed
   React.useEffect(() => {
@@ -86,24 +88,27 @@ export default function ChainSelector() {
         </Dialog.Description>
       </Dialog>
       <Button
+        size="sm"
         variant="secondary"
-        className={"!space-x-4 lg:flex items-center hidden border-transparent"}
+        className={
+          "!space-x-2 lg:flex items-center hidden border-transparent text-xs bg-bg-tertiary hover:bg-bg-secondary"
+        }
         onClick={openDialog}
       >
-        <span className="flex space-x-2">
+        <span className="flex space-x-2 p-1">
           <ImageWithHideOnError
-            src={`/assets/chains/${chainId}.webp`}
+            src={`/assets/chains/${defaultChainId}.webp`}
             width={16}
             height={16}
             className="h-4 rounded-sm size-4"
-            key={chainId}
+            key={defaultChainId}
             alt={`${chain?.name}-logo`}
           />
-          <span className="text-sm whitespace-nowrap">{chain?.name}</span>
+          {/* <span className="text-sm whitespace-nowrap">{chain?.name}</span> */}
         </span>
-        <div className="pl-2">
-          <ChevronDown className="w-5" />
-        </div>
+        {/* <div className="pl-2"> */}
+        {/* <ChevronDown className="w-5" /> */}
+        {/* </div> */}
       </Button>
     </>
   )
