@@ -91,7 +91,7 @@ export default function ChainSelector() {
         size="sm"
         variant="secondary"
         className={
-          "!space-x-2 lg:flex items-center hidden border-transparent text-xs bg-bg-tertiary hover:bg-bg-secondary"
+          "!space-x-2 !rounded-sm lg:flex items-center hidden border-transparent text-xs bg-bg-tertiary hover:bg-bg-secondary"
         }
         onClick={openDialog}
       >

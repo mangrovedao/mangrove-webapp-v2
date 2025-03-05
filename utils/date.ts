@@ -85,3 +85,26 @@ export function getFormattedTimeFromNowTo(date: Date) {
     seconds,
   })
 }
+
+export function formatRelativeTime(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date
+  const now = new Date()
+  const diffInSeconds = differenceInSeconds(now, d)
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds}s ago`
+  }
+
+  const diffInMinutes = differenceInMinutes(now, d)
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes}m ago`
+  }
+
+  const diffInHours = differenceInHours(now, d)
+  if (diffInHours < 24) {
+    return `${diffInHours}h ago`
+  }
+
+  const diffInDays = differenceInDays(now, d)
+  return `${diffInDays}d ago`
+}

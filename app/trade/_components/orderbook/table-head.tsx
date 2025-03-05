@@ -6,7 +6,7 @@ export function OrderBookTableHead({ children, className }: TableCellProps) {
   return (
     <motion.th
       className={cn(
-        "p-0 px-3 text-left font-medium text-xs tracking-wider uppercase text-primary/80 transition-all duration-200",
+        "p-0 px-3 text-left font-medium text-xs tracking-wider text-primary/80 transition-all duration-200",
         className,
       )}
       initial={{ opacity: 0, y: -3 }}

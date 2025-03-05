@@ -45,7 +45,7 @@ export const OrderBook = React.memo(function OrderBook({
     <motion.div
       style={style}
       className={cn(
-        "h-full w-full flex flex-col rounded-lg overflow-hidden",
+        "h-full w-full flex flex-col rounded-sm overflow-hidden",
         className,
       )}
       initial={{ opacity: 0 }}
@@ -69,7 +69,7 @@ export const OrderBook = React.memo(function OrderBook({
             <TabsTrigger
               value="book"
               className={cn(
-                "text-base font-medium data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent",
+                "text-base font-medium data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:rounded-sm data-[state=active]:shadow-none data-[state=active]:bg-transparent",
                 "px-4 py-3",
               )}
             >
@@ -78,7 +78,7 @@ export const OrderBook = React.memo(function OrderBook({
             <TabsTrigger
               value="trades"
               className={cn(
-                "text-base font-medium data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:rounded-none data-[state=active]:shadow-none data-[state=active]:bg-transparent",
+                "text-base font-medium data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:rounded-sm data-[state=active]:shadow-none data-[state=active]:bg-transparent",
                 "px-4 py-3",
               )}
             >
@@ -264,24 +264,24 @@ export const BookContent = React.memo(function BookContent() {
             {/* Asks Table - Only shown in default or asks view */}
             <Table className="text-sm leading-5 select-none relative w-full">
               <motion.thead
-                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-[var(--bar-height)]"
+                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-5"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
               >
                 <TableRow className="border-none">
-                  <OrderBookTableHead>
+                  <OrderBookTableHead className="text-xs">
                     Price ({currentMarket.quote.symbol})
                   </OrderBookTableHead>
-                  <OrderBookTableHead className="text-right">
+                  <OrderBookTableHead className="text-right text-xs">
                     Size ({currentMarket.base.symbol})
                   </OrderBookTableHead>
-                  <OrderBookTableHead className="text-right">
+                  <OrderBookTableHead className="text-right text-xs">
                     Total ({currentMarket.quote.symbol})
                   </OrderBookTableHead>
                 </TableRow>
               </motion.thead>
-              <TableBody className="overflow-scroll">
+              <TableBody className="overflow-scroll pt-5">
                 <SemiBook
                   type={BA.asks}
                   data={book}
@@ -292,7 +292,7 @@ export const BookContent = React.memo(function BookContent() {
 
             {/* Mid Price and Spread */}
             <motion.div
-              className="text-center text-muted-foreground text-xs py-2 font-light bg-bg-secondary/90 backdrop-blur-sm border-y border-border-tertiary/50 shadow-sm"
+              className="text-center text-muted-foreground text-xs py-1 font-light bg-bg-secondary/90 backdrop-blur-sm shadow-sm "
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
@@ -302,12 +302,16 @@ export const BookContent = React.memo(function BookContent() {
               }}
               ref={spreadRef}
             >
-              <span className="font-medium text-primary">Mid:</span>{" "}
-              <span className="font-mono font-light">
+              <span className="font-medium text-text-secondary text-xs">
+                Mid:
+              </span>{" "}
+              <span className="font-mono font-light text-xs text-white pr-2">
                 {midPrice.toFixed(1)}
               </span>{" "}
-              <span className="font-medium text-primary">Spread:</span>{" "}
-              <span className="font-mono font-light">
+              <span className="font-medium text-text-secondary text-xs">
+                Spread:
+              </span>{" "}
+              <span className="font-mono font-light text-xs text-white">
                 {spreadPercentString}
               </span>
             </motion.div>

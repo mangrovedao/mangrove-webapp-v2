@@ -1,10 +1,10 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
+import { AnimatePresence, motion } from "framer-motion"
 import React from "react"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useBook } from "@/hooks/use-book"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
@@ -14,11 +14,13 @@ import { cn } from "@/utils"
 import { determineDecimals, formatNumber } from "@/utils/numbers"
 
 function Container({ children }: React.PropsWithChildren) {
-  return <span className="text-xs font-medium space-y-[2px]">{children}</span>
+  return (
+    <span className="text-xs font-medium space-y-[2px] block">{children}</span>
+  )
 }
 
 function Label({ children }: React.PropsWithChildren) {
-  return <div className="text-muted-foreground">{children}</div>
+  return <div className="text-muted-foreground h-2">{children}</div>
 }
 
 function Value({
@@ -28,13 +30,20 @@ function Value({
   return (
     <div
       className={cn(
-        "flex items-center font-ubuntu font-semibold text-sm",
+        "flex items-center font-ubuntu font-semibold text-sm h-6",
         className,
       )}
     >
       {children}
     </div>
   )
+}
+
+// Animation variants for number transitions
+const numberVariants = {
+  initial: { opacity: 0, y: 5 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -5 },
 }
 
 function Item({
@@ -59,26 +68,54 @@ function Item({
     token?.priceDisplayDecimals,
   )
 
+  // Check if value is valid (not undefined, NaN, or null)
+  const isValidValue =
+    value !== undefined && value !== null && !isNaN(Number(value))
+
+  // Format the value outside of the render to ensure consistent width
+  let formattedValue = "-"
+  if (isValidValue) {
+    try {
+      formattedValue = formatNumber(value ?? 0, {
+        style: showSymbol ? "currency" : undefined,
+        currencyDisplay: showSymbol ? "symbol" : undefined,
+        currency: showSymbol ? "USD" : undefined,
+        minimumFractionDigits: displayedPriceDecimals,
+        maximumFractionDigits: displayedPriceDecimals,
+      })
+    } catch (error) {
+      console.error("Error formatting value:", error)
+      formattedValue = "-"
+    }
+  }
+
   return (
     <Container>
       <Label>{label}</Label>
-      {skeleton ? (
-        <Skeleton className="w-16 h-4" />
-      ) : value ? (
-        <Value className={className}>
-          {formatNumber(value ?? 0, {
-            style: showSymbol ? "currency" : undefined,
-            currencyDisplay: showSymbol ? "symbol" : undefined,
-            currency: showSymbol ? "USD" : undefined,
-            minimumFractionDigits: displayedPriceDecimals,
-            maximumFractionDigits: displayedPriceDecimals,
-          })}{" "}
-          {token?.symbol}
-          {rightElement}
-        </Value>
-      ) : (
-        <span>-</span>
-      )}
+      <div className="h-5 min-w-[80px]">
+        {skeleton ? (
+          <Skeleton className="w-16 h-4" />
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${formattedValue}-${token?.symbol || ""}`}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={numberVariants}
+              transition={{ duration: 0.2 }}
+            >
+              <Value className={className}>
+                {formattedValue}{" "}
+                {isValidValue && token?.symbol && (
+                  <span className="text-xs pl-1"> {token.symbol}</span>
+                )}
+                {isValidValue && rightElement}
+              </Value>
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </div>
     </Container>
   )
 }
@@ -111,93 +148,127 @@ export function PricesBar() {
         : Math.max(lowestAskPrice || 0, highestBidPrice || 0)
 
   if (side === "quote") {
-    spotPrice = 1 / (spotPrice ?? 1)
+    spotPrice = spotPrice ? 1 / spotPrice : undefined
   }
 
-  const variation24hPercentage =
-    ((Number(data?.close) - Number(data?.open)) / Number(data?.close)) * 100
+  // Calculate variation only if we have valid data
+  const hasValidPriceData =
+    data?.close &&
+    data?.open &&
+    !isNaN(Number(data.close)) &&
+    !isNaN(Number(data.open)) &&
+    Number(data.close) > 0
+
+  const variation24hPercentage = hasValidPriceData
+    ? ((Number(data?.close) - Number(data?.open)) / Number(data?.close)) * 100
+    : undefined
 
   const variation24hClassnames = cn({
-    "text-green-caribbean": variation24hPercentage >= 0,
-    "text-red-100": variation24hPercentage < 0,
+    "text-green-caribbean":
+      variation24hPercentage !== undefined && variation24hPercentage >= 0,
+    "text-red-100":
+      variation24hPercentage !== undefined && variation24hPercentage < 0,
   })
 
+  // Format percentage for display
+  const formattedPercentage =
+    variation24hPercentage !== undefined && !isNaN(variation24hPercentage)
+      ? new Intl.NumberFormat(undefined, {
+          style: "percent",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(Math.abs(variation24hPercentage) / 100)
+      : "-"
+
   return (
-    <ScrollArea>
-      <div className="flex items-center w-full space-x-8 whitespace-nowrap h-full min-h-[54px] px-4">
+    <>
+      <div className="flex items-center px-2">
         <Item
           label={"Price"}
-          value={spotPrice ? Number(spotPrice ?? 0) : undefined}
+          value={spotPrice}
           token={side === "quote" ? base : quote}
           skeleton={false}
         />
-
-        <Separator orientation="vertical" className="h-4" />
-
-        <Item
-          label={`24h Change`}
-          value={variation24hPercentage}
-          token={token}
-          skeleton={mangroveTokenPriceLoading}
-          className={variation24hClassnames}
-          rightElement={
-            <span
-              className={cn(
-                "space-x-[2px] text-xs inline-flex ml-2",
-                variation24hClassnames,
-              )}
-            >
-              <VariationArrow
-                className={cn("h-3", {
-                  "rotate-180": variation24hPercentage < 0,
-                })}
-              />
-              <span>
-                {new Intl.NumberFormat(undefined, {
-                  style: "percent",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(variation24hPercentage / 100)}
-              </span>
-            </span>
-          }
-        />
-
-        <Item
-          label="24h High"
-          value={data?.maxPrice ? Number(data?.maxPrice ?? 0) : undefined}
-          token={token}
-          skeleton={mangroveTokenPriceLoading}
-        />
-
-        <Item
-          label="24h Low"
-          value={data?.minPrice ? Number(data?.minPrice ?? 0) : undefined}
-          token={token}
-          skeleton={mangroveTokenPriceLoading}
-        />
-
-        <Separator orientation="vertical" className="h-4" />
-
-        <Item
-          label="24h Volume"
-          value={data?.quoteVolume ? Number(data?.quoteVolume ?? 0) : undefined}
-          token={token}
-          skeleton={mangroveTokenPriceLoading}
-        />
-
-        {/* <Button
-          variant={"secondary"}
-          size={"icon"}
-          className="p-1"
-          onClick={() => {
-            setSide(side === "base" ? "quote" : "base")
-          }}
-        >
-          <ArrowLeftRight />
-        </Button> */}
       </div>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+      <ScrollArea className="relative px-2">
+        <motion.div
+          className="flex items-center w-full space-x-2 whitespace-nowrap h-full min-h-[54px] px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Item
+            label={`24h Change`}
+            value={variation24hPercentage}
+            token={token}
+            skeleton={mangroveTokenPriceLoading}
+            className={variation24hClassnames}
+            rightElement={
+              variation24hPercentage !== undefined &&
+              !isNaN(variation24hPercentage) ? (
+                <motion.span
+                  className={cn(
+                    "space-x-[2px] text-xs inline-flex ml-2",
+                    variation24hClassnames,
+                  )}
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    transition: {
+                      duration: 0.5,
+                      repeat: 0,
+                      repeatType: "reverse",
+                    },
+                  }}
+                >
+                  <VariationArrow
+                    className={cn("h-3", {
+                      "rotate-180": variation24hPercentage < 0,
+                    })}
+                  />
+                  <span>{formattedPercentage}</span>
+                </motion.span>
+              ) : undefined
+            }
+          />
+
+          <Item
+            label="24h High"
+            value={
+              data?.maxPrice && !isNaN(Number(data.maxPrice))
+                ? Number(data.maxPrice)
+                : undefined
+            }
+            token={token}
+            skeleton={mangroveTokenPriceLoading}
+          />
+
+          <Item
+            label="24h Low"
+            value={
+              data?.minPrice && !isNaN(Number(data.minPrice))
+                ? Number(data.minPrice)
+                : undefined
+            }
+            token={token}
+            skeleton={mangroveTokenPriceLoading}
+          />
+
+          <Item
+            label="24h Volume"
+            value={
+              data?.quoteVolume && !isNaN(Number(data.quoteVolume))
+                ? Number(data.quoteVolume)
+                : undefined
+            }
+            token={token}
+            skeleton={mangroveTokenPriceLoading}
+          />
+        </motion.div>
+        <ScrollBar
+          orientation="horizontal"
+          className="shadow-sm bg-transparent"
+        />
+      </ScrollArea>
+    </>
   )
 }

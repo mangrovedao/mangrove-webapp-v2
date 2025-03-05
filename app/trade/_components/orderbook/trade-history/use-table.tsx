@@ -13,7 +13,7 @@ import React from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { formatDate } from "@/utils/date"
+import { formatDate, formatRelativeTime } from "@/utils/date"
 import type { TradeHistory } from "../trade-history/schema"
 
 const columnHelper = createColumnHelper<TradeHistory>()
@@ -29,7 +29,7 @@ export function useTable({ data }: Params) {
   const columns = React.useMemo(
     () => [
       columnHelper.display({
-        header: "Size",
+        header: "Type/Size",
         cell: ({ row }) => {
           const { takerGot, takerGave, isBid } = row.original
           if (!market) return null
@@ -37,14 +37,19 @@ export function useTable({ data }: Params) {
           const baseValue = isBid ? takerGot : takerGave
 
           return (
-            <span
-              className={cn({
-                "text-green-caribbean": isBid,
-                "text-red-100": !isBid,
-              })}
-            >
-              {Big(baseValue).toFixed(base.displayDecimals)} {base.symbol}
-            </span>
+            <div className="flex flex-col">
+              <span
+                className={cn("font-medium text-xs", {
+                  "text-green-caribbean": isBid,
+                  "text-red-100": !isBid,
+                })}
+              >
+                {isBid ? "BUY" : "SELL"}
+              </span>
+              <span className="text-xs opacity-80">
+                {Big(baseValue).toFixed(base.displayDecimals)} {base.symbol}
+              </span>
+            </div>
           )
         },
       }),
@@ -54,10 +59,14 @@ export function useTable({ data }: Params) {
         cell: (row) =>
           market ? (
             row.getValue() ? (
-              <span>
-                {Big(row.getValue()).toFixed(market.quote.displayDecimals)}{" "}
-                {market.quote.symbol}
-              </span>
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {Big(row.getValue()).toFixed(market.quote.displayDecimals)}
+                </span>
+                <span className="text-xs opacity-80">
+                  {market.quote.symbol}
+                </span>
+              </div>
             ) : (
               <span>-</span>
             )
@@ -67,10 +76,19 @@ export function useTable({ data }: Params) {
       }),
 
       columnHelper.accessor("creationDate", {
-        header: "Date",
+        header: "Time",
         cell: ({ row }) => {
           const date = row.original.creationDate
-          return <div>{formatDate(date, "dd/MM/yyyy, HH:mm")}</div>
+          return (
+            <div className="flex flex-col">
+              <span className="font-medium text-xs">
+                {formatDate(date, "HH:mm:ss")}
+              </span>
+              <span className="text-xs opacity-70">
+                {formatRelativeTime(date)}
+              </span>
+            </div>
+          )
         },
       }),
     ],

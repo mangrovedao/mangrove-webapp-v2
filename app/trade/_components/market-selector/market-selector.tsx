@@ -49,9 +49,9 @@ export default function MarketSelector() {
       onValueChange={onValueChange}
       disabled={!markets?.length}
     >
-      <SelectTrigger className="">
+      <SelectTrigger className="rounded-sm ">
         <SelectValue
-          placeholder={!markets?.length ? "Select a market" : "No markets"}
+          placeholder={!markets?.length ? "Market" : "No markets"}
           suppressHydrationWarning
         />
       </SelectTrigger>
@@ -66,7 +66,8 @@ export default function MarketSelector() {
                 <TokenIcon symbol={m.base.symbol} />
                 <TokenIcon symbol={m.quote.symbol} />
               </div>
-              <span>{getSymbol(m)}</span>
+
+              <span className="max-sm:hidden">{getSymbol(m)}</span>
             </div>
           </SelectItem>
         ))}

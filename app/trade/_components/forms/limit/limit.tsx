@@ -5,10 +5,8 @@ import { useAccount } from "wagmi"
 
 import InfoTooltip from "@/components/info-tooltip-new"
 import { EnhancedNumericInput } from "@/components/token-input-new"
-import { Caption } from "@/components/typography/caption"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -25,7 +23,6 @@ import { FIELD_ERRORS } from "@/utils/form-errors"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { Accordion } from "../components/accordion"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
-import SourceIcon from "./components/source-icon"
 import { TimeInForce, TimeToLiveUnit } from "./enums"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
@@ -243,92 +240,6 @@ export function Limit(props: { bs: BS }) {
                     </span>
                   )}
                 </div>
-
-                <Accordion title="Liquidity sourcing">
-                  <div className="flex justify-between space-x-2 pt-2">
-                    <form.Field name="sendFrom">
-                      {(field) => (
-                        <div className="flex flex-col w-full">
-                          <Label className="flex items-center text-muted-foreground">
-                            Send from
-                            <InfoTooltip className="text-muted-foreground">
-                              <Caption>Select the origin of the assets</Caption>
-                            </InfoTooltip>
-                          </Label>
-
-                          <Select
-                            name={field.name}
-                            value={field.state.value}
-                            onValueChange={(value: string) => {
-                              field.handleChange(value)
-                            }}
-                            disabled={!currentMarket}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectItem key="simple" value="simple">
-                                  <div className="flex gap-2 w-full items-center">
-                                    <SourceIcon sourceId={"simple"} />
-                                    <Caption className="capitalize">
-                                      Wallet
-                                    </Caption>
-                                  </div>
-                                </SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
-                    </form.Field>
-
-                    <form.Field name="receiveTo">
-                      {(field) => (
-                        <div className="flex flex-col w-full z-50">
-                          <Label className="flex items-center text-muted-foreground">
-                            Receive to
-                            <InfoTooltip className="ml-2 text-muted-foreground">
-                              <div>
-                                <Caption>
-                                  Select the destination of the assets
-                                </Caption>
-
-                                <Caption>(after the trade is executed)</Caption>
-                              </div>
-                            </InfoTooltip>
-                          </Label>
-
-                          <Select
-                            name={field.name}
-                            value={field.state.value}
-                            onValueChange={(value: string) => {
-                              field.handleChange(value)
-                            }}
-                            disabled={!currentMarket}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectItem key="simple" value="simple">
-                                  <div className="flex gap-2 w-full items-center">
-                                    <SourceIcon sourceId={"simple"} />
-                                    <Caption className="capitalize">
-                                      Wallet
-                                    </Caption>
-                                  </div>
-                                </SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
-                    </form.Field>
-                  </div>
-                </Accordion>
 
                 <Accordion title="Time in force">
                   <form.Field name="timeInForce">

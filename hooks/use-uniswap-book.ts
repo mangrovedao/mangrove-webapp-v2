@@ -41,7 +41,13 @@ export function useUniswapBook() {
 
         // Merge both orderbooks
         const mergedBook = mergeOffers(uniBook.asks, uniBook.bids, book)
-        console.log("uniBook", uniBook)
+        console.log(
+          "uniBook",
+          uniBook.asks.length,
+          uniBook.bids.length,
+          mergedBook.asks.length,
+          mergedBook.bids.length,
+        )
 
         return mergedBook
       } catch (error) {

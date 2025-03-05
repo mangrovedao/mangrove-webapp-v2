@@ -65,7 +65,7 @@ const MemoizedOffer = React.memo(
               ref={isRefRow ? rowRef : null}
               key={`${type}-${offerId}`}
               className={cn(
-                "relative h-6 border-none transition-all duration-300 group cursor-pointer",
+                "relative h-2 border-none transition-all duration-300 group cursor-pointer",
                 "hover:bg-background-secondary/70 hover:backdrop-blur-sm",
                 "animate-fadeIn",
                 isHovered &&
@@ -122,7 +122,6 @@ const MemoizedOffer = React.memo(
                   priceDecimals={priceDecimals}
                 />
               </OrderBookTableCell>
-
               <td
                 className={cn(
                   "absolute inset-y-0 -z-10 transition-all duration-500 ease-out",
@@ -314,7 +313,7 @@ function Cell({
         <TooltipTrigger className="w-full">
           <span
             className={cn(
-              "font-mono text-sm font-light transition-all duration-200 hover:font-medium group-hover:scale-105",
+              "font-mono text-xs font-light transition-all duration-200 hover:font-medium group-hover:scale-105",
               isAnimating && "animate-valueChange",
             )}
           >

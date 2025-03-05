@@ -11,7 +11,7 @@ import { TradeIcon } from "@/svgs"
 import { useEffect, useState } from "react"
 import { Market } from "./_components/charts/charts"
 import { Forms } from "./_components/forms/forms"
-import { OrderBook } from "./_components/orderbook/orderbook"
+import { BookContent, OrderBook } from "./_components/orderbook/orderbook"
 import { Trades } from "./_components/orderbook/trade-history/trades"
 import { PricesBar } from "./_components/prices-bar/prices-bar"
 import { Tables } from "./_components/tables/tables"
@@ -38,7 +38,7 @@ export default function Page() {
   }, [])
 
   return (
-    <main className="flex flex-col h-full">
+    <main className="flex flex-col h-full gap-2">
       <div className="flex items-center">
         <MarketSelector />
         <PricesBar />
@@ -46,7 +46,7 @@ export default function Page() {
 
       {/* Desktop Layout (lg and above) */}
       {!isMobile && (
-        <div className="flex-1 flex flex-col overflow-hidden pb-2">
+        <div className="flex-1 flex flex-col pb-2">
           {/* Top section with Chart, OrderBook, and Forms */}
           <div className="flex-1 flex gap-2 min-h-0">
             {/* Left section with Chart, OrderBook, and Tables */}
@@ -89,7 +89,7 @@ export default function Page() {
 
       {/* Mobile Layout */}
       {isMobile && (
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col gap-2">
           {/* Main Tab Navigation */}
           <TradeTabs
             tabs={mainTabs}
@@ -99,40 +99,32 @@ export default function Page() {
           />
 
           {/* Main Tab Content */}
-          <div className="flex-1 overflow-hidden border-border-tertiary flex flex-col">
+          <div className="flex-1 border-border-tertiary flex flex-col gap-2">
             {activeMainTab === "Chart" && (
               <>
-                <div className="flex-1  border border-bg-secondary m-2 rounded-lg">
+                <div className="flex-1 w-full rounded-sm">
                   <Market className="w-full h-full" />
-                </div>
-                {/* Orders Section - Below Chart */}
-                <div className="h-[200px]  border border-bg-secondary m-2 rounded-lg">
-                  <Tables className="h-full" />
                 </div>
               </>
             )}
             {activeMainTab === "Order Book" && (
               <>
-                <div className="flex-1 max-w-screen-xl mx-auto w-full  border border-bg-secondary m-2 rounded-lg">
-                  <OrderBook className="h-full" />
-                </div>
-                {/* Orders Section - Below Order Book */}
-                <div className="h-[200px]  border border-bg-secondary m-2 rounded-lg">
-                  <Tables className="h-full" />
+                <div className="flex-1 mx-auto w-full border border-bg-secondary rounded-sm">
+                  <BookContent />
                 </div>
               </>
             )}
             {activeMainTab === "Trades" && (
               <>
-                <div className="flex-1 max-w-screen-xl mx-auto w-full p-2  border border-bg-secondary m-2 rounded-lg">
-                  <Trades />
-                </div>
-                {/* Orders Section - Below Trades */}
-                <div className="h-[200px]  border border-bg-secondary m-2 rounded-lg">
-                  <Tables className="h-full" />
+                <div className="flex-1 mx-auto w-full p-2 border border-bg-secondary rounded-sm">
+                  <Trades className="h-full" />
                 </div>
               </>
             )}
+            {/* Orders Section - Below Trades */}
+            <div className="h-[200px] rounded-sm">
+              <Tables className="max-h-[400px]" />
+            </div>
           </div>
 
           {/* Floating Button for Trading Form */}
