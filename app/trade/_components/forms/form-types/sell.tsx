@@ -1,5 +1,3 @@
-import { BS } from "@mangrovedao/mgv/lib"
-
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
@@ -43,8 +41,8 @@ export function Sell() {
         ))}
       </CustomRadioGroup>
       {/* Note: selling forms */}
-      {currentFormType === FormType.LIMIT && <Limit bs={BS.sell} />}
-      {currentFormType === FormType.MARKET && <Market bs={BS.sell} />}
+      {currentFormType === FormType.LIMIT && <Limit />}
+      {currentFormType === FormType.MARKET && <Market />}
     </>
   )
 }
