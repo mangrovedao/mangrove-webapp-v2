@@ -2,16 +2,16 @@ import { printEvmError } from "@/utils/errors"
 
 import { getOpenMarkets } from "@mangrovedao/mgv/actions"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount, usePublicClient } from "wagmi"
+import { useAccount } from "wagmi"
 import {
   useCashnesses,
   useMangroveAddresses,
   useSymbolOverrides,
 } from "./use-addresses"
-
+import { useNetworkClient } from "./use-network-client"
 export function useOpenMarkets() {
   const { chain } = useAccount()
-  const client = usePublicClient()
+  const client = useNetworkClient()
   const addresses = useMangroveAddresses()
 
   const cashnesses = useCashnesses()
