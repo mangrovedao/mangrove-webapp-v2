@@ -180,7 +180,7 @@ const MemoizedOffer = React.memo(
 
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                 <span className="text-muted-foreground">Price:</span>
-                <span className="font-mono font-medium text-right">
+                <span className="font-sansfont-medium text-right">
                   {price.toLocaleString(undefined, {
                     minimumFractionDigits: priceDecimals,
                     maximumFractionDigits: priceDecimals,
@@ -189,7 +189,7 @@ const MemoizedOffer = React.memo(
                 </span>
 
                 <span className="text-muted-foreground">Size:</span>
-                <span className="font-mono font-medium text-right">
+                <span className="font-sansfont-medium text-right">
                   {volume.toLocaleString(undefined, {
                     minimumFractionDigits: priceDecimals,
                     maximumFractionDigits: priceDecimals,
@@ -198,7 +198,7 @@ const MemoizedOffer = React.memo(
                 </span>
 
                 <span className="text-muted-foreground">Total:</span>
-                <span className="font-mono font-medium text-right">
+                <span className="font-sansfont-medium text-right">
                   {(price * volume).toLocaleString(undefined, {
                     minimumFractionDigits: priceDecimals,
                     maximumFractionDigits: priceDecimals,
@@ -207,7 +207,7 @@ const MemoizedOffer = React.memo(
                 </span>
 
                 <span className="text-muted-foreground">Cumulative Vol:</span>
-                <span className="font-mono font-medium text-right">
+                <span className="font-sansfont-medium text-right">
                   {cumulatedVolume?.toLocaleString(undefined, {
                     minimumFractionDigits: priceDecimals,
                     maximumFractionDigits: priceDecimals,
@@ -313,7 +313,7 @@ function Cell({
         <TooltipTrigger className="w-full">
           <span
             className={cn(
-              "font-mono text-xs font-light transition-all duration-200 hover:font-medium group-hover:scale-105",
+              "font-sans text-xs font-light transition-all duration-200 hover:font-medium group-hover:scale-105",
               isAnimating && "animate-valueChange",
             )}
           >

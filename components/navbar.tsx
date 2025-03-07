@@ -23,6 +23,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit"
 import { WalletIcon } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import posthog from "posthog-js"
 import React from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
@@ -71,6 +72,7 @@ export function MobileOverlay() {
   const { address, isConnected } = useAccount()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
+  const pathname = usePathname()
 
   function handleConnect() {
     if (openConnectModal) {
@@ -138,23 +140,33 @@ export function MobileOverlay() {
 
               {/* Navigation Menu */}
               <div className="bg-bg-secondary rounded-sm p-2 mb-6">
-                {MENUS.map(({ href, disabled, icon: Icon, text }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      "flex items-center w-full gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium",
-                      !disabled
-                        ? "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary"
-                        : "opacity-50 pointer-events-none",
-                    )}
-                  >
-                    <span className="text-nav-item-button-icon-fg">
-                      <Icon />
-                    </span>
-                    <div>{text}</div>
-                  </Link>
-                ))}
+                {MENUS.map(({ href, disabled, icon: Icon, text }) => {
+                  const isActive =
+                    pathname === href || pathname?.startsWith(`${href}/`)
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={cn(
+                        "flex items-center w-full gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium",
+                        isActive
+                          ? "text-white bg-bg-tertiary"
+                          : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
+                        disabled && "opacity-50 pointer-events-none",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "text-nav-item-button-icon-fg",
+                          isActive && "text-white",
+                        )}
+                      >
+                        <Icon />
+                      </span>
+                      <div>{text}</div>
+                    </Link>
+                  )
+                })}
               </div>
 
               {/* Wallet Connection */}
@@ -268,6 +280,7 @@ export default function Navbar() {
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
   const { disconnect } = useDisconnect()
+  const pathname = usePathname()
 
   function handleConnect() {
     if (openConnectModal) {
@@ -308,23 +321,33 @@ export default function Navbar() {
               {/* Desktop Navigation */}
               <div className="hidden md:block">
                 <div className="flex items-center p-1 space-x-1">
-                  {MENUS.map(({ href, disabled, icon: Icon, text }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                        !disabled
-                          ? "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary"
-                          : "opacity-50 pointer-events-none",
-                      )}
-                    >
-                      <span className="text-nav-item-button-icon-fg">
-                        <Icon />
-                      </span>
-                      <span>{text}</span>
-                    </Link>
-                  ))}
+                  {MENUS.map(({ href, disabled, icon: Icon, text }) => {
+                    const isActive =
+                      pathname === href || pathname?.startsWith(`${href}/`)
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                          isActive
+                            ? "text-white bg-bg-tertiary"
+                            : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
+                          disabled && "opacity-50 pointer-events-none",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "text-nav-item-button-icon-fg",
+                            isActive && "text-white",
+                          )}
+                        >
+                          <Icon />
+                        </span>
+                        <span>{text}</span>
+                      </Link>
+                    )
+                  })}
                 </div>
               </div>
             </div>

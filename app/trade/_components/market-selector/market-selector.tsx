@@ -49,7 +49,7 @@ export default function MarketSelector() {
       onValueChange={onValueChange}
       disabled={!markets?.length}
     >
-      <SelectTrigger className="rounded-sm ">
+      <SelectTrigger className="rounded-sm w-[180px] flex justify-between">
         <SelectValue
           placeholder={!markets?.length ? "Market" : "No markets"}
           suppressHydrationWarning

@@ -20,7 +20,7 @@ import { TradeTabs } from "./_components/trade-tabs/trade-tabs"
 export default function Page() {
   const [activeMainTab, setActiveMainTab] = useState("Chart")
   const mainTabs = ["Chart", "Order Book", "Trades"]
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   // Check if we're on mobile
@@ -39,7 +39,7 @@ export default function Page() {
 
   return (
     <main className="flex flex-col h-full gap-2">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <MarketSelector />
         <PricesBar />
       </div>

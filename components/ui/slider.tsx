@@ -22,8 +22,8 @@ const Ticks = ({
       {Array.from({ length: 15 }, (_, index) => (
         <span
           key={`slider-top-decoration-${index}`}
-          className={cn("h-[2px] w-[2px] rounded-full bg-green-bangladesh", {
-            "bg-green-caribbean": (Number(value) / 100) * 15 > index,
+          className={cn("h-[2px] w-[2px] rounded-full bg-bg-secondary", {
+            "bg-bg-tertiary": (Number(value) / 100) * 15 > index,
             "bg-muted": (Number(value) / 100) * 15 <= index,
           })}
         />
@@ -47,7 +47,7 @@ const Slider = React.forwardRef<
     >
       <Ticks value={props.value} position="bottom" />
       <SliderPrimitive.Track className="relative h-[5px] w-full grow rounded-full bg-muted">
-        <SliderPrimitive.Range className="absolute rounded-full h-full bg-green-bangladesh" />
+        <SliderPrimitive.Range className="absolute rounded-full h-full bg-bg-tertiary" />
         <div className="flex justify-between">
           {Array.from({ length: 4 }, (_, index) => (
             <span
@@ -58,8 +58,8 @@ const Slider = React.forwardRef<
         </div>
       </SliderPrimitive.Track>
       <Ticks value={props.value} position="top" />
-      <SliderPrimitive.Thumb className=" hover:border-green-caribbean focus-visible:outline-none active:!text-gray-scale-200 cursor-pointer whitespace-nowrap rounded-xl border-[1px] border-green-bangladesh bg-background transition-colors disabled:pointer-events-none disabled:opacity-50">
-        <span className="text-xs px-2">{props.value}% </span>
+      <SliderPrimitive.Thumb className="focus-visible:outline-none active:!text-gray-scale-200 text-xs font-sans border-[0.5px] border-bg-tertiary hover:bg-bg-tertiary cursor-pointer whitespace-nowrap rounded-sm bg-bg-secondary transition-colors disabled:pointer-events-none disabled:opacity-50">
+        <span className="px-1 text-[10px]">{props.value}% </span>
       </SliderPrimitive.Thumb>
     </SliderPrimitive.Root>
   </>

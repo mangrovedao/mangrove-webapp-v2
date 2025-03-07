@@ -5,7 +5,12 @@ import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableRow } from "@/components/ui/table"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+import {
+  CustomTabs,
+  CustomTabsList,
+  CustomTabsTrigger,
+} from "@/components/custom-tabs"
 import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
@@ -44,20 +49,18 @@ export const OrderBook = React.memo(function OrderBook({
   return (
     <motion.div
       style={style}
-      className={cn(
-        "h-full w-full flex flex-col rounded-sm overflow-hidden",
-        className,
-      )}
+      // className={cn("flex flex-col rounded-sm overflow-hidden", className)}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <Tabs
+      <CustomTabs
         value={activeTab}
         onValueChange={(value: string) =>
           setActiveTab(value as "book" | "trades")
         }
-        className="w-full h-full"
+        // className="w-full h-full"
+        className={"border border-bg-secondary rounded-sm h-full max-h-fit"}
       >
         <motion.div
           className="border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm"
@@ -65,26 +68,24 @@ export const OrderBook = React.memo(function OrderBook({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <TabsList className="bg-transparent h-12 px-4">
-            <TabsTrigger
+          <CustomTabsList className="w-full p-0 space-x-0">
+            <CustomTabsTrigger
               value="book"
               className={cn(
-                "text-base font-medium data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:rounded-sm data-[state=active]:shadow-none data-[state=active]:bg-transparent",
-                "px-4 py-3",
+                "capitalize w-full data-[state=inactive]:bg-transparent data-[state=active]:text-text-primary data-[state=active]:border-b-primary/80 bg-bg-secondary rounded-none",
               )}
             >
               Order Book
-            </TabsTrigger>
-            <TabsTrigger
+            </CustomTabsTrigger>
+            <CustomTabsTrigger
               value="trades"
               className={cn(
-                "text-base font-medium data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:rounded-sm data-[state=active]:shadow-none data-[state=active]:bg-transparent",
-                "px-4 py-3",
+                "capitalize w-full data-[state=inactive]:bg-transparent data-[state=active]:text-text-primary data-[state=active]:border-b-primary/80 bg-bg-secondary rounded-none",
               )}
             >
               Trades
-            </TabsTrigger>
-          </TabsList>
+            </CustomTabsTrigger>
+          </CustomTabsList>
         </motion.div>
 
         {activeTab === "book" && <BookContent />}
@@ -98,7 +99,7 @@ export const OrderBook = React.memo(function OrderBook({
             <Trades />
           </motion.div>
         )}
-      </Tabs>
+      </CustomTabs>
     </motion.div>
   )
 })
@@ -264,19 +265,19 @@ export const BookContent = React.memo(function BookContent() {
             {/* Asks Table - Only shown in default or asks view */}
             <Table className="text-sm leading-5 select-none relative w-full">
               <motion.thead
-                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-5"
+                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full"
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.3 }}
               >
                 <TableRow className="border-none">
-                  <OrderBookTableHead className="text-xs">
+                  <OrderBookTableHead className="font-sans text-xs">
                     Price ({currentMarket.quote.symbol})
                   </OrderBookTableHead>
-                  <OrderBookTableHead className="text-right text-xs">
+                  <OrderBookTableHead className="text-right font-sans text-xs">
                     Size ({currentMarket.base.symbol})
                   </OrderBookTableHead>
-                  <OrderBookTableHead className="text-right text-xs">
+                  <OrderBookTableHead className="text-right font-sans text-xs">
                     Total ({currentMarket.quote.symbol})
                   </OrderBookTableHead>
                 </TableRow>
@@ -319,7 +320,7 @@ export const BookContent = React.memo(function BookContent() {
             {/* Bids Table */}
             <Table className="text-sm leading-5 select-none relative w-full">
               <motion.thead
-                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-[var(--bar-height)]"
+                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full"
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.6 }}
@@ -350,7 +351,7 @@ export const BookContent = React.memo(function BookContent() {
         {viewOption === "asks" && (
           <Table className="text-sm leading-5 select-none relative w-full">
             <motion.thead
-              className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-[var(--bar-height)]"
+              className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full"
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.3 }}

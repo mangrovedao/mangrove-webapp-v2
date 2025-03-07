@@ -1,5 +1,4 @@
 "use client"
-import { BS } from "@mangrovedao/mgv/lib"
 import React from "react"
 
 import {
@@ -8,18 +7,22 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useBook } from "@/hooks/use-book"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { cn } from "@/utils"
 import { renderElement } from "@/utils/render"
 import { AnimatedFormsSkeleton } from "./animated-forms-skeleton"
-import { Buy } from "./form-types/buy"
-import { Sell } from "./form-types/sell"
+import { Limit } from "./limit/limit"
+import { Market } from "./market/market"
+
+enum FormType {
+  LIMIT = "Limit",
+  MARKET = "Market",
+}
 
 const TABS_CONTENT = {
-  [BS.sell]: Sell,
-  [BS.buy]: Buy,
+  [FormType.LIMIT]: Limit,
+  [FormType.MARKET]: Market,
 }
 
 export function Forms({
@@ -27,7 +30,7 @@ export function Forms({
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
   const { book } = useBook()
-  const [orderType, setOrderType] = useLocalStorage<BS | null>(
+  const [orderType, setOrderType] = useLocalStorage<FormType | null>(
     "orderType",
     null,
   )
@@ -39,45 +42,35 @@ export function Forms({
   return (
     <CustomTabs
       {...props}
-      defaultValue={orderType ?? Object.values(BS)[0]}
-      className={" border border-bg-secondary rounded-sm h-full max-h-fit"}
-      onValueChange={(value) => setOrderType(value as BS)}
+      defaultValue={orderType ?? Object.values(FormType)[0]}
+      className="border border-bg-secondary rounded-sm h-full flex flex-col"
+      onValueChange={(value) => setOrderType(value as FormType)}
     >
       <CustomTabsList className="w-full p-0 space-x-0">
-        {Object.values(BS).map((form) => (
+        {Object.values(FormType).map((form) => (
           <CustomTabsTrigger
             key={`${form}-tab`}
             value={form}
             className={cn(
-              "capitalize w-full data-[state=inactive]:bg-bg-secondary data-[state=active]:text-text-brand bg-bg-primary rounded-none",
-              {
-                "data-[state=active]:border-[#FF5555] data-[state=active]:text-[#FF5555] rounded-sm":
-                  form === BS.sell,
-                "rounded-sm": form === BS.buy,
-              },
+              "capitalize w-full data-[state=inactive]:bg-transparent data-[state=active]:text-text-primary data-[state=active]:border-b-primary/80 bg-bg-secondary rounded-none",
             )}
           >
             {form}
           </CustomTabsTrigger>
         ))}
       </CustomTabsList>
-      <ScrollArea
-        scrollHideDelay={200}
-        className="max-h-[calc(100%-var(--bar-height))] h-full"
-      >
-        <div className="px-4 space-y-4 mt-[24px] flex flex-col h-full">
-          {Object.values(BS).map((form) => (
-            <CustomTabsContent
-              key={`${form}-content`}
-              value={form}
-              className="flex-1 flex flex-col h-full"
-            >
-              {renderElement(TABS_CONTENT[form])}
-            </CustomTabsContent>
-          ))}
-        </div>
-        <ScrollBar orientation="vertical" />
-      </ScrollArea>
+
+      <div className="flex-1 overflow-hidden p-4">
+        {Object.values(FormType).map((form) => (
+          <CustomTabsContent
+            key={`${form}-content`}
+            value={form}
+            className="h-full"
+          >
+            {renderElement(TABS_CONTENT[form])}
+          </CustomTabsContent>
+        ))}
+      </div>
     </CustomTabs>
   )
 }

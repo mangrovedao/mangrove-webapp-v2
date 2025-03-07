@@ -207,6 +207,60 @@ export function useMarketForm(props: Props) {
     form?.reset()
   }, [form, market?.base, market?.quote])
 
+  // Move the isWrapping hook to the top level
+  const isWrapping = form.useStore((state) => state.values.isWrapping)
+
+  // Add a function to get all form errors
+  const getAllErrors = React.useCallback(() => {
+    // Create a new empty object instead of spreading form.state.errors
+    const errors: Record<string, string | string[]> = {}
+
+    // Manually copy any field errors from form.state.errors if needed
+    if (form.state.errors) {
+      Object.entries(form.state.errors).forEach(([key, value]) => {
+        if (
+          typeof key === "string" &&
+          !["length", "toString", "toLocaleString"].includes(key)
+        ) {
+          errors[key] = value as string | string[]
+        }
+      })
+    }
+
+    // Check for send field errors
+    if (form.state.values.send) {
+      const sendValue = Number(form.state.values.send)
+      if (sendValue <= 0) {
+        // errors.send = "Amount must be greater than 0"
+      } else if (
+        !isWrapping &&
+        sendValue >
+          Number(
+            formatUnits(
+              sendTokenBalance.balance?.balance || 0n,
+              sendToken?.decimals ?? 18,
+            ),
+          )
+      ) {
+        errors.send = "Insufficient balance"
+      }
+    }
+
+    // Check for receive field errors
+    if (form.state.values.receive === "0" && hasEnoughVolume) {
+      errors.receive = "Insufficient volume"
+    }
+
+    return errors
+  }, [
+    form.state.errors,
+    form.state.values,
+    isWrapping,
+    sendTokenBalance,
+    sendToken,
+    hasEnoughVolume,
+  ])
+
   return {
     computeReceiveAmount,
     computeSendAmount,
@@ -224,7 +278,8 @@ export function useMarketForm(props: Props) {
     feeInPercentageAsString,
     hasEnoughVolume,
     slippage: form.useStore((state) => state.values.slippage),
-    isWrapping: form.useStore((state) => state.values.isWrapping),
+    isWrapping,
     spotPrice,
+    getAllErrors,
   }
 }

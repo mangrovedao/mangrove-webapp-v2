@@ -46,6 +46,18 @@ const numberVariants = {
   exit: { opacity: 0, y: -5 },
 }
 
+// Animation variants for loading
+const loadingVariants = {
+  animate: {
+    opacity: [0.5, 1, 0.5],
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  },
+}
+
 function Item({
   label,
   value,
@@ -94,9 +106,16 @@ function Item({
       <Label>{label}</Label>
       <div className="h-5 min-w-[80px]">
         {skeleton ? (
-          <Skeleton className="w-16 h-4" />
+          <motion.div
+            variants={loadingVariants}
+            animate="animate"
+            className="flex items-center"
+          >
+            <span className="text-xs text-muted-foreground">{label}:</span>
+            <Skeleton className="w-16 h-4 ml-1" />
+          </motion.div>
         ) : (
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             <motion.div
               key={`${formattedValue}-${token?.symbol || ""}`}
               initial="initial"
@@ -182,7 +201,7 @@ export function PricesBar() {
 
   return (
     <>
-      <div className="flex items-center px-2">
+      <div className="flex items-center pl-2">
         <Item
           label={"Price"}
           value={spotPrice}
@@ -190,9 +209,9 @@ export function PricesBar() {
           skeleton={false}
         />
       </div>
-      <ScrollArea className="relative px-2">
+      <ScrollArea className="relative ">
         <motion.div
-          className="flex items-center w-full space-x-2 whitespace-nowrap h-full min-h-[54px] px-4"
+          className="flex items-center w-full space-x-2 whitespace-nowrap h-full min-h-[54px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}

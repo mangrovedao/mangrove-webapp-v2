@@ -234,6 +234,70 @@ export function useLimit(props: Props) {
     }, 0)
   }, [bs, book?.midPrice])
 
+  // Add a function to get all form errors
+  const getAllErrors = React.useCallback(() => {
+    // Create a new empty object instead of spreading form.state.errors
+    const errors: Record<string, string | string[]> = {}
+
+    // Manually copy any field errors from form.state.errors if needed
+    if (form.state.errors) {
+      Object.entries(form.state.errors).forEach(([key, value]) => {
+        if (
+          typeof key === "string" &&
+          !["length", "toString", "toLocaleString"].includes(key)
+        ) {
+          errors[key] = value as string | string[]
+        }
+      })
+    }
+
+    // Check for send field errors
+    if (form.state.values.send) {
+      const sendValue = Number(form.state.values.send)
+      if (sendValue <= 0) {
+        // errors.send = "Pay amount required"
+      } else if (
+        !isWrapping &&
+        sendValue >
+          Number(
+            formatUnits(
+              sendTokenBalance?.balance || 0n,
+              sendToken?.decimals ?? 18,
+            ),
+          )
+      ) {
+        errors.send = "Insufficient balance"
+      } else if (
+        Number(minVolumeFormatted) > 0 &&
+        sendValue < Number(minVolumeFormatted)
+      ) {
+        errors.send = `Minimum volume is ${minVolumeFormatted} ${sendToken?.symbol}`
+      }
+    }
+
+    // Check for receive field errors
+    if (form.state.values.receive && Number(form.state.values.receive) <= 0) {
+      errors.receive = "Amount must be greater than 0"
+    }
+
+    // Check for limit price errors
+    if (
+      form.state.values.limitPrice &&
+      Number(form.state.values.limitPrice) <= 0
+    ) {
+      errors.limitPrice = "Price must be greater than 0"
+    }
+
+    return errors
+  }, [
+    form.state.errors,
+    form.state.values,
+    isWrapping,
+    sendTokenBalance,
+    sendToken,
+    minVolumeFormatted,
+  ])
+
   return {
     form,
     timeInForce,
@@ -261,5 +325,6 @@ export function useLimit(props: Props) {
     computeReceiveAmount,
     handleSubmit,
     quoteToken,
+    getAllErrors,
   }
 }

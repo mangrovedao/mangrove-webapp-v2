@@ -37,16 +37,16 @@ export function useTable({ data }: Params) {
           const baseValue = isBid ? takerGot : takerGave
 
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-0">
               <span
-                className={cn("font-medium text-xs", {
+                className={cn("font-sans text-xs leading-tight", {
                   "text-green-caribbean": isBid,
                   "text-red-100": !isBid,
                 })}
               >
                 {isBid ? "BUY" : "SELL"}
               </span>
-              <span className="text-xs opacity-80">
+              <span className="text-xs opacity-80 font-sans">
                 {Big(baseValue).toFixed(base.displayDecimals)} {base.symbol}
               </span>
             </div>
@@ -59,11 +59,11 @@ export function useTable({ data }: Params) {
         cell: (row) =>
           market ? (
             row.getValue() ? (
-              <div className="flex flex-col">
-                <span className="font-medium">
+              <div className="flex flex-col gap-0">
+                <span className="font-sans text-xs leading-tight">
                   {Big(row.getValue()).toFixed(market.quote.displayDecimals)}
                 </span>
-                <span className="text-xs opacity-80">
+                <span className="text-xs opacity-80 font-sans leading-tight">
                   {market.quote.symbol}
                 </span>
               </div>
@@ -80,11 +80,11 @@ export function useTable({ data }: Params) {
         cell: ({ row }) => {
           const date = row.original.creationDate
           return (
-            <div className="flex flex-col">
-              <span className="font-medium text-xs">
+            <div className="flex flex-col gap-0">
+              <span className="font-sans text-xs leading-tight">
                 {formatDate(date, "HH:mm:ss")}
               </span>
-              <span className="text-xs opacity-70">
+              <span className="text-xs opacity-70 font-sans leading-tight">
                 {formatRelativeTime(date)}
               </span>
             </div>

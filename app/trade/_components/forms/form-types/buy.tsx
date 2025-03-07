@@ -1,5 +1,3 @@
-import { BS } from "@mangrovedao/mgv/lib"
-
 import {
   CustomRadioGroup,
   CustomRadioGroupItem,
@@ -30,21 +28,22 @@ export function Buy() {
         onValueChange={(e: FormType) => {
           setFormType(e)
         }}
+        className="rounded-sm"
       >
         {Object.values(FormType).map((action) => (
           <CustomRadioGroupItem
             key={action}
             value={action}
             id={action}
-            className="capitalize"
+            className="capitalize rounded-sm"
           >
             {action}
           </CustomRadioGroupItem>
         ))}
       </CustomRadioGroup>
       {/* Note: buying forms */}
-      {currentFormType === FormType.LIMIT && <Limit bs={BS.buy} />}
-      {currentFormType === FormType.MARKET && <Market bs={BS.buy} />}
+      {currentFormType === FormType.LIMIT && <Limit />}
+      {currentFormType === FormType.MARKET && <Market />}
     </>
   )
 }
