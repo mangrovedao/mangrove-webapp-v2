@@ -7,10 +7,12 @@ import { useEventListener } from "usehooks-ts"
 
 import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
-import { useBook } from "@/hooks/use-book"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
+import { useMenuStore } from "@/stores/menu.store"
 import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { formatUnits, parseUnits } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
@@ -22,7 +24,8 @@ type Props = {
 }
 
 export function useLimit(props: Props) {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
+  const { openConnectModal } = useConnectModal()
   const { data: ethBalance } = useBalance({
     address,
   })
@@ -46,6 +49,7 @@ export function useLimit(props: Props) {
   })
 
   const { currentMarket } = useMarket()
+  const { data: book } = useUniswapBook()
   const logics = useLogics()
 
   const bs = props.bs
@@ -53,7 +57,6 @@ export function useLimit(props: Props) {
 
   const timeInForce = form.useStore((state) => state.values.timeInForce)
   const isWrapping = form.useStore((state) => state.values.isWrapping)
-  const { book } = useBook()
 
   const isBid = bs === BS.buy
   const sendToken = bs === BS.buy ? currentMarket?.quote : currentMarket?.base
@@ -168,37 +171,66 @@ export function useLimit(props: Props) {
     if (sendAmount === 0n) return
     computeReceiveAmount()
   }
+  const { isOpen, toggle } = useMenuStore()
+
+  function handleConnect() {
+    if (openConnectModal) {
+      openConnectModal()
+    }
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     e.stopPropagation()
+    if (!isConnected) {
+      handleConnect()
+      return
+    }
     if (checkAndShowDisclaimer(address)) return
 
     void form.handleSubmit()
   }
 
   function computeReceiveAmount() {
-    if (!currentMarket) return
-    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
-    const send = Number(form?.getFieldValue("send") ?? 0)
+    if (!currentMarket || !form) return
 
-    form.setFieldValue(
-      "receive",
-      (bs === BS.buy ? send / limit : send * limit).toString(),
-    )
-    form.validateAllFields("submit")
+    try {
+      const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+      const send = Number(form?.getFieldValue("send") ?? 0)
+
+      // Only set the receive value if we have valid inputs
+      if (limit > 0 && send > 0) {
+        form.setFieldValue(
+          "receive",
+          (bs === BS.buy ? send / limit : send * limit).toString(),
+        )
+      }
+
+      // Don't call validateAllFields here
+    } catch (error) {
+      console.error("Error in computeReceiveAmount:", error)
+    }
   }
 
   function computeSendAmount() {
-    if (!currentMarket) return
-    const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
-    const receive = Number(form?.getFieldValue("receive") ?? 0)
+    if (!currentMarket || !form) return
 
-    form.setFieldValue(
-      "send",
-      (bs === BS.buy ? receive * limit : receive / limit).toString(),
-    )
-    form.validateAllFields("submit")
+    try {
+      const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
+      const receive = Number(form?.getFieldValue("receive") ?? 0)
+
+      // Only set the send value if we have valid inputs
+      if (limit > 0 && receive > 0) {
+        form.setFieldValue(
+          "send",
+          (bs === BS.buy ? receive * limit : receive / limit).toString(),
+        )
+      }
+
+      // Don't call validateAllFields here
+    } catch (error) {
+      console.error("Error in computeSendAmount:", error)
+    }
   }
 
   React.useEffect(() => {
@@ -276,9 +308,9 @@ export function useLimit(props: Props) {
     }
 
     // Check for receive field errors
-    if (form.state.values.receive && Number(form.state.values.receive) <= 0) {
-      errors.receive = "Amount must be greater than 0"
-    }
+    // if (form.state.values.receive && Number(form.state.values.receive) <= 0) {
+    //   errors.receive = "Amount must be greater than 0"
+    // }
 
     // Check for limit price errors
     if (

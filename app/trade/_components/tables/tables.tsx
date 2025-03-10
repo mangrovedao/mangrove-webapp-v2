@@ -54,12 +54,12 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   }, [isConnected, defaultEnum])
 
   return (
-    <ResizablePanelGroup direction="vertical" className="h-full">
+    <ResizablePanelGroup direction="vertical" className="h-full w-full">
       <ResizablePanel
         defaultSize={100}
         minSize={30}
         maxSize={70}
-        className="border rounded-sm"
+        className="border border-bg-secondary rounded-sm w-full"
       >
         <CustomTabs
           {...props}
@@ -67,17 +67,17 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
             setValue(value)
           }}
           value={value}
-          className="h-full"
+          className="w-full flex flex-col"
         >
           <CustomTabsList
-            className="w-full flex justify-start border-b"
+            className="flex justify-start space-x-0 w-full"
             loading={ordersLoading ?? fillsLoading}
           >
             {Object.values(defaultEnum).map((table) => (
               <CustomTabsTrigger
                 key={`${table}-tab`}
                 value={table}
-                className="capitalize"
+                className="capitalize w-full rounded-none"
                 count={
                   isConnected && table === TradeTablesLoggedIn.ORDERS
                     ? ordersCount
@@ -90,11 +90,15 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
               </CustomTabsTrigger>
             ))}
           </CustomTabsList>
-          <div className="w-full pb-4 px-1 h-[calc(100%-var(--bar-height))]">
+          <div className="w-full flex-1 overflow-hidden">
             {Object.values(defaultEnum).map((table: string) => (
-              <CustomTabsContent key={`${table}-content`} value={table}>
-                <ScrollArea className="h-full" scrollHideDelay={200}>
-                  <div className="px-2 h-full">
+              <CustomTabsContent
+                key={`${table}-content`}
+                value={table}
+                className="h-full"
+              >
+                <ScrollArea className="h-full w-full" type="always">
+                  <div className="p-2 min-h-full">
                     {table === TradeTablesLoggedIn.ORDERS && isConnected && (
                       <Orders />
                     )}
@@ -103,7 +107,6 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                     )}
                   </div>
                   <ScrollBar orientation="vertical" className="z-50" />
-                  <ScrollBar orientation="horizontal" className="z-50" />
                 </ScrollArea>
               </CustomTabsContent>
             ))}

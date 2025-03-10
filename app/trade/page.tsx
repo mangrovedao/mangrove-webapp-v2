@@ -56,12 +56,12 @@ export default function Page() {
                 <ResizablePanel defaultSize={70} minSize={30} className="pb-2">
                   <div className="flex gap-2 h-full">
                     {/* Chart Section */}
-                    <div className="flex-[3] rounded-sm overflow-hidden  border border-bg-secondary">
+                    <div className="flex-[3] rounded-sm overflow-hidden border border-bg-secondary">
                       <Market className="w-full h-full" />
                     </div>
 
                     {/* Order Book Section */}
-                    <div className="w-[320px] rounded-sm overflow-hidden flex flex-col  border border-bg-secondary">
+                    <div className="w-[320px] rounded-sm overflow-hidden flex flex-col border border-bg-secondary">
                       <OrderBook className="flex-1 w-full min-h-0" />
                     </div>
                   </div>
@@ -72,9 +72,9 @@ export default function Page() {
                 <ResizablePanel
                   defaultSize={30}
                   minSize={15}
-                  className="rounded-sm overflow-hidden  border border-bg-secondary"
+                  className="rounded-sm border border-bg-secondary h-full w-full"
                 >
-                  <Tables className="h-full" />
+                  <Tables className="h-full w-full" />
                 </ResizablePanel>
               </ResizablePanelGroup>
             </div>

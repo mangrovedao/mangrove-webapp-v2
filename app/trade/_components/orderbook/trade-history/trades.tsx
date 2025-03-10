@@ -35,16 +35,6 @@ export function Trades({ className }: { className?: string }) {
       transition={{ duration: 0.3 }}
       className="h-full"
     >
-      {/* <div className="mb-1 px-2 flex items-center justify-between">
-        <h3 className="text-xs font-normal">Recent Trades</h3>
-        <motion.div
-          className="text-xs text-muted-foreground font-light"
-          animate={{ opacity: [0.7, 1, 0.7] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          {tradesHistoryQuery.data?.length || 0} trades
-        </motion.div>
-      </div> */}
       <ScrollArea
         className={cn("h-[calc(100%-1.5rem)]", className)}
         scrollHideDelay={200}

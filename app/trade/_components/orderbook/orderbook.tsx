@@ -1,5 +1,4 @@
 "use client"
-import { motion } from "framer-motion"
 import React, { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -47,67 +46,49 @@ export const OrderBook = React.memo(function OrderBook({
   }, [activeTab])
 
   return (
-    <motion.div
-      style={style}
-      // className={cn("flex flex-col rounded-sm overflow-hidden", className)}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-    >
+    <div className={cn("flex flex-col h-full w-full", className)} style={style}>
       <CustomTabs
         value={activeTab}
         onValueChange={(value: string) =>
           setActiveTab(value as "book" | "trades")
         }
-        // className="w-full h-full"
-        className={"border border-bg-secondary rounded-sm h-full max-h-fit"}
+        className="h-full flex flex-col"
       >
-        <motion.div
-          className="border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm"
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
+        <div className="border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm">
           <CustomTabsList className="w-full p-0 space-x-0">
             <CustomTabsTrigger
               value="book"
-              className={cn(
-                "capitalize w-full data-[state=inactive]:bg-transparent data-[state=active]:text-text-primary data-[state=active]:border-b-primary/80 bg-bg-secondary rounded-none",
-              )}
+              className={cn("capitalize w-full rounded-none")}
             >
               Order Book
             </CustomTabsTrigger>
             <CustomTabsTrigger
               value="trades"
-              className={cn(
-                "capitalize w-full data-[state=inactive]:bg-transparent data-[state=active]:text-text-primary data-[state=active]:border-b-primary/80 bg-bg-secondary rounded-none",
-              )}
+              className={cn("capitalize w-full rounded-none")}
             >
               Trades
             </CustomTabsTrigger>
           </CustomTabsList>
-        </motion.div>
+        </div>
 
-        {activeTab === "book" && <BookContent />}
-        {activeTab === "trades" && (
-          <motion.div
-            className="p-2 h-full bg-bg-secondary/50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Trades />
-          </motion.div>
-        )}
+        <div className="flex-1 overflow-hidden">
+          {activeTab === "book" && <BookContent />}
+          {activeTab === "trades" && (
+            <div className="p-2 h-full bg-bg-secondary/50">
+              <Trades className="h-full" />
+            </div>
+          )}
+        </div>
       </CustomTabs>
-    </motion.div>
+    </div>
   )
 })
 
 // Also memoize the BookContent component
 export const BookContent = React.memo(function BookContent() {
   const { currentMarket } = useMarket()
-  const { bodyRef, scrollAreaRef, spreadRef } = useScrollToMiddle()
+  const { bodyRef, scrollAreaRef, spreadRef, scrollToMiddle } =
+    useScrollToMiddle()
   const { data: book, isLoading } = useUniswapBook()
   const [viewOption, setViewOption] = useState<ViewOption>("default")
   const [precision, setPrecision] = useState<number>(1)
@@ -171,31 +152,23 @@ export const BookContent = React.memo(function BookContent() {
 
   if (!isLoading && book?.asks.length === 0 && book?.bids.length === 0) {
     return (
-      <motion.div
-        className="w-full h-full flex justify-center items-center mt-4 text-muted-foreground font-ubuntu text-sm font-bold"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
+      <div className="w-full h-full flex justify-center items-center mt-4 text-muted-foreground font-ubuntu text-sm font-bold">
         Empty market.
-      </motion.div>
+      </div>
     )
   }
 
+  // Function to manually trigger scroll to middle
+  const handleScrollToMiddle = () => {
+    if (scrollToMiddle) {
+      scrollToMiddle()
+    }
+  }
+
   return (
-    <motion.div
-      className="flex flex-col h-full bg-bg-secondary/50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <div className="flex flex-col h-full bg-bg-secondary/50">
       {/* View Options and Precision Controls */}
-      <motion.div
-        className="flex justify-between items-center px-4 py-2 border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm shadow-sm"
-        initial={{ opacity: 0, y: -5 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-      >
+      <div className="flex justify-between items-center px-4 py-2 border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm shadow-sm">
         <div className="flex space-x-2">
           {/* Default View (Both) */}
           <button
@@ -240,8 +213,29 @@ export const BookContent = React.memo(function BookContent() {
           </button>
         </div>
 
-        {/* Precision Dropdown */}
-        <div className="flex items-center">
+        <div className="flex items-center space-x-2">
+          {/* Center button */}
+          <button
+            onClick={handleScrollToMiddle}
+            className="text-xs text-muted-foreground hover:text-text-primary transition-colors"
+            title="Scroll to middle"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+
+          {/* Precision Dropdown */}
           <Button
             variant="invisible"
             size="sm"
@@ -252,79 +246,85 @@ export const BookContent = React.memo(function BookContent() {
             <ChevronDown className="h-3 w-3 transition-transform duration-200" />
           </Button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Orderbook Content */}
-      <ScrollArea
-        className="flex-1 min-h-0"
-        scrollHideDelay={200}
-        ref={scrollAreaRef}
-      >
-        {viewOption === "default" && (
-          <div className="flex flex-col w-full">
-            {/* Asks Table - Only shown in default or asks view */}
-            <Table className="text-sm leading-5 select-none relative w-full">
-              <motion.thead
-                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full"
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-              >
-                <TableRow className="border-none">
-                  <OrderBookTableHead className="font-sans text-xs">
-                    Price ({currentMarket.quote.symbol})
-                  </OrderBookTableHead>
-                  <OrderBookTableHead className="text-right font-sans text-xs">
-                    Size ({currentMarket.base.symbol})
-                  </OrderBookTableHead>
-                  <OrderBookTableHead className="text-right font-sans text-xs">
-                    Total ({currentMarket.quote.symbol})
-                  </OrderBookTableHead>
-                </TableRow>
-              </motion.thead>
-              <TableBody className="overflow-scroll pt-5">
-                <SemiBook
-                  type={BA.asks}
-                  data={book}
-                  priceDecimals={precision}
-                />
-              </TableBody>
-            </Table>
+      <div className="flex-1 overflow-hidden" ref={scrollAreaRef}>
+        <ScrollArea className="h-full" type="always">
+          {viewOption === "default" && (
+            <div className="flex flex-col w-full">
+              {/* Asks Table - Only shown in default or asks view */}
+              <Table className="text-sm leading-5 select-none relative w-full">
+                <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
+                  <TableRow className="border-none">
+                    <OrderBookTableHead className="font-sans text-xs">
+                      Price ({currentMarket.quote.symbol})
+                    </OrderBookTableHead>
+                    <OrderBookTableHead className="text-right font-sans text-xs">
+                      Size ({currentMarket.base.symbol})
+                    </OrderBookTableHead>
+                    <OrderBookTableHead className="text-right font-sans text-xs">
+                      Total ({currentMarket.quote.symbol})
+                    </OrderBookTableHead>
+                  </TableRow>
+                </thead>
+                <TableBody>
+                  <SemiBook
+                    type={BA.asks}
+                    data={book}
+                    priceDecimals={precision}
+                  />
+                </TableBody>
+              </Table>
 
-            {/* Mid Price and Spread */}
-            <motion.div
-              className="text-center text-muted-foreground text-xs py-1 font-light bg-bg-secondary/90 backdrop-blur-sm shadow-sm "
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                duration: 0.4,
-                delay: 0.5,
-                ease: [0.34, 1.56, 0.64, 1],
-              }}
-              ref={spreadRef}
-            >
-              <span className="font-medium text-text-secondary text-xs">
-                Mid:
-              </span>{" "}
-              <span className="font-mono font-light text-xs text-white pr-2">
-                {midPrice.toFixed(1)}
-              </span>{" "}
-              <span className="font-medium text-text-secondary text-xs">
-                Spread:
-              </span>{" "}
-              <span className="font-mono font-light text-xs text-white">
-                {spreadPercentString}
-              </span>
-            </motion.div>
-
-            {/* Bids Table */}
-            <Table className="text-sm leading-5 select-none relative w-full">
-              <motion.thead
-                className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.6 }}
+              {/* Mid Price and Spread */}
+              <div
+                className="text-center text-muted-foreground text-xs py-1 font-light bg-bg-secondary/90 backdrop-blur-sm shadow-sm"
+                ref={spreadRef}
               >
+                <span className="font-medium text-text-secondary text-xs">
+                  Mid:
+                </span>{" "}
+                <span className="font-mono font-light text-xs text-white pr-2">
+                  {midPrice.toFixed(1)}
+                </span>{" "}
+                <span className="font-medium text-text-secondary text-xs">
+                  Spread:
+                </span>{" "}
+                <span className="font-mono font-light text-xs text-white">
+                  {spreadPercentString}
+                </span>
+              </div>
+
+              {/* Bids Table */}
+              <Table className="text-sm leading-5 select-none relative w-full">
+                <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
+                  <TableRow className="border-none">
+                    <OrderBookTableHead>
+                      Price ({currentMarket.quote.symbol})
+                    </OrderBookTableHead>
+                    <OrderBookTableHead className="text-right">
+                      Size ({currentMarket.base.symbol})
+                    </OrderBookTableHead>
+                    <OrderBookTableHead className="text-right">
+                      Total ({currentMarket.quote.symbol})
+                    </OrderBookTableHead>
+                  </TableRow>
+                </thead>
+                <TableBody ref={bodyRef}>
+                  <SemiBook
+                    type={BA.bids}
+                    data={book}
+                    priceDecimals={precision}
+                  />
+                </TableBody>
+              </Table>
+            </div>
+          )}
+
+          {viewOption === "asks" && (
+            <Table className="text-sm leading-5 select-none relative w-full">
+              <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
                 <TableRow className="border-none">
                   <OrderBookTableHead>
                     Price ({currentMarket.quote.symbol})
@@ -336,8 +336,33 @@ export const BookContent = React.memo(function BookContent() {
                     Total ({currentMarket.quote.symbol})
                   </OrderBookTableHead>
                 </TableRow>
-              </motion.thead>
-              <TableBody className="overflow-scroll" ref={bodyRef}>
+              </thead>
+              <TableBody>
+                <SemiBook
+                  type={BA.asks}
+                  data={book}
+                  priceDecimals={precision}
+                />
+              </TableBody>
+            </Table>
+          )}
+
+          {viewOption === "bids" && (
+            <Table className="text-sm leading-5 select-none relative w-full">
+              <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
+                <TableRow className="border-none">
+                  <OrderBookTableHead>
+                    Price ({currentMarket.quote.symbol})
+                  </OrderBookTableHead>
+                  <OrderBookTableHead className="text-right">
+                    Size ({currentMarket.base.symbol})
+                  </OrderBookTableHead>
+                  <OrderBookTableHead className="text-right">
+                    Total ({currentMarket.quote.symbol})
+                  </OrderBookTableHead>
+                </TableRow>
+              </thead>
+              <TableBody>
                 <SemiBook
                   type={BA.bids}
                   data={book}
@@ -345,63 +370,10 @@ export const BookContent = React.memo(function BookContent() {
                 />
               </TableBody>
             </Table>
-          </div>
-        )}
-
-        {viewOption === "asks" && (
-          <Table className="text-sm leading-5 select-none relative w-full">
-            <motion.thead
-              className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.3 }}
-            >
-              <TableRow className="border-none">
-                <OrderBookTableHead>
-                  Price ({currentMarket.quote.symbol})
-                </OrderBookTableHead>
-                <OrderBookTableHead className="text-right">
-                  Size ({currentMarket.base.symbol})
-                </OrderBookTableHead>
-                <OrderBookTableHead className="text-right">
-                  Total ({currentMarket.quote.symbol})
-                </OrderBookTableHead>
-              </TableRow>
-            </motion.thead>
-            <TableBody className="overflow-scroll">
-              <SemiBook type={BA.asks} data={book} priceDecimals={precision} />
-            </TableBody>
-          </Table>
-        )}
-
-        {viewOption === "bids" && (
-          <Table className="text-sm leading-5 select-none relative w-full">
-            <motion.thead
-              className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-[var(--bar-height)]"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.3 }}
-            >
-              <TableRow className="border-none">
-                <OrderBookTableHead>
-                  Price ({currentMarket.quote.symbol})
-                </OrderBookTableHead>
-                <OrderBookTableHead className="text-right">
-                  Size ({currentMarket.base.symbol})
-                </OrderBookTableHead>
-                <OrderBookTableHead className="text-right">
-                  Total ({currentMarket.quote.symbol})
-                </OrderBookTableHead>
-              </TableRow>
-            </motion.thead>
-            <TableBody className="overflow-scroll">
-              <SemiBook type={BA.bids} data={book} priceDecimals={precision} />
-            </TableBody>
-          </Table>
-        )}
-
-        <ScrollBar orientation="vertical" className="z-50" />
-      </ScrollArea>
-    </motion.div>
+          )}
+          <ScrollBar orientation="vertical" className="z-50" />
+        </ScrollArea>
+      </div>
+    </div>
   )
 })

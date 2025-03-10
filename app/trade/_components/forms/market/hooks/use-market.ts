@@ -231,7 +231,7 @@ export function useMarketForm(props: Props) {
     if (form.state.values.send) {
       const sendValue = Number(form.state.values.send)
       if (sendValue <= 0) {
-        // errors.send = "Amount must be greater than 0"
+        // errors.send = ""
       } else if (
         !isWrapping &&
         sendValue >
@@ -247,9 +247,9 @@ export function useMarketForm(props: Props) {
     }
 
     // Check for receive field errors
-    if (form.state.values.receive === "0" && hasEnoughVolume) {
-      errors.receive = "Insufficient volume"
-    }
+    // if (form.state.values.receive === "0" && hasEnoughVolume) {
+    //   errors.receive = "Insufficient volume"
+    // }
 
     return errors
   }, [

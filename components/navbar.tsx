@@ -339,7 +339,7 @@ export default function Navbar() {
                         <span
                           className={cn(
                             "text-nav-item-button-icon-fg",
-                            isActive && "text-white",
+                            isActive && "text-text-primary",
                           )}
                         >
                           <Icon />
@@ -365,7 +365,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleAccount}
-                  className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-white rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   {address && <WalletIcon className="w-4" />}
                   <span>{shortenAddress(address || "")}</span>
@@ -375,7 +375,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleConnect}
-                  className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-white rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden md:flex items-center border-transparent gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   <span>Connect</span>
                   <PersonIcon />
@@ -384,7 +384,7 @@ export default function Navbar() {
 
               {/* Mobile menu button */}
               <button
-                className="md:hidden text-nav-item-button-icon-fg p-2 rounded-lg hover:text-white hover:bg-bg-tertiary transition-colors"
+                className="md:hidden text-nav-item-button-icon-fg p-2 rounded-lg hover:text-text-primary hover:bg-bg-tertiary transition-colors"
                 onClick={toggle}
               >
                 <BurgerIcon />

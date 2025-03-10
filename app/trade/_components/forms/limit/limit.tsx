@@ -1,7 +1,7 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import { motion } from "framer-motion"
 import { ArrowDown } from "lucide-react"
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { formatUnits, parseUnits } from "viem"
 import { useAccount } from "wagmi"
 
@@ -15,6 +15,7 @@ import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { useTradeFormStore } from "../store"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
@@ -26,11 +27,16 @@ import {
 
 const sliderValues = [25, 50, 75]
 
-export function Limit() {
+export function Limit({ bs = BS.buy }: { bs?: BS }) {
   const { isConnected } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
-  const [side, setSide] = React.useState<BS>(BS.buy)
+  const [localSide, setLocalSide] = React.useState<BS>(bs)
+
+  const { payAmount, setPayAmount } = useTradeFormStore()
+
+  const isMounted = useRef(false)
+  const initializedFromSharedState = useRef(false)
 
   const { currentMarket } = useMarket()
   const {
@@ -56,34 +62,122 @@ export function Limit() {
     getAllErrors,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
-    bs: side,
+    bs: localSide,
   })
 
-  const handleSliderChange = (value: number) => {
-    if (!sendBalanceWithEth) return
-    const amount =
-      (BigInt(value * 100) *
-        parseUnits(sendBalanceWithEth.toString(), sendToken?.decimals || 18)) /
-      10_000n
-    setSendSliderValue(value)
-    form.setFieldValue("send", formatUnits(amount, sendToken?.decimals ?? 18))
-    form.validateAllFields("change")
-    if (!form.state.values.limitPrice) {
-      form.setFieldValue("receive", "")
-      return
+  useEffect(() => {
+    isMounted.current = true
+    console.log("Limit form mounted, payAmount:", payAmount)
+
+    return () => {
+      isMounted.current = false
     }
-    computeReceiveAmount()
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted.current || initializedFromSharedState.current) return
+
+    if (
+      payAmount &&
+      form &&
+      form.setFieldValue &&
+      payAmount !== "0" &&
+      payAmount !== "0.0" &&
+      payAmount !== "0.00"
+    ) {
+      console.log("Limit form: Initializing with shared pay amount:", payAmount)
+      form.setFieldValue("send", payAmount)
+      initializedFromSharedState.current = true
+
+      if (form.state.values.limitPrice) {
+        computeReceiveAmount()
+      }
+    }
+  }, [payAmount, form, computeReceiveAmount])
+
+  useEffect(() => {
+    if (!isMounted.current) return
+
+    const currentSendValue = form.state.values.send
+    if (
+      currentSendValue &&
+      currentSendValue !== payAmount &&
+      currentSendValue !== "0" &&
+      currentSendValue !== "0.0" &&
+      currentSendValue !== "0.00"
+    ) {
+      console.log("Limit form: Updating shared state with:", currentSendValue)
+      setPayAmount(currentSendValue)
+    }
+  }, [form.state.values.send, setPayAmount, payAmount])
+
+  const handleSliderChange = (value: number) => {
+    if (!sendBalanceWithEth || !sendToken) return
+
+    try {
+      const amount =
+        (BigInt(value * 100) *
+          parseUnits(
+            sendBalanceWithEth.toString(),
+            sendToken?.decimals || 18,
+          )) /
+        10_000n
+
+      setSendSliderValue(value)
+
+      // Format the amount for display
+      const amountFormatted = formatUnits(amount, sendToken?.decimals ?? 18)
+
+      // Set the field value without calling validateAllFields
+      form.setFieldValue("send", amountFormatted)
+
+      // We don't need to update the shared state here anymore
+      // as it's handled by the useEffect
+
+      // Check if limitPrice exists before computing receive amount
+      if (!form.state?.values?.limitPrice) {
+        form.setFieldValue("receive", "")
+        return
+      }
+
+      // Compute receive amount will indirectly validate the form
+      computeReceiveAmount()
+    } catch (error) {
+      console.error("Error in slider change:", error)
+    }
   }
 
   const handleSwapDirection = () => {
-    const newSide = side === BS.buy ? BS.sell : BS.buy
-    setSide(newSide)
+    try {
+      // Toggle between buy and sell
+      const newSide = localSide === BS.buy ? BS.sell : BS.buy
+      setLocalSide(newSide)
 
-    setSendSliderValue(0)
+      // Reset slider value
+      setSendSliderValue(0)
 
-    form.setFieldValue("send", "")
-    form.setFieldValue("receive", "")
+      // Keep the current pay amount in the shared state
+      const currentPayAmount = form.state.values.send
+
+      // Clear receive value but keep the pay amount
+      if (form && form.setFieldValue) {
+        form.setFieldValue("receive", "")
+
+        // If we have a limit price, recompute the receive amount
+        if (form.state.values.limitPrice && currentPayAmount) {
+          setTimeout(() => {
+            computeReceiveAmount()
+          }, 0)
+        }
+      }
+    } catch (error) {
+      console.error("Error in swap direction:", error)
+    }
   }
+
+  React.useEffect(() => {
+    handleSliderChange(sendSliderValue)
+  }, [sendSliderValue])
 
   return (
     <div className="flex flex-col h-full">
@@ -118,6 +212,8 @@ export function Limit() {
                     onBlur={field.handleBlur}
                     onChange={({ target: { value } }) => {
                       field.handleChange(value)
+                      // We don't need to update the shared state here anymore
+                      // as it's handled by the useEffect
                       computeReceiveAmount()
                     }}
                     inputClassName="text-text-primary text-lg h-8"
@@ -219,7 +315,7 @@ export function Limit() {
 
             {/* slider section */}
 
-            <div className="py-4">
+            <div className="py-4 z-100">
               {/* Slider */}
               <Slider
                 disabled={!currentMarket}
@@ -229,7 +325,7 @@ export function Limit() {
                 }}
                 max={100}
                 step={1}
-                className="w-full"
+                className="w-full z-50"
               />
               <div className="flex space-x-2 mt-4">
                 {sliderValues.map((value, i) => (
@@ -352,16 +448,16 @@ export function Limit() {
                   <>
                     <Button
                       className={cn(
-                        "rounded-sm w-full flex items-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
+                        "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
                       )}
                       size={"lg"}
                       type="submit"
-                      disabled={
-                        !state.canSubmit || !currentMarket || !isConnected
-                      }
+                      disabled={!state.canSubmit}
                       loading={!!state.isSubmitting}
                     >
-                      {Object.keys(allErrors).length > 0 ? (
+                      {!isConnected ? (
+                        "Connect Wallet"
+                      ) : Object.keys(allErrors).length > 0 ? (
                         <span>
                           {Array.isArray(allErrors.send)
                             ? allErrors.send.join(", ")

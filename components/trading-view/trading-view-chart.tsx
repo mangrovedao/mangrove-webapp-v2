@@ -98,6 +98,7 @@ const createDexScreenerDatafeed = (options: {
       try {
         const { from, to, countBack } = periodParams
         const url = `https://api.dexscreener.com/latest/dex/pairs/${chainName}/${pairAddress}`
+        // const url = `https://io.dexscreener.com/dex/chart/amm/v3/uniswap/bars/avalanche/0xA389f9430876455C36478DeEa9769B7Ca4E3DDB1?res=15&cb=329&q=0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664`
 
         console.log("Fetching data from:", url)
         const response = await fetch(url)

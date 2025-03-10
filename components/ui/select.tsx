@@ -2,7 +2,6 @@
 
 import { ChevronDown } from "@/svgs"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { Check } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "utils"
@@ -93,7 +92,7 @@ const SelectItem = React.forwardRef<
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     <span className="absolute right-0 flex h-6 w-6 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
+        {/* <Check className="h-4 w-4" /> */}
       </SelectPrimitive.ItemIndicator>
     </span>
   </SelectPrimitive.Item>

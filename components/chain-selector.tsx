@@ -91,11 +91,11 @@ export default function ChainSelector() {
         size="sm"
         variant="secondary"
         className={
-          "!space-x-2 !rounded-sm lg:flex items-center hidden border-transparent text-xs bg-bg-tertiary hover:bg-bg-secondary"
+          "!space-x-2 !rounded-sm lg:flex items-center hidden border-transparent  text-xs bg-bg-tertiary hover:bg-bg-secondary"
         }
         onClick={openDialog}
       >
-        <span className="flex space-x-2 p-1">
+        <span className="flex space-x-2">
           <ImageWithHideOnError
             src={`/assets/chains/${defaultChainId}.webp`}
             width={16}

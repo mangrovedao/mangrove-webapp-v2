@@ -2,7 +2,7 @@ import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { motion } from "framer-motion"
 import { ArrowDown, ArrowUp } from "lucide-react"
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { formatUnits } from "viem"
 
 import { CustomInput } from "@/components/custom-input-new"
@@ -15,6 +15,7 @@ import { EnhancedNumericInput } from "@components/token-input-new"
 import { useAccount, useBalance } from "wagmi"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
+import { useTradeFormStore } from "../store"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
 import { useMarketForm } from "./hooks/use-market"
 import { type Form } from "./types"
@@ -22,7 +23,7 @@ import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
 const slippageValues = ["0.1", "0.5", "1"]
 
-export function Market() {
+export function Market({ bs = BS.buy }: { bs?: BS }) {
   const { isConnected, address } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
@@ -30,7 +31,17 @@ export function Market() {
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
 
-  const [side, setSide] = React.useState<BS>(BS.buy)
+  const [localSide, setLocalSide] = React.useState<BS>(bs)
+
+  // Get and set shared pay amount
+  const { payAmount, setPayAmount } = useTradeFormStore()
+
+  // Track if the component is mounted
+  const isMounted = useRef(false)
+
+  // Track if we've initialized from the shared state
+  const initializedFromSharedState = useRef(false)
+
   const {
     computeReceiveAmount,
     computeSendAmount,
@@ -51,8 +62,58 @@ export function Market() {
     getAllErrors,
   } = useMarketForm({
     onSubmit: (formData) => setFormData(formData),
-    bs: side,
+    bs: localSide,
   })
+
+  // Set mounted flag
+  useEffect(() => {
+    isMounted.current = true
+    console.log("Market form mounted, payAmount:", payAmount)
+
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  // Initialize form with shared pay amount when component mounts or when switching tabs
+  useEffect(() => {
+    if (!isMounted.current || initializedFromSharedState.current) return
+
+    // Only set the value if payAmount exists and is meaningful
+    if (
+      payAmount &&
+      form &&
+      form.setFieldValue &&
+      payAmount !== "0" &&
+      payAmount !== "0.0" &&
+      payAmount !== "0.00"
+    ) {
+      console.log(
+        "Market form: Initializing with shared pay amount:",
+        payAmount,
+      )
+      form.setFieldValue("send", payAmount)
+      initializedFromSharedState.current = true
+      computeReceiveAmount()
+    }
+  }, [payAmount, form, computeReceiveAmount])
+
+  // Update shared state when form values change
+  useEffect(() => {
+    if (!isMounted.current) return
+
+    const currentSendValue = form.state.values.send
+    if (
+      currentSendValue &&
+      currentSendValue !== payAmount &&
+      currentSendValue !== "0" &&
+      currentSendValue !== "0.0" &&
+      currentSendValue !== "0.00"
+    ) {
+      console.log("Market form: Updating shared state with:", currentSendValue)
+      setPayAmount(currentSendValue)
+    }
+  }, [form.state.values.send, setPayAmount, payAmount])
 
   const sendBalanceWithEth = isWrapping
     ? Number(
@@ -70,14 +131,29 @@ export function Market() {
       )
 
   const handleSliderChange = (value: number) => {
-    const amount = (value * sendBalanceWithEth) / 100
-    form.setFieldValue("send", amount.toString())
-    form.validateAllFields("change")
-    computeReceiveAmount()
+    if (!sendBalanceWithEth || !sendToken) return
+
+    try {
+      const amount = Big(value)
+        .div(100)
+        .mul(sendBalanceWithEth)
+        .toFixed(sendToken?.displayDecimals || 18)
+
+      // Set the field value without calling validateAllFields
+      form.setFieldValue("send", amount)
+
+      // We don't need to update the shared state here anymore
+      // as it's handled by the useEffect
+
+      // Compute receive amount will indirectly validate the form
+      computeReceiveAmount()
+    } catch (error) {
+      console.error("Error in slider change:", error)
+    }
   }
 
   const sliderValue = Math.min(
-    Big(!isNaN(Number(send)) ? Number(send) : 0)
+    Big(form.state.values.send || 0)
       .mul(100)
       .div(sendBalanceWithEth === 0 ? 1 : sendBalanceWithEth)
       .toNumber(),
@@ -85,11 +161,28 @@ export function Market() {
   )
 
   const handleSwapDirection = () => {
-    const newSide = side === BS.buy ? BS.sell : BS.buy
-    setSide(newSide)
+    try {
+      // Toggle between buy and sell
+      const newSide = localSide === BS.buy ? BS.sell : BS.buy
+      setLocalSide(newSide)
 
-    form.setFieldValue("send", "")
-    form.setFieldValue("receive", "")
+      // Keep the current pay amount in the shared state
+      const currentPayAmount = form.state.values.send
+
+      // Clear receive value but keep the pay amount
+      if (form && form.setFieldValue) {
+        form.setFieldValue("receive", "")
+
+        // Recompute the receive amount if we have a pay amount
+        if (currentPayAmount) {
+          setTimeout(() => {
+            computeReceiveAmount()
+          }, 0)
+        }
+      }
+    } catch (error) {
+      console.error("Error in swap direction:", error)
+    }
   }
 
   return (
@@ -113,6 +206,8 @@ export function Market() {
                   onBlur={field.handleBlur}
                   onChange={({ target: { value } }) => {
                     field.handleChange(value)
+                    // We don't need to update the shared state here anymore
+                    // as it's handled by the useEffect
                     computeReceiveAmount()
                   }}
                   sendSliderValue={sliderValue}
@@ -341,7 +436,7 @@ export function Market() {
                   <>
                     <Button
                       className={cn(
-                        "w-full flex items-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
+                        "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
                       )}
                       size={"lg"}
                       type="submit"
