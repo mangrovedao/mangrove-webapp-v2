@@ -23,6 +23,17 @@ import { useAccount } from "wagmi"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
+// Helper function to check if book is a complete Book object
+const isCompleteBook = (book: any): book is Book => {
+  return (
+    book &&
+    "asksConfig" in book &&
+    "bidsConfig" in book &&
+    "marketConfig" in book &&
+    "midPrice" in book
+  )
+}
+
 type Props = {
   onSubmit: (data: Form) => void
   bs: BS
@@ -34,15 +45,21 @@ const determinePrices = (
   orderBook?: Book | null,
   marketPrice?: number,
 ) => {
-  if (!orderBook?.bids || !orderBook?.asks) {
+  // Check if orderBook is valid and has bids/asks
+  if (
+    !orderBook ||
+    !orderBook.bids ||
+    !orderBook.asks ||
+    !isCompleteBook(orderBook)
+  ) {
     return {
       price: marketPrice,
       decimals: determinePriceDecimalsFromToken(marketPrice, quoteToken),
     }
   }
 
-  const bids = orderBook?.bids
-  const asks = orderBook?.asks
+  const bids = orderBook.bids
+  const asks = orderBook.asks
 
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
@@ -94,10 +111,13 @@ export function useMarketForm(props: Props) {
   const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
 
+  // Use a safe version of the book for determinePrices
+  const safeBook = book && isCompleteBook(book) ? book : null
+
   const averagePrice = determinePrices(
     bs,
     quoteToken,
-    book,
+    safeBook,
     Number(marketPrice?.close),
   )
 
@@ -118,6 +138,11 @@ export function useMarketForm(props: Props) {
     queryFn: () => {
       if (!book) return null
 
+      // Check if book is a complete Book object
+      if (!isCompleteBook(book)) {
+        return null
+      }
+
       const baseAmount =
         bs == BS.buy
           ? parseUnits(receive, market?.base.decimals ?? 18)
@@ -136,23 +161,23 @@ export function useMarketForm(props: Props) {
             ? {
                 base: baseAmount,
                 bs: BS.sell,
-                book,
+                book: book as Book,
               }
             : {
                 quote: quoteAmount,
                 bs: BS.buy,
-                book,
+                book: book as Book,
               }
           : isBasePay
             ? {
                 quote: quoteAmount,
                 bs: BS.buy,
-                book,
+                book: book as Book,
               }
             : {
                 base: baseAmount,
                 bs: BS.sell,
-                book,
+                book: book as Book,
               }
 
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =

@@ -12,6 +12,7 @@ import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { useMenuStore } from "@/stores/menu.store"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { Book } from "@mangrovedao/mgv"
 import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
 import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { formatUnits, parseUnits } from "viem"
@@ -103,8 +104,23 @@ export function useLimit(props: Props) {
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
     : Number(sendTokenBalanceFormatted)
 
+  // Helper function to check if book is a complete Book object
+  const isCompleteBook = (book: any): book is Book => {
+    return (
+      book &&
+      "asksConfig" in book &&
+      "bidsConfig" in book &&
+      "marketConfig" in book &&
+      "midPrice" in book
+    )
+  }
+
   const fee = Number(
-    (isBid ? book?.asksConfig?.fee : book?.bidsConfig?.fee) ?? 0,
+    (isCompleteBook(book)
+      ? isBid
+        ? book.asksConfig?.fee
+        : book.bidsConfig?.fee
+      : 0) ?? 0,
   )
 
   const feeInPercentageAsString = new Intl.NumberFormat("en-US", {
@@ -152,8 +168,10 @@ export function useLimit(props: Props) {
     ),
   )
 
-  const minAsk = book ? minVolume(book.asksConfig, gasreq) : 0n
-  const minBid = book ? minVolume(book.bidsConfig, gasreq) : 0n
+  const minAsk =
+    book && isCompleteBook(book) ? minVolume(book.asksConfig, gasreq) : 0n
+  const minBid =
+    book && isCompleteBook(book) ? minVolume(book.bidsConfig, gasreq) : 0n
 
   const minComputedVolume = bs === BS.buy ? minBid : minAsk
   const minVolumeFormatted = formatUnits(
@@ -270,7 +288,7 @@ export function useLimit(props: Props) {
       )
       form?.validateAllFields("blur")
     }, 0)
-  }, [bs, book?.midPrice])
+  }, [bs, book?.asks, book?.bids, form, sendToken])
 
   // Add a function to get all form errors
   const getAllErrors = React.useCallback(() => {

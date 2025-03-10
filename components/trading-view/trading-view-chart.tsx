@@ -115,8 +115,21 @@ const createDexScreenerDatafeed = (options: {
         // Check if we have cached data
         if (cachedBars[cacheKey]) {
           console.log("Using cached data for", cacheKey)
-          onHistoryCallback(cachedBars[cacheKey], {
-            noData: cachedBars[cacheKey].length === 0,
+          // Ensure we have a non-null array by providing a default empty array
+          const ohlcvBars = cachedBars[cacheKey] || []
+
+          // Convert OHLCVBar[] to Bar[] to match the expected type
+          const bars = ohlcvBars.map((bar) => ({
+            time: bar.time,
+            open: bar.open,
+            high: bar.high,
+            low: bar.low,
+            close: bar.close,
+            volume: bar.volume,
+          }))
+
+          onHistoryCallback(bars, {
+            noData: bars.length === 0,
           })
           return
         }
