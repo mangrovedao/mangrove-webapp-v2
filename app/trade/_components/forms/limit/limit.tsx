@@ -36,16 +36,6 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
   const { payAmount, setPayAmount, tradeSide, setTradeSide } =
     useTradeFormStore()
 
-  // Use the shared tradeSide instead of local state
-  const [localSide, setLocalSide] = React.useState<BS>(tradeSide || bs)
-
-  // Update local side when shared side changes
-  React.useEffect(() => {
-    if (tradeSide !== localSide) {
-      setLocalSide(tradeSide)
-    }
-  }, [tradeSide])
-
   // Track if the component is mounted
   const isMounted = useRef(false)
 
@@ -76,7 +66,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
     getAllErrors,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
-    bs: localSide,
+    bs: tradeSide,
   })
 
   useEffect(() => {
@@ -164,10 +154,9 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
   const handleSwapDirection = () => {
     try {
       // Toggle between buy and sell
-      const newSide = localSide === BS.buy ? BS.sell : BS.buy
+      const newSide = tradeSide === BS.buy ? BS.sell : BS.buy
 
-      // Update both local and shared state
-      setLocalSide(newSide)
+      // Update the shared state
       setTradeSide(newSide)
 
       // Reset slider value

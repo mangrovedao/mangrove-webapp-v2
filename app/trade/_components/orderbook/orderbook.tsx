@@ -298,19 +298,6 @@ export const BookContent = React.memo(function BookContent() {
 
               {/* Bids Table */}
               <Table className="text-sm leading-5 select-none relative w-full">
-                <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
-                  <TableRow className="border-none">
-                    <OrderBookTableHead>
-                      Price ({currentMarket.quote.symbol})
-                    </OrderBookTableHead>
-                    <OrderBookTableHead className="text-right">
-                      Size ({currentMarket.base.symbol})
-                    </OrderBookTableHead>
-                    <OrderBookTableHead className="text-right">
-                      Total ({currentMarket.quote.symbol})
-                    </OrderBookTableHead>
-                  </TableRow>
-                </thead>
                 <TableBody ref={bodyRef}>
                   <SemiBook
                     type={BA.bids}
