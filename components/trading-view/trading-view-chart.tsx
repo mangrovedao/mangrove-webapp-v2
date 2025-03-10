@@ -79,7 +79,7 @@ const createDexScreenerDatafeed = (options: {
           timezone: "Etc/UTC",
           ticker: symbolName,
           minmov: 1,
-          pricescale: 100000000,
+          pricescale: 100,
           has_intraday: true,
           intraday_multipliers: ["1", "5", "15", "30", "60", "240"],
           supported_resolutions: [
@@ -93,7 +93,7 @@ const createDexScreenerDatafeed = (options: {
             "1W",
             "1M",
           ] as ResolutionString[],
-          volume_precision: 8,
+          volume_precision: 2,
           data_status: "streaming",
           exchange: "DEX",
           listed_exchange: "DEX",
@@ -143,6 +143,8 @@ const createDexScreenerDatafeed = (options: {
             chainName,
             pair.pairAddress,
             resolution,
+            baseAddress,
+            quoteAddress,
           )
 
           if (chartData && chartData.length > 0) {
@@ -164,7 +166,7 @@ const createDexScreenerDatafeed = (options: {
 
         // Generate bars from price and volume data
         console.log("Generating bars from available price data")
-        const bars = generateOHLCVBars(pair, from, to, resolution)
+        const bars = generateOHLCVBars(pair, from, to, resolution, chainName)
 
         // Cache the result
         cachedBars[cacheKey] = bars
@@ -266,8 +268,21 @@ export const TVChartContainer = (
         "create_volume_indicator_by_default",
       ],
       overrides: {
-        "paneProperties.background": "#0C1719", // #12272B light bg
+        "paneProperties.background": "#0C1719",
         "paneProperties.backgroundType": "solid",
+        "scalesProperties.textColor": "#AAA",
+        "scalesProperties.lineColor": "#333",
+        "mainSeriesProperties.priceAxisProperties.autoScale": true,
+        "mainSeriesProperties.priceAxisProperties.percentage": false,
+        "mainSeriesProperties.priceAxisProperties.log": false,
+        "mainSeriesProperties.priceFormat.type": "price",
+        "mainSeriesProperties.priceFormat.precision": 2,
+        "mainSeriesProperties.priceFormat.minMove": 0.01,
+        "scalesProperties.showSeriesLastValue": true,
+        "scalesProperties.showStudyLastValue": false,
+      },
+      studies_overrides: {
+        "volume.precision": 0,
       },
       fullscreen: false,
       autosize: true,
