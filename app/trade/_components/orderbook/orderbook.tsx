@@ -74,7 +74,7 @@ export const OrderBook = React.memo(function OrderBook({
         <div className="flex-1 overflow-hidden">
           {activeTab === "book" && <BookContent />}
           {activeTab === "trades" && (
-            <div className="p-2 h-full bg-bg-secondary/50">
+            <div className="h-full bg-bg-secondary/50">
               <Trades className="h-full" />
             </div>
           )}

@@ -181,7 +181,7 @@ export function DataTable<TData>({
     <>
       <Table>
         <TableHeader
-          className={`sticky top-[0] border-b border-bg-secondary z-40 p-0 text-xs ${rows.length}`}
+          className={`sticky top-[0] border-b border-bg-secondary z-40 p-0 text-xs backdrop-blur-sm ${rows.length}`}
         >
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>

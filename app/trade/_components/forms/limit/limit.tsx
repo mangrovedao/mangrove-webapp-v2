@@ -15,7 +15,7 @@ import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { useTradeFormStore } from "../store"
+import { useTradeFormStore } from "../../forms/store"
 import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
 import { useLimit } from "./hooks/use-limit"
 import type { Form } from "./types"
@@ -31,11 +31,25 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
   const { isConnected } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
-  const [localSide, setLocalSide] = React.useState<BS>(bs)
 
-  const { payAmount, setPayAmount } = useTradeFormStore()
+  // Get and set shared state
+  const { payAmount, setPayAmount, tradeSide, setTradeSide } =
+    useTradeFormStore()
 
+  // Use the shared tradeSide instead of local state
+  const [localSide, setLocalSide] = React.useState<BS>(tradeSide || bs)
+
+  // Update local side when shared side changes
+  React.useEffect(() => {
+    if (tradeSide !== localSide) {
+      setLocalSide(tradeSide)
+    }
+  }, [tradeSide])
+
+  // Track if the component is mounted
   const isMounted = useRef(false)
+
+  // Track if we've initialized from the shared state
   const initializedFromSharedState = useRef(false)
 
   const { currentMarket } = useMarket()
@@ -151,7 +165,10 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
     try {
       // Toggle between buy and sell
       const newSide = localSide === BS.buy ? BS.sell : BS.buy
+
+      // Update both local and shared state
       setLocalSide(newSide)
+      setTradeSide(newSide)
 
       // Reset slider value
       setSendSliderValue(0)

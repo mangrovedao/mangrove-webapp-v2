@@ -13,9 +13,9 @@ import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { EnhancedNumericInput } from "@components/token-input-new"
 import { useAccount, useBalance } from "wagmi"
+import { useTradeFormStore } from "../../forms/store"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
-import { useTradeFormStore } from "../store"
 import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
 import { useMarketForm } from "./hooks/use-market"
 import { type Form } from "./types"
@@ -31,10 +31,19 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
 
-  const [localSide, setLocalSide] = React.useState<BS>(bs)
+  // Get and set shared state
+  const { payAmount, setPayAmount, tradeSide, setTradeSide } =
+    useTradeFormStore()
 
-  // Get and set shared pay amount
-  const { payAmount, setPayAmount } = useTradeFormStore()
+  // Use the shared tradeSide instead of local state
+  const [localSide, setLocalSide] = React.useState<BS>(tradeSide || bs)
+
+  // Update local side when shared side changes
+  React.useEffect(() => {
+    if (tradeSide !== localSide) {
+      setLocalSide(tradeSide)
+    }
+  }, [tradeSide])
 
   // Track if the component is mounted
   const isMounted = useRef(false)
@@ -164,7 +173,10 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
     try {
       // Toggle between buy and sell
       const newSide = localSide === BS.buy ? BS.sell : BS.buy
+
+      // Update both local and shared state
       setLocalSide(newSide)
+      setTradeSide(newSide)
 
       // Keep the current pay amount in the shared state
       const currentPayAmount = form.state.values.send

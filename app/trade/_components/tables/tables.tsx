@@ -67,10 +67,10 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
             setValue(value)
           }}
           value={value}
-          className="w-full flex flex-col"
+          className="w-full h-full flex flex-col"
         >
           <CustomTabsList
-            className="flex justify-start space-x-0 w-full"
+            className="flex p-0 justify-start space-x-0 w-full"
             loading={ordersLoading ?? fillsLoading}
           >
             {Object.values(defaultEnum).map((table) => (
@@ -98,7 +98,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                 className="h-full"
               >
                 <ScrollArea className="h-full w-full" type="always">
-                  <div className="p-2 min-h-full">
+                  <div className="min-h-full">
                     {table === TradeTablesLoggedIn.ORDERS && isConnected && (
                       <Orders />
                     )}
@@ -106,7 +106,8 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                       <Fills />
                     )}
                   </div>
-                  <ScrollBar orientation="vertical" className="z-50" />
+                  <ScrollBar orientation="vertical" />
+                  <ScrollBar orientation="horizontal" />
                 </ScrollArea>
               </CustomTabsContent>
             ))}
