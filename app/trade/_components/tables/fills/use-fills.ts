@@ -75,7 +75,7 @@ export function useFills<T = Fill[]>({
     },
     select,
     meta: {
-      error: "Unable to retrieve fills",
+      error: "Unable to retrieve order history",
     },
     enabled: !!(isConnected && indexerSdk),
     retry: false,

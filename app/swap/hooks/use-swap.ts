@@ -233,6 +233,18 @@ export function useSwap() {
         const book = uniBook
         if (!(book && address)) return null
 
+        // Check if book is a complete Book object with required properties
+        if (
+          !(
+            "asksConfig" in book &&
+            "bidsConfig" in book &&
+            "marketConfig" in book
+          )
+        ) {
+          console.warn("Incomplete book object for market order simulation")
+          return null
+        }
+
         const isBasePay = currentMarket?.base.address === payToken?.address
         const params: MarketOrderSimulationParams = isBasePay
           ? {
