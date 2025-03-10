@@ -10,7 +10,6 @@ import {
 import { useBook } from "@/hooks/use-book"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { cn } from "@/utils"
-import { BS } from "@mangrovedao/mgv/lib"
 import { AnimatedFormsSkeleton } from "./animated-forms-skeleton"
 import { Limit } from "./limit/limit"
 import { Market } from "./market/market"
@@ -22,8 +21,8 @@ enum FormType {
 }
 
 // Create persistent component instances
-const LimitComponent = React.memo(() => <Limit bs={BS.buy} />)
-const MarketComponent = React.memo(() => <Market bs={BS.buy} />)
+const LimitComponent = React.memo(() => <Limit />)
+const MarketComponent = React.memo(() => <Market />)
 
 // Map of form types to components
 const FORM_COMPONENTS = {
@@ -80,7 +79,7 @@ export function Forms({
           ))}
         </CustomTabsList>
 
-        <div className="flex-1 overflow-hidden p-4">
+        <div className="flex-1 p-1.5 overflow-visible">
           <CustomTabsContent value={FormType.LIMIT} className="h-full">
             <div className="h-full">
               <LimitComponent />

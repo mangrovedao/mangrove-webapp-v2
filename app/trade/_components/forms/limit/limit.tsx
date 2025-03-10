@@ -27,7 +27,7 @@ import {
 
 const sliderValues = [25, 50, 75]
 
-export function Limit({ bs = BS.buy }: { bs?: BS }) {
+export function Limit() {
   const { isConnected } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
@@ -186,14 +186,14 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
   }, [sendSliderValue])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full">
       <form.Provider>
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
           className="flex flex-col h-full"
         >
-          <div className="space-y-2 flex-1 overflow-y-auto">
+          <div className="space-y-1.5 flex-1 overflow-y-auto">
             <form.Field
               name="send"
               onChange={
@@ -222,7 +222,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                       // as it's handled by the useEffect
                       computeReceiveAmount()
                     }}
-                    inputClassName="text-text-primary text-lg h-8"
+                    inputClassName="text-text-primary text-base h-7"
                     balanceAction={{
                       onClick: () => {
                         field.handleChange(sendBalanceWithEth.toString())
@@ -247,7 +247,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
               )}
             </form.Field>
 
-            <div className="flex justify-center -my-2">
+            <div className="flex justify-center -my-1.5">
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
@@ -263,7 +263,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                     type="button"
                     variant="secondary"
                     size="sm"
-                    className="h-8 w-8 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
+                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
                     onClick={handleSwapDirection}
                   >
                     <ArrowDown className="h-4 w-4" />
@@ -283,7 +283,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                     computeSendAmount()
                   }}
                   token={receiveToken}
-                  inputClassName="text-text-primary text-lg h-8"
+                  inputClassName="text-text-primary text-base h-7"
                   label="Receive"
                   disabled={!(currentMarket && form.state.isFormValid)}
                   error={
@@ -302,7 +302,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  inputClassName="text-text-primary text-lg h-8"
+                  inputClassName="text-text-primary text-base h-7"
                   onChange={(e) => {
                     field.handleChange(e.target.value)
                     computeReceiveAmount()
@@ -321,18 +321,20 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
 
             {/* slider section */}
 
-            <div className="py-4 z-100">
+            <div className="py-3">
               {/* Slider */}
-              <Slider
-                disabled={!currentMarket}
-                value={[sendSliderValue || 0]}
-                onValueChange={(values) => {
-                  setSendSliderValue?.(values[0] || 0)
-                }}
-                max={100}
-                step={1}
-                className="w-full z-50"
-              />
+              <div className="px-2">
+                <Slider
+                  disabled={!currentMarket}
+                  value={[sendSliderValue || 0]}
+                  onValueChange={(values) => {
+                    setSendSliderValue?.(values[0] || 0)
+                  }}
+                  max={100}
+                  step={1}
+                  className="z-50"
+                />
+              </div>
               <div className="flex space-x-2 mt-4">
                 {sliderValues.map((value, i) => (
                   <Button
@@ -342,7 +344,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                     disabled={!currentMarket}
                     value={sendSliderValue}
                     className={cn(
-                      "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
+                      "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                       {
                         "bg-bg-tertiary": sendSliderValue === value,
                       },
@@ -361,7 +363,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                   size={"md"}
                   disabled={!currentMarket}
                   className={cn(
-                    "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
+                    "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                   )}
                   onClick={(e) => {
                     e.preventDefault()
@@ -382,7 +384,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                     <div className="flex justify-between items-center">
                       <span className="flex items-center text-muted-foreground text-xs font-sans">
                         Use ETH balance
-                        <InfoTooltip className="text-text-quaternary text-sm size-[12px] cursor-pointer">
+                        <InfoTooltip className="text-text-quaternary text-xs size-[12px] cursor-pointer">
                           <span className="text-xs font-sans">
                             Will add a wrap ETH to wETH step during transaction
                             ({" "}
@@ -402,7 +404,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                       </span>
                       <div className="flex items-center gap-1 text-xs text-text-secondary">
                         <Switch
-                          className="data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary h-4 w-8"
+                          className="data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
                           checked={isWrapping}
                           onClick={() => field.handleChange(!isWrapping)}
                         />
@@ -436,7 +438,7 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
             </div>
           </div>
 
-          <div className="mt-auto pt-4 border-t border-border-primary">
+          <div className="mt-auto pt-3 border-t border-border-primary">
             <form.Subscribe
               selector={useCallback(
                 (state: any) => ({
@@ -456,9 +458,11 @@ export function Limit({ bs = BS.buy }: { bs?: BS }) {
                       className={cn(
                         "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
                       )}
-                      size={"lg"}
+                      size={"md"}
                       type="submit"
-                      disabled={!state.canSubmit}
+                      disabled={
+                        !state.canSubmit || Object.keys(allErrors).length > 0
+                      }
                       loading={!!state.isSubmitting}
                     >
                       {!isConnected ? (

@@ -14,13 +14,15 @@ import { cn } from "@/utils"
 import { determineDecimals, formatNumber } from "@/utils/numbers"
 
 function Container({ children }: React.PropsWithChildren) {
-  return (
-    <span className="text-xs font-medium space-y-[2px] block">{children}</span>
-  )
+  return <span className="text-xs font-medium space-y-2 block">{children}</span>
 }
 
 function Label({ children }: React.PropsWithChildren) {
-  return <div className="text-muted-foreground h-2">{children}</div>
+  return (
+    <div className="text-muted-foreground h-2 text-xs font-light">
+      {children}
+    </div>
+  )
 }
 
 function Value({
@@ -28,12 +30,7 @@ function Value({
   className,
 }: React.PropsWithChildren<{ className?: string }>) {
   return (
-    <div
-      className={cn(
-        "flex items-center font-ubuntu font-semibold text-sm h-6",
-        className,
-      )}
-    >
+    <div className={cn("flex items-center font-sans text-xs h-4", className)}>
       {children}
     </div>
   )
@@ -104,7 +101,7 @@ function Item({
   return (
     <Container>
       <Label>{label}</Label>
-      <div className="h-5 min-w-[80px]">
+      <div className="h-4 min-w-[70px] flex items-center font-sans text-xs">
         {skeleton ? (
           <motion.div
             variants={loadingVariants}
@@ -125,10 +122,7 @@ function Item({
               transition={{ duration: 0.2 }}
             >
               <Value className={className}>
-                {formattedValue}{" "}
-                {isValidValue && token?.symbol && (
-                  <span className="text-xs pl-1"> {token.symbol}</span>
-                )}
+                {formattedValue} {isValidValue && token?.symbol && token.symbol}
                 {isValidValue && rightElement}
               </Value>
             </motion.div>
@@ -209,9 +203,9 @@ export function PricesBar() {
           skeleton={false}
         />
       </div>
-      <ScrollArea className="relative ">
+      <ScrollArea className="relative w-full -pl-2">
         <motion.div
-          className="flex items-center w-full space-x-2 whitespace-nowrap h-full min-h-[54px]"
+          className="flex items-center w-full space-x-2 whitespace-nowrap h-full min-h-[48px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}

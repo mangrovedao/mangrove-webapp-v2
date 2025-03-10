@@ -11,6 +11,7 @@ import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { useMenuStore } from "@/stores/menu.store"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
 import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { formatUnits, parseUnits } from "viem"
@@ -160,6 +161,11 @@ export function useLimit(props: Props) {
     sendToken?.decimals || 18,
   )
 
+  const minVolumeFormattedWithDecimals = getExactWeiAmount(
+    minVolumeFormatted,
+    sendToken?.displayDecimals || 8,
+  )
+
   // @ts-expect-error
   useEventListener("on-orderbook-offer-clicked", handleOnOrderbookOfferClicked)
 
@@ -303,7 +309,7 @@ export function useLimit(props: Props) {
         Number(minVolumeFormatted) > 0 &&
         sendValue < Number(minVolumeFormatted)
       ) {
-        errors.send = `Minimum volume is ${minVolumeFormatted} ${sendToken?.symbol}`
+        errors.send = `Minimum volume is ${minVolumeFormattedWithDecimals} ${sendToken?.symbol}`
       }
     }
 

@@ -23,7 +23,7 @@ import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
 const slippageValues = ["0.1", "0.5", "1"]
 
-export function Market({ bs = BS.buy }: { bs?: BS }) {
+export function Market() {
   const { isConnected, address } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
@@ -194,14 +194,14 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
           autoComplete="off"
           className="flex flex-col h-full"
         >
-          <div className="space-y-2 flex-1 overflow-y-auto">
+          <div className="space-y-1.5 flex-1 overflow-y-auto">
             <form.Field
               name="send"
               onChange={sendValidator(sendBalanceWithEth)}
             >
               {(field) => (
                 <EnhancedNumericInput
-                  inputClassName="text-text-primary text-lg h-8"
+                  inputClassName="text-text-primary text-base h-7"
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -246,7 +246,7 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
                   type="button"
                   variant="secondary"
                   size="sm"
-                  className="h-8 w-8 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
+                  className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
                   onClick={handleSwapDirection}
                 >
                   <motion.div
@@ -275,7 +275,7 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
               ethBalance.value > 0n && (
                 <form.Field name="isWrapping">
                   {(field) => (
-                    <div className="flex justify-between items-center px-1 -mt-2">
+                    <div className="flex justify-between items-center px-1 -mt-1.5">
                       <div className="flex items-center text-muted-foreground text-xs">
                         Use ETH balance
                         <InfoTooltip className="text-text-quaternary text-sm">
@@ -305,7 +305,7 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
                 <EnhancedNumericInput
-                  inputClassName="text-text-primary text-sm h-8"
+                  inputClassName="text-text-primary text-base h-7"
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -419,7 +419,7 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
             </Accordion>
           </div>
 
-          <div className="mt-auto pt-4 border-t border-border-primary">
+          <div className="mt-auto pt-3 border-t border-border-primary">
             <form.Subscribe
               selector={useCallback(
                 (state: any) => ({
@@ -439,7 +439,7 @@ export function Market({ bs = BS.buy }: { bs?: BS }) {
                       className={cn(
                         "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
                       )}
-                      size={"lg"}
+                      size={"md"}
                       type="submit"
                       disabled={!state.canSubmit || !market || !isConnected}
                       loading={!!state.isSubmitting}

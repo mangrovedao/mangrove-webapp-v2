@@ -70,7 +70,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
           className="w-full h-full flex flex-col"
         >
           <CustomTabsList
-            className="flex p-0 justify-start space-x-0 w-full"
+            className="flex p-0 justify-start space-x-0 w-full h-8"
             loading={ordersLoading ?? fillsLoading}
           >
             {Object.values(defaultEnum).map((table) => (

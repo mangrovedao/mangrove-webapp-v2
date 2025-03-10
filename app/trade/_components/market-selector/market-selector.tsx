@@ -49,7 +49,7 @@ export default function MarketSelector() {
       onValueChange={onValueChange}
       disabled={!markets?.length}
     >
-      <SelectTrigger className="rounded-sm w-[180px] flex justify-between p-2">
+      <SelectTrigger className="rounded-sm w-fit flex justify-between p-1.5 text-sm">
         <SelectValue
           placeholder={!markets?.length ? "Market" : "No markets"}
           suppressHydrationWarning
@@ -60,7 +60,7 @@ export default function MarketSelector() {
           <SelectItem
             key={`${m.base.address}/${m.quote.address}/${m.tickSpacing}`}
             value={getValue(m)}
-            className="p-2"
+            className="p-1.5 text-sm"
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">

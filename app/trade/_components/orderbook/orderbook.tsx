@@ -54,8 +54,8 @@ export const OrderBook = React.memo(function OrderBook({
         }
         className="h-full flex flex-col"
       >
-        <div className="border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm">
-          <CustomTabsList className="w-full p-0 space-x-0">
+        <div className="border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm h-8">
+          <CustomTabsList className="w-full p-0 space-x-0 h-full">
             <CustomTabsTrigger
               value="book"
               className={cn("capitalize w-full rounded-none")}
@@ -168,7 +168,7 @@ export const BookContent = React.memo(function BookContent() {
   return (
     <div className="flex flex-col h-full bg-bg-secondary/50">
       {/* View Options and Precision Controls */}
-      <div className="flex justify-between items-center px-4 py-2 border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm shadow-sm">
+      <div className="flex justify-between items-center px-3 py-1 border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm shadow-sm">
         <div className="flex space-x-2">
           {/* Default View (Both) */}
           <button

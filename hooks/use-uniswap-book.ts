@@ -25,8 +25,8 @@ export function useUniswapBook() {
     ],
     queryFn: async () => {
       try {
-        if (!currentMarket || !client || !book)
-          throw new Error("Get quotes missing params")
+        if (!currentMarket || !client || !book || !uniClone)
+          return { asks: [], bids: [] }
 
         // Get Uniswap book with density scaled by Mangrove's density
         const uniBook = await getUniBook(
@@ -52,9 +52,12 @@ export function useUniswapBook() {
         return mergedBook
       } catch (error) {
         printEvmError(error)
+        console.error("Error fetching Uniswap quotes:", error)
+        // Return empty book instead of undefined
+        return book ? { ...book, asks: [], bids: [] } : { asks: [], bids: [] }
       }
     },
-    enabled: !!currentMarket && !!client && !!book,
+    enabled: !!currentMarket && !!client && !!book && !!uniClone,
     refetchInterval: 5000,
     refetchOnWindowFocus: false,
     staleTime: 2000,

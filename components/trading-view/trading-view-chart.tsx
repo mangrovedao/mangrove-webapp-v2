@@ -2,6 +2,13 @@
 "use client"
 
 import useMarket from "@/providers/market"
+import {
+  generateOHLCVBars,
+  getDexScreenerChainName,
+  getPairInfo,
+  tryFetchOHLCVData,
+  type OHLCVBar,
+} from "@/services/dexscreener-api"
 import { cn } from "@/utils"
 import React from "react"
 import { arbitrum } from "viem/chains"
@@ -23,8 +30,14 @@ const createDexScreenerDatafeed = (options: {
   chainId: number
 }): IBasicDataFeed => {
   const { base, quote, baseAddress, quoteAddress, chainId } = options
-  const chainName = chainId === arbitrum.id ? "arbitrum" : "ethereum"
+  const chainName = getDexScreenerChainName(chainId)
   const pairAddress = `${baseAddress}_${quoteAddress}`
+
+  // Cache for storing fetched bars to avoid redundant API calls
+  const cachedBars: Record<string, OHLCVBar[]> = {}
+
+  // Store active subscriptions
+  const subscriptions: Record<string, NodeJS.Timeout> = {}
 
   return {
     onReady: (callback) => {
@@ -97,81 +110,69 @@ const createDexScreenerDatafeed = (options: {
     ) => {
       try {
         const { from, to, countBack } = periodParams
-        const url = `https://api.dexscreener.com/latest/dex/pairs/${chainName}/${pairAddress}`
-        // const url = `https://io.dexscreener.com/dex/chart/amm/v3/uniswap/bars/avalanche/0xA389f9430876455C36478DeEa9769B7Ca4E3DDB1?res=15&cb=329&q=0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664`
+        const cacheKey = `${symbolInfo.ticker}-${resolution}-${from}-${to}`
 
-        console.log("Fetching data from:", url)
-        const response = await fetch(url)
-        const data = await response.json()
-
-        console.log("DexScreener response:", data)
-
-        if (!data || !data.pairs || data.pairs.length === 0) {
-          console.log("No pairs data found")
-          onHistoryCallback([], { noData: true })
+        // Check if we have cached data
+        if (cachedBars[cacheKey]) {
+          console.log("Using cached data for", cacheKey)
+          onHistoryCallback(cachedBars[cacheKey], {
+            noData: cachedBars[cacheKey].length === 0,
+          })
           return
         }
 
-        const pair = data.pairs[0]
-        console.log("Pair data:", pair)
+        // Get pair information from DEXScreener
+        const pair = await getPairInfo(chainId, baseAddress, quoteAddress)
 
-        // DexScreener doesn't provide OHLC data directly in their API
-        // We need to check if there's price history data available
-        if (!pair.priceUsd) {
-          console.log("No price data available for this pair")
+        if (!pair) {
+          console.log("No pair data found")
           onHistoryCallback([], { noData: true })
           return
         }
-
-        // Since DexScreener API doesn't provide historical OHLC data in the free tier,
-        // we'll create synthetic data based on the current price
-        const currentPrice = parseFloat(pair.priceUsd)
-        const priceChange24h = pair.priceChange?.h24
-          ? parseFloat(pair.priceChange.h24) / 100
-          : 0
-        const volume24h = pair.volume?.h24 ? parseFloat(pair.volume.h24) : 0
-
-        // Create synthetic bars for demonstration
-        const timeRange = to - from
-        const barCount = Math.min(200, Math.floor(timeRange / (60 * 60))) // Hourly bars, max 200
 
         console.log(
-          `Creating ${barCount} synthetic bars based on current price: ${currentPrice}`,
+          "Pair found:",
+          pair.baseToken.symbol,
+          "/",
+          pair.quoteToken.symbol,
         )
 
-        const bars = []
-        const startPrice = currentPrice / (1 + priceChange24h)
+        // Try to fetch OHLCV data from DEXScreener's chart endpoint
+        try {
+          const chartData = await tryFetchOHLCVData(
+            chainName,
+            pair.pairAddress,
+            resolution,
+          )
 
-        for (let i = 0; i < barCount; i++) {
-          const barTime = from * 1000 + i * ((timeRange * 1000) / barCount)
-          const progress = i / barCount
+          if (chartData && chartData.length > 0) {
+            // Filter and sort the data
+            const bars = chartData
+              .filter((bar) => bar.time >= from * 1000 && bar.time <= to * 1000)
+              .sort((a, b) => a.time - b.time)
 
-          // Create a price that gradually changes from start price to current price
-          const barPrice = startPrice + (currentPrice - startPrice) * progress
+            // Cache the result
+            cachedBars[cacheKey] = bars
 
-          // Add some randomness to make it look more realistic
-          const randomFactor = 0.99 + Math.random() * 0.02
-          const open = barPrice * randomFactor
-          const close = barPrice * randomFactor
-          const high = Math.max(open, close) * (1 + Math.random() * 0.01)
-          const low = Math.min(open, close) * (1 - Math.random() * 0.01)
-          const volume = (volume24h / barCount) * (0.5 + Math.random())
-
-          bars.push({
-            time: barTime,
-            open,
-            high,
-            low,
-            close,
-            volume,
-          })
+            onHistoryCallback(bars, { noData: bars.length === 0 })
+            return
+          }
+        } catch (chartError) {
+          console.warn("Failed to fetch chart data:", chartError)
+          // Continue to fallback method
         }
 
-        console.log("Generated synthetic bars:", bars.length)
+        // Generate bars from price and volume data
+        console.log("Generating bars from available price data")
+        const bars = generateOHLCVBars(pair, from, to, resolution)
 
+        // Cache the result
+        cachedBars[cacheKey] = bars
+
+        console.log("Generated bars:", bars.length)
         onHistoryCallback(bars, { noData: bars.length === 0 })
       } catch (error) {
-        console.error("Error fetching data from DexScreener:", error)
+        console.error("Error fetching data from DEXScreener:", error)
         onErrorCallback(error instanceof Error ? error.message : String(error))
       }
     },
@@ -182,12 +183,42 @@ const createDexScreenerDatafeed = (options: {
       subscriberUID,
       onResetCacheNeededCallback,
     ) => {
-      // Implement real-time updates if needed
-      console.log("subscribeBars called")
+      // Set up a periodic update for real-time data
+      const intervalId = setInterval(async () => {
+        try {
+          const pair = await getPairInfo(chainId, baseAddress, quoteAddress)
+          if (!pair) return
+
+          const currentPrice = parseFloat(pair.priceUsd)
+          const currentTime = Math.floor(Date.now() / 1000) * 1000
+
+          // Create a real-time bar
+          const bar = {
+            time: currentTime,
+            open: currentPrice * 0.999,
+            high: currentPrice * 1.001,
+            low: currentPrice * 0.998,
+            close: currentPrice,
+            volume: pair.volume?.h1
+              ? parseFloat(String(pair.volume.h1)) / 24
+              : 0,
+          }
+
+          onRealtimeCallback(bar)
+        } catch (error) {
+          console.error("Error in real-time update:", error)
+        }
+      }, 15000) // Update every 15 seconds
+
+      // Store the interval ID for cleanup
+      subscriptions[subscriberUID] = intervalId
     },
     unsubscribeBars: (subscriberUID) => {
       // Cleanup subscription
-      console.log("unsubscribeBars called")
+      if (subscriptions[subscriberUID]) {
+        clearInterval(subscriptions[subscriberUID])
+        delete subscriptions[subscriberUID]
+      }
     },
   }
 }
@@ -250,18 +281,18 @@ export const TVChartContainer = (
     return () => {
       tvWidget.remove()
     }
-  }, [currentMarket, chain?.id, props])
-
-  if (!currentMarket) {
-    return <AnimatedChartSkeleton />
-  }
+  }, [currentMarket, chain, props])
 
   return (
-    <div className="w-full h-full relative border border-bg-secondary rounded-sm">
-      {isLoading && <AnimatedChartSkeleton />}
+    <div className="relative w-full h-full">
+      {isLoading && (
+        <div className="absolute inset-0 z-10">
+          <AnimatedChartSkeleton />
+        </div>
+      )}
       <div
         ref={chartContainerRef}
-        className={cn("w-full h-full", isLoading && "opacity-0")}
+        className={cn("w-full h-full", isLoading ? "opacity-0" : "opacity-100")}
       />
     </div>
   )

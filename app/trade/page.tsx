@@ -38,7 +38,7 @@ export default function Page() {
   }, [])
 
   return (
-    <main className="flex flex-col h-full gap-2">
+    <main className="flex flex-col h-full">
       <div className="flex items-center gap-2">
         <MarketSelector />
         <PricesBar />
@@ -48,20 +48,20 @@ export default function Page() {
       {!isMobile && (
         <div className="flex-1 flex flex-col pb-2">
           {/* Top section with Chart, OrderBook, and Forms */}
-          <div className="flex-1 flex gap-2 min-h-0">
+          <div className="flex-1 flex gap-1 min-h-0">
             {/* Left section with Chart, OrderBook, and Tables */}
-            <div className="flex-[3] flex flex-col">
+            <div className="flex-[4] flex flex-col">
               <ResizablePanelGroup direction="vertical" className="h-full">
                 {/* Top section with Chart and OrderBook */}
-                <ResizablePanel defaultSize={70} minSize={30} className="pb-2">
-                  <div className="flex gap-2 h-full">
+                <ResizablePanel defaultSize={75} minSize={30} className="pb-1">
+                  <div className="flex gap-1 h-full">
                     {/* Chart Section */}
-                    <div className="flex-[3] rounded-sm overflow-hidden border border-bg-secondary">
+                    <div className="flex-[4] rounded-sm overflow-hidden border border-bg-secondary">
                       <Market className="w-full h-full" />
                     </div>
 
                     {/* Order Book Section */}
-                    <div className="w-[320px] rounded-sm overflow-hidden flex flex-col border border-bg-secondary">
+                    <div className="w-[280px] rounded-sm overflow-hidden flex flex-col border border-bg-secondary">
                       <OrderBook className="flex-1 w-full min-h-0" />
                     </div>
                   </div>
@@ -70,7 +70,7 @@ export default function Page() {
 
                 {/* Bottom section with Tables */}
                 <ResizablePanel
-                  defaultSize={30}
+                  defaultSize={25}
                   minSize={15}
                   className="rounded-sm border border-bg-secondary h-full w-full"
                 >
@@ -80,8 +80,8 @@ export default function Page() {
             </div>
 
             {/* Trading Forms Section - Right */}
-            <div className="w-[320px] rounded-sm overflow-auto ">
-              <Forms className="rounded-sm " />
+            <div className="w-[280px] rounded-sm overflow-auto">
+              <Forms className="rounded-sm" />
             </div>
           </div>
         </div>
@@ -159,7 +159,14 @@ export default function Page() {
 
       <style jsx>{`
         main {
-          height: calc(100vh - 64px);
+          height: calc(100vh - 60px);
+        }
+
+        @media (max-width: 1366px) {
+          /* Adjustments for smaller screens like 13" */
+          main {
+            font-size: 0.95rem;
+          }
         }
       `}</style>
     </main>

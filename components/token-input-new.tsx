@@ -65,7 +65,7 @@ export const EnhancedNumericInput = React.forwardRef<
       <div className="grid">
         <div
           className={cn(
-            "grid z-10 px-3 pt-[12px] pb-[12px] -gap-4 flex-col bg-bg-primary rounded-sm border border-border-tertiary transition-all",
+            "grid z-10 px-3 pt-[10px] pb-[10px] -gap-3 flex-col bg-bg-primary rounded-sm border border-border-tertiary transition-all",
             !error?.length &&
               "focus-within:border focus-within:border-border-brand",
             error?.length && "border-red-900 border-[0.5px] bg-red-950 ",
@@ -77,7 +77,7 @@ export const EnhancedNumericInput = React.forwardRef<
               <Caption
                 variant={"caption1"}
                 as={"label"}
-                className="mb-0.5 text-text-secondary"
+                className="mb-0.5 text-text-secondary text-xs"
               >
                 {label}
               </Caption>
