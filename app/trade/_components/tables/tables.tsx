@@ -106,7 +106,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                       <Fills />
                     )}
                   </div>
-                  <ScrollBar orientation="vertical" />
+                  <ScrollBar orientation="vertical" className="z-50" />
                   <ScrollBar orientation="horizontal" />
                 </ScrollArea>
               </CustomTabsContent>
