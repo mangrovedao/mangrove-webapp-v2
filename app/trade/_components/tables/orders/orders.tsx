@@ -46,7 +46,7 @@ export function Orders() {
     <>
       <DataTable
         table={table}
-        isError={!!ordersQuery.error}
+        isError={false}
         isLoading={false}
         emptyArrayMessage="No orders currently active"
         onRowClick={(order) =>

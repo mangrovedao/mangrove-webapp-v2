@@ -90,9 +90,7 @@ export default function ChainSelector() {
       <Button
         size="sm"
         variant="secondary"
-        className={
-          "!space-x-2 !rounded-sm lg:flex items-center hidden border-transparent  text-xs bg-bg-tertiary hover:bg-bg-secondary"
-        }
+        className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
         onClick={openDialog}
       >
         <span className="flex space-x-2">
@@ -100,7 +98,7 @@ export default function ChainSelector() {
             src={`/assets/chains/${defaultChainId}.webp`}
             width={16}
             height={16}
-            className="h-4 rounded-sm size-4"
+            className="h-5 rounded-sm size-5"
             key={defaultChainId}
             alt={`${chain?.name}-logo`}
           />

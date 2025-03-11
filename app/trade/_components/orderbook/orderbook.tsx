@@ -101,8 +101,8 @@ export const BookContent = React.memo(function BookContent() {
     highestBidPrice,
     spread,
     spreadPercent,
-    midPrice,
     spreadPercentString,
+    midPrice,
   } = React.useMemo(() => {
     if (!book || !currentMarket)
       return {
@@ -250,21 +250,25 @@ export const BookContent = React.memo(function BookContent() {
 
       {/* Orderbook Content */}
       <div className="flex-1 overflow-hidden" ref={scrollAreaRef}>
-        <ScrollArea className="h-full" type="always">
+        <ScrollArea className="h-full" type="hover">
           {viewOption === "default" && (
             <div className="flex flex-col w-full">
               {/* Asks Table - Only shown in default or asks view */}
-              <Table className="text-sm leading-5 select-none relative w-full">
-                <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
+              <Table className="text-xs select-none relative w-full">
+                <thead className="sticky bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
                   <TableRow className="border-none">
                     <OrderBookTableHead>
-                      Price ({currentMarket.quote.symbol})
+                      <span className="text-xs">Price</span>
                     </OrderBookTableHead>
                     <OrderBookTableHead className="text-right ">
-                      Size ({currentMarket.base.symbol})
+                      <span className="text-xs">
+                        Size ({currentMarket.base.symbol})
+                      </span>
                     </OrderBookTableHead>
                     <OrderBookTableHead className="text-right ">
-                      Total ({currentMarket.quote.symbol})
+                      <span className="text-xs">
+                        Total ({currentMarket.quote.symbol})
+                      </span>
                     </OrderBookTableHead>
                   </TableRow>
                 </thead>
@@ -297,7 +301,24 @@ export const BookContent = React.memo(function BookContent() {
               </div>
 
               {/* Bids Table */}
-              <Table className="text-sm leading-5 select-none relative w-full">
+              <Table className="text-xs select-none relative w-full -inset-y-6 max-h-fit">
+                <thead className="sticky bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
+                  <TableRow className="border-none invisible">
+                    <OrderBookTableHead>
+                      <span className="text-xs">Price</span>
+                    </OrderBookTableHead>
+                    <OrderBookTableHead className="text-right">
+                      <span className="text-xs">
+                        Size ({currentMarket.base.symbol})
+                      </span>
+                    </OrderBookTableHead>
+                    <OrderBookTableHead className="text-right">
+                      <span className="text-xs">
+                        Total ({currentMarket.quote.symbol})
+                      </span>
+                    </OrderBookTableHead>
+                  </TableRow>
+                </thead>
                 <TableBody ref={bodyRef}>
                   <SemiBook
                     type={BA.bids}
@@ -310,17 +331,21 @@ export const BookContent = React.memo(function BookContent() {
           )}
 
           {viewOption === "asks" && (
-            <Table className="text-sm leading-5 select-none relative w-full">
+            <Table className="text-xs select-none relative w-full">
               <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
                 <TableRow className="border-none">
                   <OrderBookTableHead>
-                    Price ({currentMarket.quote.symbol})
+                    <span className="text-xs">Price</span>
                   </OrderBookTableHead>
                   <OrderBookTableHead className="text-right">
-                    Size ({currentMarket.base.symbol})
+                    <span className="text-xs">
+                      Size ({currentMarket.base.symbol})
+                    </span>
                   </OrderBookTableHead>
                   <OrderBookTableHead className="text-right">
-                    Total ({currentMarket.quote.symbol})
+                    <span className="text-xs">
+                      Total ({currentMarket.quote.symbol})
+                    </span>
                   </OrderBookTableHead>
                 </TableRow>
               </thead>
@@ -335,17 +360,21 @@ export const BookContent = React.memo(function BookContent() {
           )}
 
           {viewOption === "bids" && (
-            <Table className="text-sm leading-5 select-none relative w-full">
+            <Table className="text-xs select-none relative w-full">
               <thead className="sticky top-0 bg-bg-secondary/90 backdrop-blur-sm z-40 py-2 text-xs h-full">
                 <TableRow className="border-none">
                   <OrderBookTableHead>
-                    Price ({currentMarket.quote.symbol})
+                    <span className="text-xs">Price</span>
                   </OrderBookTableHead>
                   <OrderBookTableHead className="text-right">
-                    Size ({currentMarket.base.symbol})
+                    <span className="text-xs">
+                      Size ({currentMarket.base.symbol})
+                    </span>
                   </OrderBookTableHead>
                   <OrderBookTableHead className="text-right">
-                    Total ({currentMarket.quote.symbol})
+                    <span className="text-xs">
+                      Total ({currentMarket.quote.symbol})
+                    </span>
                   </OrderBookTableHead>
                 </TableRow>
               </thead>

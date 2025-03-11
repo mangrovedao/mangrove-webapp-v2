@@ -365,7 +365,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleAccount}
-                  className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden md:flex border-transparent items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   {address && <WalletIcon className="w-4" />}
                   <span>{shortenAddress(address || "")}</span>

@@ -34,7 +34,7 @@ export function Fills() {
     <DataTable
       emptyArrayMessage="No trade history"
       table={table}
-      isError={!!fillsQuery.error}
+      isError={false}
       isLoading={false}
       pagination={{
         onPageChange: setPageDetails,

@@ -65,7 +65,7 @@ const MemoizedOffer = React.memo(
               ref={isRefRow ? rowRef : null}
               key={`${type}-${offerId}`}
               className={cn(
-                "relative h-2 border-none transition-all duration-300 group cursor-pointer",
+                "relative h-1 border-none transition-all duration-300 group cursor-pointer",
                 "hover:bg-background-secondary/70 hover:backdrop-blur-sm",
                 "animate-fadeIn",
                 isHovered &&
@@ -172,9 +172,6 @@ const MemoizedOffer = React.memo(
                   )}
                 >
                   {type === "asks" ? "Ask Offer" : "Bid Offer"}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  ID: {offerId.substring(0, 8)}
                 </span>
               </div>
 

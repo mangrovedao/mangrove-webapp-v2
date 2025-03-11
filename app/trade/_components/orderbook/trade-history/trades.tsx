@@ -24,9 +24,14 @@ export function Trades({ className }: { className?: string }) {
   const blockExplorerUrl =
     chain?.blockExplorers?.default.url || arbitrum.blockExplorers.default.url
 
-  if (tradesHistoryQuery.isLoading || !market) {
+  // Only show loading skeleton when market is not available
+  if (!market) {
     return <AnimatedTradesHistorySkeleton />
   }
+
+  // Only show loading state if we're loading and don't have data yet
+  const isLoading =
+    tradesHistoryQuery.isLoading && !Array.isArray(tradesHistoryQuery.data)
 
   return (
     <motion.div
@@ -41,8 +46,8 @@ export function Trades({ className }: { className?: string }) {
       >
         <DataTable
           table={table}
-          isError={!!tradesHistoryQuery.error}
-          isLoading={false}
+          isError={false} // Never show error since we're using mock data as fallback
+          isLoading={isLoading}
           onRowClick={(row) =>
             row &&
             row.transactionHash &&

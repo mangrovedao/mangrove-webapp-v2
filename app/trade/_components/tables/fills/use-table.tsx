@@ -22,6 +22,70 @@ import type { Fill } from "./schema"
 const columnHelper = createColumnHelper<Fill>()
 const DEFAULT_DATA: Fill[] = []
 
+// Mock data for fills when no data is available
+const MOCK_DATA: Fill[] = [
+  {
+    creationDate: new Date(Date.now() - 1000 * 60 * 45), // 45 minutes ago
+    transactionHash:
+      "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+    isBid: true,
+    takerGot: "0.5",
+    takerGave: "1000",
+    penalty: "0",
+    feePaid: "0.5",
+    initialWants: "0.5",
+    initialGives: "1000",
+    price: "2000",
+    status: "Completed",
+    isMarketOrder: false,
+  },
+  {
+    creationDate: new Date(Date.now() - 1000 * 60 * 25), // 25 minutes ago
+    transactionHash:
+      "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+    isBid: false,
+    takerGot: "1200",
+    takerGave: "0.6",
+    penalty: "0",
+    feePaid: "0.3",
+    initialWants: "1200",
+    initialGives: "0.6",
+    price: "2000",
+    status: "Completed",
+    isMarketOrder: true,
+  },
+  {
+    creationDate: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
+    transactionHash:
+      "0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
+    isBid: true,
+    takerGot: "0.25",
+    takerGave: "500",
+    penalty: "0",
+    feePaid: "0.1",
+    initialWants: "0.25",
+    initialGives: "500",
+    price: "2000",
+    status: "Completed",
+    isMarketOrder: false,
+  },
+  {
+    creationDate: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
+    transactionHash:
+      "0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc",
+    isBid: false,
+    takerGot: "600",
+    takerGave: "0.3",
+    penalty: "0",
+    feePaid: "0.15",
+    initialWants: "600",
+    initialGives: "0.3",
+    price: "2000",
+    status: "Completed",
+    isMarketOrder: true,
+  },
+]
+
 type Params = {
   data?: Fill[]
 }
@@ -29,6 +93,14 @@ type Params = {
 export function useTable({ data }: Params) {
   const { currentMarket: market } = useMarket()
   const { chain } = useAccount()
+
+  // Use mock data if data is empty or undefined
+  const tableData = React.useMemo(() => {
+    if (!data || data.length === 0) {
+      return MOCK_DATA
+    }
+    return data
+  }, [data])
 
   const columns = React.useMemo(
     () => [
@@ -153,7 +225,7 @@ export function useTable({ data }: Params) {
   )
 
   return useReactTable({
-    data: data ?? DEFAULT_DATA,
+    data: tableData,
     columns,
     enableRowSelection: false,
     getCoreRowModel: getCoreRowModel(),

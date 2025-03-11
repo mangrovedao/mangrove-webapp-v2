@@ -61,7 +61,7 @@ export default function Page() {
                     </div>
 
                     {/* Order Book Section */}
-                    <div className="w-[280px] rounded-sm overflow-hidden flex flex-col border border-bg-secondary">
+                    <div className="w-[300px] rounded-sm overflow-hidden flex flex-col border border-bg-secondary">
                       <OrderBook className="flex-1 w-full min-h-0" />
                     </div>
                   </div>
