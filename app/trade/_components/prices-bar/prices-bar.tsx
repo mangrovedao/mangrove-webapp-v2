@@ -101,7 +101,7 @@ function Item({
   return (
     <Container>
       <Label>{label}</Label>
-      <div className="h-4 min-w-[70px] flex items-center font-sans text-xs">
+      <div className="h-4 flex items-center font-sans text-xs">
         {skeleton ? (
           <motion.div
             variants={loadingVariants}
@@ -195,7 +195,7 @@ export function PricesBar() {
 
   return (
     <>
-      <div className="flex items-center pl-2">
+      <div className="flex items-center pl-2 pr-2">
         <Item
           label={"Price"}
           value={spotPrice}
@@ -203,9 +203,9 @@ export function PricesBar() {
           skeleton={false}
         />
       </div>
-      <ScrollArea className="relative w-full -pl-2">
+      <ScrollArea className="relative w-full ">
         <motion.div
-          className="flex items-center w-full space-x-2 whitespace-nowrap h-full min-h-[48px]"
+          className="flex items-center w-full space-x-5 whitespace-nowrap h-full min-h-[48px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}

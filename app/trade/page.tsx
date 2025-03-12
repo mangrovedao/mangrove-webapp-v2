@@ -38,7 +38,7 @@ export default function Page() {
   }, [])
 
   return (
-    <main className="flex flex-col h-full">
+    <main className="flex flex-col h-full overflow-hidden">
       <div className="flex items-center gap-2">
         <MarketSelector />
         <PricesBar />
@@ -99,48 +99,44 @@ export default function Page() {
           />
 
           {/* Main Tab Content */}
-          <div className="flex-1 border-border-tertiary flex flex-col gap-2">
-            {activeMainTab === "Chart" && (
-              <>
-                <div className="flex-1 w-full rounded-sm">
+          <div className="flex-1 border-border-tertiary flex flex-col">
+            {/* Main content area */}
+            <div className="mb-2">
+              {activeMainTab === "Chart" && (
+                <div className="h-[400px] w-full rounded-sm border border-bg-secondary">
                   <Market className="w-full h-full" />
                 </div>
-              </>
-            )}
-            {activeMainTab === "Order Book" && (
-              <>
-                <div className="flex-1 mx-auto w-full border border-bg-secondary rounded-sm">
+              )}
+              {activeMainTab === "Order Book" && (
+                <div className="h-[400px] w-full border border-bg-secondary rounded-sm">
                   <BookContent />
                 </div>
-              </>
-            )}
-            {activeMainTab === "Trades" && (
-              <>
-                <div className="flex-1 mx-auto w-full p-2 border border-bg-secondary rounded-sm">
+              )}
+              {activeMainTab === "Trades" && (
+                <div className="h-[400px] w-full p-2 border border-bg-secondary rounded-sm">
                   <Trades className="h-full" />
                 </div>
-              </>
-            )}
-            {/* Orders Section - Below Trades */}
-            <div className="h-[200px] rounded-sm">
-              <Tables className="max-h-[400px]" />
+              )}
+            </div>
+
+            {/* Tables section with fixed height */}
+            <div className="h-full border border-bg-secondary rounded-sm">
+              <Tables className="h-full w-full" />
             </div>
           </div>
 
           {/* Floating Button for Trading Form */}
           <Button
-            className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-bg-tertiary hover: z-50"
+            className="flex items-center justify-center fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-bg-tertiary hover: z-50 hover:bg-bg-primary-hover hover:border-bg-bg-primary hover:border-2"
             onClick={() => setIsDrawerOpen(true)}
           >
-            <TradeIcon className="w-6 h-6" />
+            <TradeIcon className="pl-[0.6px] w-6 h-6" />
           </Button>
 
           {/* Trading Form Drawer */}
           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-            <Drawer.Content className="h-[80vh]">
-              <div className="p-4 h-full">
-                <Forms />
-              </div>
+            <Drawer.Content className="h-[60vh] p-4">
+              <Forms />
             </Drawer.Content>
           </Drawer>
         </div>

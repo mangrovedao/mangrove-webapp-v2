@@ -68,7 +68,9 @@ export default function MarketSelector() {
                 <TokenIcon symbol={m.quote.symbol} />
               </div>
 
-              <span className="max-sm:hidden">{getSymbol(m)}</span>
+              <span className="group-data-[state=checked]:inline-block group-data-[highlighted]:inline-block">
+                {getSymbol(m)}
+              </span>
             </div>
           </SelectItem>
         ))}

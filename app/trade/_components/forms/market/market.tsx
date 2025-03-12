@@ -2,29 +2,40 @@ import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { motion } from "framer-motion"
 import { ArrowDown, ArrowUp } from "lucide-react"
-import React, { useCallback, useEffect, useRef } from "react"
-import { formatUnits } from "viem"
+import React, { useEffect, useRef } from "react"
+import { Address, formatUnits } from "viem"
+import { useAccount, useBalance } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
+import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
+import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { EnhancedNumericInput } from "@components/token-input-new"
-import { useAccount, useBalance } from "wagmi"
 import { useTradeFormStore } from "../../forms/store"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
-import FromWalletMarketOrderDialog from "./components/from-wallet-order-dialog"
+import { useTradeInfos } from "../hooks/use-trade-infos"
 import { useMarketForm } from "./hooks/use-market"
+import { useMarketTransaction } from "./hooks/use-market-transaction"
+import { useMarketSteps } from "./hooks/use-steps"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
+
+// Reuse the wethAdresses from the dialog
+export const wethAdresses: { [key: number]: Address | undefined } = {
+  168587773: "0x4200000000000000000000000000000000000023",
+  81457: "0x4300000000000000000000000000000000000004",
+  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+}
 
 const slippageValues = ["0.1", "0.5", "1"]
 
 export function Market() {
-  const { isConnected, address } = useAccount()
+  const { isConnected, address, chain } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
   })
@@ -64,7 +75,43 @@ export function Market() {
     bs: tradeSide,
   })
 
-  // Set mounted flag
+  // Registry and trade infos
+  const { mangroveChain } = useRegistry()
+  const { baseToken, quoteToken, spender } = useTradeInfos("market", tradeSide)
+
+  // Market steps to check if approval is needed
+  const { data: marketOrderSteps } = useMarketSteps({
+    user: address,
+    bs: tradeSide,
+    sendAmount: form.state.values.send,
+    sendToken,
+  })
+
+  // Approve mutation
+  const approveAmount = useApproveAmount({
+    token: sendToken,
+    spender: mangroveChain?.ghostbook ?? undefined,
+    sendAmount: form.state.values.send,
+  })
+
+  // Use the transaction hook
+  const {
+    txState,
+    isButtonLoading,
+    onSubmit,
+    getButtonText: getTransactionButtonText,
+    needsWrapping,
+    totalWrapping,
+  } = useMarketTransaction({
+    form,
+    tradeSide,
+    sendToken,
+    baseToken,
+    sendTokenBalance,
+    isWrapping,
+  })
+
+  // Set mounted flag and cleanup on unmount
   useEffect(() => {
     isMounted.current = true
     console.log("Market form mounted, payAmount:", payAmount)
@@ -186,11 +233,28 @@ export function Market() {
     }
   }
 
+  // Get button text based on transaction state
+  const getButtonText = () => {
+    const allErrors = getAllErrors()
+    return getTransactionButtonText({
+      isConnected,
+      errors: allErrors,
+    })
+  }
+
+  // Get button disabled state
+  const isButtonDisabled =
+    !form.state.canSubmit ||
+    Object.keys(getAllErrors()).length > 0 ||
+    isButtonLoading ||
+    !market ||
+    !isConnected
+
   return (
     <div className="flex flex-col h-full">
       <form.Provider>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={onSubmit}
           autoComplete="off"
           className="flex flex-col h-full"
         >
@@ -291,8 +355,8 @@ export function Market() {
                           3,
                         )}{" "}
                         ETH
-                        <Checkbox
-                          className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                        <Switch
+                          className="data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
                           checked={isWrapping}
                           onClick={() => field.handleChange(!isWrapping)}
                         />
@@ -420,73 +484,20 @@ export function Market() {
           </div>
 
           <div className="mt-auto pt-3 border-t border-border-primary">
-            <form.Subscribe
-              selector={useCallback(
-                (state: any) => ({
-                  canSubmit: state.canSubmit,
-                  isSubmitting: state.isSubmitting,
-                  tradeAction: state.values.bs,
-                }),
-                [],
+            <Button
+              className={cn(
+                "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
               )}
+              size={"md"}
+              type="submit"
+              disabled={isButtonDisabled}
+              loading={isButtonLoading}
             >
-              {(state: any): React.ReactNode => {
-                const allErrors = getAllErrors()
-
-                return (
-                  <>
-                    <Button
-                      className={cn(
-                        "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
-                      )}
-                      size={"md"}
-                      type="submit"
-                      disabled={!state.canSubmit || !market || !isConnected}
-                      loading={!!state.isSubmitting}
-                    >
-                      {Object.keys(allErrors).length > 0 ? (
-                        <span>
-                          {Array.isArray(allErrors.send)
-                            ? allErrors.send.join(", ")
-                            : (allErrors.send as React.ReactNode)}
-                        </span>
-                      ) : (
-                        state.tradeAction
-                      )}
-                    </Button>
-                  </>
-                )
-              }}
-            </form.Subscribe>
+              {getButtonText()}
+            </Button>
           </div>
         </form>
       </form.Provider>
-
-      {formData && (
-        <FromWalletMarketOrderDialog
-          form={{
-            ...formData,
-            estimatedFee: feeInPercentageAsString,
-            totalWrapping:
-              Number(formData.send) >
-              Number(
-                formatUnits(
-                  sendTokenBalance.balance?.balance || 0n,
-                  sendToken?.decimals ?? 18,
-                ),
-              )
-                ? Number(formData.send) -
-                  Number(
-                    formatUnits(
-                      sendTokenBalance.balance?.balance || 0n,
-                      sendToken?.decimals ?? 18,
-                    ),
-                  )
-                : 0,
-          }}
-          onClose={() => setFormData(undefined)}
-        />
-      )}
     </div>
   )
 }

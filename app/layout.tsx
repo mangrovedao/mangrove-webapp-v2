@@ -1,4 +1,5 @@
-import React from "react"
+"use client"
+import React, { useEffect, useState } from "react"
 import { Toaster } from "sonner"
 
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
@@ -18,6 +19,32 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const [toastPosition, setToastPosition] = useState<
+    "top-right" | "bottom-center"
+  >("bottom-center")
+
+  useEffect(() => {
+    // Function to set position based on screen width
+    const setPositionBasedOnScreenSize = () => {
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        setToastPosition("top-right")
+      } else {
+        setToastPosition("bottom-center")
+      }
+    }
+
+    // Set initial position
+    setPositionBasedOnScreenSize()
+
+    // Add event listener for window resize
+    window.addEventListener("resize", setPositionBasedOnScreenSize)
+
+    // Clean up event listener
+    return () => {
+      window.removeEventListener("resize", setPositionBasedOnScreenSize)
+    }
+  }, [])
+
   return (
     <html lang="en">
       <body>
@@ -30,7 +57,7 @@ export default function RootLayout({
             <DisclaimerDialog />
           </RootProvider>
           <Toaster
-            position="bottom-center"
+            position={toastPosition}
             toastOptions={{
               className: toastClasses,
               classNames: {

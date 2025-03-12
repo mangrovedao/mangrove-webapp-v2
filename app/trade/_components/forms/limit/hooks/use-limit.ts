@@ -226,7 +226,9 @@ export function useLimit(props: Props) {
       if (limit > 0 && send > 0) {
         form.setFieldValue(
           "receive",
-          (bs === BS.buy ? send / limit : send * limit).toString(),
+          (bs === BS.buy ? send / limit : send * limit).toFixed(
+            receiveToken?.priceDisplayDecimals || 8,
+          ),
         )
       }
 
@@ -247,7 +249,9 @@ export function useLimit(props: Props) {
       if (limit > 0 && receive > 0) {
         form.setFieldValue(
           "send",
-          (bs === BS.buy ? receive * limit : receive / limit).toString(),
+          (bs === BS.buy ? receive * limit : receive / limit).toFixed(
+            sendToken?.priceDisplayDecimals || 8,
+          ),
         )
       }
 
@@ -327,7 +331,7 @@ export function useLimit(props: Props) {
         Number(minVolumeFormatted) > 0 &&
         sendValue < Number(minVolumeFormatted)
       ) {
-        errors.send = `Minimum volume is ${minVolumeFormattedWithDecimals} ${sendToken?.symbol}`
+        // errors.send = `Minimum volume is ${minVolumeFormattedWithDecimals} ${sendToken?.symbol}`
       }
     }
 

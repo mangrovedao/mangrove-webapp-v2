@@ -1,8 +1,8 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import { motion } from "framer-motion"
 import { ArrowDown } from "lucide-react"
-import React, { useCallback, useEffect, useRef } from "react"
-import { formatUnits, parseUnits } from "viem"
+import React, { useEffect, useRef } from "react"
+import { Address, formatUnits, parseUnits } from "viem"
 import { useAccount } from "wagmi"
 
 import InfoTooltip from "@/components/info-tooltip-new"
@@ -16,8 +16,9 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { useTradeFormStore } from "../../forms/store"
-import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
+import { useTradeInfos } from "../hooks/use-trade-infos"
 import { useLimit } from "./hooks/use-limit"
+import { useLimitTransaction } from "./hooks/use-limit-transaction"
 import type { Form } from "./types"
 import {
   isGreaterThanZeroValidator,
@@ -27,8 +28,15 @@ import {
 
 const sliderValues = [25, 50, 75]
 
+// Reuse the wethAdresses from the dialog
+export const wethAdresses: { [key: number]: Address | undefined } = {
+  168587773: "0x4200000000000000000000000000000000000023",
+  81457: "0x4300000000000000000000000000000000000004",
+  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+}
+
 export function Limit() {
-  const { isConnected } = useAccount()
+  const { isConnected, address, chain } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
 
@@ -47,17 +55,10 @@ export function Limit() {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
-    handleSubmit,
     form,
     sendToken,
     receiveToken,
     quoteToken,
-    timeInForce,
-    send,
-    minVolume,
-    sendLogics,
-    receiveLogics,
-    sendTokenBalanceFormatted,
     receiveTokenBalanceFormatted,
     minVolumeFormatted,
     isWrapping,
@@ -69,6 +70,24 @@ export function Limit() {
     bs: tradeSide,
   })
 
+  // Registry and trade infos
+  const { baseToken } = useTradeInfos("limit", tradeSide)
+
+  // Use the transaction hook
+  const {
+    isButtonLoading,
+    onSubmit,
+    getButtonText: getTransactionButtonText,
+  } = useLimitTransaction({
+    form,
+    tradeSide,
+    sendToken,
+    baseToken,
+    sendTokenBalance,
+    isWrapping,
+  })
+
+  // Set mounted flag and cleanup on unmount
   useEffect(() => {
     isMounted.current = true
     console.log("Limit form mounted, payAmount:", payAmount)
@@ -185,11 +204,28 @@ export function Limit() {
     handleSliderChange(sendSliderValue)
   }, [sendSliderValue])
 
+  // Get button text based on transaction state
+  const getButtonText = () => {
+    const allErrors = getAllErrors()
+    return getTransactionButtonText({
+      isConnected,
+      errors: allErrors,
+      tradeSide,
+    })
+  }
+
+  // Get button disabled state
+  const isButtonDisabled =
+    !form.state.canSubmit ||
+    Object.keys(getAllErrors()).length > 0 ||
+    isButtonLoading ||
+    !isConnected
+
   return (
     <div className="flex flex-col h-full w-full">
       <form.Provider>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={onSubmit}
           autoComplete="off"
           className="flex flex-col h-full"
         >
@@ -439,77 +475,20 @@ export function Limit() {
           </div>
 
           <div className="mt-auto pt-3 border-t border-border-primary">
-            <form.Subscribe
-              selector={useCallback(
-                (state: any) => ({
-                  canSubmit: state.canSubmit,
-                  isSubmitting: state.isSubmitting,
-                  tradeAction: state.values.bs,
-                }),
-                [],
+            <Button
+              className={cn(
+                "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
               )}
+              size={"md"}
+              type="submit"
+              disabled={isButtonDisabled}
+              loading={isButtonLoading}
             >
-              {(state: any): React.ReactNode => {
-                const allErrors = getAllErrors()
-
-                return (
-                  <>
-                    <Button
-                      className={cn(
-                        "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
-                      )}
-                      size={"md"}
-                      type="submit"
-                      disabled={
-                        !state.canSubmit || Object.keys(allErrors).length > 0
-                      }
-                      loading={!!state.isSubmitting}
-                    >
-                      {!isConnected ? (
-                        "Connect Wallet"
-                      ) : Object.keys(allErrors).length > 0 ? (
-                        <span>
-                          {Array.isArray(allErrors.send)
-                            ? allErrors.send.join(", ")
-                            : (allErrors.send as React.ReactNode)}
-                        </span>
-                      ) : (
-                        state.tradeAction
-                      )}
-                    </Button>
-                  </>
-                )
-              }}
-            </form.Subscribe>
+              {getButtonText()}
+            </Button>
           </div>
         </form>
       </form.Provider>
-
-      {formData && (
-        <FromWalletLimitOrderDialog
-          form={{
-            ...formData,
-            minVolume: minVolumeFormatted,
-            totalWrapping:
-              Number(formData.send) >
-              Number(
-                formatUnits(
-                  sendTokenBalance?.balance || 0n,
-                  sendToken?.decimals ?? 18,
-                ),
-              )
-                ? Number(formData.send) -
-                  Number(
-                    formatUnits(
-                      sendTokenBalance?.balance || 0n,
-                      sendToken?.decimals ?? 18,
-                    ),
-                  )
-                : 0,
-          }}
-          onClose={() => setFormData(undefined)}
-        />
-      )}
     </div>
   )
 }

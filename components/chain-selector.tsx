@@ -90,7 +90,7 @@ export default function ChainSelector() {
       <Button
         size="sm"
         variant="secondary"
-        className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+        className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors border-transparent"
         onClick={openDialog}
       >
         <span className="flex space-x-2">

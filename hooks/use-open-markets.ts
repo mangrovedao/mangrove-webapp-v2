@@ -13,19 +13,24 @@ export function useOpenMarkets() {
   const { chain } = useAccount()
   const client = useNetworkClient()
   const publicClient = usePublicClient()
-
   const addresses = useMangroveAddresses()
-
   const cashnesses = useCashnesses()
   const symbolOverride = useSymbolOverrides()
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["open-markets", client?.key, cashnesses, addresses, chain?.id],
+    queryKey: [
+      "open-markets",
+      client?.key,
+      cashnesses,
+      addresses,
+      chain?.id,
+      publicClient?.key,
+    ],
     queryFn: async () => {
       try {
         if (!client || !publicClient) throw new Error("No market client found")
 
-        return await getOpenMarkets(client, addresses, {
+        return await getOpenMarkets(publicClient, addresses, {
           cashnesses: Object.fromEntries(
             Object.entries(cashnesses).filter(Boolean),
           ),

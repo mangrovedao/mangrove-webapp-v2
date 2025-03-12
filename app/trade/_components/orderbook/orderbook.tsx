@@ -250,7 +250,7 @@ export const BookContent = React.memo(function BookContent() {
 
       {/* Orderbook Content */}
       <div className="flex-1 overflow-hidden" ref={scrollAreaRef}>
-        <ScrollArea className="h-full" type="hover">
+        <ScrollArea className="h-full" type="always">
           {viewOption === "default" && (
             <div className="flex flex-col w-full">
               {/* Asks Table - Only shown in default or asks view */}
