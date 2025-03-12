@@ -100,7 +100,7 @@ export function useTransactionState({
     setTxState("wrapping")
     try {
       await sendTransaction({
-        to: wethAddresses[chainId],
+        to: wethAddresses[chainId] as Address,
         value: parseEther(totalWrapping.toString()),
       })
     } catch (error) {
