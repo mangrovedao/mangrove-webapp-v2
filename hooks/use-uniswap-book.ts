@@ -233,15 +233,20 @@ export function useUniswapBook() {
     // Sort offers and limit to 12 on each side
     const MAX_OFFERS = 12
 
-    // For asks, we want the lowest prices first (ascending order)
-    const sortedAsks = [...mergedAsks]
-      .sort((a, b) => a.price - b.price)
-      .slice(0, MAX_OFFERS)
+    // First sort all asks by price (ascending order)
+    const allAsksSorted = [...mergedAsks].sort((a, b) => a.price - b.price)
 
-    // For bids, we want the highest prices first (descending order)
-    const sortedBids = [...mergedBids]
-      .sort((a, b) => b.price - a.price)
-      .slice(0, MAX_OFFERS)
+    // For asks, we want to display from highest to lowest price (top to bottom)
+    // But we want to select the 12 asks that are CLOSEST to the mid price
+    // So we take the first 12 (lowest priced) and reverse them for display
+    const sortedAsks = allAsksSorted.slice(0, MAX_OFFERS).reverse()
+
+    // First sort all bids by price (descending order)
+    const allBidsSorted = [...mergedBids].sort((a, b) => b.price - a.price)
+
+    // For bids, we want to display from highest to lowest price (top to bottom)
+    // We take the highest priced bids (which are already sorted correctly)
+    const sortedBids = allBidsSorted.slice(0, MAX_OFFERS)
 
     // Update state maps for next cycle
     const newAsksMap = new Map<string, EnhancedOffer>()
