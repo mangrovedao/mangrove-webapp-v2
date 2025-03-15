@@ -199,7 +199,11 @@ export function useUniswapBook() {
         // Merge both orderbooks
         const mergedBook = mergeOffers(uniBook.asks, uniBook.bids, book)
 
-        return mergedBook
+        return {
+          ...mergedBook,
+          asks: mergedBook.asks,
+          bids: mergedBook.bids,
+        }
       } catch (error) {
         printEvmError(error)
         console.error("Error fetching Uniswap quotes:", error)
@@ -222,15 +226,32 @@ export function useUniswapBook() {
     const enhancedAsks = processOffers(newData.asks, asksMap)
     const enhancedBids = processOffers(newData.bids, bidsMap)
 
+    // Merge offers with the same price
+    const mergedAsks = mergeOffersSamePrice(enhancedAsks)
+    const mergedBids = mergeOffersSamePrice(enhancedBids)
+
+    // Sort offers and limit to 12 on each side
+    const MAX_OFFERS = 12
+
+    // For asks, we want the lowest prices first (ascending order)
+    const sortedAsks = [...mergedAsks]
+      .sort((a, b) => a.price - b.price)
+      .slice(0, MAX_OFFERS)
+
+    // For bids, we want the highest prices first (descending order)
+    const sortedBids = [...mergedBids]
+      .sort((a, b) => b.price - a.price)
+      .slice(0, MAX_OFFERS)
+
     // Update state maps for next cycle
     const newAsksMap = new Map<string, EnhancedOffer>()
     const newBidsMap = new Map<string, EnhancedOffer>()
 
-    enhancedAsks.forEach((offer) => {
+    sortedAsks.forEach((offer) => {
       newAsksMap.set(offer.id.toString(), offer)
     })
 
-    enhancedBids.forEach((offer) => {
+    sortedBids.forEach((offer) => {
       newBidsMap.set(offer.id.toString(), offer)
     })
 
@@ -242,10 +263,95 @@ export function useUniswapBook() {
 
     return {
       ...newData,
-      asks: enhancedAsks,
-      bids: enhancedBids,
+      asks: sortedAsks,
+      bids: sortedBids,
     }
   }, [query.data])
+
+  // Helper function to merge offers with the same price - simple and TS-error-free approach
+  function mergeOffersSamePrice(offers: EnhancedOffer[]): EnhancedOffer[] {
+    // Return early if no offers
+    if (!offers || offers.length === 0) return []
+
+    // Determine a reasonable precision - 2 decimal places for most cases
+    const pricePrecision = 2
+
+    // Create a map to group offers by price
+    const priceGroups: { [price: string]: EnhancedOffer[] } = {}
+
+    // Group offers by price, using fixed precision to handle floating point issues
+    for (const offer of offers) {
+      // Round the price to fixed precision to avoid floating point comparison issues
+      const roundedPrice = Number(offer.price.toFixed(pricePrecision))
+      const priceKey = roundedPrice.toString()
+
+      if (!priceGroups[priceKey]) {
+        priceGroups[priceKey] = []
+      }
+      priceGroups[priceKey].push(offer)
+    }
+
+    const result: EnhancedOffer[] = []
+
+    // Process each price group
+    for (const priceKey in priceGroups) {
+      if (!Object.prototype.hasOwnProperty.call(priceGroups, priceKey)) continue
+
+      const group = priceGroups[priceKey]
+
+      // Skip empty groups (shouldn't happen)
+      if (!group || group.length === 0) continue
+
+      // If only one offer at this price, keep it as is
+      if (group.length === 1 && group[0]) {
+        result.push(group[0])
+        continue
+      }
+
+      // Get the first offer as base (with null check)
+      const baseOffer = group[0]
+      if (!baseOffer) continue // Skip if base offer is somehow undefined
+
+      // Sum up volumes
+      let totalVolume = 0
+      let hasNewStatus = false
+      let hasChangedStatus = false
+
+      // Process all offers in the group
+      for (const offer of group) {
+        if (offer) {
+          // Skip undefined offers
+          totalVolume += offer.volume
+          if (offer.status === "new") hasNewStatus = true
+          if (offer.status === "changed") hasChangedStatus = true
+        }
+      }
+
+      // Determine final status
+      let mergedStatus: OfferStatus = "unchanged"
+      if (hasNewStatus) mergedStatus = "new"
+      else if (hasChangedStatus) mergedStatus = "changed"
+
+      // Use the rounded price instead of the original price
+      const roundedPrice = Number(priceKey)
+
+      // Create merged offer with required properties
+      const merged: EnhancedOffer = {
+        id: baseOffer.id, // Required by EnhancedOffer
+        price: roundedPrice, // Use rounded price for consistency
+        volume: totalVolume, // Calculated total volume
+        status: mergedStatus, // Determined status
+        transitionStartTime: baseOffer.transitionStartTime,
+        isMerged: true, // Flag to indicate merged offer
+        mergedCount: group.length, // How many offers were merged
+        originalOffers: group.filter(Boolean).map((o) => o.id.toString()), // Keep track of original offers
+      }
+
+      result.push(merged)
+    }
+
+    return result
+  }
 
   // Clean up removed offers after animation completes
   useEffect(() => {
