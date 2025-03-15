@@ -159,7 +159,7 @@ export const BookContent = React.memo(function BookContent() {
     useScrollToMiddle()
   const { data: book, isLoading } = useUniswapBook()
   const [viewOption, setViewOption] = useState<ViewOption>("default")
-  const [priceIncrement, setPriceIncrement] = useState<number>(1)
+  const [priceIncrement, setPriceIncrement] = useState<number>(0)
   const renderCount = React.useRef(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
@@ -262,14 +262,14 @@ export const BookContent = React.memo(function BookContent() {
     <div className="flex flex-col h-full bg-bg-secondary/50">
       {/* View Options and Precision Controls */}
       <div className="flex justify-between items-center px-3 py-1 border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm shadow-sm">
-        <div className="flex space-x-2">
+        <div className="flex ">
           {/* Default View (Both) */}
           <button
             onClick={() => setViewOption("default")}
             className={cn(
-              "flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 border border-transparent",
+              "flex items-center justify-center w-7 h-7 rounded-sm transition-all duration-200 border border-transparent",
               viewOption === "default"
-                ? "bg-bg-tertiary shadow-inner border-border-secondary"
+                ? "opacity-100"
                 : "hover:bg-bg-secondary/80 opacity-70 hover:opacity-100",
             )}
             title="Show both asks and bids"
@@ -277,13 +277,13 @@ export const BookContent = React.memo(function BookContent() {
             <div className="flex flex-col items-center">
               <div
                 className={cn(
-                  "w-4 h-1.5 bg-red-700 mb-0.5 rounded-sm transition-all",
+                  "w-4 h-1.5 bg-red-900 mb-0.5 rounded-sm transition-all",
                   viewOption === "default" ? "opacity-100" : "opacity-70",
                 )}
               ></div>
               <div
                 className={cn(
-                  "w-4 h-1.5 bg-green-700 rounded-sm transition-all",
+                  "w-4 h-1.5 bg-green-900 rounded-sm transition-all",
                   viewOption === "default" ? "opacity-100" : "opacity-70",
                 )}
               ></div>
@@ -294,16 +294,16 @@ export const BookContent = React.memo(function BookContent() {
           <button
             onClick={() => setViewOption("asks")}
             className={cn(
-              "flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 border border-transparent",
+              "flex items-center justify-center w-7 h-7 rounded-sm transition-all duration-200 border border-transparent",
               viewOption === "asks"
-                ? "bg-bg-tertiary shadow-inner border-border-secondary"
+                ? ""
                 : "hover:bg-bg-secondary/80 opacity-70 hover:opacity-100",
             )}
             title="Show asks only"
           >
             <div
               className={cn(
-                "w-4 h-3 bg-red-700 rounded-sm transition-all",
+                "w-4 h-3 bg-red-900 rounded-sm transition-all",
                 viewOption === "asks" ? "opacity-100" : "opacity-70",
               )}
             ></div>
@@ -313,16 +313,16 @@ export const BookContent = React.memo(function BookContent() {
           <button
             onClick={() => setViewOption("bids")}
             className={cn(
-              "flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 border border-transparent",
+              "flex items-center justify-center w-7 h-7 rounded-sm transition-all duration-200 border border-transparent",
               viewOption === "bids"
-                ? "bg-bg-tertiary shadow-inner border-border-secondary"
+                ? ""
                 : "hover:bg-bg-secondary/80 opacity-70 hover:opacity-100",
             )}
             title="Show bids only"
           >
             <div
               className={cn(
-                "w-4 h-3 bg-green-700 rounded-sm transition-all",
+                "w-4 h-3 bg-green-900 rounded-sm transition-all",
                 viewOption === "bids" ? "opacity-100" : "opacity-70",
               )}
             ></div>
@@ -330,27 +330,6 @@ export const BookContent = React.memo(function BookContent() {
         </div>
 
         <div className="flex items-center space-x-2">
-          {/* Center button */}
-          <button
-            onClick={handleScrollToMiddle}
-            className="text-xs text-muted-foreground hover:text-text-primary transition-colors w-7 h-7 flex items-center justify-center rounded-md hover:bg-bg-secondary/80"
-            title="Scroll to middle"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
-
           {/* Price Increment Dropdown */}
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
@@ -360,7 +339,7 @@ export const BookContent = React.memo(function BookContent() {
                 className="text-sm font-light flex items-center gap-1 h-7 rounded-md px-3 hover:bg-bg-secondary/80 transition-all duration-200"
                 title="Change price increment"
               >
-                <span className="font-mono">
+                <span className="text-xs">
                   {priceIncrement === 0
                     ? "All"
                     : priceIncrement.toLocaleString(undefined, {
@@ -391,7 +370,7 @@ export const BookContent = React.memo(function BookContent() {
                   )}
                   onClick={() => setPriceIncrement(increment)}
                 >
-                  <span className="font-mono">
+                  <span className="text-xs">
                     {increment === 0
                       ? "All"
                       : increment.toLocaleString(undefined, {
