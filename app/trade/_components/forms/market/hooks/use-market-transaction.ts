@@ -215,11 +215,6 @@ export function useMarketTransaction({
       }
     }, 30000) // 30 seconds should be enough for most wallet interactions
 
-    // Check if approval is needed
-    const needsApproval = marketOrderSteps
-      ? !marketOrderSteps[0].done
-      : undefined
-
     try {
       if (needsApproval) {
         handleApprove()
@@ -248,11 +243,11 @@ export function useMarketTransaction({
     txState,
     isButtonLoading,
     onSubmit,
-    getButtonText: (params: {
-      isConnected: boolean
-      errors: Record<string, any>
-    }) => getButtonText({ ...params, tradeSide, needsApproval }),
+    getButtonText,
     needsWrapping,
     totalWrapping,
+    needsApproval,
+    approveAmount,
+    marketOrderSteps,
   }
 }

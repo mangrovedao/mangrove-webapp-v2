@@ -120,14 +120,7 @@ export function Market() {
     if (!isMounted.current || initializedFromSharedState.current) return
 
     // Only set the value if payAmount exists and is meaningful
-    if (
-      payAmount &&
-      form &&
-      form.setFieldValue &&
-      payAmount !== "0" &&
-      payAmount !== "0.0" &&
-      payAmount !== "0.00"
-    ) {
+    if (payAmount && form && form.setFieldValue && payAmount !== "0") {
       form.setFieldValue("send", payAmount)
       initializedFromSharedState.current = true
       computeReceiveAmount()
@@ -142,9 +135,7 @@ export function Market() {
     if (
       currentSendValue &&
       currentSendValue !== payAmount &&
-      currentSendValue !== "0" &&
-      currentSendValue !== "0.0" &&
-      currentSendValue !== "0.00"
+      currentSendValue !== "0"
     ) {
       setPayAmount(currentSendValue)
     }
@@ -174,7 +165,7 @@ export function Market() {
       const amount = Big(value)
         .div(100)
         .mul(sendBalanceWithEth)
-        .toFixed(sendToken?.displayDecimals || 18)
+        .toFixed(sendToken?.priceDisplayDecimals || 18)
 
       // Set the field value without calling validateAllFields
       form.setFieldValue("send", amount)
@@ -245,6 +236,8 @@ export function Market() {
     return getTransactionButtonText({
       isConnected,
       errors: allErrors,
+      tradeSide,
+      needsApproval: marketOrderSteps ? !marketOrderSteps[0].done : undefined,
     })
   }
 

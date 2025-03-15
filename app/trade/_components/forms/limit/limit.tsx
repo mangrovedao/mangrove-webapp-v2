@@ -140,7 +140,10 @@ export function Limit() {
       const amountFormatted = formatUnits(amount, sendToken?.decimals ?? 18)
 
       // Set the field value without calling validateAllFields
-      form.setFieldValue("send", amountFormatted)
+      form.setFieldValue(
+        "send",
+        Number(amountFormatted).toFixed(sendToken?.priceDisplayDecimals ?? 18),
+      )
 
       // We don't need to update the shared state here anymore
       // as it's handled by the useEffect
