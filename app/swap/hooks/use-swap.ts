@@ -1,4 +1,5 @@
 import {
+  CompleteOffer,
   marketOrderSimulation,
   publicMarketActions,
   type Token,
@@ -54,6 +55,17 @@ const priceSchema = z.object({
   symbol: z.optional(z.string()),
   name: z.optional(z.string()),
 })
+
+// Convert EnhancedOffer to a format compatible with CompleteOffer for simulation
+function convertToSimulationOffers(offers: any[]): CompleteOffer[] {
+  return offers.map((offer) => ({
+    id: offer.id,
+    price: offer.price,
+    volume: offer.volume,
+    offer: { prev: 0n, next: 0n, tick: 0n, gives: 0n },
+    detail: { gasreq: 0n, gasprice: 0n },
+  })) as CompleteOffer[]
+}
 
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
@@ -245,17 +257,24 @@ export function useSwap() {
           return null
         }
 
+        // Convert EnhancedOffer arrays to the format expected by marketOrderSimulation
+        const simulationBook = {
+          ...book,
+          asks: convertToSimulationOffers(book.asks),
+          bids: convertToSimulationOffers(book.bids),
+        }
+
         const isBasePay = currentMarket?.base.address === payToken?.address
         const params: MarketOrderSimulationParams = isBasePay
           ? {
               base: payAmount,
               bs: BS.sell,
-              book,
+              book: simulationBook as any,
             }
           : {
               quote: payAmount,
               bs: BS.buy,
-              book,
+              book: simulationBook as any,
             }
 
         const simulation = marketOrderSimulation(params)

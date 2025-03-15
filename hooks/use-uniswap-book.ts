@@ -293,7 +293,7 @@ export function useUniswapBook() {
       if (!priceGroups[priceKey]) {
         priceGroups[priceKey] = []
       }
-      priceGroups[priceKey].push(offer)
+      priceGroups[priceKey]?.push(offer)
     }
 
     const result: EnhancedOffer[] = []

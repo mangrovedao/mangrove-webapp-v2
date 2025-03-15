@@ -58,7 +58,7 @@ const filterBookByPriceIncrement = (
       if (!buckets[bucketKey]) {
         buckets[bucketKey] = []
       }
-      buckets[bucketKey].push(entry)
+      buckets[bucketKey]?.push(entry)
     })
 
     // Take the first entry from each bucket
@@ -181,11 +181,11 @@ export const BookContent = React.memo(function BookContent() {
     // Calculate mid price safely
     let midPrice = 0
     if (asks.length > 0 && bids.length > 0) {
-      midPrice = (asks[0].price + bids[0].price) / 2
+      midPrice = ((asks[0]?.price ?? 0) + (bids[0]?.price ?? 0)) / 2
     } else if (asks.length > 0) {
-      midPrice = asks[0].price
+      midPrice = asks[0]?.price ?? 0
     } else if (bids.length > 0) {
-      midPrice = bids[0].price
+      midPrice = bids[0]?.price ?? 0
     }
 
     return {
