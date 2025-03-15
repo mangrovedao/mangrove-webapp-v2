@@ -1,6 +1,5 @@
 "use client"
 
-import { CompleteOffer } from "@mangrovedao/mgv"
 import { BA } from "@mangrovedao/mgv/lib"
 import React, { useMemo, useRef } from "react"
 
@@ -292,10 +291,9 @@ export const SemiBook = React.memo(
       const [hoveredOfferId, setHoveredOfferId] = React.useState<string | null>(
         null,
       )
-      const prevOffersRef = useRef<Map<
-        string,
-        CompleteOffer & { cumulatedVolume?: number }
-      > | null>(null)
+
+      // Use a ref to store previous offers with correct typing
+      const prevOffersRef = useRef<Map<string, EnhancedOffer> | null>(null)
 
       // Create a stable collection of offers with memoization for identity stability
       const memoizedOffers = useMemo(() => {
@@ -305,14 +303,11 @@ export const SemiBook = React.memo(
         // Sort the offers - need to create a new array for proper sorting
         const sortedOffers = [...offersData].sort((a, b) =>
           type === "asks" ? a.price - b.price : b.price - a.price,
-        )
+        ) as EnhancedOffer[]
 
         // If we don't have previous offers yet, initialize the map and return sorted offers
         if (!prevOffersRef.current) {
-          const offersMap = new Map<
-            string,
-            CompleteOffer & { cumulatedVolume?: number }
-          >()
+          const offersMap = new Map<string, EnhancedOffer>()
           sortedOffers.forEach((offer) => {
             offersMap.set(offer.id.toString(), offer)
           })
@@ -321,10 +316,7 @@ export const SemiBook = React.memo(
         }
 
         // If we have previous offers, check if we can reuse any to maintain reference stability
-        const updatedMap = new Map<
-          string,
-          CompleteOffer & { cumulatedVolume?: number }
-        >()
+        const updatedMap = new Map<string, EnhancedOffer>()
         const stableOffers = sortedOffers.map((newOffer) => {
           const offerId = newOffer.id.toString()
           const prevOffer = prevOffersRef.current?.get(offerId)
@@ -373,7 +365,7 @@ export const SemiBook = React.memo(
       ))
     },
   ),
-  // Add a custom comparison function to the SemiBook component
+  // Custom equality function
   (prevProps, nextProps) => {
     // Only re-render if the data or price decimals have changed
     if (prevProps.priceDecimals !== nextProps.priceDecimals) {

@@ -174,16 +174,24 @@ export const BookContent = React.memo(function BookContent() {
   const filteredBook = React.useMemo(() => {
     if (!book) return null
 
-    // Get the mid price to use as reference for filtering
-    const midPrice =
-      book.asks[0] && book.bids[0]
-        ? (book.asks[0].price + book.bids[0].price) / 2
-        : book.asks[0]?.price || book.bids[0]?.price || 0
+    // Safely handle the book data with type assertions
+    const asks = Array.isArray(book?.asks) ? [...book.asks] : []
+    const bids = Array.isArray(book?.bids) ? [...book.bids] : []
+
+    // Calculate mid price safely
+    let midPrice = 0
+    if (asks.length > 0 && bids.length > 0) {
+      midPrice = (asks[0].price + bids[0].price) / 2
+    } else if (asks.length > 0) {
+      midPrice = asks[0].price
+    } else if (bids.length > 0) {
+      midPrice = bids[0].price
+    }
 
     return {
-      asks: filterBookByPriceIncrement(book.asks, priceIncrement, midPrice),
-      bids: filterBookByPriceIncrement(book.bids, priceIncrement, midPrice),
-      midPrice: midPrice,
+      asks: filterBookByPriceIncrement(asks, priceIncrement, midPrice),
+      bids: filterBookByPriceIncrement(bids, priceIncrement, midPrice),
+      midPrice,
     }
   }, [book, priceIncrement])
 
