@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { EnhancedOffer, OfferStatus } from "@/hooks/use-uniswap-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { OrderBookTableCell } from "./table-cell"
@@ -19,13 +20,13 @@ import { calculateCumulatedVolume } from "./utils"
 type SemiBookProps = {
   type: BA
   data?: {
-    asks: CompleteOffer[]
-    bids: CompleteOffer[]
+    asks: EnhancedOffer[]
+    bids: EnhancedOffer[]
   } | null
   priceDecimals: number
 }
 
-// Create a memoized offer component to prevent unnecessary re-renders
+// Create a more optimized memoized offer component with a custom equality check
 const MemoizedOffer = React.memo(
   ({
     offer,
@@ -38,7 +39,7 @@ const MemoizedOffer = React.memo(
     hoveredOfferId,
     setHoveredOfferId,
   }: {
-    offer: CompleteOffer & { cumulatedVolume?: number }
+    offer: EnhancedOffer
     type: BA
     index: number
     isRefRow: boolean
@@ -48,7 +49,7 @@ const MemoizedOffer = React.memo(
     hoveredOfferId: string | null
     setHoveredOfferId: (id: string | null) => void
   }) => {
-    const { price, id, volume, cumulatedVolume } = offer
+    const { price, id, volume, cumulatedVolume, status } = offer
     const offerId = id.toString()
     const rowRef = useRef<HTMLTableRowElement>(null)
 
@@ -56,6 +57,20 @@ const MemoizedOffer = React.memo(
       ((cumulatedVolume ?? 0) * 100) / (maxVolume ?? 1)
 
     const isHovered = hoveredOfferId === offerId
+
+    // Apply different animation classes based on the offer's status
+    const getAnimationClass = () => {
+      switch (status) {
+        case "new":
+          return "animate-fadeIn"
+        case "changed":
+          return "animate-pulse-once"
+        case "removing":
+          return "animate-fadeOut"
+        default:
+          return ""
+      }
+    }
 
     return (
       <TooltipProvider key={`${type}-${offerId}-tooltip`}>
@@ -67,13 +82,14 @@ const MemoizedOffer = React.memo(
               className={cn(
                 "relative h-1 border-none transition-all duration-300 group cursor-pointer",
                 "hover:bg-background-secondary/70 hover:backdrop-blur-sm",
-                "animate-fadeIn",
+                getAnimationClass(),
                 isHovered &&
                   type === "asks" &&
                   "bg-red-100/10 shadow-[inset_0_0_0_1px_rgba(255,0,0,0.2)]",
                 isHovered &&
                   type === "bids" &&
                   "bg-green-caribbean/10 shadow-[inset_0_0_0_1px_rgba(0,128,0,0.2)]",
+                status === "removing" && "opacity-0 pointer-events-none",
               )}
               onClick={() => {
                 dispatchEvent(
@@ -84,11 +100,18 @@ const MemoizedOffer = React.memo(
               }}
               onMouseEnter={() => setHoveredOfferId(offerId)}
               onMouseLeave={() => setHoveredOfferId(null)}
+              style={{
+                animation:
+                  status === "changed"
+                    ? "pulse-once 0.8s ease-in-out"
+                    : undefined,
+              }}
             >
               <OrderBookTableCell
                 className={cn(
                   type === "asks" ? "text-red-100" : "text-green-caribbean",
                   "transition-colors duration-200",
+                  (status === "new" || status === "changed") && "font-medium",
                   isHovered && "font-medium",
                 )}
               >
@@ -96,11 +119,13 @@ const MemoizedOffer = React.memo(
                   value={price}
                   pDecimals={priceDecimals}
                   priceDecimals={priceDecimals}
+                  status={status}
                 />
               </OrderBookTableCell>
               <OrderBookTableCell
                 className={cn(
                   "text-right transition-colors duration-200",
+                  (status === "new" || status === "changed") && "font-medium",
                   isHovered && "font-medium",
                 )}
               >
@@ -108,11 +133,14 @@ const MemoizedOffer = React.memo(
                   value={volume}
                   priceDecimals={currentMarket?.base.decimals}
                   pDecimals={priceDecimals}
+                  status={status}
                 />
               </OrderBookTableCell>
               <OrderBookTableCell
                 className={cn(
                   "text-right text-muted-foreground transition-colors duration-200",
+                  (status === "new" || status === "changed") &&
+                    "font-medium text-foreground",
                   isHovered && "font-medium text-foreground",
                 )}
               >
@@ -120,6 +148,7 @@ const MemoizedOffer = React.memo(
                   value={price * volume}
                   pDecimals={priceDecimals}
                   priceDecimals={priceDecimals}
+                  status={status}
                 />
               </OrderBookTableCell>
               <td
@@ -222,60 +251,164 @@ const MemoizedOffer = React.memo(
       </TooltipProvider>
     )
   },
-  // Custom comparison function to prevent unnecessary re-renders
+  // Custom equality function to only re-render when relevant props change
   (prevProps, nextProps) => {
-    // Only re-render if these specific props change
-    return (
-      prevProps.offer.price === nextProps.offer.price &&
-      prevProps.offer.volume === nextProps.offer.volume &&
-      prevProps.offer.cumulatedVolume === nextProps.offer.cumulatedVolume &&
-      prevProps.hoveredOfferId === nextProps.hoveredOfferId &&
-      prevProps.priceDecimals === nextProps.priceDecimals
-    )
+    // Always re-render if the offer status changed
+    if (prevProps.offer.status !== nextProps.offer.status) {
+      return false
+    }
+
+    // Re-render if hover state changes for this offer
+    if (
+      (prevProps.hoveredOfferId === prevProps.offer.id.toString()) !==
+      (nextProps.hoveredOfferId === nextProps.offer.id.toString())
+    ) {
+      return false
+    }
+
+    // Re-render if the offer's core data changes
+    if (
+      prevProps.offer.price !== nextProps.offer.price ||
+      prevProps.offer.volume !== nextProps.offer.volume ||
+      prevProps.offer.id.toString() !== nextProps.offer.id.toString() ||
+      prevProps.priceDecimals !== nextProps.priceDecimals
+    ) {
+      return false
+    }
+
+    // Otherwise, don't re-render
+    return true
   },
 )
 
 MemoizedOffer.displayName = "MemoizedOffer"
 
-export const SemiBook = React.forwardRef<
-  React.ElementRef<typeof TableRow>,
-  SemiBookProps
->(({ type, data, priceDecimals }, ref) => {
-  const { currentMarket } = useMarket()
-  const { dataWithCumulatedVolume, maxVolume } = calculateCumulatedVolume(data)
-  const [hoveredOfferId, setHoveredOfferId] = React.useState<string | null>(
-    null,
-  )
+export const SemiBook = React.memo(
+  React.forwardRef<React.ElementRef<typeof TableRow>, SemiBookProps>(
+    ({ type, data, priceDecimals }, ref) => {
+      const { currentMarket } = useMarket()
+      const { dataWithCumulatedVolume, maxVolume } =
+        calculateCumulatedVolume(data)
+      const [hoveredOfferId, setHoveredOfferId] = React.useState<string | null>(
+        null,
+      )
+      const prevOffersRef = useRef<Map<
+        string,
+        CompleteOffer & { cumulatedVolume?: number }
+      > | null>(null)
 
-  // Memoize the offers to prevent unnecessary re-renders
-  const memoizedOffers = useMemo(() => {
-    // Get the offers for the current type (bids or asks)
-    const offersData = dataWithCumulatedVolume?.[type] || []
+      // Create a stable collection of offers with memoization for identity stability
+      const memoizedOffers = useMemo(() => {
+        // Get the offers for the current type (bids or asks)
+        const offersData = dataWithCumulatedVolume?.[type] || []
 
-    // Create a new array and sort it
-    return [...offersData].sort((a, b) =>
-      type === "asks" ? a.price - b.price : b.price - a.price,
-    )
-  }, [dataWithCumulatedVolume, type])
+        // Sort the offers - need to create a new array for proper sorting
+        const sortedOffers = [...offersData].sort((a, b) =>
+          type === "asks" ? a.price - b.price : b.price - a.price,
+        )
 
-  const refIndex =
-    type === "bids" ? 0 : memoizedOffers.length ? memoizedOffers.length - 1 : 0
+        // If we don't have previous offers yet, initialize the map and return sorted offers
+        if (!prevOffersRef.current) {
+          const offersMap = new Map<
+            string,
+            CompleteOffer & { cumulatedVolume?: number }
+          >()
+          sortedOffers.forEach((offer) => {
+            offersMap.set(offer.id.toString(), offer)
+          })
+          prevOffersRef.current = offersMap
+          return sortedOffers
+        }
 
-  return memoizedOffers.map((offer, i) => (
-    <MemoizedOffer
-      key={`${type}-${offer.id.toString()}`}
-      offer={offer}
-      type={type}
-      index={i}
-      isRefRow={refIndex === i}
-      priceDecimals={priceDecimals}
-      maxVolume={maxVolume ?? 1}
-      currentMarket={currentMarket}
-      hoveredOfferId={hoveredOfferId}
-      setHoveredOfferId={setHoveredOfferId}
-    />
-  ))
-})
+        // If we have previous offers, check if we can reuse any to maintain reference stability
+        const updatedMap = new Map<
+          string,
+          CompleteOffer & { cumulatedVolume?: number }
+        >()
+        const stableOffers = sortedOffers.map((newOffer) => {
+          const offerId = newOffer.id.toString()
+          const prevOffer = prevOffersRef.current?.get(offerId)
+
+          // If the offer exists and hasn't changed, reuse the previous reference
+          if (
+            prevOffer &&
+            prevOffer.price === newOffer.price &&
+            prevOffer.volume === newOffer.volume
+          ) {
+            updatedMap.set(offerId, prevOffer)
+            return prevOffer
+          }
+
+          // Otherwise, use the new offer
+          updatedMap.set(offerId, newOffer)
+          return newOffer
+        })
+
+        // Update our reference for next render
+        prevOffersRef.current = updatedMap
+
+        return stableOffers
+      }, [dataWithCumulatedVolume, type])
+
+      const refIndex =
+        type === "bids"
+          ? 0
+          : memoizedOffers.length
+            ? memoizedOffers.length - 1
+            : 0
+
+      return memoizedOffers.map((offer, i) => (
+        <MemoizedOffer
+          key={`${type}-${offer.id.toString()}`}
+          offer={offer}
+          type={type}
+          index={i}
+          isRefRow={refIndex === i}
+          priceDecimals={priceDecimals}
+          maxVolume={maxVolume ?? 1}
+          currentMarket={currentMarket}
+          hoveredOfferId={hoveredOfferId}
+          setHoveredOfferId={setHoveredOfferId}
+        />
+      ))
+    },
+  ),
+  // Add a custom comparison function to the SemiBook component
+  (prevProps, nextProps) => {
+    // Only re-render if the data or price decimals have changed
+    if (prevProps.priceDecimals !== nextProps.priceDecimals) {
+      return false
+    }
+
+    // If data is null or undefined for either, re-render if they're different
+    if (!prevProps.data || !nextProps.data) {
+      return prevProps.data === nextProps.data
+    }
+
+    // Check if the relevant data for this type has changed
+    const prevOffers = prevProps.data[prevProps.type]
+    const nextOffers = nextProps.data[nextProps.type]
+
+    // Quick length check
+    if (!prevOffers || !nextOffers || prevOffers.length !== nextOffers.length) {
+      return false
+    }
+
+    // Check each offer for changes
+    for (let i = 0; i < nextOffers.length; i++) {
+      if (
+        prevOffers[i]?.price !== nextOffers[i]?.price ||
+        prevOffers[i]?.volume !== nextOffers[i]?.volume ||
+        prevOffers[i]?.id.toString() !== nextOffers[i]?.id.toString()
+      ) {
+        return false
+      }
+    }
+
+    // No changes detected
+    return true
+  },
+)
 
 SemiBook.displayName = "SemiBook"
 
@@ -283,10 +416,12 @@ function Cell({
   value,
   priceDecimals,
   pDecimals,
+  status,
 }: {
   value: number
   priceDecimals?: number
   pDecimals: number
+  status?: OfferStatus
 }) {
   const [prevValue, setPrevValue] = React.useState(value)
   const [isAnimating, setIsAnimating] = React.useState(false)
@@ -312,6 +447,9 @@ function Cell({
             className={cn(
               "font-sans text-xs font-light transition-all duration-200 hover:font-medium group-hover:scale-105",
               isAnimating && "animate-valueChange",
+              status === "new" && "animate-fadeIn font-medium",
+              status === "changed" && "animate-pulse-once font-medium",
+              status === "removing" && "animate-fadeOut",
             )}
           >
             {value.toLocaleString(undefined, {

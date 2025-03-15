@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import useMarket from "@/providers/market"
 import { printEvmError } from "@/utils/errors"
@@ -37,14 +38,130 @@ function safelyConvertToBigInt(
   }
 }
 
+// Define offer status types for animation support
+export type OfferStatus = "new" | "changed" | "unchanged" | "removing"
+export type EnhancedOffer = {
+  id: any
+  price: number
+  volume: number
+  status: OfferStatus
+  transitionStartTime?: number
+  [key: string]: any
+}
+
+// Helper function to check if book data has changed
+function hasBookChanged(prevBook: any, newBook: any) {
+  if (!prevBook || !newBook) return true
+
+  // Quick length check first (most efficient)
+  if (
+    prevBook.asks.length !== newBook.asks.length ||
+    prevBook.bids.length !== newBook.bids.length
+  ) {
+    return true
+  }
+
+  // Check if any ask has changed (price or volume only)
+  for (let i = 0; i < newBook.asks.length; i++) {
+    if (
+      prevBook.asks[i]?.price !== newBook.asks[i]?.price ||
+      prevBook.asks[i]?.volume !== newBook.asks[i]?.volume
+    ) {
+      return true
+    }
+  }
+
+  // Check if any bid has changed (price or volume only)
+  for (let i = 0; i < newBook.bids.length; i++) {
+    if (
+      prevBook.bids[i]?.price !== newBook.bids[i]?.price ||
+      prevBook.bids[i]?.volume !== newBook.bids[i]?.volume
+    ) {
+      return true
+    }
+  }
+
+  // No changes detected
+  return false
+}
+
+// Helper function to process offers and mark their status
+function processOffers(
+  newOffers: any[],
+  prevOffersMap: Map<string, EnhancedOffer>,
+): EnhancedOffer[] {
+  const currentOffersMap = new Map<string, EnhancedOffer>()
+  const now = Date.now()
+
+  // First pass: Process new offers and mark them with status
+  const processedOffers = newOffers.map((offer) => {
+    const id = offer.id.toString()
+    const prevOffer = prevOffersMap.get(id)
+
+    // Create enhanced offer with status
+    const enhancedOffer: EnhancedOffer = {
+      ...offer,
+      status: "unchanged",
+      transitionStartTime: now,
+    }
+
+    if (!prevOffer) {
+      // This is a new offer
+      enhancedOffer.status = "new"
+    } else if (
+      prevOffer.price !== offer.price ||
+      prevOffer.volume !== offer.volume
+    ) {
+      // This offer has changed
+      enhancedOffer.status = "changed"
+    } else {
+      // This offer is unchanged - keep previous status if it was "new" or "changed"
+      // and hasn't completed its animation cycle yet
+      const timeSinceTransition = now - (prevOffer.transitionStartTime || 0)
+      if (
+        (prevOffer.status === "new" || prevOffer.status === "changed") &&
+        timeSinceTransition < 1000
+      ) {
+        enhancedOffer.status = prevOffer.status
+        enhancedOffer.transitionStartTime = prevOffer.transitionStartTime
+      } else {
+        enhancedOffer.status = "unchanged"
+      }
+    }
+
+    // Add to current map
+    currentOffersMap.set(id, enhancedOffer)
+    return enhancedOffer
+  })
+
+  // Second pass: Find removed offers and add them to the result with "removing" status
+  const removedOffers: EnhancedOffer[] = []
+  prevOffersMap.forEach((offer, id) => {
+    if (!currentOffersMap.has(id) && offer.status !== "removing") {
+      // This offer has been removed
+      removedOffers.push({
+        ...offer,
+        status: "removing",
+        transitionStartTime: now,
+      })
+    }
+  })
+
+  // Combine current and removing offers
+  return [...processedOffers, ...removedOffers]
+}
+
 export function useUniswapBook() {
   const { currentMarket } = useMarket()
   const client = useNetworkClient()
   const { book } = useBook()
   const { chain } = useAccount()
   const { uniClone } = useRegistry()
+  const [asksMap, setAsksMap] = useState<Map<string, EnhancedOffer>>(new Map())
+  const [bidsMap, setBidsMap] = useState<Map<string, EnhancedOffer>>(new Map())
+  const prevBookRef = useRef<any>(null)
 
-  return useQuery({
+  const query = useQuery({
     queryKey: [
       "uniswap-quotes",
       currentMarket?.base.address.toString(),
@@ -95,4 +212,84 @@ export function useUniswapBook() {
     refetchOnWindowFocus: false,
     staleTime: 2000,
   })
+
+  // Process and enhance the book data with animation states
+  const enhancedData = useMemo(() => {
+    const newData = query.data
+    if (!newData) return null
+
+    // Process asks and bids to add animation states
+    const enhancedAsks = processOffers(newData.asks, asksMap)
+    const enhancedBids = processOffers(newData.bids, bidsMap)
+
+    // Update state maps for next cycle
+    const newAsksMap = new Map<string, EnhancedOffer>()
+    const newBidsMap = new Map<string, EnhancedOffer>()
+
+    enhancedAsks.forEach((offer) => {
+      newAsksMap.set(offer.id.toString(), offer)
+    })
+
+    enhancedBids.forEach((offer) => {
+      newBidsMap.set(offer.id.toString(), offer)
+    })
+
+    // Schedule map updates
+    setTimeout(() => {
+      setAsksMap(newAsksMap)
+      setBidsMap(newBidsMap)
+    }, 0)
+
+    return {
+      ...newData,
+      asks: enhancedAsks,
+      bids: enhancedBids,
+    }
+  }, [query.data])
+
+  // Clean up removed offers after animation completes
+  useEffect(() => {
+    if (!enhancedData) return
+
+    // After animation duration, filter out "removing" offers
+    const cleanupTimer = setTimeout(() => {
+      setAsksMap((prevMap) => {
+        const newMap = new Map(prevMap)
+        prevMap.forEach((offer, id) => {
+          if (offer.status === "removing") {
+            const now = Date.now()
+            const timeSinceRemoval = now - (offer.transitionStartTime || 0)
+            // If removal animation has completed (1000ms), remove from map
+            if (timeSinceRemoval > 1000) {
+              newMap.delete(id)
+            }
+          }
+        })
+        return newMap
+      })
+
+      setBidsMap((prevMap) => {
+        const newMap = new Map(prevMap)
+        prevMap.forEach((offer, id) => {
+          if (offer.status === "removing") {
+            const now = Date.now()
+            const timeSinceRemoval = now - (offer.transitionStartTime || 0)
+            // If removal animation has completed (1000ms), remove from map
+            if (timeSinceRemoval > 1000) {
+              newMap.delete(id)
+            }
+          }
+        })
+        return newMap
+      })
+    }, 1000)
+
+    return () => clearTimeout(cleanupTimer)
+  }, [enhancedData])
+
+  // Return the enhanced data with animation states
+  return {
+    ...query,
+    data: enhancedData,
+  }
 }

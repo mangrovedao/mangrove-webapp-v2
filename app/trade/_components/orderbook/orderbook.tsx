@@ -96,6 +96,13 @@ const filterBookByPriceIncrement = (
   )
 }
 
+// Define a simplified book type that matches what we need
+interface SimpleBook {
+  asks: Array<{ id: any; price: number; volume: number }>
+  bids: Array<{ id: any; price: number; volume: number }>
+  [key: string]: any // Allow other properties
+}
+
 // Wrap the OrderBook component with React.memo to prevent unnecessary re-renders
 export const OrderBook = React.memo(function OrderBook({
   className,
@@ -234,10 +241,30 @@ export const BookContent = React.memo(function BookContent() {
     return 0
   }, [priceIncrement])
 
+  // Function to manually trigger scroll to middle
+  const handleScrollToMiddle = () => {
+    if (scrollToMiddle) {
+      scrollToMiddle()
+    }
+  }
+
+  // Scroll to middle when the component mounts
+  useEffect(() => {
+    handleScrollToMiddle()
+  }, [])
+
   // Log when the component renders and why
   useEffect(() => {
     renderCount.current += 1
-  }, [book, isLoading, viewOption, priceIncrement])
+    console.log(`BookContent rendered ${renderCount.current} times`)
+  }, [])
+
+  // Remove the dependency on book and isLoading to prevent re-renders
+  useEffect(() => {
+    console.log(
+      `View option or price increment changed: ${viewOption}, ${priceIncrement}`,
+    )
+  }, [viewOption, priceIncrement])
 
   if (!book || !currentMarket) {
     return <AnimatedOrderBookSkeleton />
@@ -249,13 +276,6 @@ export const BookContent = React.memo(function BookContent() {
         Empty market.
       </div>
     )
-  }
-
-  // Function to manually trigger scroll to middle
-  const handleScrollToMiddle = () => {
-    if (scrollToMiddle) {
-      scrollToMiddle()
-    }
   }
 
   return (

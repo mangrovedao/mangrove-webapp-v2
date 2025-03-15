@@ -254,11 +254,13 @@ body.mouse-down *:focus {
 }
 
 @keyframes fadeIn {
-  from {
+  0% {
     opacity: 0;
+    transform: translateY(-4px);
   }
-  to {
+  100% {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -280,5 +282,61 @@ body.mouse-down *:focus {
   }
   50% {
     opacity: 0.7;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@keyframes pulse-once {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes valueChange {
+  0% {
+    color: inherit;
+  }
+  30% {
+    color: #22c55e;
+  }
+  100% {
+    color: inherit;
+  }
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-fadeOut {
+    animation: fadeOut 0.5s ease-in forwards;
+  }
+
+  .animate-pulse-once {
+    animation: pulse-once 0.8s ease-in-out;
+  }
+
+  .animate-valueChange {
+    animation: valueChange 0.5s ease-in-out;
   }
 }
