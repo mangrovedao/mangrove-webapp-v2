@@ -211,7 +211,6 @@ export function useMarketTransaction({
     const safetyTimeout = setTimeout(() => {
       // Only reset if we're still in a non-idle state after the timeout
       if (txState !== "idle") {
-        console.log("Safety timeout triggered - resetting transaction state")
         setTxState("idle")
       }
     }, 30000) // 30 seconds should be enough for most wallet interactions

@@ -14,21 +14,17 @@ export const useTradeFormStore = create<TradeFormState>()(
     (set, get) => ({
       payAmount: "",
       setPayAmount: (amount) => {
-        console.log("Setting pay amount in store:", amount)
         set({ payAmount: amount })
       },
       tradeSide: BS.buy,
       setTradeSide: (side) => {
-        console.log("Setting trade side in store:", side)
         set({ tradeSide: side })
       },
     }),
     {
       name: "trade-form-storage",
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        console.log("Rehydrated state:", state)
-      },
+      onRehydrateStorage: () => (state) => {},
     },
   ),
 )

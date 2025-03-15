@@ -114,7 +114,6 @@ const createDexScreenerDatafeed = (options: {
 
         // Check if we have cached data
         if (cachedBars[cacheKey]) {
-          console.log("Using cached data for", cacheKey)
           // Ensure we have a non-null array by providing a default empty array
           const ohlcvBars = cachedBars[cacheKey] || []
 
@@ -138,17 +137,9 @@ const createDexScreenerDatafeed = (options: {
         const pair = await getPairInfo(chainId, baseAddress, quoteAddress)
 
         if (!pair) {
-          console.log("No pair data found")
           onHistoryCallback([], { noData: true })
           return
         }
-
-        console.log(
-          "Pair found:",
-          pair.baseToken.symbol,
-          "/",
-          pair.quoteToken.symbol,
-        )
 
         // Try to fetch OHLCV data from DEXScreener's chart endpoint
         try {
@@ -173,21 +164,17 @@ const createDexScreenerDatafeed = (options: {
             return
           }
         } catch (chartError) {
-          console.warn("Failed to fetch chart data:", chartError)
           // Continue to fallback method
         }
 
         // Generate bars from price and volume data
-        console.log("Generating bars from available price data")
         const bars = generateOHLCVBars(pair, from, to, resolution, chainName)
 
         // Cache the result
         cachedBars[cacheKey] = bars
 
-        console.log("Generated bars:", bars.length)
         onHistoryCallback(bars, { noData: bars.length === 0 })
       } catch (error) {
-        console.error("Error fetching data from DEXScreener:", error)
         onErrorCallback(error instanceof Error ? error.message : String(error))
       }
     },
@@ -220,9 +207,7 @@ const createDexScreenerDatafeed = (options: {
           }
 
           onRealtimeCallback(bar)
-        } catch (error) {
-          console.error("Error in real-time update:", error)
-        }
+        } catch (error) {}
       }, 15000) // Update every 15 seconds
 
       // Store the interval ID for cleanup

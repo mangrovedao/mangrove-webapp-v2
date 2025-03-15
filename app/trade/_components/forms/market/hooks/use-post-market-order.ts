@@ -80,8 +80,6 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           args: [address, uniClone?.pool],
         })
 
-        console.log("Current allowance:", allowance)
-
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
           ghostbook: mangroveChain.ghostbook,

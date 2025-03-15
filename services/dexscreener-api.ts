@@ -115,7 +115,6 @@ export async function getPairInfo(
     // Standard approach - try the direct pair lookup first
     const url = `https://api.dexscreener.com/latest/dex/pairs/${chainName}/${pairAddress}`
 
-    console.log(`Fetching pair info from DEXScreener: ${url}`)
     const response = await fetch(url)
     const data = (await response.json()) as DexScreenerResponse
 
@@ -125,13 +124,8 @@ export async function getPairInfo(
 
     // If we're on Base network and the direct lookup failed, try alternative approaches
     if (chainName === "base") {
-      console.log(
-        "Direct pair lookup failed for Base network, trying alternative approaches",
-      )
-
       // Try searching by token addresses
       const searchUrl = `https://api.dexscreener.com/latest/dex/tokens/${baseAddress},${quoteAddress}`
-      console.log(`Searching by token addresses: ${searchUrl}`)
 
       const searchResponse = await fetch(searchUrl)
       const searchData = (await searchResponse.json()) as {
@@ -154,9 +148,6 @@ export async function getPairInfo(
         )
 
         if (basePairs.length > 0) {
-          console.log(
-            `Found ${basePairs.length} matching pairs on Base network`,
-          )
           // Sort by liquidity to get the most liquid pair
           basePairs.sort(
             (a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0),
@@ -167,7 +158,6 @@ export async function getPairInfo(
 
       // If we still don't have data, create a synthetic pair with minimal data
       // This allows the chart to still work with generated data
-      console.log("Creating synthetic pair data for Base network")
 
       // Try to get token information
       const baseTokenUrl = `https://api.dexscreener.com/latest/dex/tokens/${baseAddress}`
@@ -257,7 +247,6 @@ export async function getPairInfo(
       return syntheticPair
     }
 
-    console.log("No pair data found")
     return null
   } catch (error) {
     console.error("Error fetching pair info from DEXScreener:", error)
@@ -315,10 +304,6 @@ export function generateOHLCVBars(
   // Adjust volatility based on the chain
   // Base tends to have lower volatility compared to other chains
   const baseVolatility = chainName === "base" ? 0.003 : 0.005 // 0.3% for Base, 0.5% for others
-
-  console.log(
-    `Generating ${barCount} bars based on available price data for ${chainName || "unknown"} chain`,
-  )
 
   const bars: OHLCVBar[] = []
 
@@ -412,24 +397,15 @@ export async function tryFetchOHLCVData(
   try {
     // For Base network, we need to use a different approach
     if (chainName === "base") {
-      console.log("Using Base network specific approach for chart data")
-
       // Try the URL format that was found to work
       // Example: https://io.dexscreener.com/dex/chart/amm/v3/uniswap/bars/base/0xfBB6Eed8e7aa03B138556eeDaF5D271A5E1e43ef?abn=27416530&res=15&cb=2&q=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
       const baseSpecificUrl = `https://io.dexscreener.com/dex/chart/amm/v3/uniswap/bars/base/0xfBB6Eed8e7aa03B138556eeDaF5D271A5E1e43ef?res=${resolution === "1D" ? "1D" : resolution}&cb=2${quoteAddress ? `&q=${quoteAddress}` : ""}`
 
-      console.log("Attempting to fetch Base chart data from:", baseSpecificUrl)
       try {
         const response = await fetch(baseSpecificUrl)
         const chartData = await response.json()
 
         if (chartData && chartData.bars && chartData.bars.length > 0) {
-          console.log(
-            "Successfully fetched Base chart data:",
-            chartData.bars.length,
-            "bars",
-          )
-
           return chartData.bars.map((bar: any) => ({
             time: bar.t * 1000, // Convert to milliseconds
             open: parseFloat(bar.o),
@@ -450,20 +426,10 @@ export async function tryFetchOHLCVData(
       const standardUrl = `https://io.dexscreener.com/dex/chart/amm/v3/uniswap/bars/${chainName}/${pairAddress}?res=${resolution === "1D" ? "1D" : resolution}`
 
       try {
-        console.log(
-          "Attempting to fetch Base chart data from standard URL:",
-          standardUrl,
-        )
         const response = await fetch(standardUrl)
         const chartData = await response.json()
 
         if (chartData && chartData.bars && chartData.bars.length > 0) {
-          console.log(
-            "Successfully fetched Base chart data with standard URL:",
-            chartData.bars.length,
-            "bars",
-          )
-
           return chartData.bars.map((bar: any) => ({
             time: bar.t * 1000, // Convert to milliseconds
             open: parseFloat(bar.o),
@@ -484,20 +450,10 @@ export async function tryFetchOHLCVData(
       const alternativeUrl = `https://io.dexscreener.com/dex/chart/base/${pairAddress}?res=${resolution === "1D" ? "1D" : resolution}`
 
       try {
-        console.log(
-          "Attempting to fetch Base chart data from alternative URL:",
-          alternativeUrl,
-        )
         const response = await fetch(alternativeUrl)
         const chartData = await response.json()
 
         if (chartData && chartData.bars && chartData.bars.length > 0) {
-          console.log(
-            "Successfully fetched Base chart data with alternative URL:",
-            chartData.bars.length,
-            "bars",
-          )
-
           return chartData.bars.map((bar: any) => ({
             time: bar.t * 1000, // Convert to milliseconds
             open: parseFloat(bar.o),
@@ -520,17 +476,10 @@ export async function tryFetchOHLCVData(
     // Standard approach for other networks
     const chartUrl = `https://io.dexscreener.com/dex/chart/amm/v3/uniswap/bars/${chainName}/${pairAddress}?res=${resolution === "1D" ? "1D" : resolution}`
 
-    console.log("Attempting to fetch chart data from:", chartUrl)
     const response = await fetch(chartUrl)
     const chartData = await response.json()
 
     if (chartData && chartData.bars && chartData.bars.length > 0) {
-      console.log(
-        "Successfully fetched chart data:",
-        chartData.bars.length,
-        "bars",
-      )
-
       return chartData.bars.map((bar: any) => ({
         time: bar.t * 1000, // Convert to milliseconds
         open: parseFloat(bar.o),

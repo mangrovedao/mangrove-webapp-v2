@@ -95,9 +95,7 @@ export default function datafeed({
       exchange: string,
       symbolType: string,
       onResult: SearchSymbolsCallback,
-    ) => {
-      console.log("[searchSymbols]: Method call")
-    },
+    ) => {},
     resolveSymbol: (
       symbolName: string,
       onResolve: ResolveCallback,
@@ -165,23 +163,11 @@ export default function datafeed({
             volume: bar.volume,
           }))
 
-          // console.log({
-          //   date: new Date().getTime(),
-          //   bars,
-          //   from: periodParams.from,
-          //   to: periodParams.to,
-          //   countback: periodParams.countBack,
-          //   length: bars.length,
-          //   resolution,
-          //   newRes,
-          // })
-
           onResult(bars, {
             noData: bars.length === 0,
             nextTime: bars.length > 0 ? undefined : periodParams.from,
           })
         } catch (error) {
-          console.log(error)
           onError({
             code: 1,
             message: "Error loading data",
@@ -234,9 +220,7 @@ export function oldDatafeed({
       exchange: string,
       symbolType: string,
       onResult: SearchSymbolsCallback,
-    ) => {
-      console.log("[searchSymbols]: Method call")
-    },
+    ) => {},
     resolveSymbol: (
       symbolName: string,
       onResolve: ResolveCallback,
@@ -297,14 +281,11 @@ export function oldDatafeed({
           const returnBars =
             old_bars.length < periodParams.countBack ? [] : old_bars
 
-          console.log({ old_bars, periodParams })
-
           onResult(old_bars, {
             noData:
               old_bars.length === 0 || old_bars.length < periodParams.countBack,
           })
         } catch (error) {
-          console.log(error)
           // onError({})
         }
       }, 0)

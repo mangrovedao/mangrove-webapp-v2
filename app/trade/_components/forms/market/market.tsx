@@ -2,13 +2,15 @@ import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { motion } from "framer-motion"
 import { ArrowDown, ArrowUp } from "lucide-react"
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
+import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
 import { useAccount, useBalance } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
@@ -33,6 +35,7 @@ export const wethAdresses: { [key: number]: Address | undefined } = {
 }
 
 const slippageValues = ["0.1", "0.5", "1"]
+const sliderValues = [25, 50, 75]
 
 export function Market() {
   const { isConnected, address, chain } = useAccount()
@@ -41,6 +44,7 @@ export function Market() {
   })
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
+  const [sendSliderValue, setSendSliderValue] = useState(0)
 
   // Get and set shared state
   const { payAmount, setPayAmount, tradeSide, setTradeSide } =
@@ -111,16 +115,6 @@ export function Market() {
     isWrapping,
   })
 
-  // Set mounted flag and cleanup on unmount
-  useEffect(() => {
-    isMounted.current = true
-    console.log("Market form mounted, payAmount:", payAmount)
-
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
-
   // Initialize form with shared pay amount when component mounts or when switching tabs
   useEffect(() => {
     if (!isMounted.current || initializedFromSharedState.current) return
@@ -134,10 +128,6 @@ export function Market() {
       payAmount !== "0.0" &&
       payAmount !== "0.00"
     ) {
-      console.log(
-        "Market form: Initializing with shared pay amount:",
-        payAmount,
-      )
       form.setFieldValue("send", payAmount)
       initializedFromSharedState.current = true
       computeReceiveAmount()
@@ -156,7 +146,6 @@ export function Market() {
       currentSendValue !== "0.0" &&
       currentSendValue !== "0.00"
     ) {
-      console.log("Market form: Updating shared state with:", currentSendValue)
       setPayAmount(currentSendValue)
     }
   }, [form.state.values.send, setPayAmount, payAmount])
@@ -180,6 +169,8 @@ export function Market() {
     if (!sendBalanceWithEth || !sendToken) return
 
     try {
+      setSendSliderValue(value)
+
       const amount = Big(value)
         .div(100)
         .mul(sendBalanceWithEth)
@@ -198,13 +189,25 @@ export function Market() {
     }
   }
 
-  const sliderValue = Math.min(
-    Big(form.state.values.send || 0)
-      .mul(100)
-      .div(sendBalanceWithEth === 0 ? 1 : sendBalanceWithEth)
-      .toNumber(),
-    100,
-  )
+  // Update slider value when form.state.values.send changes
+  useEffect(() => {
+    if (!sendBalanceWithEth || sendBalanceWithEth === 0) return
+
+    try {
+      const currentSendValue = Number(form.state.values.send || 0)
+      const newSliderValue = Math.min(
+        (currentSendValue / sendBalanceWithEth) * 100,
+        100,
+      )
+
+      // Only update if the difference is significant to avoid infinite loops
+      if (Math.abs(newSliderValue - sendSliderValue) > 1) {
+        setSendSliderValue(newSliderValue)
+      }
+    } catch (error) {
+      console.error("Error updating slider value:", error)
+    }
+  }, [form.state.values.send, sendBalanceWithEth])
 
   const handleSwapDirection = () => {
     try {
@@ -213,6 +216,9 @@ export function Market() {
 
       // Update the shared state
       setTradeSide(newSide)
+
+      // Reset slider value
+      setSendSliderValue(0)
 
       // Keep the current pay amount in the shared state
       const currentPayAmount = form.state.values.send
@@ -242,19 +248,32 @@ export function Market() {
     })
   }
 
-  // Get button disabled state
+  // Button disabled state
   const isButtonDisabled =
     !form.state.canSubmit ||
     Object.keys(getAllErrors()).length > 0 ||
     isButtonLoading ||
-    !market ||
-    !isConnected
+    !isConnected ||
+    !sendToken ||
+    !baseToken
 
   return (
     <div className="flex flex-col h-full">
       <form.Provider>
         <form
-          onSubmit={onSubmit}
+          onSubmit={(e) => {
+            if (!isConnected) {
+              e.preventDefault()
+              toast.error("Please connect your wallet")
+              return
+            }
+            if (!sendToken || !baseToken) {
+              e.preventDefault()
+              toast.error("Token information is missing")
+              return
+            }
+            handleSubmit(e)
+          }}
           autoComplete="off"
           className="flex flex-col h-full"
         >
@@ -275,11 +294,10 @@ export function Market() {
                     // as it's handled by the useEffect
                     computeReceiveAmount()
                   }}
-                  sendSliderValue={sliderValue}
-                  setSendSliderValue={handleSliderChange}
                   balanceAction={{
                     onClick: () => {
                       field.handleChange(sendBalanceWithEth.toString() || "0")
+                      setSendSliderValue(100)
                       computeReceiveAmount()
                     },
                   }}
@@ -389,6 +407,63 @@ export function Market() {
               )}
             </form.Field>
 
+            {/* slider section */}
+            <div className="py-3">
+              {/* Slider */}
+              <div className="px-2">
+                <Slider
+                  disabled={!market || sendBalanceWithEth === 0}
+                  value={[sendSliderValue || 0]}
+                  onValueChange={(values) => {
+                    handleSliderChange(values[0] || 0)
+                  }}
+                  max={100}
+                  step={1}
+                  className="z-50"
+                />
+              </div>
+              <div className="flex space-x-2 mt-4">
+                {sliderValues.map((value, i) => (
+                  <Button
+                    key={`percentage-button-${value}`}
+                    variant={"secondary"}
+                    size={"md"}
+                    disabled={!market || sendBalanceWithEth === 0}
+                    className={cn(
+                      "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
+                      {
+                        "bg-bg-tertiary": Math.abs(sendSliderValue - value) < 1,
+                      },
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleSliderChange(Number(value))
+                    }}
+                  >
+                    {value}%
+                  </Button>
+                ))}
+                <Button
+                  key={`percentage-button-max`}
+                  variant={"secondary"}
+                  size={"md"}
+                  disabled={!market || sendBalanceWithEth === 0}
+                  className={cn(
+                    "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
+                    {
+                      "bg-bg-tertiary": Math.abs(sendSliderValue - 100) < 1,
+                    },
+                  )}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleSliderChange(100)
+                  }}
+                >
+                  Max
+                </Button>
+              </div>
+            </div>
+
             <div className="flex justify-between">
               <span className="text-muted-foreground text-xs">
                 Average market price
@@ -397,6 +472,9 @@ export function Market() {
                 {avgPrice} {quote?.symbol}
               </span>
             </div>
+
+            <MarketDetails takerFee={feeInPercentageAsString} />
+
             <Accordion
               title="Slippage tolerance"
               tooltip="How much price slippage you're willing to accept so that your order can be executed"
@@ -405,19 +483,19 @@ export function Market() {
               <form.Field name="slippage">
                 {(field) => (
                   <div className="space-y-2 mt-1">
-                    <div className="flex justify-around bg-bg-primary rounded-lg">
+                    <div className="flex justify-around bg-bg-primary rounded-sm">
                       {slippageValues.map((value) => (
                         <Button
                           key={`percentage-button-${value}`}
                           variant={"secondary"}
                           size={"sm"}
                           className={cn(
-                            "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                            "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                             {
                               "opacity-10":
                                 field.state.value !== Number(value) ||
                                 showCustomInput,
-                              "border-none bg-bg-tertiary rounded-lg":
+                              "border-none bg-bg-tertiary rounded-sm":
                                 field.state.value === Number(value) &&
                                 !showCustomInput,
                             },
@@ -441,10 +519,10 @@ export function Market() {
                         variant={"secondary"}
                         size={"sm"}
                         className={cn(
-                          "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                          "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                           {
                             "opacity-10": !showCustomInput,
-                            "border-none bg-bg-tertiary rounded-lg":
+                            "border-none bg-bg-tertiary rounded-sm":
                               showCustomInput,
                           },
                         )}
@@ -469,17 +547,6 @@ export function Market() {
                   </div>
                 )}
               </form.Field>
-            </Accordion>
-
-            <MarketDetails takerFee={feeInPercentageAsString} />
-
-            {/* Advanced options accordion */}
-            <Accordion title="Advanced options">
-              <div className="pt-2">
-                <span className="text-xs text-muted-foreground">
-                  Additional settings for advanced users
-                </span>
-              </div>
             </Accordion>
           </div>
 

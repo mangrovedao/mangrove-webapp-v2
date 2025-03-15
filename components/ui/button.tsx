@@ -8,14 +8,14 @@ import { Spinner } from "./spinner"
 
 const buttonVariants = cva(
   [
-    "rounded-xl transition-all border border-solid border-transparent",
+    "rounded-sm transition-all border border-solid border-transparent",
     "outline-offset-2 ring-red-200 outline-transparent disabled:bg-bg-disabled-subtle disabled:text-text-disabled",
   ],
   {
     variants: {
       variant: {
         primary:
-          "bg-button-primary-bg hover:bg-button-primary-bg-hover text-button-primary-fg disabled:bg-bg-disabled disabled:text-button-primary-fg_disabled",
+          "bg-bg-tertiary hover:bg-bg-secondary text-button-primary-fg disabled:bg-bg-disabled disabled:text-button-primary-fg_disabled",
         secondary:
           "bg-button-secondary-bg hover:bg-button-secondary-bg-hover border-border-primary text-button-secondary-fg",
         tertiary: ["", ""],
@@ -53,7 +53,7 @@ const buttonVariants = cva(
 
 const rightIconVariants = cva(
   [
-    "text-primary-solid-black aspect-square w-6 flex items-center justify-center bg-white rounded-full ml-2",
+    "text-primary-solid-black aspect-square w-6 flex items-center justify-center bg-white rounded-sm ml-2",
     "group-active/button:text-primary-solid-black group-hover/button:text-primary-solid-black",
     "group-disabled/button:text-gray-scale-600 group-disabled/button:bg-gray-scale-300",
   ],

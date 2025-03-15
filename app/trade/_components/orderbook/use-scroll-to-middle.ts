@@ -54,15 +54,6 @@ export default function useScrollToMiddle() {
         top: Math.max(0, targetScrollTop),
         behavior: "smooth",
       })
-
-      console.log("Scrolled to middle:", {
-        spreadTop: spreadRect.top,
-        scrollAreaTop: scrollAreaRect.top,
-        currentScrollTop,
-        targetScrollTop,
-        scrollAreaHeight: scrollAreaRect.height,
-        spreadHeight: spreadRect.height,
-      })
     } catch (error) {
       console.error("Error scrolling to middle:", error)
     }

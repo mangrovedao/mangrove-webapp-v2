@@ -288,11 +288,17 @@ export function useLimit(props: Props) {
     setTimeout(() => {
       form?.setFieldValue(
         "limitPrice",
-        limitPrice.toFixed(sendToken.displayDecimals),
+        getExactWeiAmount(limitPrice.toString(), sendToken.displayDecimals),
       )
       form?.validateAllFields("blur")
     }, 0)
-  }, [bs, book?.asks, book?.bids, form, sendToken])
+  }, [
+    bs,
+    form,
+    sendToken,
+    currentMarket?.base.address,
+    currentMarket?.quote.address,
+  ])
 
   // Add a function to get all form errors
   const getAllErrors = React.useCallback(() => {

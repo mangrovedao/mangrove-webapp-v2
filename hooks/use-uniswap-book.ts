@@ -68,13 +68,6 @@ export function useUniswapBook() {
           20_000_000n,
         )
 
-        console.log("Density values:", {
-          bids: book.bidsConfig.density,
-          asks: book.asksConfig.density,
-          bidsConverted: bidsDensityMultiplier,
-          asksConverted: asksDensityMultiplier,
-        })
-
         // Get Uniswap book with density scaled by Mangrove's density
         const uniBook = await getUniBook(
           client,
@@ -88,13 +81,6 @@ export function useUniswapBook() {
 
         // Merge both orderbooks
         const mergedBook = mergeOffers(uniBook.asks, uniBook.bids, book)
-        console.log(
-          "uniBook",
-          uniBook.asks.length,
-          uniBook.bids.length,
-          mergedBook.asks.length,
-          mergedBook.bids.length,
-        )
 
         return mergedBook
       } catch (error) {

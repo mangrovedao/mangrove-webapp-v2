@@ -1,6 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
+import { useChains } from "@/providers/chains"
 import { useMenuStore } from "@/stores/menu.store"
 import {
   BurgerIcon,
@@ -31,6 +32,7 @@ import { useAccount, useDisconnect } from "wagmi"
 import ChainSelector from "./chain-selector"
 import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
 import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
+import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 const MENUS = [
   {
@@ -69,9 +71,10 @@ const MENUS = [
 
 export function MobileOverlay() {
   const { isOpen, toggle } = useMenuStore()
-  const { address, isConnected } = useAccount()
+  const { address, isConnected, chain } = useAccount()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
+  const { chains, setIsChainDialogOpen } = useChains()
   const pathname = usePathname()
 
   function handleConnect() {
@@ -86,6 +89,11 @@ export function MobileOverlay() {
       openAccountModal()
       toggle() // Close overlay after opening account modal
     }
+  }
+
+  function openNetworkDialog() {
+    setIsChainDialogOpen?.(true)
+    toggle() // Close overlay when opening network dialog
   }
 
   return (
@@ -130,12 +138,52 @@ export function MobileOverlay() {
                 </DialogTrigger>
               </div>
 
-              {/* Network Selector */}
-              <div className="mb-6">
-                <div className="text-sm text-nav-item-button-icon-fg font-medium mb-2">
-                  Network
-                </div>
-                <ChainSelector />
+              {/* Quick Actions Bar */}
+              <div className="flex items-center justify-between gap-2 mb-6">
+                {/* Network Selection Button */}
+                <button
+                  onClick={openNetworkDialog}
+                  className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
+                >
+                  <ImageWithHideOnError
+                    src={`/assets/chains/${chain?.id || 42161}.webp`}
+                    width={20}
+                    height={20}
+                    className="h-5 rounded-sm size-5"
+                    alt={`${chain?.name || "Network"}-logo`}
+                  />
+                  <span className="text-sm font-medium truncate">
+                    {chain?.name || "Select Network"}
+                  </span>
+                </button>
+
+                {/* Wallet Button */}
+                {isConnected ? (
+                  <button
+                    onClick={handleAccount}
+                    className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
+                  >
+                    <span className="bg-gray-500 h-5 w-5 rounded-full relative overflow-hidden">
+                      {address && (
+                        <Jazzicon
+                          seed={jsNumberForAddress(address)}
+                          diameter={20}
+                        />
+                      )}
+                    </span>
+                    <span className="text-sm font-medium truncate">
+                      {shortenAddress(address || "")}
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleConnect}
+                    className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
+                  >
+                    <WalletIcon className="h-5 w-5" />
+                    <span className="text-sm font-medium">Connect</span>
+                  </button>
+                )}
               </div>
 
               {/* Navigation Menu */}
@@ -167,31 +215,6 @@ export function MobileOverlay() {
                     </Link>
                   )
                 })}
-              </div>
-
-              {/* Wallet Connection */}
-              <div className="mb-6">
-                {isConnected ? (
-                  <button
-                    onClick={handleAccount}
-                    className="flex items-center w-full gap-3 px-4 py-3 rounded-lg text-nav-item-button-icon-fg hover:text-white hover:bg-bg-tertiary text-sm font-medium transition-colors"
-                  >
-                    <span className="text-nav-item-button-icon-fg">
-                      <PersonIcon />
-                    </span>
-                    <div>Wallet: {shortenAddress(address || "")}</div>
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleConnect}
-                    className="flex items-center w-full gap-3 px-4 py-3 rounded-lg text-nav-item-button-icon-fg hover:text-white hover:bg-bg-tertiary text-sm font-medium transition-colors"
-                  >
-                    <span className="text-nav-item-button-icon-fg">
-                      <PersonIcon />
-                    </span>
-                    <div>Connect Wallet</div>
-                  </button>
-                )}
               </div>
 
               <Link

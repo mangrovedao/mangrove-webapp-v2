@@ -43,13 +43,8 @@ export function Forms({
   // Access the shared state to ensure it's available
   const { payAmount } = useTradeFormStore()
 
-  // Log when the component renders
-  console.log("Forms component rendering, orderType:", orderType)
-
-  // Log the current pay amount when switching tabs
   const handleTabChange = React.useCallback(
     (value: string) => {
-      console.log("Switching tab to:", value, "Current pay amount:", payAmount)
       setOrderType(value as FormType)
     },
     [payAmount, setOrderType],

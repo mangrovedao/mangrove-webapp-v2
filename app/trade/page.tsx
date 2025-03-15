@@ -120,8 +120,8 @@ export default function Page() {
             </div>
 
             {/* Tables section with fixed height */}
-            <div className="h-full border border-bg-secondary rounded-sm">
-              <Tables className="h-full w-full" />
+            <div className="border border-bg-secondary rounded-sm h-[360px]">
+              <Tables className="w-full h-full" />
             </div>
           </div>
 
@@ -151,11 +151,26 @@ export default function Page() {
           bottom: 0;
           overflow: hidden;
         }
+
+        @media (max-width: 1024px) {
+          body {
+            position: relative;
+            overflow: auto;
+          }
+        }
       `}</style>
 
       <style jsx>{`
         main {
           height: calc(100vh - 60px);
+        }
+
+        @media (max-width: 1024px) {
+          main {
+            min-height: calc(100vh - 60px);
+            height: auto;
+            overflow-y: auto;
+          }
         }
 
         @media (max-width: 1366px) {

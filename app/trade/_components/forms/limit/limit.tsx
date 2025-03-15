@@ -87,16 +87,6 @@ export function Limit() {
     isWrapping,
   })
 
-  // Set mounted flag and cleanup on unmount
-  useEffect(() => {
-    isMounted.current = true
-    console.log("Limit form mounted, payAmount:", payAmount)
-
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
-
   useEffect(() => {
     if (!isMounted.current || initializedFromSharedState.current) return
 
@@ -108,7 +98,6 @@ export function Limit() {
       payAmount !== "0.0" &&
       payAmount !== "0.00"
     ) {
-      console.log("Limit form: Initializing with shared pay amount:", payAmount)
       form.setFieldValue("send", payAmount)
       initializedFromSharedState.current = true
 
@@ -129,7 +118,6 @@ export function Limit() {
       currentSendValue !== "0.0" &&
       currentSendValue !== "0.00"
     ) {
-      console.log("Limit form: Updating shared state with:", currentSendValue)
       setPayAmount(currentSendValue)
     }
   }, [form.state.values.send, setPayAmount, payAmount])

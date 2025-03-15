@@ -112,8 +112,6 @@ export async function trade(params: TradeParams) {
     ],
   })
 
-  console.log(data)
-
   // Simulate the trade to check expected results
   const { request, result } = await simulateContract(client, {
     address: ghostbook,
@@ -136,16 +134,12 @@ export async function trade(params: TradeParams) {
   // Call optional callback with expected trade results
   await onTrade?.({ got, gave, bounty, feePaid })
 
-  console.log("Trade request sent")
-
   // Execute the actual trade
   const tx = await writeContract(client, request as any)
-  console.log(`Trade tx: ${tx}`)
 
   // Wait for and verify transaction receipt
   const receipt = await waitForTransactionReceipt(client, { hash: tx })
   if (receipt.status === "success") {
-    console.log(`Trade tx: ${tx} success`)
     return { got, gave, bounty, feePaid, receipt }
   } else {
     throw new Error(`Trade tx: ${tx} failed`)

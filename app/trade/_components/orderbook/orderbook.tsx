@@ -38,11 +38,7 @@ export const OrderBook = React.memo(function OrderBook({
   // Log when the component renders and why
   useEffect(() => {
     renderCount.current += 1
-    console.log(`OrderBook rendered (${renderCount.current} times)`)
-
-    return () => {
-      console.log("OrderBook unmounted")
-    }
+    return () => {}
   }, [activeTab])
 
   return (
@@ -138,12 +134,6 @@ export const BookContent = React.memo(function BookContent() {
   // Log when the component renders and why
   useEffect(() => {
     renderCount.current += 1
-    console.log(`BookContent rendered (${renderCount.current} times)`, {
-      hasBook: !!book,
-      isLoading,
-      viewOption,
-      precision,
-    })
   }, [book, isLoading, viewOption, precision])
 
   if (!book || !currentMarket) {

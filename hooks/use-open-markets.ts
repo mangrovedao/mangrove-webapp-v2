@@ -30,7 +30,9 @@ export function useOpenMarkets() {
       try {
         if (!client || !publicClient) throw new Error("No market client found")
 
-        return await getOpenMarkets(publicClient, addresses, {
+        const clientToUse = client.account ? client : publicClient
+
+        return await getOpenMarkets(clientToUse, addresses, {
           cashnesses: Object.fromEntries(
             Object.entries(cashnesses).filter(Boolean),
           ),

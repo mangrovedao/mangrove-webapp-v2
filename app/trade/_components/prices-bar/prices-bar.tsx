@@ -30,7 +30,12 @@ function Value({
   className,
 }: React.PropsWithChildren<{ className?: string }>) {
   return (
-    <div className={cn("flex items-center font-sans text-xs h-4", className)}>
+    <div
+      className={cn(
+        "flex items-center font-light text-xs h-2 text-nowrap",
+        className,
+      )}
+    >
       {children}
     </div>
   )
