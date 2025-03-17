@@ -65,17 +65,18 @@ export function useFills<T = Fill[]>({
           skip,
           maker: address.toLowerCase(),
         })
-        return parseFills(result)
+        const parsedData = parseFills(result)
+        return parsedData
       } catch (e) {
         console.error(getErrorMessage(e))
-        throw new Error()
+        return []
       } finally {
         stopLoading(TRADE.TABLES.ORDERS)
       }
     },
     select,
     meta: {
-      error: "Unable to retrieve fills",
+      error: "Unable to retrieve order history",
     },
     enabled: !!(isConnected && indexerSdk),
     retry: false,

@@ -17,11 +17,23 @@ import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { Book } from "@mangrovedao/mgv"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
+
+// Helper function to check if book is a complete Book object
+const isCompleteBook = (book: any): book is Book => {
+  return (
+    book &&
+    "asksConfig" in book &&
+    "bidsConfig" in book &&
+    "marketConfig" in book &&
+    "midPrice" in book
+  )
+}
 
 type Props = {
   onSubmit: (data: Form) => void
@@ -34,15 +46,21 @@ const determinePrices = (
   orderBook?: Book | null,
   marketPrice?: number,
 ) => {
-  if (!orderBook?.bids || !orderBook?.asks) {
+  // Check if orderBook is valid and has bids/asks
+  if (
+    !orderBook ||
+    !orderBook.bids ||
+    !orderBook.asks ||
+    !isCompleteBook(orderBook)
+  ) {
     return {
       price: marketPrice,
       decimals: determinePriceDecimalsFromToken(marketPrice, quoteToken),
     }
   }
 
-  const bids = orderBook?.bids
-  const asks = orderBook?.asks
+  const bids = orderBook.bids
+  const asks = orderBook.asks
 
   const lowestAsk = asks?.[0]
   const highestBid = bids?.[0]
@@ -94,10 +112,13 @@ export function useMarketForm(props: Props) {
   const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
 
+  // Use a safe version of the book for determinePrices
+  const safeBook = book && isCompleteBook(book) ? book : null
+
   const averagePrice = determinePrices(
     bs,
     quoteToken,
-    book,
+    safeBook,
     Number(marketPrice?.close),
   )
 
@@ -106,18 +127,14 @@ export function useMarketForm(props: Props) {
   >()
 
   const { data, refetch } = useQuery({
-    queryKey: [
-      "marketOrderSimulation",
-      estimateFrom,
-      bs,
-      receive,
-      send,
-      book?.asks?.[0]?.price,
-      book?.bids?.[0]?.price,
-    ],
+    queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
     queryFn: () => {
       if (!book) return null
 
+      // Check if book is a complete Book object
+      if (!isCompleteBook(book)) {
+        return null
+      }
       const baseAmount =
         bs == BS.buy
           ? parseUnits(receive, market?.base.decimals ?? 18)
@@ -136,35 +153,38 @@ export function useMarketForm(props: Props) {
             ? {
                 base: baseAmount,
                 bs: BS.sell,
-                book,
+                book: book as Book,
               }
             : {
                 quote: quoteAmount,
                 bs: BS.buy,
-                book,
+                book: book as Book,
               }
           : isBasePay
             ? {
                 quote: quoteAmount,
                 bs: BS.buy,
-                book,
+                book: book as Book,
               }
             : {
                 base: baseAmount,
                 bs: BS.sell,
-                book,
+                book: book as Book,
               }
 
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
 
-      const formattedBaseEstimation = formatUnits(
-        baseEstimation,
-        market?.base.decimals ?? 18,
+      console.log("is after marketOrderSimulation")
+
+      const formattedBaseEstimation = getExactWeiAmount(
+        formatUnits(baseEstimation, market?.base.decimals ?? 18),
+        market?.base.displayDecimals,
       )
-      const formattedQuoteEstimation = formatUnits(
-        quoteEstimation,
-        market?.quote.decimals ?? 18,
+
+      const formattedQuoteEstimation = getExactWeiAmount(
+        formatUnits(quoteEstimation, market?.quote.decimals ?? 18),
+        market?.quote.displayDecimals,
       )
 
       const estimatedReceive =
@@ -207,6 +227,60 @@ export function useMarketForm(props: Props) {
     form?.reset()
   }, [form, market?.base, market?.quote])
 
+  // Move the isWrapping hook to the top level
+  const isWrapping = form.useStore((state) => state.values.isWrapping)
+
+  // Add a function to get all form errors
+  const getAllErrors = React.useCallback(() => {
+    // Create a new empty object instead of spreading form.state.errors
+    const errors: Record<string, string | string[]> = {}
+
+    // Manually copy any field errors from form.state.errors if needed
+    if (form.state.errors) {
+      Object.entries(form.state.errors).forEach(([key, value]) => {
+        if (
+          typeof key === "string" &&
+          !["length", "toString", "toLocaleString"].includes(key)
+        ) {
+          errors[key] = value as string | string[]
+        }
+      })
+    }
+
+    // Check for send field errors
+    if (form.state.values.send) {
+      const sendValue = Number(form.state.values.send)
+      if (sendValue <= 0) {
+        // errors.send = ""
+      } else if (
+        !isWrapping &&
+        sendValue >
+          Number(
+            formatUnits(
+              sendTokenBalance.balance?.balance || 0n,
+              sendToken?.decimals ?? 18,
+            ),
+          )
+      ) {
+        errors.send = "Insufficient balance"
+      }
+    }
+
+    // Check for receive field errors
+    // if (form.state.values.receive === "0" && hasEnoughVolume) {
+    //   errors.receive = "Insufficient volume"
+    // }
+
+    return errors
+  }, [
+    form.state.errors,
+    form.state.values,
+    isWrapping,
+    sendTokenBalance,
+    sendToken,
+    hasEnoughVolume,
+  ])
+
   return {
     computeReceiveAmount,
     computeSendAmount,
@@ -224,7 +298,8 @@ export function useMarketForm(props: Props) {
     feeInPercentageAsString,
     hasEnoughVolume,
     slippage: form.useStore((state) => state.values.slippage),
-    isWrapping: form.useStore((state) => state.values.isWrapping),
+    isWrapping,
     spotPrice,
+    getAllErrors,
   }
 }

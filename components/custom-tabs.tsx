@@ -23,7 +23,7 @@ const CustomTabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-baseline justify-center text-primary h-[var(--bar-height)] px-4 space-x-6 relative overflow-hidden",
+      "flex items-baseline justify-center text-primary h-8 px-4 space-x-6 relative overflow-hidden",
       className,
     )}
     {...props}
@@ -53,20 +53,21 @@ const CustomTabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "justify-center whitespace-nowrap rounded-sm text-sm leading-[22px] font-medium ring-offset-primary-dark-green transition-all",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none items-center h-full",
+        "justify-center whitespace-nowrap rounded-sm text-xs leading-[16px] py-1 font-medium ring-offset-primary-dark-green transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none items-center h-7",
         "disabled:data-[state=active]:text-gray-scale-300 disabled:data-[state=active]:decoration-gray-scale-200 disabled:text-gray-scale-300",
         "text-text-tertiary data-[state=active]:text-white",
         "active:!text-gray-scale-200 group space-x-2",
-        "data-[state=active]:border-b-[2px] data-[state=active]:border-b-text-brand rounded-b-none border-b-[2px] border-b-transparent",
-        "hover:border-b-[2px] hover:border-b-text-brand",
+        "data-[state=active]:border-b-[1px] data-[state=active]: rounded-b-none border-b-[2px] border-b-transparent",
+        "hover:border-b-[2px] hover:border-b-text-primary/90",
+        "data-[state=inactive]:bg-bg-secondary",
         className,
       )}
       {...props}
     >
       <span className="">{children}</span>
       {count ? (
-        <span className="font-ubuntu bg-text-tertiary rounded-full p-1 text-xs text-white no-underline decoration-0">
+        <span className="font-ubuntu bg-text-tertiary rounded-sm px-1 py-0.5 text-xs text-white no-underline decoration-0">
           {count}
         </span>
       ) : undefined}

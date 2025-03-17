@@ -1,7 +1,7 @@
-import { PublicClient } from "viem"
 import { z } from "zod"
 
 import { vaultIncentivesSchema } from "@/app/rewards/schemas/rewards-configuration"
+import { PublicClient } from "viem/_types/clients/createPublicClient"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 
 /**
@@ -18,7 +18,7 @@ export async function getVaultIncentives(
     if (!incentives) return null
 
     const userIncentives = await fetch(
-      `https://${client.chain?.id}-mgv-data.mgvinfra.com/incentives/vaults/${client.chain?.id}/${incentives?.vault}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}&page=0&pageSize=100`,
+      `https://indexer.mgvinfra.com/incentives/vaults/${client.chain?.id}/${incentives?.vault}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}&page=0&pageSize=100`,
     )
 
     if (!userIncentives?.ok) {

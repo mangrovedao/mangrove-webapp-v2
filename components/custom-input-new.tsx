@@ -13,7 +13,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
   ({ className, icon, symbol, ...props }, ref) => {
     return (
       <div
-        className="w-full flex items-center bg-bg-primary relative rounded-lg focus-within:border-border-brand border border-transparent transition-all"
+        className="w-full flex items-center bg-bg-primary relative rounded-sm focus-within:border-border-brand border border-transparent transition-all"
         onClick={(e) => {
           const input = e.currentTarget.querySelector("input")
           input?.focus()

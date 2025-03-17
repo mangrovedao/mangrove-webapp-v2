@@ -1,5 +1,4 @@
 import InfoTooltip from "@/components/info-tooltip-new"
-import { Text } from "@/components/typography/text"
 import {
   Collapsible,
   CollapsibleContent,
@@ -38,20 +37,19 @@ export function Accordion({
     >
       <CollapsibleTrigger asChild>
         <button className="flex items-center justify-between w-full hover:opacity-80 transition-opacity">
-          <Text
-            variant={"text2"}
-            className="font-light font-axiforma text-text-secondary flex items-center"
-          >
+          <span className="text-text-secondary flex items-center text-xs">
             {title}
             {tooltip && (
               <InfoTooltip className="text-text-quaternary text-sm">
                 {tooltip}
               </InfoTooltip>
             )}
-          </Text>
+          </span>
           <div className="flex items-center">
             {chevronValue && (
-              <Text className="text-text-secondary">{chevronValue}</Text>
+              <span className="text-text-secondary text-xs">
+                {chevronValue}
+              </span>
             )}
             <ChevronDown
               className={

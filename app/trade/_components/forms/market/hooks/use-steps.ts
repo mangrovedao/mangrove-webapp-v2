@@ -29,62 +29,96 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
       user,
       marketClient?.name,
       sendAmount,
-      sendToken?.address.toString(),
+      sendToken?.address?.toString(),
       mangroveChain?.ghostbook,
     ],
     queryFn: async () => {
       try {
-        if (
-          !marketClient?.key ||
-          !user ||
-          !sendAmount ||
-          !sendToken ||
-          !mangroveChain
-        )
-          throw new Error("Market order steps missing params")
+        // Check for required parameters
+        if (!marketClient?.key) {
+          console.warn("Market client key is missing")
+          return null
+        }
 
+        if (!user) {
+          console.warn("User address is missing")
+          return null
+        }
+
+        if (!sendAmount || sendAmount === "0" || sendAmount === "") {
+          console.warn("Send amount is missing or zero")
+          return null
+        }
+
+        if (!sendToken) {
+          console.warn("Send token is missing")
+          return null
+        }
+
+        if (!mangroveChain) {
+          console.warn("Mangrove chain is missing")
+          return null
+        }
+
+        // Base case - handle non-Base chain
         if (chain?.id !== 84532) {
-          // Check and increase allowance for Ghostbook to spend user's tokens
-          const allowance = await checkAllowance(
-            marketClient,
-            user,
-            mangroveChain.ghostbook as Address,
-            sendToken.address,
-          )
+          try {
+            // Check and increase allowance for Ghostbook to spend user's tokens
+            const allowance = await checkAllowance(
+              marketClient,
+              user,
+              mangroveChain.ghostbook as Address,
+              sendToken.address,
+            )
 
-          console.log({ allowance })
-          if (allowance < parseUnits(sendAmount, sendToken.decimals)) {
-            console.log("Allowance not approved")
+            if (allowance < parseUnits(sendAmount, sendToken.decimals)) {
+              return [
+                {
+                  done: false,
+                  step: `Approve ${sendToken?.symbol}`,
+                },
+              ]
+            }
+
             return [
               {
-                done: false,
+                done: true,
                 step: `Approve ${sendToken?.symbol}`,
               },
             ]
+          } catch (allowanceError) {
+            console.error("Error checking allowance:", allowanceError)
+            toast.error("Error checking token allowance")
+            return null
           }
-          console.log("Allowance approved")
-
-          return [
-            {
-              done: true,
-              step: `Approve ${sendToken?.symbol}`,
-            },
-          ]
         }
 
-        const steps = await marketClient.getMarketOrderSteps({
-          bs,
-          user,
-          sendAmount: parseUnits(sendAmount, sendToken.decimals),
-        })
+        // Base chain - get market order steps
+        try {
+          const steps = await marketClient.getMarketOrderSteps({
+            bs,
+            user,
+            sendAmount: parseUnits(sendAmount, sendToken.decimals),
+          })
 
-        return steps
+          return steps
+        } catch (stepsError) {
+          console.error("Error getting market order steps:", stepsError)
+          toast.error("Error fetching market order steps")
+          return null
+        }
       } catch (error) {
-        console.error(error)
+        console.error("Unexpected error in useMarketSteps:", error)
         toast.error("Error while fetching market order steps")
         return null
       }
     },
-    enabled: !!marketClient?.name,
+    enabled:
+      !!marketClient?.name &&
+      !!user &&
+      !!sendAmount &&
+      !!sendToken?.address &&
+      !!mangroveChain?.ghostbook,
+    retry: 1, // Limit retries to avoid spamming the user with error messages
   })
 }

@@ -57,14 +57,14 @@ export type MangroveChain = {
 
 export const mangroveChains = [
   {
-    ghostbook: "0xe2beB61E868661827Fa822A28080957e7136DcA9",
-    univ3Module: "0x5126d161210654148445AdB3053e6DE2bbeaeefB",
+    ghostbook: "0x46708Dd6E68e1f09c6f4830C2586f73659dFafEA",
+    univ3Module: "0x22Ba67Eb361Ec40e0949ED034F3CE08Af51099fA",
     mangroveParams: arbitrumMangrove,
     chain: arbitrum,
   },
   {
-    ghostbook: "0xBd7189C760a8D00933DCDd42ad565FebE9b5A918",
-    univ3Module: "0x1cc93D6cf0706fD482F258B549C814D531d0B5BF",
+    ghostbook: "0x15F02Fb9c9Bb772A3303349F88c94Fc971bd549F",
+    univ3Module: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
     mangroveParams: baseMangrove,
     chain: base,
   },

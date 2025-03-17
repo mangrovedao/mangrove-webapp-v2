@@ -54,11 +54,12 @@ export function DepthChart() {
     baseDecimals,
     priceDecimals,
     market,
-    asks,
+    asks: oldAsks,
     bids,
     isLoading,
   } = useDepthChart()
 
+  const asks = oldAsks.reverse()
   if (asks?.length === 0 && bids?.length === 0 && !isLoading && !!market) {
     return (
       <div className="w-full h-full flex justify-center items-center text-muted-foreground font-ubuntu text-sm font-bold">

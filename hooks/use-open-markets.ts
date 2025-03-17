@@ -2,28 +2,42 @@ import { printEvmError } from "@/utils/errors"
 
 import { getOpenMarkets } from "@mangrovedao/mgv/actions"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount, usePublicClient } from "wagmi"
 import {
   useCashnesses,
   useMangroveAddresses,
   useSymbolOverrides,
 } from "./use-addresses"
-
+import { useNetworkClient } from "./use-network-client"
 export function useOpenMarkets() {
-  const { chain } = useAccount()
-  const client = usePublicClient()
+  const client = useNetworkClient()
+  const networkClient = useNetworkClient()
   const addresses = useMangroveAddresses()
-
   const cashnesses = useCashnesses()
   const symbolOverride = useSymbolOverrides()
 
+  const clientToUse = client.account ? client : networkClient
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["open-markets", client?.key, cashnesses, addresses, chain?.id],
+    queryKey: [
+      "open-markets",
+      client?.key,
+      cashnesses,
+      addresses,
+      clientToUse.chain.id,
+      networkClient?.key,
+    ],
     queryFn: async () => {
       try {
-        if (!client) throw new Error("No market client found")
+        if (!client || !networkClient) throw new Error("No market client found")
 
-        return await getOpenMarkets(client, addresses, {
+        console.log(
+          "clientToUse",
+          clientToUse.chain.id,
+          client.chain.id,
+          networkClient.chain.id,
+        )
+
+        return await getOpenMarkets(clientToUse, addresses, {
           cashnesses: Object.fromEntries(
             Object.entries(cashnesses).filter(Boolean),
           ),
@@ -32,12 +46,14 @@ export function useOpenMarkets() {
           ),
         })
       } catch (error) {
+        console.error("Error fetching open markets:", error)
         printEvmError(error)
         return []
       }
     },
     enabled: !!(client?.key && cashnesses && addresses),
     retry: true,
+    staleTime: 1000 * 30, // 30 seconds
   })
 
   return {

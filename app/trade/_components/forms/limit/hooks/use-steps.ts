@@ -26,8 +26,7 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
     queryKey: ["limitOrderSteps", bs, user, addresses, marketClient?.name],
     queryFn: async () => {
       try {
-        if (!marketClient?.name || !user || !addresses)
-          throw new Error("Limit order steps missing params")
+        if (!marketClient?.name || !user || !addresses) return null
 
         const userRouter = await getUserRouter(
           publicClient as Client,

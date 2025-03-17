@@ -1,6 +1,5 @@
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
-import { arbitrum } from "viem/chains"
-import { useAccount } from "wagmi"
 import { mangroveChains, uniClones } from "../lib/registry"
 
 /**
@@ -20,17 +19,16 @@ import { mangroveChains, uniClones } from "../lib/registry"
  * @returns {Object|undefined} mangroveChain - Mangrove configuration for the connected chain
  */
 export function useRegistry() {
-  const { chain } = useAccount()
-  const defaultChainId = chain?.id ?? arbitrum.id
+  const defaultChain = useDefaultChain()
 
   const { data: uniClone } = useQuery({
-    queryKey: ["uni-clone", defaultChainId],
-    queryFn: () => uniClones.find((c) => c.chain.id === defaultChainId),
+    queryKey: ["uni-clone", defaultChain.id],
+    queryFn: () => uniClones.find((c) => c.chain.id === defaultChain.id),
   })
 
   const { data: mangroveChain } = useQuery({
-    queryKey: ["mangrove-chain", defaultChainId],
-    queryFn: () => mangroveChains.find((c) => c.chain.id === defaultChainId),
+    queryKey: ["mangrove-chain", defaultChain.id],
+    queryFn: () => mangroveChains.find((c) => c.chain.id === defaultChain.id),
   })
 
   return {

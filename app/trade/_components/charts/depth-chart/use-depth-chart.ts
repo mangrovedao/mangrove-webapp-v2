@@ -44,7 +44,10 @@ export function useDepthChart() {
   const [zoomDomain, setZoomDomain] = React.useState<undefined | number>()
   const baseDecimals = market?.base.displayDecimals
   const priceDecimals = market?.quote.priceDisplayDecimals
-  const { asks, bids } = removeCrossedOrders(book?.bids ?? [], book?.asks ?? [])
+  const { asks, bids } = removeCrossedOrders(
+    book?.bids as unknown as CompleteOffer[],
+    book?.asks as unknown as CompleteOffer[],
+  )
   const cumulativeAsks = calculateCumulative(asks, true)
   const cumulativeBids = calculateCumulative(bids)
   const lowestAsk = asks?.[0]

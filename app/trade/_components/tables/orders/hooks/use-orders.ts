@@ -48,7 +48,7 @@ export function useOrders<T = Order[]>({
 
       try {
         const { asksMarket, bidsMarket } = getSemibooksOLKeys(market)
-        
+
         const result = await indexerSdk.getOpenLimitOrders({
           ask: {
             token: {
@@ -69,10 +69,11 @@ export function useOrders<T = Order[]>({
           maker: address.toLowerCase(),
         })
 
-        return parseOrders(result)
+        const parsedData = parseOrders(result)
+        return parsedData
       } catch (e) {
         console.error(getErrorMessage(e))
-        throw new Error()
+        return []
       } finally {
         stopLoading(TRADE.TABLES.ORDERS)
       }

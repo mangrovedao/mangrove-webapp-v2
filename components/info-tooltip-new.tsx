@@ -39,7 +39,12 @@ export default function InfoTooltip({
           <CircleHelp size={iconSize ?? 16} />
         </TooltipTrigger>
         <TooltipPortal>
-          <TooltipContent side={side}>{children}</TooltipContent>
+          <TooltipContent
+            side={side}
+            className="bg-bg-secondary flex-wrap text-wrap"
+          >
+            {children}
+          </TooltipContent>
         </TooltipPortal>
       </Tooltip>
     </TooltipProvider>

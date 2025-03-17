@@ -1,4 +1,4 @@
-import { erc20Abi, formatUnits, type Address, type Client } from "viem"
+import { erc20Abi, type Address, type Client } from "viem"
 import {
   readContract,
   simulateContract,
@@ -32,7 +32,7 @@ export async function checkAllowance(
     functionName: "allowance",
     args: [user, spender],
   })
-  console.log("allowance", formatUnits(allowance, 18))
+
   return allowance
 }
 
@@ -58,10 +58,6 @@ export async function approveAmount(
     throw new Error("No user address found")
   }
 
-  console.log(
-    `Approving amount ${amount} for token ${token} for spender ${spender}`,
-  )
-
   const { request } = await simulateContract(client, {
     address: token,
     abi: erc20Abi,
@@ -70,11 +66,9 @@ export async function approveAmount(
   })
 
   const hash = await writeContract(client, request as any)
-  console.log(`Allowance tx: ${hash}`)
 
   const receipt = await waitForTransactionReceipt(client, { hash })
   if (receipt.status === "success") {
-    console.log(`Allowance tx: ${hash} success`)
     return amount
   } else {
     throw new Error(`Allowance tx: ${hash} failed`)

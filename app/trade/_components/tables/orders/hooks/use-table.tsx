@@ -31,6 +31,7 @@ type Params = {
 
 export function useTable({ data, onCancel, onEdit }: Params) {
   const { currentMarket: market } = useMarket()
+
   const columns = React.useMemo(
     () => [
       columnHelper.display({
@@ -176,7 +177,7 @@ export function useTable({ data, onCancel, onEdit }: Params) {
   )
 
   return useReactTable({
-    data: data ?? DEFAULT_DATA,
+    data: data || DEFAULT_DATA,
     columns,
     enableRowSelection: false,
     getCoreRowModel: getCoreRowModel(),

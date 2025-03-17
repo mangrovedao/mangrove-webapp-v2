@@ -9,6 +9,7 @@ import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
+import { PublicClient } from "viem"
 import { useAccount } from "wagmi"
 
 type Params<T> = {
@@ -24,7 +25,7 @@ export function useVaults<T = Vault[] | undefined>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
-  const publicClient = useNetworkClient()
+  const networkClient = useNetworkClient()
   const { address: user, chainId } = useAccount()
   const plainVaults = useVaultsWhitelist()
   const incentives = useVaultsIncentives()
@@ -33,7 +34,7 @@ export function useVaults<T = Vault[] | undefined>({
   const { data, ...rest } = useQuery({
     queryKey: [
       "vaults",
-      publicClient?.key,
+      networkClient?.key,
       fdv,
       user,
       chainId,
@@ -41,13 +42,13 @@ export function useVaults<T = Vault[] | undefined>({
     ],
     queryFn: async (): Promise<Vault[]> => {
       try {
-        if (!publicClient?.key) throw new Error("Public client is not enabled")
+        if (!networkClient?.key) throw new Error("Public client is not enabled")
         if (!plainVaults) return []
 
         const incentivesData = await Promise.all(
           plainVaults.map(async (vault) => {
             const data = await getVaultIncentives(
-              publicClient,
+              networkClient as PublicClient,
               incentives.find(
                 (i) => i.vault.toLowerCase() === vault.address.toLowerCase(),
               ),
@@ -64,7 +65,7 @@ export function useVaults<T = Vault[] | undefined>({
         )
 
         const vaults = await getVaultsInformation(
-          publicClient,
+          networkClient as PublicClient,
           plainVaults,
           user,
           incentives,
@@ -78,7 +79,7 @@ export function useVaults<T = Vault[] | undefined>({
         return []
       }
     },
-    enabled: !!publicClient && !!plainVaults.length,
+    enabled: !!networkClient && !!plainVaults.length,
   })
   return {
     data: (select ? select(data ?? []) : data) as unknown as T,

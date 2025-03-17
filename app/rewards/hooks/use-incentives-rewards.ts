@@ -1,23 +1,23 @@
 import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
-import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import { incentiveResponseSchema } from "../schemas/rewards-configuration"
 
 export const useIncentivesRewards = () => {
-  const { chain, address: user } = useAccount()
+  const { address: user } = useAccount()
   const vaultsIncentives = useVaultsIncentives()
-  const defaultChainId = chain?.id ?? arbitrum.id
+  const defaultChain = useDefaultChain()
 
   return useQuery({
-    queryKey: ["incentives-rewards", vaultsIncentives, chain?.id, user],
+    queryKey: ["incentives-rewards", vaultsIncentives, defaultChain.id, user],
     queryFn: async () => {
       try {
         if (!user) return null
         const userIncentives = await Promise.all(
           vaultsIncentives.map((incentive) =>
             fetch(
-              `https://${defaultChainId}-mgv-data.mgvinfra.com/incentives/vaults/${defaultChainId}/${incentive.vault}/${user}?startTimestamp=${incentive.startTimestamp}&endTimestamp=${incentive.endTimestamp}&rewardRate=${incentive.rewardRate}&maxRewards=${incentive.maxRewards}`,
+              `https://indexer.mgvinfra.com/incentives/vaults/${defaultChain.id}/${incentive.vault}/${user}?startTimestamp=${incentive.startTimestamp}&endTimestamp=${incentive.endTimestamp}&rewardRate=${incentive.rewardRate}&maxRewards=${incentive.maxRewards}`,
             ),
           ),
         )

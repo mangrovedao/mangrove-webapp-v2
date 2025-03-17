@@ -153,7 +153,7 @@ export function useTable({ data }: Params) {
   )
 
   return useReactTable({
-    data: data ?? DEFAULT_DATA,
+    data: data || DEFAULT_DATA,
     columns,
     enableRowSelection: false,
     getCoreRowModel: getCoreRowModel(),

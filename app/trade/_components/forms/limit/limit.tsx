@@ -1,33 +1,24 @@
 import { BS } from "@mangrovedao/mgv/lib"
-import React from "react"
-import { formatUnits, parseUnits } from "viem"
+import { motion } from "framer-motion"
+import { ArrowDown } from "lucide-react"
+import React, { useEffect, useRef } from "react"
+import { Address, formatUnits, parseUnits } from "viem"
 import { useAccount } from "wagmi"
 
 import InfoTooltip from "@/components/info-tooltip-new"
 import { EnhancedNumericInput } from "@/components/token-input-new"
-import { Caption } from "@/components/typography/caption"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select-new"
+import { Switch } from "@/components/ui/switch"
+
 import { Skeleton } from "@/components/ui/skeleton"
+import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { enumKeys } from "@/utils/enums"
-import { FIELD_ERRORS } from "@/utils/form-errors"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { Accordion } from "../components/accordion"
-import FromWalletLimitOrderDialog from "./components/from-wallet-order-dialog"
-import SourceIcon from "./components/source-icon"
-import { TimeInForce, TimeToLiveUnit } from "./enums"
+import { useTradeFormStore } from "../../forms/store"
+import { useTradeInfos } from "../hooks/use-trade-infos"
 import { useLimit } from "./hooks/use-limit"
+import { useLimitTransaction } from "./hooks/use-limit-transaction"
 import type { Form } from "./types"
 import {
   isGreaterThanZeroValidator,
@@ -35,77 +26,201 @@ import {
   sendVolumeValidator,
 } from "./validators"
 
-export function Limit(props: { bs: BS }) {
-  const { isConnected } = useAccount()
+const sliderValues = [25, 50, 75]
+
+// Reuse the wethAdresses from the dialog
+export const wethAdresses: { [key: number]: Address | undefined } = {
+  168587773: "0x4200000000000000000000000000000000000023",
+  81457: "0x4300000000000000000000000000000000000004",
+  42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+}
+
+export function Limit() {
+  const { isConnected, address, chain } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
+
+  // Get and set shared state
+  const { payAmount, setPayAmount, tradeSide, setTradeSide } =
+    useTradeFormStore()
+
+  // Track if the component is mounted
+  const isMounted = useRef(false)
+
+  // Track if we've initialized from the shared state
+  const initializedFromSharedState = useRef(false)
 
   const { currentMarket } = useMarket()
   const {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
-    handleSubmit,
     form,
     sendToken,
     receiveToken,
     quoteToken,
-    timeInForce,
-    send,
-    minVolume,
-    sendLogics,
-    receiveLogics,
-    sendTokenBalanceFormatted,
     receiveTokenBalanceFormatted,
     minVolumeFormatted,
     isWrapping,
     sendBalanceWithEth,
     ethBalance,
+    getAllErrors,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
-    bs: props.bs,
+    bs: tradeSide,
   })
 
-  const handleSliderChange = (value: number) => {
-    if (!sendBalanceWithEth) return
-    const amount =
-      (BigInt(value * 100) *
-        parseUnits(sendBalanceWithEth.toString(), sendToken?.decimals || 18)) /
-      10_000n
-    setSendSliderValue(value)
-    form.setFieldValue("send", formatUnits(amount, sendToken?.decimals ?? 18))
-    form.validateAllFields("change")
-    if (!form.state.values.limitPrice) {
-      form.setFieldValue("receive", "")
-      return
+  // Registry and trade infos
+  const { baseToken } = useTradeInfos("limit", tradeSide)
+
+  // Use the transaction hook
+  const {
+    isButtonLoading,
+    onSubmit,
+    getButtonText: getTransactionButtonText,
+  } = useLimitTransaction({
+    form,
+    tradeSide,
+    sendToken,
+    baseToken,
+    sendTokenBalance,
+    isWrapping,
+  })
+
+  useEffect(() => {
+    if (!isMounted.current || initializedFromSharedState.current) return
+
+    if (
+      payAmount &&
+      form &&
+      form.setFieldValue &&
+      payAmount !== "0" &&
+      payAmount !== "0.0" &&
+      payAmount !== "0.00"
+    ) {
+      form.setFieldValue("send", payAmount)
+      initializedFromSharedState.current = true
+
+      if (form.state.values.limitPrice) {
+        computeReceiveAmount()
+      }
     }
-    computeReceiveAmount()
+  }, [payAmount, form, computeReceiveAmount])
+
+  useEffect(() => {
+    if (!isMounted.current) return
+
+    const currentSendValue = form.state.values.send
+    if (
+      currentSendValue &&
+      currentSendValue !== payAmount &&
+      currentSendValue !== "0" &&
+      currentSendValue !== "0.0" &&
+      currentSendValue !== "0.00"
+    ) {
+      setPayAmount(currentSendValue)
+    }
+  }, [form.state.values.send, setPayAmount, payAmount])
+
+  const handleSliderChange = (value: number) => {
+    if (!sendBalanceWithEth || !sendToken) return
+
+    try {
+      const amount =
+        (BigInt(value * 100) *
+          parseUnits(
+            sendBalanceWithEth.toString(),
+            sendToken?.decimals || 18,
+          )) /
+        10_000n
+
+      setSendSliderValue(value)
+
+      // Format the amount for display
+      const amountFormatted = formatUnits(amount, sendToken?.decimals ?? 18)
+
+      // Set the field value without calling validateAllFields
+      form.setFieldValue(
+        "send",
+        Number(amountFormatted).toFixed(sendToken?.priceDisplayDecimals ?? 18),
+      )
+
+      // We don't need to update the shared state here anymore
+      // as it's handled by the useEffect
+
+      // Check if limitPrice exists before computing receive amount
+      if (!form.state?.values?.limitPrice) {
+        form.setFieldValue("receive", "")
+        return
+      }
+
+      // Compute receive amount will indirectly validate the form
+      computeReceiveAmount()
+    } catch (error) {
+      console.error("Error in slider change:", error)
+    }
   }
 
-  return (
-    <>
-      <form.Provider>
-        <form onSubmit={handleSubmit} autoComplete="off">
-          <div className="space-y-2 !mt-6">
-            <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
-              {(field) => (
-                <EnhancedNumericInput
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  inputClassName="text-text-primary text-lg h-8"
-                  onChange={(e) => {
-                    field.handleChange(e.target.value)
-                    computeReceiveAmount()
-                  }}
-                  token={quoteToken}
-                  label="Limit price"
-                  disabled={!currentMarket}
-                  error={field.state.meta.errors}
-                />
-              )}
-            </form.Field>
+  const handleSwapDirection = () => {
+    try {
+      // Toggle between buy and sell
+      const newSide = tradeSide === BS.buy ? BS.sell : BS.buy
 
+      // Update the shared state
+      setTradeSide(newSide)
+
+      // Reset slider value
+      setSendSliderValue(0)
+
+      // Keep the current pay amount in the shared state
+      const currentPayAmount = form.state.values.send
+
+      // Clear receive value but keep the pay amount
+      if (form && form.setFieldValue) {
+        form.setFieldValue("receive", "")
+
+        // If we have a limit price, recompute the receive amount
+        if (form.state.values.limitPrice && currentPayAmount) {
+          setTimeout(() => {
+            computeReceiveAmount()
+          }, 0)
+        }
+      }
+    } catch (error) {
+      console.error("Error in swap direction:", error)
+    }
+  }
+
+  React.useEffect(() => {
+    handleSliderChange(sendSliderValue)
+  }, [sendSliderValue])
+
+  // Get button text based on transaction state
+  const getButtonText = () => {
+    const allErrors = getAllErrors()
+    return getTransactionButtonText({
+      isConnected,
+      errors: allErrors,
+      tradeSide,
+    })
+  }
+
+  // Get button disabled state
+  const isButtonDisabled =
+    !form.state.canSubmit ||
+    Object.keys(getAllErrors()).length > 0 ||
+    isButtonLoading ||
+    !isConnected
+
+  return (
+    <div className="flex flex-col h-full w-full">
+      <form.Provider>
+        <form
+          onSubmit={onSubmit}
+          autoComplete="off"
+          className="flex flex-col h-full"
+        >
+          <div className="space-y-1.5 flex-1 overflow-y-auto">
             <form.Field
               name="send"
               onChange={
@@ -130,86 +245,59 @@ export function Limit(props: { bs: BS }) {
                     onBlur={field.handleBlur}
                     onChange={({ target: { value } }) => {
                       field.handleChange(value)
+                      // We don't need to update the shared state here anymore
+                      // as it's handled by the useEffect
                       computeReceiveAmount()
                     }}
-                    // dollarAmount={"..."}
-                    inputClassName="text-text-primary text-lg h-8"
-                    sendSliderValue={sendSliderValue}
-                    setSendSliderValue={handleSliderChange}
-                    // minimumVolume={formatUnits(
-                    //   minVolume,
-                    //   sendToken?.decimals || 18,
-                    // )}
-                    // volumeAction={{
-                    //   onClick: () => {
-                    //     field.handleChange(minVolumeFormatted),
-                    //       computeReceiveAmount()
-                    //   },
-                    // }}
+                    inputClassName="text-text-primary text-base h-7"
                     balanceAction={{
                       onClick: () => {
-                        field.handleChange(sendBalanceWithEth.toString()),
-                          computeReceiveAmount()
+                        field.handleChange(sendBalanceWithEth.toString())
+                        computeReceiveAmount()
                       },
                     }}
                     isWrapping={isWrapping}
                     token={sendToken}
                     customBalance={sendBalanceWithEth.toString()}
-                    label="Send amount"
+                    label="Pay"
                     disabled={
                       !currentMarket || sendBalanceWithEth.toString() === "0"
                     }
                     showBalance
                     error={
-                      !isWrapping &&
-                      Number(field.state.value) >
-                        Number(
-                          formatUnits(
-                            sendTokenBalance?.balance || 0n,
-                            sendToken?.decimals ?? 18,
-                          ),
-                        )
-                        ? [FIELD_ERRORS.insufficientBalance]
-                        : field.state.meta.touchedErrors
+                      getAllErrors().send
+                        ? [getAllErrors().send].flat()
+                        : undefined
                     }
                   />
                 </>
               )}
             </form.Field>
 
-            {sendToken?.symbol.includes("ETH") &&
-              ethBalance?.value &&
-              ethBalance.value > 0n && (
-                <form.Field name="isWrapping">
-                  {(field) => (
-                    <div className="flex justify-between items-center px-1">
-                      <span className="flex items-center text-muted-foreground text-xs">
-                        Use ETH balance
-                        <InfoTooltip className="text-text-quaternary text-sm">
-                          Will add a wrap ETH to wETH step during transaction
-                        </InfoTooltip>
-                      </span>
-                      <div className="flex items-center gap-1 text-xs text-text-secondary">
-                        <span>
-                          {getExactWeiAmount(
-                            formatUnits(
-                              ethBalance?.value ?? 0n,
-                              ethBalance?.decimals ?? 18,
-                            ),
-                            3,
-                          )}{" "}
-                          ETH
-                        </span>
-                        <Checkbox
-                          className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
-                          checked={isWrapping}
-                          onClick={() => field.handleChange(!isWrapping)}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
-              )}
+            <div className="flex justify-center -my-1.5">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                <motion.div
+                  className="flex items-center justify-center"
+                  initial={{ rotate: 0 }}
+                  whileHover={{ rotate: 180 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
+                    onClick={handleSwapDirection}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </div>
 
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
@@ -222,17 +310,145 @@ export function Limit(props: { bs: BS }) {
                     computeSendAmount()
                   }}
                   token={receiveToken}
-                  inputClassName="text-text-primary text-lg h-8"
-                  label="Total"
+                  inputClassName="text-text-primary text-base h-7"
+                  label="Receive"
                   disabled={!(currentMarket && form.state.isFormValid)}
-                  error={field.state.meta.touchedErrors}
+                  error={
+                    getAllErrors().receive
+                      ? [getAllErrors().receive].flat()
+                      : undefined
+                  }
                   customBalance={receiveTokenBalanceFormatted}
                 />
               )}
             </form.Field>
+
+            <form.Field name="limitPrice" onChange={isGreaterThanZeroValidator}>
+              {(field) => (
+                <EnhancedNumericInput
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  inputClassName="text-text-primary text-base h-7"
+                  onChange={(e) => {
+                    field.handleChange(e.target.value)
+                    computeReceiveAmount()
+                  }}
+                  token={quoteToken}
+                  label="When price at or below"
+                  disabled={!currentMarket}
+                  error={
+                    getAllErrors().limitPrice
+                      ? [getAllErrors().limitPrice].flat()
+                      : undefined
+                  }
+                />
+              )}
+            </form.Field>
+
+            {/* slider section */}
+
+            <div className="py-3">
+              {/* Slider */}
+              <div className="px-2">
+                <Slider
+                  disabled={!currentMarket}
+                  value={[sendSliderValue || 0]}
+                  onValueChange={(values) => {
+                    setSendSliderValue?.(values[0] || 0)
+                  }}
+                  max={100}
+                  step={1}
+                  className="z-50"
+                />
+              </div>
+              <div className="flex space-x-2 mt-4">
+                {sliderValues.map((value, i) => (
+                  <Button
+                    key={`percentage-button-${value}`}
+                    variant={"secondary"}
+                    size={"md"}
+                    disabled={!currentMarket}
+                    value={sendSliderValue}
+                    className={cn(
+                      "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
+                      {
+                        "bg-bg-tertiary": sendSliderValue === value,
+                      },
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setSendSliderValue?.(Number(value))
+                    }}
+                  >
+                    {value}%
+                  </Button>
+                ))}
+                <Button
+                  key={`percentage-button-max`}
+                  variant={"secondary"}
+                  size={"md"}
+                  disabled={!currentMarket}
+                  className={cn(
+                    "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
+                  )}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setSendSliderValue?.(100)
+                  }}
+                  // disabled={!currentMarket}
+                >
+                  Max
+                </Button>
+              </div>
+            </div>
+
+            {sendToken?.symbol.includes("ETH") &&
+              ethBalance?.value &&
+              ethBalance.value > 0n && (
+                <form.Field name="isWrapping">
+                  {(field) => (
+                    <div className="flex justify-between items-center">
+                      <span className="flex items-center text-muted-foreground text-xs font-sans">
+                        Use ETH balance
+                        <InfoTooltip className="text-text-quaternary text-xs size-[12px] cursor-pointer">
+                          <span className="text-xs font-sans">
+                            Will add a wrap ETH to wETH step during transaction
+                            ({" "}
+                            <span>
+                              {getExactWeiAmount(
+                                formatUnits(
+                                  ethBalance?.value ?? 0n,
+                                  ethBalance?.decimals ?? 18,
+                                ),
+                                3,
+                              )}{" "}
+                              ETH
+                            </span>
+                            )
+                          </span>
+                        </InfoTooltip>
+                      </span>
+                      <div className="flex items-center gap-1 text-xs text-text-secondary">
+                        <Switch
+                          className="data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
+                          checked={isWrapping}
+                          onClick={() => field.handleChange(!isWrapping)}
+                        />
+                        {/* <Checkbox
+                            className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                            checked={isWrapping}
+                            onClick={() => field.handleChange(!isWrapping)}
+                          /> */}
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+              )}
+
             <div className="grid space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground text-sm">
+                <span className="text-muted-foreground text-xs font-sans">
                   Minimum volume
                 </span>
                 {Number(minVolumeFormatted) == 0 ? (
@@ -246,289 +462,24 @@ export function Limit(props: { bs: BS }) {
                   </span>
                 )}
               </div>
-
-              <Accordion title="Liquidity sourcing">
-                <div className="flex justify-between space-x-2 pt-2">
-                  <form.Field name="sendFrom">
-                    {(field) => (
-                      <div className="flex flex-col w-full">
-                        <Label className="flex items-center text-muted-foreground">
-                          Send from
-                          <InfoTooltip className="text-muted-foreground">
-                            <Caption>Select the origin of the assets</Caption>
-                          </InfoTooltip>
-                        </Label>
-
-                        <Select
-                          name={field.name}
-                          value={field.state.value}
-                          onValueChange={(value: string) => {
-                            field.handleChange(value)
-                          }}
-                          disabled={!currentMarket}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              {/* {sendLogics?.map(
-                                (source) =>
-                                  source && (
-                                    <SelectItem
-                                      key={source.logic.name}
-                                      value={source.logic.name}
-                                    >
-                                      <div className="flex gap-2 w-full items-center">
-                                        <SourceIcon
-                                          sourceId={source.logic.name}
-                                        />
-                                        <Caption className="capitalize">
-                                          {source.logic.name.toUpperCase()}
-                                        </Caption>
-                                      </div>
-                                    </SelectItem>
-                                  ),
-                              )} */}
-                              <SelectItem key="simple" value="simple">
-                                <div className="flex gap-2 w-full items-center">
-                                  <SourceIcon sourceId={"simple"} />
-                                  <Caption className="capitalize">
-                                    Wallet
-                                  </Caption>
-                                </div>
-                              </SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                  </form.Field>
-
-                  <form.Field name="receiveTo">
-                    {(field) => (
-                      <div className="flex flex-col w-full z-50">
-                        <Label className="flex items-center text-muted-foreground">
-                          Receive to
-                          <InfoTooltip className="ml-2 text-muted-foreground">
-                            <div>
-                              <Caption>
-                                Select the destination of the assets
-                              </Caption>
-
-                              <Caption>(after the trade is executed)</Caption>
-                            </div>
-                          </InfoTooltip>
-                        </Label>
-
-                        <Select
-                          name={field.name}
-                          value={field.state.value}
-                          onValueChange={(value: string) => {
-                            field.handleChange(value)
-                          }}
-                          disabled={!currentMarket}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              {/* {receiveLogics?.map(
-                                (source) =>
-                                  source && (
-                                    <SelectItem
-                                      key={source.logic.name}
-                                      value={source.logic.name}
-                                    >
-                                      <div className="flex gap-2 w-full items-center">
-                                        <SourceIcon
-                                          sourceId={source.logic.name}
-                                        />
-                                        <Caption className="capitalize">
-                                          {source.logic.name.toUpperCase()}
-                                        </Caption>
-                                      </div>
-                                    </SelectItem>
-                                  ),
-                              )} */}
-                              <SelectItem key="simple" value="simple">
-                                <div className="flex gap-2 w-full items-center">
-                                  <SourceIcon sourceId={"simple"} />
-                                  <Caption className="capitalize">
-                                    Wallet
-                                  </Caption>
-                                </div>
-                              </SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                  </form.Field>
-                </div>
-              </Accordion>
-
-              <Accordion title="Time in force">
-                <form.Field name="timeInForce">
-                  {(field) => {
-                    return (
-                      <div className="grid text-md space-y-2 mt-2">
-                        <Select
-                          name={field.name}
-                          value={field.state.value.toString()}
-                          onValueChange={(value) => {
-                            field.handleChange(Number(value))
-                          }}
-                          disabled={!currentMarket}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time in force" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              {enumKeys(TimeInForce).map((timeInForce) => (
-                                <SelectItem
-                                  key={timeInForce}
-                                  value={TimeInForce[timeInForce].toString()}
-                                >
-                                  {timeInForce}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )
-                  }}
-                </form.Field>
-
-                <div
-                  className={cn("flex justify-between space-x-2", {
-                    hidden:
-                      timeInForce !== TimeInForce.GTC &&
-                      timeInForce !== TimeInForce.PO,
-                  })}
-                >
-                  <form.Field
-                    name="timeToLive"
-                    onChange={isGreaterThanZeroValidator}
-                  >
-                    {(field) => (
-                      <EnhancedNumericInput
-                        className="h-10 py-0"
-                        inputClassName="h-full text-sm"
-                        placeholder="1"
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={({ target: { value } }) => {
-                          if (!value) return
-                          field.handleChange(value)
-                        }}
-                        disabled={!(currentMarket && form.state.isFormValid)}
-                        error={field.state.meta.touchedErrors}
-                      />
-                    )}
-                  </form.Field>
-
-                  <form.Field name="timeToLiveUnit">
-                    {(field) => (
-                      <Select
-                        name={field.name}
-                        value={field.state.value}
-                        onValueChange={(value: TimeToLiveUnit) => {
-                          field.handleChange(value)
-                        }}
-                        disabled={!currentMarket}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select time unit" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {Object.values(TimeToLiveUnit).map(
-                              (timeToLiveUnit) => (
-                                <SelectItem
-                                  className="hover:bg-bg-secondary active:bg-bg-secondary focus:bg-bg-secondary"
-                                  key={timeToLiveUnit}
-                                  value={timeToLiveUnit}
-                                >
-                                  {timeToLiveUnit}
-                                </SelectItem>
-                              ),
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </form.Field>
-                </div>
-              </Accordion>
             </div>
+          </div>
 
-            {/* <MarketDetails
-              minVolume={minVolume}
-              takerFee={feeInPercentageAsString}
-              tickSize={tickSize}
-              spotPrice={spotPrice}
-            /> */}
-
-            <form.Subscribe
-              selector={(state) => [
-                state.canSubmit,
-                state.isSubmitting,
-                state.values.bs,
-              ]}
+          <div className="mt-auto pt-3 border-t border-border-primary">
+            <Button
+              className={cn(
+                "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
+              )}
+              size={"md"}
+              type="submit"
+              disabled={isButtonDisabled}
+              loading={isButtonLoading}
             >
-              {([canSubmit, isSubmitting, tradeAction]) => {
-                return (
-                  <Button
-                    className={cn(
-                      "w-full flex items-center justify-center !mb-4 capitalize !mt-6",
-                      {
-                        "bg-[#FF5555] hover:bg-[#ff6363]":
-                          tradeAction === BS.sell,
-                      },
-                    )}
-                    size={"lg"}
-                    disabled={!canSubmit || !currentMarket || !isConnected}
-                    loading={!!isSubmitting}
-                  >
-                    {tradeAction}
-                  </Button>
-                )
-              }}
-            </form.Subscribe>
+              {getButtonText()}
+            </Button>
           </div>
         </form>
       </form.Provider>
-
-      {formData && (
-        <FromWalletLimitOrderDialog
-          form={{
-            ...formData,
-            minVolume: minVolumeFormatted,
-            totalWrapping:
-              Number(formData.send) >
-              Number(
-                formatUnits(
-                  sendTokenBalance?.balance || 0n,
-                  sendToken?.decimals ?? 18,
-                ),
-              )
-                ? Number(formData.send) -
-                  Number(
-                    formatUnits(
-                      sendTokenBalance?.balance || 0n,
-                      sendToken?.decimals ?? 18,
-                    ),
-                  )
-                : 0,
-          }}
-          onClose={() => setFormData(undefined)}
-        />
-      )}
-    </>
+    </div>
   )
 }

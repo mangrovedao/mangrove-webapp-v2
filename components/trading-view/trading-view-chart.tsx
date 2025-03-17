@@ -1,44 +1,247 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMarket from "@/providers/market"
+import {
+  generateOHLCVBars,
+  getDexScreenerChainName,
+  getPairInfo,
+  tryFetchOHLCVData,
+  type OHLCVBar,
+} from "@/services/dexscreener-api"
 import { cn } from "@/utils"
 import React from "react"
-import { arbitrum } from "viem/chains"
-import { useAccount } from "wagmi"
 import {
   IBasicDataFeed,
   ResolutionString,
   widget,
   type ChartingLibraryWidgetOptions,
 } from "../../public/charting_library"
-import { Skeleton } from "../ui/skeleton"
-import datafeed from "./datafeed"
+import { AnimatedChartSkeleton } from "./animated-chart-skeleton"
 
-const from = new Date(2024, 7, 1).getTime() / 1000
-const to = new Date().getTime() / 1000
+// DexScreener API based datafeed
+const createDexScreenerDatafeed = (options: {
+  base: string
+  quote: string
+  baseAddress: string
+  quoteAddress: string
+  chainId: number
+}): IBasicDataFeed => {
+  const { base, quote, baseAddress, quoteAddress, chainId } = options
+  const chainName = getDexScreenerChainName(chainId)
+  const pairAddress = `${baseAddress}_${quoteAddress}`
+
+  // Cache for storing fetched bars to avoid redundant API calls
+  const cachedBars: Record<string, OHLCVBar[]> = {}
+
+  // Store active subscriptions
+  const subscriptions: Record<string, NodeJS.Timeout> = {}
+
+  return {
+    onReady: (callback) => {
+      setTimeout(
+        () =>
+          callback({
+            supported_resolutions: [
+              "1",
+              "5",
+              "15",
+              "30",
+              "60",
+              "240",
+              "1D",
+              "1W",
+              "1M",
+            ] as ResolutionString[],
+            supports_time: true,
+            supports_marks: false,
+            supports_timescale_marks: false,
+          }),
+        0,
+      )
+    },
+    searchSymbols: (userInput, exchange, symbolType, onResult) => {
+      onResult([])
+    },
+    resolveSymbol: (
+      symbolName,
+      onSymbolResolvedCallback,
+      onResolveErrorCallback,
+    ) => {
+      setTimeout(() => {
+        onSymbolResolvedCallback({
+          name: `${base}/${quote}`,
+          description: `${base}/${quote}`,
+          type: "crypto",
+          session: "24x7",
+          timezone: "Etc/UTC",
+          ticker: symbolName,
+          minmov: 1,
+          pricescale: 100,
+          has_intraday: true,
+          intraday_multipliers: ["1", "5", "15", "30", "60", "240"],
+          supported_resolutions: [
+            "1",
+            "5",
+            "15",
+            "30",
+            "60",
+            "240",
+            "1D",
+            "1W",
+            "1M",
+          ] as ResolutionString[],
+          volume_precision: 2,
+          data_status: "streaming",
+          exchange: "DEX",
+          listed_exchange: "DEX",
+          format: "price",
+        })
+      }, 0)
+    },
+    getBars: async (
+      symbolInfo,
+      resolution,
+      periodParams,
+      onHistoryCallback,
+      onErrorCallback,
+    ) => {
+      try {
+        const { from, to, countBack } = periodParams
+        const cacheKey = `${symbolInfo.ticker}-${resolution}-${from}-${to}`
+
+        // Check if we have cached data
+        if (cachedBars[cacheKey]) {
+          // Ensure we have a non-null array by providing a default empty array
+          const ohlcvBars = cachedBars[cacheKey] || []
+
+          // Convert OHLCVBar[] to Bar[] to match the expected type
+          const bars = ohlcvBars.map((bar) => ({
+            time: bar.time,
+            open: bar.open,
+            high: bar.high,
+            low: bar.low,
+            close: bar.close,
+            volume: bar.volume,
+          }))
+
+          onHistoryCallback(bars, {
+            noData: bars.length === 0,
+          })
+          return
+        }
+
+        // Get pair information from DEXScreener
+        const pair = await getPairInfo(chainId, baseAddress, quoteAddress)
+
+        if (!pair) {
+          onHistoryCallback([], { noData: true })
+          return
+        }
+
+        // Try to fetch OHLCV data from DEXScreener's chart endpoint
+        try {
+          const chartData = await tryFetchOHLCVData(
+            chainName,
+            pair.pairAddress,
+            resolution,
+            baseAddress,
+            quoteAddress,
+          )
+
+          if (chartData && chartData.length > 0) {
+            // Filter and sort the data
+            const bars = chartData
+              .filter((bar) => bar.time >= from * 1000 && bar.time <= to * 1000)
+              .sort((a, b) => a.time - b.time)
+
+            // Cache the result
+            cachedBars[cacheKey] = bars
+
+            onHistoryCallback(bars, { noData: bars.length === 0 })
+            return
+          }
+        } catch (chartError) {
+          // Continue to fallback method
+        }
+
+        // Generate bars from price and volume data
+        const bars = generateOHLCVBars(pair, from, to, resolution, chainName)
+
+        // Cache the result
+        cachedBars[cacheKey] = bars
+
+        onHistoryCallback(bars, { noData: bars.length === 0 })
+      } catch (error) {
+        onErrorCallback(error instanceof Error ? error.message : String(error))
+      }
+    },
+    subscribeBars: (
+      symbolInfo,
+      resolution,
+      onRealtimeCallback,
+      subscriberUID,
+      onResetCacheNeededCallback,
+    ) => {
+      // Set up a periodic update for real-time data
+      const intervalId = setInterval(async () => {
+        try {
+          const pair = await getPairInfo(chainId, baseAddress, quoteAddress)
+          if (!pair) return
+
+          const currentPrice = parseFloat(pair.priceUsd)
+          const currentTime = Math.floor(Date.now() / 1000) * 1000
+
+          // Create a real-time bar
+          const bar = {
+            time: currentTime,
+            open: currentPrice * 0.999,
+            high: currentPrice * 1.001,
+            low: currentPrice * 0.998,
+            close: currentPrice,
+            volume: pair.volume?.h1
+              ? parseFloat(String(pair.volume.h1)) / 24
+              : 0,
+          }
+
+          onRealtimeCallback(bar)
+        } catch (error) {}
+      }, 180000) // Update every 3 minutes
+
+      // Store the interval ID for cleanup
+      subscriptions[subscriberUID] = intervalId
+    },
+    unsubscribeBars: (subscriberUID) => {
+      // Cleanup subscription
+      if (subscriptions[subscriberUID]) {
+        clearInterval(subscriptions[subscriberUID])
+        delete subscriptions[subscriberUID]
+      }
+    },
+  }
+}
 
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
 ) => {
-  const { chainId } = useAccount()
   const { currentMarket } = useMarket()
+  const defaultChain = useDefaultChain()
   const [isLoading, setIsLoading] = React.useState(true)
-  const chartContainerRef =
-    React.useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>
+  const chartContainerRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    if (!currentMarket) return
+    if (!currentMarket || !chartContainerRef.current) return
 
-    const widgetOptions: ChartingLibraryWidgetOptions = {
+    const tvWidget = new widget({
       symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
-      datafeed: datafeed({
-        base: currentMarket?.base.symbol,
-        quote: currentMarket?.quote.symbol,
-        baseAddress: currentMarket?.base.address,
-        quoteAddress: currentMarket?.quote.address,
-        chainId: chainId ?? arbitrum.id,
-      }) as unknown as IBasicDataFeed,
+      datafeed: createDexScreenerDatafeed({
+        base: currentMarket.base.symbol,
+        quote: currentMarket.quote.symbol,
+        baseAddress: currentMarket.base.address,
+        quoteAddress: currentMarket.quote.address,
+        chainId: defaultChain.id,
+      }) as IBasicDataFeed,
       timeframe: "12M",
       interval: "1W" as ResolutionString,
       container: chartContainerRef.current,
@@ -55,26 +258,33 @@ export const TVChartContainer = (
         "timeframes_toolbar",
         "use_localstorage_for_settings",
         "popup_hints",
-        // "header_chart_type",
-        // "header_screenshot",
-        // "volume_force_overlay",
-        // "create_volume_indicator_by_default",
-        // "hide_main_series_symbol_from_indicator_legend",
+      ],
+      enabled_features: [
+        "hide_left_toolbar_by_default",
+        "move_logo_to_main_pane",
+        "create_volume_indicator_by_default",
       ],
       overrides: {
-        "paneProperties.background": "#0B1719",
+        "paneProperties.background": "#0C1719",
         "paneProperties.backgroundType": "solid",
+        "scalesProperties.textColor": "#AAA",
+        "scalesProperties.lineColor": "#333",
+        "mainSeriesProperties.priceAxisProperties.autoScale": true,
+        "mainSeriesProperties.priceAxisProperties.percentage": false,
+        "mainSeriesProperties.priceAxisProperties.log": false,
+        "mainSeriesProperties.priceFormat.type": "price",
+        "mainSeriesProperties.priceFormat.precision": 2,
+        "mainSeriesProperties.priceFormat.minMove": 0.01,
+        "scalesProperties.showSeriesLastValue": true,
+        "scalesProperties.showStudyLastValue": false,
       },
-    }
-
-    const tvWidget = new widget(widgetOptions)
-    const element = chartContainerRef.current.querySelector(
-      '[id^="tradingview"]',
-    )
-
-    if (!element) return
-    element.classList.add("w-full")
-    element.classList.add("h-full")
+      studies_overrides: {
+        "volume.precision": 0,
+      },
+      fullscreen: false,
+      autosize: true,
+      ...props,
+    })
 
     tvWidget.onChartReady(() => {
       setIsLoading(false)
@@ -83,16 +293,18 @@ export const TVChartContainer = (
     return () => {
       tvWidget.remove()
     }
-  }, [props, currentMarket?.base, currentMarket?.quote])
+  }, [currentMarket, defaultChain.id, props])
 
   return (
-    <div className="w-full h-full relative">
+    <div className="relative w-full h-full">
       {isLoading && (
-        <Skeleton className="absolute inset-0 text-green-caribbean flex items-center justify-center" />
+        <div className="absolute inset-0 z-10">
+          <AnimatedChartSkeleton />
+        </div>
       )}
       <div
-        className={cn("h-full transition-opacity", { "opacity-0": isLoading })}
         ref={chartContainerRef}
+        className={cn("w-full h-full", isLoading ? "opacity-0" : "opacity-100")}
       />
     </div>
   )

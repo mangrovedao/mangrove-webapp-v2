@@ -3,7 +3,7 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import Dialog from "@/components/dialogs/alert-dialog"
-import { Button } from "@/components/ui/button-old"
+import { Button } from "@/components/ui/button"
 import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 
@@ -66,7 +66,6 @@ export function WrongNetworkAlertDialog() {
           <Button
             size={"lg"}
             className="w-full flex-1"
-            rightIcon
             onClick={handleChangeNetwork}
           >
             Change network

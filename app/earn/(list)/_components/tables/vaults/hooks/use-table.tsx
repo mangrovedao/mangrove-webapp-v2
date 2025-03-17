@@ -65,7 +65,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {getChainImage(chain?.id, chain?.name)}
+                {getChainImage()}
               </Link>
             </div>
           )
