@@ -1,7 +1,7 @@
-import { PublicClient } from "viem"
 import { z } from "zod"
 
 import { vaultIncentivesSchema } from "@/app/rewards/schemas/rewards-configuration"
+import { PublicClient } from "viem/_types/clients/createPublicClient"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 
 /**

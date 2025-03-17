@@ -17,6 +17,7 @@ import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { Book } from "@mangrovedao/mgv"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
@@ -126,15 +127,7 @@ export function useMarketForm(props: Props) {
   >()
 
   const { data, refetch } = useQuery({
-    queryKey: [
-      "marketOrderSimulation",
-      estimateFrom,
-      bs,
-      receive,
-      send,
-      book?.asks?.[0]?.price,
-      book?.bids?.[0]?.price,
-    ],
+    queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
     queryFn: () => {
       if (!book) return null
 
@@ -142,7 +135,6 @@ export function useMarketForm(props: Props) {
       if (!isCompleteBook(book)) {
         return null
       }
-
       const baseAmount =
         bs == BS.buy
           ? parseUnits(receive, market?.base.decimals ?? 18)
@@ -183,13 +175,16 @@ export function useMarketForm(props: Props) {
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
 
-      const formattedBaseEstimation = formatUnits(
-        baseEstimation,
-        market?.base.decimals ?? 18,
+      console.log("is after marketOrderSimulation")
+
+      const formattedBaseEstimation = getExactWeiAmount(
+        formatUnits(baseEstimation, market?.base.decimals ?? 18),
+        market?.base.displayDecimals,
       )
-      const formattedQuoteEstimation = formatUnits(
-        quoteEstimation,
-        market?.quote.decimals ?? 18,
+
+      const formattedQuoteEstimation = getExactWeiAmount(
+        formatUnits(quoteEstimation, market?.quote.decimals ?? 18),
+        market?.quote.displayDecimals,
       )
 
       const estimatedReceive =

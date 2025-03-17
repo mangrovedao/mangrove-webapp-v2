@@ -11,7 +11,6 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import React, { ReactNode } from "react"
 import { formatUnits } from "viem"
-import { useAccount } from "wagmi"
 
 import {
   CustomRadioGroup,
@@ -28,6 +27,7 @@ import { Button } from "@/components/ui/button"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
@@ -44,7 +44,7 @@ enum Action {
 
 export default function Page() {
   const [action, setAction] = React.useState(Action.Deposit)
-  const { chain } = useAccount()
+  const chain = useDefaultChain()
   const params = useParams<{ address: string }>()
 
   const {
@@ -110,7 +110,7 @@ export default function Page() {
             <Subline
               title={"Chain"}
               value={chain?.name}
-              icon={getChainImage(chain?.id, chain?.name)}
+              icon={getChainImage()}
             />
 
             <Separator className="h-4 self-center" orientation="vertical" />
@@ -288,7 +288,7 @@ export default function Page() {
                     <GridLine
                       title="Chain"
                       value={chain?.name}
-                      icon={getChainImage(chain?.id, chain?.name)}
+                      icon={getChainImage()}
                       iconFirst
                     />
                   </div>

@@ -1,7 +1,7 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
 import { motion } from "framer-motion"
-import { ArrowDown, ArrowUp } from "lucide-react"
+import { ArrowDown } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
@@ -311,37 +311,28 @@ export function Market() {
               )}
             </form.Field>
 
-            <div className="flex justify-center -my-1">
+            <div className="flex justify-center -my-1.5">
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
-                  onClick={handleSwapDirection}
+                <motion.div
+                  className="flex items-center justify-center"
+                  initial={{ rotate: 0 }}
+                  whileHover={{ rotate: 180 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ opacity: 1, y: 0 }}
-                    whileHover={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.2 }}
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
+                    onClick={handleSwapDirection}
                   >
                     <ArrowDown className="h-4 w-4" />
-                  </motion.div>
-
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ opacity: 0, y: -10 }}
-                    whileHover={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ArrowUp className="h-4 w-4" />
-                  </motion.div>
-                </Button>
+                  </Button>
+                </motion.div>
               </motion.div>
             </div>
 

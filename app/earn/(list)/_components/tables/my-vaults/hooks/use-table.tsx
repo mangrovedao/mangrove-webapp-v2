@@ -9,12 +9,12 @@ import {
 } from "@tanstack/react-table"
 import Link from "next/link"
 import React from "react"
-import { useAccount } from "wagmi"
 
 import { Vault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
 
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { formatNumber } from "@/utils/numbers"
 import { formatUnits } from "viem"
 import { Market } from "../components/market"
@@ -30,7 +30,7 @@ type Params = {
 }
 
 export function useTable({ pageSize, data, onManage }: Params) {
-  const { chain } = useAccount()
+  const defaultChain = useDefaultChain()
 
   const columns = React.useMemo(
     () => [
@@ -39,7 +39,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
         header: () => "",
         cell: ({ row }) => {
           const { address } = row.original
-          const blockExplorerUrl = chain?.blockExplorers?.default.url
+          const blockExplorerUrl = defaultChain?.blockExplorers?.default.url
 
           // note: check if we can retrive logos from library directly
           // const icon = getWhitelistedChainObjects().find(
@@ -54,7 +54,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {getChainImage(chain?.id, chain?.name)}
+                {getChainImage()}
               </Link>
             </div>
           )
