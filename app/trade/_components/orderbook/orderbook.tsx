@@ -261,19 +261,6 @@ export const BookContent = React.memo(function BookContent() {
     handleScrollToMiddle()
   }, [])
 
-  // Log when the component renders and why
-  useEffect(() => {
-    renderCount.current += 1
-    console.log(`BookContent rendered ${renderCount.current} times`)
-  }, [])
-
-  // Remove the dependency on book and isLoading to prevent re-renders
-  useEffect(() => {
-    console.log(
-      `View option or price increment changed: ${viewOption}, ${priceIncrement}`,
-    )
-  }, [viewOption, priceIncrement])
-
   if (!book || !currentMarket) {
     return <AnimatedOrderBookSkeleton />
   }
