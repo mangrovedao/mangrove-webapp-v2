@@ -60,7 +60,7 @@ export function useLimitTransaction({
       //   address: result.transactionHash ?? "",
       //   blockExplorerUrl: chain?.blockExplorers?.default.url,
       // })
-      toast.success("Transaction completed successfully!")
+      // toast.success("Transaction completed successfully!")
     },
   })
 

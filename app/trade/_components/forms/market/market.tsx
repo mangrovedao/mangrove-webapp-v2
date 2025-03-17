@@ -14,7 +14,6 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
-import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { EnhancedNumericInput } from "@components/token-input-new"
@@ -46,7 +45,6 @@ export function Market() {
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [sendSliderValue, setSendSliderValue] = useState(0)
-  const { checkAndShowDisclaimer } = useDisclaimerDialog()
 
   // Get and set shared state
   const { payAmount, setPayAmount, tradeSide, setTradeSide } =
@@ -115,13 +113,6 @@ export function Market() {
     baseToken,
     sendTokenBalance,
     isWrapping,
-    // Add a callback for successful transaction completion to handle form reset
-    onTransactionSuccess: () => {
-      // Only reset the form on successful transaction completion (not approval)
-      form.reset()
-      setSendSliderValue(0)
-      setFormData(undefined)
-    },
   })
 
   // Initialize form with shared pay amount when component mounts or when switching tabs
@@ -178,6 +169,9 @@ export function Market() {
 
       // Set the field value without calling validateAllFields
       form.setFieldValue("send", amount)
+
+      // We don't need to update the shared state here anymore
+      // as it's handled by the useEffect
 
       // Compute receive amount will indirectly validate the form
       computeReceiveAmount()
@@ -261,28 +255,17 @@ export function Market() {
       <form.Provider>
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-
             if (!isConnected) {
+              e.preventDefault()
               toast.error("Please connect your wallet")
               return
             }
             if (!sendToken || !baseToken) {
+              e.preventDefault()
               toast.error("Token information is missing")
               return
             }
-
-            if (checkAndShowDisclaimer(address)) return
-
-            // Submit the form without resetting it
-            void form.handleSubmit().then(() => {
-              if (form.state.isFormValid) {
-                // onSubmit will handle the transaction flow
-                // form reset now happens in onTransactionSuccess callback
-                onSubmit(e)
-              }
-            })
+            handleSubmit(e)
           }}
           autoComplete="off"
           className="flex flex-col h-full"

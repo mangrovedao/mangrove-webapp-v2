@@ -7,8 +7,8 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
-import { useBook } from "@/hooks/use-book"
 import useLocalStorage from "@/hooks/use-local-storage"
+import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import { cn } from "@/utils"
 import { AnimatedFormsSkeleton } from "./animated-forms-skeleton"
 import { Limit } from "./limit/limit"
@@ -34,7 +34,7 @@ export function Forms({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
-  const { book } = useBook()
+  const { data: book } = useUniswapBook()
   const [orderType, setOrderType] = useLocalStorage<FormType>(
     "orderType",
     FormType.LIMIT,

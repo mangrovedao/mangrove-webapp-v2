@@ -24,7 +24,6 @@ interface UseMarketTransactionProps {
   baseToken?: any
   sendTokenBalance: any
   isWrapping: boolean
-  onTransactionSuccess?: () => void
 }
 
 export function useMarketTransaction({
@@ -34,7 +33,6 @@ export function useMarketTransaction({
   baseToken,
   sendTokenBalance,
   isWrapping,
-  onTransactionSuccess,
 }: UseMarketTransactionProps) {
   const { isConnected, address, chain } = useAccount()
   const { mangroveChain } = useRegistry()
@@ -63,10 +61,7 @@ export function useMarketTransaction({
       //   address: result.transactionHash ?? "",
       //   blockExplorerUrl: chain?.blockExplorers?.default.url,
       // })
-      toast.success("Transaction completed successfully!")
-      if (onTransactionSuccess) {
-        onTransactionSuccess()
-      }
+      // toast.success("Transaction completed successfully!")
     },
   })
 
