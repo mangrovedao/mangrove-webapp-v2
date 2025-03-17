@@ -279,10 +279,11 @@ export function useLimit(props: Props) {
   }, [form, bs])
 
   React.useEffect(() => {
+    const currentLimitPrice = form?.getFieldValue("limitPrice")
     const limitPrice =
       bs === BS.buy ? book?.asks[0]?.price : book?.bids[0]?.price
 
-    if (!limitPrice || !form || !sendToken) return
+    if (currentLimitPrice || !limitPrice || !form || !sendToken) return
 
     //what is this x)
     setTimeout(() => {
@@ -296,8 +297,9 @@ export function useLimit(props: Props) {
     bs,
     form,
     sendToken,
-    currentMarket?.base.address,
-    currentMarket?.quote.address,
+    book,
+    currentMarket?.base.address.toString(),
+    currentMarket?.quote.address.toString(),
   ])
 
   // Add a function to get all form errors
