@@ -2,6 +2,7 @@
  * @fileoverview TradingView datafeed implementation for Mangrove markets
  */
 
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import {
   HistoryCallback,
   LibrarySymbolInfo,
@@ -13,7 +14,6 @@ import {
   SubscribeBarsCallback,
   SymbolResolveExtension,
 } from "@/public/charting_library/charting_library"
-import { arbitrum } from "viem/chains"
 import { z } from "zod"
 
 /**
@@ -66,13 +66,7 @@ const candlesSchema = z.object({
  * @param {Params} params - Configuration parameters for the datafeed
  * @returns {Object} TradingView compatible datafeed implementation
  */
-export default function datafeed({
-  base,
-  quote,
-  baseAddress,
-  quoteAddress,
-  chainId,
-}: Params) {
+function datafeed({ base, quote, baseAddress, quoteAddress, chainId }: Params) {
   return {
     onReady: (callback: OnReadyCallback) => {
       callback({
@@ -137,8 +131,6 @@ export default function datafeed({
     ) => {
       setTimeout(async () => {
         try {
-          const currentChainId = chainId ?? arbitrum.id
-
           const newRes =
             resolution === "60"
               ? "1h"
@@ -147,7 +139,7 @@ export default function datafeed({
                 : resolution.toLowerCase()
 
           const result = await fetch(
-            `https://${currentChainId}-mgv-data.mgvinfra.com/ohlc/${currentChainId}/${baseAddress}/${quoteAddress}/1/${newRes}?count=${periodParams.countBack}&to=${periodParams.to}`,
+            `https://indexer.mgvinfra.com/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${newRes}?count=${periodParams.countBack}&to=${periodParams.to}`,
           ).then(async (res) => candlesSchema.safeParse(await res.json()))
 
           if (!result.success) {
@@ -260,10 +252,10 @@ export function oldDatafeed({
           const end = new Date(periodParams.to * 1000)
           const formattedStart = start.toISOString().split("T")[0]
           const formattedEnd = end.toISOString().split("T")[0]
-          const currentChainId = chainId ?? arbitrum.id
+          const defaultChain = useDefaultChain()
 
           const old_res = await fetch(
-            `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${currentChainId}&interval=${resolution}&start_time=${formattedStart}&end_time=${formattedEnd}`,
+            `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${defaultChain.id}&interval=${resolution}&start_time=${formattedStart}&end_time=${formattedEnd}`,
           )
           let old_data = await old_res.json()
 

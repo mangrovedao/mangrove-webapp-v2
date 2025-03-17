@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMarket from "@/providers/market"
 import {
   generateOHLCVBars,
@@ -11,8 +12,6 @@ import {
 } from "@/services/dexscreener-api"
 import { cn } from "@/utils"
 import React from "react"
-import { arbitrum } from "viem/chains"
-import { useAccount } from "wagmi"
 import {
   IBasicDataFeed,
   ResolutionString,
@@ -208,7 +207,7 @@ const createDexScreenerDatafeed = (options: {
 
           onRealtimeCallback(bar)
         } catch (error) {}
-      }, 15000) // Update every 15 seconds
+      }, 180000) // Update every 3 minutes
 
       // Store the interval ID for cleanup
       subscriptions[subscriberUID] = intervalId
@@ -227,7 +226,7 @@ export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
 ) => {
   const { currentMarket } = useMarket()
-  const { chain } = useAccount()
+  const defaultChain = useDefaultChain()
   const [isLoading, setIsLoading] = React.useState(true)
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
 
@@ -241,7 +240,7 @@ export const TVChartContainer = (
         quote: currentMarket.quote.symbol,
         baseAddress: currentMarket.base.address,
         quoteAddress: currentMarket.quote.address,
-        chainId: chain?.id || arbitrum.id,
+        chainId: defaultChain.id,
       }) as IBasicDataFeed,
       timeframe: "12M",
       interval: "1W" as ResolutionString,
@@ -294,7 +293,7 @@ export const TVChartContainer = (
     return () => {
       tvWidget.remove()
     }
-  }, [currentMarket, chain, props])
+  }, [currentMarket, defaultChain.id, props])
 
   return (
     <div className="relative w-full h-full">

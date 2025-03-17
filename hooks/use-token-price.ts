@@ -1,4 +1,3 @@
-import { arbitrum } from "viem/chains"
 import { z } from "zod"
 
 const priceSchema = z.object({
@@ -10,7 +9,7 @@ export async function getTokenPrice(tokenAddress?: string, chainId?: number) {
     if (!tokenAddress) return 0
 
     const response = await fetch(
-      `https://price.mgvinfra.com/price-by-address?chain=${chainId ?? arbitrum.id}&address=${tokenAddress}`,
+      `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${tokenAddress}`,
     )
     const data = await response.json()
     const parsed = priceSchema.parse(data)

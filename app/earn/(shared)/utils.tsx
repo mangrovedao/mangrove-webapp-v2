@@ -1,9 +1,9 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { ReactNode } from "react"
 import { Address, parseAbi, PublicClient } from "viem"
-import { arbitrum } from "viem/chains"
 import { pnlSchema, priceSchema } from "./schemas"
 
 // ============= CONTRACT INTERFACES =============
@@ -69,8 +69,9 @@ export async function fetchPnLData(
     if (!user) return undefined
 
     const res = await fetch(
-      `https://${client.chain?.id}-mgv-data.mgvinfra.com/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
+      `https://indexer.mgvinfra.com/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
     )
+
     const data = await res.json()
     return pnlSchema.parse(data)
   } catch (error) {
@@ -127,17 +128,16 @@ export function getIconFromChainlist(name: string) {
   return `https://icons.llamao.fi/icons/chains/rsz_${icon.toLowerCase().replaceAll(" ", "_")}.jpg`
 }
 
-export function getChainImage(chainId?: number, chainName?: string) {
-  const id = chainId || arbitrum.id
-  const name = chainName || arbitrum.name
+export function getChainImage() {
+  const chain = useDefaultChain()
 
   return (
     <ImageWithHideOnError
-      src={`/assets/chains/${id}.webp`}
+      src={`/assets/chains/${chain.id}.webp`}
       width={16}
       height={16}
       className="h-4 rounded-sm size-4"
-      key={id}
+      key={chain.id}
       alt={`${name}-logo`}
     />
   )

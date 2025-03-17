@@ -2,9 +2,9 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { motion } from "framer-motion"
 
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
 import { AnimatedTradesHistorySkeleton } from "./animated-trades-skeleton"
@@ -13,6 +13,7 @@ import { useTradeHistory } from "./use-trade-history"
 
 export function Trades({ className }: { className?: string }) {
   const { chain } = useAccount()
+  const defaultChain = useDefaultChain()
 
   const { currentMarket: market } = useMarket()
   const tradesHistoryQuery = useTradeHistory()
@@ -22,7 +23,8 @@ export function Trades({ className }: { className?: string }) {
   })
 
   const blockExplorerUrl =
-    chain?.blockExplorers?.default.url || arbitrum.blockExplorers.default.url
+    chain?.blockExplorers?.default.url ||
+    defaultChain.blockExplorers?.default.url
 
   // Only show loading skeleton when market is not available
   if (!market) {

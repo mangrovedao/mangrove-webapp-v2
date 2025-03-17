@@ -1,12 +1,13 @@
 import { createPublicClient, http } from "viem"
-import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
+import { useDefaultChain } from "./use-default-chain"
 
 export function useNetworkClient() {
   const { isConnected, chain } = useAccount()
+  const defaultChain = useDefaultChain()
 
   return createPublicClient({
-    chain: isConnected ? chain : arbitrum,
+    chain: isConnected ? chain : defaultChain,
     transport: http(),
   })
 }

@@ -2,10 +2,10 @@ import React from "react"
 import { useAccount, useSwitchChain } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 import { getChainObjectById } from "@/utils/chains"
-import { arbitrum } from "viem/chains"
 import { Button } from "./ui/button"
 import { XClose } from "./ui/dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
@@ -22,11 +22,11 @@ function getIconFromChainlist(name: string) {
 
 export default function ChainSelector() {
   const { chainId } = useAccount()
-  const defaultChainId = chainId ?? arbitrum.id
+  const defaultChain = useDefaultChain()
 
   const { switchChain } = useSwitchChain()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
-  const chain = getChainObjectById(defaultChainId?.toString())
+  const chain = getChainObjectById(defaultChain.id?.toString())
 
   // Close dialog if the chain id has changed
   React.useEffect(() => {
@@ -95,11 +95,11 @@ export default function ChainSelector() {
       >
         <span className="flex space-x-2">
           <ImageWithHideOnError
-            src={`/assets/chains/${defaultChainId}.webp`}
+            src={`/assets/chains/${defaultChain.id}.webp`}
             width={16}
             height={16}
             className="h-5 rounded-sm size-5"
-            key={defaultChainId}
+            key={defaultChain.id}
             alt={`${chain?.name}-logo`}
           />
           {/* <span className="text-sm whitespace-nowrap">{chain?.name}</span> */}
