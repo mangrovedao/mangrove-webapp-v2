@@ -1,6 +1,5 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import withClientOnly from "@/hocs/withClientOnly"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useChains } from "@/providers/chains"
 import { useMenuStore } from "@/stores/menu.store"
@@ -26,13 +25,9 @@ import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit"
 import { WalletIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import posthog from "posthog-js"
-import React from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { useAccount, useDisconnect } from "wagmi"
 import ChainSelector from "./chain-selector"
-import UnWrapETHDialog from "./stateful/dialogs/unwrap-dialog"
-import WrapETHDialog from "./stateful/dialogs/wrap-dialog"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 const MENUS = [
@@ -236,68 +231,6 @@ export function MobileOverlay() {
     </Dialog>
   )
 }
-
-// User Account section for the navbar
-const UserAccount = withClientOnly(() => {
-  const { openConnectModal } = useConnectModal()
-  const { openAccountModal } = useAccountModal()
-  const { isConnected, connector, address, isConnecting } = useAccount()
-  const { chain } = useAccount()
-  const { disconnect } = useDisconnect()
-
-  function handleConnect() {
-    posthog.capture("connect-wallet:click")
-    openConnectModal?.()
-  }
-
-  function handleAccount() {
-    openAccountModal?.()
-  }
-
-  const [wrapETH, setWrapETH] = React.useState(false)
-  const [unWrapETH, setUnWrapETH] = React.useState(false)
-
-  React.useEffect(() => {
-    if (address && !chain?.id) {
-      disconnect()
-    }
-  }, [chain?.id, address, disconnect])
-
-  if (!isConnected) {
-    return (
-      <>
-        <Button
-          onClick={handleConnect}
-          disabled={isConnecting}
-          size="sm"
-          className="bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-xl px-4 py-2 text-sm font-medium border-none"
-        >
-          Connect Wallet
-        </Button>
-      </>
-    )
-  }
-
-  return (
-    <div className="flex space-x-4 items-center">
-      <WrapETHDialog isOpen={wrapETH} onClose={() => setWrapETH(false)} />
-      <UnWrapETHDialog isOpen={unWrapETH} onClose={() => setUnWrapETH(false)} />
-
-      <ChainSelector />
-
-      <Button
-        variant="secondary"
-        className="flex items-center gap-2 bg-[#1e293b] rounded-xl py-2 px-3 text-white hover:bg-[#334155] border-none"
-        onClick={handleAccount}
-      >
-        <span className="bg-gray-500 h-[18px] w-[18px] rounded-full relative overflow-hidden">
-          {address && <Jazzicon seed={jsNumberForAddress(address)} />}
-        </span>
-        <span className="text-sm">{shortenAddress(address ?? "")}</span>
-      </Button>
-    </div>
-  )
-})
 
 export default function Navbar() {
   const { toggle } = useMenuStore()

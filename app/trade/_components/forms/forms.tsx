@@ -24,12 +24,6 @@ enum FormType {
 const LimitComponent = React.memo(() => <Limit />)
 const MarketComponent = React.memo(() => <Market />)
 
-// Map of form types to components
-const FORM_COMPONENTS = {
-  [FormType.LIMIT]: LimitComponent,
-  [FormType.MARKET]: MarketComponent,
-}
-
 export function Forms({
   className,
   ...props
@@ -52,13 +46,12 @@ export function Forms({
   if (!book) {
     return <AnimatedFormsSkeleton />
   }
-  console.log(book)
 
   return (
     <div className="h-full">
       <CustomTabs
         {...props}
-        defaultValue={orderType}
+        defaultValue={FormType.LIMIT}
         className="border border-bg-secondary rounded-sm h-full flex flex-col"
         onValueChange={handleTabChange}
       >
