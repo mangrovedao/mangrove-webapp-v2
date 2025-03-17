@@ -8,5 +8,26 @@ import { useAccount } from "wagmi"
 export function useDefaultChain() {
   const { isConnected, chain } = useAccount()
 
-  return isConnected && chain ? chain : base
+  // Use custom RPC URL if connected with a chain, otherwise use base with custom RPC
+  if (isConnected && chain) {
+    return chain
+  }
+
+  // Create a modified base chain with custom RPC URL
+  return {
+    ...base,
+    rpcUrls: {
+      ...base.rpcUrls,
+      default: {
+        http: [
+          process.env.NEXT_PUBLIC_BASE_RPC_URL || base.rpcUrls.default.http[0],
+        ],
+      },
+      public: {
+        http: [
+          process.env.NEXT_PUBLIC_BASE_RPC_URL || base.rpcUrls.default.http[0],
+        ],
+      },
+    },
+  }
 }

@@ -1,6 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useChains } from "@/providers/chains"
 import { useMenuStore } from "@/stores/menu.store"
 import {
@@ -71,7 +72,8 @@ const MENUS = [
 
 export function MobileOverlay() {
   const { isOpen, toggle } = useMenuStore()
-  const { address, isConnected, chain } = useAccount()
+  const { address, isConnected } = useAccount()
+  const defaultChain = useDefaultChain()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
   const { chains, setIsChainDialogOpen } = useChains()
@@ -146,14 +148,14 @@ export function MobileOverlay() {
                   className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
                 >
                   <ImageWithHideOnError
-                    src={`/assets/chains/${chain?.id || 42161}.webp`}
+                    src={`/assets/chains/${defaultChain?.id}.webp`}
                     width={20}
                     height={20}
                     className="h-5 rounded-sm size-5"
-                    alt={`${chain?.name || "Network"}-logo`}
+                    alt={`${defaultChain?.name || "Network"}-logo`}
                   />
                   <span className="text-sm font-medium truncate">
-                    {chain?.name || "Select Network"}
+                    {defaultChain?.name || "Select Network"}
                   </span>
                 </button>
 

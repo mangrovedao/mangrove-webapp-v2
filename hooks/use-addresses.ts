@@ -15,13 +15,14 @@ import {
   blastTokens,
 } from "@mangrovedao/mgv/addresses"
 import { arbitrum, base, baseSepolia, blast } from "viem/chains"
-import { useAccount } from "wagmi"
+import { useDefaultChain } from "./use-default-chain"
 
 export const aaveKandelSeeder = "0x55B12De431C6e355b56b79472a3632faec58FB5a"
 
 export function useMangroveAddresses() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return blastMangrove
     case arbitrum.id:
@@ -36,8 +37,9 @@ export function useMangroveAddresses() {
 }
 
 export function useAaveKandelRouter() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return "" // no aave on blast
     case arbitrum.id:
@@ -52,8 +54,9 @@ export function useAaveKandelRouter() {
 }
 
 export function useAaveKandelSeeder() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return "" // no aave on blast
     case arbitrum.id:
@@ -66,8 +69,9 @@ export function useAaveKandelSeeder() {
 }
 
 export function useKandelSeeder() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return "0x4bb7567303c8bde27a4b490b3e5f1593c891b03d"
     case arbitrum.id:
@@ -82,8 +86,9 @@ export function useKandelSeeder() {
 }
 
 export function useMarkets() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return blastMarkets
     case arbitrum.id:
@@ -98,8 +103,9 @@ export function useMarkets() {
 }
 
 export function useLogics() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return blastLogics
     case arbitrum.id:
@@ -114,8 +120,9 @@ export function useLogics() {
 }
 
 export function useTokens() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return blastTokens
     case arbitrum.id:
@@ -130,9 +137,9 @@ export function useTokens() {
 }
 
 export function useCashnesses() {
-  const { chainId } = useAccount()
+  const defaultChain = useDefaultChain()
 
-  switch (chainId) {
+  switch (defaultChain.id) {
     case arbitrum.id:
       return {
         WETH: 1000,
@@ -160,8 +167,9 @@ export function useCashnesses() {
 }
 
 export function useSymbolOverrides() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const defaultChain = useDefaultChain()
+
+  switch (defaultChain.id) {
     case arbitrum.id:
       return {
         "USD₮0": "USDT",

@@ -49,10 +49,10 @@ export function Forms({
     },
     [payAmount, setOrderType],
   )
-
   if (!book) {
     return <AnimatedFormsSkeleton />
   }
+  console.log(book)
 
   return (
     <div className="h-full">
