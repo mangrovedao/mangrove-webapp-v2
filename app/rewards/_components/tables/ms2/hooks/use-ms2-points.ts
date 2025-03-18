@@ -40,7 +40,7 @@ export function useMs2Points<T = Ms2PointsRow[]>({
   select,
 }: Params<T> = {}) {
   const { address: user } = useAccount()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   const { data, ...rest } = useQuery({
     queryKey: ["ms2-points", user, defaultChain.id, epochId, first, skip],

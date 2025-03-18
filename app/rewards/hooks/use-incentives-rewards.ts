@@ -7,7 +7,7 @@ import { incentiveResponseSchema } from "../schemas/rewards-configuration"
 export const useIncentivesRewards = () => {
   const { address: user } = useAccount()
   const vaultsIncentives = useVaultsIncentives()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   return useQuery({
     queryKey: ["incentives-rewards", vaultsIncentives, defaultChain.id, user],

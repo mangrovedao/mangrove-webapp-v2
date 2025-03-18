@@ -129,15 +129,15 @@ export function getIconFromChainlist(name: string) {
 }
 
 export function getChainImage() {
-  const chain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   return (
     <ImageWithHideOnError
-      src={`/assets/chains/${chain.id}.webp`}
+      src={`/assets/chains/${defaultChain.id}.webp`}
       width={16}
       height={16}
       className="h-4 rounded-sm size-4"
-      key={chain.id}
+      key={defaultChain.id}
       alt={`${name}-logo`}
     />
   )

@@ -20,7 +20,7 @@ import { useDefaultChain } from "./use-default-chain"
 export const aaveKandelSeeder = "0x55B12De431C6e355b56b79472a3632faec58FB5a"
 
 export function useMangroveAddresses() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case blast.id:
@@ -37,7 +37,7 @@ export function useMangroveAddresses() {
 }
 
 export function useAaveKandelRouter() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case blast.id:
@@ -54,7 +54,7 @@ export function useAaveKandelRouter() {
 }
 
 export function useAaveKandelSeeder() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case blast.id:
@@ -69,7 +69,7 @@ export function useAaveKandelSeeder() {
 }
 
 export function useKandelSeeder() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case blast.id:
@@ -86,7 +86,7 @@ export function useKandelSeeder() {
 }
 
 export function useMarkets() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case blast.id:
@@ -103,7 +103,7 @@ export function useMarkets() {
 }
 
 export function useLogics() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case blast.id:
@@ -120,7 +120,7 @@ export function useLogics() {
 }
 
 export function useTokens() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case blast.id:
@@ -137,7 +137,7 @@ export function useTokens() {
 }
 
 export function useCashnesses() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case arbitrum.id:
@@ -167,7 +167,7 @@ export function useCashnesses() {
 }
 
 export function useSymbolOverrides() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   switch (defaultChain.id) {
     case arbitrum.id:

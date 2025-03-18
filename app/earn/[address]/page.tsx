@@ -44,7 +44,7 @@ enum Action {
 
 export default function Page() {
   const [action, setAction] = React.useState(Action.Deposit)
-  const chain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
   const params = useParams<{ address: string }>()
 
   const {
@@ -109,7 +109,7 @@ export default function Page() {
           <div className="flex gap-2 flex-wrap">
             <Subline
               title={"Chain"}
-              value={chain?.name}
+              value={defaultChain?.name}
               icon={getChainImage()}
             />
 
@@ -287,7 +287,7 @@ export default function Page() {
                     />
                     <GridLine
                       title="Chain"
-                      value={chain?.name}
+                      value={defaultChain?.name}
                       icon={getChainImage()}
                       iconFirst
                     />
@@ -296,7 +296,7 @@ export default function Page() {
                     <GridLine
                       title="Vault Address"
                       value={shortenAddress(vault?.address || "")}
-                      href={`${chain?.blockExplorers?.default.url}/address/${vault?.address}`}
+                      href={`${defaultChain?.blockExplorers?.default.url}/address/${vault?.address}`}
                       icon={
                         <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
                       }

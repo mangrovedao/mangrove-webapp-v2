@@ -11,7 +11,7 @@ type UseRewardsProps = {
 
 export const useRewards = ({ epochId = "1" }: UseRewardsProps) => {
   const { address } = useAccount()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   return useQuery({
     queryKey: ["rewards", address, defaultChain.id, epochId],

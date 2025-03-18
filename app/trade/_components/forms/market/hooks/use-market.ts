@@ -211,7 +211,7 @@ export function useMarketForm(props: Props) {
     e.preventDefault()
     e.stopPropagation()
     if (checkAndShowDisclaimer(address)) return
-
+    console.log("test")
     void form.handleSubmit()
   }
 

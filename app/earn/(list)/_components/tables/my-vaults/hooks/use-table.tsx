@@ -30,7 +30,7 @@ type Params = {
 }
 
 export function useTable({ pageSize, data, onManage }: Params) {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   const columns = React.useMemo(
     () => [

@@ -23,19 +23,13 @@ export function useOpenMarkets() {
       client?.key,
       cashnesses,
       addresses,
-      clientToUse.chain.id,
+      clientToUse?.chain?.id,
       networkClient?.key,
     ],
     queryFn: async () => {
       try {
-        if (!client || !networkClient) throw new Error("No market client found")
-
-        console.log(
-          "clientToUse",
-          clientToUse.chain.id,
-          client.chain.id,
-          networkClient.chain.id,
-        )
+        if (!clientToUse || !networkClient)
+          throw new Error("No market client found")
 
         return await getOpenMarkets(clientToUse, addresses, {
           cashnesses: Object.fromEntries(

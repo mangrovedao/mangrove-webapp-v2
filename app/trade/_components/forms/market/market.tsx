@@ -14,6 +14,7 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
+import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { EnhancedNumericInput } from "@components/token-input-new"
@@ -45,6 +46,7 @@ export function Market() {
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [sendSliderValue, setSendSliderValue] = useState(0)
+  const { checkAndShowDisclaimer } = useDisclaimerDialog()
 
   // Get and set shared state
   const { payAmount, setPayAmount, tradeSide, setTradeSide } =
@@ -106,6 +108,7 @@ export function Market() {
     getButtonText: getTransactionButtonText,
     needsWrapping,
     totalWrapping,
+    needsApproval,
   } = useMarketTransaction({
     form,
     tradeSide,
@@ -113,6 +116,12 @@ export function Market() {
     baseToken,
     sendTokenBalance,
     isWrapping,
+    onTransactionSuccess: () => {
+      // Reset form state after successful transaction
+      form.reset()
+      setSendSliderValue(0)
+      setFormData(undefined)
+    },
   })
 
   // Initialize form with shared pay amount when component mounts or when switching tabs
@@ -255,17 +264,32 @@ export function Market() {
       <form.Provider>
         <form
           onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+
             if (!isConnected) {
-              e.preventDefault()
               toast.error("Please connect your wallet")
               return
             }
             if (!sendToken || !baseToken) {
-              e.preventDefault()
               toast.error("Token information is missing")
               return
             }
-            handleSubmit(e)
+
+            // Check disclaimer acceptance first
+            if (checkAndShowDisclaimer(address)) return
+
+            // Validate the form before proceeding
+            void form.handleSubmit().then(() => {
+              if (form.state.isFormValid) {
+                // Call the onSubmit from useMarketTransaction
+                // which will handle all the appropriate actions based on the current state:
+                // - If approval is needed, it will call handleApprove()
+                // - If ETH wrapping is needed, it will call handleWrapEth()
+                // - Otherwise, it will call handlePostOrder()
+                onSubmit(e)
+              }
+            })
           }}
           autoComplete="off"
           className="flex flex-col h-full"

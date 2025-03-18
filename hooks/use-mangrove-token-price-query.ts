@@ -18,7 +18,7 @@ const useMangroveTokenPricesQuery = (
   quoteAddress?: string,
   tickSpacing?: number,
 ) => {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   return useQuery({
     queryKey: [

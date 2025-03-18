@@ -12,7 +12,7 @@ import { getTokenPrice } from "@/hooks/use-token-price"
 
 const useIndexerSdkContext = () => {
   const tokens = useTokens()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   const indexerSdkQuery = useQuery({
     queryKey: ["indexer-sdk", defaultChain.id],

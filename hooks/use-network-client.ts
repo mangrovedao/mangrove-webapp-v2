@@ -4,7 +4,7 @@ import { useDefaultChain } from "./use-default-chain"
 
 export function useNetworkClient() {
   const { isConnected, chain } = useAccount()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   return createPublicClient({
     chain: isConnected ? chain : defaultChain,

@@ -1,11 +1,9 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount } from "wagmi"
 import { configurationSchema } from "../schemas/rewards-configuration"
 
 export const useConfiguration = () => {
-  const { chain } = useAccount()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   return useQuery({
     queryKey: ["rewards-configuration", defaultChain.id],

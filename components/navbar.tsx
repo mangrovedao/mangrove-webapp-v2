@@ -25,9 +25,11 @@ import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit"
 import { WalletIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { useAccount, useDisconnect } from "wagmi"
 import ChainSelector from "./chain-selector"
+import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog-new"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 
 const MENUS = [
@@ -65,13 +67,130 @@ const MENUS = [
   // },
 ]
 
+// Create separate component for the network selection modal
+function NetworkSelectionModal() {
+  const { defaultChain, setDefaultChain } = useDefaultChain()
+  const { chains, setIsChainDialogOpen } = useChains()
+  const { openConnectModal } = useConnectModal()
+  const { toggle } = useMenuStore()
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <button
+          className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
+          onClick={() => setIsOpen(true)}
+        >
+          <span className="flex items-center gap-1.5">
+            <ImageWithHideOnError
+              src={`/assets/chains/${defaultChain?.id}.webp`}
+              width={20}
+              height={20}
+              className="h-5 rounded-sm size-5"
+              alt={`${defaultChain?.name || "Network"}-logo`}
+            />
+            <span className="text-sm font-medium truncate">
+              {defaultChain?.name || "Select Network"}
+            </span>
+          </span>
+        </button>
+      </DialogTrigger>
+      <DialogPortal>
+        <DialogContent
+          className="sm:max-w-md p-0 overflow-hidden z-[999999] fixed"
+          style={{ zIndex: 999999 }}
+        >
+          <DialogHeader className="p-4 border-b border-border-tertiary">
+            <DialogTitle className="text-lg">Choose a Network</DialogTitle>
+            <DialogDescription className="text-sm text-text-secondary">
+              Select a network and connect your wallet
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4">
+            {chains?.map((chain) => (
+              <button
+                key={chain.id}
+                onClick={() => {
+                  setDefaultChain(chain)
+                  // Immediately prompt to connect wallet after network selection
+                  setIsOpen(false)
+                  if (openConnectModal) {
+                    setTimeout(() => {
+                      openConnectModal()
+                      toggle() // Close mobile overlay
+                    }, 300)
+                  }
+                }}
+                className={`flex items-center justify-between w-full p-3 mb-2 rounded-lg transition-colors ${
+                  defaultChain?.id === chain.id
+                    ? "bg-bg-tertiary text-white"
+                    : "bg-bg-secondary hover:bg-bg-tertiary text-text-secondary hover:text-white"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <ImageWithHideOnError
+                    src={`/assets/chains/${chain.id}.webp`}
+                    width={24}
+                    height={24}
+                    className="rounded-sm size-6"
+                    alt={`${chain.name} Network`}
+                  />
+                  <div className="text-left">
+                    <p className="font-medium text-sm">{chain.name}</p>
+                    <p className="text-xs text-text-tertiary">
+                      {defaultChain?.id === chain.id
+                        ? "Selected"
+                        : "Tap to select"}
+                    </p>
+                  </div>
+                </div>
+                {defaultChain?.id === chain.id && (
+                  <div className="bg-green-600 rounded-full p-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="p-4 border-t border-border-tertiary bg-bg-secondary/50">
+            <button
+              onClick={() => {
+                setIsOpen(false)
+                if (openConnectModal) {
+                  openConnectModal()
+                }
+              }}
+              className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            >
+              Connect Wallet with {defaultChain?.name}
+            </button>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
+  )
+}
+
 export function MobileOverlay() {
   const { isOpen, toggle } = useMenuStore()
   const { address, isConnected } = useAccount()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
-  const { chains, setIsChainDialogOpen } = useChains()
+  const { setIsChainDialogOpen } = useChains()
   const pathname = usePathname()
 
   function handleConnect() {
@@ -138,21 +257,26 @@ export function MobileOverlay() {
               {/* Quick Actions Bar */}
               <div className="flex items-center justify-between gap-2 mb-6">
                 {/* Network Selection Button */}
-                <button
-                  onClick={openNetworkDialog}
-                  className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
-                >
-                  <ImageWithHideOnError
-                    src={`/assets/chains/${defaultChain?.id}.webp`}
-                    width={20}
-                    height={20}
-                    className="h-5 rounded-sm size-5"
-                    alt={`${defaultChain?.name || "Network"}-logo`}
-                  />
-                  <span className="text-sm font-medium truncate">
-                    {defaultChain?.name || "Select Network"}
-                  </span>
-                </button>
+
+                {isConnected ? (
+                  <button
+                    onClick={openNetworkDialog}
+                    className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
+                  >
+                    <ImageWithHideOnError
+                      src={`/assets/chains/${defaultChain?.id}.webp`}
+                      width={20}
+                      height={20}
+                      className="h-5 rounded-sm size-5"
+                      alt={`${defaultChain?.name || "Network"}-logo`}
+                    />
+                    <span className="text-sm font-medium truncate">
+                      {defaultChain?.name || "Select Network"}
+                    </span>
+                  </button>
+                ) : (
+                  <NetworkSelectionModal />
+                )}
 
                 {/* Wallet Button */}
                 {isConnected ? (

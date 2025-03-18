@@ -252,7 +252,7 @@ export function oldDatafeed({
           const end = new Date(periodParams.to * 1000)
           const formattedStart = start.toISOString().split("T")[0]
           const formattedEnd = end.toISOString().split("T")[0]
-          const defaultChain = useDefaultChain()
+          const { defaultChain } = useDefaultChain()
 
           const old_res = await fetch(
             `https://ohlc.mgvinfra.com/ohlc?market=${base}/${quote}&chain_id=${defaultChain.id}&interval=${resolution}&start_time=${formattedStart}&end_time=${formattedEnd}`,

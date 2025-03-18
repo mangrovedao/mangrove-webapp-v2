@@ -1,5 +1,5 @@
 import React from "react"
-import { useAccount, useSwitchChain } from "wagmi"
+import { useSwitchChain } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
 import { useDefaultChain } from "@/hooks/use-default-chain"
@@ -21,8 +21,7 @@ function getIconFromChainlist(name: string) {
 }
 
 export default function ChainSelector() {
-  const { chainId } = useAccount()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   const { switchChain } = useSwitchChain()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()

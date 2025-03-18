@@ -19,7 +19,7 @@ import { mangroveChains, uniClones } from "../lib/registry"
  * @returns {Object|undefined} mangroveChain - Mangrove configuration for the connected chain
  */
 export function useRegistry() {
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
 
   const { data: uniClone } = useQuery({
     queryKey: ["uni-clone", defaultChain.id],
