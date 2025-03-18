@@ -3,31 +3,32 @@ import React from "react"
 
 import useMarket from "@/providers/market"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
-import { AnimatedFillsSkeleton } from "./animated-fills-skeleton"
-import { useFills } from "./use-fills"
+import { AnimatedOrderHistorySkeleton } from "./animated-history-skeleton"
+import { useOrderHistory } from "./use-order-history"
 import { useTable } from "./use-table"
 
-export function Fills() {
+export function OrderHistory() {
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
   })
   const { currentMarket: market } = useMarket()
-  const { data: count } = useFills({
-    select: (fills) => fills.length,
+  const { data: count } = useOrderHistory({
+    select: (orderHistory) => orderHistory.length,
   })
-  const fillsQuery = useFills({
+
+  const orderHistoryQuery = useOrderHistory({
     filters: {
       skip: (page - 1) * pageSize,
     },
   })
 
   const table = useTable({
-    data: fillsQuery.data,
+    data: orderHistoryQuery.data,
   })
-
-  if (fillsQuery.isLoading || !market) {
-    return <AnimatedFillsSkeleton />
+  console.log(orderHistoryQuery.data)
+  if (orderHistoryQuery.isLoading || !market) {
+    return <AnimatedOrderHistorySkeleton />
   }
 
   return (

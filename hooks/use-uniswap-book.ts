@@ -157,7 +157,7 @@ export function useUniswapBook(params: { priceIncrement?: number }) {
           500,
           bidsDensityMultiplier,
           asksDensityMultiplier,
-          30,
+          12,
           params?.priceIncrement,
           uniClone,
         )

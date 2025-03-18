@@ -138,7 +138,7 @@ export async function getUniBook(
   // Generate arrays of random amounts around the averages
   const askWants = generateRandomAmounts(askWantsAvg, nOffers)
   const bidWants = generateRandomAmounts(bidWantsAvg, nOffers)
-  console.log(priceIncrement)
+
   // Get quotes for all amounts in a single multicall
   const result = await multicall(client, {
     contracts: askWants

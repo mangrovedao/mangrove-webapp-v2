@@ -4,12 +4,10 @@ import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
-import useIndexerSdk from "@/providers/mangrove-indexer"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
-import { hash } from "@mangrovedao/mgv"
-import { getSemibooksOLKeys } from "@mangrovedao/mgv/lib"
 import { parseOrders, type Order } from "../schema"
 
 type Params<T> = {
@@ -26,7 +24,7 @@ export function useOrders<T = Order[]>({
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
   const { currentMarket: market } = useMarket()
-  const { indexerSdk } = useIndexerSdk()
+  const { defaultChain } = useDefaultChain()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
@@ -43,33 +41,16 @@ export function useOrders<T = Order[]>({
       skip,
     ],
     queryFn: async () => {
-      if (!(indexerSdk && address && market)) return []
-      startLoading(TRADE.TABLES.ORDERS)
-
       try {
-        const { asksMarket, bidsMarket } = getSemibooksOLKeys(market)
+        if (!(address && market)) return []
+        startLoading(TRADE.TABLES.ORDERS)
 
-        const result = await indexerSdk.getOpenLimitOrders({
-          ask: {
-            token: {
-              address: asksMarket.outbound_tkn,
-              decimals: market.base.decimals,
-            },
-            olKey: hash(asksMarket),
-          },
-          bid: {
-            token: {
-              address: bidsMarket.outbound_tkn,
-              decimals: market.quote.decimals,
-            },
-            olKey: hash(bidsMarket),
-          },
-          first,
-          skip,
-          maker: address.toLowerCase(),
-        })
+        const activeOrders = await fetch(
+          `https://indexer.mgvinfra.com/orders/history/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}&page=${0}&limit=${first}`,
+        ).then(async (res) => await res.json())
 
-        const parsedData = parseOrders(result)
+        console.log(activeOrders)
+        const parsedData = parseOrders(activeOrders)
         return parsedData
       } catch (e) {
         console.error(getErrorMessage(e))
@@ -80,9 +61,9 @@ export function useOrders<T = Order[]>({
     },
     select,
     meta: {
-      error: "Unable to retrieve orders",
+      error: "Unable to retrieve open orders",
     },
-    enabled: !!(isConnected && indexerSdk),
+    enabled: !!isConnected,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

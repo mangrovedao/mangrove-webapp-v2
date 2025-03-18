@@ -10,8 +10,8 @@ import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useLoadingStore } from "@/stores/loading.store"
 import { TRADE } from "../../_constants/loading-keys"
-import { Fills } from "./fills/fills"
-import { useFills } from "./fills/use-fills"
+import { OrderHistory } from "./order-history/order-history"
+import { useOrderHistory } from "./order-history/use-order-history"
 
 import { useAccount } from "wagmi"
 import { useOrders } from "./orders/hooks/use-orders"
@@ -19,18 +19,18 @@ import { Orders } from "./orders/orders"
 
 export enum TradeTablesLoggedIn {
   ORDERS = "Open Orders",
-  FILLS = "Orders History",
+  ORDER_HISTORY = "Orders History",
 }
 
 export enum TradeTablesLoggedOut {
   ORDERS = "Open Orders",
-  FILLS = "Orders History",
+  ORDER_HISTORY = "Orders History",
 }
 
 export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const { isConnected } = useAccount()
-  const [ordersLoading, fillsLoading] = useLoadingStore((state) =>
-    state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS]),
+  const [ordersLoading, orderHistoryLoading] = useLoadingStore((state) =>
+    state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY]),
   )
   const [defaultEnum, setDefaultEnum] = React.useState(
     isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut,
@@ -39,13 +39,13 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
     Object.values(defaultEnum)[0] || "Open Orders",
   )
 
-  // Get the total count of orders and fills
+  // Get the total count of orders and history
   const { data: ordersCount } = useOrders({
     select: (orders) => orders.length,
   })
 
-  const { data: fillsCount } = useFills({
-    select: (fills) => fills.length,
+  const { data: orderHistoryCount } = useOrderHistory({
+    select: (orderHistory) => orderHistory.length,
   })
 
   React.useEffect(() => {
@@ -71,7 +71,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
         >
           <CustomTabsList
             className="flex p-0 justify-start space-x-0 w-full h-8"
-            loading={ordersLoading ?? fillsLoading}
+            loading={ordersLoading ?? orderHistoryLoading}
           >
             {Object.values(defaultEnum).map((table) => (
               <CustomTabsTrigger
@@ -81,8 +81,8 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                 count={
                   isConnected && table === TradeTablesLoggedIn.ORDERS
                     ? ordersCount
-                    : isConnected && table === TradeTablesLoggedIn.FILLS
-                      ? fillsCount
+                    : isConnected && table === TradeTablesLoggedIn.ORDER_HISTORY
+                      ? orderHistoryCount
                       : 0
                 }
               >
@@ -102,9 +102,8 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                     {table === TradeTablesLoggedIn.ORDERS && isConnected && (
                       <Orders />
                     )}
-                    {table === TradeTablesLoggedIn.FILLS && isConnected && (
-                      <Fills />
-                    )}
+                    {table === TradeTablesLoggedIn.ORDER_HISTORY &&
+                      isConnected && <OrderHistory />}
                   </div>
                   <ScrollBar orientation="vertical" className="z-50" />
                   <ScrollBar orientation="horizontal" />

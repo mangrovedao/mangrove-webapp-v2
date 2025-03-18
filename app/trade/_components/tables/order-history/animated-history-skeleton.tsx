@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 
-export function AnimatedFillsSkeleton() {
+export function AnimatedOrderHistorySkeleton() {
   return (
     <div className="w-full h-full flex flex-col">
       {/* Header */}

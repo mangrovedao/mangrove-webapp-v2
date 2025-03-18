@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const fillSchema = z.object({
+const orderHistorySchema = z.object({
   creationDate: z.date(),
   transactionHash: z.string(),
   isBid: z.boolean(),
@@ -14,17 +14,17 @@ const fillSchema = z.object({
   status: z.string(),
   isMarketOrder: z.boolean(),
 })
-export type Fill = z.infer<typeof fillSchema>
+export type OrderHistory = z.infer<typeof orderHistorySchema>
 
-export function parseFills(data: unknown[]): Fill[] {
+export function parseOrderHistory(data: unknown[]): OrderHistory[] {
   return data
     .map((item) => {
       try {
-        return fillSchema.parse(item)
+        return orderHistorySchema.parse(item)
       } catch (error) {
-        console.error("Invalid format for fills: ", item, error)
+        console.error("Invalid format for order history: ", item, error)
         return null
       }
     })
-    .filter(Boolean) as Fill[]
+    .filter(Boolean) as OrderHistory[]
 }

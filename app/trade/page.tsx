@@ -20,7 +20,7 @@ import { TradeTabs } from "./_components/trade-tabs/trade-tabs"
 export default function Page() {
   const [activeMainTab, setActiveMainTab] = useState("Chart")
   const mainTabs = ["Chart", "Order Book", "Trades"]
-  const [isMobile, setIsMobile] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   // Check if we're on mobile
