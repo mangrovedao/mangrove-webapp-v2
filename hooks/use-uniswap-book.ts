@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import useMarket from "@/providers/market"
 import { printEvmError } from "@/utils/errors"
@@ -47,42 +47,6 @@ export type EnhancedOffer = {
   status: OfferStatus
   transitionStartTime?: number
   [key: string]: any
-}
-
-// Helper function to check if book data has changed
-function hasBookChanged(prevBook: any, newBook: any) {
-  if (!prevBook || !newBook) return true
-
-  // Quick length check first (most efficient)
-  if (
-    prevBook.asks.length !== newBook.asks.length ||
-    prevBook.bids.length !== newBook.bids.length
-  ) {
-    return true
-  }
-
-  // Check if any ask has changed (price or volume only)
-  for (let i = 0; i < newBook.asks.length; i++) {
-    if (
-      prevBook.asks[i]?.price !== newBook.asks[i]?.price ||
-      prevBook.asks[i]?.volume !== newBook.asks[i]?.volume
-    ) {
-      return true
-    }
-  }
-
-  // Check if any bid has changed (price or volume only)
-  for (let i = 0; i < newBook.bids.length; i++) {
-    if (
-      prevBook.bids[i]?.price !== newBook.bids[i]?.price ||
-      prevBook.bids[i]?.volume !== newBook.bids[i]?.volume
-    ) {
-      return true
-    }
-  }
-
-  // No changes detected
-  return false
 }
 
 // Helper function to process offers and mark their status
@@ -151,15 +115,15 @@ function processOffers(
   return [...processedOffers, ...removedOffers]
 }
 
-export function useUniswapBook() {
+export function useUniswapBook(params: { priceIncrement?: number }) {
   const { currentMarket } = useMarket()
   const client = useNetworkClient()
   const { book } = useBook()
   const { chain } = useAccount()
   const { uniClone } = useRegistry()
+
   const [asksMap, setAsksMap] = useState<Map<string, EnhancedOffer>>(new Map())
   const [bidsMap, setBidsMap] = useState<Map<string, EnhancedOffer>>(new Map())
-  const prevBookRef = useRef<any>(null)
 
   const query = useQuery({
     queryKey: [
@@ -168,6 +132,7 @@ export function useUniswapBook() {
       currentMarket?.quote.address.toString(),
       chain?.id,
       client?.key,
+      params?.priceIncrement,
     ],
     queryFn: async () => {
       try {
@@ -192,7 +157,8 @@ export function useUniswapBook() {
           500,
           bidsDensityMultiplier,
           asksDensityMultiplier,
-          12,
+          30,
+          params?.priceIncrement,
           uniClone,
         )
 

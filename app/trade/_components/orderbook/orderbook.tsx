@@ -164,10 +164,9 @@ export const BookContent = React.memo(function BookContent() {
   const { currentMarket } = useMarket()
   const { bodyRef, scrollAreaRef, spreadRef, scrollToMiddle } =
     useScrollToMiddle()
-  const { data: book, isLoading } = useUniswapBook()
-  const [viewOption, setViewOption] = useState<ViewOption>("default")
   const [priceIncrement, setPriceIncrement] = useState<number>(0)
-  const renderCount = React.useRef(0)
+  const { data: book, isLoading } = useUniswapBook({ priceIncrement })
+  const [viewOption, setViewOption] = useState<ViewOption>("default")
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   // Filter book data based on selected price increment
@@ -189,8 +188,11 @@ export const BookContent = React.memo(function BookContent() {
     }
 
     return {
-      asks: filterBookByPriceIncrement(asks, priceIncrement, midPrice),
-      bids: filterBookByPriceIncrement(bids, priceIncrement, midPrice),
+      // asks: filterBookByPriceIncrement(asks, priceIncrement, midPrice),
+      // bids: filterBookByPriceIncrement(bids, priceIncrement, midPrice),
+
+      asks: book.asks,
+      bids: book.bids,
       midPrice,
     }
   }, [book, priceIncrement])
