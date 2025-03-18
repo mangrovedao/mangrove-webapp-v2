@@ -39,11 +39,6 @@ export function Accordion({
         <button className="flex items-center justify-between w-full hover:opacity-80 transition-opacity">
           <span className="text-text-secondary flex items-center text-xs">
             {title}
-            {tooltip && (
-              <InfoTooltip className="text-text-quaternary text-sm">
-                {tooltip}
-              </InfoTooltip>
-            )}
           </span>
           <div className="flex items-center">
             {chevronValue && (
@@ -56,6 +51,11 @@ export function Accordion({
                 "h-6 w-6 transition-transform group-data-[state=open]:rotate-180 text-text-secondary"
               }
             />
+            {tooltip && (
+              <InfoTooltip className="text-text-quaternary text-sm">
+                {tooltip}
+              </InfoTooltip>
+            )}
           </div>
 
           <span className="sr-only">Toggle</span>

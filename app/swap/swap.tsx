@@ -6,7 +6,6 @@ import React from "react"
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
 import { TokenIcon } from "@/components/token-icon"
-import { Text } from "@/components/typography/text"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -70,12 +69,12 @@ export default function Swap() {
 
   return (
     <>
-      <div className="bg-bg-secondary rounded-2xl p-5 relative mt-16">
+      <div className="bg-bg-secondary rounded-sm p-5 relative mt-40">
         <div className="absolute max-w-[234px] top-0 -right-4 -translate-y-[73px] translate-x-[15px] w-full h-[121px]">
           <Rive src="/assets/rive/iguane.riv" animations="Timeline 1" />
         </div>
         <h1 className="text-2xl mb-4">Swap</h1>
-        <div className="space-y-4 relative">
+        <div className="space-y-2 relative">
           <div className="space-y-0.5">
             <TokenContainer
               type="pay"
@@ -133,53 +132,24 @@ export default function Swap() {
               {swapButtonText}
             </Button>
           )}
-          {payToken?.symbol.includes("ETH") &&
-            ethBalance?.value &&
-            ethBalance.value > 0n && (
-              <div className="flex justify-between items-center px-1">
-                <Text className="flex items-center text-muted-foreground text-base">
-                  Use ETH balance
-                  <InfoTooltip className="text-text-quaternary text-sm">
-                    Will add a wrap ETH to wETH step during transaction
-                  </InfoTooltip>
-                </Text>
-                <div className="flex items-center gap-1 text-xs text-text-secondary">
-                  <span>
-                    {getExactWeiAmount(
-                      formatUnits(
-                        ethBalance?.value ?? 0n,
-                        ethBalance?.decimals ?? 18,
-                      ),
-                      3,
-                    )}{" "}
-                    ETH
-                  </span>
-                  <Checkbox
-                    className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
-                    checked={isWrapping}
-                    onClick={() => setIsWrapping(!isWrapping)}
-                  />
-                </div>
-              </div>
-            )}
           <Accordion
             title="Slippage tolerance"
-            tooltip="How much price slippage you're willing to accept so that your order can be executed"
             chevronValue={`${slippage}%`}
+            tooltip="How much price slippage you're willing to accept so that your order can be executed"
           >
             <div className="space-y-2 mt-1">
-              <div className="flex justify-around bg-bg-primary rounded-lg">
+              <div className="flex justify-around bg-bg-primary rounded-sm">
                 {SLIPPAGES.map((value) => (
                   <Button
                     key={`percentage-button-${value}`}
                     variant={"secondary"}
                     size={"sm"}
                     className={cn(
-                      "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                      "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                       {
                         "opacity-10":
                           Number(slippage) !== Number(value) || showCustomInput,
-                        "border-none bg-bg-tertiary rounded-lg":
+                        "border-none bg-bg-tertiary rounded-sm":
                           Number(slippage) === Number(value) &&
                           !showCustomInput,
                       },
@@ -201,10 +171,10 @@ export default function Swap() {
                   variant={"secondary"}
                   size={"sm"}
                   className={cn(
-                    "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                    "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                     {
                       "opacity-10": !showCustomInput,
-                      "border-none bg-bg-tertiary rounded-lg": showCustomInput,
+                      "border-none bg-bg-tertiary rounded-sm": showCustomInput,
                     },
                   )}
                 >
@@ -224,6 +194,35 @@ export default function Swap() {
               )}
             </div>
           </Accordion>
+          {payToken?.symbol.includes("ETH") &&
+            ethBalance?.value &&
+            ethBalance.value > 0n && (
+              <div className="flex justify-between items-center ">
+                <span className="text-text-secondary flex items-center text-xs">
+                  Use ETH balance
+                </span>
+                <div className="flex items-center gap-1 text-xs text-text-secondary">
+                  <span>
+                    {getExactWeiAmount(
+                      formatUnits(
+                        ethBalance?.value ?? 0n,
+                        ethBalance?.decimals ?? 18,
+                      ),
+                      3,
+                    )}{" "}
+                    ETH
+                  </span>
+                  <Checkbox
+                    className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                    checked={isWrapping}
+                    onClick={() => setIsWrapping(!isWrapping)}
+                  />
+                  <InfoTooltip className="text-text-quaternary text-sm">
+                    Will add a wrap ETH to wETH step during transaction
+                  </InfoTooltip>
+                </div>
+              </div>
+            )}
         </div>
         <TokenSelectorDialog
           type="sell"
@@ -301,12 +300,12 @@ function TokenSelectorDialog({
               <div key={token.address}>
                 <Button
                   onClick={() => onSelect(token)}
-                  className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-2"
+                  className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
                 >
                   <div className="relative">
                     <TokenIcon
                       symbol={token.symbol}
-                      imgClasses="rounded-full w-7"
+                      imgClasses="rounded-sm w-7"
                       customSrc={ODOS_API_IMAGE_URL(token.symbol)}
                       useFallback={true}
                     />
@@ -365,7 +364,7 @@ function TokenContainer({
     <div
       className={cn(
         "flex bg-primary-solid-black px-6 py-4 flex-col border border-transparent transition-all focus-within:!border-green-caribbean hover:border-border-primary",
-        type === "pay" ? "rounded-t-xl" : "rounded-b-xl",
+        type === "pay" ? "rounded-t-sm" : "rounded-b-sm",
       )}
     >
       <div className="flex justify-between items-center w-full">
@@ -401,27 +400,23 @@ function TokenContainer({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        {loadingValue ? (
-          <Skeleton className="bg-muted-foreground w-full h-10 my-2" />
-        ) : (
-          <Input
-            aria-label="You pay"
-            className="border-none outline-none p-0 text-3xl"
-            placeholder="0"
-            value={value}
-            onChange={onChange}
-          />
-        )}
+        <Input
+          aria-label="You pay"
+          className="border-none outline-none p-0 text-3xl"
+          placeholder="0"
+          value={value}
+          onChange={onChange}
+        />
         <span>
           {token ? (
             <Button
               onClick={onTokenClicked}
-              className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-full text-sm flex items-center space-x-1"
+              className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-sm text-sm flex items-center space-x-1"
             >
               <TokenIcon
                 symbol={token.symbol}
                 customSrc={ODOS_API_IMAGE_URL(token.symbol)}
-                imgClasses="rounded-full"
+                imgClasses="rounded-sm"
                 useFallback={true}
               />
               <span className="font-semibold text-lg text-nowrap pl-2">
@@ -437,10 +432,10 @@ function TokenContainer({
         </span>
       </div>
       <div className="flex justify-between items-center opacity-70">
-        {isFetchingDollarValue ? (
-          <Skeleton className="w-10 h-3 bg-gray" />
-        ) : Number(dollars) <= 0 ? (
-          ""
+        {Number(dollars) <= 0 ? (
+          <div className="text-sm text-left text-text-quaternary">
+            ≈ <span className="text-text-secondary">0</span> $
+          </div>
         ) : (
           <div className="text-sm text-left text-text-quaternary">
             ≈{" "}

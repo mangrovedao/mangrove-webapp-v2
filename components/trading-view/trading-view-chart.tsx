@@ -11,9 +11,11 @@ import {
   type OHLCVBar,
 } from "@/services/dexscreener-api"
 import { cn } from "@/utils"
-import React from "react"
+import { ZoomOutIcon } from "lucide-react"
+import React, { useCallback } from "react"
 import {
   IBasicDataFeed,
+  IChartingLibraryWidget,
   ResolutionString,
   widget,
   type ChartingLibraryWidgetOptions,
@@ -229,6 +231,31 @@ export const TVChartContainer = (
   const { defaultChain } = useDefaultChain()
   const [isLoading, setIsLoading] = React.useState(true)
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
+  // Keep a reference to the widget
+  const tvWidgetRef = React.useRef<IChartingLibraryWidget | null>(null)
+
+  // Handle unzooming the price scale
+  const handleUnzoomPriceScale = useCallback(() => {
+    if (!tvWidgetRef.current) return
+
+    try {
+      // Simply reload the chart with current settings
+      // This effectively resets all zooming to default
+      if (currentMarket) {
+        const symbol = `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`
+        const interval = tvWidgetRef.current
+          .activeChart()
+          .resolution() as ResolutionString
+
+        // Force a reset by reloading the chart
+        tvWidgetRef.current.setSymbol(symbol, interval, () => {
+          /* callback after symbol is loaded */
+        })
+      }
+    } catch (error) {
+      console.error("Error unzooming price scale", error)
+    }
+  }, [currentMarket])
 
   React.useEffect(() => {
     if (!currentMarket || !chartContainerRef.current) return
@@ -281,10 +308,12 @@ export const TVChartContainer = (
       studies_overrides: {
         "volume.precision": 0,
       },
-      fullscreen: false,
       autosize: true,
       ...props,
     })
+
+    // Save reference to widget
+    tvWidgetRef.current = tvWidget
 
     tvWidget.onChartReady(() => {
       setIsLoading(false)
@@ -292,6 +321,7 @@ export const TVChartContainer = (
 
     return () => {
       tvWidget.remove()
+      tvWidgetRef.current = null
     }
   }, [currentMarket, defaultChain.id, props])
 
@@ -302,6 +332,17 @@ export const TVChartContainer = (
           <AnimatedChartSkeleton />
         </div>
       )}
+
+      {!isLoading && (
+        <button
+          onClick={handleUnzoomPriceScale}
+          className="absolute top-2 right-2 z-20 bg-bg-secondary/80 hover:bg-bg-secondary p-1 rounded-sm text-text-secondary hover:text-text-primary transition-colors"
+          title="Reset price scale"
+        >
+          <ZoomOutIcon size={16} />
+        </button>
+      )}
+
       <div
         ref={chartContainerRef}
         className={cn("w-full h-full", isLoading ? "opacity-0" : "opacity-100")}

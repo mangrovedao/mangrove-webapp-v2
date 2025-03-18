@@ -115,7 +115,7 @@ function processOffers(
   return [...processedOffers, ...removedOffers]
 }
 
-export function useUniswapBook(params: { priceIncrement?: number }) {
+export function useUniswapBook(params: { priceIncrement?: number } = {}) {
   const { currentMarket } = useMarket()
   const client = useNetworkClient()
   const { book } = useBook()
