@@ -226,7 +226,7 @@ export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
 ) => {
   const { currentMarket } = useMarket()
-  const defaultChain = useDefaultChain()
+  const { defaultChain } = useDefaultChain()
   const [isLoading, setIsLoading] = React.useState(true)
   const chartContainerRef = React.useRef<HTMLDivElement>(null)
 
