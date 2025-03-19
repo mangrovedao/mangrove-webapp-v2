@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from "react"
-import { toast } from "sonner"
 import { formatUnits, parseEther } from "viem"
 import {
   useAccount,
@@ -7,14 +6,11 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi"
 
-import { tradeService } from "@/app/trade/_services/trade.service"
 import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { Logic } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 
-import { printEvmError } from "@/utils/errors"
 import { useTransactionState } from "../../hooks/use-transaction-state"
 import { wethAdresses } from "../limit"
 import { usePostLimitOrder } from "./use-post-limit-order"
@@ -60,11 +56,6 @@ export function useLimitTransaction({
   const post = usePostLimitOrder({
     onResult: (result) => {
       setTxState("idle")
-      // tradeService.openTxCompletedDialog({
-      //   address: result.transactionHash ?? "",
-      //   blockExplorerUrl: chain?.blockExplorers?.default.url,
-      // })
-      // toast.success("Transaction completed successfully!")
     },
   })
 
@@ -126,13 +117,8 @@ export function useLimitTransaction({
           },
         },
         {
-          onError: (error: Error) => {
-            // setTxState("idle")
-            printEvmError(error)
-            toast.error("Failed to post the limit order")
-            tradeService.openTxFailedDialog(
-              getTitleDescriptionErrorMessages(error),
-            )
+          onSettled: () => {
+            setTxState("idle")
           },
         },
       )

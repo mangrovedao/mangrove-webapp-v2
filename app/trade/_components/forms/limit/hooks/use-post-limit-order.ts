@@ -139,6 +139,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
 
         return { result, receipt }
       } catch (error) {
+        console.log("limit order error", error)
         printEvmError(error)
         toast.error("Failed to post the limit order")
       }
