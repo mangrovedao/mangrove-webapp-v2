@@ -254,7 +254,7 @@ export function useMarketForm(props: Props) {
         // errors.send = ""
       } else if (
         !isWrapping &&
-        sendValue >
+        sendValue - 0.0000001 >
           Number(
             formatUnits(
               sendTokenBalance.balance?.balance || 0n,

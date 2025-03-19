@@ -326,7 +326,7 @@ export function useLimit(props: Props) {
         // errors.send = "Pay amount required"
       } else if (
         !isWrapping &&
-        sendValue >
+        sendValue - 0.0000001 >
           Number(
             formatUnits(
               sendTokenBalance?.balance || 0n,

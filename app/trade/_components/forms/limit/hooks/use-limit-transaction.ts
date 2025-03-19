@@ -45,7 +45,7 @@ export function useLimitTransaction({
 
   const { data: limitOrderSteps } = useLimitSteps(hookParams)
 
-  console.log("limitOrderSteps", limitOrderSteps, form)
+  console.log("limitOrderSteps", limitOrderSteps, form.state.values)
 
   // Get logics
   const logics = useLogics()
@@ -114,7 +114,13 @@ export function useLimitTransaction({
     try {
       await post.mutateAsync(
         {
-          form,
+          form: {
+            ...form.state.values,
+            send:
+              baseToken?.symbol === "WETH"
+                ? (Number(form.state.values.send) - 0.0000001).toString()
+                : form.state.values.send,
+          },
         },
         {
           onSettled: () => {
