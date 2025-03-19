@@ -1,10 +1,4 @@
-import { tradeService } from "@/app/trade/_services/trade.service"
-import { useLogics } from "@/hooks/use-addresses"
-import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
-import { Logic } from "@mangrovedao/mgv"
-import { BS } from "@mangrovedao/mgv/lib"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { toast } from "sonner"
 import { formatUnits, parseEther } from "viem"
 import {
@@ -12,7 +6,14 @@ import {
   useSendTransaction,
   useWaitForTransactionReceipt,
 } from "wagmi"
-import { useTradeInfos } from "../../hooks/use-trade-infos"
+
+import { tradeService } from "@/app/trade/_services/trade.service"
+import { useLogics } from "@/hooks/use-addresses"
+import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
+import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
+import { Logic } from "@mangrovedao/mgv"
+import { BS } from "@mangrovedao/mgv/lib"
+
 import { useTransactionState } from "../../hooks/use-transaction-state"
 import { wethAdresses } from "../limit"
 import { usePostLimitOrder } from "./use-post-limit-order"
@@ -36,14 +37,16 @@ export function useLimitTransaction({
   isWrapping,
 }: UseLimitTransactionProps) {
   const { isConnected, address, chain } = useAccount()
-  const { spender } = useTradeInfos("limit", tradeSide)
 
-  // Limit steps to check if approval is needed
-  const { data: limitOrderSteps } = useLimitSteps({
-    user: address,
-    bs: tradeSide,
-    logic: form.state.values.sendFrom,
-  })
+  const hookParams = useMemo(
+    () => ({
+      user: address,
+      bs: tradeSide,
+    }),
+    [address, tradeSide],
+  )
+
+  const { data: limitOrderSteps } = useLimitSteps(hookParams)
 
   // Get logics
   const logics = useLogics()
@@ -110,7 +113,7 @@ export function useLimitTransaction({
 
   // Check if approval is needed
   const needsApproval = limitOrderSteps ? !limitOrderSteps[0].done : undefined
-
+  console.log(limitOrderSteps)
   // Handle posting order
   const handlePostOrder = async () => {
     setTxState("posting")
@@ -164,7 +167,7 @@ export function useLimitTransaction({
         {
           token: sendToken,
           logic: logic as Logic,
-          spender,
+          spender: limitOrderSteps?.[0].params.spender,
         },
         {
           onSuccess: () => {

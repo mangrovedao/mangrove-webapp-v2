@@ -46,11 +46,11 @@ export function useOrderHistory<T = OrderHistory[]>({
         startLoading(TRADE.TABLES.ORDERS)
 
         const orderHistory = await fetch(
-          `https://indexer.mgvinfra.com/orders/active/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}&page=${0}&limit=${first}`,
+          `https://indexer.mgvinfra.com/orders/history/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}&page=${0}&limit=${first}`,
         ).then(async (res) => await res.json())
 
         // Transform the raw data to match our schema format
-        const transformedData = orderHistory?.map((item: any) => ({
+        const transformedData = orderHistory.orders?.map((item: any) => ({
           creationDate: new Date(item.timestamp * 1000),
           transactionHash: item.transactionHash,
           isBid: item.side === "buy",
@@ -65,7 +65,7 @@ export function useOrderHistory<T = OrderHistory[]>({
           isMarketOrder: item.type !== "GTC", // Assuming non-GTC orders are market orders
         }))
 
-        console.log(transformedData)
+        console.log("order history", { transformedData })
 
         const parsedData = parseOrderHistory(transformedData)
         return parsedData

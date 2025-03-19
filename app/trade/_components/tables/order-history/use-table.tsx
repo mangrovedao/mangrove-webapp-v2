@@ -17,13 +17,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
-import type { Fill } from "./schema"
+import type { OrderHistory } from "./schema"
 
-const columnHelper = createColumnHelper<Fill>()
-const DEFAULT_DATA: Fill[] = []
+const columnHelper = createColumnHelper<OrderHistory>()
+const DEFAULT_DATA: OrderHistory[] = []
 
 type Params = {
-  data?: Fill[]
+  data?: OrderHistory[]
 }
 
 export function useTable({ data }: Params) {

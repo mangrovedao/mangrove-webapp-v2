@@ -193,8 +193,11 @@ export function useUniswapBook(params: { priceIncrement?: number } = {}) {
     const enhancedBids = processOffers(newData.bids, bidsMap)
 
     // Merge offers with the same price
-    const mergedAsks = mergeOffersSamePrice(enhancedAsks)
-    const mergedBids = mergeOffersSamePrice(enhancedBids)
+    // const mergedAsks = mergeOffersSamePrice(enhancedAsks)
+    // const mergedBids = mergeOffersSamePrice(enhancedBids)
+
+    const mergedAsks = enhancedAsks
+    const mergedBids = enhancedBids
 
     // Sort offers and limit to 12 on each side
     const MAX_OFFERS = 12

@@ -46,11 +46,27 @@ export function useOrders<T = Order[]>({
         startLoading(TRADE.TABLES.ORDERS)
 
         const activeOrders = await fetch(
-          `https://indexer.mgvinfra.com/orders/history/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}&page=${0}&limit=${first}`,
+          `https://indexer.mgvinfra.com/orders/active/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}&page=${0}&limit=${first}`,
         ).then(async (res) => await res.json())
 
-        console.log(activeOrders)
-        const parsedData = parseOrders(activeOrders)
+        const transformedData = activeOrders.orders?.map((item: any) => ({
+          creationDate: new Date(item.timestamp * 1000),
+          transactionHash: item.transactionHash,
+          isBid: item.side === "buy",
+          takerGot: item.received?.toString() || "0",
+          takerGave: item.sent?.toString() || "0",
+          penalty: "0", // Default value as it's not in the raw data
+          feePaid: item.fee?.toString() || "0",
+          initialWants: "0", // Default value as it's not in the raw data
+          initialGives: "0", // Default value as it's not in the raw data
+          price: item.price?.toString() || "0",
+          status: item.status || "",
+          isMarketOrder: item.type !== "GTC", // Assuming non-GTC orders are market orders
+        }))
+
+        console.log("active orders", { transformedData })
+
+        const parsedData = parseOrders(transformedData)
         return parsedData
       } catch (e) {
         console.error(getErrorMessage(e))

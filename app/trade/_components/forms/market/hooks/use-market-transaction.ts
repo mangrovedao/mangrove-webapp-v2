@@ -11,7 +11,6 @@ import {
   useSendTransaction,
   useWaitForTransactionReceipt,
 } from "wagmi"
-import { useTradeInfos } from "../../hooks/use-trade-infos"
 import { useTransactionState } from "../../hooks/use-transaction-state"
 import { wethAdresses } from "../market"
 import { usePostMarketOrder } from "./use-post-market-order"
@@ -38,7 +37,6 @@ export function useMarketTransaction({
 }: UseMarketTransactionProps) {
   const { isConnected, address, chain } = useAccount()
   const { mangroveChain } = useRegistry()
-  const { spender } = useTradeInfos("market", tradeSide)
 
   // Market steps to check if approval is needed
   const { data: marketOrderSteps } = useMarketSteps({

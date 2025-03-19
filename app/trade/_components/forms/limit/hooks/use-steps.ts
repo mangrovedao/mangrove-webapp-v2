@@ -6,8 +6,8 @@ import { Address, Client } from "viem"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useBalances } from "@/hooks/use-balances"
 import { useMarketClient } from "@/hooks/use-market"
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
-import { usePublicClient } from "wagmi"
 
 type Props = {
   bs: BS
@@ -19,7 +19,7 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
   const marketClient = useMarketClient()
   const balances = useBalances()
   const addresses = useMangroveAddresses()
-  const publicClient = usePublicClient()
+  const networkClient = useNetworkClient()
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -29,7 +29,7 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
         if (!marketClient?.name || !user || !addresses) return null
 
         const userRouter = await getUserRouter(
-          publicClient as Client,
+          networkClient as Client,
           addresses,
           {
             user,
