@@ -8,8 +8,8 @@ import { useAccount } from "wagmi"
  * @returns The chain ID of the connected user or base.id if not connected
  */
 export function useDefaultChain() {
-  const [defaultChain, setDefaultChain] = React.useState<Chain>(base)
   const { isConnected, chain } = useAccount()
+  const [defaultChain, setDefaultChain] = React.useState<Chain>(chain ?? base)
 
   return {
     defaultChain: isConnected && chain ? chain : defaultChain,
