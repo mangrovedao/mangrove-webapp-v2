@@ -14,6 +14,7 @@ import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { Logic } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 
+import { printEvmError } from "@/utils/errors"
 import { useTransactionState } from "../../hooks/use-transaction-state"
 import { wethAdresses } from "../limit"
 import { usePostLimitOrder } from "./use-post-limit-order"
@@ -126,7 +127,8 @@ export function useLimitTransaction({
         },
         {
           onError: (error: Error) => {
-            setTxState("idle")
+            // setTxState("idle")
+            printEvmError(error)
             toast.error("Failed to post the limit order")
             tradeService.openTxFailedDialog(
               getTitleDescriptionErrorMessages(error),
