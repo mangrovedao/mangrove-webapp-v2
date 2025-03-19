@@ -113,7 +113,7 @@ export function useLimitTransaction({
 
   // Check if approval is needed
   const needsApproval = limitOrderSteps ? !limitOrderSteps[0].done : undefined
-  console.log(limitOrderSteps)
+
   // Handle posting order
   const handlePostOrder = async () => {
     setTxState("posting")

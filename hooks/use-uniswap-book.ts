@@ -119,6 +119,7 @@ export function useUniswapBook(params: { priceIncrement?: number } = {}) {
   const { currentMarket } = useMarket()
   const client = useNetworkClient()
   const { book } = useBook()
+
   const { chain } = useAccount()
   const { uniClone } = useRegistry()
 
@@ -208,14 +209,16 @@ export function useUniswapBook(params: { priceIncrement?: number } = {}) {
     // For asks, we want to display from highest to lowest price (top to bottom)
     // But we want to select the 12 asks that are CLOSEST to the mid price
     // So we take the first 12 (lowest priced) and reverse them for display
-    const sortedAsks = allAsksSorted.slice(0, MAX_OFFERS).reverse()
+    // const sortedAsks = allAsksSorted.slice(0, MAX_OFFERS).reverse()
+    const sortedAsks = allAsksSorted.reverse()
 
     // First sort all bids by price (descending order)
     const allBidsSorted = [...mergedBids].sort((a, b) => b.price - a.price)
 
     // For bids, we want to display from highest to lowest price (top to bottom)
     // We take the highest priced bids (which are already sorted correctly)
-    const sortedBids = allBidsSorted.slice(0, MAX_OFFERS)
+    // const sortedBids = allBidsSorted.slice(0, MAX_OFFERS)
+    const sortedBids = allBidsSorted
 
     // Update state maps for next cycle
     const newAsksMap = new Map<string, EnhancedOffer>()

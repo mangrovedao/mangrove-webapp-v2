@@ -49,24 +49,51 @@ export function useOrders<T = Order[]>({
           `https://indexer.mgvinfra.com/orders/active/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}&page=${0}&limit=${first}`,
         ).then(async (res) => await res.json())
 
-        const transformedData = activeOrders.orders?.map((item: any) => ({
-          creationDate: new Date(item.timestamp * 1000),
-          transactionHash: item.transactionHash,
-          isBid: item.side === "buy",
-          takerGot: item.received?.toString() || "0",
-          takerGave: item.sent?.toString() || "0",
-          penalty: "0", // Default value as it's not in the raw data
-          feePaid: item.fee?.toString() || "0",
-          initialWants: "0", // Default value as it's not in the raw data
-          initialGives: "0", // Default value as it's not in the raw data
-          price: item.price?.toString() || "0",
-          status: item.status || "",
-          isMarketOrder: item.type !== "GTC", // Assuming non-GTC orders are market orders
-        }))
+        const transformedData = activeOrders.orders?.map((item: any) => {
+          // Safe date parsing function that handles invalid or missing timestamps
+          const safeDate = (timestamp: number | undefined | null) => {
+            // Check if timestamp is valid number and reasonable (after 2010)
+            if (
+              timestamp &&
+              typeof timestamp === "number" &&
+              timestamp > 1262304000
+            ) {
+              try {
+                const date = new Date(timestamp * 1000)
+                // Verify the date is valid
+                if (!isNaN(date.getTime())) {
+                  return date
+                }
+              } catch (e) {
+                console.warn("Invalid date parsing", timestamp, e)
+              }
+            }
+            // Return current date as fallback for required date fields
+            return new Date()
+          }
+
+          return {
+            creationDate: safeDate(item.timestamp),
+            latestUpdateDate: safeDate(item.timestamp), // Using same timestamp for latest update
+            expiryDate: item.expiryDate ? safeDate(item.expiryDate) : undefined,
+            transactionHash: item.transactionHash || "",
+            isBid: item.side === "buy",
+            takerGot: item.received?.toString() || "0",
+            takerGave: item.sent?.toString() || "0",
+            penalty: "0", // Default value as it's not in the raw data
+            feePaid: item.fee?.toString() || "0",
+            initialWants: item.initialWants?.toString() || "0",
+            initialGives: item.initialGives?.toString() || "0",
+            price: item.price?.toString() || "0",
+            offerId: item.offerId?.toString() || "0",
+            inboundRoute: item.inboundRoute || "",
+            outboundRoute: item.outboundRoute || "",
+          }
+        })
 
         console.log("active orders", { transformedData })
 
-        const parsedData = parseOrders(transformedData)
+        const parsedData = parseOrders(transformedData || [])
         return parsedData
       } catch (e) {
         console.error(getErrorMessage(e))

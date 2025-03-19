@@ -238,11 +238,13 @@ export function useSwap() {
     ],
     queryFn: async () => {
       if (!(payToken && receiveToken && isConnected)) return null
+
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
 
       // Mangrove
       if (marketClient) {
         const book = uniBook
+        console.log(book)
         if (!(book && address)) return null
 
         // Check if book is a complete Book object with required properties
