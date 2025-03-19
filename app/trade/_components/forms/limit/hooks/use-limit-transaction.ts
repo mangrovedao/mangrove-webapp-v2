@@ -112,9 +112,7 @@ export function useLimitTransaction({
     try {
       await post.mutateAsync(
         {
-          form: {
-            ...form.state.values,
-          },
+          form,
         },
         {
           onSettled: () => {
