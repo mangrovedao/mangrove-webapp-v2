@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { formatUnits, parseEther } from "viem"
 import {
   useAccount,
@@ -44,6 +44,8 @@ export function useLimitTransaction({
   )
 
   const { data: limitOrderSteps } = useLimitSteps(hookParams)
+
+  console.log("limitOrderSteps", limitOrderSteps, form)
 
   // Get logics
   const logics = useLogics()
@@ -192,14 +194,6 @@ export function useLimitTransaction({
     // Reset any previous transaction state
     setTxState("idle")
 
-    // Set a safety timeout to reset the state if the transaction is taking too long
-    const safetyTimeout = setTimeout(() => {
-      // Only reset if we're still in a non-idle state after the timeout
-      if (txState !== "idle") {
-        setTxState("idle")
-      }
-    }, 30000) // 30 seconds should be enough for most wallet interactions
-
     // Check if approval is needed
     const needsApproval = limitOrderSteps && !limitOrderSteps[0].done
 
@@ -215,17 +209,7 @@ export function useLimitTransaction({
       console.error("Transaction error:", error)
       setTxState("idle")
     }
-
-    // Clear the safety timeout when the function completes
-    return () => clearTimeout(safetyTimeout)
   }
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      setTxState("idle")
-    }
-  }, [])
 
   return {
     txState,

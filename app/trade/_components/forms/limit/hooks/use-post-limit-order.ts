@@ -67,9 +67,13 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           receiveTo,
         } = form
 
+        console.log("1")
+
         const { base, quote } = market
         const receiveToken = bs === "buy" ? base : quote
         const sendToken = bs === "buy" ? quote : base
+
+        console.log("2")
 
         const takerGivesLogic = logics.find(
           (item) => item.name === sendFrom,
@@ -81,6 +85,8 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
 
         const restingOrderGasreq = getDefaultLimitOrderGasreq()
 
+        console.log("3")
+
         const baseAmount =
           bs === "buy"
             ? parseUnits(wants, base.decimals)
@@ -90,6 +96,8 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           bs === "buy"
             ? parseUnits(gives, quote.decimals)
             : parseUnits(wants, quote.decimals)
+
+        console.log("4")
 
         const { request } = await marketClient.simulateLimitOrder({
           account,
@@ -111,10 +119,14 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           gas: 20_000_000n,
         })
 
+        console.log("5")
+
         const hash = await walletClient.writeContract(request)
         const receipt = await networkClient.waitForTransactionReceipt({
           hash,
         })
+
+        console.log("6")
 
         const result = limitOrderResultFromLogs(
           { ...addresses, ...market },
@@ -125,6 +137,8 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
             bs: BS.buy,
           },
         )
+
+        console.log("7")
 
         successToast(
           TradeMode.LIMIT,
