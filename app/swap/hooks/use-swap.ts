@@ -337,7 +337,10 @@ export function useSwap() {
     if (simulateQuery.data?.receiveValue) {
       setFields((fields) => ({
         ...fields,
-        receiveValue: simulateQuery.data?.receiveValue ?? "",
+        receiveValue: getExactWeiAmount(
+          simulateQuery.data?.receiveValue ?? "",
+          receiveToken?.priceDisplayDecimals ?? 18,
+        ),
       }))
     }
   }, [simulateQuery.data?.receiveValue])
