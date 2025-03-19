@@ -47,15 +47,14 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
       try {
-        console.log(
-          "0",
+        console.log("0", {
           market,
           marketClient,
           book,
           walletClient,
           networkClient,
           addresses,
-        )
+        })
         if (
           !market ||
           !marketClient ||
