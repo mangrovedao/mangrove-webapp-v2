@@ -218,7 +218,7 @@ export default function Swap() {
                     checked={isWrapping}
                     onClick={() => setIsWrapping(!isWrapping)}
                   />
-                  <InfoTooltip className="text-text-quaternary text-sm">
+                  <InfoTooltip className="text-text-quaternary text-sm size-4 cursor-pointer">
                     Will add a wrap ETH to wETH step during transaction
                   </InfoTooltip>
                 </div>

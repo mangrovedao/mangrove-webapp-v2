@@ -5,11 +5,11 @@ import React, { useEffect, useRef } from "react"
 import { Address, formatUnits, parseUnits } from "viem"
 import { useAccount } from "wagmi"
 
-import InfoTooltip from "@/components/info-tooltip-new"
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 
+import InfoTooltip from "@/components/info-tooltip-new"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import useMarket from "@/providers/market"
@@ -411,7 +411,14 @@ export function Limit() {
                     <div className="flex justify-between items-center">
                       <span className="flex items-center text-muted-foreground text-xs font-sans">
                         Use ETH balance
-                        <InfoTooltip className="text-text-quaternary text-xs size-[12px] cursor-pointer">
+                      </span>
+                      <div className="flex items-center gap-1 text-xs text-text-secondary">
+                        <Switch
+                          className="data-[state=checked]:!bg-bg-secondary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
+                          checked={isWrapping}
+                          onClick={() => field.handleChange(!isWrapping)}
+                        />
+                        <InfoTooltip className="text-text-quaternary text-xs size-4 cursor-pointer">
                           <span className="text-xs font-sans">
                             Will add a wrap ETH to wETH step during transaction
                             ({" "}
@@ -428,18 +435,6 @@ export function Limit() {
                             )
                           </span>
                         </InfoTooltip>
-                      </span>
-                      <div className="flex items-center gap-1 text-xs text-text-secondary">
-                        <Switch
-                          className="data-[state=checked]:!bg-bg-secondary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
-                          checked={isWrapping}
-                          onClick={() => field.handleChange(!isWrapping)}
-                        />
-                        {/* <Checkbox
-                            className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
-                            checked={isWrapping}
-                            onClick={() => field.handleChange(!isWrapping)}
-                          /> */}
                       </div>
                     </div>
                   )}

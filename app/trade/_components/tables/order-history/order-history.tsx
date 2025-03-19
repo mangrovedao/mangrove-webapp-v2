@@ -26,7 +26,7 @@ export function OrderHistory() {
   const table = useTable({
     data: orderHistoryQuery.data,
   })
-  console.log(orderHistoryQuery.data)
+
   if (orderHistoryQuery.isLoading || !market) {
     return <AnimatedOrderHistorySkeleton />
   }

@@ -257,7 +257,6 @@ export function useSwap() {
           console.warn("Incomplete book object for market order simulation")
           return null
         }
-        console.log(book)
 
         // Convert EnhancedOffer arrays to the format expected by marketOrderSimulation
         const simulationBook = {
@@ -265,7 +264,7 @@ export function useSwap() {
           asks: convertToSimulationOffers(book.asks),
           bids: convertToSimulationOffers(book.bids),
         }
-        console.log(1)
+
         const isBasePay = currentMarket?.base.address === payToken?.address
         const params: MarketOrderSimulationParams = isBasePay
           ? {
@@ -278,15 +277,15 @@ export function useSwap() {
               bs: BS.buy,
               book: simulationBook as any,
             }
-        console.log(2)
+
         const simulation = marketOrderSimulation(params)
-        console.log(3)
+
         const [approvalStep] = await marketClient.getMarketOrderSteps({
           bs: isBasePay ? BS.sell : BS.buy,
           user: address,
           sendAmount: payAmount,
         })
-        console.log(4)
+
         return {
           simulation,
           approvalStep,

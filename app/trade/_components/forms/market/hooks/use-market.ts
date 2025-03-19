@@ -175,8 +175,6 @@ export function useMarketForm(props: Props) {
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
 
-      console.log("is after marketOrderSimulation")
-
       const formattedBaseEstimation = getExactWeiAmount(
         formatUnits(baseEstimation, market?.base.decimals ?? 18),
         market?.base.displayDecimals,
@@ -211,7 +209,7 @@ export function useMarketForm(props: Props) {
     e.preventDefault()
     e.stopPropagation()
     if (checkAndShowDisclaimer(address)) return
-    console.log("test")
+
     void form.handleSubmit()
   }
 

@@ -31,7 +31,6 @@ export default function useScrollToMiddle() {
         "[data-radix-scroll-area-viewport]",
       )
       if (!scrollAreaElement) {
-        console.log("Could not find scroll area viewport")
         return
       }
 
