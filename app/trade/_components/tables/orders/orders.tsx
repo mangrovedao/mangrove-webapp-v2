@@ -4,7 +4,6 @@ import React from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import useMarket from "@/providers/market"
 import { AnimatedOrdersSkeleton } from "./animated-orders-skeleton"
-import CancelOfferDialog from "./components/cancel-offer-dialog"
 import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"
 import { useTable } from "./hooks/use-table"
@@ -66,11 +65,11 @@ export function Orders() {
         market={{ currentMarket, setMarket, markets }}
         onClose={() => setOrderToEdit(undefined)}
       />
-      <CancelOfferDialog
+      {/* <CancelOfferDialog
         order={orderToDelete}
         market={{ currentMarket, setMarket, markets }}
         onClose={() => setOrderToDelete(undefined)}
-      />
+      /> */}
     </>
   )
 }

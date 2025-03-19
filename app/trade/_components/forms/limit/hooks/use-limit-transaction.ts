@@ -45,8 +45,6 @@ export function useLimitTransaction({
 
   const { data: limitOrderSteps } = useLimitSteps(hookParams)
 
-  console.log("limitOrderSteps", limitOrderSteps, form.state.values)
-
   // Get logics
   const logics = useLogics()
   const logic = logics.find((l) => l?.name === form.state.values.sendFrom)

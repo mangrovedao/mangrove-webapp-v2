@@ -1,6 +1,7 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
+import { AnimatePresence, motion } from "framer-motion"
 import React from "react"
 
 import { CustomInput } from "@/components/custom-input-new"
@@ -400,13 +401,53 @@ function TokenContainer({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <Input
-          aria-label="You pay"
-          className="border-none outline-none p-0 text-3xl"
-          placeholder="0"
-          value={value}
-          onChange={onChange}
-        />
+        <div className="flex-1 relative h-12">
+          <AnimatePresence mode="wait">
+            {loadingValue ? (
+              <motion.div
+                key="loading-input"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 flex items-center"
+              >
+                <motion.div
+                  initial={{ width: 0, opacity: 0.5 }}
+                  animate={{
+                    width: "60%",
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  }}
+                  className="h-9 bg-gradient-to-r from-transparent via-bg-tertiary to-transparent rounded-sm"
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="actual-input"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0"
+              >
+                <Input
+                  aria-label="You pay"
+                  className="border-none outline-none p-0 text-3xl h-full"
+                  placeholder="0"
+                  value={value}
+                  onChange={onChange}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <span>
           {token ? (
             <Button
@@ -431,22 +472,63 @@ function TokenContainer({
           )}
         </span>
       </div>
-      <div className="flex justify-between items-center opacity-70">
-        {Number(dollars) <= 0 ? (
-          <div className="text-sm text-left text-text-quaternary">
-            ≈ <span className="text-text-secondary">0</span> $
-          </div>
-        ) : (
-          <div className="text-sm text-left text-text-quaternary">
-            ≈{" "}
-            <span className="text-text-secondary">
-              {token && Number(dollars) !== 0
-                ? dollars.slice(0, dollars.indexOf(".") + 3)
-                : "0"}
-            </span>{" "}
-            $
-          </div>
-        )}
+      <div className="flex justify-between items-center opacity-70 h-5">
+        <div className="relative w-full h-full">
+          <AnimatePresence mode="wait">
+            {loadingValue ? (
+              <motion.div
+                key="loading-dollars"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 text-sm text-left text-text-quaternary"
+              >
+                <motion.div
+                  initial={{ width: 0, opacity: 0.5 }}
+                  animate={{
+                    width: "50px",
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  }}
+                  className="h-4 bg-gradient-to-r from-transparent via-bg-tertiary to-transparent rounded-sm"
+                />
+              </motion.div>
+            ) : Number(dollars) <= 0 ? (
+              <motion.div
+                key="zero-dollars"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 text-sm text-left text-text-quaternary"
+              >
+                ≈ <span className="text-text-secondary">0</span> $
+              </motion.div>
+            ) : (
+              <motion.div
+                key="actual-dollars"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 text-sm text-left text-text-quaternary"
+              >
+                ≈{" "}
+                <span className="text-text-secondary">
+                  {token && Number(dollars) !== 0
+                    ? dollars.slice(0, dollars.indexOf(".") + 3)
+                    : "0"}
+                </span>{" "}
+                $
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   )

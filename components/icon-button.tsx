@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import React from "react"
-import { Button } from "./ui/button-old"
+import { Button } from "./ui/button-new"
 import {
   Tooltip,
   TooltipContent,
@@ -11,14 +11,27 @@ import {
 type Props = React.ComponentProps<typeof Button> & {
   tooltip?: string
   children: React.ReactElement
+  isLoading?: boolean
 }
 
-export function IconButton({ children: icon, tooltip, ...props }: Props) {
+export function IconButton({
+  children: icon,
+  tooltip,
+  isLoading,
+  ...props
+}: Props) {
   return (
     <TooltipProvider>
       <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>
-          <Button {...props} type="button" variant={"tertiary"} size={"icon"}>
+          <Button
+            {...props}
+            type="button"
+            variant={"tertiary"}
+            size={"icon"}
+            loading={isLoading}
+            disabled={isLoading}
+          >
             {React.cloneElement(icon, {
               className: clsx(
                 icon.props.className,

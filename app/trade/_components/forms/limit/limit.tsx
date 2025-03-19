@@ -431,7 +431,7 @@ export function Limit() {
                       </span>
                       <div className="flex items-center gap-1 text-xs text-text-secondary">
                         <Switch
-                          className="data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
+                          className="data-[state=checked]:!bg-bg-secondary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
                           checked={isWrapping}
                           onClick={() => field.handleChange(!isWrapping)}
                         />

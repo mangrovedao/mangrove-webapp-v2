@@ -401,7 +401,7 @@ export default function Navbar() {
               </Link>
 
               {/* Desktop Navigation */}
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <div className="flex items-center p-1 space-x-1">
                   {MENUS.map(({ href, disabled, icon: Icon, text }) => {
                     const isActive =
@@ -437,7 +437,7 @@ export default function Navbar() {
             {/* Right Side - Network, Account & Mobile Menu */}
             <div className="flex items-center gap-3">
               {/* Network Selector */}
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <ChainSelector />
               </div>
 
@@ -447,7 +447,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleAccount}
-                  className="hidden md:flex border-transparent items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden lg:flex border-transparent items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   {address && <WalletIcon className="w-4" />}
                   <span>{shortenAddress(address || "")}</span>
@@ -457,7 +457,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleConnect}
-                  className="hidden md:flex items-center border-transparent gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden lg:flex items-center border-transparent gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   <span>Connect</span>
                   <PersonIcon />
@@ -466,7 +466,7 @@ export default function Navbar() {
 
               {/* Mobile menu button */}
               <button
-                className="md:hidden text-nav-item-button-icon-fg p-2 rounded-lg hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+                className="lg:hidden text-nav-item-button-icon-fg p-2 rounded-lg hover:text-text-primary hover:bg-bg-tertiary transition-colors"
                 onClick={toggle}
               >
                 <BurgerIcon />

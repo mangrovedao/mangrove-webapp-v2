@@ -1,10 +1,10 @@
 import { ChevronRight } from "@/svgs"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Loader2 } from "lucide-react"
 import * as React from "react"
 
 import { cn } from "utils"
-import { Spinner } from "./spinner"
 
 const buttonVariants = cva(
   [
@@ -101,7 +101,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     const body = !asChild ? (
       <>
-        {loading ? <Spinner className="w-6 mx-auto" /> : props.children}
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          props.children
+        )}
         {rightIcon && !loading && (
           <span className={cn(rightIconVariants({ variant }))}>
             <ChevronRight className="aspect-auto w-4" />

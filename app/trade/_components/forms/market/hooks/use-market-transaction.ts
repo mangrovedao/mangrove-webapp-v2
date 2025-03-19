@@ -1,7 +1,5 @@
-import { tradeService } from "@/app/trade/_services/trade.service"
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
-import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useEffect } from "react"
 import { toast } from "sonner"
@@ -135,18 +133,14 @@ export function useMarketTransaction({
                 : form.state.values.send,
           },
         },
+
         {
-          onError: (error: Error) => {
+          onSettled: () => {
             setTxState("idle")
-            toast.error("Failed to post the market order")
-            tradeService.openTxFailedDialog(
-              getTitleDescriptionErrorMessages(error),
-            )
           },
         },
       )
     } catch (error) {
-      console.error("Error posting order:", error)
       setTxState("idle")
       toast.error("Failed to post the market order")
     }

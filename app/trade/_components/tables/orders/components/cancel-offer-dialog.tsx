@@ -38,7 +38,6 @@ export default function CancelOfferDialog({ order, market, onClose }: Props) {
             onClick={() => {
               retract.mutate({
                 order,
-                market: { ...market },
               })
             }}
           >

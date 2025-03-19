@@ -6,7 +6,6 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
-import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
 import type { Order } from "../schema"
@@ -36,13 +35,7 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
      * for each retraction operation.
      */
     mutationKey: ["retractOrder", offerId],
-    mutationFn: async ({
-      order,
-      market,
-    }: {
-      order: Order
-      market: ReturnType<typeof useMarket>
-    }) => {
+    mutationFn: async ({ order }: { order: Order }) => {
       try {
         if (!offerId || !walletClient || !publicClient || !marketClient)
           throw new Error("Retract order missing params")

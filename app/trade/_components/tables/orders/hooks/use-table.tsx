@@ -15,10 +15,11 @@ import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
 import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
-import { Close, Pen } from "@/svgs"
+import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
+import { useCancelOrder } from "./use-cancel-order"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -142,10 +143,13 @@ export function useTable({ data, onCancel, onEdit }: Params) {
           const isExpired = expiryDate
             ? new Date(expiryDate) < new Date()
             : true
+          const cancelOrder = useCancelOrder({
+            offerId: row.original.offerId,
+          })
 
           return (
             <div className="w-full h-full flex justify-end space-x-1">
-              <IconButton
+              {/* <IconButton
                 tooltip="Modify"
                 className="aspect-square w-6 rounded-full"
                 disabled={isExpired}
@@ -156,14 +160,19 @@ export function useTable({ data, onCancel, onEdit }: Params) {
                 }}
               >
                 <Pen />
-              </IconButton>
+              </IconButton> */}
+
               <IconButton
                 tooltip="Cancel offer"
                 className="aspect-square w-6 rounded-full"
+                isLoading={cancelOrder.isPending}
+                disabled={cancelOrder.isPending}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  onCancel(row.original)
+                  cancelOrder.mutate({
+                    order: row.original,
+                  })
                 }}
               >
                 <Close />
