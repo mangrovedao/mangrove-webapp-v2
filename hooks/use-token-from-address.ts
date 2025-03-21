@@ -11,11 +11,11 @@ export function useTokenFromAddress(address: Address) {
     queryKey: ["tokenFromAddress", address, tokens],
     queryFn: () => {
       try {
-        if (!(address && tokens)) return null
+        if (!(address && tokens)) return undefined
         return tokens.find((item) => isAddressEqual(item.address, address))
       } catch (error) {
         console.error(error)
-        return null
+        return undefined
       }
     },
     enabled: !!(address && tokens),
