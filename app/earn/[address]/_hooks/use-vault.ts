@@ -1,18 +1,23 @@
+import { isAddress } from "viem"
+import { useAccount } from "wagmi"
+
+import { useDefaultChain } from "@/hooks/use-default-chain"
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useQuery } from "@tanstack/react-query"
-import { isAddress } from "viem"
-import { useAccount, usePublicClient } from "wagmi"
 import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
 import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"
 import { getVaultsInformation } from "../../(shared)/_service/vaults-infos"
 import { useMgvFdv } from "../../(shared)/store/vault-store"
 
 export function useVault(address?: string | null) {
-  const { chainId } = useAccount()
   const { address: user } = useAccount()
-  const publicClient = usePublicClient()
+  const { defaultChain } = useDefaultChain()
+
+  const networkClient = useNetworkClient()
   const vaultsWhitelist = useVaultsWhitelist()
   const incentives = useVaultsIncentives()
+
   const { fdv } = useMgvFdv()
 
   return useQuery({
@@ -20,13 +25,13 @@ export function useVault(address?: string | null) {
       "vault",
       address,
       user,
-      chainId,
+      defaultChain.id,
       vaultsWhitelist.length,
       incentives.length,
     ],
     queryFn: async () => {
       try {
-        if (!publicClient) throw new Error("Public client is not enabled")
+        if (!networkClient) throw new Error("Public client is not enabled")
         if (address && !isAddress(address))
           throw new Error("Invalid vault address")
 
@@ -42,7 +47,7 @@ export function useVault(address?: string | null) {
 
         const [vaultInfo] = await Promise.all([
           getVaultsInformation(
-            publicClient,
+            networkClient,
             [vault],
             user,
             vaultIncentives ? [vaultIncentives] : undefined,
@@ -57,7 +62,7 @@ export function useVault(address?: string | null) {
         return { vault: undefined }
       }
     },
-    enabled: !!publicClient && !!vaultsWhitelist.length,
+    enabled: !!networkClient && !!vaultsWhitelist.length,
     initialData: { vault: undefined },
   })
 }

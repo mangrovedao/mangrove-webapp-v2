@@ -1,6 +1,6 @@
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { type Address } from "viem"
 import { arbitrum, baseSepolia, blast } from "viem/chains"
-import { useAccount } from "wagmi"
 
 /**
  * A program that distributes rewards to LP token holders.
@@ -67,9 +67,9 @@ export const BASE_SEPOLIA_INCENTIVE_PROGRAMS: VaultLPProgram[] = [
 ]
 
 export function useVaultsIncentives() {
-  const { chainId } = useAccount()
+  const { defaultChain } = useDefaultChain()
 
-  switch (chainId) {
+  switch (defaultChain.id) {
     case blast.id:
       return []
     case arbitrum.id:

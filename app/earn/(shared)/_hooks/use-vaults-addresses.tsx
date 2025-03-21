@@ -1,5 +1,5 @@
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { arbitrum, base, baseSepolia, blast } from "viem/chains"
-import { useAccount } from "wagmi"
 import {
   VAULTS_WHITELIST_ARBITRUM,
   VAULTS_WHITELIST_BASE,
@@ -7,8 +7,9 @@ import {
 } from "./vault-list"
 
 export function useVaultsWhitelist() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const { defaultChain } = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return []
     case base.id:
@@ -23,8 +24,9 @@ export function useVaultsWhitelist() {
 }
 
 export function useVaultMintHelper() {
-  const { chainId } = useAccount()
-  switch (chainId) {
+  const { defaultChain } = useDefaultChain()
+
+  switch (defaultChain.id) {
     case blast.id:
       return ""
     case arbitrum.id:

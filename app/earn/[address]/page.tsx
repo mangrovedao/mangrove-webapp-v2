@@ -1,5 +1,6 @@
 "use client"
 
+import { AnimatePresence, motion } from "framer-motion"
 import {
   CheckIcon,
   ChevronRight,
@@ -9,7 +10,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import React, { ReactNode } from "react"
+import React, { ReactNode, useEffect, useState } from "react"
 import { formatUnits } from "viem"
 
 import {
@@ -24,10 +25,11 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { Drawer } from "@/components/ui/drawer"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
@@ -43,9 +45,25 @@ enum Action {
 }
 
 export default function Page() {
-  const [action, setAction] = React.useState(Action.Deposit)
   const { defaultChain } = useDefaultChain()
+  const [action, setAction] = React.useState(Action.Deposit)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const params = useParams<{ address: string }>()
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 1024) // lg breakpoint
+    }
+
+    checkIfMobile()
+    window.addEventListener("resize", checkIfMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile)
+    }
+  }, [])
 
   const {
     data: { vault },
@@ -71,7 +89,7 @@ export default function Page() {
     <div className="max-w-7xl mx-auto px-3 pb-4">
       {/* BreadCrumb   */}
 
-      <div className="flex items-center gap-2 pb-4 ml-4 ">
+      <div className="flex items-center gap-2 mb-1 ml-4">
         <Link href={"/earn"} className="flex items-center gap-2">
           <Caption className="text-text-quaternary text-sm">Earn</Caption>
           <ChevronRight className="h-4 w-4 text-text-disabled" />
@@ -80,52 +98,43 @@ export default function Page() {
       </div>
       {/* Market details */}
       <div className="flex items-center gap-2 flex-wrap ml-4">
-        <div className="flex -space-x-2 items-center">
+        <div className="grid items-center gap-2 ">
           {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
-            <>
-              <Skeleton className={cn("h-16 w-16", "rounded-full")} />
-              <Skeleton className={cn("h-16 w-16", "rounded-full")} />
-            </>
+            <Skeleton className={cn("h-7 w-7", "rounded-sm")} />
           ) : (
-            <>
-              <TokenIcon
-                symbol={vault?.market?.base?.symbol}
-                imgClasses="h-16 w-16"
-              />
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-2 items-center">
+                {!vault?.market?.quote?.symbol ||
+                !vault?.market?.base?.symbol ? (
+                  <>
+                    <Skeleton className={cn("h-16 w-16", "rounded-sm")} />
+                    <Skeleton className={cn("h-16 w-16", "rounded-sm")} />
+                  </>
+                ) : (
+                  <>
+                    <TokenIcon
+                      symbol={vault?.market?.base?.symbol}
+                      imgClasses="h-10 w-10"
+                    />
 
-              <TokenIcon
-                symbol={vault?.market?.quote?.symbol}
-                imgClasses="h-16 w-16"
-              />
-            </>
+                    <TokenIcon
+                      symbol={vault?.market?.quote?.symbol}
+                      imgClasses="h-10 w-10"
+                    />
+                  </>
+                )}
+              </div>
+
+              <Title className="!text-2xl">{`${vault?.market?.base?.symbol}-${vault?.market?.quote?.symbol}`}</Title>
+            </div>
           )}
-        </div>
-        <div className="grid items-center ">
-          {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
-            <Skeleton className={cn("h-7 w-7", "rounded-full")} />
-          ) : (
-            <Title className="!text-3xl">{`${vault?.market?.base?.symbol}-${vault?.market?.quote?.symbol}`}</Title>
-          )}
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-3 flex-wrap ">
             <Subline
               title={"Chain"}
               value={defaultChain?.name}
-              icon={getChainImage()}
+              icon={getChainImage(defaultChain)}
             />
-
-            <Separator className="h-4 self-center" orientation="vertical" />
-            <Subline
-              title={"Strategy"}
-              value={vault?.type}
-              icon={
-                <div className="relative h-4 w-4">
-                  <div className="absolute inset-0 bg-green-700 rounded-full"></div>
-                  <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
-                </div>
-              }
-            />
-
-            <Separator className="h-4 self-center" orientation="vertical" />
+            <Subline title={"Strategy"} value={vault?.type} />
             <Subline title={"Manager"} value={vault?.manager} />
           </div>
         </div>
@@ -135,7 +144,7 @@ export default function Page() {
       <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5 ">
         <div className="col-span-12 md:col-span-8 space-y-6">
           {/* Infos Card */}
-          <div className="mx-1 flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
+          <div className="mx-1 flex p-2 justify-between rounded-sm bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
             <GridLineHeader
               title={"TVL"}
               value={formatNumber(
@@ -247,7 +256,7 @@ export default function Page() {
                       value={vault?.strategyType}
                       icon={
                         <div className="relative h-4 w-4">
-                          <div className="absolute inset-0 bg-green-700 rounded-full"></div>
+                          <div className="absolute inset-0 bg-green-700 rounded-sm"></div>
                           <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
                         </div>
                       }
@@ -288,7 +297,7 @@ export default function Page() {
                     <GridLine
                       title="Chain"
                       value={defaultChain?.name}
-                      icon={getChainImage()}
+                      icon={getChainImage(defaultChain)}
                       iconFirst
                     />
                   </div>
@@ -319,7 +328,7 @@ export default function Page() {
           <div className="grid gap-8">
             <NeonContainer className="relative">
               <ImageWithHideOnError
-                className="absolute -top-[24px] -right-[17px] rounded-xl"
+                className="absolute -top-[24px] -right-[17px] rounded-sm"
                 src={`/assets/illustrations/earn-leaf.png`}
                 width={100}
                 height={90}
@@ -329,10 +338,9 @@ export default function Page() {
                 title={"Your incentives rewards"}
                 value={
                   <div className="flex items-center gap-1">
-                    <Text className="font-axiforma text-text-secondary">
-                      MGV
-                    </Text>
+                    <span className="text-text-secondary !text-md">MGV</span>
                     <FlowingNumbers
+                      className="text-md"
                       initialValue={vault?.incentivesData?.rewards || 0}
                       ratePerSecond={
                         vault?.incentivesData?.currentRewardsPerSecond || 0
@@ -346,8 +354,8 @@ export default function Page() {
                 <GridLine
                   title={"Your deposit"}
                   value={
-                    <div className="flex items-center justify-center gap-2 text-2xl font-axiforma">
-                      <span className="flex gap-1">
+                    <div className="flex items-center justify-center gap-2 text-md">
+                      <span className="flex gap-1 text-md">
                         {(baseDepositDollar + quoteDepositDollar).toFixed(2)}
                         <span className="text-text-secondary">$</span>
                       </span>
@@ -357,7 +365,7 @@ export default function Page() {
                 <GridLine
                   title={"Your PNL"}
                   value={
-                    <span className="text-2xl flex gap-1 font-axiforma">
+                    <span className="flex gap-1 text-md">
                       {vault?.pnlData?.pnl
                         ? `${vault?.pnlData?.pnl.toFixed(2)}%`
                         : "0"}
@@ -370,29 +378,58 @@ export default function Page() {
             {/* <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
              
             </div> */}
-            <div className="grid space-y-5 bg-bg-secondary p-3 rounded-lg">
-              <div className="w-full ">
-                <CustomRadioGroup
-                  name={"action"}
-                  value={action}
-                  onValueChange={(e: Action) => {
-                    setAction(e)
-                  }}
-                >
-                  {Object.values(Action).map((action) => (
-                    <CustomRadioGroupItem
-                      key={action}
-                      value={action}
-                      id={action}
-                      className="capitalize"
-                    >
-                      {action}
-                    </CustomRadioGroupItem>
-                  ))}
-                </CustomRadioGroup>
+            {/* Only show the form directly on desktop */}
+            {!isMobile && (
+              <div className="grid space-y-5 bg-bg-secondary p-3 rounded-sm">
+                <div className="w-full">
+                  <CustomRadioGroup
+                    name={"action"}
+                    value={action}
+                    onValueChange={(e: Action) => {
+                      setAction(e)
+                    }}
+                  >
+                    {Object.values(Action).map((action) => (
+                      <CustomRadioGroupItem
+                        key={action}
+                        value={action}
+                        id={action}
+                        className="capitalize"
+                      >
+                        {action}
+                      </CustomRadioGroupItem>
+                    ))}
+                  </CustomRadioGroup>
+                </div>
+                <div className="relative min-h-[400px]">
+                  <AnimatePresence mode="wait">
+                    {action === Action.Deposit ? (
+                      <motion.div
+                        key="deposit-form"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0"
+                      >
+                        <DepositForm />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="withdraw-form"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute inset-0"
+                      >
+                        <WithdrawForm />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
-              {action === Action.Deposit ? <DepositForm /> : <WithdrawForm />}
-            </div>
+            )}
           </div>
 
           <div className="grid gap-4 px-6 mt-6">
@@ -477,7 +514,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="z-20 grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-lg ">
+          <div className="z-20 grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-sm ">
             <Title className="text-lg">Rewards</Title>
             <div className="grid xs:grid-cols-1 grid-cols-2 gap-4">
               <div className="flex gap-2 items-start">
@@ -510,6 +547,93 @@ export default function Page() {
           </div>
         </div>
       </div>
+
+      {/* Floating Action Button - shown on all screen sizes */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+        className="fixed bottom-6 right-6 z-50"
+      >
+        <Button
+          className="flex items-center justify-center rounded-full bg-bg-tertiary hover:bg-bg-primary-hover"
+          onClick={() => setIsDrawerOpen(true)}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={action}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center justify-center"
+            >
+              <TradeIcon className="w-8 h-8 p-1 text-text-secondary" />
+            </motion.div>
+          </AnimatePresence>
+        </Button>
+      </motion.div>
+
+      {/* Drawer for Action Selection and Form */}
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <Drawer.Content className="h-[80vh] p-4 bg-bg-primary">
+          <div className="flex justify-center mb-4">
+            <div className="w-12 h-1 bg-bg-tertiary rounded-sm" />
+          </div>
+          <Title className="text-2xl mb-4 text-center">
+            {action === Action.Deposit ? "Deposit" : "Withdraw"}
+          </Title>
+          <div className="space-y-6">
+            <div className="w-full">
+              <CustomRadioGroup
+                name={"action"}
+                value={action}
+                onValueChange={(e: Action) => {
+                  setAction(e)
+                }}
+              >
+                {Object.values(Action).map((action) => (
+                  <CustomRadioGroupItem
+                    key={action}
+                    value={action}
+                    id={action}
+                    className="capitalize"
+                  >
+                    {action}
+                  </CustomRadioGroupItem>
+                ))}
+              </CustomRadioGroup>
+            </div>
+            <div className="relative min-h-[400px]">
+              <AnimatePresence mode="wait">
+                {action === Action.Deposit ? (
+                  <motion.div
+                    key="deposit-form-drawer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0"
+                  >
+                    <DepositForm />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="withdraw-form-drawer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0"
+                  >
+                    <WithdrawForm />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </Drawer.Content>
+      </Drawer>
     </div>
   )
 }
@@ -591,9 +715,12 @@ const GridLineHeader = ({
   info?: string
 }) => {
   return (
-    <div className="grid mt-2 items-center space-y-2">
-      <div className="flex items-center -gap-1">
-        <Title className="text-text-secondary font-light text-md">
+    <div className="grid items-center gap-2">
+      <div className="flex items-center">
+        <Title
+          className="text-text-secondary font-light text-sm"
+          variant={"title3"}
+        >
           {title}
         </Title>
         {info ? (
@@ -603,13 +730,13 @@ const GridLineHeader = ({
         ) : undefined}
       </div>
       <div
-        className={cn("flex items-center gap-2 ", {
+        className={cn("flex items-center -mt-2", {
           "flex-row-reverse justify-end": iconFirst,
         })}
       >
         {value ? (
           <>
-            <Title className="text-text-primary !text-3xl">
+            <Title className="text-text-primary !text-md">
               {value}
               {symbol ? (
                 <span className="text-text-tertiary">{symbol}</span>
@@ -618,7 +745,7 @@ const GridLineHeader = ({
             <span className="text-text-secondary">{icon}</span>
           </>
         ) : (
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-5 w-full" />
         )}
       </div>
     </div>
@@ -635,9 +762,9 @@ const Subline = ({
   icon?: ReactNode
 }) => {
   return (
-    <div className="flex items-center gap-2">
-      <Caption className="text-text-secondary !text-sm"> {title}</Caption>
-      <Caption className="text-text-primary !text-sm">{value}</Caption>
+    <div className="flex items-center gap-1">
+      <Caption className="text-text-secondary !text-xs"> {title}</Caption>
+      <Caption className="text-text-primary !text-xs">{value}</Caption>
       {icon ? icon : undefined}
     </div>
   )

@@ -124,7 +124,7 @@ export function DepositForm({ className }: { className?: string }) {
       />
 
       <Button
-        className="w-full"
+        className="w-full hover:bg-fg-quaternary bg-bg-tertiary"
         onClick={() => {
           if (checkAndShowDisclaimer(address)) return
           setAddDialog(!addDialog)

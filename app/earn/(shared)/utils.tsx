@@ -1,9 +1,8 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useDefaultChain } from "@/hooks/use-default-chain"
 import { ReactNode } from "react"
-import { Address, parseAbi, PublicClient } from "viem"
+import { Address, Chain, parseAbi, PublicClient } from "viem"
 import { pnlSchema, priceSchema } from "./schemas"
 
 // ============= CONTRACT INTERFACES =============
@@ -128,16 +127,14 @@ export function getIconFromChainlist(name: string) {
   return `https://icons.llamao.fi/icons/chains/rsz_${icon.toLowerCase().replaceAll(" ", "_")}.jpg`
 }
 
-export function getChainImage() {
-  const { defaultChain } = useDefaultChain()
-
+export function getChainImage(chain: Chain) {
   return (
     <ImageWithHideOnError
-      src={`/assets/chains/${defaultChain.id}.webp`}
+      src={`/assets/chains/${chain.id}.webp`}
       width={16}
       height={16}
       className="h-4 rounded-sm size-4"
-      key={defaultChain.id}
+      key={chain.id}
       alt={`${name}-logo`}
     />
   )

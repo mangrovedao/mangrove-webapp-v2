@@ -13,7 +13,7 @@ const CustomRadioGroup = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return (
     <RadioGroupPrimitive.Root
-      className={cn("flex w-full rounded-xl bg-muted ", className)}
+      className={cn("flex w-full rounded-sm bg-muted ", className)}
       {...props}
       ref={ref}
     />
@@ -22,7 +22,7 @@ const CustomRadioGroup = React.forwardRef<
 CustomRadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 
 const customRadioGroupItemVariants = cva(
-  `w-full rounded-xl border border-transparent aria-checked:text-primary
+  `w-full rounded-sm border border-transparent aria-checked:text-primary
   hover:cursor-pointer hover:text-secondary transition-colors text-text-secondary
   ring-offset-primary-dark-green focus:outline-none focus-visible:ring-2 py-2 px-3
   focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-sm font-medium `,

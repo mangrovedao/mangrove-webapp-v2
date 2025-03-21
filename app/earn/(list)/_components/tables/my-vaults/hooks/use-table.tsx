@@ -54,7 +54,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {getChainImage()}
+                {getChainImage(defaultChain)}
               </Link>
             </div>
           )

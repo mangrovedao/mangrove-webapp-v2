@@ -140,7 +140,7 @@ export function WithdrawForm({ className }: { className?: string }) {
       </div>
 
       <Button
-        className="w-full"
+        className="w-full hover:bg-fg-quaternary bg-bg-tertiary"
         onClick={() => {
           if (checkAndShowDisclaimer(address)) return
           setRemoveDialog(!removeDialog)

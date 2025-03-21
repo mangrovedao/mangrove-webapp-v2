@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { Check } from "@/svgs"
 import { formatNumber } from "@/utils/numbers"
 import { formatUnits } from "viem"
@@ -40,6 +41,7 @@ type Params = {
 }
 
 export function useTable({ pageSize, data, onDeposit }: Params) {
+  const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
   const { fdv, setFdv } = useMgvFdv()
 
@@ -65,7 +67,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {getChainImage()}
+                {getChainImage(defaultChain)}
               </Link>
             </div>
           )
