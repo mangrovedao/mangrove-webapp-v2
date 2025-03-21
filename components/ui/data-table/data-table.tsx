@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table-new"
 import { cn } from "@/utils"
 import { AnimatePresence, motion } from "framer-motion"
 import { LoadingBody } from "./loading-body"
@@ -107,7 +107,7 @@ export function DataTable<TData>({
           >
             <div
               className={cn(
-                "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
+                "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-sm group-last/cell:rounded-r-sm",
                 {
                   "!bg-primary-dark-green": isRowHighlighted?.(row.original),
                 },
@@ -160,7 +160,7 @@ export function DataTable<TData>({
           >
             <div
               className={cn(
-                "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
+                "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-sm group-last/cell:rounded-r-sm",
                 {
                   "!bg-primary-dark-green": isRowHighlighted?.(row.original),
                 },
@@ -179,55 +179,57 @@ export function DataTable<TData>({
 
   return (
     <>
-      <Table>
-        <TableHeader
-          className={`sticky top-[0] border-b border-bg-secondary z-40 p-0 text-xs backdrop-blur-sm ${rows.length}`}
-        >
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    key={`${tableName}-head-${header.id}`}
-                    className="px-2"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
-          ) : rows?.length ? (
-            animated ? (
-              <AnimatePresence>
-                {rows.map((row) => renderAnimatedRow(row))}
-              </AnimatePresence>
+      <div className="w-full overflow-auto">
+        <Table className="min-w-full table-auto">
+          <TableHeader
+            className={`sticky top-[0] border-b border-bg-secondary z-40 p-0 text-xs backdrop-blur-sm ${rows.length}`}
+          >
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={`${tableName}-head-${header.id}`}
+                      className="px-2 whitespace-nowrap"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
+            ) : rows?.length ? (
+              animated ? (
+                <AnimatePresence>
+                  {rows.map((row) => renderAnimatedRow(row))}
+                </AnimatePresence>
+              ) : (
+                rows.map((row) => renderRegularRow(row))
+              )
             ) : (
-              rows.map((row) => renderRegularRow(row))
-            )
-          ) : (
-            <TableRow key={`${tableName}-bodyrow-${Math.random()}`}>
-              <TableCell
-                colSpan={leafColumns.length}
-                className="h-24 text-center text-muted-foreground"
-              >
-                {isError
-                  ? "Due to excessive demand, we are unable to return your data. Please try again later."
-                  : emptyArrayMessage ?? "No results."}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+              <TableRow key={`${tableName}-bodyrow-${Math.random()}`}>
+                <TableCell
+                  colSpan={leafColumns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  {isError
+                    ? "Due to excessive demand, we are unable to return your data. Please try again later."
+                    : emptyArrayMessage ?? "No results."}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       <Pagination {...pagination} />
     </>
   )

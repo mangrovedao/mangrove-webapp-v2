@@ -10,11 +10,11 @@ import {
 import Big from "big.js"
 import Link from "next/link"
 import React from "react"
-import { useAccount } from "wagmi"
 
 import useStrategyStatus from "@/app/strategies/(shared)/_hooks/use-strategy-status"
 import SourceIcon from "@/app/trade/_components/forms/limit/components/source-icon"
 import { IconButton } from "@/components/icon-button"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { Close, Pen } from "@/svgs"
 import { shortenAddress } from "@/utils/wallet"
 import Status from "../../../../../(shared)/_components/status"
@@ -34,7 +34,7 @@ type Params = {
 }
 
 export function useTable({ type, data, onCancel, onManage }: Params) {
-  const { chain } = useAccount()
+  const { defaultChain } = useDefaultChain()
 
   const columns = React.useMemo(
     () => [
@@ -48,7 +48,7 @@ export function useTable({ type, data, onCancel, onManage }: Params) {
         ),
         cell: ({ row }) => {
           const { address, owner } = row.original
-          const blockExplorerUrl = chain?.blockExplorers?.default.url
+          const blockExplorerUrl = defaultChain?.blockExplorers?.default.url
           return (
             <div className="flex flex-col underline">
               <Link

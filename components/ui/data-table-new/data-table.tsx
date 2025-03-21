@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table-new"
 import { cn } from "@/utils"
+import { ScrollArea, ScrollBar } from "../scroll-area"
 import { LoadingBody } from "./loading-body"
 import { Pagination, type PaginationProps } from "./pagination"
 
@@ -29,6 +30,7 @@ interface DataTableProps<TData> {
   skeletonRows?: number
   cellClasses?: string
   rowHighlightedClasses?: { row?: string; inner?: string }
+  containerClassName?: string
 }
 
 export function DataTable<TData>({
@@ -45,6 +47,7 @@ export function DataTable<TData>({
   skeletonRows = 1,
   cellClasses,
   rowHighlightedClasses,
+  containerClassName,
 }: DataTableProps<TData>) {
   const rows = table.getRowModel().rows
   const tableName = Object.keys(table._getAllFlatColumnsById()).join("-")
@@ -54,106 +57,111 @@ export function DataTable<TData>({
 
   return (
     <>
-      <Table>
-        <TableHeader className={`sticky z-40 text-xs ${rows.length}`}>
-          {rows.length > 0 &&
-            table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={`${tableName}-head-row-${headerGroup.id}`}
-                className="hover:bg-transparent"
-              >
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={`${tableName}-head-${header.id}`}
-                      className="text-text-tertiary text-xs"
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
-          ) : rows?.length ? (
-            rows.map((row) => (
-              <React.Fragment key={`${tableName}-fragment-${row.id}`}>
-                <TableRow
-                  key={`${tableName}-body-row-${row.id}`}
-                  data-state={row.getIsSelected() && "selected"}
-                  className={cn(
-                    "hover:text-white transition-colors group/row ",
-                    {
-                      "cursor-pointer": !!onRowClick,
-                      [rowHighlightedClasses?.row ??
-                      "text-white hover:opacity-80 transition-all"]:
-                        isRowHighlighted?.(row.original),
-                    },
-                    tableRowClasses,
-                  )}
-                  onClick={(e) => {
-                    onRowClick?.(row.original)
-                  }}
-                  onMouseEnter={() => onRowHover?.(row.original)}
-                  onMouseLeave={() => onRowHover?.(null)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={`${tableName}-body-cell-${cell.id}`}
+      <div className={cn("w-full overflow-auto", containerClassName)}>
+        <ScrollArea className="h-full">
+          <Table className="min-w-full table-auto">
+            <TableHeader className={`sticky z-40 text-xs ${rows.length}`}>
+              {rows.length > 0 &&
+                table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow
+                    key={`${tableName}-head-row-${headerGroup.id}`}
+                    className="hover:bg-transparent"
+                  >
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead
+                          key={`${tableName}-head-${header.id}`}
+                          className="text-text-tertiary text-xs whitespace-nowrap"
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
+              ) : rows?.length ? (
+                rows.map((row) => (
+                  <React.Fragment key={`${tableName}-fragment-${row.id}`}>
+                    <TableRow
+                      key={`${tableName}-body-row-${row.id}`}
+                      data-state={row.getIsSelected() && "selected"}
                       className={cn(
-                        "px-0 py-2 group/cell whitespace-nowrap !text-red-500",
-                        cellClasses,
+                        "hover:text-white transition-colors group/row ",
+                        {
+                          "cursor-pointer": !!onRowClick,
+                          [rowHighlightedClasses?.row ??
+                          "text-white hover:opacity-80 transition-all"]:
+                            isRowHighlighted?.(row.original),
+                        },
+                        tableRowClasses,
                       )}
+                      onClick={(e) => {
+                        onRowClick?.(row.original)
+                      }}
+                      onMouseEnter={() => onRowHover?.(row.original)}
+                      onMouseLeave={() => onRowHover?.(null)}
                     >
-                      <div
-                        className={cn(
-                          " py-2 group-first/cell:rounded-l-lg group-last/cell:rounded-r-lg",
-                          {
-                            [rowHighlightedClasses?.inner ??
-                            "!bg-primary-dark-green"]: isRowHighlighted?.(
-                              row.original,
-                            ),
-                          },
-                        )}
-                      >
-                        <div className="px-4 h-6 flex items-center ">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={`${tableName}-body-cell-${cell.id}`}
+                          className={cn(
+                            "px-0 py-2 group/cell whitespace-nowrap !text-red-500",
+                            cellClasses,
                           )}
-                        </div>
-                      </div>
-                    </TableCell>
-                  ))}
+                        >
+                          <div
+                            className={cn(
+                              " py-2 group-first/cell:rounded-l-sm group-last/cell:rounded-r-sm",
+                              {
+                                [rowHighlightedClasses?.inner ??
+                                "!bg-primary-dark-green"]: isRowHighlighted?.(
+                                  row.original,
+                                ),
+                              },
+                            )}
+                          >
+                            <div className="px-4 h-6 flex items-center ">
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                    {renderExtraRow?.(row)}
+                  </React.Fragment>
+                ))
+              ) : (
+                <TableRow
+                  key={`${tableName}-bodyrow-empty`}
+                  className="hover:bg-transparent"
+                >
+                  <TableCell
+                    colSpan={leafColumns.length}
+                    className="h-19 text-center bg-gradient-to-t from-bg-primary to-bg-secondary rounded-sm text-text-tertiary"
+                  >
+                    {isError
+                      ? "Due to excessive demand, we are unable to return your data. Please try again later."
+                      : emptyArrayMessage ?? "No results."}
+                  </TableCell>
                 </TableRow>
-                {renderExtraRow?.(row)}
-              </React.Fragment>
-            ))
-          ) : (
-            <TableRow
-              key={`${tableName}-bodyrow-empty`}
-              className="hover:bg-transparent"
-            >
-              <TableCell
-                colSpan={leafColumns.length}
-                className="h-19 text-center bg-gradient-to-t from-bg-primary to-bg-secondary rounded-xl text-text-tertiary"
-              >
-                {isError
-                  ? "Due to excessive demand, we are unable to return your data. Please try again later."
-                  : emptyArrayMessage ?? "No results."}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+              )}
+            </TableBody>
+          </Table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
       <Pagination {...pagination} />
     </>
   )
