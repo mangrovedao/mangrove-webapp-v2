@@ -1,4 +1,5 @@
 import React from "react"
+import { useAccount } from "wagmi"
 
 import {
   CustomTabs,
@@ -12,8 +13,6 @@ import { useLoadingStore } from "@/stores/loading.store"
 import { TRADE } from "../../_constants/loading-keys"
 import { OrderHistory } from "./order-history/order-history"
 import { useOrderHistory } from "./order-history/use-order-history"
-
-import { useAccount } from "wagmi"
 import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
@@ -29,6 +28,7 @@ export enum TradeTablesLoggedOut {
 
 export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const { isConnected } = useAccount()
+  const [showAllMarkets, setShowAllMarkets] = React.useState(true)
   const [ordersLoading, orderHistoryLoading] = useLoadingStore((state) =>
     state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY]),
   )
@@ -40,13 +40,22 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   )
 
   // Get the total count of orders and history
-  const { data: ordersCount } = useOrders({
-    select: (orders) => orders.length,
+  const { data: orders } = useOrders()
+  const ordersCount = React.useMemo(() => {
+    if (!orders?.pages) return 0
+    return orders.pages.reduce((total, page) => total + page.data.length, 0)
+  }, [orders])
+
+  const { data } = useOrderHistory({
+    pageSize: 25,
+    allMarkets: true,
   })
 
-  const { data: orderHistoryCount } = useOrderHistory({
-    select: (orderHistory) => orderHistory.length,
-  })
+  // Calculate the total count from all pages
+  const orderHistoryCount = React.useMemo(() => {
+    if (!data?.pages) return 0
+    return data.pages.reduce((total, page) => total + page.data.length, 0)
+  }, [data])
 
   React.useEffect(() => {
     setDefaultEnum(isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut)
@@ -97,13 +106,21 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                 value={table}
                 className="h-full"
               >
-                <ScrollArea className="h-full w-full" type="always">
-                  <div className="min-h-full">
+                <ScrollArea className="h-full w-full" type="auto">
+                  <div className="min-h-full p-1">
                     {table === TradeTablesLoggedIn.ORDERS && isConnected && (
-                      <Orders />
+                      <Orders
+                        showAllMarkets={showAllMarkets}
+                        setShowAllMarkets={setShowAllMarkets}
+                      />
                     )}
                     {table === TradeTablesLoggedIn.ORDER_HISTORY &&
-                      isConnected && <OrderHistory />}
+                      isConnected && (
+                        <OrderHistory
+                          showAllMarkets={showAllMarkets}
+                          setShowAllMarkets={setShowAllMarkets}
+                        />
+                      )}
                   </div>
                   <ScrollBar orientation="vertical" className="z-50" />
                   <ScrollBar orientation="horizontal" />

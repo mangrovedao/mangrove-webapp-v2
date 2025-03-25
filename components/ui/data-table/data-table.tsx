@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table-new"
+} from "@/components/ui/table"
 import { cn } from "@/utils"
 import { AnimatePresence, motion } from "framer-motion"
 import { LoadingBody } from "./loading-body"
@@ -29,8 +29,8 @@ interface DataTableProps<TData> {
   skeletonRows?: number
   cellClasses?: string
   emptyArrayMessage?: string
-  // Animation props
   animated?: boolean
+  // Animation props
   animationVariant?: "fade" | "slide" | "scale" | "stagger"
 }
 
@@ -204,7 +204,7 @@ export function DataTable<TData>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="relative">
             {isLoading ? (
               <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
             ) : rows?.length ? (
@@ -230,7 +230,7 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      <Pagination {...pagination} />
+      {pagination && <Pagination {...pagination} />}
     </>
   )
 }

@@ -80,6 +80,17 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           args: [address, uniClone?.pool],
         })
 
+        console.log("market order", {
+          client: walletClient,
+          ghostbook: mangroveChain.ghostbook,
+          market,
+          bs,
+          sendAmount: gives,
+          router: uniClone.router,
+          univ3Module: mangroveChain.univ3Module,
+          fee: 500,
+        })
+
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
           ghostbook: mangroveChain.ghostbook,

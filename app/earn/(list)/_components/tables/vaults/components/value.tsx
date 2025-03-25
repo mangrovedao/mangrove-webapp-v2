@@ -13,7 +13,7 @@ export function Value({ value, trusted, symbol }: Props) {
 
   return (
     <div className="flex space-x-3 items-center">
-      <span>
+      <span className="text-sm">
         {value}{" "}
         {symbol ? (
           <span className="text-text-secondary">{symbol}</span>

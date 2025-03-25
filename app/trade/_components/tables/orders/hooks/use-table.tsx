@@ -3,7 +3,6 @@
 import {
   createColumnHelper,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
@@ -13,10 +12,11 @@ import React from "react"
 import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useTokenFromId } from "@/hooks/use-token-from-id"
 import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
+import { Address } from "viem"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
 import { useCancelOrder } from "./use-cancel-order"
@@ -26,171 +26,181 @@ const DEFAULT_DATA: Order[] = []
 
 type Params = {
   data?: Order[]
+  showMarketInfo?: boolean
   onCancel: (order: Order) => void
   onEdit: (order: Order) => void
 }
 
-export function useTable({ data, onCancel, onEdit }: Params) {
+export function useTable({
+  data,
+  showMarketInfo = false,
+  onCancel,
+  onEdit,
+}: Params) {
   const { currentMarket: market } = useMarket()
 
-  const columns = React.useMemo(
-    () => [
+  const columnList = React.useMemo(() => {
+    const columns = [] as any[]
+
+    columns.push(
       columnHelper.display({
         header: "Market",
-        cell: () => (
-          <div className="flex items-center space-x-2">
-            <TokenPair
-              titleProps={{
-                variant: "title3",
-                className: "text-sm text-current font-normal",
-                as: "span",
-              }}
-              tokenClasses="w-4 h-4"
-              baseToken={market?.base}
-              quoteToken={market?.quote}
-            />
-          </div>
-        ),
-      }),
-      columnHelper.accessor("isBid", {
-        header: "Side",
-        cell: (row) => {
-          const isBid = row.getValue()
-          return (
-            <div
-              className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
-            >
-              {isBid ? "Buy" : "Sell"}
-            </div>
-          )
-        },
-        sortingFn: "datetime",
-      }),
-      columnHelper.display({
-        header: "Type",
-        cell: () => <span>Limit</span>,
-      }),
-      columnHelper.display({
-        header: "Filled/Amount",
         cell: ({ row }) => {
-          const { initialWants, takerGot, initialGives, isBid, takerGave } =
-            row.original
-          const baseSymbol = market?.base.symbol
-          const quoteSymbol = market?.quote.symbol
-          const symbol = isBid ? baseSymbol : quoteSymbol
+          const { baseAddress, quoteAddress } = row.original
 
-          const displayDecimals = isBid
-            ? market?.base.displayDecimals
-            : market?.quote.displayDecimals
+          const { data: baseToken } = useTokenFromId(baseAddress as Address)
+          const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
 
-          const amount = Big(initialWants).toFixed(displayDecimals)
-          const filled = Big(takerGot).toFixed(displayDecimals)
-          const progress = Math.min(
-            Math.round(
-              Big(filled)
-                .mul(100)
-                .div(Big(amount).eq(0) ? 1 : amount)
-                .toNumber(),
-            ),
-            100,
-          )
-          return market ? (
-            <div className={cn("flex items-center")}>
-              <span className="text-sm text-muted-foreground">
-                {filled}
-                &nbsp;/
-              </span>
-              <span className="">
-                &nbsp;
-                {amount} {symbol}
-              </span>
-              <CircularProgressBar progress={progress} className="ml-3" />
+          return (
+            <div className="flex items-center space-x-2">
+              <TokenPair
+                titleProps={{
+                  variant: "title3",
+                  className: "text-sm text-current font-normal",
+                  as: "span",
+                }}
+                tokenClasses="w-4 h-4"
+                baseToken={baseToken}
+                quoteToken={quoteToken}
+              />
             </div>
-          ) : (
-            <Skeleton className="w-32 h-6" />
           )
         },
-        enableSorting: false,
       }),
-      columnHelper.accessor("price", {
-        header: "Price",
-        cell: (row) =>
-          market ? (
-            row.getValue() ? (
+    ),
+      // Rest of the columns
+      columns.push(
+        columnHelper.accessor("isBid", {
+          header: "Side",
+          cell: (row) => {
+            const isBid = row.getValue()
+            return (
+              <div
+                className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
+              >
+                {isBid ? "Buy" : "Sell"}
+              </div>
+            )
+          },
+          sortingFn: "datetime",
+        }),
+        columnHelper.display({
+          header: "Type",
+          cell: () => <span>Limit</span>,
+        }),
+        columnHelper.display({
+          header: "Filled/Amount",
+          cell: ({ row }) => {
+            const { initialWants, takerGot, isBid, baseAddress, quoteAddress } =
+              row.original
+
+            const { data: baseToken } = useTokenFromId(baseAddress as Address)
+            const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
+
+            // Use market info from the row if available (for all markets view)
+            // or fall back to current market
+            const symbol = isBid ? baseToken?.symbol : quoteToken?.symbol
+
+            // Determine display decimals - default to 6 if not available
+            const displayDecimals = isBid
+              ? baseToken?.priceDisplayDecimals || 6
+              : quoteToken?.priceDisplayDecimals || 6
+
+            const amount = Big(initialWants).toFixed(displayDecimals)
+            const filled = Big(takerGot).toFixed(displayDecimals)
+            const progress = Math.min(
+              Math.round(
+                Big(filled)
+                  .mul(100)
+                  .div(Big(amount).eq(0) ? 1 : amount)
+                  .toNumber(),
+              ),
+              100,
+            )
+            return (
+              <div className={cn("flex items-center")}>
+                <span className="text-sm text-muted-foreground">
+                  {filled}
+                  &nbsp;/
+                </span>
+                <span className="">
+                  &nbsp;
+                  {amount} {symbol}
+                </span>
+                <CircularProgressBar progress={progress} className="ml-3" />
+              </div>
+            )
+          },
+          enableSorting: false,
+        }),
+        columnHelper.accessor("price", {
+          header: "Price",
+          cell: ({ row }) => {
+            const { quoteAddress, price } = row.original
+
+            const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
+
+            return price ? (
               <span>
-                {Big(row.getValue()).toFixed(market.quote.priceDisplayDecimals)}{" "}
-                {market.quote.symbol}
+                {Big(price).toFixed(quoteToken?.priceDisplayDecimals)}{" "}
+                {quoteToken?.symbol}
               </span>
             ) : (
               <span>-</span>
             )
-          ) : (
-            <Skeleton className="w-20 h-6" />
-          ),
-      }),
-      columnHelper.accessor("expiryDate", {
-        header: "Time in force",
-        cell: (row) => {
-          const expiry = row.getValue()
-          return expiry ? <Timer expiry={expiry} /> : <div>-</div>
-        },
-      }),
-      columnHelper.display({
-        id: "actions",
-        header: () => <div className="text-right">Action</div>,
-        cell: ({ row }) => {
-          const { expiryDate } = row.original
-          const isExpired = expiryDate
-            ? new Date(expiryDate) < new Date()
-            : true
-          const cancelOrder = useCancelOrder({
-            offerId: row.original.offerId,
-          })
+          },
+        }),
+        columnHelper.accessor("expiryDate", {
+          header: "Time in force",
+          cell: ({ row }) => {
+            const { expiryDate } = row.original
 
-          return (
-            <div className="w-full h-full flex justify-end space-x-1">
-              {/* <IconButton
-                tooltip="Modify"
-                className="aspect-square w-6 rounded-full"
-                disabled={isExpired}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  onEdit(row.original)
-                }}
-              >
-                <Pen />
-              </IconButton> */}
+            return expiryDate ? <Timer expiry={expiryDate} /> : <div>-</div>
+          },
+        }),
+        columnHelper.display({
+          id: "actions",
+          header: () => <div className="text-right">Action</div>,
+          cell: ({ row }) => {
+            const { expiryDate } = row.original
+            const isExpired = expiryDate
+              ? new Date(expiryDate) < new Date()
+              : true
+            const cancelOrder = useCancelOrder({
+              offerId: row.original.offerId,
+            })
 
-              <IconButton
-                tooltip="Cancel offer"
-                className="aspect-square w-6 rounded-full"
-                isLoading={cancelOrder.isPending}
-                disabled={cancelOrder.isPending}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  cancelOrder.mutate({
-                    order: row.original,
-                  })
-                }}
-              >
-                <Close />
-              </IconButton>
-            </div>
-          )
-        },
-      }),
-    ],
-    [market, onEdit, onCancel],
-  )
+            return (
+              <div className="w-full h-full flex justify-end space-x-1">
+                <IconButton
+                  tooltip="Cancel offer"
+                  className="aspect-square w-6 rounded-full"
+                  isLoading={cancelOrder.isPending}
+                  disabled={cancelOrder.isPending}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    cancelOrder.mutate({
+                      order: row.original,
+                    })
+                  }}
+                >
+                  <Close />
+                </IconButton>
+              </div>
+            )
+          },
+        }),
+      )
+
+    return columns
+  }, [market, onEdit, onCancel, showMarketInfo])
 
   return useReactTable({
     data: data || DEFAULT_DATA,
-    columns,
+    columns: columnList,
     enableRowSelection: false,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   })
 }

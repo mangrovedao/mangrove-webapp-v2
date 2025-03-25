@@ -114,13 +114,13 @@ export function DataTable<TData>({
                         <TableCell
                           key={`${tableName}-body-cell-${cell.id}`}
                           className={cn(
-                            "px-0 py-2 group/cell whitespace-nowrap !text-red-500",
+                            "px-0 py-1 group/cell whitespace-nowrap !text-red-500",
                             cellClasses,
                           )}
                         >
                           <div
                             className={cn(
-                              " py-2 group-first/cell:rounded-l-sm group-last/cell:rounded-r-sm",
+                              " py-1 group-first/cell:rounded-l-sm group-last/cell:rounded-r-sm",
                               {
                                 [rowHighlightedClasses?.inner ??
                                 "!bg-primary-dark-green"]: isRowHighlighted?.(

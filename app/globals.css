@@ -299,12 +299,44 @@ body.mouse-down *:focus {
   }
 }
 
+@keyframes simplePulse {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@-webkit-keyframes simplePulse {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
 @keyframes pulse-once {
   0% {
     background-color: transparent;
   }
   50% {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(0, 128, 0, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@-webkit-keyframes pulse-once {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(0, 128, 0, 0.1);
   }
   100% {
     background-color: transparent;
@@ -339,4 +371,10 @@ body.mouse-down *:focus {
   .animate-valueChange {
     animation: valueChange 0.5s ease-in-out;
   }
+}
+
+.safari-pulse-fix {
+  -webkit-animation: pulse-once 0.8s ease-in-out;
+  animation: pulse-once 0.8s ease-in-out;
+  opacity: 1 !important;
 }

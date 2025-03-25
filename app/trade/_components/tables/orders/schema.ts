@@ -23,6 +23,10 @@ const orderSchema = z.object({
   offerId: z.string(),
   inboundRoute: z.string(),
   outboundRoute: z.string(),
+  marketBase: z.string().optional(),
+  marketQuote: z.string().optional(),
+  baseAddress: z.string().optional(),
+  quoteAddress: z.string().optional(),
 })
 export type Order = z.infer<typeof orderSchema>
 

@@ -1,55 +1,125 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
 import { parseOrders, type Order } from "../schema"
 
 type Params<T> = {
-  filters?: {
-    first?: number
-    skip?: number
-  }
+  pageSize?: number
+  allMarkets?: boolean
   select?: (data: Order[]) => T
 }
 
+// Define the response type
+type OrdersPage = {
+  data: Order[]
+  meta: {
+    hasNextPage: boolean
+    page: number
+  }
+}
+
 export function useOrders<T = Order[]>({
-  filters: { first = 100, skip = 0 } = {},
+  pageSize = 25,
+  allMarkets = false,
   select,
 }: Params<T> = {}) {
   const { address, isConnected } = useAccount()
   const { currentMarket: market } = useMarket()
+  const { openMarkets } = useOpenMarkets()
   const { defaultChain } = useDefaultChain()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
   ])
 
-  return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+  return useInfiniteQuery<OrdersPage>({
     queryKey: [
-      "orders",
-      market?.base.address,
-      market?.quote.address,
+      "orders-infinite",
+      allMarkets ? "all-markets" : market?.base.address,
+      allMarkets ? "" : market?.quote.address,
       address,
-      first,
-      skip,
+      pageSize,
     ],
-    queryFn: async () => {
+    initialPageParam: 0,
+    queryFn: async ({ pageParam = 0 }) => {
       try {
-        if (!(address && market)) return []
+        if (!address)
+          return {
+            data: [],
+            meta: { hasNextPage: false, page: pageParam as number },
+          }
+        if (!allMarkets && !market)
+          return {
+            data: [],
+            meta: { hasNextPage: false, page: pageParam as number },
+          }
+        if (allMarkets && (!openMarkets || openMarkets.length === 0))
+          return {
+            data: [],
+            meta: { hasNextPage: false, page: pageParam as number },
+          }
+
         startLoading(TRADE.TABLES.ORDERS)
 
-        const activeOrders = await fetch(
-          `https://indexer.mgvinfra.com/orders/active/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?user=${address}&page=${0}&limit=${first}`,
-        ).then(async (res) => await res.json())
+        // Determine which markets to query
+        const marketsToQuery =
+          allMarkets && openMarkets ? openMarkets : market ? [market] : []
 
-        const transformedData = activeOrders.orders?.map((item: any) => {
+        // Fetch active orders for all specified markets
+        const allOrdersPromises = marketsToQuery.map(async (marketItem) => {
+          if (!marketItem || !marketItem.base || !marketItem.quote) {
+            return { orders: [] }
+          }
+
+          try {
+            const response = await fetch(
+              `https://indexer.mgvinfra.com/orders/active/${defaultChain.id}/${marketItem.base.address}/${marketItem.quote.address}/${marketItem.tickSpacing}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+            )
+
+            if (!response.ok) {
+              console.warn(
+                `Failed to fetch active orders for market ${marketItem.base.symbol}-${marketItem.quote.symbol}`,
+              )
+              return { orders: [] }
+            }
+
+            const data = await response.json()
+
+            // Add market information to each order
+            return {
+              ...data,
+              orders: data.orders?.map((order: any) => ({
+                ...order,
+                marketBase: marketItem.base.symbol,
+                marketQuote: marketItem.quote.symbol,
+                baseAddress: marketItem.base.address,
+                quoteAddress: marketItem.quote.address,
+              })),
+            }
+          } catch (error) {
+            console.error(
+              `Error fetching for market ${marketItem.base.symbol}-${marketItem.quote.symbol}:`,
+              error,
+            )
+            return { orders: [] }
+          }
+        })
+        const allOrdersResults = await Promise.all(allOrdersPromises)
+
+        // Combine all order results
+        const combinedOrders = allOrdersResults.flatMap(
+          (result) => result.orders || [],
+        )
+
+        const transformedData = combinedOrders.map((item: any) => {
           // Safe date parsing function that handles invalid or missing timestamps
           const safeDate = (timestamp: number | undefined | null) => {
             // Check if timestamp is valid number and reasonable (after 2010)
@@ -88,25 +158,53 @@ export function useOrders<T = Order[]>({
             offerId: item.offerId?.toString() || "0",
             inboundRoute: item.inboundRoute || "",
             outboundRoute: item.outboundRoute || "",
+            marketBase: item.marketBase,
+            marketQuote: item.marketQuote,
+            baseAddress: item.baseAddress,
+            quoteAddress: item.quoteAddress,
           }
         })
 
-        console.log("active orders", { transformedData })
-
         const parsedData = parseOrders(transformedData || [])
-        return parsedData
+
+        // Sort by timestamp descending (newest first)
+        parsedData.sort(
+          (a, b) =>
+            new Date(b.creationDate).getTime() -
+            new Date(a.creationDate).getTime(),
+        )
+
+        return {
+          data: parsedData,
+          meta: {
+            hasNextPage: parsedData.length >= pageSize,
+            page: pageParam as number,
+          },
+        }
       } catch (e) {
         console.error(getErrorMessage(e))
-        return []
+        return {
+          data: [],
+          meta: {
+            hasNextPage: false,
+            page: pageParam as number,
+          },
+        }
       } finally {
         stopLoading(TRADE.TABLES.ORDERS)
       }
     },
-    select,
+    getNextPageParam: (lastPage) => {
+      // If we got fewer orders than the requested page size, there are no more pages
+      if (!lastPage.meta.hasNextPage) return undefined
+      return lastPage.meta.page + 1
+    },
     meta: {
       error: "Unable to retrieve open orders",
     },
-    enabled: !!isConnected,
+    enabled: allMarkets
+      ? !!isConnected && !!openMarkets
+      : !!isConnected && !!market,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })

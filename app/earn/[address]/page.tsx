@@ -445,6 +445,7 @@ export default function Page() {
                     <TokenIcon
                       symbol={vault?.market.base.symbol}
                       className="h-4 w-4"
+                      imgClasses="w-5 h-5"
                     />
                     <Caption className="text-text-secondary !text-sm">
                       {vault?.market.base.symbol}
@@ -469,6 +470,7 @@ export default function Page() {
                     <TokenIcon
                       symbol={vault?.market.quote.symbol}
                       className="h-4 w-4"
+                      imgClasses="w-5 h-5"
                     />
                     <Caption className="text-text-secondary !text-sm">
                       {vault?.market.quote.symbol}
@@ -494,7 +496,11 @@ export default function Page() {
               <Line
                 title={
                   <div className="flex gap-2">
-                    <TokenIcon symbol={vault?.symbol} className="h-4 w-4" />
+                    <TokenIcon
+                      symbol={vault?.symbol}
+                      className="h-4 w-4"
+                      imgClasses="w-5 h-5"
+                    />
                     <Caption className="text-text-secondary text-sm">
                       {vault?.symbol}
                     </Caption>
@@ -553,7 +559,7 @@ export default function Page() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 15 }}
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed bottom-6 right-6 z-50 md:hidden"
       >
         <Button
           className="flex items-center justify-center rounded-full bg-bg-tertiary hover:bg-bg-primary-hover"

@@ -11,6 +11,7 @@ export default function Page() {
           Earn
         </Title>
       </div>
+
       <Tables />
 
       <style jsx global>{`

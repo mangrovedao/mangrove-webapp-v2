@@ -52,6 +52,7 @@
     "@tanstack/react-form": "0.10.3",
     "@tanstack/react-query": "^5.17.10",
     "@tanstack/react-table": "^8.11.6",
+    "@tanstack/react-virtual": "^3.13.5",
     "@types/d3-scale": "^4.0.8",
     "@types/lodash": "^4.17.16",
     "@visx/axis": "^3.5.0",

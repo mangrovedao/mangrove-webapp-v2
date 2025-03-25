@@ -63,7 +63,7 @@ const MemoizedOffer = React.memo(
         case "new":
           return "animate-fadeIn"
         case "changed":
-          return "animate-pulse-once"
+          return "safari-pulse-fix" // Use a custom class that works in Safari
         case "removing":
           return "animate-fadeOut"
         default:
@@ -99,12 +99,11 @@ const MemoizedOffer = React.memo(
               }}
               onMouseEnter={() => setHoveredOfferId(offerId)}
               onMouseLeave={() => setHoveredOfferId(null)}
-              style={{
-                animation:
-                  status === "changed"
-                    ? "pulse-once 0.8s ease-in-out"
-                    : undefined,
-              }}
+              style={
+                {
+                  // Remove animation style and use className instead
+                }
+              }
             >
               <OrderBookTableCell
                 className={cn(
@@ -160,29 +159,60 @@ const MemoizedOffer = React.memo(
                 td:last-of-type {
                   width: ${cumulatedVolumePercentage}%;
                   background: ${type === "bids"
-                    ? "linear-gradient(90deg, rgba(0, 128, 0, 0.05) 0%, rgba(0, 128, 0, 0.25) 100%)"
-                    : "linear-gradient(90deg, rgba(255, 0, 0, 0.05) 0%, rgba(255, 0, 0, 0.25) 100%)"};
+                    ? "linear-gradient(to right, rgba(0, 128, 0, 0.05) 0%, rgba(0, 128, 0, 0.25) 100%)"
+                    : "linear-gradient(to right, rgba(255, 0, 0, 0.05) 0%, rgba(255, 0, 0, 0.25) 100%)"};
+                  -webkit-transition:
+                    width 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.4s ease,
+                    opacity 0.3s ease;
                   transition:
                     width 0.8s cubic-bezier(0.16, 1, 0.3, 1),
                     background-color 0.4s ease,
                     opacity 0.3s ease;
+                  -webkit-box-shadow: ${type === "bids"
+                    ? "inset 0 0 8px rgba(0, 128, 0, 0.1)"
+                    : "inset 0 0 8px rgba(255, 0, 0, 0.1)"};
                   box-shadow: ${type === "bids"
                     ? "inset 0 0 8px rgba(0, 128, 0, 0.1)"
                     : "inset 0 0 8px rgba(255, 0, 0, 0.1)"};
                   opacity: 0.9;
                   border-radius: 0 4px 4px 0;
-                  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                  -webkit-animation: simplePulse 4s ease infinite;
+                  animation: simplePulse 4s ease infinite;
+                  -webkit-animation-delay: ${index * 0.1}s;
                   animation-delay: ${index * 0.1}s;
                 }
                 tr:hover td:last-of-type {
                   background: ${type === "bids"
-                    ? "linear-gradient(90deg, rgba(0, 128, 0, 0.1) 0%, rgba(0, 128, 0, 0.35) 100%)"
-                    : "linear-gradient(90deg, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.35) 100%)"};
+                    ? "linear-gradient(to right, rgba(0, 128, 0, 0.1) 0%, rgba(0, 128, 0, 0.35) 100%)"
+                    : "linear-gradient(to right, rgba(255, 0, 0, 0.1) 0%, rgba(255, 0, 0, 0.35) 100%)"};
                   opacity: 1;
+                  -webkit-box-shadow: ${type === "bids"
+                    ? "inset 0 0 12px rgba(0, 128, 0, 0.2)"
+                    : "inset 0 0 12px rgba(255, 0, 0, 0.2)"};
                   box-shadow: ${type === "bids"
                     ? "inset 0 0 12px rgba(0, 128, 0, 0.2)"
                     : "inset 0 0 12px rgba(255, 0, 0, 0.2)"};
+                  -webkit-animation: none;
                   animation: none;
+                }
+                @-webkit-keyframes simplePulse {
+                  0%,
+                  100% {
+                    opacity: 0.9;
+                  }
+                  50% {
+                    opacity: 0.7;
+                  }
+                }
+                @keyframes simplePulse {
+                  0%,
+                  100% {
+                    opacity: 0.9;
+                  }
+                  50% {
+                    opacity: 0.7;
+                  }
                 }
               `}</style>
             </TableRow>

@@ -13,6 +13,10 @@ const orderHistorySchema = z.object({
   price: z.string(),
   status: z.string(),
   isMarketOrder: z.boolean(),
+  marketBase: z.string().optional(),
+  marketQuote: z.string().optional(),
+  baseAddress: z.string().optional(),
+  quoteAddress: z.string().optional(),
 })
 export type OrderHistory = z.infer<typeof orderHistorySchema>
 
