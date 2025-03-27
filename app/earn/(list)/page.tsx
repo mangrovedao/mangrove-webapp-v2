@@ -67,7 +67,10 @@ export default function Page() {
         {/* Text content - positioned on top of the coins */}
         <div className="w-full h-full relative z-10 flex items-center justify-center rounded-sm bg-gradient-to-r from-bg-secondary/80 via-bg-primary/80 to-bg-secondary/80 backdrop-blur-sm">
           <div className="text-center">
-            <Title variant="title3" className="text-text-primary mb-4 text-2xl">
+            <Title
+              variant="header1"
+              className="text-text-primary mb-2 text-2xl"
+            >
               Earn Passive Income
             </Title>
             <Text className="text-text-secondary max-w-2xl mx-auto px-4">
