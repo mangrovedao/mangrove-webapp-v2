@@ -86,7 +86,9 @@ export function useTable({ pageSize, data, onManage }: Params) {
 
       columnHelper.display({
         id: "Deposited",
-        header: () => <span>Deposited</span>,
+        header: () => (
+          <span className="text-right w-full block">Deposited</span>
+        ),
         cell: ({ row }) => {
           const {
             userBaseBalance,
@@ -103,7 +105,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
               quoteDollarPrice
 
           return (
-            <div>
+            <div className="text-right w-full">
               <Value
                 value={formatNumber(Number(value.toFixed(2)))}
                 symbol={"$"}
@@ -114,21 +116,26 @@ export function useTable({ pageSize, data, onManage }: Params) {
       }),
 
       columnHelper.display({
-        header: "Curator",
+        id: "Curator",
+        header: () => <span className="text-right w-full block">Curator</span>,
         cell: ({ row }) => {
           const { strategist } = row.original
-          return <Value value={strategist} />
+          return (
+            <div className="text-right w-full">
+              <Value value={strategist} className="justify-end" />
+            </div>
+          )
         },
       }),
 
       columnHelper.display({
         id: "My APY",
-        header: () => <span>APR</span>,
+        header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
           const { apr } = row.original
           return (
-            <div>
-              <Value value={`${apr.toFixed(2)}%`} />
+            <div className="text-right w-full">
+              <Value value={`${apr.toFixed(2)}%`} className="justify-end" />
             </div>
           )
         },

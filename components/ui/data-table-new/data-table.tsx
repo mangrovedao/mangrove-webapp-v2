@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/table-new"
 import { cn } from "@/utils"
 import { ScrollArea, ScrollBar } from "../scroll-area"
-import { LoadingBody } from "./loading-body"
 import { Pagination, type PaginationProps } from "./pagination"
 
 interface DataTableProps<TData> {
@@ -60,7 +59,7 @@ export function DataTable<TData>({
       <div className={cn("w-full overflow-auto", containerClassName)}>
         <ScrollArea className="h-full">
           <Table className="min-w-full table-auto">
-            <TableHeader className={`sticky z-40 text-xs ${rows.length}`}>
+            <TableHeader className={`sticky z-40 text-xs h-2 ${rows.length}`}>
               {rows.length > 0 &&
                 table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
@@ -71,7 +70,7 @@ export function DataTable<TData>({
                       return (
                         <TableHead
                           key={`${tableName}-head-${header.id}`}
-                          className="text-text-tertiary text-xs whitespace-nowrap"
+                          className="text-text-primary text-xs whitespace-nowrap"
                         >
                           {header.isPlaceholder
                             ? null
@@ -86,9 +85,7 @@ export function DataTable<TData>({
                 ))}
             </TableHeader>
             <TableBody>
-              {isLoading ? (
-                <LoadingBody cells={leafColumns.length} rows={skeletonRows} />
-              ) : rows?.length ? (
+              {rows?.length ? (
                 rows.map((row) => (
                   <React.Fragment key={`${tableName}-fragment-${row.id}`}>
                     <TableRow
@@ -129,7 +126,7 @@ export function DataTable<TData>({
                               },
                             )}
                           >
-                            <div className="px-4 h-6 flex items-center ">
+                            <div className="px-2 h-6 flex items-center ">
                               {flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext(),
@@ -149,7 +146,7 @@ export function DataTable<TData>({
                 >
                   <TableCell
                     colSpan={leafColumns.length}
-                    className="h-19 text-center bg-gradient-to-t from-bg-primary to-bg-secondary rounded-sm text-text-tertiary"
+                    className="h-19 text-center rounded-sm text-text-tertiary"
                   >
                     {isError
                       ? "Due to excessive demand, we are unable to return your data. Please try again later."

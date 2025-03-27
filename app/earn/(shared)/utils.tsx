@@ -32,10 +32,10 @@ export const VaultABI = parseAbi([
 export async function fetchTokenPrices(
   client: PublicClient,
   market: [string, string, bigint],
-) {
+): Promise<[number, number]> {
   try {
     const [base, quote] = market
-    return Promise.all([
+    const [basePrice, quotePrice] = await Promise.all([
       fetch(
         `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${base}`,
       )
@@ -51,8 +51,11 @@ export async function fetchTokenPrices(
         .then((data) => data.price)
         .catch(() => 1),
     ])
+    return [basePrice, quotePrice]
   } catch (error) {
     console.error(error)
+    // Return default values on error
+    return [1, 1]
   }
 }
 

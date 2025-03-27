@@ -96,7 +96,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
 
       columnHelper.display({
         id: "TVL",
-        header: () => <span>TVL</span>,
+        header: () => <span className="text-right w-full block">TVL</span>,
         cell: ({ row }) => {
           const loading = !("tvl" in row.original)
           const tvl = "tvl" in row.original ? row.original.tvl : 0n
@@ -110,9 +110,9 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
             Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
             quoteDollarPrice
           return (
-            <div>
+            <div className="text-right w-full">
               {loading ? (
-                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-6 w-24 ml-auto" />
               ) : (
                 <Value
                   value={formatNumber(Number(value.toFixed(2)))}
@@ -125,15 +125,20 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
       }),
 
       columnHelper.display({
-        header: "Manager",
+        id: "Manager",
+        header: () => <span className="text-right w-full block">Manager</span>,
         cell: ({ row }) => {
-          return <Value value={row.original.strategist} />
+          return (
+            <div className="text-right w-full">
+              <Value value={row.original.strategist} className="justify-end" />
+            </div>
+          )
         },
       }),
 
       columnHelper.display({
         id: "APR",
-        header: () => <span>APR</span>,
+        header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
           const apr = row.original.apr ? `${row.original.apr.toFixed(2)}%` : "-"
 
@@ -142,21 +147,13 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
             : "-"
 
           return (
-            <div className="group relative">
+            <div className="group relative w-full text-right">
               <TooltipProvider>
                 <Tooltip delayDuration={200}>
                   <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                    <Value value={apr} />
+                    <Value value={apr} className="justify-end" />
                   </TooltipTrigger>
                   <TooltipContent
-                    // onKeyDown={(e) => {
-                    //   e.preventDefault()
-                    //   e.stopPropagation()
-                    // }}
-                    // onKeyUp={(e) => {
-                    //   e.preventDefault()
-                    //   e.stopPropagation()
-                    // }}
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
@@ -165,7 +162,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
                   >
                     <div className="cursor-default">
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
                             Incentives rate
                           </span>
@@ -173,7 +170,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
                             {incentivesApr}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
                             Net APR
                           </span>

@@ -6,6 +6,7 @@ import { Vault } from "@/app/earn/(shared)/types"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
+import { TableLoadingSkeleton } from "../tables"
 import { useMyVaults } from "./hooks/use-my-vaults"
 import { useTable } from "./hooks/use-table"
 
@@ -14,7 +15,7 @@ export function MyVaults() {
   const { chainId } = useAccount()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
-    pageSize: 10,
+    pageSize: 15, // Increased page size for better performance
   })
 
   const {
@@ -25,6 +26,7 @@ export function MyVaults() {
   } = useMyVaults({
     filters: {
       skip: (page - 1) * pageSize,
+      first: pageSize,
     },
   })
 
@@ -46,20 +48,22 @@ export function MyVaults() {
   // temporary fix
   React.useEffect(() => {
     refetch?.()
-  }, [chainId])
+  }, [chainId, refetch])
+
+  if (isLoading) return <TableLoadingSkeleton />
 
   return (
-    <>
+    <div className="relative overflow-hidden">
       <DataTable
         table={table}
         emptyArrayMessage="No positions yet."
         isError={!!error}
-        // isLoading={isLoading}
-        onRowClick={(vault) =>
-          // note: lost of context after redirecting with push method here
-          // push(`/earn/${strategy?.address}`)
-          (window.location.href = `/earn/${vault?.address}`)
-        }
+        isLoading={isLoading}
+        onRowClick={(vault) => {
+          if (vault) {
+            window.location.href = `/earn/${vault.address}`
+          }
+        }}
         cellClasses="font-ubuntu"
         tableRowClasses="font-ubuntu"
         pagination={{
@@ -68,12 +72,14 @@ export function MyVaults() {
           pageSize,
           count,
         }}
+        containerClassName="max-h-[600px]"
+        skeletonRows={5}
       />
       <CloseStrategyDialog
         strategyAddress={closeStrategy?.address || ""}
         isOpen={!!closeStrategy}
         onClose={() => setCloseStrategy(undefined)}
       />
-    </>
+    </div>
   )
 }
