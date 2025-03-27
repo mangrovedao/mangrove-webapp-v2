@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import { formatUnits } from "viem"
 
 import { EnhancedNumericInput } from "@/components/token-input-new"
@@ -38,6 +38,48 @@ export function DepositForm({ className }: { className?: string }) {
   const { address } = useAccount()
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
 
+  // Calculate slider percentage from manually entered value
+  useEffect(() => {
+    if (baseBalance?.balance && baseBalance.balance > 0n && baseDeposit) {
+      try {
+        const enteredValue = parseFloat(baseDeposit)
+        const maxValue = parseFloat(
+          formatUnits(baseBalance.balance, baseBalance.token.decimals),
+        )
+        if (!isNaN(enteredValue) && !isNaN(maxValue) && maxValue > 0) {
+          const percentage = Math.min(
+            Math.round((enteredValue / maxValue) * 100),
+            100,
+          )
+          setBaseSliderValue(percentage)
+        }
+      } catch (e) {
+        // Handle parsing errors silently
+      }
+    }
+  }, [baseDeposit, baseBalance])
+
+  // Calculate slider percentage from manually entered value
+  useEffect(() => {
+    if (quoteBalance?.balance && quoteBalance.balance > 0n && quoteDeposit) {
+      try {
+        const enteredValue = parseFloat(quoteDeposit)
+        const maxValue = parseFloat(
+          formatUnits(quoteBalance.balance, quoteBalance.token.decimals),
+        )
+        if (!isNaN(enteredValue) && !isNaN(maxValue) && maxValue > 0) {
+          const percentage = Math.min(
+            Math.round((enteredValue / maxValue) * 100),
+            100,
+          )
+          setQuoteSliderValue(percentage)
+        }
+      } catch (e) {
+        // Handle parsing errors silently
+      }
+    }
+  }, [quoteDeposit, quoteBalance])
+
   const handleBaseSliderChange = (value: number) => {
     if (!baseBalance) return
     const amount = (BigInt(value * 100) * baseBalance.balance) / 10_000n
@@ -54,6 +96,22 @@ export function DepositForm({ className }: { className?: string }) {
     setQuoteSliderValue(value)
     setBaseSliderValue(0)
     handleQuoteDepositChange(formatUnits(amount, quoteBalance.token.decimals))
+  }
+
+  // Custom handler for manual input changes
+  const handleBaseInputChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleBaseDepositChange(e)
+    // Slider will be updated by the effect
+  }
+
+  // Custom handler for manual input changes
+  const handleQuoteInputChange = (
+    e: React.ChangeEvent<HTMLInputElement> | string,
+  ) => {
+    handleQuoteDepositChange(e)
+    // Slider will be updated by the effect
   }
 
   React.useEffect(() => {
@@ -76,63 +134,69 @@ export function DepositForm({ className }: { className?: string }) {
 
   return (
     <form
-      className={cn("space-y-6", className)}
+      className={cn("flex flex-col h-full", className)}
       onSubmit={(e) => {
         e.preventDefault()
       }}
     >
-      <EnhancedNumericInput
-        sendSliderValue={baseSliderValue}
-        setSendSliderValue={handleBaseSliderChange}
-        token={baseToken}
-        disabled={
-          (vault?.totalBase === 0n && vault?.totalQuote !== 0n) ||
-          baseBalance?.balance === 0n
-        }
-        dollarAmount={
-          (Number(baseDeposit) * (vault?.baseDollarPrice || 0)).toFixed(3) ||
-          "..."
-        }
-        label={`Deposit ${baseSliderValue}%`}
-        inputClassName="bg-bg-primary"
-        value={Number(baseDeposit).toFixed(currentDecimals(baseToken))}
-        onChange={handleBaseDepositChange}
-        error={errors.baseDeposit}
-        showBalance
-        balanceAction={{ onClick: handleBaseDepositChange, text: "MAX" }}
-      />
+      <div className="flex-grow space-y-6">
+        <EnhancedNumericInput
+          sendSliderValue={baseSliderValue}
+          setSendSliderValue={handleBaseSliderChange}
+          token={baseToken}
+          disabled={
+            (vault?.totalBase === 0n && vault?.totalQuote !== 0n) ||
+            baseBalance?.balance === 0n
+          }
+          dollarAmount={
+            (Number(baseDeposit) * (vault?.baseDollarPrice || 0)).toFixed(3) ||
+            "..."
+          }
+          label={`Deposit ${baseSliderValue}%`}
+          inputClassName="bg-bg-primary"
+          value={Number(baseDeposit).toFixed(currentDecimals(baseToken))}
+          onChange={handleBaseInputChange}
+          error={errors.baseDeposit}
+          showBalance
+          balanceAction={{ onClick: handleBaseDepositChange, text: "MAX" }}
+        />
 
-      <EnhancedNumericInput
-        sendSliderValue={quoteSliderValue}
-        setSendSliderValue={handleQuoteSliderChange}
-        token={quoteToken}
-        disabled={
-          (vault?.totalQuote === 0n && vault?.totalBase !== 0n) ||
-          quoteBalance?.balance === 0n
-        }
-        dollarAmount={
-          (Number(quoteDeposit) * (vault?.quoteDollarPrice || 0)).toFixed(3) ||
-          "..."
-        }
-        label={`Deposit ${quoteSliderValue}%`}
-        value={Number(quoteDeposit).toFixed(currentDecimals(quoteToken))}
-        inputClassName="bg-bg-primary"
-        onChange={handleQuoteDepositChange}
-        error={errors.quoteDeposit}
-        showBalance
-        balanceAction={{ onClick: handleQuoteDepositChange, text: "MAX" }}
-      />
+        <EnhancedNumericInput
+          sendSliderValue={quoteSliderValue}
+          setSendSliderValue={handleQuoteSliderChange}
+          token={quoteToken}
+          disabled={
+            (vault?.totalQuote === 0n && vault?.totalBase !== 0n) ||
+            quoteBalance?.balance === 0n
+          }
+          dollarAmount={
+            (Number(quoteDeposit) * (vault?.quoteDollarPrice || 0)).toFixed(
+              3,
+            ) || "..."
+          }
+          label={`Deposit ${quoteSliderValue}%`}
+          value={Number(quoteDeposit).toFixed(currentDecimals(quoteToken))}
+          inputClassName="bg-bg-primary"
+          onChange={handleQuoteInputChange}
+          error={errors.quoteDeposit}
+          showBalance
+          balanceAction={{ onClick: handleQuoteDepositChange, text: "MAX" }}
+        />
+      </div>
 
-      <Button
-        className="w-full hover:hover:bg-bg-secondary bg-bg-tertiary"
-        onClick={() => {
-          if (checkAndShowDisclaimer(address)) return
-          setAddDialog(!addDialog)
-        }}
-        disabled={isLoading || mintAmount === 0n || hasErrors}
-      >
-        Depositss
-      </Button>
+      <div className="mt-auto pt-4">
+        <Button
+          className="w-full hover:hover:bg-bg-tertiary bg-bg-primary"
+          onClick={() => {
+            if (checkAndShowDisclaimer(address)) return
+            setAddDialog(!addDialog)
+          }}
+          disabled={isLoading || mintAmount === 0n || hasErrors}
+        >
+          Deposit
+        </Button>
+      </div>
+
       {addDialog ? (
         <DepositToVaultDialog
           isOpen={addDialog}

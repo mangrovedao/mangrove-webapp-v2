@@ -401,7 +401,7 @@ export default function Page() {
                     ))}
                   </CustomRadioGroup>
                 </div>
-                <div className="relative min-h-[400px]">
+                <div className="relative min-h-[360px]">
                   <AnimatePresence mode="wait">
                     {action === Action.Deposit ? (
                       <motion.div
@@ -495,7 +495,7 @@ export default function Page() {
 
               <Line
                 title={
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center flex-wrap">
                     <TokenIcon
                       symbol={vault?.symbol}
                       className="h-4 w-4"
@@ -527,7 +527,7 @@ export default function Page() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 15 }}
-        className="fixed bottom-6 right-6 z-50 md:hidden"
+        className="fixed bottom-6 right-6 z-50 lg:hidden"
       >
         <Button
           className="flex items-center justify-center rounded-full bg-bg-tertiary hover:bg-bg-primary-hover"
@@ -578,7 +578,7 @@ export default function Page() {
                 ))}
               </CustomRadioGroup>
             </div>
-            <div className="relative min-h-[400px]">
+            <div className="relative">
               <AnimatePresence mode="wait">
                 {action === Action.Deposit ? (
                   <motion.div
