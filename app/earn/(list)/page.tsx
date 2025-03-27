@@ -34,7 +34,7 @@ export default function Page() {
   return (
     <main className="flex flex-col min-h-[calc(100vh-80px)]">
       {/* Header */}
-      <div className="mt-[56px] mb-6 flex justify-between items-center">
+      <div className="mt-[56px] flex justify-between items-center">
         <Title variant={"header1"}>Earn</Title>
       </div>
 
@@ -68,11 +68,11 @@ export default function Page() {
         <div className="w-full h-full relative z-10 flex items-center justify-center rounded-sm bg-gradient-to-r from-bg-secondary/80 via-bg-primary/80 to-bg-secondary/80 backdrop-blur-sm">
           <div className="text-center">
             <Title variant="title3" className="text-text-primary mb-4 text-2xl">
-              Earn Passive Income with These Tokens
+              Earn Passive Income
             </Title>
             <Text className="text-text-secondary max-w-2xl mx-auto px-4">
-              Deposit these tokens into our vaults to earn trading fees and
-              incentives while maintaining liquidity.
+              Deposit into our vaults to earn trading fees and incentives while
+              maintaining liquidity.
             </Text>
           </div>
         </div>

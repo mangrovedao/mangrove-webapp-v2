@@ -124,14 +124,14 @@ export function DepositForm({ className }: { className?: string }) {
       />
 
       <Button
-        className="w-full hover:hover:bg-button-secondary-bg-hover bg-button-secondary-bg"
+        className="w-full hover:hover:bg-bg-secondary bg-bg-tertiary"
         onClick={() => {
           if (checkAndShowDisclaimer(address)) return
           setAddDialog(!addDialog)
         }}
         disabled={isLoading || mintAmount === 0n || hasErrors}
       >
-        Deposit
+        Depositss
       </Button>
       {addDialog ? (
         <DepositToVaultDialog
