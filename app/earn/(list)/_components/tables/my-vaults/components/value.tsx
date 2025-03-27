@@ -23,6 +23,12 @@ export function Value({ value, trusted, symbol, variant, className }: Props) {
         className,
       )}
     >
+      {trusted ? (
+        <div className="relative h-4 w-4 ml-3">
+          <div className="absolute inset-0 bg-bg-tertiary rounded-full"></div>
+          <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
+        </div>
+      ) : undefined}
       <span className="font-ubuntu text-sm whitespace-nowrap">
         {value}{" "}
         {symbol === "$" ? (
@@ -32,12 +38,6 @@ export function Value({ value, trusted, symbol, variant, className }: Props) {
           <span className="text-text-secondary">{symbol}</span>
         ) : undefined}
       </span>
-      {trusted ? (
-        <div className="relative h-4 w-4 ml-3">
-          <div className="absolute inset-0 bg-bg-tertiary rounded-full"></div>
-          <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
-        </div>
-      ) : undefined}
     </div>
   )
 }

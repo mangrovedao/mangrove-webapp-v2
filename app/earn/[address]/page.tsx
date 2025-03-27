@@ -33,7 +33,7 @@ import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
-import { Line, LineRewards, getChainImage } from "../(shared)/utils"
+import { Line, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/deposit-form"
@@ -144,7 +144,7 @@ export default function Page() {
       <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5 ">
         <div className="col-span-12 md:col-span-8 space-y-6">
           {/* Infos Card */}
-          <div className="mx-1 flex p-2 justify-between rounded-sm bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
+          <div className="mx-1 flex p-2 justify-between rounded-sm bg-bg-secondary flex-wrap">
             <GridLineHeader
               title={"TVL"}
               value={formatNumber(
@@ -518,38 +518,6 @@ export default function Page() {
                 }
               />
             </div>
-          </div>
-
-          <div className="z-20 grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-sm ">
-            <Title className="text-lg">Rewards</Title>
-            <div className="grid xs:grid-cols-1 grid-cols-2 gap-4">
-              <div className="flex gap-2 items-start">
-                <div className="flex items-center gap-2">
-                  <ImageWithHideOnError
-                    src={`/assets/illustrations/mangrove-logo.png`}
-                    width={24}
-                    height={26}
-                    key={`mangrove-logo`}
-                    alt={`mangrove-logo`}
-                  />
-                  <Caption className="text-text-secondary">MGV</Caption>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <LineRewards title={"Claimable"} value={"0.00"} />
-                <LineRewards title={"Earned"} value={"0.00"} />
-                <LineRewards title={"All time"} value={"0.00"} />
-              </div>
-            </div>
-            <Button
-              variant={"primary"}
-              size={"lg"}
-              className="w-full"
-              disabled={true}
-            >
-              Claim rewards
-            </Button>
           </div>
         </div>
       </div>
