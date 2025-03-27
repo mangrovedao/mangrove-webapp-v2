@@ -32,15 +32,19 @@ export default function Page() {
   const displayTokens = [...tokens, ...tokens, ...tokens, ...tokens]
 
   return (
-    <main>
-      <div className="mt-[56px] flex justify-between items-center">
+    <main className="flex flex-col min-h-[calc(100vh-80px)]">
+      {/* Header */}
+      <div className="mt-[56px] mb-6 flex justify-between items-center">
         <Title variant={"header1"}>Earn</Title>
       </div>
 
-      <Tables />
+      {/* Main content */}
+      <div className="flex-1">
+        <Tables />
+      </div>
 
-      {/* Animated coin display section with explanatory text */}
-      <div className="mt-12 relative h-[160px]">
+      {/* Footer with animated coin display - always at bottom */}
+      <div className="w-full h-[160px] relative mb-24">
         {/* Background coins animation */}
         <div className="absolute inset-0 w-full overflow-hidden opacity-50 flex items-center">
           {/* Single continuous animation row */}
@@ -61,7 +65,7 @@ export default function Page() {
         </div>
 
         {/* Text content - positioned on top of the coins */}
-        <div className="w-full relative z-10 py-12 rounded-sm bg-gradient-to-r from-bg-secondary/80 via-bg-primary/80 to-bg-secondary/80 backdrop-blur-sm">
+        <div className="w-full h-full relative z-10 flex items-center justify-center rounded-sm bg-gradient-to-r from-bg-secondary/80 via-bg-primary/80 to-bg-secondary/80 backdrop-blur-sm">
           <div className="text-center">
             <Title variant="title3" className="text-text-primary mb-4 text-2xl">
               Earn Passive Income with These Tokens

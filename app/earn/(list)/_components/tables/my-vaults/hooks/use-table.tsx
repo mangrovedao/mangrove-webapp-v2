@@ -48,7 +48,7 @@ export function useTable({ pageSize, data, onManage }: Params) {
           return (
             <div className="flex flex-col underline">
               <Link
-                className="hover:opacity-80 transition-opacity bg-[#284061] size-6 rounded-sm flex items-center justify-center"
+                className="hover:opacity-80 transition-opacity bg-bg-tertiary size-6 rounded-sm flex items-center justify-center"
                 href={`${blockExplorerUrl}/address/${address}`}
                 target="_blank"
                 rel="noopener noreferrer"
