@@ -336,14 +336,6 @@ export function DepositForm({ className }: { className?: string }) {
     return "Deposit"
   }
 
-  console.log({
-    isLoading,
-    isLoadingAllowance,
-    mintParams: mintParams.mintAmount,
-    hasErrors,
-    isPending,
-    isProcessing,
-  })
   if (!baseToken || !quoteToken)
     return (
       <div className={"p-0.5"}>

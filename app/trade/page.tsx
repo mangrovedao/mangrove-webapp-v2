@@ -13,7 +13,6 @@ import { useEffect, useState } from "react"
 import { Market } from "./_components/charts/charts"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
-import { BookContent } from "./_components/orderbook/orderbook"
 import { Trades } from "./_components/orderbook/trade-history/trades"
 import OrderBookV2 from "./_components/orderbookv2/orderbook-v2"
 import { PricesBar } from "./_components/prices-bar/prices-bar"
@@ -127,7 +126,11 @@ export default function Page() {
               )}
               {activeMainTab === "Order Book" && (
                 <div className="h-[400px] w-full border border-bg-secondary rounded-sm">
-                  <BookContent />
+                  <OrderBookV2
+                    asks={mergedBooks.asks}
+                    bids={mergedBooks.bids}
+                  />
+                  {/* <BookContent /> */}
                 </div>
               )}
               {activeMainTab === "Trades" && (
