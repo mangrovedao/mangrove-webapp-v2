@@ -10,7 +10,6 @@ import {
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { TradeIcon } from "@/svgs"
 import { useEffect, useState } from "react"
-import { Market } from "./_components/charts/charts"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
 import { Trades } from "./_components/orderbook/trade-history/trades"
@@ -121,7 +120,8 @@ export default function Page() {
             <div className="mb-2">
               {activeMainTab === "Chart" && (
                 <div className="h-[400px] w-full rounded-sm border border-bg-secondary">
-                  <Market className="w-full h-full" />
+                  {/* <Market className="w-full h-full" /> */}
+                  <EmbedPriceChart />
                 </div>
               )}
               {activeMainTab === "Order Book" && (
