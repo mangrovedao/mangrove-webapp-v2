@@ -145,16 +145,18 @@ export function useTokenPrice(tokenAddress: string, chainId: number) {
     queryFn: async () => {
       if (!tokenAddress) return null
 
-      const response = await fetch(
-        `https://api.coingecko.com/api/v3/simple/token_price/${chainId}?contract_addresses=${tokenAddress}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`,
-      )
+      return null
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch token price")
-      }
+      // const response = await fetch(
+      //   `https://api.coingecko.com/api/v3/simple/token_price/${chainId}?contract_addresses=${tokenAddress}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`,
+      // )
 
-      const data = await response.json()
-      return data[tokenAddress.toLowerCase()]
+      // if (!response.ok) {
+      //   throw new Error("Failed to fetch token price")
+      // }
+
+      // const data = await response.json()
+      // return data[tokenAddress.toLowerCase()]
     },
     // Refetch every 60 seconds
     refetchInterval: 60000,
