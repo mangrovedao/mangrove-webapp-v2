@@ -2,6 +2,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
+import { getExactWeiAmount } from "@/utils/regexp"
 import React, { useMemo } from "react"
 
 type OrderBookProps = {
@@ -98,7 +99,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
               >
                 {/* Background volume bar */}
                 <div
-                  className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#500] to-transparent group-hover:from-[#700]"
+                  className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#500] to-transparent group-hover:from-[#fff]"
                   style={{
                     width: `${(ask.cumulative / maxCumulative) * 100}%`,
                     background:
@@ -111,11 +112,24 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
                     animationDelay: `${i * 0.1}s`,
                     transition:
                       "width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, opacity 0.3s ease",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    dispatchEvent(
+                      new CustomEvent("on-orderbook-offer-clicked", {
+                        detail: {
+                          price: getExactWeiAmount(
+                            ask.price.toString(),
+                            quote?.priceDisplayDecimals ?? 8,
+                          ),
+                        },
+                      }),
+                    )
                   }}
                 />
 
                 {/* Content */}
-                <span className="w-1/3 text-[#a92644] text-xs z-10">
+                <span className="w-1/3 text-[#a92644] text-xs z-10 ">
                   {ask.price.toLocaleString(undefined, {
                     minimumFractionDigits: 1,
                   })}

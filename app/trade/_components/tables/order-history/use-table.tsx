@@ -63,6 +63,17 @@ export function useTable({ data, showMarketInfo = false }: Params) {
     ),
       // Add standard columns
       columnList.push(
+        columnHelper.accessor("isMarketOrder", {
+          header: "Type",
+          cell: ({ row }) => {
+            const isMarketOrder = row.original.isMarketOrder
+            return (
+              <span className={cn("text-xs")}>
+                {isMarketOrder ? "Market" : "Limit"}
+              </span>
+            )
+          },
+        }),
         columnHelper.accessor("isBid", {
           header: "Side",
           cell: (row) => {
@@ -79,23 +90,6 @@ export function useTable({ data, showMarketInfo = false }: Params) {
             )
           },
           sortingFn: "datetime",
-        }),
-
-        columnHelper.accessor("isMarketOrder", {
-          header: "Type",
-          cell: ({ row }) => {
-            const isMarketOrder = row.original.isMarketOrder
-            return (
-              <span
-                className={cn(
-                  isMarketOrder ? "text-green-caribbean" : "text-red-100",
-                  "text-xs",
-                )}
-              >
-                {isMarketOrder ? "Market" : "Limit"}
-              </span>
-            )
-          },
         }),
 
         columnHelper.display({

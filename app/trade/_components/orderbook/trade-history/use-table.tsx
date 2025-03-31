@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate, formatRelativeTime } from "@/utils/date"
+import { formatNumber } from "@/utils/numbers"
 import type { TradeHistory } from "../trade-history/schema"
 
 const columnHelper = createColumnHelper<TradeHistory>()
@@ -47,7 +48,11 @@ export function useTable({ data }: Params) {
                 {isBid ? "BUY" : "SELL"}
               </span>
               <span className="text-xs opacity-80 font-sans">
-                {Big(baseValue).toFixed(base.displayDecimals)} {base.symbol}
+                {formatNumber(Big(baseValue).toNumber(), {
+                  maximumFractionDigits: base.displayDecimals,
+                  minimumFractionDigits: base.displayDecimals,
+                })}{" "}
+                {base.symbol}
               </span>
             </div>
           )
@@ -61,7 +66,10 @@ export function useTable({ data }: Params) {
             row.getValue() ? (
               <div className="flex flex-col gap-0">
                 <span className="font-sans text-xs leading-tight">
-                  {Big(row.getValue()).toFixed(market.quote.displayDecimals)}
+                  {formatNumber(Big(row.getValue()).toNumber(), {
+                    maximumFractionDigits: market.quote.displayDecimals,
+                    minimumFractionDigits: market.quote.displayDecimals,
+                  })}
                 </span>
                 <span className="text-xs opacity-80 font-sans leading-tight">
                   {market.quote.symbol}

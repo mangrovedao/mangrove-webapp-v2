@@ -16,6 +16,7 @@ import { useTokenFromId } from "@/hooks/use-token-from-id"
 import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
+import { formatNumber } from "@/utils/numbers"
 import { Address } from "viem"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
@@ -109,8 +110,8 @@ export function useTable({
               ? baseToken?.priceDisplayDecimals || 6
               : quoteToken?.priceDisplayDecimals || 6
 
-            const amount = Big(initialWants).toFixed(displayDecimals)
-            const filled = Big(takerGot).toFixed(displayDecimals)
+            const amount = Big(initialWants).toNumber()
+            const filled = Big(takerGot).toNumber()
             const progress = Math.min(
               Math.round(
                 Big(filled)
@@ -122,15 +123,22 @@ export function useTable({
             )
             return (
               <div className={cn("flex items-center")}>
+                <CircularProgressBar progress={progress} className="mr-2" />
                 <span className="text-xs text-muted-foreground">
-                  {filled}
+                  {formatNumber(filled, {
+                    maximumFractionDigits: displayDecimals,
+                    minimumFractionDigits: displayDecimals,
+                  })}
                   &nbsp;/
                 </span>
                 <span className="text-xs">
                   &nbsp;
-                  {amount} {symbol}
+                  {formatNumber(amount, {
+                    maximumFractionDigits: displayDecimals,
+                    minimumFractionDigits: displayDecimals,
+                  })}{" "}
+                  {symbol}
                 </span>
-                <CircularProgressBar progress={progress} className="ml-3" />
               </div>
             )
           },
@@ -142,10 +150,14 @@ export function useTable({
             const { quoteAddress, price } = row.original
 
             const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
+            const displayDecimals = quoteToken?.priceDisplayDecimals || 6
 
             return price ? (
               <span className="text-xs">
-                {Big(price).toFixed(quoteToken?.priceDisplayDecimals)}{" "}
+                {formatNumber(Big(price).toNumber(), {
+                  maximumFractionDigits: displayDecimals,
+                  minimumFractionDigits: displayDecimals,
+                })}{" "}
                 {quoteToken?.symbol}
               </span>
             ) : (
