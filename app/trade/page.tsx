@@ -7,12 +7,15 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { TradeIcon } from "@/svgs"
 import { useEffect, useState } from "react"
 import { Market } from "./_components/charts/charts"
+import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
-import { BookContent, OrderBook } from "./_components/orderbook/orderbook"
+import { BookContent } from "./_components/orderbook/orderbook"
 import { Trades } from "./_components/orderbook/trade-history/trades"
+import OrderBookV2 from "./_components/orderbookv2/orderbook-v2"
 import { PricesBar } from "./_components/prices-bar/prices-bar"
 import { Tables } from "./_components/tables/tables"
 import { TradeTabs } from "./_components/trade-tabs/trade-tabs"
@@ -22,6 +25,16 @@ export default function Page() {
   const mainTabs = ["Chart", "Order Book", "Trades"]
   const [isMobile, setIsMobile] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+
+  const { mergedBooks, refetch } = useMergedBooks()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch()
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Check if we're on mobile
   useEffect(() => {
@@ -57,12 +70,17 @@ export default function Page() {
                   <div className="flex gap-1 h-full">
                     {/* Chart Section */}
                     <div className="flex-[4] rounded-sm overflow-hidden border border-bg-secondary">
-                      <Market className="w-full h-full" />
+                      {/* <Market className="w-full h-full" /> */}
+                      <EmbedPriceChart />
                     </div>
 
                     {/* Order Book Section */}
                     <div className="w-[300px] rounded-sm overflow-hidden flex flex-col border border-bg-secondary">
-                      <OrderBook className="flex-1 w-full min-h-0" />
+                      <OrderBookV2
+                        asks={mergedBooks.asks}
+                        bids={mergedBooks.bids}
+                      />
+                      {/* <OrderBook className="flex-1 w-full min-h-0" /> */}
                     </div>
                   </div>
                 </ResizablePanel>

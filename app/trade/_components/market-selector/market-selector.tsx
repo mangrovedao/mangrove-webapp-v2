@@ -64,8 +64,8 @@ export default function MarketSelector() {
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">
-                <TokenIcon symbol={m.base.symbol} />
-                <TokenIcon symbol={m.quote.symbol} />
+                <TokenIcon symbol={m.base.symbol} imgClasses="rounded-full" />
+                <TokenIcon symbol={m.quote.symbol} imgClasses="rounded-full" />
               </div>
 
               <span className="group-data-[state=checked]:inline-block group-data-[highlighted]:inline-block">

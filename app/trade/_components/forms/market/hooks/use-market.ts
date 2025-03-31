@@ -13,8 +13,8 @@ import { formatUnits, parseUnits } from "viem"
 
 import useMarket from "@/providers/market"
 
+import { useGhostBook } from "@/hooks/use-ghost-book"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
-import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -107,7 +107,7 @@ export function useMarketForm(props: Props) {
     spotPrice,
   } = useTradeInfos("market", bs)
 
-  const { data: book } = useUniswapBook()
+  const { data: book } = useGhostBook()
 
   const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)

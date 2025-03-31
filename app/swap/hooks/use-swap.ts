@@ -25,9 +25,9 @@ import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spend
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
+import { useGhostBook } from "@/hooks/use-ghost-book"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
-import { useUniswapBook } from "@/hooks/use-uniswap-book"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -73,7 +73,7 @@ export function useSwap() {
     address,
   })
 
-  const { data: uniBook } = useUniswapBook()
+  const { data: uniBook } = useGhostBook()
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
     getQuote,

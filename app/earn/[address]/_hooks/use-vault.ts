@@ -5,6 +5,7 @@ import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useEffect } from "react"
 import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
 import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"
 import { getVaultsInformation } from "../../(shared)/_service/vaults-infos"
@@ -38,6 +39,16 @@ export function useVault(address?: string | null) {
   // Check for previous data as placeholder
   const previousVaultData = queryClient.getQueryData<VaultResult>(queryKey)
 
+  // Force refetch on mount to ensure data is fresh, especially for direct page loads
+  useEffect(() => {
+    // Short delay to ensure providers are fully initialized
+    const timer = setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey })
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [queryClient, queryKey, address])
+
   return useQuery({
     queryKey,
     queryFn: async (): Promise<VaultResult> => {
@@ -46,31 +57,39 @@ export function useVault(address?: string | null) {
         if (address && !isAddress(address))
           throw new Error("Invalid vault address")
 
+        // Find the vault in the whitelist
         const vault = vaultsWhitelist?.find(
-          (v) => v.address.toLowerCase() == address?.toLowerCase(),
+          (v) => v.address.toLowerCase() === address?.toLowerCase(),
         )
 
         const vaultIncentives = incentives?.find(
-          (v) => v.vault.toLowerCase() == address?.toLowerCase(),
+          (v) => v.vault.toLowerCase() === address?.toLowerCase(),
         )
 
-        if (!vault) return { vault: undefined }
+        if (!vault) {
+          console.warn(`Vault with address ${address} not found in whitelist`)
+          return { vault: undefined }
+        }
 
-        const [vaultInfo] = await Promise.all([
-          getVaultsInformation(
-            networkClient,
-            [vault],
-            user,
-            vaultIncentives ? [vaultIncentives] : undefined,
-            fdv,
-          ).then((v) => v[0]),
-        ])
+        const [vaultInfo] = await getVaultsInformation(
+          networkClient,
+          [vault],
+          user,
+          vaultIncentives ? [vaultIncentives] : undefined,
+          fdv,
+        )
+
+        if (!vaultInfo) {
+          throw new Error("Failed to fetch vault information")
+        }
+
         return {
           vault: vaultInfo,
         }
       } catch (error) {
         printEvmError(error)
-        return { vault: undefined }
+        console.error("Error fetching vault data:", error)
+        throw error // Re-throw to trigger retries
       }
     },
     placeholderData: previousVaultData,
@@ -78,6 +97,8 @@ export function useVault(address?: string | null) {
     staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh longer
     gcTime: 10 * 60 * 1000, // 10 minutes - data stays in cache longer
     refetchOnWindowFocus: false,
+    retry: 3, // Retry up to 3 times if fails
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000), // Exponential backoff
     initialData: { vault: undefined },
   })
 }

@@ -1,4 +1,4 @@
-import { EnhancedOffer } from "@/hooks/use-uniswap-book"
+import { EnhancedOffer } from "@/hooks/use-ghost-book"
 import { CompleteOffer } from "@mangrovedao/mgv"
 
 export type Data = {

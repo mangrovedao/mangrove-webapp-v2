@@ -1,22 +1,22 @@
 "use client"
 
-import { TokenIcon } from "@/components/token-icon-new"
-import { Caption } from "@/components/typography/caption"
-import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/utils"
+import { useQueryClient } from "@tanstack/react-query"
 import React, { ReactNode } from "react"
+import { toast } from "sonner"
+import { formatUnits, parseAbi, parseUnits } from "viem"
 import {
   useAccount,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi"
 
+import { TokenIcon } from "@/components/token-icon-new"
+import { Caption } from "@/components/typography/caption"
+import { Title } from "@/components/typography/title"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { formatUnits, parseAbi, parseUnits } from "viem"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
@@ -45,8 +45,6 @@ export function WithdrawForm({ className }: { className?: string }) {
       })
     }
   }, [isConfirmed, queryClient])
-
-  const [removeDialog, setRemoveDialog] = React.useState(false)
 
   const {
     baseToken,

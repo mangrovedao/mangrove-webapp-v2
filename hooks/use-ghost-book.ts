@@ -3,10 +3,8 @@ import { useEffect, useMemo, useState } from "react"
 
 import useMarket from "@/providers/market"
 import { printEvmError } from "@/utils/errors"
-import { useAccount } from "wagmi"
-import { useRegistry } from "./ghostbook/hooks/use-registry"
-import { getUniBook, mergeOffers } from "./ghostbook/lib/uni_book"
-import { useBook } from "./use-book"
+import { useMangroveBook, usePoolBook } from "./new_ghostbook/book"
+import { useDefaultChain } from "./use-default-chain"
 import { useNetworkClient } from "./use-network-client"
 
 /**
@@ -115,73 +113,66 @@ function processOffers(
   return [...processedOffers, ...removedOffers]
 }
 
-export function useUniswapBook(params: { priceIncrement?: number } = {}) {
+export function useGhostBook(params: { priceIncrement?: number } = {}) {
   const { currentMarket } = useMarket()
   const client = useNetworkClient()
-  const { book } = useBook()
 
-  const { chain } = useAccount()
-  const { uniClone } = useRegistry()
+  const { defaultChain } = useDefaultChain()
 
   const [asksMap, setAsksMap] = useState<Map<string, EnhancedOffer>>(new Map())
   const [bidsMap, setBidsMap] = useState<Map<string, EnhancedOffer>>(new Map())
 
+  const {
+    data: mangroveBook,
+    isLoading: mangroveBookLoading,
+    refetch: refetchMangroveBook,
+    isFetched: mangroveBookFetched,
+  } = useMangroveBook()
+  const {
+    data: poolBook,
+    isLoading: poolBookLoading,
+    refetch: refetchPoolBook,
+    isFetched: poolBookFetched,
+  } = usePoolBook()
+
+  // const { mergedBooks, refetch, isLoading, isFetched } = useMergedBooks()
+
   const query = useQuery({
     queryKey: [
-      "uniswap-quotes",
+      "ghostbook-quotes",
       currentMarket?.base.address.toString(),
       currentMarket?.quote.address.toString(),
-      chain?.id,
+      defaultChain?.id,
       client?.key,
       params?.priceIncrement,
     ],
     queryFn: async () => {
       try {
-        if (!currentMarket || !client || !book || !uniClone)
-          return { asks: [], bids: [] }
+        if (!currentMarket || !client) return { asks: [], bids: [] }
 
-        // Safely convert density values to BigInt
-        // Use a default multiplier of 20_000_000n if conversion fails
-        const bidsDensityMultiplier = safelyConvertToBigInt(
-          book.bidsConfig.density,
-          20_000_000n,
-        )
-        const asksDensityMultiplier = safelyConvertToBigInt(
-          book.asksConfig.density,
-          20_000_000n,
-        )
-
-        // Get Uniswap book with density scaled by Mangrove's density
-        const uniBook = await getUniBook(
-          client,
-          currentMarket,
-          500,
-          bidsDensityMultiplier,
-          asksDensityMultiplier,
-          12,
-          params?.priceIncrement,
-          uniClone,
-        )
-
-        // Merge both orderbooks
-        const mergedBook = mergeOffers(uniBook.asks, uniBook.bids, book)
+        const mergedBooks = {
+          asks: [...(mangroveBook?.asks || []), ...(poolBook?.asks || [])].sort(
+            (a, b) => a.price - b.price,
+          ),
+          bids: [...(mangroveBook?.bids || []), ...(poolBook?.bids || [])].sort(
+            (a, b) => b.price - a.price,
+          ),
+        }
 
         return {
-          ...mergedBook,
-          asks: mergedBook.asks,
-          bids: mergedBook.bids,
+          ...mergedBooks,
+          asks: mergedBooks.asks,
+          bids: mergedBooks.bids,
         }
       } catch (error) {
         printEvmError(error)
-        console.error("Error fetching Uniswap quotes:", error)
-        // Return empty book instead of undefined
-        return book ? { ...book, asks: [], bids: [] } : { asks: [], bids: [] }
+        console.error("Error fetching ghostbook quotes:", error)
+        return { asks: [], bids: [] }
       }
     },
-    enabled: !!currentMarket && !!client && !!book && !!uniClone,
-    refetchInterval: 5000,
+    enabled: !!currentMarket && !!client,
     refetchOnWindowFocus: false,
-    staleTime: 2000,
+    refetchInterval: 5000,
   })
 
   // Process and enhance the book data with animation states
@@ -210,7 +201,7 @@ export function useUniswapBook(params: { priceIncrement?: number } = {}) {
     // But we want to select the 12 asks that are CLOSEST to the mid price
     // So we take the first 12 (lowest priced) and reverse them for display
     // const sortedAsks = allAsksSorted.slice(0, MAX_OFFERS).reverse()
-    const sortedAsks = allAsksSorted.reverse()
+    const sortedAsks = allAsksSorted
 
     // First sort all bids by price (descending order)
     const allBidsSorted = [...mergedBids].sort((a, b) => b.price - a.price)
@@ -244,91 +235,6 @@ export function useUniswapBook(params: { priceIncrement?: number } = {}) {
       bids: sortedBids,
     }
   }, [query.data])
-
-  // Helper function to merge offers with the same price - simple and TS-error-free approach
-  function mergeOffersSamePrice(offers: EnhancedOffer[]): EnhancedOffer[] {
-    // Return early if no offers
-    if (!offers || offers.length === 0) return []
-
-    // Determine a reasonable precision - 2 decimal places for most cases
-    const pricePrecision = 2
-
-    // Create a map to group offers by price
-    const priceGroups: { [price: string]: EnhancedOffer[] } = {}
-
-    // Group offers by price, using fixed precision to handle floating point issues
-    for (const offer of offers) {
-      // Round the price to fixed precision to avoid floating point comparison issues
-      const roundedPrice = Number(offer.price.toFixed(pricePrecision))
-      const priceKey = roundedPrice.toString()
-
-      if (!priceGroups[priceKey]) {
-        priceGroups[priceKey] = []
-      }
-      priceGroups[priceKey]?.push(offer)
-    }
-
-    const result: EnhancedOffer[] = []
-
-    // Process each price group
-    for (const priceKey in priceGroups) {
-      if (!Object.prototype.hasOwnProperty.call(priceGroups, priceKey)) continue
-
-      const group = priceGroups[priceKey]
-
-      // Skip empty groups (shouldn't happen)
-      if (!group || group.length === 0) continue
-
-      // If only one offer at this price, keep it as is
-      if (group.length === 1 && group[0]) {
-        result.push(group[0])
-        continue
-      }
-
-      // Get the first offer as base (with null check)
-      const baseOffer = group[0]
-      if (!baseOffer) continue // Skip if base offer is somehow undefined
-
-      // Sum up volumes
-      let totalVolume = 0
-      let hasNewStatus = false
-      let hasChangedStatus = false
-
-      // Process all offers in the group
-      for (const offer of group) {
-        if (offer) {
-          // Skip undefined offers
-          totalVolume += offer.volume
-          if (offer.status === "new") hasNewStatus = true
-          if (offer.status === "changed") hasChangedStatus = true
-        }
-      }
-
-      // Determine final status
-      let mergedStatus: OfferStatus = "unchanged"
-      if (hasNewStatus) mergedStatus = "new"
-      else if (hasChangedStatus) mergedStatus = "changed"
-
-      // Use the rounded price instead of the original price
-      const roundedPrice = Number(priceKey)
-
-      // Create merged offer with required properties
-      const merged: EnhancedOffer = {
-        id: baseOffer.id, // Required by EnhancedOffer
-        price: roundedPrice, // Use rounded price for consistency
-        volume: totalVolume, // Calculated total volume
-        status: mergedStatus, // Determined status
-        transitionStartTime: baseOffer.transitionStartTime,
-        isMerged: true, // Flag to indicate merged offer
-        mergedCount: group.length, // How many offers were merged
-        originalOffers: group.filter(Boolean).map((o) => o.id.toString()), // Keep track of original offers
-      }
-
-      result.push(merged)
-    }
-
-    return result
-  }
 
   // Clean up removed offers after animation completes
   useEffect(() => {

@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { EnhancedOffer, OfferStatus } from "@/hooks/use-uniswap-book"
+import { EnhancedOffer, OfferStatus } from "@/hooks/use-ghost-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { OrderBookTableCell } from "./table-cell"
@@ -49,7 +49,7 @@ const MemoizedOffer = React.memo(
     setHoveredOfferId: (id: string | null) => void
   }) => {
     const { price, id, volume, cumulatedVolume, status } = offer
-    const offerId = id.toString()
+    const offerId = id.toString() + volume.toString()
     const rowRef = useRef<HTMLTableRowElement>(null)
 
     const cumulatedVolumePercentage =

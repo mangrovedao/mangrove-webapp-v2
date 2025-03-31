@@ -41,7 +41,7 @@ export function MyVaults() {
     pageSize,
     data: vaults,
     onManage: (vault: Vault) => {
-      push(`/vault/${vault.address}`)
+      push(`/earn/${vault.address}`)
     },
   })
 
@@ -61,7 +61,7 @@ export function MyVaults() {
         isLoading={isLoading}
         onRowClick={(vault) => {
           if (vault) {
-            window.location.href = `/earn/${vault.address}`
+            push(`/earn/${vault.address}`)
           }
         }}
         cellClasses="font-ubuntu"

@@ -7,7 +7,7 @@ export default function NeonContainer({
 }) {
   return (
     <div
-      className="w-full rounded-sm border border-solid p-5 relative overflow-hidden"
+      className="w-full rounded-sm border border-solid p-3 relative overflow-hidden"
       style={{
         boxShadow: "0px 0px 24px rgba(0, 203, 111, 0.4)",
       }}

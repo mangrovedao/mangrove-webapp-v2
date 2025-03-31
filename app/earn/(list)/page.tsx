@@ -34,7 +34,7 @@ export default function Page() {
   return (
     <main className="flex flex-col min-h-[calc(100vh-80px)]">
       {/* Header */}
-      <div className="mt-[56px] flex justify-between items-center">
+      <div className="mt-5 flex justify-between items-center">
         <Title variant={"header1"}>Earn</Title>
       </div>
 

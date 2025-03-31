@@ -87,22 +87,40 @@ export default function Page() {
 
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
-      {/* BreadCrumb   */}
-
-      <div className="flex items-center gap-2 mb-1 ml-4">
-        <Link href={"/earn"} className="flex items-center gap-2">
+      {/* BreadCrumb */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-center gap-2 mb-1 ml-4"
+      >
+        <Link
+          href={"/earn"}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
           <Caption className="text-text-quaternary text-sm">Earn</Caption>
           <ChevronRight className="h-4 w-4 text-text-disabled" />
         </Link>
         <Caption className="text-text-secondary text-sm">Vault details</Caption>
-      </div>
+      </motion.div>
+
       {/* Market details */}
-      <div className="flex items-center gap-2 flex-wrap ml-4">
-        <div className="grid items-center gap-2 ">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="flex items-center gap-2 flex-wrap ml-4"
+      >
+        <div className="grid items-center gap-2">
           {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
             <Skeleton className={cn("h-7 w-7", "rounded-sm")} />
           ) : (
-            <div className="flex items-center gap-2">
+            <motion.div
+              className="flex items-center gap-2"
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
               <div className="flex -space-x-2 items-center">
                 {!vault?.market?.quote?.symbol ||
                 !vault?.market?.base?.symbol ? (
@@ -112,23 +130,33 @@ export default function Page() {
                   </>
                 ) : (
                   <>
-                    <TokenIcon
-                      symbol={vault?.market?.base?.symbol}
-                      imgClasses="h-10 w-10"
-                    />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market?.base?.symbol}
+                        imgClasses="h-10 w-10 drop-shadow-lg"
+                      />
+                    </motion.div>
 
-                    <TokenIcon
-                      symbol={vault?.market?.quote?.symbol}
-                      imgClasses="h-10 w-10"
-                    />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: -5 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market?.quote?.symbol}
+                        imgClasses="h-10 w-10 drop-shadow-lg"
+                      />
+                    </motion.div>
                   </>
                 )}
               </div>
-
-              <Title className="!text-2xl">{`${vault?.market?.base?.symbol}-${vault?.market?.quote?.symbol}`}</Title>
-            </div>
+              <Title className="!text-2xl bg-clip-text text-white">{`${vault?.market?.base?.symbol}-${vault?.market?.quote?.symbol}`}</Title>
+            </motion.div>
           )}
-          <div className="flex gap-3 flex-wrap ">
+
+          <div className="flex gap-3 flex-wrap">
             <Subline
               title={"Chain"}
               value={defaultChain?.name}
@@ -138,13 +166,24 @@ export default function Page() {
             <Subline title={"Manager"} value={vault?.manager} />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Columns */}
-      <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5 ">
-        <div className="col-span-12 md:col-span-8 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5">
+        <motion.div
+          className="col-span-12 md:col-span-8 space-y-6"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           {/* Infos Card */}
-          <div className="mx-1 flex p-4 justify-between rounded-sm  flex-wrap">
+          <motion.div
+            className="mx-1 flex p-4 justify-between rounded-sm flex-wrap box-shadow-lg"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+            style={{ boxShadow: "0 0 15px 0 rgba(0, 255, 170, 0.1)" }}
+          >
             <GridLineHeader
               title={"TVL"}
               value={formatNumber(
@@ -169,43 +208,27 @@ export default function Page() {
               symbol={"%"}
               info="A fee based on the profits generated from your deposit."
             />
-          </div>
+          </motion.div>
 
           {/* Description */}
-
-          <div className="mx-5 space-y-3">
-            <Title variant={"title1"} className="text-text-primary ">
+          <motion.div
+            className="mx-5 space-y-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            <Title variant={"title1"} className="text-text-primary">
               Vault description
             </Title>
             {vault?.description ? (
               <>
-                <Text className="font-axiforma text-text-secondary text-sm">
-                  {vault?.description?.split("\n").map((line, i) => (
-                    <React.Fragment key={i}>
-                      {line.startsWith("- ") ? (
-                        <li className="list-disc ml-4">{line.substring(2)}</li>
-                      ) : line.includes(":") ? (
-                        <>
-                          <Title
-                            variant={"title3"}
-                            className="text-text-primary"
-                          >
-                            {line.split(":")[0]}
-                          </Title>
-                        </>
-                      ) : (
-                        line
-                      )}
-                    </React.Fragment>
-                  ))}
-                </Text>
-
-                <Accordion title="Read more">
-                  <Text
-                    className="font-axiforma text-text-secondary mt-2"
-                    variant={"text2"}
-                  >
-                    {vault?.descriptionBonus?.split("\n").map((line, i) => (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
+                >
+                  <Text className="text-text-secondary text-sm font-axiforma">
+                    {vault?.description?.split("\n").map((line, i) => (
                       <React.Fragment key={i}>
                         {line.startsWith("- ") ? (
                           <li className="list-disc ml-4">
@@ -223,29 +246,80 @@ export default function Page() {
                         ) : (
                           line
                         )}
-                        <br />
                       </React.Fragment>
                     ))}
                   </Text>
-                </Accordion>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.6 }}
+                >
+                  <Accordion title="Read more">
+                    <Text
+                      className="text-text-secondary mt-2 font-axiforma text-sm"
+                      variant={"text2"}
+                    >
+                      {vault?.descriptionBonus?.split("\n").map((line, i) => (
+                        <React.Fragment key={i}>
+                          {line.startsWith("- ") ? (
+                            <li className="list-disc ml-4">
+                              {line.substring(2)}
+                            </li>
+                          ) : line.includes(":") ? (
+                            <>
+                              <Title
+                                variant={"title3"}
+                                className="text-text-primary"
+                              >
+                                {line.split(":")[0]}
+                              </Title>
+                            </>
+                          ) : (
+                            line
+                          )}
+                          <br />
+                        </React.Fragment>
+                      ))}
+                    </Text>
+                  </Accordion>
+                </motion.div>
               </>
             ) : (
               <Skeleton className="h-20 w-full" />
             )}
-          </div>
+          </motion.div>
 
-          {/* Graphs  */}
-          <div className="flex justify-center items-center">
+          {/* Graphs */}
+          <motion.div
+            className="flex justify-center items-center"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.6,
+              type: "spring",
+              stiffness: 100,
+            }}
+            whileHover={{ scale: 1.01 }}
+          >
             <ImageWithHideOnError
               src={`/assets/illustrations/vault-graph-placeholder.png`}
               width={832}
               height={382}
               alt={`vault-graph-placeholder`}
+              className="rounded-sm shadow-lg"
             />
-          </div>
+          </motion.div>
 
           {/* Vault details */}
-          <div className="mx-5">
+          <motion.div
+            className="mx-5"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.7 }}
+          >
             <Title className="text-text-primary text-lg">Vault details</Title>
             {vault ? (
               <div>
@@ -255,10 +329,14 @@ export default function Page() {
                       title="Strategy"
                       value={vault?.strategyType}
                       icon={
-                        <div className="relative h-4 w-4">
+                        <motion.div
+                          className="relative h-4 w-4"
+                          whileHover={{ scale: 1.2 }}
+                          transition={{ duration: 0.2 }}
+                        >
                           <div className="absolute inset-0 bg-green-700 rounded-sm"></div>
                           <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
-                        </div>
+                        </motion.div>
                       }
                     />
 
@@ -267,22 +345,30 @@ export default function Page() {
                       value={vault?.manager}
                       icon={
                         <div className="flex gap-1 text-text-secondary">
-                          <Link
-                            href={vault?.socials.website || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <motion.div
+                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            transition={{ duration: 0.2 }}
                           >
-                            <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                          </Link>
-                          {/* <Send className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
-                          <Link
-                            href={vault?.socials.x || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            <Link
+                              href={vault?.socials.website || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                            </Link>
+                          </motion.div>
+                          <motion.div
+                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            transition={{ duration: 0.2 }}
                           >
-                            <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                          </Link>
-                          {/* <Mail className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
+                            <Link
+                              href={vault?.socials.x || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                            </Link>
+                          </motion.div>
                         </div>
                       }
                     />
@@ -307,7 +393,12 @@ export default function Page() {
                       value={shortenAddress(vault?.address || "")}
                       href={`${defaultChain?.blockExplorers?.default.url}/address/${vault?.address}`}
                       icon={
-                        <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        <motion.div
+                          whileHover={{ scale: 1.2, rotate: 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        </motion.div>
                       }
                     />
 
@@ -321,19 +412,35 @@ export default function Page() {
             ) : (
               <Skeleton className="h-20 w-full mt-5" />
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="col-span-12 md:col-span-4">
+        <motion.div
+          className="col-span-12 md:col-span-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <div className="grid gap-8">
-            <NeonContainer className="relative">
-              <ImageWithHideOnError
-                className="absolute -top-[24px] -right-[17px] rounded-sm"
-                src={`/assets/illustrations/earn-leaf.png`}
-                width={100}
-                height={90}
-                alt={`mangrove-logo`}
-              />
+            <NeonContainer className="relative  ">
+              <motion.div
+                className="absolute -top-4 -right-2 rounded-sm overflow-hidden"
+                initial={{ rotate: -1, y: -1 }}
+                animate={{ rotate: 0, y: 0 }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                }}
+              >
+                <ImageWithHideOnError
+                  src={`/assets/illustrations/earn-leaf.png`}
+                  width={100}
+                  height={90}
+                  alt={`mangrove-logo`}
+                />
+              </motion.div>
               <GridLine
                 title={"Your incentives rewards"}
                 value={
@@ -354,33 +461,47 @@ export default function Page() {
                 <GridLine
                   title={"Your deposit"}
                   value={
-                    <div className="flex items-center justify-center gap-2 text-md">
+                    <motion.div
+                      className="flex items-center justify-center gap-2 text-md"
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.8 }}
+                    >
                       <span className="flex gap-1 text-md">
                         {(baseDepositDollar + quoteDepositDollar).toFixed(2)}
                         <span className="text-text-secondary">$</span>
                       </span>
-                    </div>
+                    </motion.div>
                   }
                 />
                 <GridLine
                   title={"Your PNL"}
                   value={
-                    <span className="flex gap-1 text-md">
+                    <motion.span
+                      className={cn("flex gap-1 text-md")}
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.9 }}
+                    >
                       {vault?.pnlData?.pnl
                         ? `${vault?.pnlData?.pnl.toFixed(2)}%`
                         : "0"}
-                    </span>
+                    </motion.span>
                   }
                   symbol={""}
                 />
               </div>
             </NeonContainer>
-            {/* <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
-             
-            </div> */}
+
             {/* Only show the form directly on desktop */}
             {!isMobile && (
-              <div className="grid space-y-5 bg-bg-secondary p-3 rounded-sm">
+              <motion.div
+                className="grid space-y-5 bg-bg-secondary p-3 rounded-sm"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.6 }}
+                style={{ boxShadow: "0 0 15px 0 rgba(0, 255, 170, 0.1)" }}
+              >
                 <div className="w-full">
                   <CustomRadioGroup
                     name={"action"}
@@ -406,10 +527,14 @@ export default function Page() {
                     {action === Action.Deposit ? (
                       <motion.div
                         key="deposit-form"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
                         className="absolute inset-0"
                       >
                         <DepositForm />
@@ -417,10 +542,14 @@ export default function Page() {
                     ) : (
                       <motion.div
                         key="withdraw-form"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
                         className="absolute inset-0"
                       >
                         <WithdrawForm />
@@ -428,11 +557,16 @@ export default function Page() {
                     )}
                   </AnimatePresence>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
 
-          <div className="grid gap-4 px-6 mt-6">
+          <motion.div
+            className="grid gap-4 px-6 mt-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.7 }}
+          >
             <Title className="text-xl">My Position</Title>
 
             <div>
@@ -442,11 +576,16 @@ export default function Page() {
               <Line
                 title={
                   <div className="flex gap-2">
-                    <TokenIcon
-                      symbol={vault?.market.base.symbol}
-                      className="h-4 w-4"
-                      imgClasses="w-5 h-5"
-                    />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market.base.symbol}
+                        className="h-4 w-4"
+                        imgClasses="w-5 h-5"
+                      />
+                    </motion.div>
                     <Caption className="text-text-secondary !text-sm">
                       {vault?.market.base.symbol}
                     </Caption>
@@ -467,11 +606,16 @@ export default function Page() {
               <Line
                 title={
                   <div className="flex gap-2">
-                    <TokenIcon
-                      symbol={vault?.market.quote.symbol}
-                      className="h-4 w-4"
-                      imgClasses="w-5 h-5"
-                    />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market.quote.symbol}
+                        className="h-4 w-4"
+                        imgClasses="w-5 h-5"
+                      />
+                    </motion.div>
                     <Caption className="text-text-secondary !text-sm">
                       {vault?.market.quote.symbol}
                     </Caption>
@@ -489,37 +633,9 @@ export default function Page() {
                   }) || "0"
                 }
               />
-              <Caption className="text-text-secondary mt-5 !text-base">
-                Minted amount
-              </Caption>
-
-              <Line
-                title={
-                  <div className="flex gap-2 items-center flex-wrap">
-                    <TokenIcon
-                      symbol={vault?.symbol}
-                      className="h-4 w-4"
-                      imgClasses="w-5 h-5"
-                    />
-                    <Caption className="text-text-secondary text-sm">
-                      {vault?.symbol}
-                    </Caption>
-                  </div>
-                }
-                value={
-                  Number(
-                    formatUnits(
-                      vault?.mintedAmount || 0n,
-                      vault?.decimals || 18,
-                    ),
-                  ).toLocaleString(undefined, {
-                    maximumFractionDigits: 4,
-                  }) || "0"
-                }
-              />
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Floating Action Button - shown on all screen sizes */}
@@ -646,10 +762,12 @@ const GridLine = ({
               "flex-row-reverse justify-end": iconFirst,
             })}
           >
-            <Text className="text-text-primary font-axiforma !text-base">
+            <Text className="text-text-primary !text-base font-axiforma">
               {value}
               {symbol ? (
-                <span className="text-text-tertiary">{symbol}</span>
+                <span className="text-text-tertiary font-axiforma">
+                  {symbol}
+                </span>
               ) : undefined}
             </Text>
             {href ? (

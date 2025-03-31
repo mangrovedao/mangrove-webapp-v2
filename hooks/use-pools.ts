@@ -48,7 +48,6 @@ export function usePools({
         throw new Error("Failed to fetch pool data")
       }
 
-      console.log(await response.json())
       return await response.json()
     },
     enabled: !!(tokenOut && tokenIn && (chainId || chain?.id)),

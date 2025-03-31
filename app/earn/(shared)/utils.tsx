@@ -138,7 +138,7 @@ export function getChainImage(chain: Chain) {
       height={16}
       className="h-4 rounded-sm size-4"
       key={chain.id}
-      alt={`${name}-logo`}
+      alt={`${chain.name}-logo`}
     />
   )
 }

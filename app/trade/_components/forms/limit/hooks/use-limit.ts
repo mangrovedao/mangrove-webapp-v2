@@ -7,7 +7,7 @@ import { useEventListener } from "usehooks-ts"
 
 import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
-import { useUniswapBook } from "@/hooks/use-uniswap-book"
+import { useGhostBook } from "@/hooks/use-ghost-book"
 import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { useMenuStore } from "@/stores/menu.store"
@@ -51,7 +51,7 @@ export function useLimit(props: Props) {
   })
 
   const { currentMarket } = useMarket()
-  const { data: book } = useUniswapBook()
+  const { data: book } = useGhostBook()
   const logics = useLogics()
 
   const bs = props.bs

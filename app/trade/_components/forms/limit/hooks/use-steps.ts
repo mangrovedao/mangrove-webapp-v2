@@ -23,11 +23,24 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["limitOrderSteps", bs, user, addresses, marketClient?.name],
+    queryKey: [
+      "limitOrderSteps",
+      bs,
+      user,
+      addresses,
+      marketClient?.key,
+      networkClient?.chain?.id,
+    ],
     queryFn: async () => {
       try {
         if (!marketClient?.name || !user || !addresses) return null
-
+        console.log("marketClient?.key", {
+          bs,
+          user,
+          addresses,
+          marketClient: marketClient?.key,
+          networkClient: networkClient?.chain?.id,
+        })
         const userRouter = await getUserRouter(
           networkClient as Client,
           addresses,

@@ -32,7 +32,7 @@ export function useVaultMintHelper() {
     case arbitrum.id:
       return "0xC39b5Fb38a8AcBFFB51D876f0C0DA0325b5cD440"
     case base.id:
-      return ""
+      return "0x2AE6F95F0AC61441D9eC9290000F81087567cDa1"
     case baseSepolia.id:
       return "0xC0Ba6baF6899686bB601effE73bFC42404B93670"
     default:

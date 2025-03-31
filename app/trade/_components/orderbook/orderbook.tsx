@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useUniswapBook } from "@/hooks/use-uniswap-book"
+import { useGhostBook } from "@/hooks/use-ghost-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { BA } from "@mangrovedao/mgv/lib"
@@ -165,7 +165,9 @@ export const BookContent = React.memo(function BookContent() {
   const { bodyRef, scrollAreaRef, spreadRef, scrollToMiddle } =
     useScrollToMiddle()
   const [priceIncrement, setPriceIncrement] = useState<number>(0)
-  const { data: book, isLoading } = useUniswapBook({ priceIncrement })
+  const { data: book, isLoading } = useGhostBook({ priceIncrement })
+  // const { mergedBooks: book, isLoading } = useMergedBooks()
+
   const [viewOption, setViewOption] = useState<ViewOption>("default")
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
@@ -221,7 +223,14 @@ export const BookContent = React.memo(function BookContent() {
     const highestBidPrice = filteredBook.bids[0]?.price || 0
     const spread = Math.abs(lowestAskPrice - highestBidPrice)
     const spreadPercent = (spread / (highestBidPrice || 1)) * 100
-    const midPrice = filteredBook.midPrice
+
+    const lowestAsk = filteredBook.asks[0]?.price || 0
+    const highestBid = filteredBook.bids[0]?.price || 0
+
+    const absoluteSpread = lowestAsk - highestBid
+    const percentSpread =
+      highestBid > 0 ? (absoluteSpread / highestBid) * 100 : 0
+    const midPrice = (lowestAsk + highestBid) / 2
 
     const spreadPercentString = new Intl.NumberFormat("en-US", {
       style: "percent",
