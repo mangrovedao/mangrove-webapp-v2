@@ -69,7 +69,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ asks, bids, className }) => {
       )}
     >
       {/* Column Headers */}
-      <div className="flex items-center px-2 py-2 text-secondary sticky top-0 bg-transparent z-10 border-b border-bg-secondary">
+      <div className="flex items-center px-2 py-2 text-white sticky top-0 bg-transparent z-10 border-b border-bg-secondary">
         <span className="w-1/3 text-xs">Price</span>
         <span className="w-1/3 text-right text-xs">Size [{quote?.symbol}]</span>
         <span className="w-1/3 text-right text-xs">
@@ -115,7 +115,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ asks, bids, className }) => {
           </div>
 
           {/* Spread indicator with spread and midprice info */}
-          <div className="py-1.5 flex justify-center items-center border-y border-bg-secondary text-secondary text-xs sticky z-10">
+          <div className="py-1.5 flex justify-center items-center border-y border-bg-secondary text-[#c3d4c7] text-xs sticky z-10">
             <div className="flex gap-2">
               <span>
                 Mid:{" "}

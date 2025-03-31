@@ -49,7 +49,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
               <TokenPair
                 titleProps={{
                   variant: "title3",
-                  className: "text-sm text-current font-normal",
+                  className: "text-xs ",
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
@@ -68,11 +68,14 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           cell: (row) => {
             const isBid = row.getValue()
             return (
-              <div
-                className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
+              <span
+                className={cn(
+                  isBid ? "text-green-caribbean" : "text-red-100",
+                  "text-xs",
+                )}
               >
                 {isBid ? "Buy" : "Sell"}
-              </div>
+              </span>
             )
           },
           sortingFn: "datetime",
@@ -80,7 +83,19 @@ export function useTable({ data, showMarketInfo = false }: Params) {
 
         columnHelper.accessor("isMarketOrder", {
           header: "Type",
-          cell: (row) => (row.getValue() ? "Market" : "Limit"),
+          cell: ({ row }) => {
+            const isMarketOrder = row.original.isMarketOrder
+            return (
+              <span
+                className={cn(
+                  isMarketOrder ? "text-green-caribbean" : "text-red-100",
+                  "text-xs",
+                )}
+              >
+                {isMarketOrder ? "Market" : "Limit"}
+              </span>
+            )
+          },
         }),
 
         columnHelper.display({
@@ -115,7 +130,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
 
             return (
               <div className={cn("flex flex-col ")}>
-                <span className="text-sm font-ubuntu">
+                <span className="text-xs">
                   {Big(takerGot).toFixed(receivedDecimals)}{" "}
                   <span className="text-muted-foreground">
                     {receivedSymbol}
@@ -149,9 +164,9 @@ export function useTable({ data, showMarketInfo = false }: Params) {
             }
 
             return price ? (
-              <span className="font-ubuntu">
+              <span className="text-xs">
                 {Big(price).toFixed(priceQuoteDecimals)}{" "}
-                <span className="text-muted-foreground">
+                <span className="text-muted-foreground text-xs">
                   {priceQuoteSymbol}
                 </span>
               </span>
@@ -165,7 +180,11 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           header: "Date",
           cell: ({ row }) => {
             const date = row.original.creationDate
-            return <div>{formatDate(date, "dd/MM/yyyy, HH:mm")}</div>
+            return (
+              <div className="text-xs">
+                {formatDate(date, "dd/MM/yyyy, HH:mm")}
+              </div>
+            )
           },
         }),
 
@@ -173,7 +192,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           header: "Status",
           cell: ({ row }) =>
             row.original.status ? (
-              <span className="capitalize">
+              <span className="text-xs capitalize">
                 {row.original.status.toLowerCase()}
               </span>
             ) : (
@@ -189,7 +208,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
 
             return (
               <div className={cn("flex flex-col")}>
-                <div className="w-full h-full flex justify-end">
+                <div className="w-full h-full flex justify-end text-xs">
                   <BlockExplorer
                     address={transactionHash}
                     blockExplorerUrl={blockExplorerUrl}

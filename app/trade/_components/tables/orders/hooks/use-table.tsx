@@ -56,7 +56,7 @@ export function useTable({
               <TokenPair
                 titleProps={{
                   variant: "title3",
-                  className: "text-sm text-current font-normal",
+                  className: "text-xs text-current font-normal",
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
@@ -76,7 +76,10 @@ export function useTable({
             const isBid = row.getValue()
             return (
               <div
-                className={cn(isBid ? "text-green-caribbean" : "text-red-100")}
+                className={cn(
+                  isBid ? "text-green-caribbean" : "text-red-100",
+                  "text-xs",
+                )}
               >
                 {isBid ? "Buy" : "Sell"}
               </div>
@@ -119,11 +122,11 @@ export function useTable({
             )
             return (
               <div className={cn("flex items-center")}>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {filled}
                   &nbsp;/
                 </span>
-                <span className="">
+                <span className="text-xs">
                   &nbsp;
                   {amount} {symbol}
                 </span>
@@ -141,12 +144,12 @@ export function useTable({
             const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
 
             return price ? (
-              <span>
+              <span className="text-xs">
                 {Big(price).toFixed(quoteToken?.priceDisplayDecimals)}{" "}
                 {quoteToken?.symbol}
               </span>
             ) : (
-              <span>-</span>
+              <span className="text-xs">-</span>
             )
           },
         }),
@@ -155,7 +158,11 @@ export function useTable({
           cell: ({ row }) => {
             const { expiryDate } = row.original
 
-            return expiryDate ? <Timer expiry={expiryDate} /> : <div>-</div>
+            return expiryDate ? (
+              <Timer expiry={expiryDate} />
+            ) : (
+              <span className="text-xs">-</span>
+            )
           },
         }),
         columnHelper.display({

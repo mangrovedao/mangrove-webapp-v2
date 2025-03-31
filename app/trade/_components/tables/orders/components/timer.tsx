@@ -27,7 +27,7 @@ export function Timer({ expiry }: { expiry: Date }) {
       <Tooltip delayDuration={200}>
         <TooltipTrigger onClick={(e) => e.preventDefault()}>
           <div className="inline-flex space-x-1">
-            <span>{expired ? "expired" : timeleft}</span>
+            <span className="text-xs">{expired ? "expired" : timeleft}</span>
           </div>
         </TooltipTrigger>
         <TooltipContent>{formatDate(expiry)}</TooltipContent>

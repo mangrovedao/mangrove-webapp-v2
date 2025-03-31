@@ -43,7 +43,8 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const { data: orders } = useOrders()
   const ordersCount = React.useMemo(() => {
     if (!orders?.pages) return 0
-    return orders.pages.reduce((total, page) => total + page.data.length, 0)
+
+    return orders.pages.reduce((total, page) => total + page.meta.count, 0)
   }, [orders])
 
   const { data } = useOrderHistory({

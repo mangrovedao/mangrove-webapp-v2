@@ -21,6 +21,7 @@ type Params<T> = {
 type OrdersPage = {
   data: Order[]
   meta: {
+    count: number
     hasNextPage: boolean
     page: number
   }
@@ -54,17 +55,17 @@ export function useOrders<T = Order[]>({
         if (!address)
           return {
             data: [],
-            meta: { hasNextPage: false, page: pageParam as number },
+            meta: { hasNextPage: false, count: 0, page: pageParam as number },
           }
         if (!allMarkets && !market)
           return {
             data: [],
-            meta: { hasNextPage: false, page: pageParam as number },
+            meta: { hasNextPage: false, count: 0, page: pageParam as number },
           }
         if (allMarkets && (!openMarkets || openMarkets.length === 0))
           return {
             data: [],
-            meta: { hasNextPage: false, page: pageParam as number },
+            meta: { hasNextPage: false, count: 0, page: pageParam as number },
           }
 
         startLoading(TRADE.TABLES.ORDERS)
@@ -177,6 +178,7 @@ export function useOrders<T = Order[]>({
         return {
           data: parsedData,
           meta: {
+            count: parsedData.length,
             hasNextPage: parsedData.length >= pageSize,
             page: pageParam as number,
           },
@@ -186,6 +188,7 @@ export function useOrders<T = Order[]>({
         return {
           data: [],
           meta: {
+            count: 0,
             hasNextPage: false,
             page: pageParam as number,
           },
