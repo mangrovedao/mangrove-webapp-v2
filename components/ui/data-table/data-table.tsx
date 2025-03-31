@@ -182,7 +182,7 @@ export function DataTable<TData>({
       <div className="w-full overflow-auto">
         <Table className="min-w-full table-auto">
           <TableHeader
-            className={`sticky top-[0] border-b border-bg-secondary z-40 p-0 text-xs backdrop-blur-sm ${rows.length}`}
+            className={`sticky top-[0] border-b border-bg-secondary z-40 p-0 text-xs ${rows.length}`}
           >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={`${tableName}-head-row-${headerGroup.id}`}>

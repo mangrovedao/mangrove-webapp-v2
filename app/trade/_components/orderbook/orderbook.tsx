@@ -16,11 +16,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useGhostBook } from "@/hooks/use-ghost-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { BA } from "@mangrovedao/mgv/lib"
 import { Check, ChevronDown } from "lucide-react"
+import OrderBookV2 from "../orderbookv2/orderbook-v2"
 import { AnimatedOrderBookSkeleton } from "./animated-skeleton"
 import { SemiBook } from "./semibook"
 import { OrderBookTableHead } from "./table-head"
@@ -120,6 +122,16 @@ export const OrderBook = React.memo(function OrderBook({
     return () => {}
   }, [activeTab])
 
+  const { mergedBooks, refetch } = useMergedBooks()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch()
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <div className={cn("flex flex-col h-full w-full", className)} style={style}>
       <CustomTabs
@@ -147,7 +159,12 @@ export const OrderBook = React.memo(function OrderBook({
         </div>
 
         <div className="flex-1 overflow-hidden">
-          {activeTab === "book" && <BookContent />}
+          {
+            activeTab === "book" && (
+              <OrderBookV2 asks={mergedBooks.asks} bids={mergedBooks.bids} />
+            )
+            // <BookContent />
+          }
           {activeTab === "trades" && (
             <div className="h-full bg-bg-secondary/50">
               <Trades className="h-full" />

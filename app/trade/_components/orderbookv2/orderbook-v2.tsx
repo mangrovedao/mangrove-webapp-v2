@@ -91,11 +91,21 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ asks, bids, className }) => {
                   className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#500] to-transparent group-hover:from-[#700]"
                   style={{
                     width: `${(ask.cumulative / maxCumulative) * 100}%`,
+                    background:
+                      "linear-gradient(to right, rgba(255, 0, 0, 0.05) 0%, rgba(255, 0, 0, 0.25) 100%)",
+                    opacity: 0.9,
+
+                    boxShadow: "inset 0 0 8px rgba(0, 128, 0, 0.1)",
+                    borderRadius: "0 4px 4px 0",
+                    animation: "simplePulse 4s ease infinite",
+                    animationDelay: `${i * 0.1}s`,
+                    transition:
+                      "width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, opacity 0.3s ease",
                   }}
                 />
 
                 {/* Content */}
-                <span className="w-1/3 text-[#FF3B69] text-xs z-10">
+                <span className="w-1/3 text-[#a92644] text-xs z-10">
                   {ask.price.toLocaleString(undefined, {
                     minimumFractionDigits: 1,
                   })}
@@ -139,11 +149,21 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ asks, bids, className }) => {
                   className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#050] to-transparent group-hover:from-[#070]"
                   style={{
                     width: `${(bid.cumulative / maxCumulative) * 100}%`,
+                    background:
+                      "linear-gradient(to right, rgba(0, 128, 0, 0.05) 0%, rgba(0, 128, 0, 0.25) 100%)",
+                    opacity: 0.9,
+
+                    boxShadow: "inset 0 0 8px rgba(0, 128, 0, 0.1)",
+                    borderRadius: "0 4px 4px 0",
+                    animation: "simplePulse 4s ease infinite",
+                    animationDelay: `${i * 0.1}s`,
+                    transition:
+                      "width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, opacity 0.3s ease",
                   }}
                 />
 
                 {/* Content */}
-                <span className="w-1/3 text-[#00A86B] text-xs z-10">
+                <span className="w-1/3 text-[#28986f] text-xs z-10">
                   {bid.price.toLocaleString(undefined, {
                     minimumFractionDigits: 1,
                   })}

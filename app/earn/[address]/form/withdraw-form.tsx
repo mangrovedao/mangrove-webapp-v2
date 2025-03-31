@@ -112,12 +112,12 @@ export function WithdrawForm({ className }: { className?: string }) {
                 quoteToken?.displayDecimals ?? 4,
               )}
             />
-            <span className="text-text-tertiary text-xs">Burn:</span>
+            {/* <span className="text-text-tertiary text-xs">Burn:</span>
             <Line
               title={vault?.symbol}
               icon={vault?.symbol}
               value={Number(withdrawAmount).toFixed(4)}
-            />
+            /> */}
           </div>
           {/* Buttons loop */}
           <div className="flex justify-center space-x-2 mt-2">

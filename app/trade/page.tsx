@@ -12,6 +12,7 @@ import { TradeIcon } from "@/svgs"
 import { useEffect, useState } from "react"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
+import { OrderBook } from "./_components/orderbook/orderbook"
 import { Trades } from "./_components/orderbook/trade-history/trades"
 import OrderBookV2 from "./_components/orderbookv2/orderbook-v2"
 import { PricesBar } from "./_components/prices-bar/prices-bar"
@@ -23,16 +24,6 @@ export default function Page() {
   const mainTabs = ["Chart", "Order Book", "Trades"]
   const [isMobile, setIsMobile] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
-  const { mergedBooks, refetch } = useMergedBooks()
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetch()
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [])
 
   // Check if we're on mobile
   useEffect(() => {
@@ -46,6 +37,16 @@ export default function Page() {
     return () => {
       window.removeEventListener("resize", checkIfMobile)
     }
+  }, [])
+
+  const { mergedBooks, refetch } = useMergedBooks()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch()
+    }, 3000)
+
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -74,11 +75,7 @@ export default function Page() {
 
                     {/* Order Book Section */}
                     <div className="w-[300px] rounded-sm overflow-hidden flex flex-col border border-bg-secondary">
-                      <OrderBookV2
-                        asks={mergedBooks.asks}
-                        bids={mergedBooks.bids}
-                      />
-                      {/* <OrderBook className="flex-1 w-full min-h-0" /> */}
+                      <OrderBook className="flex-1 w-full min-h-0" />
                     </div>
                   </div>
                 </ResizablePanel>

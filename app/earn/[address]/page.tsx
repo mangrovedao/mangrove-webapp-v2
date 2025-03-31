@@ -81,6 +81,8 @@ export default function Page() {
       vault.quoteDollarPrice
     : 0
 
+  console.log("vault", quoteDepositDollar, baseDepositDollar)
+
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])
@@ -826,19 +828,15 @@ const GridLineHeader = ({
           "flex-row-reverse justify-end": iconFirst,
         })}
       >
-        {value ? (
-          <>
-            <Title className="text-text-primary !text-md">
-              {value}
-              {symbol ? (
-                <span className="text-text-tertiary">{symbol}</span>
-              ) : undefined}
-            </Title>
-            <span className="text-text-secondary">{icon}</span>
-          </>
-        ) : (
-          <Skeleton className="h-5 w-full" />
-        )}
+        <>
+          <Title className="text-text-primary !text-md">
+            {value}
+            {symbol ? (
+              <span className="text-text-tertiary">{symbol}</span>
+            ) : undefined}
+          </Title>
+          <span className="text-text-secondary">{icon}</span>
+        </>
       </div>
     </div>
   )
