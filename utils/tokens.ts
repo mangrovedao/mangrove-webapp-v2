@@ -26,6 +26,7 @@ export function getTokenInfos(symbol: string) {
 export function getSvgUrl(symbol: string) {
   const token = getTokenInfos(symbol)
   if (token.name === "GENERIC") {
+    console.log(symbol)
     const webpToken = getWebPUrl(symbol)
     return webpToken
   }

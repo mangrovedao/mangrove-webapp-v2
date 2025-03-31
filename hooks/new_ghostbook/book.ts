@@ -254,12 +254,6 @@ export function usePoolBook() {
       const baseAmountToUse =
         baseAmount < maxBaseAmount ? baseAmount : maxBaseAmount
 
-      console.log(
-        mangroveBook?.asksConfig.density,
-        mangroveBook?.bidsConfig.density,
-        quoteAmountToUse,
-        baseAmountToUse,
-      )
       return getPoolBook(
         client,
         market,
