@@ -7,7 +7,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { TradeIcon } from "@/svgs"
 import { useEffect, useState } from "react"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
@@ -37,16 +36,6 @@ export default function Page() {
     return () => {
       window.removeEventListener("resize", checkIfMobile)
     }
-  }, [])
-
-  const { mergedBooks, refetch } = useMergedBooks()
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetch()
-    }, 3000)
-
-    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -123,11 +112,7 @@ export default function Page() {
               )}
               {activeMainTab === "Order Book" && (
                 <div className="h-[400px] w-full border border-bg-secondary rounded-sm">
-                  <OrderBookV2
-                    asks={mergedBooks.asks}
-                    bids={mergedBooks.bids}
-                  />
-                  {/* <BookContent /> */}
+                  <OrderBookV2 />
                 </div>
               )}
               {activeMainTab === "Trades" && (

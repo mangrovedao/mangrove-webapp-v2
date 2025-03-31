@@ -1,17 +1,27 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { CompleteOffer } from "@mangrovedao/mgv"
 import React, { useMemo } from "react"
 
 type OrderBookProps = {
-  asks: CompleteOffer[]
-  bids: CompleteOffer[]
   className?: string
   maxHeight?: string
 }
 
-const OrderBookV2: React.FC<OrderBookProps> = ({ asks, bids, className }) => {
+const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
+  const { mergedBooks, refetch } = useMergedBooks()
+
+  const { asks, bids } = mergedBooks ?? {}
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      refetch()
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   const { currentMarket } = useMarket()
   const { base, quote } = currentMarket ?? {}
 
