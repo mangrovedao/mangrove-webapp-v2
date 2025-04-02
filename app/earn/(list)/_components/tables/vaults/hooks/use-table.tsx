@@ -98,13 +98,10 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
         id: "TVL",
         header: () => <span className="text-right w-full block">TVL</span>,
         cell: ({ row }) => {
+          const { tvl, market, quoteDollarPrice } = row.original
           const loading = !("tvl" in row.original)
-          const tvl = "tvl" in row.original ? row.original.tvl : 0n
-          const market = row.original.market
-          const quoteDollarPrice =
-            "quoteDollarPrice" in row.original
-              ? row.original.quoteDollarPrice
-              : 1
+
+          console.log(tvl, market.quote.decimals, quoteDollarPrice)
 
           const value =
             Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
