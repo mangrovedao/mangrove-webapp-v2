@@ -115,7 +115,7 @@ export default function Page() {
             <div className="flex flex-col">
               <div className="flex flex-col flex-1 mt-2">
                 <Label>Taker Rewards</Label>
-                <Value size="small">
+                <Value size="normal">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.takerReward ?? 0), 8)}
                   />
@@ -123,7 +123,7 @@ export default function Page() {
               </div>
               <div className="flex flex-col flex-1 mt-2">
                 <Label>Maker Rewards</Label>
-                <Value size="small">
+                <Value size="normal">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.makerReward ?? 0), 8)}
                   />
@@ -131,7 +131,7 @@ export default function Page() {
               </div>
               <div className="flex flex-col flex-1 mt-2">
                 <Label>Vault Rewards</Label>
-                <Value size="small">
+                <Value size="normal">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.vaultRewards ?? 0), 8)}
                   />
