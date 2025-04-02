@@ -188,7 +188,7 @@ export default function Page() {
                             value={entry.epochId.toString()}
                             id={`${entry.epochId}-tab`}
                             disabled={entry.startTimestamp > Date.now() / 1000}
-                            className="capitalize w-full rounded-none"
+                            className="capitalize w-full rounded-none p-1 sm:p-0"
                           >
                             Epoch {entry.epochId}
                           </CustomTabsTrigger>

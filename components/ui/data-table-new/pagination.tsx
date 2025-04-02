@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 export type PaginationProps = typeof Ark.Pagination.Root.defaultProps
 
 const buttonClasses =
-  " text-sm hover:text-white transition-colors disabled:text-gray-scale-400 aria-[current=page]:text-white aria-[current=page]:border aria-[current=page]:bg-bg-active rounded-lg h-8 w-8 flex justify-center items-center"
+  " text-sm hover:text-white transition-colors disabled:text-gray-scale-400 aria-[current=page]:text-white aria-[current=page]:border aria-[current=page]:bg-bg-active rounded-sm h-8 w-8 flex justify-center items-center"
 const ellipsisClasses =
   "h-8 w-8 flex justify-center items-center cursor-default"
 
