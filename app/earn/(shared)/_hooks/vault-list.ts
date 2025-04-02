@@ -110,7 +110,7 @@ export const VAULTS_WHITELIST_BASE = [
     address: "0xCC1beacCdA8024bA968D63e6db9f01A15D593C52" as Address,
     oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     market: baseWETHUSDC, // good
-    strategyType: "Kandel",
+    strategyType: "Kandel Aave",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",
     descriptionBonus:
@@ -125,7 +125,7 @@ export const VAULTS_WHITELIST_BASE = [
     address: "0x365cBDdFc764600D4728006730dd055B18f518ce" as Address,
     oracle: "0xEF62766c96FEcC5a44704a97962849D2F6a4394F" as Address,
     market: baseCBBTCUSDC, // good
-    strategyType: "Kandel",
+    strategyType: "Kandel Aave",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",
     descriptionBonus:
@@ -140,7 +140,7 @@ export const VAULTS_WHITELIST_BASE = [
     address: "0xC95a225fd311E911a610D8274593C19282012119" as Address,
     oracle: "0xcF9115B12502Bb9AA9E644c83c1DcBeFbeBbc1a6" as Address,
     market: baseCBBTCEURC, // missing market
-    strategyType: "Kandel",
+    strategyType: "Kandel Aave",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",
     descriptionBonus:
@@ -159,7 +159,7 @@ export const VAULTS_WHITELIST_BASE = [
       quote: baseWETH,
       tickSpacing: 1n,
     } as MarketParams, // missing market
-    strategyType: "Kandel",
+    strategyType: "Kandel Aave",
     description:
       "The LP's concentrated Vault strategy is an optimized approach to liquidity provision on Mangrove via Kandel. Rather than spreading liquidity across the entire price spectrum, this strategy focuses on specific price ranges to maximize returns.\n\n",
     descriptionBonus:
