@@ -48,6 +48,7 @@ export function useOrders<T = Order[]>({
       allMarkets ? "" : market?.quote.address,
       address,
       pageSize,
+      defaultChain.id,
     ],
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
