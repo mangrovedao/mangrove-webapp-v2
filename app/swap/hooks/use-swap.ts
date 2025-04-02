@@ -1,4 +1,5 @@
 import {
+  CompleteOffer,
   marketOrderSimulation,
   publicMarketActions,
   type Token,
@@ -12,7 +13,6 @@ import { Address, formatUnits, parseEther, parseUnits } from "viem"
 import {
   useAccount,
   useBalance,
-  usePublicClient,
   useSendTransaction,
   useWaitForTransactionReceipt,
   useWalletClient,
@@ -23,8 +23,10 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 // import { useTokenByAddress } from "../../../hooks/use-token-by-address";
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
@@ -54,11 +56,25 @@ const priceSchema = z.object({
   name: z.optional(z.string()),
 })
 
+// Convert EnhancedOffer to a format compatible with CompleteOffer for simulation
+function convertToSimulationOffers(offers: any[]): CompleteOffer[] {
+  return offers.map((offer) => ({
+    id: offer.id,
+    price: offer.price,
+    volume: offer.volume,
+    offer: { prev: 0n, next: 0n, tick: 0n, gives: 0n },
+    detail: { gasreq: 0n, gasprice: 0n },
+  })) as CompleteOffer[]
+}
+
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
   })
+
+  const { mergedBooks: uniBook } = useMergedBooks()
+
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
     getQuote,
@@ -105,7 +121,7 @@ export function useSwap() {
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
   const currentMarket = getMarketFromTokens(markets, payToken, receiveToken)
-  const publicClient = usePublicClient()
+  const publicClient = useNetworkClient()
   const addresses = useMangroveAddresses()
   const approvePayToken = useApproveToken()
   const { data: spender } = useSpenderAddress("market")
@@ -184,22 +200,22 @@ export function useSwap() {
     }))
   }
 
-  const getBookQuery = useQuery({
-    queryKey: [
-      "getBook",
-      marketClient,
-      currentMarket?.base.address,
-      currentMarket?.quote.address,
-    ],
-    queryFn: () => {
-      if (!marketClient) return null
-      return marketClient.getBook({
-        depth: 50n,
-      })
-    },
-    refetchInterval: 3_000,
-    enabled: !!marketClient,
-  })
+  // const getBookQuery = useQuery({
+  //   queryKey: [
+  //     "getBook",
+  //     marketClient?.key,
+  //     currentMarket?.base.address,
+  //     currentMarket?.quote.address,
+  //   ],
+  //   queryFn: () => {
+  //     if (!marketClient) return null
+  //     return marketClient.getBook({
+  //       depth: 50n,
+  //     })
+  //   },
+  //   refetchInterval: 3_000,
+  //   enabled: !!marketClient,
+  // })
 
   React.useEffect(() => {
     if (wrappingHash) {
@@ -218,40 +234,52 @@ export function useSwap() {
       currentMarket?.quote.address,
       slippage,
       fields.payValue,
-      marketClient?.uid,
+      marketClient?.key,
       address,
     ],
     queryFn: async () => {
       if (!(payToken && receiveToken && isConnected)) return null
+
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
 
       // Mangrove
       if (marketClient) {
-        const book = getBookQuery.data
+        const book = uniBook
         if (!(book && address)) return null
+
+        // Check if book is a complete Book object with required properties
+        if (
+          !(
+            "asksConfig" in book &&
+            "bidsConfig" in book &&
+            "marketConfig" in book
+          )
+        ) {
+          console.warn("Incomplete book object for market order simulation")
+          return null
+        }
+
+        // Convert EnhancedOffer arrays to the format expected by marketOrderSimulation
+        const simulationBook = {
+          ...book,
+          asks: convertToSimulationOffers(book.asks),
+          bids: convertToSimulationOffers(book.bids),
+        }
 
         const isBasePay = currentMarket?.base.address === payToken?.address
         const params: MarketOrderSimulationParams = isBasePay
           ? {
               base: payAmount,
               bs: BS.sell,
-              book,
+              book: simulationBook as any,
             }
           : {
               quote: payAmount,
               bs: BS.buy,
-              book,
+              book: simulationBook as any,
             }
 
         const simulation = marketOrderSimulation(params)
-
-        setFields((fields) => ({
-          ...fields,
-          receiveValue: formatUnits(
-            isBasePay ? simulation.quoteAmount : simulation.baseAmount,
-            receiveToken?.decimals ?? 18,
-          ),
-        }))
 
         const [approvalStep] = await marketClient.getMarketOrderSteps({
           bs: isBasePay ? BS.sell : BS.buy,
@@ -259,7 +287,14 @@ export function useSwap() {
           sendAmount: payAmount,
         })
 
-        return { simulation, approvalStep }
+        return {
+          simulation,
+          approvalStep,
+          receiveValue: formatUnits(
+            isBasePay ? simulation.quoteAmount : simulation.baseAmount,
+            receiveToken?.decimals ?? 18,
+          ),
+        }
       }
 
       // Odos
@@ -280,25 +315,35 @@ export function useSwap() {
         amount: simulation.baseAmount,
       })
 
-      setFields((fields) => ({
-        ...fields,
+      return {
+        simulation,
+        approvalStep: { done: !hasToApprove },
         receiveValue: formatUnits(
           simulation.quoteAmount,
           receiveToken?.decimals ?? 18,
         ),
-      }))
-
-      return { simulation, approvalStep: { done: !hasToApprove } }
+      }
     },
     refetchInterval: 7_000,
     enabled:
       !!payToken &&
       !!receiveToken &&
-      !!slippage &&
       !!fields.payValue &&
       Number(fields.payValue) > 0 &&
-      (!!marketClient ? !!getBookQuery.data && !!address : true),
+      (!marketClient || (!!uniBook && !!address)),
   })
+
+  React.useEffect(() => {
+    if (simulateQuery.data?.receiveValue) {
+      setFields((fields) => ({
+        ...fields,
+        receiveValue: getExactWeiAmount(
+          simulateQuery.data?.receiveValue ?? "",
+          receiveToken?.priceDisplayDecimals ?? 18,
+        ),
+      }))
+    }
+  }, [simulateQuery.data?.receiveValue])
 
   const getMarketPriceQuery = useQuery({
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
@@ -341,10 +386,7 @@ export function useSwap() {
     const payValueNum = Number(fields.payValue)
 
     if (payValueNum <= payTokenBalanceFormatted) return 0
-    console.log(
-      payValueNum - payTokenBalanceFormatted,
-      payTokenBalanceFormatted,
-    )
+
     return payValueNum - payTokenBalanceFormatted
   }, [fields.payValue, payToken, payTokenBalance.balance, ethBalance?.value])
 
@@ -535,6 +577,7 @@ export function useSwap() {
   }, [markets, payToken])
 
   return {
+    simulateQuery,
     payToken,
     receiveToken,
     reverseTokens,
@@ -559,6 +602,7 @@ export function useSwap() {
     swapButtonText,
     payDollar: getMarketPriceQuery.data?.payDollar ?? 0,
     receiveDollar: getMarketPriceQuery.data?.receiveDollar ?? 0,
+    isFetchingDollarValue: getMarketPriceQuery.isFetching,
     setShowCustomInput,
     setSlippage,
     isOdosLoading,

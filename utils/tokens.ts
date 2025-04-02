@@ -16,6 +16,7 @@ type IconType = Record<
 
 export function getTokenInfos(symbol: string) {
   const token = (icons as IconType)[symbol]
+
   if (!token) {
     return icons.GENERIC
   }
@@ -24,7 +25,15 @@ export function getTokenInfos(symbol: string) {
 
 export function getSvgUrl(symbol: string) {
   const token = getTokenInfos(symbol)
+  if (token.name === "GENERIC") {
+    const webpToken = getWebPUrl(symbol)
+    return webpToken
+  }
   return `${IMG_BASE_PATH}/${token.symbol.toLocaleLowerCase()}.svg`
+}
+
+export function getWebPUrl(symbol: string) {
+  return `${IMG_BASE_PATH}/${symbol.toLocaleLowerCase()}.webp`
 }
 
 export function getTokenByAddress(

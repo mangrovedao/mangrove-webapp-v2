@@ -1,12 +1,12 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
+import { AnimatePresence, motion } from "framer-motion"
 import React from "react"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
 import { TokenIcon } from "@/components/token-icon"
-import { Text } from "@/components/typography/text"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -65,16 +65,17 @@ export default function Swap() {
     isWrapping,
     setIsWrapping,
     isFieldLoading,
+    isFetchingDollarValue,
   } = useSwap()
 
   return (
     <>
-      <div className="bg-bg-secondary rounded-2xl p-5 relative mt-16">
+      <div className="bg-bg-secondary rounded-sm p-5 relative mt-40">
         <div className="absolute max-w-[234px] top-0 -right-4 -translate-y-[73px] translate-x-[15px] w-full h-[121px]">
           <Rive src="/assets/rive/iguane.riv" animations="Timeline 1" />
         </div>
         <h1 className="text-2xl mb-4">Swap</h1>
-        <div className="space-y-4 relative">
+        <div className="space-y-2 relative">
           <div className="space-y-0.5">
             <TokenContainer
               type="pay"
@@ -92,6 +93,7 @@ export default function Swap() {
               dollarValue={payDollar}
               onTokenClicked={() => setPayTokenDialogOpen(true)}
               onMaxClicked={onMaxClicked}
+              isFetchingDollarValue={isFetchingDollarValue}
             />
             <Button
               variant={"secondary"}
@@ -109,6 +111,7 @@ export default function Swap() {
               dollarValue={receiveDollar}
               onChange={onReceiveValueChange}
               onTokenClicked={() => setReceiveTokenDialogOpen(true)}
+              isFetchingDollarValue={isFetchingDollarValue}
             />
           </div>
 
@@ -130,53 +133,24 @@ export default function Swap() {
               {swapButtonText}
             </Button>
           )}
-          {payToken?.symbol.includes("ETH") &&
-            ethBalance?.value &&
-            ethBalance.value > 0n && (
-              <div className="flex justify-between items-center px-1">
-                <Text className="flex items-center text-muted-foreground text-base">
-                  Use ETH balance
-                  <InfoTooltip className="text-text-quaternary text-sm">
-                    Will add a wrap ETH to wETH step during transaction
-                  </InfoTooltip>
-                </Text>
-                <div className="flex items-center gap-1 text-xs text-text-secondary">
-                  <span>
-                    {getExactWeiAmount(
-                      formatUnits(
-                        ethBalance?.value ?? 0n,
-                        ethBalance?.decimals ?? 18,
-                      ),
-                      3,
-                    )}{" "}
-                    ETH
-                  </span>
-                  <Checkbox
-                    className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
-                    checked={isWrapping}
-                    onClick={() => setIsWrapping(!isWrapping)}
-                  />
-                </div>
-              </div>
-            )}
           <Accordion
             title="Slippage tolerance"
-            tooltip="How much price slippage you're willing to accept so that your order can be executed"
             chevronValue={`${slippage}%`}
+            tooltip="How much price slippage you're willing to accept so that your order can be executed"
           >
             <div className="space-y-2 mt-1">
-              <div className="flex justify-around bg-bg-primary rounded-lg">
+              <div className="flex justify-around bg-bg-primary rounded-sm">
                 {SLIPPAGES.map((value) => (
                   <Button
                     key={`percentage-button-${value}`}
                     variant={"secondary"}
                     size={"sm"}
                     className={cn(
-                      "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                      "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                       {
                         "opacity-10":
                           Number(slippage) !== Number(value) || showCustomInput,
-                        "border-none bg-bg-tertiary rounded-lg":
+                        "border-none bg-bg-tertiary rounded-sm":
                           Number(slippage) === Number(value) &&
                           !showCustomInput,
                       },
@@ -198,10 +172,10 @@ export default function Swap() {
                   variant={"secondary"}
                   size={"sm"}
                   className={cn(
-                    "text-xs flex-1 bg-bg-primary border-none rounded-lg",
+                    "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                     {
                       "opacity-10": !showCustomInput,
-                      "border-none bg-bg-tertiary rounded-lg": showCustomInput,
+                      "border-none bg-bg-tertiary rounded-sm": showCustomInput,
                     },
                   )}
                 >
@@ -221,6 +195,35 @@ export default function Swap() {
               )}
             </div>
           </Accordion>
+          {payToken?.symbol.includes("ETH") &&
+            ethBalance?.value &&
+            ethBalance.value > 0n && (
+              <div className="flex justify-between items-center ">
+                <span className="text-text-secondary flex items-center text-xs">
+                  Use ETH balance
+                </span>
+                <div className="flex items-center gap-1 text-xs text-text-secondary">
+                  <span>
+                    {getExactWeiAmount(
+                      formatUnits(
+                        ethBalance?.value ?? 0n,
+                        ethBalance?.decimals ?? 18,
+                      ),
+                      3,
+                    )}{" "}
+                    ETH
+                  </span>
+                  <Checkbox
+                    className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
+                    checked={isWrapping}
+                    onClick={() => setIsWrapping(!isWrapping)}
+                  />
+                  <InfoTooltip className="text-text-quaternary text-sm size-4 cursor-pointer">
+                    Will add a wrap ETH to wETH step during transaction
+                  </InfoTooltip>
+                </div>
+              </div>
+            )}
         </div>
         <TokenSelectorDialog
           type="sell"
@@ -298,12 +301,12 @@ function TokenSelectorDialog({
               <div key={token.address}>
                 <Button
                   onClick={() => onSelect(token)}
-                  className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-lg text-sm flex items-center space-x-2"
+                  className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
                 >
                   <div className="relative">
                     <TokenIcon
                       symbol={token.symbol}
-                      imgClasses="rounded-full w-7"
+                      imgClasses="rounded-sm w-7"
                       customSrc={ODOS_API_IMAGE_URL(token.symbol)}
                       useFallback={true}
                     />
@@ -362,7 +365,7 @@ function TokenContainer({
     <div
       className={cn(
         "flex bg-primary-solid-black px-6 py-4 flex-col border border-transparent transition-all focus-within:!border-green-caribbean hover:border-border-primary",
-        type === "pay" ? "rounded-t-xl" : "rounded-b-xl",
+        type === "pay" ? "rounded-t-sm" : "rounded-b-sm",
       )}
     >
       <div className="flex justify-between items-center w-full">
@@ -398,27 +401,63 @@ function TokenContainer({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        {loadingValue ? (
-          <Skeleton className="bg-muted-foreground w-full h-10 my-2" />
-        ) : (
-          <Input
-            aria-label="You pay"
-            className="border-none outline-none p-0 text-3xl"
-            placeholder="0"
-            value={value}
-            onChange={onChange}
-          />
-        )}
+        <div className="flex-1 relative h-12">
+          <AnimatePresence mode="wait">
+            {loadingValue ? (
+              <motion.div
+                key="loading-input"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 flex items-center"
+              >
+                <motion.div
+                  initial={{ width: 0, opacity: 0.5 }}
+                  animate={{
+                    width: "60%",
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  }}
+                  className="h-9 bg-gradient-to-r from-transparent via-bg-tertiary to-transparent rounded-sm"
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="actual-input"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0"
+              >
+                <Input
+                  aria-label="You pay"
+                  className="border-none outline-none p-0 text-3xl h-full"
+                  placeholder="0"
+                  value={value}
+                  onChange={onChange}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <span>
           {token ? (
             <Button
               onClick={onTokenClicked}
-              className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-full text-sm flex items-center space-x-1"
+              className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-sm text-sm flex items-center space-x-1"
             >
               <TokenIcon
                 symbol={token.symbol}
                 customSrc={ODOS_API_IMAGE_URL(token.symbol)}
-                imgClasses="rounded-full"
+                imgClasses="rounded-sm"
                 useFallback={true}
               />
               <span className="font-semibold text-lg text-nowrap pl-2">
@@ -433,22 +472,63 @@ function TokenContainer({
           )}
         </span>
       </div>
-      <div className="flex justify-between items-center opacity-70">
-        {isFetchingDollarValue ? (
-          <Skeleton className="w-10 h-3 bg-gray" />
-        ) : Number(dollars) <= 0 ? (
-          ""
-        ) : (
-          <div className="text-sm text-left text-text-quaternary">
-            ≈{" "}
-            <span className="text-text-secondary">
-              {token && Number(dollars) !== 0
-                ? dollars.slice(0, dollars.indexOf(".") + 3)
-                : "0"}
-            </span>{" "}
-            $
-          </div>
-        )}
+      <div className="flex justify-between items-center opacity-70 h-5">
+        <div className="relative w-full h-full">
+          <AnimatePresence mode="wait">
+            {loadingValue ? (
+              <motion.div
+                key="loading-dollars"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 text-sm text-left text-text-quaternary"
+              >
+                <motion.div
+                  initial={{ width: 0, opacity: 0.5 }}
+                  animate={{
+                    width: "50px",
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                  }}
+                  className="h-4 bg-gradient-to-r from-transparent via-bg-tertiary to-transparent rounded-sm"
+                />
+              </motion.div>
+            ) : Number(dollars) <= 0 ? (
+              <motion.div
+                key="zero-dollars"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 text-sm text-left text-text-quaternary"
+              >
+                ≈ <span className="text-text-secondary">0</span> $
+              </motion.div>
+            ) : (
+              <motion.div
+                key="actual-dollars"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 text-sm text-left text-text-quaternary"
+              >
+                ≈{" "}
+                <span className="text-text-secondary">
+                  {token && Number(dollars) !== 0
+                    ? dollars.slice(0, dollars.indexOf(".") + 3)
+                    : "0"}
+                </span>{" "}
+                $
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   )

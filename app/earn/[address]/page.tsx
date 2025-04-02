@@ -1,5 +1,6 @@
 "use client"
 
+import { AnimatePresence, motion } from "framer-motion"
 import {
   CheckIcon,
   ChevronRight,
@@ -9,9 +10,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import React, { ReactNode } from "react"
+import React, { ReactNode, useEffect, useState } from "react"
 import { formatUnits } from "viem"
-import { useAccount } from "wagmi"
 
 import {
   CustomRadioGroup,
@@ -25,13 +25,15 @@ import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
+import { Drawer } from "@/components/ui/drawer"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useDefaultChain } from "@/hooks/use-default-chain"
+import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
-import { Line, LineRewards, getChainImage } from "../(shared)/utils"
+import { Line, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/deposit-form"
@@ -43,9 +45,25 @@ enum Action {
 }
 
 export default function Page() {
+  const { defaultChain } = useDefaultChain()
   const [action, setAction] = React.useState(Action.Deposit)
-  const { chain } = useAccount()
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const params = useParams<{ address: string }>()
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 1024) // lg breakpoint
+    }
+
+    checkIfMobile()
+    window.addEventListener("resize", checkIfMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile)
+    }
+  }, [])
 
   const {
     data: { vault },
@@ -63,79 +81,111 @@ export default function Page() {
       vault.quoteDollarPrice
     : 0
 
+  console.log("vault", quoteDepositDollar, baseDepositDollar)
+
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])
 
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
-      {/* BreadCrumb   */}
-
-      <div className="flex items-center gap-2 pb-4 ml-4 ">
-        <Link href={"/earn"} className="flex items-center gap-2">
+      {/* BreadCrumb */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-center gap-2 mb-1 ml-4"
+      >
+        <Link
+          href={"/earn"}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
           <Caption className="text-text-quaternary text-sm">Earn</Caption>
           <ChevronRight className="h-4 w-4 text-text-disabled" />
         </Link>
         <Caption className="text-text-secondary text-sm">Vault details</Caption>
-      </div>
-      {/* Market details */}
-      <div className="flex items-center gap-2 flex-wrap ml-4">
-        <div className="flex -space-x-2 items-center">
-          {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
-            <>
-              <Skeleton className={cn("h-16 w-16", "rounded-full")} />
-              <Skeleton className={cn("h-16 w-16", "rounded-full")} />
-            </>
-          ) : (
-            <>
-              <TokenIcon
-                symbol={vault?.market?.base?.symbol}
-                imgClasses="h-16 w-16"
-              />
+      </motion.div>
 
-              <TokenIcon
-                symbol={vault?.market?.quote?.symbol}
-                imgClasses="h-16 w-16"
-              />
-            </>
-          )}
-        </div>
-        <div className="grid items-center ">
+      {/* Market details */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="flex items-center gap-2 flex-wrap ml-4"
+      >
+        <div className="grid items-center gap-2">
           {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
-            <Skeleton className={cn("h-7 w-7", "rounded-full")} />
+            <Skeleton className={cn("h-7 w-7", "rounded-sm")} />
           ) : (
-            <Title className="!text-3xl">{`${vault?.market?.base?.symbol}-${vault?.market?.quote?.symbol}`}</Title>
+            <motion.div
+              className="flex items-center gap-2"
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              <div className="flex -space-x-2 items-center">
+                {!vault?.market?.quote?.symbol ||
+                !vault?.market?.base?.symbol ? (
+                  <>
+                    <Skeleton className={cn("h-16 w-16", "rounded-sm")} />
+                    <Skeleton className={cn("h-16 w-16", "rounded-sm")} />
+                  </>
+                ) : (
+                  <>
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market?.base?.symbol}
+                        imgClasses="h-10 w-10 drop-shadow-lg"
+                      />
+                    </motion.div>
+
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: -5 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market?.quote?.symbol}
+                        imgClasses="h-10 w-10 drop-shadow-lg"
+                      />
+                    </motion.div>
+                  </>
+                )}
+              </div>
+              <Title className="!text-2xl bg-clip-text text-white">{`${vault?.market?.base?.symbol}-${vault?.market?.quote?.symbol}`}</Title>
+            </motion.div>
           )}
-          <div className="flex gap-2 flex-wrap">
+
+          <div className="flex gap-3 flex-wrap">
             <Subline
               title={"Chain"}
-              value={chain?.name}
-              icon={getChainImage(chain?.id, chain?.name)}
+              value={defaultChain?.name}
+              icon={getChainImage(defaultChain)}
             />
-
-            <Separator className="h-4 self-center" orientation="vertical" />
-            <Subline
-              title={"Strategy"}
-              value={vault?.type}
-              icon={
-                <div className="relative h-4 w-4">
-                  <div className="absolute inset-0 bg-green-700 rounded-full"></div>
-                  <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
-                </div>
-              }
-            />
-
-            <Separator className="h-4 self-center" orientation="vertical" />
+            <Subline title={"Strategy"} value={vault?.type} />
             <Subline title={"Manager"} value={vault?.manager} />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Columns */}
-      <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5 ">
-        <div className="col-span-12 md:col-span-8 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-12 mt-5 gap-5">
+        <motion.div
+          className="col-span-12 md:col-span-8 space-y-6"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           {/* Infos Card */}
-          <div className="mx-1 flex p-5 justify-between rounded-lg bg-gradient-to-b from-bg-secondary to-bg-primary flex-wrap">
+          <motion.div
+            className="mx-1 flex p-4 justify-between rounded-sm flex-wrap box-shadow-lg"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+            style={{ boxShadow: "0 0 15px 0 rgba(0, 255, 170, 0.1)" }}
+          >
             <GridLineHeader
               title={"TVL"}
               value={formatNumber(
@@ -160,43 +210,27 @@ export default function Page() {
               symbol={"%"}
               info="A fee based on the profits generated from your deposit."
             />
-          </div>
+          </motion.div>
 
           {/* Description */}
-
-          <div className="mx-5 space-y-3">
-            <Title variant={"title1"} className="text-text-primary ">
+          <motion.div
+            className="mx-5 space-y-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+          >
+            <Title variant={"title1"} className="text-text-primary">
               Vault description
             </Title>
             {vault?.description ? (
               <>
-                <Text className="font-axiforma text-text-secondary text-sm">
-                  {vault?.description?.split("\n").map((line, i) => (
-                    <React.Fragment key={i}>
-                      {line.startsWith("- ") ? (
-                        <li className="list-disc ml-4">{line.substring(2)}</li>
-                      ) : line.includes(":") ? (
-                        <>
-                          <Title
-                            variant={"title3"}
-                            className="text-text-primary"
-                          >
-                            {line.split(":")[0]}
-                          </Title>
-                        </>
-                      ) : (
-                        line
-                      )}
-                    </React.Fragment>
-                  ))}
-                </Text>
-
-                <Accordion title="Read more">
-                  <Text
-                    className="font-axiforma text-text-secondary mt-2"
-                    variant={"text2"}
-                  >
-                    {vault?.descriptionBonus?.split("\n").map((line, i) => (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
+                >
+                  <Text className="text-text-secondary text-sm font-axiforma">
+                    {vault?.description?.split("\n").map((line, i) => (
                       <React.Fragment key={i}>
                         {line.startsWith("- ") ? (
                           <li className="list-disc ml-4">
@@ -214,29 +248,80 @@ export default function Page() {
                         ) : (
                           line
                         )}
-                        <br />
                       </React.Fragment>
                     ))}
                   </Text>
-                </Accordion>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.6 }}
+                >
+                  <Accordion title="Read more">
+                    <Text
+                      className="text-text-secondary mt-2 font-axiforma text-sm"
+                      variant={"text2"}
+                    >
+                      {vault?.descriptionBonus?.split("\n").map((line, i) => (
+                        <React.Fragment key={i}>
+                          {line.startsWith("- ") ? (
+                            <li className="list-disc ml-4">
+                              {line.substring(2)}
+                            </li>
+                          ) : line.includes(":") ? (
+                            <>
+                              <Title
+                                variant={"title3"}
+                                className="text-text-primary"
+                              >
+                                {line.split(":")[0]}
+                              </Title>
+                            </>
+                          ) : (
+                            line
+                          )}
+                          <br />
+                        </React.Fragment>
+                      ))}
+                    </Text>
+                  </Accordion>
+                </motion.div>
               </>
             ) : (
               <Skeleton className="h-20 w-full" />
             )}
-          </div>
+          </motion.div>
 
-          {/* Graphs  */}
-          <div className="flex justify-center items-center">
+          {/* Graphs */}
+          <motion.div
+            className="flex justify-center items-center"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.6,
+              type: "spring",
+              stiffness: 100,
+            }}
+            whileHover={{ scale: 1.01 }}
+          >
             <ImageWithHideOnError
               src={`/assets/illustrations/vault-graph-placeholder.png`}
               width={832}
               height={382}
               alt={`vault-graph-placeholder`}
+              className="rounded-sm shadow-lg"
             />
-          </div>
+          </motion.div>
 
           {/* Vault details */}
-          <div className="mx-5">
+          <motion.div
+            className="mx-5"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.7 }}
+          >
             <Title className="text-text-primary text-lg">Vault details</Title>
             {vault ? (
               <div>
@@ -246,10 +331,14 @@ export default function Page() {
                       title="Strategy"
                       value={vault?.strategyType}
                       icon={
-                        <div className="relative h-4 w-4">
-                          <div className="absolute inset-0 bg-green-700 rounded-full"></div>
+                        <motion.div
+                          className="relative h-4 w-4"
+                          whileHover={{ scale: 1.2 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="absolute inset-0 bg-green-700 rounded-sm"></div>
                           <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
-                        </div>
+                        </motion.div>
                       }
                     />
 
@@ -258,22 +347,30 @@ export default function Page() {
                       value={vault?.manager}
                       icon={
                         <div className="flex gap-1 text-text-secondary">
-                          <Link
-                            href={vault?.socials.website || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <motion.div
+                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            transition={{ duration: 0.2 }}
                           >
-                            <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                          </Link>
-                          {/* <Send className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
-                          <Link
-                            href={vault?.socials.x || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            <Link
+                              href={vault?.socials.website || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Globe className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                            </Link>
+                          </motion.div>
+                          <motion.div
+                            whileHover={{ scale: 1.2, rotate: 5 }}
+                            transition={{ duration: 0.2 }}
                           >
-                            <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
-                          </Link>
-                          {/* <Mail className="h-4 w-4 cursor-pointer hover:text-text-placeholder" /> */}
+                            <Link
+                              href={vault?.socials.x || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <Twitter className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                            </Link>
+                          </motion.div>
                         </div>
                       }
                     />
@@ -287,8 +384,8 @@ export default function Page() {
                     />
                     <GridLine
                       title="Chain"
-                      value={chain?.name}
-                      icon={getChainImage(chain?.id, chain?.name)}
+                      value={defaultChain?.name}
+                      icon={getChainImage(defaultChain)}
                       iconFirst
                     />
                   </div>
@@ -296,9 +393,14 @@ export default function Page() {
                     <GridLine
                       title="Vault Address"
                       value={shortenAddress(vault?.address || "")}
-                      href={`${chain?.blockExplorers?.default.url}/address/${vault?.address}`}
+                      href={`${defaultChain?.blockExplorers?.default.url}/address/${vault?.address}`}
                       icon={
-                        <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        <motion.div
+                          whileHover={{ scale: 1.2, rotate: 5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <SquareArrowOutUpRight className="h-4 w-4 cursor-pointer hover:text-text-placeholder" />
+                        </motion.div>
                       }
                     />
 
@@ -312,27 +414,42 @@ export default function Page() {
             ) : (
               <Skeleton className="h-20 w-full mt-5" />
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="col-span-12 md:col-span-4">
+        <motion.div
+          className="col-span-12 md:col-span-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <div className="grid gap-8">
-            <NeonContainer className="relative">
-              <ImageWithHideOnError
-                className="absolute -top-[24px] -right-[17px] rounded-xl"
-                src={`/assets/illustrations/earn-leaf.png`}
-                width={100}
-                height={90}
-                alt={`mangrove-logo`}
-              />
+            <NeonContainer className="relative  ">
+              <motion.div
+                className="absolute -top-4 -right-2 rounded-sm overflow-hidden"
+                initial={{ rotate: -1, y: -1 }}
+                animate={{ rotate: 0, y: 0 }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                }}
+              >
+                <ImageWithHideOnError
+                  src={`/assets/illustrations/earn-leaf.png`}
+                  width={100}
+                  height={90}
+                  alt={`mangrove-logo`}
+                />
+              </motion.div>
               <GridLine
                 title={"Your incentives rewards"}
                 value={
                   <div className="flex items-center gap-1">
-                    <Text className="font-axiforma text-text-secondary">
-                      MGV
-                    </Text>
+                    <span className="text-text-secondary !text-md">MGV</span>
                     <FlowingNumbers
+                      className="text-md"
                       initialValue={vault?.incentivesData?.rewards || 0}
                       ratePerSecond={
                         vault?.incentivesData?.currentRewardsPerSecond || 0
@@ -346,56 +463,112 @@ export default function Page() {
                 <GridLine
                   title={"Your deposit"}
                   value={
-                    <div className="flex items-center justify-center gap-2 text-2xl font-axiforma">
-                      <span className="flex gap-1">
+                    <motion.div
+                      className="flex items-center justify-center gap-2 text-md"
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.8 }}
+                    >
+                      <span className="flex gap-1 text-md">
                         {(baseDepositDollar + quoteDepositDollar).toFixed(2)}
                         <span className="text-text-secondary">$</span>
                       </span>
-                    </div>
+                    </motion.div>
                   }
                 />
                 <GridLine
                   title={"Your PNL"}
                   value={
-                    <span className="text-2xl flex gap-1 font-axiforma">
+                    <motion.span
+                      className={cn("flex gap-1 text-md")}
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.9 }}
+                    >
                       {vault?.pnlData?.pnl
                         ? `${vault?.pnlData?.pnl.toFixed(2)}%`
                         : "0"}
-                    </span>
+                    </motion.span>
                   }
                   symbol={""}
                 />
               </div>
             </NeonContainer>
-            {/* <div className="flex border-2 border-text-brand rounded-xl p-4 shadow-[0_0_20px_rgba(0,255,0,0.3)] items-center align-middle">
-             
-            </div> */}
-            <div className="grid space-y-5 bg-bg-secondary p-3 rounded-lg">
-              <div className="w-full ">
-                <CustomRadioGroup
-                  name={"action"}
-                  value={action}
-                  onValueChange={(e: Action) => {
-                    setAction(e)
-                  }}
-                >
-                  {Object.values(Action).map((action) => (
-                    <CustomRadioGroupItem
-                      key={action}
-                      value={action}
-                      id={action}
-                      className="capitalize"
-                    >
-                      {action}
-                    </CustomRadioGroupItem>
-                  ))}
-                </CustomRadioGroup>
-              </div>
-              {action === Action.Deposit ? <DepositForm /> : <WithdrawForm />}
-            </div>
+
+            {/* Only show the form directly on desktop */}
+            {!isMobile && (
+              <motion.div
+                className="grid space-y-5 bg-bg-secondary p-3 rounded-sm"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.6 }}
+                style={{ boxShadow: "0 0 15px 0 rgba(0, 255, 170, 0.1)" }}
+              >
+                <div className="w-full">
+                  <CustomRadioGroup
+                    name={"action"}
+                    value={action}
+                    onValueChange={(e: Action) => {
+                      setAction(e)
+                    }}
+                  >
+                    {Object.values(Action).map((action) => (
+                      <CustomRadioGroupItem
+                        key={action}
+                        value={action}
+                        id={action}
+                        className="capitalize"
+                      >
+                        {action}
+                      </CustomRadioGroupItem>
+                    ))}
+                  </CustomRadioGroup>
+                </div>
+                <div className="relative min-h-[360px]">
+                  <AnimatePresence mode="wait">
+                    {action === Action.Deposit ? (
+                      <motion.div
+                        key="deposit-form"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
+                        className="absolute inset-0"
+                      >
+                        <DepositForm />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="withdraw-form"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
+                        className="absolute inset-0"
+                      >
+                        <WithdrawForm />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
           </div>
 
-          <div className="grid gap-4 px-6 mt-6">
+          <motion.div
+            className="grid gap-4 px-6 mt-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.7 }}
+          >
             <Title className="text-xl">My Position</Title>
 
             <div>
@@ -405,10 +578,16 @@ export default function Page() {
               <Line
                 title={
                   <div className="flex gap-2">
-                    <TokenIcon
-                      symbol={vault?.market.base.symbol}
-                      className="h-4 w-4"
-                    />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market.base.symbol}
+                        className="h-4 w-4"
+                        imgClasses="w-5 h-5"
+                      />
+                    </motion.div>
                     <Caption className="text-text-secondary !text-sm">
                       {vault?.market.base.symbol}
                     </Caption>
@@ -429,10 +608,16 @@ export default function Page() {
               <Line
                 title={
                   <div className="flex gap-2">
-                    <TokenIcon
-                      symbol={vault?.market.quote.symbol}
-                      className="h-4 w-4"
-                    />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <TokenIcon
+                        symbol={vault?.market.quote.symbol}
+                        className="h-4 w-4"
+                        imgClasses="w-5 h-5"
+                      />
+                    </motion.div>
                     <Caption className="text-text-secondary !text-sm">
                       {vault?.market.quote.symbol}
                     </Caption>
@@ -450,66 +635,97 @@ export default function Page() {
                   }) || "0"
                 }
               />
-              <Caption className="text-text-secondary mt-5 !text-base">
-                Minted amount
-              </Caption>
-
-              <Line
-                title={
-                  <div className="flex gap-2">
-                    <TokenIcon symbol={vault?.symbol} className="h-4 w-4" />
-                    <Caption className="text-text-secondary text-sm">
-                      {vault?.symbol}
-                    </Caption>
-                  </div>
-                }
-                value={
-                  Number(
-                    formatUnits(
-                      vault?.mintedAmount || 0n,
-                      vault?.decimals || 18,
-                    ),
-                  ).toLocaleString(undefined, {
-                    maximumFractionDigits: 4,
-                  }) || "0"
-                }
-              />
             </div>
-          </div>
-
-          <div className="z-20 grid gap-4 p-4 mt-6 border border-text-text-secondary rounded-lg ">
-            <Title className="text-lg">Rewards</Title>
-            <div className="grid xs:grid-cols-1 grid-cols-2 gap-4">
-              <div className="flex gap-2 items-start">
-                <div className="flex items-center gap-2">
-                  <ImageWithHideOnError
-                    src={`/assets/illustrations/mangrove-logo.png`}
-                    width={24}
-                    height={26}
-                    key={`mangrove-logo`}
-                    alt={`mangrove-logo`}
-                  />
-                  <Caption className="text-text-secondary">MGV</Caption>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <LineRewards title={"Claimable"} value={"0.00"} />
-                <LineRewards title={"Earned"} value={"0.00"} />
-                <LineRewards title={"All time"} value={"0.00"} />
-              </div>
-            </div>
-            <Button
-              variant={"primary"}
-              size={"lg"}
-              className="w-full"
-              disabled={true}
-            >
-              Claim rewards
-            </Button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
+
+      {/* Floating Action Button - shown on all screen sizes */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+        className="fixed bottom-6 right-6 z-50 lg:hidden"
+      >
+        <Button
+          className="flex items-center justify-center rounded-full bg-bg-tertiary hover:bg-bg-primary-hover"
+          onClick={() => setIsDrawerOpen(true)}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={action}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center justify-center"
+            >
+              <TradeIcon className="w-8 h-8 p-1 text-text-secondary" />
+            </motion.div>
+          </AnimatePresence>
+        </Button>
+      </motion.div>
+
+      {/* Drawer for Action Selection and Form */}
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <Drawer.Content className="h-[80vh] p-4 bg-bg-primary">
+          <div className="flex justify-center mb-4">
+            <div className="w-12 h-1 bg-bg-tertiary rounded-sm" />
+          </div>
+          <Title className="text-2xl mb-4 text-center">
+            {action === Action.Deposit ? "Deposit" : "Withdraw"}
+          </Title>
+          <div className="space-y-6">
+            <div className="w-full">
+              <CustomRadioGroup
+                name={"action"}
+                value={action}
+                onValueChange={(e: Action) => {
+                  setAction(e)
+                }}
+              >
+                {Object.values(Action).map((action) => (
+                  <CustomRadioGroupItem
+                    key={action}
+                    value={action}
+                    id={action}
+                    className="capitalize"
+                  >
+                    {action}
+                  </CustomRadioGroupItem>
+                ))}
+              </CustomRadioGroup>
+            </div>
+            <div className="relative">
+              <AnimatePresence mode="wait">
+                {action === Action.Deposit ? (
+                  <motion.div
+                    key="deposit-form-drawer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0"
+                  >
+                    <DepositForm />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="withdraw-form-drawer"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0"
+                  >
+                    <WithdrawForm />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </Drawer.Content>
+      </Drawer>
     </div>
   )
 }
@@ -548,10 +764,12 @@ const GridLine = ({
               "flex-row-reverse justify-end": iconFirst,
             })}
           >
-            <Text className="text-text-primary font-axiforma !text-base">
+            <Text className="text-text-primary !text-base font-axiforma">
               {value}
               {symbol ? (
-                <span className="text-text-tertiary">{symbol}</span>
+                <span className="text-text-tertiary font-axiforma">
+                  {symbol}
+                </span>
               ) : undefined}
             </Text>
             {href ? (
@@ -591,9 +809,12 @@ const GridLineHeader = ({
   info?: string
 }) => {
   return (
-    <div className="grid mt-2 items-center space-y-2">
-      <div className="flex items-center -gap-1">
-        <Title className="text-text-secondary font-light text-md">
+    <div className="grid items-center gap-2">
+      <div className="flex items-center">
+        <Title
+          className="text-text-secondary font-light text-sm"
+          variant={"title3"}
+        >
           {title}
         </Title>
         {info ? (
@@ -603,23 +824,19 @@ const GridLineHeader = ({
         ) : undefined}
       </div>
       <div
-        className={cn("flex items-center gap-2 ", {
+        className={cn("flex items-center -mt-2", {
           "flex-row-reverse justify-end": iconFirst,
         })}
       >
-        {value ? (
-          <>
-            <Title className="text-text-primary !text-3xl">
-              {value}
-              {symbol ? (
-                <span className="text-text-tertiary">{symbol}</span>
-              ) : undefined}
-            </Title>
-            <span className="text-text-secondary">{icon}</span>
-          </>
-        ) : (
-          <Skeleton className="h-10 w-full" />
-        )}
+        <>
+          <Title className="text-text-primary !text-md">
+            {value}
+            {symbol ? (
+              <span className="text-text-tertiary">{symbol}</span>
+            ) : undefined}
+          </Title>
+          <span className="text-text-secondary">{icon}</span>
+        </>
       </div>
     </div>
   )
@@ -635,9 +852,9 @@ const Subline = ({
   icon?: ReactNode
 }) => {
   return (
-    <div className="flex items-center gap-2">
-      <Caption className="text-text-secondary !text-sm"> {title}</Caption>
-      <Caption className="text-text-primary !text-sm">{value}</Caption>
+    <div className="flex items-center gap-1">
+      <Caption className="text-text-secondary !text-xs"> {title}</Caption>
+      <Caption className="text-text-primary !text-xs">{value}</Caption>
       {icon ? icon : undefined}
     </div>
   )

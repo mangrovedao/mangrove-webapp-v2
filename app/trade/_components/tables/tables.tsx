@@ -1,4 +1,5 @@
 import React from "react"
+import { useAccount } from "wagmi"
 
 import {
   CustomTabs,
@@ -6,119 +7,130 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useLoadingStore } from "@/stores/loading.store"
-import { renderElement } from "@/utils/render"
 import { TRADE } from "../../_constants/loading-keys"
-import { Fills } from "./fills/fills"
-import { useFills } from "./fills/use-fills"
-
-import { useAccount } from "wagmi"
-import { BookContent } from "../orderbook/orderbook"
-import { Trades } from "../orderbook/trade-history/trades"
+import { OrderHistory } from "./order-history/order-history"
+import { useOrderHistory } from "./order-history/use-order-history"
 import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
 export enum TradeTablesLoggedIn {
-  BOOK = "Book",
-  TRADES = "Trades",
   ORDERS = "Open Orders",
-  FILLS = "Orders History",
+  ORDER_HISTORY = "Orders History",
 }
 
 export enum TradeTablesLoggedOut {
-  BOOK = "Book",
-  TRADES = "Trades",
-}
-
-const LOGGED_IN_TABS_CONTENT = {
-  [TradeTablesLoggedIn.BOOK]: BookContent,
-  [TradeTablesLoggedIn.TRADES]: Trades,
-  [TradeTablesLoggedIn.ORDERS]: Orders,
-  [TradeTablesLoggedIn.FILLS]: Fills,
-}
-
-const LOGGED_OUT_TABS_CONTENT = {
-  [TradeTablesLoggedOut.BOOK]: BookContent,
-  [TradeTablesLoggedOut.TRADES]: Trades,
+  ORDERS = "Open Orders",
+  ORDER_HISTORY = "Orders History",
 }
 
 export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   const { isConnected } = useAccount()
-  const [ordersLoading, fillsLoading] = useLoadingStore((state) =>
-    state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS]),
+  const [showAllMarkets, setShowAllMarkets] = React.useState(true)
+  const [ordersLoading, orderHistoryLoading] = useLoadingStore((state) =>
+    state.isLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY]),
   )
   const [defaultEnum, setDefaultEnum] = React.useState(
     isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut,
   )
-  const [value, setValue] = React.useState(
-    Object.values(defaultEnum)[0] || "Book",
+  const [value, setValue] = React.useState<string>(
+    Object.values(defaultEnum)[0] || "Open Orders",
   )
 
-  // Get the total count of orders and fills
-  const { data: ordersCount } = useOrders({
-    select: (orders) => orders.length,
+  // Get the total count of orders and history
+  const { data: orders } = useOrders()
+  const ordersCount = React.useMemo(() => {
+    if (!orders?.pages) return 0
+
+    return orders.pages.reduce((total, page) => total + page.meta.count, 0)
+  }, [orders])
+
+  const { data } = useOrderHistory({
+    pageSize: 25,
+    allMarkets: true,
   })
 
-  const { data: fillsCount } = useFills({
-    select: (fills) => fills.length,
-  })
+  // Calculate the total count from all pages
+  const orderHistoryCount = React.useMemo(() => {
+    if (!data?.pages) return 0
+    return data.pages.reduce((total, page) => total + page.data.length, 0)
+  }, [data])
 
   React.useEffect(() => {
     setDefaultEnum(isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut)
-    setValue(Object.values(defaultEnum)[0] || "Book")
-  }, [isConnected])
+    setValue(Object.values(defaultEnum)[0] || "Open Orders")
+  }, [isConnected, defaultEnum])
 
   return (
-    <CustomTabs
-      {...props}
-      onValueChange={(value) => {
-        setValue(value)
-      }}
-      value={value}
-    >
-      <CustomTabsList
-        className="w-full flex justify-start border-b"
-        loading={ordersLoading ?? fillsLoading}
+    <ResizablePanelGroup direction="vertical" className="h-full w-full">
+      <ResizablePanel
+        defaultSize={100}
+        minSize={30}
+        maxSize={70}
+        className="border border-bg-secondary rounded-sm w-full"
       >
-        {Object.values(defaultEnum).map((table) => (
-          <CustomTabsTrigger
-            key={`${table}-tab`}
-            value={table}
-            className="capitalize"
-            count={
-              isConnected && table === TradeTablesLoggedIn.ORDERS
-                ? ordersCount
-                : isConnected && table === TradeTablesLoggedIn.FILLS
-                  ? fillsCount
-                  : 0
-            }
+        <CustomTabs
+          {...props}
+          onValueChange={(value) => {
+            setValue(value)
+          }}
+          value={value}
+          className="w-full h-full flex flex-col"
+        >
+          <CustomTabsList
+            className="flex p-0 justify-start space-x-0 w-full h-8"
+            loading={ordersLoading ?? orderHistoryLoading}
           >
-            {table}
-          </CustomTabsTrigger>
-        ))}
-      </CustomTabsList>
-      <div className="w-full pb-4 px-1 h-[calc(100%-var(--bar-height))]">
-        {Object.values(defaultEnum).map((table) => (
-          <CustomTabsContent key={`${table}-content`} value={table}>
-            <ScrollArea className="h-full" scrollHideDelay={200}>
-              <div className="px-2 h-full">
-                {renderElement(
-                  isConnected
-                    ? LOGGED_IN_TABS_CONTENT[
-                        table as keyof typeof LOGGED_IN_TABS_CONTENT
-                      ]
-                    : LOGGED_OUT_TABS_CONTENT[
-                        table as keyof typeof LOGGED_OUT_TABS_CONTENT
-                      ],
-                )}
-              </div>
-              <ScrollBar orientation="vertical" className="z-50" />
-              <ScrollBar orientation="horizontal" className="z-50" />
-            </ScrollArea>
-          </CustomTabsContent>
-        ))}
-      </div>
-    </CustomTabs>
+            {Object.values(defaultEnum).map((table) => (
+              <CustomTabsTrigger
+                key={`${table}-tab`}
+                value={table}
+                className="capitalize w-full rounded-none"
+                count={
+                  isConnected && table === TradeTablesLoggedIn.ORDERS
+                    ? ordersCount
+                    : isConnected && table === TradeTablesLoggedIn.ORDER_HISTORY
+                      ? orderHistoryCount
+                      : 0
+                }
+              >
+                {table}
+              </CustomTabsTrigger>
+            ))}
+          </CustomTabsList>
+          <div className="w-full flex-1 overflow-hidden">
+            {Object.values(defaultEnum).map((table: string) => (
+              <CustomTabsContent
+                key={`${table}-content`}
+                value={table}
+                className="h-full"
+              >
+                <ScrollArea className="h-full w-full" type="auto">
+                  <div className="min-h-full p-1">
+                    {table === TradeTablesLoggedIn.ORDERS && isConnected && (
+                      <Orders
+                        showAllMarkets={showAllMarkets}
+                        setShowAllMarkets={setShowAllMarkets}
+                      />
+                    )}
+                    {table === TradeTablesLoggedIn.ORDER_HISTORY &&
+                      isConnected && (
+                        <OrderHistory
+                          showAllMarkets={showAllMarkets}
+                          setShowAllMarkets={setShowAllMarkets}
+                        />
+                      )}
+                  </div>
+                  <ScrollBar orientation="vertical" className="z-50" />
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              </CustomTabsContent>
+            ))}
+          </div>
+        </CustomTabs>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   )
 }

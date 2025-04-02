@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { Check } from "@/svgs"
 import { formatNumber } from "@/utils/numbers"
 import { formatUnits } from "viem"
@@ -40,6 +41,7 @@ type Params = {
 }
 
 export function useTable({ pageSize, data, onDeposit }: Params) {
+  const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
   const { fdv, setFdv } = useMgvFdv()
 
@@ -60,12 +62,12 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
           return (
             <div className="flex flex-col underline">
               <Link
-                className="hover:opacity-80 transition-opacity bg-[#284061] size-6 rounded-md flex items-center justify-center"
+                className="hover:opacity-80 transition-opacity bg-bg-tertiary size-6 rounded-sm flex items-center justify-center"
                 href={`${blockExplorerUrl}/address/${address}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {getChainImage(chain?.id, chain?.name)}
+                {getChainImage(defaultChain)}
               </Link>
             </div>
           )
@@ -79,7 +81,6 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
             <Market
               base={row.original.market.base.address}
               quote={row.original.market.quote.address}
-              tokenPairClasses="font-bold text-lg"
             />
           )
         },
@@ -94,15 +95,50 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
       }),
 
       columnHelper.display({
-        header: "Manager",
+        id: "TVL",
+        header: () => <span className="text-right w-full block">TVL</span>,
         cell: ({ row }) => {
-          return <Value value={row.original.strategist} />
+          const loading = !("tvl" in row.original)
+          const tvl = "tvl" in row.original ? row.original.tvl : 0n
+          const market = row.original.market
+          const quoteDollarPrice =
+            "quoteDollarPrice" in row.original
+              ? row.original.quoteDollarPrice
+              : 1
+
+          const value =
+            Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
+            quoteDollarPrice
+          return (
+            <div className="text-right w-full">
+              {loading ? (
+                <Skeleton className="h-6 w-24 ml-auto" />
+              ) : (
+                <Value
+                  value={formatNumber(Number(value.toFixed(2)))}
+                  symbol={"$"}
+                />
+              )}
+            </div>
+          )
+        },
+      }),
+
+      columnHelper.display({
+        id: "Manager",
+        header: () => <span className="text-right w-full block">Manager</span>,
+        cell: ({ row }) => {
+          return (
+            <div className="text-right w-full">
+              <Value value={row.original.strategist} className="justify-end" />
+            </div>
+          )
         },
       }),
 
       columnHelper.display({
         id: "APR",
-        header: () => <div className="text-right">APR</div>,
+        header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
           const apr = row.original.apr ? `${row.original.apr.toFixed(2)}%` : "-"
 
@@ -111,21 +147,13 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
             : "-"
 
           return (
-            <div className="w-full h-full flex justify-end group relative">
+            <div className="group relative w-full text-right">
               <TooltipProvider>
                 <Tooltip delayDuration={200}>
                   <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                    <Value value={apr} />
+                    <Value value={apr} className="justify-end" />
                   </TooltipTrigger>
                   <TooltipContent
-                    // onKeyDown={(e) => {
-                    //   e.preventDefault()
-                    //   e.stopPropagation()
-                    // }}
-                    // onKeyUp={(e) => {
-                    //   e.preventDefault()
-                    //   e.stopPropagation()
-                    // }}
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
@@ -134,7 +162,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
                   >
                     <div className="cursor-default">
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
                             Incentives rate
                           </span>
@@ -142,7 +170,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
                             {incentivesApr}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
                             Net APR
                           </span>
@@ -191,65 +219,18 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
         },
       }),
 
-      columnHelper.display({
-        id: "incentives",
-        header: () => <div className="text-right">LP Rewards</div>,
-        cell: ({ row }) => {
-          const value = row.original.totalRewards
-          return (
-            <div className="w-full h-full flex justify-end">
-              <Value value={formatNumber(value)} symbol="MGV" />
-            </div>
-          )
-        },
-      }),
-
-      columnHelper.display({
-        id: "TVL",
-        header: () => <div className="text-right">TVL</div>,
-        cell: ({ row }) => {
-          const loading = !("tvl" in row.original)
-          const tvl = "tvl" in row.original ? row.original.tvl : 0n
-          const market = row.original.market
-          const quoteDollarPrice =
-            "quoteDollarPrice" in row.original
-              ? row.original.quoteDollarPrice
-              : 1
-
-          const value =
-            Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
-            quoteDollarPrice
-          return (
-            <div className="w-full h-full flex justify-end">
-              {loading ? (
-                <Skeleton className="h-6 w-24" />
-              ) : (
-                <Value
-                  value={formatNumber(Number(value.toFixed(2)))}
-                  symbol={"$"}
-                />
-              )}
-            </div>
-          )
-        },
-      }),
-
-      columnHelper.display({
-        id: "actions",
-        header: () => "",
-        cell: ({ row }) => {
-          return (
-            <div className="w-full h-full flex justify-end space-x-1 items-center">
-              <Button
-                className="text-text-tertiary text-lg"
-                variant={"invisible"}
-              >
-                Deposit
-              </Button>
-            </div>
-          )
-        },
-      }),
+      // columnHelper.display({
+      //   id: "incentives",
+      //   header: () => <div className="text-right">LP Rewards</div>,
+      //   cell: ({ row }) => {
+      //     const value = row.original.totalRewards
+      //     return (
+      //       <div className="w-full h-full flex justify-end">
+      //         <Value value={formatNumber(value)} symbol="MGV" />
+      //       </div>
+      //     )
+      //   },
+      // }),
     ],
     [onDeposit],
   )

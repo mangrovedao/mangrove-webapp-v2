@@ -53,10 +53,11 @@ export function useTradeHistory<T = TradeHistory[]>({
           first,
           skip,
         })
-        return parseTradeHistory(result)
+        const parsedData = parseTradeHistory(result)
+        return parsedData
       } catch (e) {
         console.error(getErrorMessage(e))
-        throw new Error()
+        return []
       }
     },
     select,
@@ -65,6 +66,6 @@ export function useTradeHistory<T = TradeHistory[]>({
     },
     enabled: !!indexerSdk,
     retry: false,
-    staleTime: 1 * 20 * 1000, // 20 secondes
+    staleTime: 1 * 20 * 1000, // 20 seconds
   })
 }

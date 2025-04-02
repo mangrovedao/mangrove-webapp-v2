@@ -30,8 +30,16 @@ export function TokenPair({
           </>
         ) : (
           <>
-            <TokenIcon symbol={baseToken.symbol} className={tokenClasses} />
-            <TokenIcon symbol={quoteToken.symbol} className={tokenClasses} />
+            <TokenIcon
+              symbol={baseToken.symbol}
+              className={tokenClasses}
+              imgClasses="rounded-full"
+            />
+            <TokenIcon
+              symbol={quoteToken.symbol}
+              className={tokenClasses}
+              imgClasses="rounded-full"
+            />
           </>
         )}
       </div>

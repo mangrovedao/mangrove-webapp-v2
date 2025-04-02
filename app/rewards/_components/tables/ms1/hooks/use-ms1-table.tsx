@@ -87,7 +87,7 @@ export function useMs1Table({ pageSize, data }: Params) {
                 <ValueLeft value={shortenAddress(address)} />
                 <Text
                   variant={"text1"}
-                  className="flex justify-center font-light items-center bg-button-primary-bg p-2 h-7 w-12 rounded-full"
+                  className="flex justify-center font-light items-center p-2 h-7 w-12 rounded-sm"
                 >
                   You
                 </Text>

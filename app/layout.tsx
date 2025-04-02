@@ -1,17 +1,17 @@
-import React from "react"
+"use client"
+import React, { useEffect, useState } from "react"
 import { Toaster } from "sonner"
 
-import { Navbar } from "@/components/navbar"
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
 import DisclaimerDialog from "@/components/stateful/dialogs/disclaimer-dialog"
 import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-network-dialog"
 import { RootProvider } from "@/providers/root"
 
-import Sidebar from "@/components/sidebar/sidebar"
+import Navbar from "@/components/navbar"
 import "./globals.css"
 
 const toastClasses =
-  "!border !border-dark-green !text-sm !font-axiforma !text-white !bg-bg-secondary !font-normal"
+  "!border !border-dark-green !text-sm !font-axiforma !text-white !bg-bg-secondary !font-normal !rounded-sm"
 const titleClasses = "!font-medium"
 
 export default function RootLayout({
@@ -19,34 +19,58 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const [toastPosition, setToastPosition] = useState<
+    "top-right" | "bottom-center"
+  >("bottom-center")
+
+  useEffect(() => {
+    // Function to set position based on screen width
+    const setPositionBasedOnScreenSize = () => {
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        setToastPosition("top-right")
+      } else {
+        setToastPosition("bottom-center")
+      }
+    }
+
+    // Set initial position
+    setPositionBasedOnScreenSize()
+
+    // Add event listener for window resize
+    window.addEventListener("resize", setPositionBasedOnScreenSize)
+
+    // Clean up event listener
+    return () => {
+      window.removeEventListener("resize", setPositionBasedOnScreenSize)
+    }
+  }, [])
+
   return (
     <html lang="en">
-      <body className="">
-        <div className="md:pl-[6.5rem] px-4">
+      <body>
+        <div>
           <RootProvider>
-            <Sidebar />
             <Navbar />
-            {children}
+            <div className="px-4">{children}</div>
             <AdminCommand />
             <WrongNetworkAlertDialog />
             <DisclaimerDialog />
           </RootProvider>
           <Toaster
-            position="bottom-center"
+            position={toastPosition}
             toastOptions={{
               className: toastClasses,
               classNames: {
                 toast: toastClasses,
                 title: titleClasses,
-                error: "!fill-red-100 border-red-100",
+                error: "!fill-red-100 border-red-900",
                 success: "!fill-green-caribbean border-border-brand",
               },
               style: {
                 backgroundColor: "bg-bg-secondary",
                 fontFamily: "Axiforma",
                 fontSize: "14px",
-                borderRadius: "16px",
-                border: "3px solid border-border-tertiary",
+                border: " solid border-border-tertiary",
               },
             }}
           />

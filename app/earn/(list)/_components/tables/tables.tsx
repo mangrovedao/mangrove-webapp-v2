@@ -1,75 +1,105 @@
-import { MyVaults } from "./my-vaults/my-vaults"
-import { Vaults } from "./vaults/vaults"
+"use client"
 
-import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button-new"
+import React, { Suspense, lazy } from "react"
+
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SearchInput } from "@/components/ui/search-input-new"
-import { ChevronDown } from "@/svgs"
-import { ListFilter } from "lucide-react"
+  CustomTabs,
+  CustomTabsContent,
+  CustomTabsList,
+  CustomTabsTrigger,
+} from "@/components/custom-tabs"
+import { Text } from "@/components/typography/text"
+import { Title } from "@/components/typography/title"
+import { useAccount } from "wagmi"
+
+// Lazy load components for better initial load time
+const LazyVaults = lazy(() =>
+  import("./vaults/vaults").then((mod) => ({ default: mod.Vaults })),
+)
+const LazyMyVaults = lazy(() =>
+  import("./my-vaults/my-vaults").then((mod) => ({ default: mod.MyVaults })),
+)
+
+export enum TableTypes {
+  VAULTS = "Vaults",
+  PORTFOLIO = "My Positions",
+}
 
 export function Tables() {
+  const { isConnected } = useAccount()
+  const [showOnlyActive, setShowOnlyActive] = React.useState(false)
+  const [value, setValue] = React.useState<TableTypes>(TableTypes.VAULTS)
+
   return (
-    <div className="pt-4 space-y-4">
-      <div className="grid gap-y-4">
-        <Title variant={"title1"} className="pl-4">
-          My positions
+    <div className="space-y-5 w-full h-auto">
+      <div className="py-2">
+        <Title variant={"title3"} className="text-text-primary">
+          Browse vaults
         </Title>
-        <MyVaults />
+        <Text className="text-text-tertiary text-sm">
+          Deposit funds in vaults to earn passive income from trading fees and
+          incentives.
+        </Text>
       </div>
-      <div className="grid gap-y-4">
-        <div className="flex gap-2 w-full justify-between items-center">
-          <Title variant={"title1"} className="pl-4">
-            All Vaults
-          </Title>
-
-          <div className="flex gap-2">
-            <SearchInput
-              placeholder="Search vault"
-              className="text-text-placeholder"
-            />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="secondary"
-                  className="flex gap-2 items-center text-text-primary"
-                  size="sm"
-                >
-                  <ListFilter className="h-5 w-5" />
-                  Filter
-                  <ChevronDown className="w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              {/* <DropdownMenuContent className="w-56 mt-1">
-                <DropdownMenuLabel>Addresses:....</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => undefined}>
-                  <span>Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Chain: </DropdownMenuLabel>
-                <DropdownMenuItem asChild> test</DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => undefined}>
-                    <span>Copy address</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>test</DropdownMenuItem>
-                </DropdownMenuGroup>
-
-                <DropdownMenuItem onClick={() => undefined}>
-                  <span>Reset</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent> */}
-            </DropdownMenu>
+      <div className="w-full border border-bg-secondary rounded-sm">
+        <CustomTabs
+          value={value}
+          onValueChange={(value) => setValue(value as TableTypes)}
+          className="w-full h-full flex flex-col"
+        >
+          <div className="flex justify-between items-center">
+            <CustomTabsList className="flex p-0 justify-start space-x-0 w-full h-8">
+              {Object.values(TableTypes).map((tab) => {
+                if (!isConnected && tab === TableTypes.PORTFOLIO) return null
+                return (
+                  <CustomTabsTrigger
+                    key={tab}
+                    className="capitalize w-full rounded-none"
+                    value={tab}
+                  >
+                    {tab}
+                  </CustomTabsTrigger>
+                )
+              })}
+            </CustomTabsList>
           </div>
-        </div>
-        <Vaults />
+
+          <div className="w-full ">
+            {/* <div className="flex gap-2 items-center justify-end mr-2">
+              <Switch
+                checked={showOnlyActive}
+                onCheckedChange={() => setShowOnlyActive(!showOnlyActive)}
+              />
+              <span className="text-sm">Active Vaults</span>
+            </div> */}
+            <Suspense fallback={<TableLoadingSkeleton />}>
+              <CustomTabsContent value={TableTypes.VAULTS}>
+                <LazyVaults />
+              </CustomTabsContent>
+              {isConnected && (
+                <CustomTabsContent value={TableTypes.PORTFOLIO}>
+                  <LazyMyVaults />
+                </CustomTabsContent>
+              )}
+            </Suspense>
+          </div>
+        </CustomTabs>
       </div>
+    </div>
+  )
+}
+
+// Loading skeleton for tables
+export const TableLoadingSkeleton = () => {
+  return (
+    <div className="space-y-2 p-4">
+      <div className="w-full h-5 bg-bg-secondary animate-pulse rounded-sm"></div>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          className="w-full h-7 bg-bg-secondary animate-pulse rounded-sm"
+        ></div>
+      ))}
     </div>
   )
 }

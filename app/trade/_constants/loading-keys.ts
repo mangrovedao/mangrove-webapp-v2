@@ -1,6 +1,6 @@
 export const TRADE = {
   TABLES: {
     ORDERS: "trade.orders.table",
-    FILLS: "trade.fills.table",
+    ORDER_HISTORY: "trade.order-history.table",
   },
 }

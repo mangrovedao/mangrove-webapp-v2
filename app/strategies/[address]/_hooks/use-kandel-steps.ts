@@ -27,7 +27,7 @@ export function useKandelSteps({ liquiditySourcing, kandelAddress }: Props) {
   const addresses = useMangroveAddresses()
   const publicClient = usePublicClient()
 
-  const currentMarket = markets.find(
+  const currentMarket = markets?.find(
     (market) =>
       market.base.address.toLocaleLowerCase() ===
         baseToken?.address.toLocaleLowerCase() &&

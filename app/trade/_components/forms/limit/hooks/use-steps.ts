@@ -6,8 +6,8 @@ import { Address, Client } from "viem"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useBalances } from "@/hooks/use-balances"
 import { useMarketClient } from "@/hooks/use-market"
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
-import { usePublicClient } from "wagmi"
 
 type Props = {
   bs: BS
@@ -19,18 +19,30 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
   const marketClient = useMarketClient()
   const balances = useBalances()
   const addresses = useMangroveAddresses()
-  const publicClient = usePublicClient()
+  const networkClient = useNetworkClient()
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["limitOrderSteps", bs, user, addresses, marketClient?.name],
+    queryKey: [
+      "limitOrderSteps",
+      bs,
+      user,
+      addresses,
+      marketClient?.key,
+      networkClient?.chain?.id,
+    ],
     queryFn: async () => {
       try {
-        if (!marketClient?.name || !user || !addresses)
-          throw new Error("Limit order steps missing params")
-
+        if (!marketClient?.name || !user || !addresses) return null
+        console.log("marketClient?.key", {
+          bs,
+          user,
+          addresses,
+          marketClient: marketClient?.key,
+          networkClient: networkClient?.chain?.id,
+        })
         const userRouter = await getUserRouter(
-          publicClient as Client,
+          networkClient as Client,
           addresses,
           {
             user,

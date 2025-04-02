@@ -1,15 +1,12 @@
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
-import { arbitrum } from "viem/chains"
-import { useAccount } from "wagmi"
 import { configurationSchema } from "../schemas/rewards-configuration"
 
 export const useConfiguration = () => {
-  const { chain } = useAccount()
-
-  const chainId = chain?.id ?? arbitrum.id
+  const { defaultChain } = useDefaultChain()
 
   return useQuery({
-    queryKey: ["rewards-configuration", chainId],
+    queryKey: ["rewards-configuration", defaultChain.id],
     queryFn: async () => {
       try {
         const response = await fetch(
@@ -20,7 +17,7 @@ export const useConfiguration = () => {
         }
 
         const epochs = configurationSchema.parse(await response.json()).chains[
-          chainId
+          defaultChain.id
         ]
 
         if (!epochs) {
@@ -48,6 +45,7 @@ export const useConfiguration = () => {
         })
 
         const epochId = currentEpochEntry?.epochId ?? null
+        const endDate = new Date(1738062000 * 1000)
 
         const nextEpochEntry = epochEntries.find((entry) => {
           return entry.startTimestamp > now && entry.startTimestamp !== 0

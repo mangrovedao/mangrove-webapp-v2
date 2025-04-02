@@ -1,11 +1,14 @@
+import { EnhancedOffer } from "@/hooks/use-ghost-book"
 import { CompleteOffer } from "@mangrovedao/mgv"
 
 export type Data = {
-  asks: CompleteOffer[]
-  bids: CompleteOffer[]
+  asks: (CompleteOffer | EnhancedOffer)[]
+  bids: (CompleteOffer | EnhancedOffer)[]
 }
 
-type OffersWithCumulative = [CompleteOffer & { cumulatedVolume?: number }]
+type OffersWithCumulative = [
+  (CompleteOffer | EnhancedOffer) & { cumulatedVolume?: number },
+]
 
 export function calculateCumulatedVolume(data: Data | null | undefined) {
   const asks = [...(data?.asks ?? [])] as OffersWithCumulative

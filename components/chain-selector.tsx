@@ -1,8 +1,8 @@
-import { ChevronDown } from "lucide-react"
 import React from "react"
-import { useAccount, useSwitchChain } from "wagmi"
+import { useSwitchChain } from "wagmi"
 
 import Dialog from "@/components/dialogs/dialog"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useChains } from "@/providers/chains"
 import { cn } from "@/utils"
 import { getChainObjectById } from "@/utils/chains"
@@ -21,10 +21,11 @@ function getIconFromChainlist(name: string) {
 }
 
 export default function ChainSelector() {
-  const { chainId } = useAccount()
+  const { defaultChain } = useDefaultChain()
+
   const { switchChain } = useSwitchChain()
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
-  const chain = getChainObjectById(chainId?.toString())
+  const chain = getChainObjectById(defaultChain.id?.toString())
 
   // Close dialog if the chain id has changed
   React.useEffect(() => {
@@ -86,24 +87,25 @@ export default function ChainSelector() {
         </Dialog.Description>
       </Dialog>
       <Button
+        size="sm"
         variant="secondary"
-        className={"!space-x-4 lg:flex items-center hidden border-transparent"}
+        className="hidden md:flex items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors border-transparent"
         onClick={openDialog}
       >
         <span className="flex space-x-2">
           <ImageWithHideOnError
-            src={`/assets/chains/${chainId}.webp`}
+            src={`/assets/chains/${defaultChain.id}.webp`}
             width={16}
             height={16}
-            className="h-4 rounded-sm size-4"
-            key={chainId}
+            className="h-5 rounded-sm size-5"
+            key={defaultChain.id}
             alt={`${chain?.name}-logo`}
           />
-          <span className="text-sm whitespace-nowrap">{chain?.name}</span>
+          {/* <span className="text-sm whitespace-nowrap">{chain?.name}</span> */}
         </span>
-        <div className="pl-2">
-          <ChevronDown className="w-5" />
-        </div>
+        {/* <div className="pl-2"> */}
+        {/* <ChevronDown className="w-5" /> */}
+        {/* </div> */}
       </Button>
     </>
   )

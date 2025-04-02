@@ -15,6 +15,7 @@ export function useTokenFromAddress(address: Address) {
         return tokens.find((item) => isAddressEqual(item.address, address))
       } catch (error) {
         console.error(error)
+        return undefined
       }
     },
     enabled: !!(address && tokens),

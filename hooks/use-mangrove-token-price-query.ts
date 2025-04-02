@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { z } from "zod"
 
-import { arbitrum } from "viem/chains"
-import { useAccount } from "wagmi"
+import { useDefaultChain } from "./use-default-chain"
 
 const priceSchema = z.object({
   baseVolume: z.number().nullable(),
@@ -19,24 +18,24 @@ const useMangroveTokenPricesQuery = (
   quoteAddress?: string,
   tickSpacing?: number,
 ) => {
-  const { chainId } = useAccount()
+  const { defaultChain } = useDefaultChain()
 
-  const currentChainId = chainId ?? arbitrum.id
   return useQuery({
     queryKey: [
       "mangroveTokenPrice",
       baseAddress,
       quoteAddress,
       tickSpacing,
-      chainId,
+      defaultChain.id,
     ],
     queryFn: async () => {
       try {
         if (!baseAddress || !quoteAddress || !tickSpacing) return null
 
         const res = await fetch(
-          `https://${currentChainId}-mgv-data.mgvinfra.com/24-hour/${currentChainId}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
+          `https://indexer.mgvinfra.com/price/24-hour/${defaultChain.id}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
         )
+
         const data = await res.json()
         const parsedData = priceSchema.parse(data)
 

@@ -13,10 +13,11 @@ import {
   limitOrderResultFromLogs,
 } from "@mangrovedao/mgv"
 
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { useAccount, useWalletClient } from "wagmi"
 import { TradeMode } from "../../enums"
 import { successToast } from "../../utils"
 import { TimeInForce } from "../enums"
@@ -36,7 +37,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
     state.startLoading,
     state.stopLoading,
   ])
-  const publicClient = usePublicClient()
+  const networkClient = useNetworkClient()
   const { data: walletClient } = useWalletClient()
   const marketClient = useMarketClient()
   const { book } = useBook()
@@ -51,7 +52,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
           !marketClient ||
           !book ||
           !walletClient ||
-          !publicClient ||
+          !networkClient ||
           !addresses
         )
           throw new Error("Failed to post limit order")
@@ -111,7 +112,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
         })
 
         const hash = await walletClient.writeContract(request)
-        const receipt = await publicClient.waitForTransactionReceipt({
+        const receipt = await networkClient.waitForTransactionReceipt({
           hash,
         })
 
@@ -156,13 +157,13 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
       onResult?.(receipt)
       try {
         // Start showing loading state indicator on parts of the UI that depend on
-        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
 
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber: Number(receipt.blockNumber),
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
-        queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["order-history"] })
         queryClient.invalidateQueries({ queryKey: ["balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {
@@ -170,7 +171,7 @@ export function usePostLimitOrder({ onResult }: Props = {}) {
       }
     },
     onSettled: () => {
-      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
     },
   })
 }

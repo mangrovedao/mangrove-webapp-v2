@@ -1,28 +1,50 @@
 "use client"
 
+import { cn } from "@/utils"
+import { useQueryClient } from "@tanstack/react-query"
+import React, { ReactNode } from "react"
+import { toast } from "sonner"
+import { formatUnits, parseAbi, parseUnits } from "viem"
+import {
+  useAccount,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi"
+
 import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/utils"
-import React, { ReactNode } from "react"
-import { useAccount } from "wagmi"
-
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
-import { formatUnits } from "viem"
-import WithdrawFromVaultDialog from "./dialogs/withdraw-dialog"
 import useForm from "./use-form"
 
 const sliderValues = [25, 50, 75]
+
+const burnABI = parseAbi([
+  "function burn(uint256 shares, uint256 minAmountBaseOut, uint256 minAmountQuoteOut) external returns (uint256 amountBaseOut, uint256 amountQuoteOut)",
+])
 
 export function WithdrawForm({ className }: { className?: string }) {
   const [sliderValue, setSliderValue] = React.useState(0)
   const [baseWithdraw, setBaseWithdraw] = React.useState("0")
   const [quoteWithdraw, setQuoteWithdraw] = React.useState("0")
   const [withdrawAmount, setWithdrawAmount] = React.useState("0")
+  const { data: hash, isPending, writeContract } = useWriteContract()
+  const queryClient = useQueryClient()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    })
 
-  const [removeDialog, setRemoveDialog] = React.useState(false)
+  React.useEffect(() => {
+    if (isConfirmed) {
+      toast.success(`Assets successfully withdrawn`)
+      queryClient.refetchQueries({
+        queryKey: ["vault"],
+      })
+    }
+  }, [isConfirmed, queryClient])
 
   const {
     baseToken,
@@ -64,13 +86,13 @@ export function WithdrawForm({ className }: { className?: string }) {
 
   return (
     <form
-      className={cn("space-y-4", className)}
+      className={cn("flex flex-col h-full", className)}
       onSubmit={(e) => {
         e.preventDefault()
       }}
     >
       <div>
-        <div className="grid bg-bg-primary rounded-lg p-2 gap-1 ">
+        <div className="grid rounded-lg p-4 gap-1 flex-1 h-full bg-bg-primary min-h-[200px]">
           <Title className="mb-1" variant={"header1"}>
             {sliderValue}
             <span className="text-text-tertiary text-sm"> %</span>
@@ -90,12 +112,12 @@ export function WithdrawForm({ className }: { className?: string }) {
                 quoteToken?.displayDecimals ?? 4,
               )}
             />
-            <span className="text-text-tertiary text-xs">Burn:</span>
+            {/* <span className="text-text-tertiary text-xs">Burn:</span>
             <Line
               title={vault?.symbol}
               icon={vault?.symbol}
               value={Number(withdrawAmount).toFixed(4)}
-            />
+            /> */}
           </div>
           {/* Buttons loop */}
           <div className="flex justify-center space-x-2 mt-2">
@@ -139,31 +161,25 @@ export function WithdrawForm({ className }: { className?: string }) {
         </div>
       </div>
 
-      <Button
-        className="w-full"
-        onClick={() => {
-          if (checkAndShowDisclaimer(address)) return
-          setRemoveDialog(!removeDialog)
-        }}
-        disabled={Number(withdrawAmount) === 0}
-      >
-        Withdraw
-      </Button>
-      {removeDialog ? (
-        <WithdrawFromVaultDialog
-          infos={{
-            baseWithdraw,
-            quoteWithdraw,
-            withdrawAmount,
+      <div className="mt-auto pt-4">
+        <Button
+          loading={isPending}
+          className="w-full hover:bg-bg-tertiary bg-bg-primary"
+          onClick={() => {
+            if (checkAndShowDisclaimer(address)) return
+
+            writeContract({
+              address: vault.address,
+              abi: burnABI,
+              functionName: "burn",
+              args: [parseUnits(withdrawAmount, vault.decimals), 0n, 0n],
+            })
           }}
-          amount={withdrawAmount}
-          vault={vault}
-          onClose={() => {
-            setRemoveDialog(false)
-          }}
-          isOpen={removeDialog}
-        />
-      ) : undefined}
+          disabled={Number(withdrawAmount) === 0 || isPending}
+        >
+          Withdraw
+        </Button>
+      </div>
     </form>
   )
 }
@@ -180,11 +196,8 @@ const Line = ({
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
-        <TokenIcon symbol={icon} className="w-5 h-5" />
-        <Caption className="text-gray text-xs text-text-secondary">
-          {" "}
-          {title}
-        </Caption>
+        <TokenIcon symbol={icon} className="w-5 h-5" imgClasses="w-5 h-5" />
+        <Caption className="text-xs text-text-secondary"> {title}</Caption>
       </div>
       <Caption className="text-text-primary text-xs">{value} </Caption>
     </div>

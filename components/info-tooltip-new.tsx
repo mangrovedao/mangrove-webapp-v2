@@ -32,14 +32,19 @@ export default function InfoTooltip({
             e.stopPropagation()
           }}
           className={cn(
-            "hover:opacity-80 transition-opacity ml-1 text-cloud-300",
+            "hover:opacity-80 transition-opacity ml-1 text-cloud-300 cursor-pointer",
             className,
           )}
         >
           <CircleHelp size={iconSize ?? 16} />
         </TooltipTrigger>
         <TooltipPortal>
-          <TooltipContent side={side}>{children}</TooltipContent>
+          <TooltipContent
+            side={side}
+            className="bg-bg-secondary flex-wrap text-wrap"
+          >
+            {children}
+          </TooltipContent>
         </TooltipPortal>
       </Tooltip>
     </TooltipProvider>

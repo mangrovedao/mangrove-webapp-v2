@@ -15,18 +15,14 @@ export default withMouseHoverEffect(function ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 px-2 py-4 rounded-xl max-w-14 @[120px]:max-w-none transition ease-out duration-300 relative",
+        "flex items-center gap-2 px-2 py-2 rounded-md transition ease-out duration-300 relative",
         isActive
           ? "bg-nav-item-button-icon-fg-hover text-white hover:text-white"
           : "",
       )}
     >
-      <span className={cn("w-[39px] flex justify-center items-center")}>
-        {children}
-      </span>
-      <div className="hidden @[120px]:block opacity-0 @[120px]:!opacity-100 transition ease-out duration-300 text-base z-50">
-        {text}
-      </div>
+      <span className={cn("flex justify-center items-center")}>{children}</span>
+      <div className="text-base">{text}</div>
     </div>
   )
 })

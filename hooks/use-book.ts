@@ -48,9 +48,8 @@ export function useBook(
 
       if (params?.aggregateOffersWithSamePrice) {
         book.bids = aggregateOffers(book.bids)
-        book.asks = aggregateOffers(book.asks).reverse()
+        book.asks = aggregateOffers(book.asks)
       }
-
       return {
         book,
       }

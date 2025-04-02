@@ -1,9 +1,9 @@
 "use client"
 
 import { Ms2PointsRow } from "@/app/rewards/types"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
 import { formatUnits } from "viem"
-import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
 import * as z from "zod"
 
@@ -39,14 +39,14 @@ export function useMs2Points<T = Ms2PointsRow[]>({
   filters: { first = 10, skip = 0, epochId, page = 1 } = {},
   select,
 }: Params<T> = {}) {
-  const { address: user, chainId } = useAccount()
-  const defaultChainId = chainId ?? arbitrum.id
+  const { address: user } = useAccount()
+  const { defaultChain } = useDefaultChain()
 
   const { data, ...rest } = useQuery({
-    queryKey: ["ms2-points", user, defaultChainId, epochId, first, skip],
+    queryKey: ["ms2-points", user, defaultChain.id, epochId, first, skip],
     queryFn: async (): Promise<Ms2PointsRow[]> => {
       try {
-        const url = `https://points.mgvinfra.com/${defaultChainId}/leaderboard?epoch=${[epochId]}&page=${page}`
+        const url = `https://points.mgvinfra.com/${defaultChain.id}/leaderboard?epoch=${[epochId]}&page=${page}`
         const response = await fetch(url)
         const leaderboard = leaderboardResponseSchema
           .parse(await response.json())
@@ -105,7 +105,7 @@ export function useMs2Points<T = Ms2PointsRow[]>({
         return []
       }
     },
-    enabled: !!defaultChainId,
+    enabled: !!defaultChain.id,
   })
   return {
     data: (select

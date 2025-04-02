@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { zeroAddress } from "viem"
-import { arbitrum } from "viem/chains"
+
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useAccount } from "wagmi"
 import { rewardsSchema } from "../schemas/rewards-configuration"
 
@@ -9,16 +10,16 @@ type UseRewardsProps = {
 }
 
 export const useRewards = ({ epochId = "1" }: UseRewardsProps) => {
-  const { address, chain } = useAccount()
-  const defaultChainId = chain?.id ?? arbitrum.id
+  const { address } = useAccount()
+  const { defaultChain } = useDefaultChain()
 
   return useQuery({
-    queryKey: ["rewards", address, chain?.id, epochId],
+    queryKey: ["rewards", address, defaultChain.id, epochId],
     queryFn: async () => {
       try {
         if (!address) return null
         const response = await fetch(
-          `https://points.mgvinfra.com/${defaultChainId}/${address ?? zeroAddress}/rewards?epoch=${epochId}`,
+          `https://points.mgvinfra.com/${defaultChain.id}/${address ?? zeroAddress}/rewards?epoch=${epochId}`,
         )
 
         if (!response.ok) {

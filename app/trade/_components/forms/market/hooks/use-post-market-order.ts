@@ -1,17 +1,18 @@
-import { marketOrderResultFromLogs, MarketParams } from "@mangrovedao/mgv"
+import { MarketParams } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { TransactionReceipt } from "viem"
+import { toast } from "sonner"
+import { Address, TransactionReceipt, erc20Abi, parseUnits } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
+import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
+import { trade } from "@/hooks/ghostbook/lib/trade"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
-import { toast } from "sonner"
-import { parseUnits } from "viem"
 import { TradeMode } from "../../enums"
 import { successToast } from "../../utils"
 import type { Form } from "../types"
@@ -34,6 +35,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
   const { data: walletClient } = useWalletClient()
   const marketClient = useMarketClient()
   const addresses = useMangroveAddresses()
+  const { uniClone, mangroveChain } = useRegistry()
 
   return useMutation({
     mutationFn: async ({
@@ -52,10 +54,14 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           !addresses ||
           !market ||
           !marketClient?.uid ||
-          !address
+          !address ||
+          !uniClone?.pool ||
+          !mangroveChain?.ghostbook ||
+          !mangroveChain?.univ3Module
         )
           throw new Error("Market order post, is missing params")
 
+        const { bs, send: gives, receive: wants, slippage } = form
         const contextMarket = swapMarket ? swapMarket : market
         const contextMarketClient = swapMarketClient
           ? swapMarketClient
@@ -63,44 +69,48 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
 
         const { base, quote } = contextMarket
 
-        const { bs, send: gives, receive: wants, slippage } = form
         const receiveToken = bs === "buy" ? base : quote
         const sendToken = bs === "buy" ? quote : base
 
-        const baseAmount =
-          bs === "buy"
-            ? parseUnits(wants, base.decimals)
-            : parseUnits(gives, base.decimals)
-        const quoteAmount =
-          bs === "buy"
-            ? parseUnits(gives, quote.decimals)
-            : parseUnits(wants, quote.decimals)
-
-        const { request } =
-          await contextMarketClient.simulateMarketOrderByVolumeAndMarket({
-            baseAmount,
-            quoteAmount,
-            bs,
-            slippage,
-            gas: 20_000_000n,
-            account: address,
-          })
-
-        const hash = await walletClient.writeContract(request)
-        const receipt = await publicClient.waitForTransactionReceipt({
-          hash,
+        // Check allowance before trade
+        const allowance = await publicClient.readContract({
+          address: sendToken.address as Address,
+          abi: erc20Abi,
+          functionName: "allowance",
+          args: [address, uniClone?.pool],
         })
-        //note:  might need to remove marketOrderResultfromlogs function if simulateMarketOrder returns correct values
-        const result = marketOrderResultFromLogs(
-          { ...addresses, ...contextMarket },
-          contextMarket,
-          {
-            logs: receipt.logs,
-            taker: walletClient.account.address,
-            bs,
-          },
-        )
 
+        console.log("market order", {
+          client: walletClient,
+          ghostbook: mangroveChain.ghostbook,
+          market,
+          bs,
+          sendAmount: gives,
+          router: uniClone.router,
+          univ3Module: mangroveChain.univ3Module,
+          fee: 500,
+        })
+
+        const { got, gave, bounty, feePaid, receipt } = await trade({
+          client: walletClient,
+          ghostbook: mangroveChain.ghostbook,
+          market,
+          bs,
+          sendAmount: parseUnits(gives, sendToken.decimals),
+          router: uniClone.router,
+          univ3Module: mangroveChain.univ3Module,
+          fee: 500,
+          async onTrade({ got, gave, bounty, feePaid }) {
+            console.log("OnTrade callback:", {
+              got,
+              gave,
+              bounty,
+              feePaid,
+            })
+          },
+        })
+
+        const result = { takerGot: got, takerGave: gave, bounty, feePaid }
         successToast(
           TradeMode.MARKET,
           bs,
@@ -132,12 +142,12 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
       onResult?.(receipt)
       try {
         // Start showing loading state indicator on parts of the UI that depend on
-        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+        startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
         await resolveWhenBlockIsIndexed.mutateAsync({
           blockNumber: Number(receipt.blockNumber),
         })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
-        queryClient.invalidateQueries({ queryKey: ["fills"] })
+        queryClient.invalidateQueries({ queryKey: ["order-history"] })
         queryClient.invalidateQueries({ queryKey: ["balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {
@@ -145,7 +155,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
       }
     },
     onSettled: () => {
-      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.FILLS])
+      stopLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
     },
   })
 }

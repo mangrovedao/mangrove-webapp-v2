@@ -84,8 +84,6 @@ export default function useForm() {
     if (baseBalance?.balance && data.baseAmount > baseBalance?.balance) {
       newErrors.baseDeposit =
         "Base deposit cannot be greater than wallet balance"
-    } else if (Number(baseDeposit) > 0 && Number(baseDeposit) === 0) {
-      newErrors.baseDeposit = "Base deposit must be greater than 0"
     } else {
       delete newErrors.baseDeposit
     }
@@ -94,12 +92,6 @@ export default function useForm() {
     if (quoteBalance?.balance && data.quoteAmount > quoteBalance?.balance) {
       newErrors.quoteDeposit =
         "Quote deposit cannot be greater than wallet balance"
-    } else if (
-      quoteDeposit &&
-      Number(quoteDeposit) > 0 &&
-      Number(quoteDeposit) === 0
-    ) {
-      newErrors.quoteDeposit = "Quote deposit must be greater than 0"
     } else {
       delete newErrors.quoteDeposit
     }
@@ -122,7 +114,7 @@ export default function useForm() {
     handleQuoteDepositChange,
     isLoading,
     vault,
-    mintAmount: data.mintAmount,
+    mintParams: data,
     hasErrors: !!Object.keys(errors).length,
   }
 }

@@ -11,7 +11,7 @@ import {
 import { tradeService } from "@/app/trade/_services/trade.service"
 import { EnhancedNumericInput } from "@/components/token-input"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button-old"
+import { Button } from "@/components/ui/button"
 import wethAbi from "../../../app/faucet/_abis/weth.json"
 
 type Props = {
@@ -83,7 +83,7 @@ export default function UnWrap({ isOpen, onClose }: Props) {
       <div className="flex flex-col space-y-2">
         <EnhancedNumericInput
           token={wethBalance?.symbol}
-          label={`Amount to Unwrap`}
+          label={`Amount to unwrap`}
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           disabled={wethBalance?.formatted === "0"}
