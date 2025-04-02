@@ -45,6 +45,7 @@ export function useOrderHistory({
       allMarkets ? "" : market?.quote.address,
       address,
       pageSize,
+      defaultChain.id,
     ],
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {

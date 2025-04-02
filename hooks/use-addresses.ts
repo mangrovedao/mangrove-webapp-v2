@@ -150,7 +150,7 @@ export function useCashnesses() {
     case base.id:
       return {
         USDC: 1e6,
-        EUR: 0.5e6,
+        EURC: 0.5e6,
         WETH: 1000,
         cbBTC: 2000,
         cbETH: 500,

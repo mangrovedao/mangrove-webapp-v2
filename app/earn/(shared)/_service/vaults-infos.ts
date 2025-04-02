@@ -20,11 +20,6 @@ import {
 import { getVaultAPR } from "./vault-apr"
 import { getUserVaultIncentives } from "./vault-incentives-rewards"
 
-// Cache for token prices to avoid redundant fetches
-const tokenPriceCache = new Map<string, [number, number]>()
-
-// Helper for creating a consistent cache key for token pairs
-const getTokenPriceCacheKey = (market: any) => `${market.base}_${market.quote}`
 
 // Cache for APR data with TTL of 5 minutes
 const aprCache = new Map<
@@ -139,22 +134,14 @@ export async function getVaultsInformation(
         lastTimestamp: _lastTimestamp,
       })
 
-      // Check cache for token prices
-      const marketCacheKey = getTokenPriceCacheKey(market)
       let baseDollarPrice = 1
       let quoteDollarPrice = 1
 
-      const cachedPrices = tokenPriceCache.get(marketCacheKey)
-      if (cachedPrices) {
-        ;[baseDollarPrice, quoteDollarPrice] = cachedPrices
-      } else {
-        // Fetch token prices if not in cache
-        ;[baseDollarPrice, quoteDollarPrice] = await fetchTokenPrices(
-          client,
-          market,
-        )
-        tokenPriceCache.set(marketCacheKey, [baseDollarPrice, quoteDollarPrice])
-      }
+      // Fetch token prices if not in cache
+      ;[baseDollarPrice, quoteDollarPrice] = await fetchTokenPrices(
+        client,
+        market,
+      )
 
       // Check APR cache
       const vaultAddress = v.address as Address
