@@ -7,7 +7,6 @@ import React from "react"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMangrovePoolStatsQuery from "@/hooks/use-pool-stats"
 import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
@@ -140,16 +139,12 @@ function Item({
 export function PricesBar() {
   const { currentMarket } = useMarket()
   const { mergedBooks: book, refetch: refetchBooks } = useMergedBooks()
-  const { defaultChain } = useDefaultChain()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
-  const tickSpacing = currentMarket?.tickSpacing
   const { data: stats, isLoading: statsLoading } = useMangrovePoolStatsQuery(
     base?.address,
     quote?.address,
   )
-
-  console.log(stats)
 
   React.useEffect(() => {
     const interval = setInterval(() => {
