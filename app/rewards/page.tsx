@@ -9,23 +9,14 @@ import {
   CustomTabsList,
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
-import NeonContainer from "@/components/neon-container"
 import { NumericValue } from "@/components/numeric-value"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
-import { Button } from "@/components/ui/button"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { ToucanIllustration } from "@/svgs"
+import { MangroveLogo, ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
 import React from "react"
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select-new"
 import { Ms1Table } from "./_components/tables/ms1/ms1-table"
 import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 import Timer from "./_components/timer"
@@ -40,6 +31,7 @@ enum MSSortValues {
 
 export default function Page() {
   const { data: configuration } = useConfiguration()
+
   const [tab, setTab] = React.useState("ms2-total-rewards")
 
   const { data: rewards } = useRewards({
@@ -74,8 +66,8 @@ export default function Page() {
       </div>
 
       <div className="grid grid-cols-6 gap-10 mt-8">
-        <div className="lg:col-span-4 col-span-6">
-          <div className="rounded-2xl bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 relative">
+        <div className="col-span-full">
+          <div className="rounded-sm bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 relative">
             <div className="absolute top-0 right-0 hidden sm:block md:-translate-x-1/2 -translate-y-2/3">
               <ToucanIllustration />
             </div>
@@ -89,11 +81,11 @@ export default function Page() {
               </div>
             </div>
           </div>
-          <div className="px-8">
+          {/* <div className="px-8">
             <hr className="px-6" />
-          </div>
-          <div className="px-4 md:px-16 py-5 flex">
-            <div className="flex flex-col flex-1">
+          </div> */}
+          <div className="px-4 py-5 flex gap-4 items-center justify-between relative">
+            <div className="flex flex-col">
               <Label>Total Epoch Reward</Label>
               <Value className="flex-wrap text-wrap">
                 <NumericValue value={formatUnits(totalRewards, 8)} />
@@ -107,27 +99,39 @@ export default function Page() {
                 </Value>
               </div>
             </div>
-
-            <div className="flex flex-col flex-1 space-y-2">
-              <div className="flex justify-between">
+            <div className="absolute inset-0 w-full overflow-hidden opacity-80 flex items-center justify-center">
+              {/* Falling Mangrove Logos */}
+              <div className="falling-container relative w-full h-full">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`falling-logo falling-logo-${(i % 6) + 1} absolute`}
+                  >
+                    <MangroveLogo className="drop-shadow-[0_0_5px_rgba(0,223,129,0.6)] opacity-10" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <div className="flex flex-col flex-1 mt-2">
                 <Label>Taker Rewards</Label>
-                <Value size="normal">
+                <Value size="small">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.takerReward ?? 0), 8)}
                   />
                 </Value>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col flex-1 mt-2">
                 <Label>Maker Rewards</Label>
-                <Value size="normal">
+                <Value size="small">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.makerReward ?? 0), 8)}
                   />
                 </Value>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col flex-1 mt-2">
                 <Label>Vault Rewards</Label>
-                <Value size="normal">
+                <Value size="small">
                   <NumericValue
                     value={formatUnits(BigInt(rewards?.vaultRewards ?? 0), 8)}
                   />
@@ -157,80 +161,51 @@ export default function Page() {
 
           <CustomTabs value={tab}>
             <ScrollArea className="h-full w-full" scrollHideDelay={200}>
-              <CustomTabsList className="w-full flex justify-start border-b">
-                <div key={`more-tab`} className="capitalize !text-primary">
-                  <Select
-                    value={msSort}
-                    onValueChange={(value) => {
-                      if (value === MSSortValues.MS1) {
-                        setTab("ms1-leaderboard")
-                        setMsSort(value as MSSortValues)
-                      } else {
-                        setTab("ms2-total-rewards")
-                        setMsSort(value as MSSortValues)
-                      }
-                    }}
-                    disabled={configuration?.epochEntries?.length === 0}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue
-                        suppressHydrationWarning
-                        placeholder={"Select program"}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(MSSortValues).map((item, i) => (
-                        <SelectItem value={item} key={`select-${item}-${i}`}>
-                          <Title variant={"title1"} className="text-nowrap">
-                            {item}
-                          </Title>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {msSort === MSSortValues.MS2 ? (
-                  <>
+              <div className="flex justify-between items-center">
+                <CustomTabsList className="flex p-0 justify-start space-x-0 w-full h-8">
+                  {msSort === MSSortValues.MS2 ? (
+                    <>
+                      <CustomTabsTrigger
+                        onClick={() => setTab("ms2-total-rewards")}
+                        key={`ms2-total-rewards-tab`}
+                        value={"ms2-total-rewards"}
+                        className="capitalize w-full rounded-none"
+                      >
+                        Total rewards
+                      </CustomTabsTrigger>
+                      {configuration?.epochEntries
+                        ?.toReversed()
+                        .filter(
+                          (entry) =>
+                            entry.startTimestamp !== 0 &&
+                            entry.startTimestamp <
+                              Math.floor(Date.now() / 1000),
+                        )
+                        ?.map((entry) => (
+                          <CustomTabsTrigger
+                            onClick={() => setTab(entry.epochId.toString())}
+                            key={`${entry.epochId}-tab`}
+                            value={entry.epochId.toString()}
+                            id={`${entry.epochId}-tab`}
+                            disabled={entry.startTimestamp > Date.now() / 1000}
+                            className="capitalize w-full rounded-none"
+                          >
+                            Epoch {entry.epochId}
+                          </CustomTabsTrigger>
+                        ))}
+                    </>
+                  ) : (
                     <CustomTabsTrigger
-                      onClick={() => setTab("ms2-total-rewards")}
-                      key={`ms2-total-rewards-tab`}
-                      value={"ms2-total-rewards"}
-                      id={`ms2-total-rewards-tab`}
+                      onClick={() => setTab("ms1-leaderboard")}
+                      key={`ms1-leaderboard-tab`}
+                      value={"ms1-leaderboard"}
+                      className="capitalize"
                     >
-                      Total rewards
+                      Leaderboard
                     </CustomTabsTrigger>
-                    {configuration?.epochEntries
-                      ?.toReversed()
-                      .filter(
-                        (entry) =>
-                          entry.startTimestamp !== 0 &&
-                          entry.startTimestamp < Math.floor(Date.now() / 1000),
-                      )
-                      ?.map((entry) => (
-                        <CustomTabsTrigger
-                          onClick={() => setTab(entry.epochId.toString())}
-                          key={`${entry.epochId}-tab`}
-                          value={entry.epochId.toString()}
-                          id={`${entry.epochId}-tab`}
-                          disabled={entry.startTimestamp > Date.now() / 1000}
-                        >
-                          Epoch {entry.epochId}
-                        </CustomTabsTrigger>
-                      ))}
-                  </>
-                ) : (
-                  <CustomTabsTrigger
-                    onClick={() => setTab("ms1-leaderboard")}
-                    key={`ms1-leaderboard-tab`}
-                    value={"ms1-leaderboard"}
-                    className="capitalize"
-                    id={`ms1-leaderboard-tab`}
-                  >
-                    Leaderboard
-                  </CustomTabsTrigger>
-                )}
-              </CustomTabsList>
+                  )}
+                </CustomTabsList>
+              </div>
               <ScrollBar orientation="horizontal" className="z-50" />
             </ScrollArea>
 
@@ -275,60 +250,162 @@ export default function Page() {
             </div>
           </CustomTabs>
         </div>
-        <div className="lg:col-span-2 col-span-6 h-20">
-          <NeonContainer className="space-y-5">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>MS2 Rewards</Label>
-                <Value>
-                  <NumericValue
-                    value={formatUnits(
-                      BigInt(rewards?.claimableRewards ?? 0n),
-                      8,
-                    )}
-                  />
-                </Value>
-              </div>
-              <div className="flex justify-between">
-                <Label>Vaults LP Rewards</Label>
-                <Value>
-                  <NumericValue
-                    value={incentivesRewards?.toFixed(6) || "0.00"}
-                  />
-                </Value>
-              </div>
-            </div>
-
-            <div className="">
-              <hr className="px-6" />
-            </div>
-
-            <div className="flex justify-between">
-              <Label>Total Rewards</Label>
-              <Value>
-                <NumericValue value={incentivesRewards?.toFixed(6) || "0.00"} />
-              </Value>
-            </div>
-
-            <Button
-              variant={"primary"}
-              size={"xl"}
-              className="w-full"
-              disabled={true}
-            >
-              Claim rewards
-            </Button>
-          </NeonContainer>
-          {/* <div className="flex justify-between my-5">
-            <Label>Claimed rewards</Label>
-            <Value>-</Value>
-          </div>
-          <div className="flex justify-between mt-5">
-            <Label>Total rewards</Label>
-            <Value>-</Value>
-          </div> */}
-        </div>
       </div>
+
+      <style jsx global>{`
+        table tbody * {
+          @apply font-ubuntu !text-lg font-normal text-white;
+        }
+        table tbody tr:first-child td:first-child > div > div {
+          max-width: 24px;
+        }
+
+        /* Falling animation for Mangrove logos */
+        .falling-container {
+          perspective: 1000px;
+        }
+
+        .falling-logo {
+          will-change: transform;
+          transform-style: preserve-3d;
+        }
+
+        .falling-logo-1 {
+          animation: fall1 4.2s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
+          animation-delay: 0.2s;
+          left: 20%;
+          top: -48px;
+        }
+
+        .falling-logo-2 {
+          animation: fall2 3.8s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
+          animation-delay: 1.1s;
+          left: 35%;
+          top: -48px;
+        }
+
+        .falling-logo-3 {
+          animation: fall3 4.5s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
+          animation-delay: 0.7s;
+          left: 50%;
+          top: -48px;
+        }
+
+        .falling-logo-4 {
+          animation: fall4 3.6s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
+          animation-delay: 1.5s;
+          left: 65%;
+          top: -48px;
+        }
+
+        .falling-logo-5 {
+          animation: fall5 4.7s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
+          animation-delay: 0.3s;
+          left: 80%;
+          top: -48px;
+        }
+
+        .falling-logo-6 {
+          animation: fall6 4s cubic-bezier(0.47, 0, 0.745, 0.715) infinite;
+          animation-delay: 2.1s;
+          left: 10%;
+          top: -48px;
+        }
+
+        @keyframes fall1 {
+          0% {
+            transform: translateY(0) translateX(0) rotate(0deg) scale(0.8);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) translateX(20px) rotate(360deg)
+              scale(0.8);
+            opacity: 0;
+          }
+        }
+
+        @keyframes fall2 {
+          0% {
+            transform: translateY(0) translateX(0) rotate(0deg) scale(0.6);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) translateX(-30px) rotate(-270deg)
+              scale(0.6);
+            opacity: 0;
+          }
+        }
+
+        @keyframes fall3 {
+          0% {
+            transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) translateX(15px) rotate(180deg)
+              scale(1);
+            opacity: 0;
+          }
+        }
+
+        @keyframes fall4 {
+          0% {
+            transform: translateY(0) translateX(0) rotate(0deg) scale(0.7);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) translateX(-25px) rotate(-360deg)
+              scale(0.7);
+            opacity: 0;
+          }
+        }
+
+        @keyframes fall5 {
+          0% {
+            transform: translateY(0) translateX(0) rotate(0deg) scale(0.9);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) translateX(10px) rotate(420deg)
+              scale(0.9);
+            opacity: 0;
+          }
+        }
+
+        @keyframes fall6 {
+          0% {
+            transform: translateY(0) translateX(0) rotate(0deg) scale(0.75);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) translateX(-15px) rotate(-420deg)
+              scale(0.75);
+            opacity: 0;
+          }
+        }
+
+        .drop-shadow-glow {
+          filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+        }
+      `}</style>
     </main>
   )
 }

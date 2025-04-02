@@ -1,7 +1,7 @@
 import Big from "big.js"
 import React from "react"
 
-import { useGhostBook } from "@/hooks/use-ghost-book"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useMarket from "@/providers/market"
 import { clamp } from "@/utils/interpolation"
 import type { CompleteOffer } from "@mangrovedao/mgv"
@@ -37,7 +37,7 @@ function removeCrossedOrders(
 
 export function useDepthChart() {
   const { currentMarket: market } = useMarket()
-  const { data: book, isLoading } = useGhostBook()
+  const { mergedBooks: book, isLoading } = useMergedBooks()
 
   const [hasScrolled, setHasScrolled] = React.useState(false)
   const [isScrolling, setIsScrolling] = React.useState(false)

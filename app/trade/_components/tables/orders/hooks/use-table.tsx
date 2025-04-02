@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-table"
 import Big from "big.js"
 import React from "react"
+import { Address } from "viem"
 
 import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
@@ -17,7 +18,6 @@ import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
-import { Address } from "viem"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
 import { useCancelOrder } from "./use-cancel-order"
@@ -57,7 +57,7 @@ export function useTable({
               <TokenPair
                 titleProps={{
                   variant: "title3",
-                  className: "text-xs text-current font-normal",
+                  className: "text-xs font-normal",
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
@@ -110,13 +110,13 @@ export function useTable({
               ? baseToken?.priceDisplayDecimals || 6
               : quoteToken?.priceDisplayDecimals || 6
 
-            const amount = Big(initialWants).toNumber()
+            const wants = Big(initialWants).toNumber()
             const filled = Big(takerGot).toNumber()
             const progress = Math.min(
               Math.round(
                 Big(filled)
                   .mul(100)
-                  .div(Big(amount).eq(0) ? 1 : amount)
+                  .div(Big(wants).eq(0) ? 1 : wants)
                   .toNumber(),
               ),
               100,
@@ -133,7 +133,7 @@ export function useTable({
                 </span>
                 <span className="text-xs">
                   &nbsp;
-                  {formatNumber(amount, {
+                  {formatNumber(wants, {
                     maximumFractionDigits: displayDecimals,
                     minimumFractionDigits: displayDecimals,
                   })}{" "}
@@ -166,7 +166,7 @@ export function useTable({
           },
         }),
         columnHelper.accessor("expiryDate", {
-          header: "Time in force",
+          header: "Expiry",
           cell: ({ row }) => {
             const { expiryDate } = row.original
 
@@ -192,7 +192,7 @@ export function useTable({
             return (
               <div className="w-full h-full flex justify-end space-x-1">
                 <IconButton
-                  tooltip="Cancel offer"
+                  tooltip="Close offer"
                   className="aspect-square w-6 rounded-full"
                   isLoading={cancelOrder.isPending}
                   disabled={cancelOrder.isPending}

@@ -7,7 +7,7 @@ import { useEventListener } from "usehooks-ts"
 
 import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
-import { useGhostBook } from "@/hooks/use-ghost-book"
+import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { useMenuStore } from "@/stores/menu.store"
@@ -51,7 +51,8 @@ export function useLimit(props: Props) {
   })
 
   const { currentMarket } = useMarket()
-  const { data: book } = useGhostBook()
+
+  const { book } = useBook()
   const logics = useLogics()
 
   const bs = props.bs
@@ -168,10 +169,8 @@ export function useLimit(props: Props) {
     ),
   )
 
-  const minAsk =
-    book && isCompleteBook(book) ? minVolume(book.asksConfig, gasreq) : 0n
-  const minBid =
-    book && isCompleteBook(book) ? minVolume(book.bidsConfig, gasreq) : 0n
+  const minAsk = book?.asksConfig ? minVolume(book.asksConfig, gasreq) : 0n
+  const minBid = book?.bidsConfig ? minVolume(book.bidsConfig, gasreq) : 0n
 
   const minComputedVolume = bs === BS.buy ? minBid : minAsk
   const minVolumeFormatted = formatUnits(
@@ -339,7 +338,7 @@ export function useLimit(props: Props) {
         Number(minVolumeFormatted) > 0 &&
         sendValue < Number(minVolumeFormatted)
       ) {
-        // errors.send = `Minimum volume is ${minVolumeFormattedWithDecimals} ${sendToken?.symbol}`
+        errors.send = `Minimum volume is ${minVolumeFormattedWithDecimals} ${sendToken?.symbol}`
       }
     }
 

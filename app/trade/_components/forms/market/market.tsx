@@ -360,38 +360,6 @@ export function Market() {
               </motion.div>
             </div>
 
-            {sendToken?.symbol.includes("ETH") &&
-              ethBalance?.value &&
-              ethBalance.value > 0n && (
-                <form.Field name="isWrapping">
-                  {(field) => (
-                    <div className="flex justify-between items-center px-1 -mt-1.5">
-                      <div className="flex items-center text-muted-foreground text-xs">
-                        Use ETH balance
-                        <InfoTooltip className="text-text-quaternary text-sm">
-                          Will add a wrap ETH to wETH step during transaction
-                        </InfoTooltip>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-text-secondary">
-                        {getExactWeiAmount(
-                          formatUnits(
-                            ethBalance?.value ?? 0n,
-                            ethBalance?.decimals ?? 18,
-                          ),
-                          3,
-                        )}{" "}
-                        ETH
-                        <Switch
-                          className="data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
-                          checked={isWrapping}
-                          onClick={() => field.handleChange(!isWrapping)}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
-              )}
-
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
                 <EnhancedNumericInput
@@ -471,6 +439,43 @@ export function Market() {
                 </Button>
               </div>
             </div>
+            {sendToken?.symbol.includes("ETH") &&
+              ethBalance?.value &&
+              ethBalance.value > 0n && (
+                <form.Field name="isWrapping">
+                  {(field) => (
+                    <div className="flex justify-between items-center">
+                      <span className="flex items-center text-muted-foreground text-xs font-sans">
+                        Use ETH balance
+                      </span>
+                      <div className="flex items-center gap-1 text-xs text-text-secondary">
+                        <Switch
+                          className="data-[state=checked]:!bg-bg-secondary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
+                          checked={isWrapping}
+                          onClick={() => field.handleChange(!isWrapping)}
+                        />
+                        <InfoTooltip className="text-text-quaternary text-xs size-4 cursor-pointer">
+                          <span className="text-xs font-sans">
+                            Will add a wrap ETH to wETH step during transaction
+                            ({" "}
+                            <span>
+                              {getExactWeiAmount(
+                                formatUnits(
+                                  ethBalance?.value ?? 0n,
+                                  ethBalance?.decimals ?? 18,
+                                ),
+                                3,
+                              )}{" "}
+                              ETH
+                            </span>
+                            )
+                          </span>
+                        </InfoTooltip>
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+              )}
 
             <div className="flex justify-between">
               <span className="text-muted-foreground text-xs">

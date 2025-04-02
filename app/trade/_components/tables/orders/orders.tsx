@@ -98,9 +98,24 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
           isError={isError}
           isLoading={isLoading && !data}
           emptyArrayMessage="No orders currently active"
-          onRowClick={(order) =>
-            setOrderToEdit({ order: order as Order, mode: "view" })
-          }
+          onRowClick={(order) => {
+            console.log(
+              order,
+              markets?.find(
+                (m) =>
+                  m.base.address.toLocaleLowerCase() ===
+                  order?.baseAddress?.toLocaleLowerCase(),
+              ),
+            )
+            setMarket(
+              markets?.find(
+                (m) =>
+                  m.base.address.toLocaleLowerCase() ===
+                  order?.baseAddress?.toLocaleLowerCase(),
+              )!,
+            )
+            // setOrderToEdit({ order: order as Order, mode: "view" })
+          }}
           animated={true}
           animationVariant="slide"
         />

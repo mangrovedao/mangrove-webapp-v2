@@ -3,6 +3,7 @@ import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { motion } from "framer-motion"
 import React, { useMemo } from "react"
 
 type OrderBookProps = {
@@ -12,7 +13,8 @@ type OrderBookProps = {
 
 const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
   const { mergedBooks, refetch } = useMergedBooks()
-
+  const { currentMarket } = useMarket()
+  const { base, quote } = currentMarket ?? {}
   const { asks, bids } = mergedBooks ?? {}
 
   React.useEffect(() => {
@@ -22,9 +24,6 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
 
     return () => clearInterval(interval)
   }, [])
-
-  const { currentMarket } = useMarket()
-  const { base, quote } = currentMarket ?? {}
 
   // Calculate cumulative volumes
   const processedAsks = useMemo(() => {
@@ -81,11 +80,30 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
     >
       {/* Column Headers */}
       <div className="flex items-center px-2 py-2 text-white sticky top-0 bg-transparent z-10 border-b border-bg-secondary">
-        <span className="w-1/3 text-xs">Price</span>
-        <span className="w-1/3 text-right text-xs">Size [{quote?.symbol}]</span>
-        <span className="w-1/3 text-right text-xs">
+        <motion.span
+          className="w-1/3 text-xs"
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          Price
+        </motion.span>
+        <motion.span
+          className="w-1/3 text-right text-xs"
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          Size [{base?.symbol}]
+        </motion.span>
+        <motion.span
+          className="w-1/3 text-right text-xs"
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
           Total [{quote?.symbol}]
-        </span>
+        </motion.span>
       </div>
 
       <ScrollArea className="h-full">
@@ -150,7 +168,12 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
 
           {/* Spread indicator with spread and midprice info */}
           <div className="py-1.5 flex justify-center items-center border-y border-bg-secondary text-[#c3d4c7] text-xs sticky z-10">
-            <div className="flex gap-2">
+            <motion.div
+              className="flex gap-2"
+              initial={{ opacity: 0.8 }}
+              animate={{ opacity: 1 }}
+              whileHover={{ scale: 1.05 }}
+            >
               <span>
                 Mid:{" "}
                 {midPrice.toLocaleString(undefined, {
@@ -158,7 +181,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
                 })}
               </span>
               <span>Spread: {percentSpread.toFixed(2)}%</span>
-            </div>
+            </motion.div>
           </div>
 
           {/* Bid (Buy) Orders */}

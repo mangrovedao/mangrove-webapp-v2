@@ -1,19 +1,18 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
-import { useQuery } from "@tanstack/react-query"
 import { AnimatePresence, motion } from "framer-motion"
 import React from "react"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useBook } from "@/hooks/use-book"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import useMangrovePoolStatsQuery from "@/hooks/use-pool-stats"
 import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
 import { determineDecimals, formatNumber } from "@/utils/numbers"
-
 function Container({ children }: React.PropsWithChildren) {
   return <span className="text-xs font-medium space-y-2 block">{children}</span>
 }
@@ -138,71 +137,44 @@ function Item({
   )
 }
 
-// Price fetching hook
-export function useTokenPrice(tokenAddress: string, chainId: number) {
-  return useQuery({
-    queryKey: ["tokenPrice", tokenAddress, chainId],
-    queryFn: async () => {
-      if (!tokenAddress) return null
-
-      return null
-
-      // const response = await fetch(
-      //   `https://api.coingecko.com/api/v3/simple/token_price/${chainId}?contract_addresses=${tokenAddress}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`,
-      // )
-
-      // if (!response.ok) {
-      //   throw new Error("Failed to fetch token price")
-      // }
-
-      // const data = await response.json()
-      // return data[tokenAddress.toLowerCase()]
-    },
-    // Refetch every 60 seconds
-    refetchInterval: 60000,
-    // Keep stale data for 5 minutes
-    staleTime: 300000,
-    // Retry 3 times with exponential backoff
-    retry: 3,
-  })
-}
-
 export function PricesBar() {
   const { currentMarket } = useMarket()
+  const { mergedBooks: book, refetch: refetchBooks } = useMergedBooks()
   const { defaultChain } = useDefaultChain()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
   const tickSpacing = currentMarket?.tickSpacing
-  // const { data, isLoading: mangroveTokenPriceLoading } =
-  //   useMangroveTokenPricesQuery(
-  //     base?.address,
-  //     quote?.address,
-  //     Number(tickSpacing),
-  //   )
+  const { data: stats, isLoading: statsLoading } = useMangrovePoolStatsQuery(
+    base?.address,
+    quote?.address,
+  )
 
-  const { data: basePrice, isLoading: basePriceLoading } = useTokenPrice(
-    base?.address ?? "",
-    defaultChain.id,
-  )
-  const { data: quotePrice, isLoading: quotePriceLoading } = useTokenPrice(
-    quote?.address ?? "",
-    defaultChain.id,
-  )
+  console.log(stats)
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      refetchBooks()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [refetchBooks])
 
   const [side, setSide] = React.useState<"base" | "quote">("base")
 
   const token = side === "base" ? quote : base
 
-  const { book } = useBook({})
-  const lowestAskPrice = book?.asks[0]?.price
-  const highestBidPrice = book?.bids[0]?.price
+  // Calculate spread and midpoint
+  const lowestAsk = book?.asks[0]?.price || 0
+  const highestBid = book?.bids[0]?.price || 0
+
+  const midPrice = (lowestAsk + highestBid) / 2
 
   let spotPrice =
-    lowestAskPrice && highestBidPrice
-      ? (lowestAskPrice + (highestBidPrice ?? 0)) / 2
-      : !lowestAskPrice && !highestBidPrice
+    lowestAsk && highestBid
+      ? (lowestAsk + (highestBid ?? 0)) / 2
+      : !lowestAsk && !highestBid
         ? undefined
-        : Math.max(lowestAskPrice || 0, highestBidPrice || 0)
+        : Math.max(lowestAsk || 0, highestBid || 0)
 
   if (side === "quote") {
     spotPrice = spotPrice ? 1 / spotPrice : undefined
@@ -210,14 +182,14 @@ export function PricesBar() {
 
   // Calculate variation only if we have valid data
   const hasValidPriceData =
-    basePrice &&
-    quotePrice &&
-    !isNaN(Number(basePrice)) &&
-    !isNaN(Number(quotePrice)) &&
-    Number(basePrice) > 0
+    stats?.close &&
+    stats?.open &&
+    !isNaN(Number(stats.close)) &&
+    !isNaN(Number(stats.open)) &&
+    Number(stats.close) > 0
 
   const variation24hPercentage = hasValidPriceData
-    ? ((Number(quotePrice) - Number(basePrice)) / Number(quotePrice)) * 100
+    ? ((Number(stats.close) - Number(stats.open)) / Number(stats.close)) * 100
     : undefined
 
   const variation24hClassnames = cn({
@@ -258,7 +230,7 @@ export function PricesBar() {
             label={`24h Change`}
             value={variation24hPercentage}
             token={token}
-            skeleton={basePriceLoading || quotePriceLoading}
+            skeleton={statsLoading}
             className={variation24hClassnames}
             rightElement={
               variation24hPercentage !== undefined &&
@@ -291,34 +263,34 @@ export function PricesBar() {
           <Item
             label="24h High"
             value={
-              quotePrice && !isNaN(Number(quotePrice))
-                ? Number(quotePrice)
+              stats?.high && !isNaN(Number(stats.high))
+                ? Number(stats.high)
                 : undefined
             }
             token={token}
-            skeleton={quotePriceLoading}
+            skeleton={statsLoading}
           />
 
           <Item
             label="24h Low"
             value={
-              basePrice && !isNaN(Number(basePrice))
-                ? Number(basePrice)
+              stats?.low && !isNaN(Number(stats.low))
+                ? Number(stats.low)
                 : undefined
             }
             token={token}
-            skeleton={basePriceLoading}
+            skeleton={statsLoading}
           />
 
           <Item
             label="24h Volume"
             value={
-              quotePrice && !isNaN(Number(quotePrice))
-                ? Number(quotePrice)
+              stats?.volume && !isNaN(Number(stats.volume))
+                ? Number(stats.volume)
                 : undefined
             }
             token={token}
-            skeleton={quotePriceLoading}
+            skeleton={statsLoading}
           />
         </motion.div>
         <ScrollBar

@@ -43,7 +43,7 @@ export function useOrders<T = Order[]>({
 
   return useInfiniteQuery<OrdersPage>({
     queryKey: [
-      "orders-infinite",
+      "orders",
       allMarkets ? "all-markets" : market?.base.address,
       allMarkets ? "" : market?.quote.address,
       address,
@@ -146,14 +146,14 @@ export function useOrders<T = Order[]>({
           return {
             creationDate: safeDate(item.timestamp),
             latestUpdateDate: safeDate(item.timestamp), // Using same timestamp for latest update
-            expiryDate: item.expiryDate ? safeDate(item.expiryDate) : undefined,
+            expiryDate: item.expiry ? safeDate(item.expiry) : undefined,
             transactionHash: item.transactionHash || "",
             isBid: item.side === "buy",
-            takerGot: item.received?.toString() || "0",
+            takerGot: item.total?.toString() || "0",
             takerGave: item.sent?.toString() || "0",
             penalty: "0", // Default value as it's not in the raw data
             feePaid: item.fee?.toString() || "0",
-            initialWants: item.initialWants?.toString() || "0",
+            initialWants: item.total?.toString() || "0",
             initialGives: item.initialGives?.toString() || "0",
             price: item.price?.toString() || "0",
             offerId: item.offerId?.toString() || "0",

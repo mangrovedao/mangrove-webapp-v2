@@ -316,6 +316,7 @@ export function MobileOverlay() {
                     <Link
                       key={href}
                       href={href}
+                      onClick={() => toggle()}
                       className={cn(
                         "flex items-center w-full gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium",
                         isActive

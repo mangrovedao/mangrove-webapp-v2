@@ -17,14 +17,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { useGhostBook } from "@/hooks/use-ghost-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { BA } from "@mangrovedao/mgv/lib"
 import { Check, ChevronDown } from "lucide-react"
 import OrderBookV2 from "../orderbookv2/orderbook-v2"
 import { AnimatedOrderBookSkeleton } from "./animated-skeleton"
-import { SemiBook } from "./semibook"
 import { OrderBookTableHead } from "./table-head"
 import { Trades } from "./trade-history/trades"
 import useScrollToMiddle from "./use-scroll-to-middle"
@@ -180,8 +177,7 @@ export const BookContent = React.memo(function BookContent() {
   const { bodyRef, scrollAreaRef, spreadRef, scrollToMiddle } =
     useScrollToMiddle()
   const [priceIncrement, setPriceIncrement] = useState<number>(0)
-  const { data: book, isLoading } = useGhostBook({ priceIncrement })
-  // const { mergedBooks: book, isLoading } = useMergedBooks()
+  const { mergedBooks: book, isLoading } = useMergedBooks()
 
   const [viewOption, setViewOption] = useState<ViewOption>("default")
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -454,11 +450,11 @@ export const BookContent = React.memo(function BookContent() {
                   </TableRow>
                 </thead>
                 <TableBody>
-                  <SemiBook
+                  {/* <SemiBook
                     type={BA.asks}
                     data={filteredBook}
                     priceDecimals={displayPrecision}
-                  />
+                  /> */}
                 </TableBody>
               </Table>
 
@@ -501,11 +497,11 @@ export const BookContent = React.memo(function BookContent() {
                   </TableRow>
                 </thead>
                 <TableBody ref={bodyRef}>
-                  <SemiBook
+                  {/* <SemiBook
                     type={BA.bids}
                     data={filteredBook}
                     priceDecimals={displayPrecision}
-                  />
+                  /> */}
                 </TableBody>
               </Table>
             </div>
@@ -531,11 +527,11 @@ export const BookContent = React.memo(function BookContent() {
                 </TableRow>
               </thead>
               <TableBody>
-                <SemiBook
+                {/* <SemiBook
                   type={BA.asks}
                   data={filteredBook}
                   priceDecimals={displayPrecision}
-                />
+                /> */}
               </TableBody>
             </Table>
           )}
@@ -560,11 +556,11 @@ export const BookContent = React.memo(function BookContent() {
                 </TableRow>
               </thead>
               <TableBody>
-                <SemiBook
+                {/* <SemiBook
                   type={BA.bids}
                   data={filteredBook}
                   priceDecimals={displayPrecision}
-                />
+                /> */}
               </TableBody>
             </Table>
           )}

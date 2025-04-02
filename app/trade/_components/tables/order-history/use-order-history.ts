@@ -40,7 +40,7 @@ export function useOrderHistory({
 
   return useInfiniteQuery<OrderHistoryPage>({
     queryKey: [
-      "order-history-infinite",
+      "order-history",
       allMarkets ? "all-markets" : market?.base.address,
       allMarkets ? "" : market?.quote.address,
       address,

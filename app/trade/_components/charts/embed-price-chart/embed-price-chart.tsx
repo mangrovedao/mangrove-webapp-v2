@@ -11,7 +11,7 @@ interface PriceChartProps {
 }
 
 export default function EmbedPriceChart({ className }: PriceChartProps) {
-  const pool = usePool()
+  const { pool, isLoading } = usePool()
   const { currentMarket } = useMarket()
   const { defaultChain } = useDefaultChain()
 
@@ -43,7 +43,7 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
   }, [pool, chainName])
 
   // Show loading state while pool is being fetched
-  if (!pool) {
+  if (isLoading) {
     return (
       <div
         className={cn(
@@ -60,7 +60,7 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
   }
 
   // Show a message if no pool address is available
-  if (!embedUrl) {
+  if (!pool || !embedUrl) {
     return (
       <div
         className={cn(

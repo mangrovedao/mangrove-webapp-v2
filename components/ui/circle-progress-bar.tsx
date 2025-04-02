@@ -44,7 +44,7 @@ export const CircularProgressBar = ({
               cy={size / 2}
             />
             <circle
-              className="stroke-green-caribbean"
+              className="stroke-green-900"
               strokeWidth={strokeWidth}
               fill="transparent"
               r={radius}

@@ -1,6 +1,6 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { type Address } from "viem"
-import { arbitrum, baseSepolia, blast } from "viem/chains"
+import { arbitrum, base, baseSepolia, blast } from "viem/chains"
 
 /**
  * A program that distributes rewards to LP token holders.
@@ -66,6 +66,44 @@ export const BASE_SEPOLIA_INCENTIVE_PROGRAMS: VaultLPProgram[] = [
   },
 ]
 
+export const BASE_VAULT_INCENTIVE_PROGRAMS: VaultLPProgram[] = [
+  {
+    vault: "0xCC1beacCdA8024bA968D63e6db9f01A15D593C52", // weth-usdc
+    startTimestamp: 1743976800, // 7th april 2025
+    endTimestamp: 1746568800, // 7th may 2025
+    maxRewards: 600_000,
+    rewardRate: 0.01,
+  },
+  {
+    vault: "0x365cBDdFc764600D4728006730dd055B18f518ce", // cbbtc-USDC
+    startTimestamp: 1743976800, // 7th april 2025
+    endTimestamp: 1746568800, // 7th may 2025
+    maxRewards: 600_000,
+    rewardRate: 0.01,
+  },
+  {
+    vault: "0xC95a225fd311E911a610D8274593C19282012119", // cbbtc-EURC
+    startTimestamp: 1743976800, // 7th april 2025
+    endTimestamp: 1746568800, // 7th may 2025
+    maxRewards: 600_000,
+    rewardRate: 0.01,
+  },
+  {
+    vault: "0xa82cbD1D7826614D1E487541F40ce5A43e58999D", // cbbtc-WETH
+    startTimestamp: 1743976800, // 7th april 2025
+    endTimestamp: 1746568800, // 7th may 2025
+    maxRewards: 600_000,
+    rewardRate: 20,
+  },
+  {
+    vault: "0x8ec6a6BB89ccF694129077954587B25b6c712bc8", // wstETH-WETH
+    startTimestamp: 1743976800, // 7th april 2025
+    endTimestamp: 1746568800, // 7th may 2025
+    maxRewards: 600_000,
+    rewardRate: 20,
+  },
+]
+
 export function useVaultsIncentives() {
   const { defaultChain } = useDefaultChain()
 
@@ -76,6 +114,8 @@ export function useVaultsIncentives() {
       return ARBITRUM_INCENTIVE_PROGRAMS
     case baseSepolia.id:
       return BASE_SEPOLIA_INCENTIVE_PROGRAMS
+    case base.id:
+      return BASE_VAULT_INCENTIVE_PROGRAMS
     default:
       return ARBITRUM_INCENTIVE_PROGRAMS
   }

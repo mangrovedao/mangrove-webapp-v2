@@ -211,7 +211,7 @@ async function getPoolBook(
 }
 
 export function usePoolBook() {
-  const pool = usePool()
+  const { pool } = usePool()
   const client = useNetworkClient()
   const { defaultChain } = useDefaultChain()
   const { currentMarket: market } = useMarket()

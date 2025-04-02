@@ -91,9 +91,9 @@ export function useMs2Table({ pageSize, data }: Params) {
                 <ValueLeft value={shortenAddress(address)} />
                 <Text
                   variant={"text1"}
-                  className="flex justify-center font-light items-center bg-button-primary-bg p-2 h-7 w-12 rounded-full"
+                  className="flex justify-center font-light items-center p-2 h-7 rounded-sm bg-bg-primary"
                 >
-                  You
+                  You're position
                 </Text>
               </div>
             )
@@ -117,7 +117,6 @@ export function useMs2Table({ pageSize, data }: Params) {
           return <Value value={formatNumber(takerReward ?? 0)} />
         },
       }),
-
 
       columnHelper.display({
         header: "Vault rewards",

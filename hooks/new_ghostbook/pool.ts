@@ -74,19 +74,27 @@ export function usePools() {
       market?.quote.address,
     ],
     queryFn: async (): Promise<Pool[]> => {
-      if (!market) return []
-      return getPools(
-        market.base.address,
-        market.quote.address,
-        defaultChain?.id,
-      )
+      try {
+        if (!market) throw new Error("usePools: market not found")
+        return getPools(
+          market.base.address,
+          market.quote.address,
+          defaultChain?.id,
+        )
+      } catch (error) {
+        console.error(error)
+        return []
+      }
     },
   })
 }
 
 export function usePool() {
-  const pools = usePools()
-  return pools.data?.sort((a, b) =>
-    Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
-  )[0]
+  const { data: pools, isLoading } = usePools()
+  return {
+    pool: pools?.sort((a, b) =>
+      Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
+    )[0],
+    isLoading,
+  }
 }
