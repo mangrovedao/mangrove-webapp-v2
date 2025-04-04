@@ -29,12 +29,10 @@ const useMangrovePoolStatsQuery = (
           `https://pools.mgvinfra.com/stats/?token0=${baseAddress}&token1=${quoteAddress}&chainId=${defaultChain.id}`,
         )
         const data = await res.json()
-        console.log(data)
 
         const parsedData = priceSchema.parse(data)
         return parsedData
       } catch (error) {
-        console.error(error)
         return null
       }
     },

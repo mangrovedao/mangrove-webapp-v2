@@ -1,10 +1,9 @@
+import useMarket from "@/providers/market"
 import { CompleteOffer, MarketParams, tickFromVolumes } from "@mangrovedao/mgv"
-import { BA, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
+import { getBook } from "@mangrovedao/mgv/actions"
+import { BA, multiplyDensity, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import { PublicClient } from "viem"
-
-import useMarket from "@/providers/market"
-import { getBook } from "@mangrovedao/mgv/actions"
 import { useMangroveAddresses } from "../use-addresses"
 import { useDefaultChain } from "../use-default-chain"
 import { useNetworkClient } from "../use-network-client"
@@ -191,7 +190,7 @@ async function getPoolBook(
       gives,
       tick,
       ba: BA.bids,
-      baseDecimals: 18,
+      baseDecimals: market.base.decimals,
       quoteDecimals: market.quote.decimals,
     })
     bids.push({
@@ -230,6 +229,7 @@ export function usePoolBook() {
     ],
     queryFn: async () => {
       if (!client || !pool || !market || !mangroveBook) return null
+
       const quoteBalance =
         BigInt(market.base.address) < BigInt(market.quote.address)
           ? BigInt(pool.token1Balance)
@@ -238,15 +238,22 @@ export function usePoolBook() {
         BigInt(market.base.address) < BigInt(market.quote.address)
           ? BigInt(pool.token0Balance)
           : BigInt(pool.token1Balance)
-      const quoteAmount = BigInt(mangroveBook.bidsConfig.density) * 100000000n
-      const baseAmount = BigInt(mangroveBook.asksConfig.density) * 100000000n
+
+      const quoteAmount = multiplyDensity(
+        mangroveBook.bidsConfig.density,
+        100000000n,
+      )
+      const baseAmount = multiplyDensity(
+        mangroveBook.asksConfig.density,
+        100000000n,
+      )
 
       const nOffers = 10
 
       // Calculate the maximum amount that can be used for quotes and base
       // Divide balance by 11 to ensure we have enough for multiple offers
-      const maxQuoteAmount = quoteBalance / BigInt(nOffers + 1)
-      const maxBaseAmount = baseBalance / BigInt(nOffers + 1)
+      const maxQuoteAmount = quoteBalance / BigInt(nOffers * 2)
+      const maxBaseAmount = baseBalance / BigInt(nOffers * 2)
 
       // Use the minimum between the calculated amount and available balance
       const quoteAmountToUse =
