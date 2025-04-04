@@ -252,8 +252,8 @@ export function usePoolBook() {
 
       // Calculate the maximum amount that can be used for quotes and base
       // Divide balance by 11 to ensure we have enough for multiple offers
-      const maxQuoteAmount = quoteBalance / BigInt(nOffers + 1)
-      const maxBaseAmount = baseBalance / BigInt(nOffers + 1)
+      const maxQuoteAmount = quoteBalance / BigInt(nOffers * 2)
+      const maxBaseAmount = baseBalance / BigInt(nOffers * 2)
 
       // Use the minimum between the calculated amount and available balance
       const quoteAmountToUse =
