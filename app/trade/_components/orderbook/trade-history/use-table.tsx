@@ -32,20 +32,20 @@ export function useTable({ data }: Params) {
       columnHelper.display({
         header: "Type/Size",
         cell: ({ row }) => {
-          const { takerGot, takerGave, isBid } = row.original
+          const { type, baseAmount, quoteAmount } = row.original
           if (!market) return null
           const { base } = market
-          const baseValue = isBid ? takerGot : takerGave
+          const baseValue = type === "buy" ? baseAmount : quoteAmount
 
           return (
             <div className="flex flex-col gap-0">
               <span
                 className={cn("font-sans text-xs leading-tight", {
-                  "text-green-caribbean": isBid,
-                  "text-red-100": !isBid,
+                  "text-green-caribbean": type === "buy",
+                  "text-red-100": type === "sell",
                 })}
               >
-                {isBid ? "BUY" : "SELL"}
+                {type === "buy" ? "BUY" : "SELL"}
               </span>
               <span className="text-xs opacity-80 font-sans">
                 {formatNumber(Big(baseValue).toNumber(), {
@@ -83,17 +83,17 @@ export function useTable({ data }: Params) {
           ),
       }),
 
-      columnHelper.accessor("creationDate", {
+      columnHelper.accessor("timestamp", {
         header: "Time",
         cell: ({ row }) => {
-          const date = row.original.creationDate
+          const date = row.original.timestamp
           return (
             <div className="flex flex-col gap-0">
               <span className="font-sans text-xs leading-tight">
-                {formatDate(date, "HH:mm:ss")}
+                {formatDate(new Date(date * 1000), "HH:mm:ss")}
               </span>
               <span className="text-xs opacity-70 font-sans leading-tight">
-                {formatRelativeTime(date)}
+                {formatRelativeTime(new Date(date * 1000))}
               </span>
             </div>
           )
