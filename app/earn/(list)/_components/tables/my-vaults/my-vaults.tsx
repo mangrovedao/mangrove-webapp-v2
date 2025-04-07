@@ -6,7 +6,6 @@ import { Vault } from "@/app/earn/(shared)/types"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
-import { TableLoadingSkeleton } from "../tables"
 import { useMyVaults } from "./hooks/use-my-vaults"
 import { useTable } from "./hooks/use-table"
 
@@ -43,14 +42,13 @@ export function MyVaults() {
     onManage: (vault: Vault) => {
       push(`/earn/${vault.address}`)
     },
+    isLoading,
   })
 
   // temporary fix
   React.useEffect(() => {
     refetch?.()
   }, [chainId, refetch])
-
-  if (isLoading) return <TableLoadingSkeleton />
 
   return (
     <div className="relative overflow-hidden">

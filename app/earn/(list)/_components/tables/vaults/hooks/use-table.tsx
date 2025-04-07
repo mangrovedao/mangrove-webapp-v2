@@ -32,15 +32,22 @@ import { Market } from "../components/market"
 import { Value } from "../components/value"
 
 const columnHelper = createColumnHelper<Vault>()
-const DEFAULT_DATA: Vault[] = []
 
 type Params = {
   data?: Vault[]
   pageSize: number
   onDeposit: (vault: Vault) => void
+  isLoading: boolean
+  defaultData: Vault[]
 }
 
-export function useTable({ pageSize, data, onDeposit }: Params) {
+export function useTable({
+  pageSize,
+  data,
+  onDeposit,
+  isLoading,
+  defaultData,
+}: Params) {
   const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
   const { fdv, setFdv } = useMgvFdv()
@@ -98,22 +105,24 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
         id: "TVL",
         header: () => <span className="text-right w-full block">TVL</span>,
         cell: ({ row }) => {
+          if (isLoading) {
+            return (
+              <div className="text-right w-full">
+                <Skeleton className="h-6 w-24 ml-auto" />
+              </div>
+            )
+          }
           const { tvl, market, quoteDollarPrice } = row.original
-          const loading = !("tvl" in row.original)
           const value =
             Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
             quoteDollarPrice
 
           return (
             <div className="text-right w-full">
-              {loading ? (
-                <Skeleton className="h-6 w-24 ml-auto" />
-              ) : (
-                <Value
-                  value={formatNumber(Number(value.toFixed(2)))}
-                  symbol={"$"}
-                />
-              )}
+              <Value
+                value={formatNumber(Number(value.toFixed(2)))}
+                symbol={"$"}
+              />
             </div>
           )
         },
@@ -135,6 +144,14 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
         id: "APR",
         header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
+          if (isLoading) {
+            return (
+              <div className="text-right w-full">
+                <Skeleton className="h-6 w-24 ml-auto" />
+              </div>
+            )
+          }
+
           const apr = row.original.apr ? `${row.original.apr.toFixed(2)}%` : "-"
 
           const incentivesApr = row.original.incentivesApr
@@ -231,7 +248,7 @@ export function useTable({ pageSize, data, onDeposit }: Params) {
   )
 
   return useReactTable({
-    data: data ?? DEFAULT_DATA,
+    data: data ?? defaultData,
     columns,
     initialState: {
       pagination: {
