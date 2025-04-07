@@ -29,6 +29,7 @@ type Params = {
 }
 
 export function useTable({ pageSize, data, onManage, isLoading }: Params) {
+
   const { defaultChain } = useDefaultChain()
 
   const columns = React.useMemo(
@@ -140,6 +141,7 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
         id: "My APY",
         header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
+
           if (isLoading) {
             return (
               <div className="text-right w-full">
