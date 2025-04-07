@@ -76,7 +76,7 @@ export function useLeaderboardTable({ pageSize, data }: Params) {
             }),
 
             columnHelper.display({
-                header: "Maker rewards",
+                header: "Rewards",
                 cell: ({ row }) => {
                     const { rewards } = row.original
                     return <Value value={formatNumber(rewards ?? 0)} />

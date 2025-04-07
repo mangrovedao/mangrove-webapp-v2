@@ -5,17 +5,19 @@ import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
 import { useFeesRewards } from "@/app/rewards/hooks/use-fees-rewards"
 import { useLeaderboardTable } from "./hooks/use-leaderboard-table"
+import { useIncentivesRewards } from "@/app/rewards/hooks/use-incentives-rewards"
 export function LeaderboardTable() {
   const { address: user, chainId, isConnected } = useAccount()
 
 
-  const { data, isLoading, error } = useFeesRewards()
+  const { data: feesData, isLoading: isFeesLoading, error: feesError } = useFeesRewards()
+  //const { data: incentivesData, isLoading: isIncentivesLoading, error: incentivesError } = useIncentivesRewards()
 
   const emptyMessage = !isConnected
     ? "Connect your wallet to see your points"
     : "No rewards data yet."
 
-  const table = useLeaderboardTable({ pageSize: 0, data: data ?? [] })
+  const table = useLeaderboardTable({ pageSize: 0, data: feesData ?? [] })
   return (
     <>
       {/* <aside>
@@ -30,8 +32,8 @@ export function LeaderboardTable() {
       <DataTable
         table={table}
         emptyArrayMessage={emptyMessage}
-        isError={!!error}
-        isLoading={!data || isLoading}
+        isError={!!feesError}
+        isLoading={isFeesLoading}
         isRowHighlighted={(row) =>
           row.user.toLowerCase() === user?.toLowerCase()
         }

@@ -22,6 +22,7 @@ import Timer from "./_components/timer"
 import { useIncentivesRewards } from "./hooks/use-incentives-rewards"
 import { useRewards } from "./hooks/use-rewards"
 import { useConfiguration } from "./hooks/use-rewards-config"
+import { LeaderboardTable } from "./_components/tables/leaderboard/leaderboard-table"
 
 export default function Page() {
   const { data: configuration } = useConfiguration()
@@ -160,6 +161,14 @@ export default function Page() {
                         </CustomTabsTrigger>
                       </>
                     )}
+                  <CustomTabsTrigger
+                    onClick={() => setTab("leaderboard")}
+                    key={`leaderboard-tab`}
+                    value={"leaderboard"}
+                    className="capitalize w-full rounded-none"
+                  >
+                    Leaderboard v2
+                  </CustomTabsTrigger>
                 </CustomTabsList>
               </div>
               <ScrollBar orientation="horizontal" className="z-50" />
@@ -191,6 +200,13 @@ export default function Page() {
                   </div>
                   <ScrollBar orientation="vertical" className="z-50" />
                   <ScrollBar orientation="horizontal" className="z-50" />
+                </ScrollArea>
+              </CustomTabsContent>
+              <CustomTabsContent value={"leaderboard"}>
+                <ScrollArea className="h-full" scrollHideDelay={200}>
+                  <div className="px-2 h-full">
+                    <LeaderboardTable />
+                  </div>
                 </ScrollArea>
               </CustomTabsContent>
             </div>
