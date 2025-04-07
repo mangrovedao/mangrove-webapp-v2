@@ -322,7 +322,7 @@ export function useLimit(props: Props) {
     if (form.state.values.send) {
       const sendValue = Number(form.state.values.send)
       if (sendValue <= 0) {
-        // errors.send = "Pay amount required"
+        errors.send = "Pay amount required"
       } else if (
         !isWrapping &&
         sendValue - 0.0000001 >
@@ -343,9 +343,9 @@ export function useLimit(props: Props) {
     }
 
     // Check for receive field errors
-    // if (form.state.values.receive && Number(form.state.values.receive) <= 0) {
-    //   errors.receive = "Amount must be greater than 0"
-    // }
+    if (form.state.values.receive && Number(form.state.values.receive) <= 0) {
+      errors.receive = "Amount must be greater than 0"
+    }
 
     // Check for limit price errors
     if (

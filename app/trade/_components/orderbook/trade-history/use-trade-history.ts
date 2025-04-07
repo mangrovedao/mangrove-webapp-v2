@@ -89,8 +89,7 @@ export function useTradeHistory<T = TradeHistory[]>({
     meta: {
       error: "Unable to retrieve trade history",
     },
-    retry: false,
-    staleTime: 1 * 20 * 1000, // 20 seconds
+    refetchInterval: 10 * 1000, // 10 seconds
   })
 }
 

@@ -133,19 +133,19 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
     },
     onSuccess: async (data) => {
       if (!data) return
-      const { receipt } = data
+      // const { receipt } = data
       /*
        * We use a custom callback to handle the success message once it's ready.
        * This is because the onSuccess callback from the mutation will only be triggered
        * after all the preceding logic has been executed.
        */
-      onResult?.(receipt)
+      // onResult?.(receipt)
       try {
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
-        await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber: Number(receipt.blockNumber),
-        })
+        // await resolveWhenBlockIsIndexed.mutateAsync({
+        //   blockNumber: Number(receipt.blockNumber),
+        // })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["order-history"] })
         queryClient.invalidateQueries({ queryKey: ["balances"] })

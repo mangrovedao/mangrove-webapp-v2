@@ -206,10 +206,7 @@ export function useOrders<T = Order[]>({
     meta: {
       error: "Unable to retrieve open orders",
     },
-    enabled: allMarkets
-      ? !!isConnected && !!openMarkets
-      : !!isConnected && !!market,
-    retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!market,
+    refetchInterval: 5 * 1000, // 10 seconds
   })
 }

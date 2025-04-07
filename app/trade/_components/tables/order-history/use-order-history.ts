@@ -175,10 +175,7 @@ export function useOrderHistory({
     meta: {
       error: "Unable to retrieve order history",
     },
-    enabled: allMarkets
-      ? !!isConnected && !!openMarkets
-      : !!isConnected && !!market,
-    retry: false,
-    staleTime: 1 * 60 * 1000, // 1 minute
+    enabled: !!market,
+    refetchInterval: 5 * 1000, // 5 seconds
   })
 }
