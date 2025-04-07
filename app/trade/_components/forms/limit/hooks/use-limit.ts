@@ -343,9 +343,9 @@ export function useLimit(props: Props) {
     }
 
     // Check for receive field errors
-    // if (form.state.values.receive && Number(form.state.values.receive) <= 0) {
-    //   errors.receive = "Amount must be greater than 0"
-    // }
+    if (form.state.values.receive && Number(form.state.values.receive) <= 0) {
+      errors.receive = "Amount must be greater than 0"
+    }
 
     // Check for limit price errors
     if (
