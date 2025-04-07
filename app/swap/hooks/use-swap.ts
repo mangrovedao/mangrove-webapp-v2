@@ -1,5 +1,4 @@
 import {
-  CompleteOffer,
   marketOrderSimulation,
   publicMarketActions,
   type Token,
@@ -26,6 +25,7 @@ import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/u
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
+import { useBook } from "@/hooks/use-book"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
@@ -56,24 +56,14 @@ const priceSchema = z.object({
   name: z.optional(z.string()),
 })
 
-// Convert EnhancedOffer to a format compatible with CompleteOffer for simulation
-function convertToSimulationOffers(offers: any[]): CompleteOffer[] {
-  return offers.map((offer) => ({
-    id: offer.id,
-    price: offer.price,
-    volume: offer.volume,
-    offer: { prev: 0n, next: 0n, tick: 0n, gives: 0n },
-    detail: { gasreq: 0n, gasprice: 0n },
-  })) as CompleteOffer[]
-}
-
 export function useSwap() {
   const { isConnected, address, chainId } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
   })
 
-  const { mergedBooks: uniBook } = useMergedBooks()
+  const { mergedBooks: book } = useMergedBooks()
+  const { book: oldBook } = useBook()
 
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
@@ -244,26 +234,17 @@ export function useSwap() {
 
       // Mangrove
       if (marketClient) {
-        const book = uniBook
         if (!(book && address)) return null
-
-        // Check if book is a complete Book object with required properties
-        if (
-          !(
-            "asksConfig" in book &&
-            "bidsConfig" in book &&
-            "marketConfig" in book
-          )
-        ) {
-          console.warn("Incomplete book object for market order simulation")
-          return null
-        }
 
         // Convert EnhancedOffer arrays to the format expected by marketOrderSimulation
         const simulationBook = {
           ...book,
-          asks: convertToSimulationOffers(book.asks),
-          bids: convertToSimulationOffers(book.bids),
+          asksConfig: oldBook?.asksConfig,
+          bidsConfig: oldBook?.bidsConfig,
+          marketConfig: oldBook?.marketConfig,
+          midPrice: oldBook?.midPrice,
+          spread: oldBook?.spread,
+          spreadPercent: oldBook?.spreadPercent,
         }
 
         const isBasePay = currentMarket?.base.address === payToken?.address
@@ -330,7 +311,7 @@ export function useSwap() {
       !!receiveToken &&
       !!fields.payValue &&
       Number(fields.payValue) > 0 &&
-      (!marketClient || (!!uniBook && !!address)),
+      (!marketClient || (!!book && !!address)),
   })
 
   React.useEffect(() => {
