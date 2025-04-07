@@ -2,7 +2,6 @@ import { useAccount } from "wagmi"
 import { feesResponseSchema, incentiveResponseSchema } from "../schemas/rewards-configuration"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
-import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
 import { useTokens } from "@/hooks/use-addresses"
 
 export const useFeesRewards = () => {
@@ -36,8 +35,17 @@ export const useFeesRewards = () => {
               feesResponseSchema.parse(await fees.json()),
             ),
           )
-  
-          return feesData.reduce((acc, curr) => acc + curr.rewards, 0)
+          const leaderByUser = {}
+          feesData.forEach((fees) => {
+            fees.leaderboard.forEach((leader) => {
+              if(leaderByUser[leader.user]){
+                leaderByUser[leader.user] += leader.rewards
+              }else{
+                leaderByUser[leader.user] = leader.rewards
+              }
+            })
+          })
+          return Object.entries(leaderByUser).sort((a, b) => b[1] - a[1])
         } catch (error) {
           console.error(error)
           return null
