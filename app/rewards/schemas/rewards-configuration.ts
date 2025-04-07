@@ -17,8 +17,13 @@ export const incentiveResponseSchema = z.object({
   timestamp: z.number(),
 })
 export const feesResponseSchema = z.object({
-  token: z.string(),
-  rewards: z.number(),
+  leaderboard: z.array(
+    z.object({
+      position: z.number(),
+      user: z.string(),
+      rewards: z.number(),
+    }),
+  ),
 })
 
 export const vaultIncentivesSchema = z.object({

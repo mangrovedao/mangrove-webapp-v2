@@ -35,17 +35,20 @@ export const useFeesRewards = () => {
               feesResponseSchema.parse(await fees.json()),
             ),
           )
-          const leaderByUser = {}
+          const leaderByUser: Record<string, number> = {}
           feesData.forEach((fees) => {
             fees.leaderboard.forEach((leader) => {
               if(leaderByUser[leader.user]){
-                leaderByUser[leader.user] += leader.rewards
+                leaderByUser[leader.user]! += leader.rewards
               }else{
                 leaderByUser[leader.user] = leader.rewards
               }
             })
           })
-          return Object.entries(leaderByUser).sort((a, b) => b[1] - a[1])
+          return Object.entries(leaderByUser).map(([user, rewards]) => ({
+            user,
+            rewards: Number(rewards),
+          })).sort((a, b) => b.rewards - a.rewards)
         } catch (error) {
           console.error(error)
           return null
