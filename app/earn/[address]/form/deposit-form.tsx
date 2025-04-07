@@ -175,13 +175,6 @@ export function DepositForm({ className }: { className?: string }) {
       10_000n
     : 0n
 
-  console.log({
-    baseToken: baseToken?.symbol,
-    quoteToken: quoteToken?.symbol,
-    baseAmount,
-    quoteAmount,
-  })
-
   const baseAllowance = allowanceData?.[0] || 0n
   const quoteAllowance = allowanceData?.[1] || 0n
 
@@ -348,8 +341,6 @@ export function DepositForm({ className }: { className?: string }) {
         <Skeleton className="w-full h-full" />
       </div>
     )
-
-  console.log(isPending, isProcessing)
 
   return (
     <form

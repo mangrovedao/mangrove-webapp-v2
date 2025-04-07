@@ -81,8 +81,6 @@ export default function Page() {
       vault.quoteDollarPrice
     : 0
 
-  console.log("vault", quoteDepositDollar, baseDepositDollar)
-
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])
