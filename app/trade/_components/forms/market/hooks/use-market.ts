@@ -14,26 +14,16 @@ import { formatUnits, parseUnits } from "viem"
 import useMarket from "@/providers/market"
 
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
+import { useBook } from "@/hooks/use-book"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { Book } from "@mangrovedao/mgv"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { Book, CompleteOffer } from "@mangrovedao/mgv"
+import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
-
-// Helper function to check if book is a complete Book object
-const isCompleteBook = (book: any): book is Book => {
-  return (
-    book &&
-    "asksConfig" in book &&
-    "bidsConfig" in book &&
-    "marketConfig" in book &&
-    "midPrice" in book
-  )
-}
 
 type Props = {
   onSubmit: (data: Form) => void
@@ -43,16 +33,11 @@ type Props = {
 const determinePrices = (
   bs: BS,
   quoteToken?: Token,
-  orderBook?: Book | null,
+  orderBook?: { bids: CompleteOffer[]; asks: CompleteOffer[] },
   marketPrice?: number,
 ) => {
   // Check if orderBook is valid and has bids/asks
-  if (
-    !orderBook ||
-    !orderBook.bids ||
-    !orderBook.asks ||
-    !isCompleteBook(orderBook)
-  ) {
+  if (!orderBook || !orderBook.bids || !orderBook.asks) {
     return {
       price: marketPrice,
       decimals: determinePriceDecimalsFromToken(marketPrice, quoteToken),
@@ -76,7 +61,6 @@ const determinePrices = (
 export function useMarketForm(props: Props) {
   const { address } = useAccount()
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
-  const queryClient = useQueryClient()
 
   const form = useForm({
     validator: zodValidator,
@@ -108,17 +92,15 @@ export function useMarketForm(props: Props) {
   } = useTradeInfos("market", bs)
 
   const { mergedBooks: book } = useMergedBooks()
+  const { book: oldBook } = useBook()
 
   const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
     useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
 
-  // Use a safe version of the book for determinePrices
-  const safeBook = book && isCompleteBook(book) ? book : null
-
   const averagePrice = determinePrices(
     bs,
     quoteToken,
-    safeBook,
+    book,
     Number(marketPrice?.close),
   )
 
@@ -130,11 +112,16 @@ export function useMarketForm(props: Props) {
     queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
     queryFn: () => {
       if (!book) return null
-
-      // Check if book is a complete Book object
-      if (!isCompleteBook(book)) {
-        return null
+      const orderbook = {
+        ...book,
+        asksConfig: oldBook?.asksConfig,
+        bidsConfig: oldBook?.bidsConfig,
+        marketConfig: oldBook?.marketConfig,
+        midPrice: oldBook?.midPrice,
+        spread: oldBook?.spread,
+        spreadPercent: oldBook?.spreadPercent,
       }
+
       const baseAmount =
         bs == BS.buy
           ? parseUnits(receive, market?.base.decimals ?? 18)
@@ -153,28 +140,29 @@ export function useMarketForm(props: Props) {
             ? {
                 base: baseAmount,
                 bs: BS.sell,
-                book: book as Book,
+                book: orderbook as Book,
               }
             : {
                 quote: quoteAmount,
                 bs: BS.buy,
-                book: book as Book,
+                book: orderbook as Book,
               }
           : isBasePay
             ? {
                 quote: quoteAmount,
                 bs: BS.buy,
-                book: book as Book,
+                book: orderbook as Book,
               }
             : {
                 base: baseAmount,
                 bs: BS.sell,
-                book: book as Book,
+                book: orderbook as Book,
               }
 
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
 
+      console.log("baseEstimation", baseEstimation, quoteEstimation)
       const formattedBaseEstimation = getExactWeiAmount(
         formatUnits(baseEstimation, market?.base.decimals ?? 18),
         market?.base.displayDecimals,

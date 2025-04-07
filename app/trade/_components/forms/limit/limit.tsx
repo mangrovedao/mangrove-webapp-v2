@@ -50,6 +50,7 @@ export function Limit() {
   const initializedFromSharedState = useRef(false)
 
   const { currentMarket } = useMarket()
+
   const {
     computeReceiveAmount,
     computeSendAmount,
@@ -64,6 +65,7 @@ export function Limit() {
     sendBalanceWithEth,
     ethBalance,
     getAllErrors,
+    book,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
     bs: tradeSide,
@@ -193,6 +195,12 @@ export function Limit() {
   React.useEffect(() => {
     handleSliderChange(sendSliderValue)
   }, [sendSliderValue])
+
+  React.useEffect(() => {
+    if (!form.state.values.limitPrice) {
+      form.setFieldValue("limitPrice", book?.midPrice.toString() ?? "")
+    }
+  }, [form.state.values.limitPrice])
 
   // Get button text based on transaction state
   const getButtonText = () => {

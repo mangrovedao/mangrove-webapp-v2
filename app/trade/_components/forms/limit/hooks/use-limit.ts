@@ -367,6 +367,7 @@ export function useLimit(props: Props) {
 
   return {
     form,
+    book,
     timeInForce,
     sendFrom,
     send,
