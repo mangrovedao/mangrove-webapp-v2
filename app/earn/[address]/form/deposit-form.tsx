@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
-import { currentDecimals } from "@/utils/market"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import {
@@ -175,6 +175,13 @@ export function DepositForm({ className }: { className?: string }) {
       10_000n
     : 0n
 
+  console.log({
+    baseToken: baseToken?.symbol,
+    quoteToken: quoteToken?.symbol,
+    baseAmount,
+    quoteAmount,
+  })
+
   const baseAllowance = allowanceData?.[0] || 0n
   const quoteAllowance = allowanceData?.[1] || 0n
 
@@ -309,7 +316,6 @@ export function DepositForm({ className }: { className?: string }) {
       } else {
         // All tokens approved, perform deposit
 
-        console.log({ baseAmount, quoteAmount }, mintParams)
         const tx = await writeContractAsync({
           address: mintHelperAddress as Address,
           abi: mintABI,
@@ -343,6 +349,8 @@ export function DepositForm({ className }: { className?: string }) {
       </div>
     )
 
+  console.log(isPending, isProcessing)
+
   return (
     <form
       className={cn("flex flex-col h-full", className)}
@@ -366,7 +374,7 @@ export function DepositForm({ className }: { className?: string }) {
           }
           label={`Deposit ${baseSliderValue}%`}
           inputClassName="bg-bg-primary"
-          value={Number(baseDeposit).toFixed(currentDecimals(baseToken))}
+          value={getExactWeiAmount(baseDeposit, baseToken.priceDisplayDecimals)}
           onChange={handleBaseInputChange}
           error={errors.baseDeposit}
           showBalance
@@ -388,7 +396,10 @@ export function DepositForm({ className }: { className?: string }) {
             ) || "..."
           }
           label={`Deposit ${quoteSliderValue}%`}
-          value={Number(quoteDeposit).toFixed(currentDecimals(quoteToken))}
+          value={getExactWeiAmount(
+            quoteDeposit,
+            quoteToken.priceDisplayDecimals,
+          )}
           inputClassName="bg-bg-primary"
           onChange={handleQuoteInputChange}
           error={errors.quoteDeposit}
@@ -410,7 +421,7 @@ export function DepositForm({ className }: { className?: string }) {
               isPending ||
               isProcessing
             }
-            loading={isPending || isConfirming || isProcessing}
+            loading={isPending || isProcessing}
           >
             {getButtonLabel()}
           </Button>

@@ -9,16 +9,15 @@ import {
 } from "@tanstack/react-table"
 import Link from "next/link"
 import React from "react"
+import { formatUnits } from "viem"
 
 import { Vault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
-
+import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { formatNumber } from "@/utils/numbers"
-import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
-
 const columnHelper = createColumnHelper<Vault>()
 const DEFAULT_DATA: Vault[] = []
 
@@ -26,9 +25,11 @@ type Params = {
   data?: Vault[]
   pageSize: number
   onManage: (vault: Vault) => void
+  isLoading: boolean
 }
 
-export function useTable({ pageSize, data, onManage }: Params) {
+export function useTable({ pageSize, data, onManage, isLoading }: Params) {
+
   const { defaultChain } = useDefaultChain()
 
   const columns = React.useMemo(
@@ -90,6 +91,14 @@ export function useTable({ pageSize, data, onManage }: Params) {
           <span className="text-right w-full block">Deposited</span>
         ),
         cell: ({ row }) => {
+          if (isLoading) {
+            return (
+              <div className="text-right w-full">
+                <Skeleton className="h-6 w-24 ml-auto" />
+              </div>
+            )
+          }
+
           const {
             userBaseBalance,
             userQuoteBalance,
@@ -132,6 +141,15 @@ export function useTable({ pageSize, data, onManage }: Params) {
         id: "My APY",
         header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
+
+          if (isLoading) {
+            return (
+              <div className="text-right w-full">
+                <Skeleton className="h-6 w-24 ml-auto" />
+              </div>
+            )
+          }
+
           const { apr } = row.original
           return (
             <div className="text-right w-full">

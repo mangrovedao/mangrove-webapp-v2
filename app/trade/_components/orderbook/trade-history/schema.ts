@@ -1,34 +1,45 @@
 import { z } from "zod"
 
+// Original schema for historical reasons
 const tradeHistorySchema = z.object({
-  creationDate: z.date(),
+  type: z.string(),
+  price: z.number(),
+  baseAmount: z.number(),
+  quoteAmount: z.number(),
+  timestamp: z.number(),
+  fee: z.number(),
   transactionHash: z.string(),
-  isBid: z.boolean(),
-  takerGot: z.string(),
-  takerGave: z.string(),
-  penalty: z.string(),
-  feePaid: z.string(),
-  initialWants: z.string(),
-  initialGives: z.string(),
-  price: z.string(),
-  status: z.string(),
-  isMarketOrder: z.boolean(),
+  block: z.number(),
 })
 
 export type TradeHistory = z.infer<typeof tradeHistorySchema>
 
-const noZeroTakerAndMakerFilter = (trade: TradeHistory) => Number(trade.takerGot) !== 0 && Number(trade.takerGave) !== 0
+// Function to parse trade history from the API
+export function parseTradeHistory(data: any): TradeHistory[] {
+  // Assuming data structure has a 'trades' array
+  if (!data || !Array.isArray(data.trades)) {
+    return []
+  }
 
-export function parseTradeHistory(data: unknown[]): TradeHistory[] {
-  return (data
-    .map((item) => {
-      try {
-        return tradeHistorySchema.parse(item)
-      } catch (error) {
-        console.error("Invalid format for trade history: ", item, error)
-        return null
+  return data.trades.map((trade: any) => {
+    try {
+      // Convert Unix timestamp to Date
+      const creationDate = new Date(trade.timestamp * 1000)
+
+      // Map API trade structure to TradeHistory
+      return {
+        creationDate,
+        type: trade.type,
+        price: trade.price,
+        baseAmount: trade.baseAmount,
+        quoteAmount: trade.quoteAmount,
+        timestamp: trade.timestamp,
+        fee: trade.fee,
+        transactionHash: trade.transactionHash,
       }
-    })
-    .filter(Boolean) as TradeHistory[])
-    .filter(noZeroTakerAndMakerFilter)
+    } catch (error) {
+      console.error("Error parsing trade:", error, trade)
+      return undefined
+    }
+  })
 }

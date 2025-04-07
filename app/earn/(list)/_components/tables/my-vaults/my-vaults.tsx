@@ -43,6 +43,7 @@ export function MyVaults() {
     onManage: (vault: Vault) => {
       push(`/earn/${vault.address}`)
     },
+    isLoading,
   })
 
   // temporary fix
@@ -50,7 +51,6 @@ export function MyVaults() {
     refetch?.()
   }, [chainId, refetch])
 
-  if (isLoading) return <TableLoadingSkeleton />
 
   return (
     <div className="relative overflow-hidden">

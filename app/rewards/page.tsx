@@ -32,6 +32,7 @@ enum MSSortValues {
 export default function Page() {
   const { data: configuration } = useConfiguration()
 
+  console.log({ configuration })
   const [tab, setTab] = React.useState("ms2-total-rewards")
 
   const { data: rewards } = useRewards({
@@ -40,10 +41,10 @@ export default function Page() {
         ? tab
         : configuration?.epochId?.toString() || "1",
   })
+  console.log({ rewards })
 
   const { data: incentivesRewards } = useIncentivesRewards()
-
-  const [msSort, setMsSort] = React.useState(MSSortValues.MS2)
+  console.log({ incentivesRewards })
 
   const totalRewards =
     BigInt(rewards?.takerReward ?? 0) +
@@ -163,7 +164,8 @@ export default function Page() {
             <ScrollArea className="h-full w-full" scrollHideDelay={200}>
               <div className="flex justify-between items-center">
                 <CustomTabsList className="flex p-0 justify-start space-x-0 w-full h-8">
-                  {msSort === MSSortValues.MS2 ? (
+                  {configuration?.epochEntries?.length &&
+                  configuration?.epochEntries?.length > 1 ? (
                     <>
                       <CustomTabsTrigger
                         onClick={() => setTab("ms2-total-rewards")}
