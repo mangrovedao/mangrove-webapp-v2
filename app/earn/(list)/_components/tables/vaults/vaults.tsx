@@ -9,6 +9,7 @@ import type { Strategy } from "../../../_schemas/kandels"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault } from "@/app/earn/(shared)/types"
+import { TableLoadingSkeleton } from "../tables"
 import { useTable } from "./hooks/use-table"
 import { useVaults } from "./hooks/use-vaults"
 
@@ -20,6 +21,7 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
   const { push } = useRouter()
   const { chainId } = useAccount()
   const containerRef = React.useRef<HTMLDivElement>(null)
+
   const plainVaults = useVaultsWhitelist()
 
   const defaultData = plainVaults.map(
@@ -49,6 +51,7 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
         userQuoteBalance: 0n,
       }) as Vault,
   )
+
 
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
@@ -89,6 +92,8 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
     isLoading,
     defaultData,
   })
+
+  if (isLoading) return <TableLoadingSkeleton />
 
   return (
     <div ref={containerRef} className="overflow-hidden">

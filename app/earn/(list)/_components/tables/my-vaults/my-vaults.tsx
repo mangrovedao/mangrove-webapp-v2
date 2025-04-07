@@ -6,6 +6,7 @@ import { Vault } from "@/app/earn/(shared)/types"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
+import { TableLoadingSkeleton } from "../tables"
 import { useMyVaults } from "./hooks/use-my-vaults"
 import { useTable } from "./hooks/use-table"
 
@@ -49,6 +50,7 @@ export function MyVaults() {
   React.useEffect(() => {
     refetch?.()
   }, [chainId, refetch])
+
 
   return (
     <div className="relative overflow-hidden">
