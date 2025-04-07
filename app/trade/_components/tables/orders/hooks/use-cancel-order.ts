@@ -8,14 +8,16 @@ import { useMarketClient } from "@/hooks/use-market"
 import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
+import { MarketParams } from "@mangrovedao/mgv"
 import type { Order } from "../schema"
 
 type Props = {
   offerId?: string
+  market?: MarketParams
   onCancel?: () => void
 }
 
-export function useCancelOrder({ offerId, onCancel }: Props = {}) {
+export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
   const queryClient = useQueryClient()
   const { address } = useAccount()
   const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
@@ -24,7 +26,7 @@ export function useCancelOrder({ offerId, onCancel }: Props = {}) {
     state.stopLoading,
   ])
   const { data: walletClient } = useWalletClient()
-  const marketClient = useMarketClient()
+  const marketClient = useMarketClient({ market })
   const publicClient = usePublicClient()
 
   return useMutation({

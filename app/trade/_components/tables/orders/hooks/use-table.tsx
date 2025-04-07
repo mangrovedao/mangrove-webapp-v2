@@ -18,6 +18,7 @@ import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
+import { MarketParams } from "@mangrovedao/mgv"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
 import { useCancelOrder } from "./use-cancel-order"
@@ -181,12 +182,20 @@ export function useTable({
           id: "actions",
           header: () => <div className="text-right">Action</div>,
           cell: ({ row }) => {
-            const { expiryDate } = row.original
-            const isExpired = expiryDate
-              ? new Date(expiryDate) < new Date()
-              : true
+            const { expiryDate, baseAddress, quoteAddress } = row.original
+
+            const { data: baseToken } = useTokenFromId(baseAddress as Address)
+            const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
+
+            const market = {
+              base: baseToken,
+              quote: quoteToken,
+              tickSpacing: 1n,
+            }
+
             const cancelOrder = useCancelOrder({
               offerId: row.original.offerId,
+              market: market as MarketParams,
             })
 
             return (
