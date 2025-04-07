@@ -322,7 +322,7 @@ export function useLimit(props: Props) {
     if (form.state.values.send) {
       const sendValue = Number(form.state.values.send)
       if (sendValue <= 0) {
-        // errors.send = "Pay amount required"
+        errors.send = "Pay amount required"
       } else if (
         !isWrapping &&
         sendValue - 0.0000001 >

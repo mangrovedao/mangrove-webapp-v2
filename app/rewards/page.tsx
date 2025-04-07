@@ -17,17 +17,11 @@ import { MangroveLogo, ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
 import React from "react"
 
-import { Ms1Table } from "./_components/tables/ms1/ms1-table"
 import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 import Timer from "./_components/timer"
 import { useIncentivesRewards } from "./hooks/use-incentives-rewards"
 import { useRewards } from "./hooks/use-rewards"
 import { useConfiguration } from "./hooks/use-rewards-config"
-
-enum MSSortValues {
-  MS2 = "MGV Incentives Program",
-  MS1 = "MS1",
-}
 
 export default function Page() {
   const { data: configuration } = useConfiguration()
@@ -141,82 +135,48 @@ export default function Page() {
             </div>
           </div>
 
-          {/* <div className="rounded-2xl bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 justify-between ">
-            <div className="flex items-center gap-2">
-              <ImageWithHideOnError
-                src={`/assets/illustrations/mangrove-logo.png`}
-                width={34}
-                height={36}
-                key={`mangrove-logo`}
-                alt={`mangrove-logo`}
-              />
-              <Title variant={"title1"}>Vault LP rewards</Title>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <Value size="normal">
-                <NumericValue value={incentivesRewards?.toFixed(6) || "0.00"} />
-              </Value>
-            </div>
-          </div> */}
-
           <CustomTabs value={tab}>
             <ScrollArea className="h-full w-full" scrollHideDelay={200}>
               <div className="flex justify-between items-center">
                 <CustomTabsList className="flex p-0 justify-start space-x-0 w-full h-8">
+                  <CustomTabsTrigger
+                    onClick={() => setTab("ms1-leaderboard")}
+                    key={`ms1-leaderboard-tab`}
+                    value={"ms1-leaderboard"}
+                    className="capitalize w-full rounded-none"
+                  >
+                    Leaderboard
+                  </CustomTabsTrigger>
                   {configuration?.epochEntries?.length &&
-                  configuration?.epochEntries?.length > 1 ? (
-                    <>
-                      <CustomTabsTrigger
-                        onClick={() => setTab("ms2-total-rewards")}
-                        key={`ms2-total-rewards-tab`}
-                        value={"ms2-total-rewards"}
-                        className="capitalize w-full rounded-none"
-                      >
-                        Total rewards
-                      </CustomTabsTrigger>
-                      {configuration?.epochEntries
-                        ?.toReversed()
-                        .filter(
-                          (entry) =>
-                            entry.startTimestamp !== 0 &&
-                            entry.startTimestamp <
-                              Math.floor(Date.now() / 1000),
-                        )
-                        ?.map((entry) => (
-                          <CustomTabsTrigger
-                            onClick={() => setTab(entry.epochId.toString())}
-                            key={`${entry.epochId}-tab`}
-                            value={entry.epochId.toString()}
-                            id={`${entry.epochId}-tab`}
-                            disabled={entry.startTimestamp > Date.now() / 1000}
-                            className="capitalize w-full rounded-none p-1 sm:p-0"
-                          >
-                            Epoch {entry.epochId}
-                          </CustomTabsTrigger>
-                        ))}
-                    </>
-                  ) : (
-                    <CustomTabsTrigger
-                      onClick={() => setTab("ms1-leaderboard")}
-                      key={`ms1-leaderboard-tab`}
-                      value={"ms1-leaderboard"}
-                      className="capitalize"
-                    >
-                      Leaderboard
-                    </CustomTabsTrigger>
-                  )}
+                    configuration?.epochEntries?.length > 1 && (
+                      <>
+                        <CustomTabsTrigger
+                          onClick={() => setTab("ms2-total-rewards")}
+                          key={`ms2-total-rewards-tab`}
+                          value={"ms2-total-rewards"}
+                          className="capitalize w-5/12 rounded-none"
+                        >
+                          MS2 Total rewards
+                        </CustomTabsTrigger>
+                      </>
+                    )}
                 </CustomTabsList>
               </div>
               <ScrollBar orientation="horizontal" className="z-50" />
             </ScrollArea>
 
             <div className="w-full pb-4 px-1 mt-3">
-              {/* ms1 leaderboard */}
-              <CustomTabsContent value={"ms1-leaderboard"}>
+              {/* leaderboard */}
+              <CustomTabsContent value={"ms2-total-rewards"}>
                 <ScrollArea className="h-full" scrollHideDelay={200}>
                   <div className="px-2 h-full">
-                    <Ms1Table />
+                    {/* TODO: ADD TABLE HERE:
+                        rank
+                        address
+                        volume rewards
+                        vault rewards
+                        total rewards
+                      */}
                   </div>
                   <ScrollBar orientation="vertical" className="z-50" />
                   <ScrollBar orientation="horizontal" className="z-50" />
@@ -233,22 +193,6 @@ export default function Page() {
                   <ScrollBar orientation="horizontal" className="z-50" />
                 </ScrollArea>
               </CustomTabsContent>
-
-              {configuration?.epochEntries?.map((entry) => (
-                <CustomTabsContent
-                  key={`${entry.epochId}-content`}
-                  value={entry.epochId.toString()}
-                  // style={{ height: "var(--history-table-content-height)" }}
-                >
-                  <ScrollArea className="h-full" scrollHideDelay={200}>
-                    <div className="px-2 h-full">
-                      <Ms2Table epochId={entry.epochId} />
-                    </div>
-                    <ScrollBar orientation="vertical" className="z-50" />
-                    <ScrollBar orientation="horizontal" className="z-50" />
-                  </ScrollArea>
-                </CustomTabsContent>
-              ))}
             </div>
           </CustomTabs>
         </div>

@@ -5,13 +5,12 @@ import React, { useEffect, useRef } from "react"
 import { Address, formatUnits, parseUnits } from "viem"
 import { useAccount } from "wagmi"
 
+import InfoTooltip from "@/components/info-tooltip-new"
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-
-import InfoTooltip from "@/components/info-tooltip-new"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -252,7 +251,12 @@ export function Limit() {
                     inputClassName="text-text-primary text-base h-7"
                     balanceAction={{
                       onClick: () => {
-                        field.handleChange(sendBalanceWithEth.toString())
+                        field.handleChange(
+                          getExactWeiAmount(
+                            sendBalanceWithEth.toString(),
+                            sendToken?.priceDisplayDecimals || 18,
+                          ),
+                        )
                         computeReceiveAmount()
                       },
                     }}
