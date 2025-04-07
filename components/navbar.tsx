@@ -51,8 +51,8 @@ const MENUS = [
   {
     href: "/rewards",
     icon: RewardsIcon,
-    text: "Rewards",
-    disabled: false,
+    text: "Rewards (soon)",
+    disabled: true,
   },
   // {
   //   href: "",
