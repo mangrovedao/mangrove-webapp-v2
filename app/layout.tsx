@@ -52,11 +52,11 @@ export default function RootLayout({
     <html lang="en">
       <Head>
         {/* Cloudflare Web Analytics */}
-        {env.CLOUDFLARE_BEACON_TOKEN && (
+        {env.NEXT_PUBLIC_CLOUDFLARE_BEACON_TOKEN && (
           <Script
             defer
             src="https://static.cloudflareinsights.com/beacon.min.js"
-            data-cf-beacon={`{"token": "${env.CLOUDFLARE_BEACON_TOKEN}"}`}
+            data-cf-beacon={`{"token": "${env.NEXT_PUBLIC_CLOUDFLARE_BEACON_TOKEN}"}`}
             strategy="afterInteractive"
           />
         )}
