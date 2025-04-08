@@ -434,7 +434,7 @@ export default function Navbar() {
                         <Link
                           href="https://docs.mangrove.exchange/"
                           target="_blank"
-                          className="text-xs text-text-tertiary"
+                          className="text-xs text-text-secondary"
                         >
                           User documentation
                         </Link>
@@ -443,7 +443,7 @@ export default function Navbar() {
                         <Link
                           href="https://docs.mangrove.exchange/dev"
                           target="_blank"
-                          className="text-xs text-text-tertiary"
+                          className="text-xs text-text-secondary"
                         >
                           Developer documentation
                         </Link>
@@ -454,7 +454,7 @@ export default function Navbar() {
                           Socials
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <div className="flex  gap-2">
+                        <div className="flex justify-center gap-2">
                           <DropdownMenuItem className="hover:bg-bg-tertiary">
                             <Link
                               href="https://x.com/MangroveDAO"
@@ -466,6 +466,7 @@ export default function Navbar() {
                                 viewBox="0 0 20 20"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
+                                className="text-text-secondary"
                               >
                                 <path
                                   d="M11.7368 8.62558L16.5763 3H15.4295L11.2273 7.88461L7.87105 3H4L9.07533 10.3864L4 16.2857H5.14688L9.58449 11.1274L13.1289 16.2857H17L11.7365 8.62558H11.7368ZM10.166 10.4515L9.65172 9.71595L5.56012 3.86336H7.32166L10.6236 8.58659L11.1379 9.32211L15.43 15.4616H13.6685L10.166 10.4518V10.4515Z"
@@ -484,8 +485,8 @@ export default function Navbar() {
                                 width="16"
                                 height="16"
                                 fill="currentColor"
-                                className="bi bi-discord"
                                 viewBox="0 0 16 16"
+                                className="text-text-secondary"
                               >
                                 <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612" />
                               </svg>
@@ -496,7 +497,11 @@ export default function Navbar() {
                               href="https://t.me/MangroveDAO"
                               target="_blank"
                             >
-                              <TelegramIcon width="20" height="20" />
+                              <TelegramIcon
+                                width="20"
+                                height="20"
+                                className="text-text-secondary"
+                              />
                             </Link>
                           </DropdownMenuItem>
                         </div>
@@ -504,13 +509,6 @@ export default function Navbar() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <Link
-                  href="https://forms.gle/Ukr9BLJYSgN7Rp388"
-                  target="_blank"
-                  className="text-white text-right font-bold text-[0.6rem] hover:text-text-tertiary"
-                >
-                  any feedback ?
-                </Link>
               </div>
 
               {/* Desktop Navigation */}
@@ -550,6 +548,13 @@ export default function Navbar() {
             {/* Right Side - Network, Account & Mobile Menu */}
             <div className="flex items-center gap-3">
               {/* Network Selector */}
+              <Link
+                href="https://forms.gle/Ukr9BLJYSgN7Rp388"
+                target="_blank"
+                className="text-text-secondary text-right font-bold text-[0.6rem] hover:text-text-tertiary"
+              >
+                any feedback ?
+              </Link>
               <div className="hidden lg:block">
                 <ChainSelector />
               </div>
