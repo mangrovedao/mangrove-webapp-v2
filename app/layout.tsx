@@ -1,10 +1,12 @@
 "use client"
+import Script from "next/script"
 import React, { useEffect, useState } from "react"
 import { Toaster } from "sonner"
 
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
 import DisclaimerDialog from "@/components/stateful/dialogs/disclaimer-dialog"
 import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-network-dialog"
+import { env } from "@/env.mjs"
 import { RootProvider } from "@/providers/root"
 
 import Navbar from "@/components/navbar"
@@ -47,13 +49,6 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        <script
-          defer
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          data-cf-beacon='{"token": "5030326a6f294181aae9b106464d4373"}'
-        ></script>
-      </head>
       <body>
         <div>
           <RootProvider>
@@ -81,6 +76,15 @@ export default function RootLayout({
               },
             }}
           />
+          {/* Cloudflare Web Analytics */}
+          {env.CLOUDFLARE_BEACON_TOKEN && (
+            <Script
+              defer
+              src="https://static.cloudflareinsights.com/beacon.min.js"
+              data-cf-beacon={`{"token": "${env.CLOUDFLARE_BEACON_TOKEN}"}`}
+              strategy="afterInteractive"
+            />
+          )}
         </div>
       </body>
     </html>

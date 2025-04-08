@@ -8,6 +8,7 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    CLOUDFLARE_BEACON_TOKEN: z.string().optional(),
   },
 
   /**
@@ -37,6 +38,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    CLOUDFLARE_BEACON_TOKEN: process.env.CLOUDFLARE_BEACON_TOKEN,
     NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID:
       process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     NEXT_PUBLIC_WHITELISTED_CHAIN_IDS:
