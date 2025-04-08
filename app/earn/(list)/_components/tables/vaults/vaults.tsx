@@ -9,7 +9,6 @@ import type { Strategy } from "../../../_schemas/kandels"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault } from "@/app/earn/(shared)/types"
-import { TableLoadingSkeleton } from "../tables"
 import { useTable } from "./hooks/use-table"
 import { useVaults } from "./hooks/use-vaults"
 
@@ -52,7 +51,6 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
       }) as Vault,
   )
 
-
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 15, // Increase page size for virtualization
@@ -92,8 +90,6 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
     isLoading,
     defaultData,
   })
-
-  if (isLoading) return <TableLoadingSkeleton />
 
   return (
     <div ref={containerRef} className="overflow-hidden">
