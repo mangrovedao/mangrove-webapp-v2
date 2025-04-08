@@ -1,4 +1,5 @@
 "use client"
+import Head from "next/head"
 import Script from "next/script"
 import React, { useEffect, useState } from "react"
 import { Toaster } from "sonner"
@@ -49,6 +50,17 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <Head>
+        {/* Cloudflare Web Analytics */}
+        {env.CLOUDFLARE_BEACON_TOKEN && (
+          <Script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={`{"token": "${env.CLOUDFLARE_BEACON_TOKEN}"}`}
+            strategy="afterInteractive"
+          />
+        )}
+      </Head>
       <body>
         <div>
           <RootProvider>
@@ -76,15 +88,6 @@ export default function RootLayout({
               },
             }}
           />
-          {/* Cloudflare Web Analytics */}
-          {env.CLOUDFLARE_BEACON_TOKEN && (
-            <Script
-              defer
-              src="https://static.cloudflareinsights.com/beacon.min.js"
-              data-cf-beacon={`{"token": "${env.CLOUDFLARE_BEACON_TOKEN}"}`}
-              strategy="afterInteractive"
-            />
-          )}
         </div>
       </body>
     </html>
