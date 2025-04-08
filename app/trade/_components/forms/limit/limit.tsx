@@ -200,7 +200,7 @@ export function Limit() {
     if (!form.state.values.limitPrice) {
       form.setFieldValue("limitPrice", book?.midPrice.toString() ?? "")
     }
-  }, [form.state.values.limitPrice])
+  }, [])
 
   // Get button text based on transaction state
   const getButtonText = () => {
