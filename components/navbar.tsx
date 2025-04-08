@@ -247,7 +247,7 @@ export function MobileOverlay() {
                 <Link
                   href="https://forms.gle/Ukr9BLJYSgN7Rp388"
                   target="_blank"
-                  className="text-white font-bold text-xl underline"
+                  className="text-white font-bold text-xl"
                 >
                   any feedback ?
                 </Link>
@@ -507,7 +507,7 @@ export default function Navbar() {
                 <Link
                   href="https://forms.gle/Ukr9BLJYSgN7Rp388"
                   target="_blank"
-                  className="text-white text-right font-bold text-[0.6rem] underline hover:text-text-tertiary"
+                  className="text-white text-right font-bold text-[0.6rem] hover:text-text-tertiary"
                 >
                   any feedback ?
                 </Link>
