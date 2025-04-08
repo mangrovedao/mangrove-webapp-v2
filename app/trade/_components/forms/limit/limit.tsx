@@ -143,11 +143,13 @@ export function Limit() {
       // Set the field value without calling validateAllFields
       form.setFieldValue(
         "send",
-        Number(amountFormatted).toFixed(sendToken?.priceDisplayDecimals ?? 18),
+        getExactWeiAmount(
+          amountFormatted,
+          sendToken?.priceDisplayDecimals ?? 18,
+        ),
       )
 
-      // We don't need to update the shared state here anymore
-      // as it's handled by the useEffect
+      form.validateAllFields("change")
 
       // Check if limitPrice exists before computing receive amount
       if (!form.state?.values?.limitPrice) {
@@ -201,7 +203,6 @@ export function Limit() {
       form.setFieldValue("limitPrice", book?.midPrice.toString() ?? "")
     }
   }, [])
-
 
   // Get button text based on transaction state
   const getButtonText = () => {
