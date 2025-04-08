@@ -1,5 +1,4 @@
 "use client"
-import Script from "next/script"
 import React, { useEffect, useState } from "react"
 import { Toaster } from "sonner"
 
@@ -48,6 +47,13 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "5030326a6f294181aae9b106464d4373"}'
+        ></script>
+      </head>
       <body>
         <div>
           <RootProvider>
@@ -74,11 +80,6 @@ export default function RootLayout({
                 border: " solid border-border-tertiary",
               },
             }}
-          />
-          <Script
-            defer
-            src="https://static.cloudflareinsights.com/beacon.min.js"
-            data-cf-beacon='{"token": "5030326a6f294181aae9b106464d4373"}'
           />
         </div>
       </body>
