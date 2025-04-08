@@ -245,9 +245,9 @@ export function MobileOverlay() {
                   <span className="text-white font-bold text-xl">Mangrove</span>
                 </Link>
                 <Link
-                  href="https://docs.mangrove.exchange/"
+                  href="https://forms.gle/Ukr9BLJYSgN7Rp388"
                   target="_blank"
-                  className="text-white font-bold text-xl underline"
+                  className="text-white font-bold text-xl"
                 >
                   any feedback ?
                 </Link>
@@ -505,9 +505,9 @@ export default function Navbar() {
                   </DropdownMenu>
                 </div>
                 <Link
-                  href="https://docs.mangrove.exchange/"
+                  href="https://forms.gle/Ukr9BLJYSgN7Rp388"
                   target="_blank"
-                  className="text-white text-right font-bold text-[0.6rem] underline hover:text-text-tertiary"
+                  className="text-white text-right font-bold text-[0.6rem] hover:text-text-tertiary"
                 >
                   any feedback ?
                 </Link>
