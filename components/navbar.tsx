@@ -244,13 +244,7 @@ export function MobileOverlay() {
                   </svg>
                   <span className="text-white font-bold text-xl">Mangrove</span>
                 </Link>
-                <Link
-                  href="https://forms.gle/Ukr9BLJYSgN7Rp388"
-                  target="_blank"
-                  className="text-white font-bold text-xl"
-                >
-                  any feedback ?
-                </Link>
+
                 <DialogTrigger asChild>
                   <button className="text-nav-item-button-icon-fg p-2 rounded-lg hover:text-white hover:bg-bg-tertiary transition-colors focus:outline-none">
                     <svg
