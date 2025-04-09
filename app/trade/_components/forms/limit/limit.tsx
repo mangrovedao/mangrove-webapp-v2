@@ -149,8 +149,6 @@ export function Limit() {
         ),
       )
 
-      form.validateAllFields("change")
-
       // Check if limitPrice exists before computing receive amount
       if (!form.state?.values?.limitPrice) {
         form.setFieldValue("receive", "")
@@ -200,7 +198,13 @@ export function Limit() {
 
   React.useEffect(() => {
     if (!form.state.values.limitPrice) {
-      form.setFieldValue("limitPrice", book?.midPrice.toString() ?? "")
+      form.setFieldValue(
+        "limitPrice",
+        getExactWeiAmount(
+          book?.midPrice.toString() ?? "",
+          sendToken?.displayDecimals ?? 18,
+        ),
+      )
     }
   }, [])
 

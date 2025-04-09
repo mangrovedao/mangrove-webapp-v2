@@ -1,6 +1,5 @@
 "use client"
 
-import useIndexerSdk from "@/providers/mangrove-indexer"
 import { useQuery } from "@tanstack/react-query"
 import { parseStrategy } from "../_schemas/kandel"
 
@@ -9,17 +8,14 @@ type Params = {
 }
 
 export function useStrategy({ strategyAddress }: Params) {
-  const { indexerSdk } = useIndexerSdk()
   return useQuery({
     queryKey: ["strategy", strategyAddress],
     queryFn: async () => {
       try {
-        if (!(indexerSdk && strategyAddress)) {
+        if (!strategyAddress) {
           throw new Error("Unable to fetch strategy")
         }
-        const result = await indexerSdk.getKandel({
-          address: strategyAddress,
-        })
+        const result = {}
 
         return parseStrategy(result)
       } catch (error) {
@@ -30,7 +26,7 @@ export function useStrategy({ strategyAddress }: Params) {
     meta: {
       error: "Unable to fetch strategy",
     },
-    enabled: !!(indexerSdk && strategyAddress),
+    enabled: !!strategyAddress,
     retry: false,
   })
 }

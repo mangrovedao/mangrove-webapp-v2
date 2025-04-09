@@ -4,7 +4,6 @@ import { toast } from "sonner"
 import type { Address } from "viem"
 import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
-import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 import { useLoadingStore } from "@/stores/loading.store"
 import useStrategyStatus from "../../(shared)/_hooks/use-strategy-status"
@@ -36,7 +35,6 @@ export function useCloseStrategy({ strategyAddress }: Props) {
     offers: strategyQuery.data?.offers,
   })
 
-  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
