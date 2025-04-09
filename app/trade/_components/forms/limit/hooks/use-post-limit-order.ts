@@ -6,7 +6,6 @@ import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useLogics, useMangroveAddresses } from "@/hooks/use-addresses"
 import { useBook } from "@/hooks/use-book"
 import { useMarketClient } from "@/hooks/use-market"
-import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useLoadingStore } from "@/stores/loading.store"
 import {
   getDefaultLimitOrderGasreq,
@@ -31,7 +30,6 @@ type Props = {
 export function usePostLimitOrder({ onResult }: Props = {}) {
   const { address: account } = useAccount()
   const { currentMarket: market } = useMarket()
-  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,

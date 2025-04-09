@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useBook } from "@/hooks/use-book"
 import { useMarketClient } from "@/hooks/use-market"
-import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
+
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
@@ -28,7 +28,6 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
 
-  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
@@ -90,9 +89,7 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
         const { blockNumber, transactionHash } = receipt
         onResult?.(transactionHash)
-        await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber: Number(blockNumber),
-        })
+
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["order-history"] })
       } catch (error) {

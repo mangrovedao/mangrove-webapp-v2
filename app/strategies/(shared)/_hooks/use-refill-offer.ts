@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
 import { useLoadingStore } from "@/stores/loading.store"
 import { OfferParsed } from "@mangrovedao/mgv"
 import { useRefillRequirements } from "../../[address]/_hooks/use-refill-requirements"
@@ -27,7 +26,7 @@ export function useRefillOffer({ offer, onCancel }: Props) {
   // })
 
   const queryClient = useQueryClient()
-  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
+
   const [startLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,

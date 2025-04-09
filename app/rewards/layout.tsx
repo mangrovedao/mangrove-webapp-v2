@@ -2,7 +2,6 @@ import { Metadata } from "next"
 import React from "react"
 
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { IndexerSdkProvider } from "@/providers/mangrove-indexer"
 import {
   MarketProvider,
   MarketProvider as NewMarketProvider,
@@ -17,9 +16,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <MarketProvider>
       <NewMarketProvider>
-        <TooltipProvider>
-          <IndexerSdkProvider>{children}</IndexerSdkProvider>
-        </TooltipProvider>
+        <TooltipProvider>{children}</TooltipProvider>
       </NewMarketProvider>
     </MarketProvider>
   )

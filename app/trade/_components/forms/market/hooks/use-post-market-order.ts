@@ -9,7 +9,7 @@ import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { trade } from "@/hooks/ghostbook/lib/trade"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMarketClient } from "@/hooks/use-market"
-import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
+
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
@@ -24,7 +24,7 @@ type Props = {
 export function usePostMarketOrder({ onResult }: Props = {}) {
   const { currentMarket: market } = useMarket()
   const { address } = useAccount()
-  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
+
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,

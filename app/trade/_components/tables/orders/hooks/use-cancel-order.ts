@@ -5,7 +5,7 @@ import { useAccount, usePublicClient, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useMarketClient } from "@/hooks/use-market"
-import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
+
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
 import { MarketParams } from "@mangrovedao/mgv"
@@ -20,7 +20,7 @@ type Props = {
 export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
   const queryClient = useQueryClient()
   const { address } = useAccount()
-  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
+
   const [startLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
@@ -66,9 +66,6 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
       try {
         startLoading(TRADE.TABLES.ORDERS)
 
-        await resolveWhenBlockIsIndexed.mutateAsync({
-          blockNumber: Number(blockNumber),
-        })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
       } catch (error) {
         console.error(error)

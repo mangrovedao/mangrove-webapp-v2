@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 import useKandelInstance from "@/app/strategies/(shared)/_hooks/use-kandel-instance"
-import { useResolveWhenBlockIsIndexed } from "@/hooks/use-resolve-when-block-is-indexed"
+
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { KandelParams } from "@mangrovedao/mgv"
 import { Address, parseEther } from "viem"
@@ -17,7 +17,6 @@ export function useEditKandelStrategy(
   kandelClient?: ReturnType<typeof useKandelInstance>,
 ) {
   const queryClient = useQueryClient()
-  const resolveWhenBlockIsIndexed = useResolveWhenBlockIsIndexed()
 
   const { address } = useAccount()
   const publicClient = usePublicClient()

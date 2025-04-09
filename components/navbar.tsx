@@ -416,8 +416,10 @@ export default function Navbar() {
                     </span>
                   </Link>
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <ChevronDown className="h-4 w-4 text-text-primary hover:text-text-tertiary" />
+                    <DropdownMenuTrigger asChild>
+                      <button className="focus:outline-none">
+                        <ChevronDown className="h-4 w-4 text-text-primary hover:text-text-tertiary transition-transform duration-200 ease-in-out data-[state=open]:rotate-180" />
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-bg-secondary">
                       <DropdownMenuLabel className="text-xs text-text-primary">
