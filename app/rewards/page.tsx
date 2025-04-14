@@ -11,7 +11,6 @@ import {
   CustomTabsTrigger,
 } from "@/components/custom-tabs"
 import { NumericValue } from "@/components/numeric-value"
-import { PostHogDebug } from "@/components/PostHogDebug"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
@@ -48,9 +47,6 @@ export default function Page() {
 
   return (
     <main className="mt-8 px-4">
-      {/* PostHog Debug Component - Remove after testing */}
-      <PostHogDebug />
-
       <div className="pl-5 grid">
         <Title variant={"header1"}>Rewards</Title>
         <Caption className="pl-0.5 text-text-secondary hover:underline !text-sm">
