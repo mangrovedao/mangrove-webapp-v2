@@ -28,11 +28,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider, createConfig, http } from "wagmi"
 import { arbitrum, base, baseSepolia } from "wagmi/chains"
 
+import { createFallbackTransport } from "@/config/fallback-transport"
 import { env } from "@/env.mjs"
 
+// Create a query client for React Query
 const queryClient = new QueryClient()
 const projectId = env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
+// Set up the wallets we want to support
 const recommendedWalletList: WalletList = [
   {
     groupName: "Popular",
@@ -60,11 +63,14 @@ const recommendedWalletList: WalletList = [
     ],
   },
 ]
+
+// Configure wallet connectors
 const connectors = connectorsForWallets(recommendedWalletList, {
   projectId: projectId,
   appName: "Mangrove dApp",
 })
 
+// Create wagmi config with fallback RPC for Base
 export const config = createConfig({
   ssr: true,
   connectors,
@@ -72,7 +78,9 @@ export const config = createConfig({
   transports: {
     [baseSepolia.id]: http(),
     [arbitrum.id]: http(),
-    [base.id]: http(),
+    // Use fallback transport with multiple RPCs for Base chain
+    // WebSockets provide better performance for subscriptions
+    [base.id]: createFallbackTransport(base, true),
   },
 })
 
