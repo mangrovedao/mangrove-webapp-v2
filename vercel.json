@@ -9,6 +9,10 @@
       "destination": "https://eu.i.posthog.com/decide"
     },
     {
+      "source": "/ingest/array/:path*",
+      "destination": "https://eu.i.posthog.com/array/:path*"
+    },
+    {
       "source": "/ingest/:path*",
       "destination": "https://eu.i.posthog.com/:path*"
     }
