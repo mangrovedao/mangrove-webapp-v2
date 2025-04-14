@@ -5,6 +5,7 @@ import Script from "next/script"
 import React, { useEffect, useState } from "react"
 import { Toaster } from "sonner"
 
+import { PostHogProvider } from "@/components/PostHogProvider"
 import AdminCommand from "@/components/stateful/admin-command/admin-command"
 import DisclaimerDialog from "@/components/stateful/dialogs/disclaimer-dialog"
 import { WrongNetworkAlertDialog } from "@/components/stateful/dialogs/wrong-network-dialog"
@@ -64,13 +65,15 @@ export default function RootLayout({
       </Head>
       <body>
         <div>
-          <RootProvider>
-            <Navbar />
-            <div className="px-4">{children}</div>
-            <AdminCommand />
-            <WrongNetworkAlertDialog />
-            <DisclaimerDialog />
-          </RootProvider>
+          <PostHogProvider>
+            <RootProvider>
+              <Navbar />
+              <div className="px-4">{children}</div>
+              <AdminCommand />
+              <WrongNetworkAlertDialog />
+              <DisclaimerDialog />
+            </RootProvider>
+          </PostHogProvider>
           <Toaster
             position={toastPosition}
             toastOptions={{

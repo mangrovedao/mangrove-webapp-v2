@@ -23,7 +23,11 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["explorer-api.walletconnect.com", "icons.llamao.fi", "assets.odos.xyz"],
+    domains: [
+      "explorer-api.walletconnect.com",
+      "icons.llamao.fi",
+      "assets.odos.xyz",
+    ],
   },
   async redirects() {
     return Promise.resolve([
@@ -34,6 +38,24 @@ const config = {
       },
     ])
   },
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://eu-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://eu.i.posthog.com/:path*",
+      },
+      {
+        source: "/ingest/decide",
+        destination: "https://eu.i.posthog.com/decide",
+      },
+    ]
+  },
+  // This is required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
   webpack: (config) => {
     config.externals.push("pino-pretty", "lokijs", "encoding")
     return config

@@ -46,3 +46,5 @@ generated
 public/cryptocurrency-icons
 # Sentry Config File
 .sentryclirc
+
+.env.local
