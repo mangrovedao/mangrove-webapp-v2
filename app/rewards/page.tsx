@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import React from "react"
 import { formatUnits } from "viem"
 
 import {
@@ -15,7 +16,6 @@ import { Title } from "@/components/typography/title"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { MangroveLogo, ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
-import React from "react"
 
 import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 import Timer from "./_components/timer"
