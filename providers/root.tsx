@@ -16,11 +16,7 @@ export function RootProvider({ children }: React.PropsWithChildren) {
             <MangroveProvider>
               <ChainsProvider>
                 <FocusOutline>
-                  <StyledJsxRegistry>
-                    {/* <CSPostHogProvider> */}
-                    {children}
-                    {/* </CSPostHogProvider> */}
-                  </StyledJsxRegistry>
+                  <StyledJsxRegistry>{children}</StyledJsxRegistry>
                 </FocusOutline>
               </ChainsProvider>
             </MangroveProvider>
