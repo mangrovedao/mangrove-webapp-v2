@@ -138,7 +138,11 @@ function Item({
 
 export function PricesBar() {
   const { currentMarket } = useMarket()
-  const { mergedBooks: book, refetch: refetchBooks } = useMergedBooks()
+  const {
+    mergedBooks: book,
+    refetch: refetchBooks,
+    spotPrice,
+  } = useMergedBooks()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
   const { data: stats, isLoading: statsLoading } = useMangrovePoolStatsQuery(
@@ -159,21 +163,10 @@ export function PricesBar() {
   const token = side === "base" ? quote : base
 
   // Calculate spread and midpoint
-  const lowestAsk = book?.asks[0]?.price || 0
-  const highestBid = book?.bids[0]?.price || 0
 
-  const midPrice = (lowestAsk + highestBid) / 2
-
-  let spotPrice =
-    lowestAsk && highestBid
-      ? (lowestAsk + (highestBid ?? 0)) / 2
-      : !lowestAsk && !highestBid
-        ? undefined
-        : Math.max(lowestAsk || 0, highestBid || 0)
-
-  if (side === "quote") {
-    spotPrice = spotPrice ? 1 / spotPrice : undefined
-  }
+  // if (side === "quote") {
+  //   spotPrice = spotPrice ? 1 / spotPrice : undefined
+  // }
 
   // Calculate variation only if we have valid data
   const hasValidPriceData =
@@ -209,7 +202,7 @@ export function PricesBar() {
       <div className="flex items-center pl-2 pr-2">
         <Item
           label={"Price"}
-          value={spotPrice}
+          value={side === "quote" ? 1 / (spotPrice ?? 1) : spotPrice}
           token={side === "quote" ? base : quote}
           skeleton={false}
         />

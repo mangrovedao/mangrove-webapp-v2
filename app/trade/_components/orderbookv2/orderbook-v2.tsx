@@ -5,6 +5,7 @@ import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { motion } from "framer-motion"
 import React, { useMemo } from "react"
+import { AnimatedOrderBookSkeleton } from "../orderbook/animated-skeleton"
 
 type OrderBookProps = {
   className?: string
@@ -71,8 +72,13 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
     processedBids[processedBids.length - 1]?.cumulative || 0,
   )
 
+  if (!displayAsks.length || !processedBids.length)
+    return <AnimatedOrderBookSkeleton />
+
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       className={cn(
         "flex flex-col w-full h-full bg-transparent text-white font-mono",
         className,
@@ -231,7 +237,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
         </div>
         <ScrollBar orientation="vertical" className="z-50" />
       </ScrollArea>
-    </div>
+    </motion.div>
   )
 }
 

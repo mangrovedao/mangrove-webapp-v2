@@ -12,7 +12,6 @@ import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
@@ -22,6 +21,7 @@ import { useTradeFormStore } from "../../forms/store"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import { useTradeInfos } from "../hooks/use-trade-infos"
+import { calcDollarAmt } from "../utils"
 import { useMarketForm } from "./hooks/use-market"
 import { useMarketTransaction } from "./hooks/use-market-transaction"
 import { useMarketSteps } from "./hooks/use-steps"
@@ -93,22 +93,11 @@ export function Market() {
     sendToken,
   })
 
-  // Approve mutation
-  const approveAmount = useApproveAmount({
-    token: sendToken,
-    spender: mangroveChain?.ghostbook ?? undefined,
-    sendAmount: form.state.values.send,
-  })
-
   // Use the transaction hook
   const {
-    txState,
     isButtonLoading,
     onSubmit,
     getButtonText: getTransactionButtonText,
-    needsWrapping,
-    totalWrapping,
-    needsApproval,
   } = useMarketTransaction({
     form,
     tradeSide,
@@ -171,16 +160,12 @@ export function Market() {
     try {
       setSendSliderValue(value)
 
-      const amount = Big(value)
-        .div(100)
-        .mul(sendBalanceWithEth)
-        .toFixed(sendToken?.priceDisplayDecimals || 18)
+      const amount = Big(value).div(100).mul(sendBalanceWithEth)
 
+      const decimals = sendToken.priceDisplayDecimals || 18
       // Set the field value without calling validateAllFields
-      form.setFieldValue("send", amount)
-
-      // We don't need to update the shared state here anymore
-      // as it's handled by the useEffect
+      const safeAmount = Math.min(amount.toNumber(), sendBalanceWithEth)
+      form.setFieldValue("send", safeAmount.toFixed(decimals).toString())
 
       // Compute receive amount will indirectly validate the form
       computeReceiveAmount()
@@ -305,6 +290,11 @@ export function Market() {
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
+                  dollarAmount={calcDollarAmt(
+                    field.state.value,
+                    true,
+                    tradeSide,
+                  )}
                   onChange={({ target: { value } }) => {
                     field.handleChange(value)
                     // We don't need to update the shared state here anymore
@@ -371,6 +361,11 @@ export function Market() {
                     field.handleChange(value)
                     computeSendAmount()
                   }}
+                  dollarAmount={calcDollarAmt(
+                    field.state.value,
+                    false,
+                    tradeSide,
+                  )}
                   token={receiveToken}
                   label="Receive"
                   disabled={!(market && form.state.isFormValid)}

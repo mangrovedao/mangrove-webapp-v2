@@ -296,10 +296,23 @@ export function useMergedBooks() {
     ),
   }
 
+  const lowestAsk = mergedBooks?.asks[0]?.price || 0
+  const highestBid = mergedBooks?.bids[0]?.price || 0
+
+  let spotPrice = 0
+  if (lowestAsk && highestBid) {
+    spotPrice = (lowestAsk + highestBid) / 2
+  } else if (!lowestAsk && !highestBid) {
+    spotPrice = 0
+  } else {
+    spotPrice = Math.max(lowestAsk || 0, highestBid || 0)
+  }
+
   return {
     mergedBooks,
     isLoading: mangroveBookLoading || poolBookLoading,
     isFetched: mangroveBookFetched || poolBookFetched,
+    spotPrice,
     refetch: () => {
       refetchMangroveBook()
       refetchPoolBook()

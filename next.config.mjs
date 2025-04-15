@@ -23,10 +23,19 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: [
-      "explorer-api.walletconnect.com",
-      "icons.llamao.fi",
-      "assets.odos.xyz",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "explorer-api.walletconnect.com",
+      },
+      {
+        protocol: "https",
+        hostname: "icons.llamao.fi",
+      },
+      {
+        protocol: "https",
+        hostname: "assets.odos.xyz",
+      },
     ],
   },
   async redirects() {
