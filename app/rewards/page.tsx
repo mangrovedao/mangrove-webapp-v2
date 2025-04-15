@@ -78,14 +78,18 @@ export default function Page() {
               <div className="flex flex-col">
                 <Title
                   variant={"title1"}
-                  className="text-center text-text-brand/80"
+                  className="text-center text-text-secondary"
                 >
-                  Welcome to the leaderboard
+                  Mangrove Rewards Leaderboard
                 </Title>
-                <Caption className="text-center">
-                  The leaderboard is updated every seconds for vaults deposited
-                  values and every time you make a trade your volume is
-                  calculated.
+                <Caption className="text-center mt-2" variant={"caption1"}>
+                  Track your position in real-time! Vault rewards update
+                  continuously based on your deposits, while trading volume
+                  rewards are calculated instantly with each transaction you
+                  make.
+                </Caption>
+                <Caption className="text-center mt-1">
+                  Compete with other users to earn more MGV tokens.
                 </Caption>
               </div>
             </div>
@@ -95,16 +99,41 @@ export default function Page() {
           </div> */}
           <div className="px-4 py-5 flex gap-4 items-center justify-between relative">
             {/* Left side */}
-            <div className="flex flex-col">
-              <Label>Total Reward</Label>
-              <Value className="flex-wrap text-wrap">
-                <NumericValue
-                  value={getExactWeiAmount(
-                    totalStats?.totalRewards.toString() ?? "0",
-                    8,
-                  )}
-                />
-              </Value>
+
+            <div className="flex items-center gap-4 w-full justify-evenly">
+              <div className="flex flex-col">
+                <Label>Total Reward</Label>
+                <Value className="flex-wrap text-wrap">
+                  <NumericValue
+                    value={getExactWeiAmount(
+                      totalStats?.totalRewards.toString() ?? "0",
+                      8,
+                    )}
+                  />
+                </Value>
+              </div>
+              <div className="flex flex-col">
+                <Label>Volume Rewards</Label>
+                <Value size="normal">
+                  <NumericValue
+                    value={getExactWeiAmount(
+                      totalStats?.totalVolumeRewards.toString() ?? "0",
+                      8,
+                    )}
+                  />
+                </Value>
+              </div>
+              <div className="flex flex-col">
+                <Label>Vault Rewards</Label>
+                <Value size="normal">
+                  <NumericValue
+                    value={getExactWeiAmount(
+                      totalStats?.totalVaultRewards.toString() ?? "0",
+                      8,
+                    )}
+                  />
+                </Value>
+              </div>
             </div>
 
             {/* Middle side: Falling Mangrove Logos */}
@@ -118,30 +147,6 @@ export default function Page() {
                     <MangroveLogo className="drop-shadow-[0_0_5px_rgba(0,223,129,0.6)] opacity-10" />
                   </div>
                 ))}
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex flex-col flex-1 mt-2">
-                <Label>Volume Rewards</Label>
-                <Value size="normal">
-                  <NumericValue
-                    value={getExactWeiAmount(
-                      totalStats?.totalVolumeRewards.toString() ?? "0",
-                      8,
-                    )}
-                  />
-                </Value>
-              </div>
-              <div className="flex flex-col flex-1 mt-2">
-                <Label>Vault Rewards</Label>
-                <Value size="normal">
-                  <NumericValue
-                    value={getExactWeiAmount(
-                      totalStats?.totalVaultRewards.toString() ?? "0",
-                      8,
-                    )}
-                  />
-                </Value>
               </div>
             </div>
           </div>
