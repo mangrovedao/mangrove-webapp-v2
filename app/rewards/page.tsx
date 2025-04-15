@@ -20,18 +20,34 @@ import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { arbitrum } from "viem/chains"
 import { useAccount } from "wagmi"
-import { useLeaderboard } from "./_components/tables/leaderboard/hooks/use-leaderboard"
+import {
+  LeaderboardEntry,
+  useLeaderboard,
+} from "./_components/tables/leaderboard/hooks/use-leaderboard"
 import { LeaderboardTable } from "./_components/tables/leaderboard/leaderboard-table"
 import { Ms2Table } from "./_components/tables/ms2/ms2-table"
+
 export default function Page() {
   const [tab, setTab] = React.useState("leaderboard")
   const { address: user } = useAccount()
-  const { data: leaderboard } = useLeaderboard()
+  const { data: leaderboard } = useLeaderboard({
+    select: (data) => data,
+  })
   const { defaultChain } = useDefaultChain()
 
+  // Extract the flattened leaderboard data from the new structure
+  const leaderboardData = leaderboard || []
+
   // Calculate total rewards across all users
-  const totalStats = leaderboard?.reduce(
-    (acc, entry) => {
+  const totalStats = leaderboardData.reduce(
+    (
+      acc: {
+        totalVolumeRewards: number
+        totalVaultRewards: number
+        totalRewards: number
+      },
+      entry: LeaderboardEntry,
+    ) => {
       return {
         totalVolumeRewards: acc.totalVolumeRewards + entry.volumeRewards,
         totalVaultRewards: acc.totalVaultRewards + entry.vaultRewards,
@@ -47,7 +63,7 @@ export default function Page() {
         <Title variant={"header1"}>Rewards</Title>
         <Caption className="pl-0.5 text-text-secondary hover:underline !text-sm">
           <Link
-            className="flex gap-1 items-center"
+            className="flex gap-1 items-center w-fit"
             href="https://docs.mangrove.exchange/mgv-incentives/introduction"
             target="_blank"
           >
@@ -181,13 +197,9 @@ export default function Page() {
             <div className="w-full pb-4 px-1">
               {/* leaderboard */}
               <CustomTabsContent value={"leaderboard"}>
-                <ScrollArea className="h-full" scrollHideDelay={200}>
-                  <div className="px-2 h-full">
-                    <LeaderboardTable />
-                  </div>
-                  <ScrollBar orientation="vertical" className="z-50" />
-                  <ScrollBar orientation="horizontal" className="z-50" />
-                </ScrollArea>
+                <div className="px-2">
+                  <LeaderboardTable height="600px" />
+                </div>
               </CustomTabsContent>
 
               {/* ms2 leaderboards */}

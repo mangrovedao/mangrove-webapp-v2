@@ -3,8 +3,8 @@
 import { useFeesRewards } from "@/app/rewards/hooks/use-fees-rewards"
 import { useIncentivesRewards } from "@/app/rewards/hooks/use-incentives-rewards"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useQuery } from "@tanstack/react-query"
-import { formatUnits } from "viem"
+import { getExactWeiAmount } from "@/utils/regexp"
+import { useInfiniteQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
 /**
@@ -22,22 +22,17 @@ export interface LeaderboardEntry {
   formattedTotalRewards: string
 }
 
-// For backward compatibility with existing Ms2PointsRow
-export interface Ms2PointsRow {
-  rank: number
-  address: string
-  makerReward: number
-  takerReward: number
-  vaultReward: number
-  total: number
+// Define the leaderboard page type
+type LeaderboardPage = {
+  data: LeaderboardEntry[]
+  meta: {
+    hasNextPage: boolean
+    page: number
+  }
 }
 
 export type LeaderboardParams<T = LeaderboardEntry[]> = {
-  filters?: {
-    page?: number
-    first?: number
-    skip?: number
-  }
+  pageSize?: number
   select?: (data: LeaderboardEntry[]) => T
 }
 
@@ -45,7 +40,7 @@ export type LeaderboardParams<T = LeaderboardEntry[]> = {
  * Hook to create a leaderboard combining volume rewards and vault rewards
  */
 export const useLeaderboard = <T = LeaderboardEntry[]>({
-  filters = {},
+  pageSize = 10,
   select,
 }: LeaderboardParams<T> = {}) => {
   const { address: userAddress } = useAccount()
@@ -54,25 +49,29 @@ export const useLeaderboard = <T = LeaderboardEntry[]>({
   const { data: vaultRewards, isLoading: isLoadingVaults } =
     useIncentivesRewards()
 
-  const { skip = 0, first = 10 } = filters
-
-  const queryResult = useQuery({
+  return useInfiniteQuery<LeaderboardPage, Error, T>({
     queryKey: [
       "combined-leaderboard",
       defaultChain.id,
       userAddress,
       feesRewards?.length,
       vaultRewards?.length,
-      skip,
-      first,
+      pageSize,
     ],
-    queryFn: async (): Promise<LeaderboardEntry[]> => {
+    initialPageParam: 0,
+    queryFn: async ({ pageParam = 0 }) => {
       // Return empty array if neither fee rewards nor vault rewards are available
       if (
         (!feesRewards || !Array.isArray(feesRewards)) &&
         (!vaultRewards || !Array.isArray(vaultRewards))
       ) {
-        return []
+        return {
+          data: [],
+          meta: {
+            hasNextPage: false,
+            page: pageParam as number,
+          },
+        }
       }
 
       // Create a map to combine rewards by address
@@ -108,21 +107,24 @@ export const useLeaderboard = <T = LeaderboardEntry[]>({
       // Convert map to array and add totals
       const leaderboard = Object.entries(combinedRewardsMap).map(
         ([address, rewards]) => {
-          // Convert floating-point rewards to integers by multiplying by 10^8
-          // This preserves 8 decimal places of precision when formatted
-          const volumeRewardsInt = Math.round(rewards.volumeRewards * 1e8)
-          const vaultRewardsInt = Math.round(rewards.vaultRewards * 1e8)
-          const totalRewardsInt = volumeRewardsInt + vaultRewardsInt
-
           return {
             address,
             volumeRewards: rewards.volumeRewards,
             vaultRewards: rewards.vaultRewards,
             totalRewards: rewards.volumeRewards + rewards.vaultRewards,
             rank: 0, // Will be assigned after sorting
-            formattedVolumeRewards: formatUnits(BigInt(volumeRewardsInt), 8),
-            formattedVaultRewards: formatUnits(BigInt(vaultRewardsInt), 8),
-            formattedTotalRewards: formatUnits(BigInt(totalRewardsInt), 8),
+            formattedVolumeRewards: getExactWeiAmount(
+              rewards.volumeRewards.toString(),
+              8,
+            ),
+            formattedVaultRewards: getExactWeiAmount(
+              rewards.vaultRewards.toString(),
+              8,
+            ),
+            formattedTotalRewards: getExactWeiAmount(
+              (rewards.volumeRewards + rewards.vaultRewards).toString(),
+              8,
+            ),
           }
         },
       )
@@ -137,46 +139,67 @@ export const useLeaderboard = <T = LeaderboardEntry[]>({
         entry.rank = index + 1
       })
 
-      // Apply pagination - start with one fewer than requested to leave room for user if needed
-      let paginatedLeaderboard = sortedLeaderboard.slice(skip, skip + first)
-
-      // If the user is connected, find their entry in the full leaderboard
+      // Find the user entry in the complete sorted leaderboard
+      let userEntry = undefined
       if (userAddress) {
-        const userEntry = sortedLeaderboard.find(
+        userEntry = sortedLeaderboard.find(
           (entry) => entry.address.toLowerCase() === userAddress.toLowerCase(),
         )
-
-        if (userEntry) {
-          // Check if user is already in paginated results
-          const userIndexInPaginated = paginatedLeaderboard.findIndex(
-            (entry) =>
-              entry.address.toLowerCase() === userAddress.toLowerCase(),
-          )
-
-          if (userIndexInPaginated !== -1) {
-            // User is in the results, remove them from their current position
-            paginatedLeaderboard.splice(userIndexInPaginated, 1)
-          } else if (paginatedLeaderboard.length === first) {
-            // User not in results and results are full, remove the last item
-            paginatedLeaderboard.pop()
-          }
-
-          // Add user to the top
-          paginatedLeaderboard = [userEntry, ...paginatedLeaderboard]
-        }
       }
 
-      return paginatedLeaderboard
+      // If this is the first page and we found the user, ensure they appear first
+      if (pageParam === 0 && userEntry && userAddress) {
+        // Create a new array without the user entry
+        const leaderboardWithoutUser = sortedLeaderboard.filter(
+          (entry) => entry.address.toLowerCase() !== userAddress.toLowerCase(),
+        )
+
+        // Create a paginated array starting with the user followed by other entries
+        const start = (pageParam as number) * pageSize
+        const end = start + pageSize - 1 // Subtract 1 to make room for the user entry
+
+        let pageData = [userEntry, ...leaderboardWithoutUser.slice(start, end)]
+
+        return {
+          data: pageData,
+          meta: {
+            hasNextPage: end < leaderboardWithoutUser.length,
+            page: pageParam as number,
+          },
+        }
+      } else {
+        // Process normal paging for other pages
+        const start = (pageParam as number) * pageSize
+        const end = start + pageSize
+        const pageData = sortedLeaderboard.slice(start, end)
+
+        return {
+          data: pageData,
+          meta: {
+            hasNextPage: end < sortedLeaderboard.length,
+            page: pageParam as number,
+          },
+        }
+      }
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.meta.hasNextPage) return undefined
+      return lastPage.meta.page + 1
     },
     enabled: (!isLoadingFees || !isLoadingVaults) && !!defaultChain,
-  })
+    select: (data) => {
+      // Apply custom selector if provided, otherwise flatten pages
+      if (select) {
+        const flatData = data.pages.flatMap((page) => page.data)
+        return select(flatData) as T
+      }
 
-  // Apply selector if provided, otherwise return the data as is
-  return {
-    ...queryResult,
-    data:
-      select && queryResult.data
-        ? select(queryResult.data)
-        : (queryResult.data as unknown as T),
-  }
+      // Default behavior: flatten pages
+      return {
+        ...data,
+        pages: data.pages,
+        flattened: data.pages.flatMap((page) => page.data),
+      } as unknown as T
+    },
+  })
 }
