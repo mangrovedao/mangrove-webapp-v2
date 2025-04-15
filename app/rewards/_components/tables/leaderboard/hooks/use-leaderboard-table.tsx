@@ -26,7 +26,7 @@ export function useLeaderboardTable({
   // Common header and cell classes for consistent alignment
   const rankClasses = "text-center w-full"
   const addressClasses = "text-left w-full"
-  const rewardClasses = "text-center w-full"
+  const rewardClasses = "w-full"
 
   const columns: ColumnDef<LeaderboardEntry>[] = [
     {
