@@ -98,8 +98,6 @@ export default function Page() {
             <hr className="px-6" />
           </div> */}
           <div className="px-4 py-5 flex gap-4 items-center justify-between relative">
-            {/* Left side */}
-
             <div className="flex items-center gap-4 w-full justify-evenly">
               <div className="flex flex-col">
                 <Label>Total Reward</Label>
@@ -210,9 +208,6 @@ export default function Page() {
       <style jsx global>{`
         table tbody * {
           @apply font-ubuntu !text-lg font-normal text-white;
-        }
-        table tbody tr:first-child td:first-child > div > div {
-          max-width: 24px;
         }
 
         /* Falling animation for Mangrove logos */

@@ -60,8 +60,8 @@ export function LeaderboardTable() {
           row.address.toLowerCase() === user?.toLowerCase()
         }
         rowHighlightedClasses={{
-          row: "text-white hover:opacity-80 transition-all",
-          inner: "!bg-[#1c3a40]",
+          row: "!text-inherit !font-inherit",
+          inner: "!bg-opacity-30 !bg-[#1c3a40]",
         }}
         cellClasses="font-roboto"
         tableRowClasses="font-ubuntuLight"
