@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import React from "react"
-import { formatUnits } from "viem"
 
 import {
   CustomTabs,
@@ -17,33 +16,30 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { MangroveLogo, ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
 
+import { useDefaultChain } from "@/hooks/use-default-chain"
+import { getExactWeiAmount } from "@/utils/regexp"
+import { arbitrum } from "viem/chains"
+import { useAccount } from "wagmi"
+import { useLeaderboard } from "./_components/tables/leaderboard/hooks/use-leaderboard"
+import { LeaderboardTable } from "./_components/tables/leaderboard/leaderboard-table"
 import { Ms2Table } from "./_components/tables/ms2/ms2-table"
-import Timer from "./_components/timer"
-import { useIncentivesRewards } from "./hooks/use-incentives-rewards"
-import { useRewards } from "./hooks/use-rewards"
-import { useConfiguration } from "./hooks/use-rewards-config"
-
 export default function Page() {
-  const { data: configuration } = useConfiguration()
+  const [tab, setTab] = React.useState("leaderboard")
+  const { address: user } = useAccount()
+  const { data: leaderboard } = useLeaderboard()
+  const { defaultChain } = useDefaultChain()
 
-  console.log({ configuration })
-  const [tab, setTab] = React.useState("ms2-total-rewards")
-
-  const { data: rewards } = useRewards({
-    epochId:
-      tab !== "ms1-leaderboard" && tab !== "ms2-total-rewards"
-        ? tab
-        : configuration?.epochId?.toString() || "1",
-  })
-  console.log({ rewards })
-
-  const { data: incentivesRewards } = useIncentivesRewards()
-  console.log({ incentivesRewards })
-
-  const totalRewards =
-    BigInt(rewards?.takerReward ?? 0) +
-    BigInt(rewards?.makerReward ?? 0) +
-    BigInt(rewards?.vaultRewards ?? 0)
+  // Calculate total rewards across all users
+  const totalStats = leaderboard?.reduce(
+    (acc, entry) => {
+      return {
+        totalVolumeRewards: acc.totalVolumeRewards + entry.volumeRewards,
+        totalVaultRewards: acc.totalVaultRewards + entry.vaultRewards,
+        totalRewards: acc.totalRewards + entry.totalRewards,
+      }
+    },
+    { totalVolumeRewards: 0, totalVaultRewards: 0, totalRewards: 0 },
+  )
 
   return (
     <main className="mt-8 px-4">
@@ -62,17 +58,35 @@ export default function Page() {
 
       <div className="grid grid-cols-6 gap-10 mt-8">
         <div className="col-span-full">
-          <div className="rounded-sm bg-gradient-to-t from-bg-primary to-bg-secondary p-5 flex items-center space-x-2 relative">
+          <div
+            className="w-full rounded-sm border border-solid p-3 relative "
+            style={{
+              boxShadow: "0px 0px 24px rgba(0, 203, 111, 0.4)",
+            }}
+          >
+            <div
+              className="absolute inset-[1px] rounded-sm -z-20"
+              style={{
+                background: "linear-gradient(30deg, #7BAFB9 0%, #00CB6F 100%)",
+              }}
+            ></div>
+            <div className="absolute inset-[3px] bg-[#0B1819] rounded-sm -z-10"></div>
             <div className="absolute top-0 right-0 hidden sm:block md:-translate-x-1/2 -translate-y-2/3">
               <ToucanIllustration />
             </div>
-            <Timer />
-            <div>
-              <h2 className="font-semibold text-2xl">
-                Epoch #{configuration?.epochId}
-              </h2>
-              <div className="text-text-secondary text-xs flex space-x-4">
-                <span>Ended</span>
+            <div className="flex justify-center">
+              <div className="flex flex-col">
+                <Title
+                  variant={"title1"}
+                  className="text-center text-text-brand/80"
+                >
+                  Welcome to the leaderboard
+                </Title>
+                <Caption className="text-center">
+                  The leaderboard is updated every seconds for vaults deposited
+                  values and every time you make a trade your volume is
+                  calculated.
+                </Caption>
               </div>
             </div>
           </div>
@@ -80,22 +94,21 @@ export default function Page() {
             <hr className="px-6" />
           </div> */}
           <div className="px-4 py-5 flex gap-4 items-center justify-between relative">
+            {/* Left side */}
             <div className="flex flex-col">
-              <Label>Total Epoch Reward</Label>
+              <Label>Total Reward</Label>
               <Value className="flex-wrap text-wrap">
-                <NumericValue value={formatUnits(totalRewards, 8)} />
+                <NumericValue
+                  value={getExactWeiAmount(
+                    totalStats?.totalRewards.toString() ?? "0",
+                    8,
+                  )}
+                />
               </Value>
-              <div className="flex flex-col flex-1 mt-2">
-                <Label>Vaults LP Rewards</Label>
-                <Value className="flex-wrap text-wrap">
-                  <NumericValue
-                    value={incentivesRewards?.toFixed(6) || "0.00"}
-                  />
-                </Value>
-              </div>
             </div>
+
+            {/* Middle side: Falling Mangrove Logos */}
             <div className="absolute inset-0 w-full overflow-hidden opacity-80 flex items-center justify-center">
-              {/* Falling Mangrove Logos */}
               <div className="falling-container relative w-full h-full">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div
@@ -109,18 +122,13 @@ export default function Page() {
             </div>
             <div className="flex flex-col">
               <div className="flex flex-col flex-1 mt-2">
-                <Label>Taker Rewards</Label>
+                <Label>Volume Rewards</Label>
                 <Value size="normal">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.takerReward ?? 0), 8)}
-                  />
-                </Value>
-              </div>
-              <div className="flex flex-col flex-1 mt-2">
-                <Label>Maker Rewards</Label>
-                <Value size="normal">
-                  <NumericValue
-                    value={formatUnits(BigInt(rewards?.makerReward ?? 0), 8)}
+                    value={getExactWeiAmount(
+                      totalStats?.totalVolumeRewards.toString() ?? "0",
+                      8,
+                    )}
                   />
                 </Value>
               </div>
@@ -128,7 +136,10 @@ export default function Page() {
                 <Label>Vault Rewards</Label>
                 <Value size="normal">
                   <NumericValue
-                    value={formatUnits(BigInt(rewards?.vaultRewards ?? 0), 8)}
+                    value={getExactWeiAmount(
+                      totalStats?.totalVaultRewards.toString() ?? "0",
+                      8,
+                    )}
                   />
                 </Value>
               </div>
@@ -140,43 +151,36 @@ export default function Page() {
               <div className="flex justify-between items-center">
                 <CustomTabsList className="flex p-0 justify-start space-x-0 w-full h-8">
                   <CustomTabsTrigger
-                    onClick={() => setTab("ms1-leaderboard")}
-                    key={`ms1-leaderboard-tab`}
-                    value={"ms1-leaderboard"}
+                    onClick={() => setTab("leaderboard")}
+                    key={`leaderboard`}
+                    value={"leaderboard"}
                     className="capitalize w-full rounded-none"
                   >
                     Leaderboard
                   </CustomTabsTrigger>
-                  {configuration?.epochEntries?.length &&
-                    configuration?.epochEntries?.length > 1 && (
-                      <>
-                        <CustomTabsTrigger
-                          onClick={() => setTab("ms2-total-rewards")}
-                          key={`ms2-total-rewards-tab`}
-                          value={"ms2-total-rewards"}
-                          className="capitalize w-5/12 rounded-none"
-                        >
-                          MS2 Total rewards
-                        </CustomTabsTrigger>
-                      </>
-                    )}
+                  {arbitrum.id === defaultChain.id && (
+                    <>
+                      <CustomTabsTrigger
+                        onClick={() => setTab("ms2")}
+                        key={`ms2`}
+                        value={"ms2"}
+                        className="capitalize w-5/12 rounded-none"
+                      >
+                        MS2 Total rewards
+                      </CustomTabsTrigger>
+                    </>
+                  )}
                 </CustomTabsList>
               </div>
               <ScrollBar orientation="horizontal" className="z-50" />
             </ScrollArea>
 
-            <div className="w-full pb-4 px-1 mt-3">
+            <div className="w-full pb-4 px-1">
               {/* leaderboard */}
-              <CustomTabsContent value={"ms2-total-rewards"}>
+              <CustomTabsContent value={"leaderboard"}>
                 <ScrollArea className="h-full" scrollHideDelay={200}>
                   <div className="px-2 h-full">
-                    {/* TODO: ADD TABLE HERE:
-                        rank
-                        address
-                        volume rewards
-                        vault rewards
-                        total rewards
-                      */}
+                    <LeaderboardTable />
                   </div>
                   <ScrollBar orientation="vertical" className="z-50" />
                   <ScrollBar orientation="horizontal" className="z-50" />
@@ -184,7 +188,7 @@ export default function Page() {
               </CustomTabsContent>
 
               {/* ms2 leaderboards */}
-              <CustomTabsContent value={"ms2-total-rewards"}>
+              <CustomTabsContent value={"ms2"}>
                 <ScrollArea className="h-full" scrollHideDelay={200}>
                   <div className="px-2 h-full">
                     <Ms2Table />

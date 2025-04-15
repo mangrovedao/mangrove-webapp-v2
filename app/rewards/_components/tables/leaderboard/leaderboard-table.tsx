@@ -3,30 +3,38 @@ import React from "react"
 
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
-import { useMs1Points } from "./hooks/use-ms1-points"
-import { useMs1Table } from "./hooks/use-ms1-table"
-export function Ms1Table() {
+import { useLeaderboard } from "./hooks/use-leaderboard"
+import { useLeaderboardTable } from "./hooks/use-leaderboard-table"
+
+// Define the PageDetails type at the top of the file
+interface PageDetails {
+  page: number
+  pageSize: number
+}
+
+export function LeaderboardTable() {
   const { address: user, chainId, isConnected } = useAccount()
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 10,
   })
 
-  const { data, isLoading, error, refetch } = useMs1Points({
+  const { data, isLoading, error, refetch } = useLeaderboard({
     filters: {
       skip: (page - 1) * pageSize,
+      first: pageSize,
     },
   })
 
-  const { data: count } = useMs1Points({
-    select: (points) => points.length ?? 0,
+  const { data: count } = useLeaderboard({
+    select: (points) => points.length,
   })
 
   React.useEffect(() => {
     refetch?.()
-  }, [chainId, page, user])
+  }, [chainId, page, user, refetch])
 
-  const table = useMs1Table({ pageSize, data, user })
+  const table = useLeaderboardTable({ pageSize, data, user })
 
   const emptyMessage = !isConnected
     ? "Connect your wallet to see your points"
@@ -38,13 +46,11 @@ export function Ms1Table() {
         <div className="flex align-middle items-center space-x-2 p-2">
           <div>
             <Caption className="text-base!">
-              Points allocated to early users and community members from ... to
-              July 2024. These points will be soon converted into MGVs.
+              Description of ms2 rewards...
             </Caption>
           </div>
         </div>
       </aside> */}
-
       <DataTable
         table={table}
         emptyArrayMessage={emptyMessage}
@@ -63,7 +69,7 @@ export function Ms1Table() {
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count,
+          count: typeof count === "number" ? count : data?.length ?? 0,
         }}
       />
     </>
