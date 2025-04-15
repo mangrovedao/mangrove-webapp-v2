@@ -18,3 +18,8 @@ export type Ms1PointsRow = {
   communityPoints: number
   totalPoints: number
 }
+
+export type LeaderboardRow = {
+  user: string
+  rewards: number
+}
