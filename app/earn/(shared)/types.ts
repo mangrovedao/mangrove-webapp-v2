@@ -5,6 +5,7 @@ import { z } from "zod"
 import { pnlSchema } from "./schemas"
 
 export type VaultWhitelist = {
+  isDeprecated?: boolean
   manager: string
   address: Address
   description: string

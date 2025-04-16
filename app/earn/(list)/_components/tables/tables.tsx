@@ -1,6 +1,9 @@
 "use client"
 
+import { motion } from "framer-motion"
+import { AlertTriangle } from "lucide-react"
 import React, { Suspense, lazy } from "react"
+import { useAccount } from "wagmi"
 
 import {
   CustomTabs,
@@ -10,7 +13,6 @@ import {
 } from "@/components/custom-tabs"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
-import { useAccount } from "wagmi"
 
 // Lazy load components for better initial load time
 const LazyVaults = lazy(() =>
@@ -27,7 +29,6 @@ export enum TableTypes {
 
 export function Tables() {
   const { isConnected } = useAccount()
-  const [showOnlyActive, setShowOnlyActive] = React.useState(false)
   const [value, setValue] = React.useState<TableTypes>(TableTypes.VAULTS)
 
   return (
@@ -41,6 +42,26 @@ export function Tables() {
           incentives.
         </Text>
       </div>
+      {/* Deprecated Vaults */}
+      <motion.div
+        className="bg-yellow-900/20 border border-yellow-600/30 rounded-md p-4 mb-6"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="text-yellow-500 font-medium mb-1">
+              Deprecated Vaults
+            </h3>
+            <p className="text-sm text-text-secondary">
+              These vaults are deprecated and only withdrawals are allowed. A
+              new version will be deployed soon.
+            </p>
+          </div>
+        </div>
+      </motion.div>
       <div className="w-full border border-bg-secondary rounded-sm">
         <CustomTabs
           value={value}
@@ -65,13 +86,6 @@ export function Tables() {
           </div>
 
           <div className="w-full ">
-            {/* <div className="flex gap-2 items-center justify-end mr-2">
-              <Switch
-                checked={showOnlyActive}
-                onCheckedChange={() => setShowOnlyActive(!showOnlyActive)}
-              />
-              <span className="text-sm">Active Vaults</span>
-            </div> */}
             <Suspense fallback={<TableLoadingSkeleton />}>
               <CustomTabsContent value={TableTypes.VAULTS}>
                 <LazyVaults />

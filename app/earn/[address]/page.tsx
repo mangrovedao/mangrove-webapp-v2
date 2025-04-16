@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion"
 import {
+  AlertTriangle,
   CheckIcon,
   ChevronRight,
   Globe,
@@ -87,6 +88,29 @@ export default function Page() {
 
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
+      <div>
+        {vault?.isDeprecated && (
+          <motion.div
+            className="bg-yellow-900/20 border border-yellow-600/30 rounded-md p-4 mb-6 mx-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="text-yellow-500 font-medium mb-1">
+                  Deprecated Vault
+                </h3>
+                <p className="text-sm text-text-secondary">
+                  This vault is deprecated and only withdrawals are allowed. A
+                  new version will be deployed soon.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
       {/* BreadCrumb */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -513,6 +537,9 @@ export default function Page() {
                     {Object.values(Action).map((action) => (
                       <CustomRadioGroupItem
                         key={action}
+                        disabled={
+                          action === Action.Deposit && vault?.isDeprecated
+                        }
                         value={action}
                         id={action}
                         className="capitalize"
@@ -524,7 +551,7 @@ export default function Page() {
                 </div>
                 <div className="relative min-h-[360px]">
                   <AnimatePresence mode="wait">
-                    {action === Action.Deposit ? (
+                    {action === Action.Deposit && !vault?.isDeprecated ? (
                       <motion.div
                         key="deposit-form"
                         initial={{ opacity: 0, x: -10 }}
