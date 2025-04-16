@@ -13,7 +13,6 @@ import {
   useAccount,
   useBalance,
   useSendTransaction,
-  useWaitForTransactionReceipt,
   useWalletClient,
 } from "wagmi"
 
@@ -94,10 +93,6 @@ export function useSwap() {
     isPending: isPendingWrapping,
     sendTransaction,
   } = useSendTransaction()
-
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
-    hash: wrappingHash,
-  })
 
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [slippage, setSlippage] = React.useState(SLIPPAGES[1])

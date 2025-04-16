@@ -85,17 +85,16 @@ export function useMarketForm(props: Props) {
     quoteToken,
     receiveToken,
     sendTokenBalance,
-    receiveTokenBalance,
-    tickSize,
     feeInPercentageAsString,
-    spotPrice,
   } = useTradeInfos("market", bs)
 
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
 
-  const { data: marketPrice, isLoading: mangroveTokenPriceLoading } =
-    useMangroveTokenPricesQuery(market?.base?.address, market?.quote?.address)
+  const { data: marketPrice } = useMangroveTokenPricesQuery(
+    market?.base?.address,
+    market?.quote?.address,
+  )
 
   const averagePrice = determinePrices(
     bs,
@@ -108,7 +107,7 @@ export function useMarketForm(props: Props) {
     "send" | "receive" | undefined
   >()
 
-  const { data, refetch } = useQuery({
+  const { data } = useQuery({
     queryKey: ["marketOrderSimulation", estimateFrom, bs, receive, send],
     queryFn: () => {
       if (!book) return null
@@ -162,7 +161,6 @@ export function useMarketForm(props: Props) {
       const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
         marketOrderSimulation(params)
 
-      console.log("baseEstimation", baseEstimation, quoteEstimation)
       const formattedBaseEstimation = getExactWeiAmount(
         formatUnits(baseEstimation, market?.base.decimals ?? 18),
         market?.base.displayDecimals,
@@ -192,14 +190,6 @@ export function useMarketForm(props: Props) {
     ((Number(receive) || Number(send)) != 0 &&
       Number(data?.baseEstimation) === 0) ||
     Number(data?.quoteEstimation) === 0
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    e.stopPropagation()
-    if (checkAndShowDisclaimer(address)) return
-
-    void form.handleSubmit()
-  }
 
   const computeReceiveAmount = React.useCallback(() => {
     setEstimateFrom("send")
@@ -270,22 +260,16 @@ export function useMarketForm(props: Props) {
   return {
     computeReceiveAmount,
     computeSendAmount,
-    handleSubmit,
     sendTokenBalance,
-    receiveTokenBalance,
     form,
     market,
-    avgPrice: averagePrice.price?.toFixed(averagePrice.decimals),
     sendToken,
-    send,
-    quote: market?.quote,
     receiveToken,
-    tickSize,
+    quote: market?.quote,
+    avgPrice: averagePrice.price?.toFixed(averagePrice.decimals),
     feeInPercentageAsString,
-    hasEnoughVolume,
-    slippage: form.useStore((state) => state.values.slippage),
     isWrapping,
-    spotPrice,
+    slippage: form.useStore((state) => state.values.slippage),
     getAllErrors,
   }
 }
