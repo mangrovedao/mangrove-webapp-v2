@@ -1,22 +1,20 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
+import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
+import { formatUnits, parseUnits } from "viem"
+import { useAccount, useBalance } from "wagmi"
 
-import { useLogics } from "@/hooks/use-addresses"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
-import { useMenuStore } from "@/stores/menu.store"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { Book } from "@mangrovedao/mgv"
-import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
-import { useConnectModal } from "@rainbow-me/rainbowkit"
-import { formatUnits, parseUnits } from "viem"
-import { useAccount, useBalance } from "wagmi"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -33,11 +31,18 @@ export function useLimit(props: Props) {
   })
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
 
+  const { currentMarket } = useMarket()
+  const bs = props.bs
+  const { spotPrice } = useMergedBooks()
+  const sendToken = bs === BS.buy ? currentMarket?.quote : currentMarket?.base
+
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
       bs: props.bs,
-      limitPrice: "",
+      limitPrice:
+        getExactWeiAmount(spotPrice.toString(), sendToken?.displayDecimals) ??
+        "",
       send: "",
       sendFrom: "simple",
       isWrapping: false,
@@ -50,19 +55,11 @@ export function useLimit(props: Props) {
     onSubmit: (values) => props.onSubmit(values),
   })
 
-  const { currentMarket } = useMarket()
-
   const { book } = useBook()
-  const logics = useLogics()
 
-  const bs = props.bs
-  const send = form.useStore((state) => state.values.send)
-
-  const timeInForce = form.useStore((state) => state.values.timeInForce)
   const isWrapping = form.useStore((state) => state.values.isWrapping)
 
   const isBid = bs === BS.buy
-  const sendToken = bs === BS.buy ? currentMarket?.quote : currentMarket?.base
   const receiveToken =
     bs === BS.buy ? currentMarket?.base : currentMarket?.quote
   const quoteToken = currentMarket?.quote
@@ -104,38 +101,6 @@ export function useLimit(props: Props) {
     ? Number(sendTokenBalanceFormatted) +
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
     : Number(sendTokenBalanceFormatted)
-
-  // Helper function to check if book is a complete Book object
-  const isCompleteBook = (book: any): book is Book => {
-    return (
-      book &&
-      "asksConfig" in book &&
-      "bidsConfig" in book &&
-      "marketConfig" in book &&
-      "midPrice" in book
-    )
-  }
-
-  const fee = Number(
-    (isCompleteBook(book)
-      ? isBid
-        ? book.asksConfig?.fee
-        : book.bidsConfig?.fee
-      : 0) ?? 0,
-  )
-
-  const feeInPercentageAsString = new Intl.NumberFormat("en-US", {
-    style: "percent",
-    maximumFractionDigits: 2,
-  }).format(fee / 10_000)
-
-  const tickSize = currentMarket?.tickSpacing
-    ? `${((1.0001 ** Number(currentMarket?.tickSpacing) - 1) * 100).toFixed(2)}%`
-    : ""
-
-  const spotPrice = isBid
-    ? book?.bids[0]?.price || 0
-    : book?.asks[0]?.price || 0
 
   const [baseAmount, quoteAmount, humanPrice, sendAmount, receiveAmount] =
     form.useStore((state) => {
@@ -180,7 +145,7 @@ export function useLimit(props: Props) {
 
   const minVolumeFormattedWithDecimals = getExactWeiAmount(
     minVolumeFormatted,
-    sendToken?.displayDecimals || 8,
+    sendToken?.displayDecimals,
   )
 
   // @ts-expect-error
@@ -194,7 +159,6 @@ export function useLimit(props: Props) {
     if (sendAmount === 0n) return
     computeReceiveAmount()
   }
-  const { isOpen, toggle } = useMenuStore()
 
   function handleConnect() {
     if (openConnectModal) {
@@ -218,18 +182,16 @@ export function useLimit(props: Props) {
     if (!currentMarket || !form) return
 
     try {
-      const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
-      const send = Number(form?.getFieldValue("send") ?? 0)
+      const limit = Number(form.getFieldValue("limitPrice") ?? 0)
+      const send = Number(form.getFieldValue("send") ?? 0)
 
-      // Only set the receive value if we have valid inputs
-      if (limit > 0 && send > 0) {
-        form.setFieldValue(
-          "receive",
-          (bs === BS.buy ? send / limit : send * limit).toFixed(
-            receiveToken?.priceDisplayDecimals || 8,
-          ),
-        )
-      }
+      // Set field even when value is 0, to reflect 0 change value
+      form.setFieldValue(
+        "receive",
+        (bs === BS.buy ? send / limit : send * limit).toFixed(
+          receiveToken?.priceDisplayDecimals || 8,
+        ),
+      )
 
       // Don't call validateAllFields here
     } catch (error) {
@@ -241,8 +203,8 @@ export function useLimit(props: Props) {
     if (!currentMarket || !form) return
 
     try {
-      const limit = Number(form?.getFieldValue("limitPrice") ?? 0)
-      const receive = Number(form?.getFieldValue("receive") ?? 0)
+      const limit = Number(form.getFieldValue("limitPrice") ?? 0)
+      const receive = Number(form.getFieldValue("receive") ?? 0)
 
       // Only set the send value if we have valid inputs
       if (limit > 0 && receive > 0) {
@@ -262,15 +224,13 @@ export function useLimit(props: Props) {
 
   React.useEffect(() => {
     form?.reset()
-  }, [form, currentMarket?.base, currentMarket?.quote])
+  }, [currentMarket?.base, currentMarket?.quote])
 
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
     const receive = form?.getFieldValue("receive")
-
     form.setFieldValue("sendFrom", "simple")
     form.setFieldValue("receiveTo", "simple")
-
     if (!(send && receive)) return
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
@@ -278,24 +238,22 @@ export function useLimit(props: Props) {
   }, [form, bs])
 
   React.useEffect(() => {
-    const currentLimitPrice = form?.getFieldValue("limitPrice")
-    const limitPrice =
-      bs === BS.buy ? book?.asks[0]?.price : book?.bids[0]?.price
+    if (!form || !sendToken || !book || !spotPrice) return
 
-    if (currentLimitPrice || !limitPrice || !form || !sendToken) return
+    if (form.getFieldValue("limitPrice")) return
 
-    //what is this x)
-    setTimeout(() => {
-      form?.setFieldValue(
-        "limitPrice",
-        getExactWeiAmount(limitPrice.toString(), sendToken.displayDecimals),
-      )
-      form?.validateAllFields("blur")
-    }, 0)
+    const amount = getExactWeiAmount(
+      spotPrice.toString(),
+      sendToken.displayDecimals,
+    )
+    form.setFieldValue("limitPrice", amount)
+
+    setTimeout(() => form.validateAllFields("blur"), 0)
   }, [
     bs,
     form,
     sendToken,
+    spotPrice,
     book,
     currentMarket?.base.address.toString(),
     currentMarket?.quote.address.toString(),
@@ -366,33 +324,18 @@ export function useLimit(props: Props) {
   ])
 
   return {
+    computeReceiveAmount,
+    computeSendAmount,
+    sendTokenBalance,
     form,
-    book,
-    timeInForce,
-    sendFrom,
-    send,
-    receiveTo,
     sendToken,
     receiveToken,
-    sendTokenBalance,
-    sendTokenBalanceFormatted,
-    ethBalance,
-    receiveTokenBalance,
-    receiveTokenBalanceFormatted,
-    logics,
-    sendLogics,
-    spotPrice,
-    isWrapping,
-    receiveLogics,
-    sendBalanceWithEth,
-    feeInPercentageAsString,
-    tickSize,
-    minVolume: minComputedVolume,
-    minVolumeFormatted,
-    computeSendAmount,
-    computeReceiveAmount,
-    handleSubmit,
     quoteToken,
+    receiveTokenBalanceFormatted,
+    minVolumeFormatted,
+    isWrapping,
+    sendBalanceWithEth,
+    ethBalance,
     getAllErrors,
   }
 }

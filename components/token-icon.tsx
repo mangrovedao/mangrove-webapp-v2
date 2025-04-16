@@ -7,7 +7,7 @@ export function TokenIcon({
   className,
   imgClasses,
   customSrc,
-  useFallback
+  useFallback,
 }: {
   symbol?: string
   className?: string

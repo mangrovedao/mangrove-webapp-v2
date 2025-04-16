@@ -16,6 +16,7 @@ import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { useTradeFormStore } from "../../forms/store"
 import { useTradeInfos } from "../hooks/use-trade-infos"
+import { calcDollarAmt } from "../utils"
 import { useLimit } from "./hooks/use-limit"
 import { useLimitTransaction } from "./hooks/use-limit-transaction"
 import type { Form } from "./types"
@@ -35,7 +36,7 @@ export const wethAdresses: { [key: number]: Address | undefined } = {
 }
 
 export function Limit() {
-  const { isConnected, address, chain } = useAccount()
+  const { isConnected } = useAccount()
   const [formData, setFormData] = React.useState<Form>()
   const [sendSliderValue, setSendSliderValue] = React.useState(0)
 
@@ -65,7 +66,6 @@ export function Limit() {
     sendBalanceWithEth,
     ethBalance,
     getAllErrors,
-    book,
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
     bs: tradeSide,
@@ -126,6 +126,10 @@ export function Limit() {
   const handleSliderChange = (value: number) => {
     if (!sendBalanceWithEth || !sendToken) return
 
+    if (!form.getFieldValue("send")) {
+      form.setFieldValue("send", "0")
+    }
+
     try {
       const amount =
         (BigInt(value * 100) *
@@ -138,16 +142,13 @@ export function Limit() {
       setSendSliderValue(value)
 
       // Format the amount for display
-      const amountFormatted = formatUnits(amount, sendToken?.decimals ?? 18)
-
-      // Set the field value without calling validateAllFields
-      form.setFieldValue(
-        "send",
-        getExactWeiAmount(
-          amountFormatted,
-          sendToken?.priceDisplayDecimals ?? 18,
-        ),
+      const amountFormatted = getExactWeiAmount(
+        formatUnits(amount, sendToken.decimals),
+        sendToken.priceDisplayDecimals,
       )
+
+      form.setFieldValue("send", amountFormatted)
+      form.validateAllFields("blur")
 
       // Check if limitPrice exists before computing receive amount
       if (!form.state?.values?.limitPrice) {
@@ -171,7 +172,7 @@ export function Limit() {
       setTradeSide(newSide)
 
       // Reset slider value
-      setSendSliderValue(0)
+      handleSliderChange(0)
 
       // Keep the current pay amount in the shared state
       const currentPayAmount = form.state.values.send
@@ -191,22 +192,6 @@ export function Limit() {
       console.error("Error in swap direction:", error)
     }
   }
-
-  React.useEffect(() => {
-    handleSliderChange(sendSliderValue)
-  }, [sendSliderValue])
-
-  React.useEffect(() => {
-    if (!form.state.values.limitPrice) {
-      form.setFieldValue(
-        "limitPrice",
-        getExactWeiAmount(
-          book?.midPrice.toString() ?? "",
-          sendToken?.displayDecimals ?? 18,
-        ),
-      )
-    }
-  }, [])
 
   // Get button text based on transaction state
   const getButtonText = () => {
@@ -254,44 +239,47 @@ export function Limit() {
               }
             >
               {(field) => (
-                <>
-                  <EnhancedNumericInput
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={({ target: { value } }) => {
-                      field.handleChange(value)
-                      // We don't need to update the shared state here anymore
-                      // as it's handled by the useEffect
+                <EnhancedNumericInput
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={({ target: { value } }) => {
+                    field.handleChange(value)
+                    // We don't need to update the shared state here anymore
+                    // as it's handled by the useEffect
+                    computeReceiveAmount()
+                  }}
+                  dollarAmount={calcDollarAmt(
+                    field.state.value,
+                    sendToken?.address !== currentMarket?.base.address,
+                    tradeSide,
+                  )}
+                  inputClassName="text-text-primary text-base h-7"
+                  balanceAction={{
+                    onClick: () => {
+                      field.handleChange(
+                        getExactWeiAmount(
+                          sendBalanceWithEth.toString(),
+                          sendToken?.priceDisplayDecimals || 18,
+                        ),
+                      )
                       computeReceiveAmount()
-                    }}
-                    inputClassName="text-text-primary text-base h-7"
-                    balanceAction={{
-                      onClick: () => {
-                        field.handleChange(
-                          getExactWeiAmount(
-                            sendBalanceWithEth.toString(),
-                            sendToken?.priceDisplayDecimals || 18,
-                          ),
-                        )
-                        computeReceiveAmount()
-                      },
-                    }}
-                    isWrapping={isWrapping}
-                    token={sendToken}
-                    customBalance={sendBalanceWithEth.toString()}
-                    label="Pay"
-                    disabled={
-                      !currentMarket || sendBalanceWithEth.toString() === "0"
-                    }
-                    showBalance
-                    error={
-                      getAllErrors().send
-                        ? [getAllErrors().send].flat()
-                        : undefined
-                    }
-                  />
-                </>
+                    },
+                  }}
+                  isWrapping={isWrapping}
+                  token={sendToken}
+                  customBalance={sendBalanceWithEth.toString()}
+                  label="Pay"
+                  disabled={
+                    !currentMarket || sendBalanceWithEth.toString() === "0"
+                  }
+                  showBalance
+                  error={
+                    getAllErrors().send
+                      ? [getAllErrors().send].flat()
+                      : undefined
+                  }
+                />
               )}
             </form.Field>
 
@@ -330,6 +318,11 @@ export function Limit() {
                     field.handleChange(value)
                     computeSendAmount()
                   }}
+                  dollarAmount={calcDollarAmt(
+                    field.state.value,
+                    receiveToken?.address !== currentMarket?.base.address,
+                    tradeSide,
+                  )}
                   token={receiveToken}
                   inputClassName="text-text-primary text-base h-7"
                   label="Receive"
@@ -356,7 +349,7 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   token={quoteToken}
-                  label="When price at or below"
+                  label="When price is at or below"
                   disabled={!currentMarket}
                   error={
                     getAllErrors().limitPrice
@@ -367,8 +360,6 @@ export function Limit() {
               )}
             </form.Field>
 
-            {/* slider section */}
-
             <div className="py-3">
               {/* Slider */}
               <div className="px-2">
@@ -376,7 +367,7 @@ export function Limit() {
                   disabled={!currentMarket}
                   value={[sendSliderValue || 0]}
                   onValueChange={(values) => {
-                    setSendSliderValue?.(values[0] || 0)
+                    handleSliderChange(values[0] || 0)
                   }}
                   max={100}
                   step={1}
@@ -399,7 +390,7 @@ export function Limit() {
                     )}
                     onClick={(e) => {
                       e.preventDefault()
-                      setSendSliderValue?.(Number(value))
+                      handleSliderChange(Number(value))
                     }}
                   >
                     {value}%
@@ -415,9 +406,8 @@ export function Limit() {
                   )}
                   onClick={(e) => {
                     e.preventDefault()
-                    setSendSliderValue?.(100)
+                    handleSliderChange(100)
                   }}
-                  // disabled={!currentMarket}
                 >
                   Max
                 </Button>

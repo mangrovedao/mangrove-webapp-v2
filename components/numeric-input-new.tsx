@@ -16,13 +16,13 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
         {icon && (
           <div className="flex items-center absolute inset-y-0 right-0 gap-2">
             <TokenIcon symbol={icon} />
-            <span className="text-text-primary">{icon}</span>
+            <div className="text-text-primary leading-[1]">{icon}</div>
           </div>
         )}
         <Input
           ref={ref}
           className={cn(
-            "text-text-secondary text-3xl w-2/3 bg-bg-primary !outline-none transition-none",
+            "text-text-secondary text-3xl w-2/3 bg-bg-primary !outline-none transition-all",
             { "pl-1": !!icon, "pr-24": !!symbol },
             className,
           )}

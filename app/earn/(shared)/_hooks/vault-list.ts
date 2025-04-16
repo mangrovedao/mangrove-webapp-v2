@@ -103,6 +103,7 @@ export const VAULTS_WHITELIST_BASE_SEPOLIA = [
 
 export const VAULTS_WHITELIST_BASE = [
   {
+    isDeprecated: true,
     manager: "Redacted Labs",
     address: "0xCC1beacCdA8024bA968D63e6db9f01A15D593C52" as Address,
     oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
@@ -118,6 +119,7 @@ export const VAULTS_WHITELIST_BASE = [
     },
   },
   {
+    isDeprecated: true,
     manager: "Redacted Labs",
     address: "0x365cBDdFc764600D4728006730dd055B18f518ce" as Address,
     oracle: "0xEF62766c96FEcC5a44704a97962849D2F6a4394F" as Address,
@@ -133,6 +135,7 @@ export const VAULTS_WHITELIST_BASE = [
     },
   },
   {
+    isDeprecated: true,
     manager: "Redacted Labs",
     address: "0xC95a225fd311E911a610D8274593C19282012119" as Address,
     oracle: "0xcF9115B12502Bb9AA9E644c83c1DcBeFbeBbc1a6" as Address,
@@ -167,6 +170,7 @@ export const VAULTS_WHITELIST_BASE = [
   //   },
   // },
   {
+    isDeprecated: true,
     manager: "Redacted Labs",
     address: "0x8ec6a6BB89ccF694129077954587B25b6c712bc8" as Address,
     oracle: "0xB95FfCFB01F66Bb30F6940aF5118E46F69628cb2" as Address,

@@ -12,52 +12,6 @@ export function AnimatedOrderBookSkeleton() {
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/* Header */}
-      <motion.div
-        className="flex justify-between items-center px-4 py-2 border-b border-border-tertiary bg-bg-secondary/80 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div
-          className="h-6 w-24 bg-bg-tertiary rounded-md"
-          animate={{
-            opacity: [0.5, 0.7, 0.5],
-            backgroundColor: ["#2a2a2a", "#333333", "#2a2a2a"],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 1.5,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="h-6 w-16 bg-bg-tertiary rounded-md"
-          animate={{
-            opacity: [0.5, 0.7, 0.5],
-            backgroundColor: ["#2a2a2a", "#333333", "#2a2a2a"],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 1.5,
-            ease: "easeInOut",
-            delay: 0.2,
-          }}
-        />
-      </motion.div>
-
-      {/* Table Header */}
-      <motion.div
-        className="flex justify-between px-4 py-2 border-b border-border-tertiary text-xs text-muted-foreground"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.7 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <div className="flex-1">Price</div>
-        <div className="flex-1 text-center">Size</div>
-        <div className="flex-1 text-right">Total</div>
-      </motion.div>
-
       {/* Asks (Sell) Section */}
       <div className="flex-1 overflow-hidden">
         <div className="flex flex-col">
