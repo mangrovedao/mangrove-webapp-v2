@@ -1,22 +1,20 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
+import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
+import { formatUnits, parseUnits } from "viem"
+import { useAccount, useBalance } from "wagmi"
 
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { useLogics } from "@/hooks/use-addresses"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { Book } from "@mangrovedao/mgv"
-import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
-import { useConnectModal } from "@rainbow-me/rainbowkit"
-import { formatUnits, parseUnits } from "viem"
-import { useAccount, useBalance } from "wagmi"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -58,11 +56,7 @@ export function useLimit(props: Props) {
   })
 
   const { book } = useBook()
-  const logics = useLogics()
 
-  const send = form.useStore((state) => state.values.send)
-
-  const timeInForce = form.useStore((state) => state.values.timeInForce)
   const isWrapping = form.useStore((state) => state.values.isWrapping)
 
   const isBid = bs === BS.buy
@@ -107,34 +101,6 @@ export function useLimit(props: Props) {
     ? Number(sendTokenBalanceFormatted) +
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
     : Number(sendTokenBalanceFormatted)
-
-  // Helper function to check if book is a complete Book object
-  const isCompleteBook = (book: any): book is Book => {
-    return (
-      book &&
-      "asksConfig" in book &&
-      "bidsConfig" in book &&
-      "marketConfig" in book &&
-      "midPrice" in book
-    )
-  }
-
-  const fee = Number(
-    (isCompleteBook(book)
-      ? isBid
-        ? book.asksConfig?.fee
-        : book.bidsConfig?.fee
-      : 0) ?? 0,
-  )
-
-  const feeInPercentageAsString = new Intl.NumberFormat("en-US", {
-    style: "percent",
-    maximumFractionDigits: 2,
-  }).format(fee / 10_000)
-
-  const tickSize = currentMarket?.tickSpacing
-    ? `${((1.0001 ** Number(currentMarket?.tickSpacing) - 1) * 100).toFixed(2)}%`
-    : ""
 
   const [baseAmount, quoteAmount, humanPrice, sendAmount, receiveAmount] =
     form.useStore((state) => {
@@ -258,15 +224,13 @@ export function useLimit(props: Props) {
 
   React.useEffect(() => {
     form?.reset()
-  }, [form, currentMarket?.base, currentMarket?.quote])
+  }, [currentMarket?.base, currentMarket?.quote])
 
   React.useEffect(() => {
     const send = form?.getFieldValue("send")
     const receive = form?.getFieldValue("receive")
-
     form.setFieldValue("sendFrom", "simple")
     form.setFieldValue("receiveTo", "simple")
-
     if (!(send && receive)) return
     form.setFieldValue("send", receive)
     form.setFieldValue("receive", send)
@@ -360,33 +324,18 @@ export function useLimit(props: Props) {
   ])
 
   return {
+    computeReceiveAmount,
+    computeSendAmount,
+    sendTokenBalance,
     form,
-    book,
-    timeInForce,
-    sendFrom,
-    send,
-    receiveTo,
     sendToken,
     receiveToken,
-    sendTokenBalance,
-    sendTokenBalanceFormatted,
-    ethBalance,
-    receiveTokenBalance,
-    receiveTokenBalanceFormatted,
-    logics,
-    sendLogics,
-    spotPrice,
-    isWrapping,
-    receiveLogics,
-    sendBalanceWithEth,
-    feeInPercentageAsString,
-    tickSize,
-    minVolume: minComputedVolume,
-    minVolumeFormatted,
-    computeSendAmount,
-    computeReceiveAmount,
-    handleSubmit,
     quoteToken,
+    receiveTokenBalanceFormatted,
+    minVolumeFormatted,
+    isWrapping,
+    sendBalanceWithEth,
+    ethBalance,
     getAllErrors,
   }
 }

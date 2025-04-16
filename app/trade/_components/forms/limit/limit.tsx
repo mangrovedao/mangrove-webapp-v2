@@ -142,7 +142,10 @@ export function Limit() {
       setSendSliderValue(value)
 
       // Format the amount for display
-      const amountFormatted = formatUnits(amount, sendToken.decimals)
+      const amountFormatted = getExactWeiAmount(
+        formatUnits(amount, sendToken.decimals),
+        sendToken.priceDisplayDecimals,
+      )
 
       form.setFieldValue("send", amountFormatted)
       form.validateAllFields("blur")
@@ -248,7 +251,7 @@ export function Limit() {
                   }}
                   dollarAmount={calcDollarAmt(
                     field.state.value,
-                    true,
+                    sendToken?.address !== currentMarket?.base.address,
                     tradeSide,
                   )}
                   inputClassName="text-text-primary text-base h-7"
@@ -317,7 +320,7 @@ export function Limit() {
                   }}
                   dollarAmount={calcDollarAmt(
                     field.state.value,
-                    false,
+                    receiveToken?.address !== currentMarket?.base.address,
                     tradeSide,
                   )}
                   token={receiveToken}

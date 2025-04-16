@@ -61,18 +61,14 @@ export function Market() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    handleSubmit,
     sendTokenBalance,
     form,
     market,
     sendToken,
     receiveToken,
-    hasEnoughVolume,
-    send,
     quote,
     avgPrice,
     feeInPercentageAsString,
-    spotPrice,
     isWrapping,
     slippage,
     getAllErrors,
@@ -292,7 +288,7 @@ export function Market() {
                   onBlur={field.handleBlur}
                   dollarAmount={calcDollarAmt(
                     field.state.value,
-                    true,
+                    sendToken?.address !== market?.base.address,
                     tradeSide,
                   )}
                   onChange={({ target: { value } }) => {
@@ -363,7 +359,7 @@ export function Market() {
                   }}
                   dollarAmount={calcDollarAmt(
                     field.state.value,
-                    false,
+                    receiveToken?.address !== market?.base.address,
                     tradeSide,
                   )}
                   token={receiveToken}
