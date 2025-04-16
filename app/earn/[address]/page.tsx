@@ -69,8 +69,13 @@ export default function Page() {
   const {
     data: { vault },
     refetch,
-    isPending,
   } = useVault(params.address)
+
+  useEffect(() => {
+    if (vault?.isDeprecated) {
+      setAction(Action.Withdraw)
+    }
+  }, [vault])
 
   const baseDepositDollar = vault?.baseDollarPrice
     ? Number(formatUnits(vault.userBaseBalance, vault.market.base.decimals)) *
@@ -526,64 +531,73 @@ export default function Page() {
                 transition={{ duration: 0.4, delay: 0.6 }}
                 style={{ boxShadow: "0 0 15px 0 rgba(0, 255, 170, 0.1)" }}
               >
-                <div className="w-full">
-                  <CustomRadioGroup
-                    name={"action"}
-                    value={action}
-                    onValueChange={(e: Action) => {
-                      setAction(e)
-                    }}
-                  >
-                    {Object.values(Action).map((action) => (
-                      <CustomRadioGroupItem
-                        key={action}
-                        disabled={
-                          action === Action.Deposit && vault?.isDeprecated
-                        }
+                {!vault ? (
+                  <>
+                    <Skeleton className="h-10 mb-4 w-full" />
+                    <Skeleton className="h-[200px] w-full bg-bg-primary" />
+                  </>
+                ) : (
+                  <>
+                    <div className="w-full">
+                      <CustomRadioGroup
+                        name={"action"}
                         value={action}
-                        id={action}
-                        className="capitalize"
-                      >
-                        {action}
-                      </CustomRadioGroupItem>
-                    ))}
-                  </CustomRadioGroup>
-                </div>
-                <div className="relative min-h-[360px]">
-                  <AnimatePresence mode="wait">
-                    {action === Action.Deposit && !vault?.isDeprecated ? (
-                      <motion.div
-                        key="deposit-form"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
+                        onValueChange={(e: Action) => {
+                          setAction(e)
                         }}
-                        className="absolute inset-0"
                       >
-                        <DepositForm />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="withdraw-form"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
-                        }}
-                        className="absolute inset-0"
-                      >
-                        <WithdrawForm />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                        {Object.values(Action).map((action) => (
+                          <CustomRadioGroupItem
+                            key={action}
+                            disabled={
+                              action === Action.Deposit && vault?.isDeprecated
+                            }
+                            value={action}
+                            id={action}
+                            className="capitalize"
+                          >
+                            {action}
+                          </CustomRadioGroupItem>
+                        ))}
+                      </CustomRadioGroup>
+                    </div>
+                    <div className="relative min-h-[360px]">
+                      <AnimatePresence mode="wait">
+                        {action === Action.Deposit && !vault?.isDeprecated ? (
+                          <motion.div
+                            key="deposit-form"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 30,
+                            }}
+                            className="absolute inset-0"
+                          >
+                            <DepositForm />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="withdraw-form"
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 30,
+                            }}
+                            className="absolute inset-0"
+                          >
+                            <WithdrawForm />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </>
+                )}
               </motion.div>
             )}
           </div>

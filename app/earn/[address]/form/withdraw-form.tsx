@@ -26,16 +26,15 @@ const burnABI = parseAbi([
 ])
 
 export function WithdrawForm({ className }: { className?: string }) {
-  const [sliderValue, setSliderValue] = React.useState(0)
+  const [sliderValue, setSliderValue] = React.useState(25)
   const [baseWithdraw, setBaseWithdraw] = React.useState("0")
   const [quoteWithdraw, setQuoteWithdraw] = React.useState("0")
   const [withdrawAmount, setWithdrawAmount] = React.useState("0")
   const { data: hash, isPending, writeContract } = useWriteContract()
   const queryClient = useQueryClient()
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    })
+  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  })
 
   React.useEffect(() => {
     if (isConfirmed) {
@@ -46,14 +45,8 @@ export function WithdrawForm({ className }: { className?: string }) {
     }
   }, [isConfirmed, queryClient])
 
-  const {
-    baseToken,
-    quoteToken,
-    vault,
-    quoteDeposited,
-    baseDeposited,
-    isLoading,
-  } = useForm()
+  const { baseToken, quoteToken, vault, quoteDeposited, baseDeposited } =
+    useForm()
 
   const { address } = useAccount()
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
@@ -72,10 +65,6 @@ export function WithdrawForm({ className }: { className?: string }) {
     setQuoteWithdraw(formatUnits(quoteAmount, quoteToken?.decimals ?? 18))
     setWithdrawAmount(formatUnits(mintedAmunt, vault?.decimals ?? 18))
   }
-
-  React.useEffect(() => {
-    handleSliderChange(25)
-  }, [quoteDeposited, baseDeposited])
 
   if (!baseToken || !quoteToken || !vault)
     return (
@@ -112,12 +101,6 @@ export function WithdrawForm({ className }: { className?: string }) {
                 quoteToken?.displayDecimals ?? 4,
               )}
             />
-            {/* <span className="text-text-tertiary text-xs">Burn:</span>
-            <Line
-              title={vault?.symbol}
-              icon={vault?.symbol}
-              value={Number(withdrawAmount).toFixed(4)}
-            /> */}
           </div>
           {/* Buttons loop */}
           <div className="flex justify-center space-x-2 mt-2">
@@ -136,7 +119,6 @@ export function WithdrawForm({ className }: { className?: string }) {
                   e.preventDefault()
                   handleSliderChange(value)
                 }}
-                // disabled={!currentMarket}
               >
                 {value}%
               </Button>
@@ -153,7 +135,6 @@ export function WithdrawForm({ className }: { className?: string }) {
                 e.preventDefault()
                 handleSliderChange(100)
               }}
-              // disabled={!currentMarket}
             >
               Max
             </Button>
