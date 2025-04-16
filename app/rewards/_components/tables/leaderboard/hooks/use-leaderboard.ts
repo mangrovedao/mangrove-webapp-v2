@@ -115,15 +115,15 @@ export const useLeaderboard = <T = LeaderboardEntry[]>({
             rank: 0, // Will be assigned after sorting
             formattedVolumeRewards: getExactWeiAmount(
               rewards.volumeRewards.toString(),
-              8,
+              2,
             ),
             formattedVaultRewards: getExactWeiAmount(
               rewards.vaultRewards.toString(),
-              8,
+              2,
             ),
             formattedTotalRewards: getExactWeiAmount(
               (rewards.volumeRewards + rewards.vaultRewards).toString(),
-              8,
+              2,
             ),
           }
         },

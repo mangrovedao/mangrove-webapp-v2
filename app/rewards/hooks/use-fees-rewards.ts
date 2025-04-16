@@ -218,6 +218,6 @@ export const useFeesRewards = () => {
         return []
       }
     },
-    enabled: Boolean(user) && Boolean(defaultChain) && tokens.length > 0,
+    enabled: Boolean(defaultChain) && tokens.length > 0,
   })
 }

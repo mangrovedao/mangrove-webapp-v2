@@ -2,6 +2,7 @@
 import React from "react"
 
 import { DataTable } from "@/components/ui/data-table-new/data-table"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useAccount } from "wagmi"
 import { useMs2Points } from "./hooks/use-ms2-points"
 import { useMs2Table } from "./hooks/use-ms2-table"
@@ -48,27 +49,31 @@ export function Ms2Table({ epochId }: { epochId?: number }) {
           </div>
         </div>
       </aside> */}
-      <DataTable
-        table={table}
-        emptyArrayMessage={emptyMessage}
-        isError={!!error}
-        isLoading={!data || isLoading}
-        isRowHighlighted={(row) =>
-          row.address.toLowerCase() === user?.toLowerCase()
-        }
-        rowHighlightedClasses={{
-          row: "text-white hover:opacity-80 transition-all",
-          inner: "!bg-[#1c3a40]",
-        }}
-        cellClasses="font-roboto"
-        tableRowClasses="font-ubuntuLight"
-        pagination={{
-          onPageChange: setPageDetails,
-          page,
-          pageSize,
-          count,
-        }}
-      />
+      <ScrollArea className="h-full" scrollHideDelay={200}>
+        <DataTable
+          table={table}
+          emptyArrayMessage={emptyMessage}
+          isError={!!error}
+          isLoading={!data || isLoading}
+          isRowHighlighted={(row) =>
+            row.address.toLowerCase() === user?.toLowerCase()
+          }
+          rowHighlightedClasses={{
+            row: "text-white hover:opacity-80 transition-all",
+            inner: "!bg-[#1c3a40]",
+          }}
+          cellClasses="font-roboto"
+          tableRowClasses="font-ubuntuLight"
+          pagination={{
+            onPageChange: setPageDetails,
+            page,
+            pageSize,
+            count,
+          }}
+        />
+        <ScrollBar orientation="vertical" className="z-50" />
+        <ScrollBar orientation="horizontal" className="z-50" />
+      </ScrollArea>
     </>
   )
 }

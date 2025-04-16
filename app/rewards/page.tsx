@@ -12,14 +12,12 @@ import {
 import { NumericValue } from "@/components/numeric-value"
 import { Caption } from "@/components/typography/caption"
 import { Title } from "@/components/typography/title"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { MangroveLogo, ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
 
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { arbitrum } from "viem/chains"
-import { useAccount } from "wagmi"
 import {
   LeaderboardEntry,
   useLeaderboard,
@@ -29,7 +27,6 @@ import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 
 export default function Page() {
   const [tab, setTab] = React.useState("leaderboard")
-  const { address: user } = useAccount()
   const { data: leaderboard } = useLeaderboard({
     select: (data) => data,
   })
@@ -114,7 +111,7 @@ export default function Page() {
             <hr className="px-6" />
           </div> */}
           <div className="px-4 py-5 flex gap-4 items-center justify-between relative">
-            <div className="flex items-center gap-4 w-full justify-evenly">
+            <div className="flex items-center gap-4 w-full justify-evenly h-[100px]">
               <div className="flex flex-col">
                 <Label>Total Reward</Label>
                 <Value className="flex-wrap text-wrap">
@@ -151,7 +148,7 @@ export default function Page() {
             </div>
 
             {/* Middle side: Falling Mangrove Logos */}
-            <div className="absolute inset-0 w-full overflow-hidden opacity-80 flex items-center justify-center">
+            <div className="absolute inset-0 w-full overflow-hidden opacity-80 flex items-center justify-center h-[500px]">
               <div className="falling-container relative w-full h-full">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div
@@ -166,51 +163,40 @@ export default function Page() {
           </div>
 
           <CustomTabs value={tab}>
-            <ScrollArea className="h-full w-full" scrollHideDelay={200}>
-              <div className="flex justify-between items-center">
-                <CustomTabsList className="flex p-0 justify-start space-x-0 w-full h-8">
-                  <CustomTabsTrigger
-                    onClick={() => setTab("leaderboard")}
-                    key={`leaderboard`}
-                    value={"leaderboard"}
-                    className="capitalize w-full rounded-none"
-                  >
-                    Leaderboard
-                  </CustomTabsTrigger>
-                  {arbitrum.id === defaultChain.id && (
-                    <>
-                      <CustomTabsTrigger
-                        onClick={() => setTab("ms2")}
-                        key={`ms2`}
-                        value={"ms2"}
-                        className="capitalize w-5/12 rounded-none"
-                      >
-                        MS2 Total rewards
-                      </CustomTabsTrigger>
-                    </>
-                  )}
-                </CustomTabsList>
-              </div>
-              <ScrollBar orientation="horizontal" className="z-50" />
-            </ScrollArea>
+            <div className="flex justify-between items-center">
+              <CustomTabsList className="flex p-0 justify-start space-x-0 w-full h-8">
+                <CustomTabsTrigger
+                  onClick={() => setTab("leaderboard")}
+                  key={`leaderboard`}
+                  value={"leaderboard"}
+                  className="capitalize w-full rounded-none"
+                >
+                  Leaderboard
+                </CustomTabsTrigger>
+                {arbitrum.id === defaultChain.id && (
+                  <>
+                    <CustomTabsTrigger
+                      onClick={() => setTab("ms2")}
+                      key={`ms2`}
+                      value={"ms2"}
+                      className="capitalize w-5/12 rounded-none"
+                    >
+                      MS2 Total rewards
+                    </CustomTabsTrigger>
+                  </>
+                )}
+              </CustomTabsList>
+            </div>
 
             <div className="w-full pb-4 px-1">
               {/* leaderboard */}
-              <CustomTabsContent value={"leaderboard"}>
-                <div className="px-2">
-                  <LeaderboardTable height="600px" />
-                </div>
+              <CustomTabsContent value={"leaderboard"} className="px-2 h-full">
+                <LeaderboardTable height="600px" />
               </CustomTabsContent>
 
               {/* ms2 leaderboards */}
-              <CustomTabsContent value={"ms2"}>
-                <ScrollArea className="h-full" scrollHideDelay={200}>
-                  <div className="px-2 h-full">
-                    <Ms2Table />
-                  </div>
-                  <ScrollBar orientation="vertical" className="z-50" />
-                  <ScrollBar orientation="horizontal" className="z-50" />
-                </ScrollArea>
+              <CustomTabsContent value={"ms2"} className="px-2 h-full">
+                <Ms2Table />
               </CustomTabsContent>
             </div>
           </CustomTabs>

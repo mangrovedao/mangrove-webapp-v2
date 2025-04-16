@@ -29,9 +29,9 @@ interface LeaderboardTableProps {
 }
 
 export function LeaderboardTable({
-  height = "500px", // Default fixed height
+  height = "600px", // Default fixed height
 }: LeaderboardTableProps) {
-  const { address: user, chainId, isConnected } = useAccount()
+  const { address: user, chainId } = useAccount()
   const loadingRef = useRef<HTMLDivElement>(null)
   const pageSize = 10
 
@@ -86,10 +86,6 @@ export function LeaderboardTable({
     user,
   })
 
-  const emptyMessage = !isConnected
-    ? "Connect your wallet to see your points"
-    : "No rewards data yet."
-
   return (
     <div className="relative">
       <ScrollArea
@@ -100,7 +96,7 @@ export function LeaderboardTable({
         <div className="min-w-full">
           <DataTable
             table={table}
-            emptyArrayMessage={emptyMessage}
+            emptyArrayMessage="No rewards data yet."
             isError={!!error}
             isLoading={!data || isLoading}
             isRowHighlighted={(row) =>

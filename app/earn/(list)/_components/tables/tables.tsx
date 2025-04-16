@@ -65,13 +65,6 @@ export function Tables() {
           </div>
 
           <div className="w-full ">
-            {/* <div className="flex gap-2 items-center justify-end mr-2">
-              <Switch
-                checked={showOnlyActive}
-                onCheckedChange={() => setShowOnlyActive(!showOnlyActive)}
-              />
-              <span className="text-sm">Active Vaults</span>
-            </div> */}
             <Suspense fallback={<TableLoadingSkeleton />}>
               <CustomTabsContent value={TableTypes.VAULTS}>
                 <LazyVaults />
