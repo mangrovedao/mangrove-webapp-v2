@@ -1,57 +1,86 @@
 import { printEvmError } from "@/utils/errors"
 
-import { getOpenMarkets } from "@mangrovedao/mgv/actions"
+import { useDefaultChain } from "@/hooks/use-default-chain"
+import { MarketParams, Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
-import {
-  useCashnesses,
-  useMangroveAddresses,
-  useSymbolOverrides,
-} from "./use-addresses"
-import { useNetworkClient } from "./use-network-client"
+import { Address } from "viem"
+import { z } from "zod"
+import { useCashnesses, useSymbolOverrides } from "./use-addresses"
+
+// Define Zod schemas that match the expected Mangrove types
+const TokenSchema = z
+  .object({
+    address: z.string().transform((val) => val as Address),
+    symbol: z.string(),
+    decimals: z.number(),
+  })
+  .transform(
+    (token) =>
+      ({
+        ...token,
+        displayDecimals: token.decimals,
+        priceDisplayDecimals: token.decimals,
+        mgvTestToken: false,
+      }) as Token,
+  )
+
+const MarketSchema = z
+  .object({
+    base: TokenSchema,
+    quote: TokenSchema,
+    bidsOlKeyHash: z.string(),
+    asksOlKeyHash: z.string(),
+    tickSpacing: z.number().transform((val) => BigInt(val)),
+  })
+  .transform((market) => market as MarketParams)
+
+const OpenMarketsResponseSchema = z.object({
+  tokens: z.array(TokenSchema),
+  markets: z.array(MarketSchema),
+})
+
 export function useOpenMarkets() {
-  const client = useNetworkClient()
-  const networkClient = useNetworkClient()
-  const addresses = useMangroveAddresses()
+  const { defaultChain } = useDefaultChain()
   const cashnesses = useCashnesses()
   const symbolOverride = useSymbolOverrides()
 
-  const clientToUse = client.account ? client : networkClient
-
   const { data, isLoading, isError } = useQuery({
-    queryKey: [
-      "open-markets",
-      client?.key,
-      cashnesses,
-      addresses,
-      clientToUse?.chain?.id,
-      networkClient?.key,
-    ],
+    queryKey: ["open-markets", defaultChain.id, cashnesses, symbolOverride],
     queryFn: async () => {
       try {
-        if (!clientToUse || !networkClient)
-          throw new Error("No market client found")
+        if (!defaultChain.id) throw new Error("Chain ID not found")
 
-        return await getOpenMarkets(clientToUse, addresses, {
-          cashnesses: Object.fromEntries(
-            Object.entries(cashnesses).filter(Boolean),
-          ),
-          symbolOverrides: Object.fromEntries(
-            Object.entries(symbolOverride).filter(Boolean),
-          ),
-        })
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_INDEXER_URL}/markets/open/${defaultChain.id}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              cashnesses,
+              overrides: symbolOverride,
+            }),
+          },
+        )
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+
+        // Parse and validate in one step
+        return OpenMarketsResponseSchema.parse(await response.json())
       } catch (error) {
         console.error("Error fetching open markets:", error)
         printEvmError(error)
-        return []
+        return { tokens: [], markets: [] }
       }
     },
-    enabled: !!(client?.key && cashnesses && addresses),
+    enabled: !!defaultChain.id,
     retry: true,
-    staleTime: 1000 * 30, // 30 seconds
   })
 
   return {
-    openMarkets: data,
+    openMarkets: data?.markets || [],
+    tokens: data?.tokens || [],
     isLoading,
     isError,
   }
