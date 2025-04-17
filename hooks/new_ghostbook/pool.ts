@@ -59,6 +59,7 @@ async function getPools(
   const data = await fetch(
     `https://pools.mgvinfra.com/pool/?${params.toString()}`,
   )
+
   return data.json() as Promise<Pool[]>
 }
 

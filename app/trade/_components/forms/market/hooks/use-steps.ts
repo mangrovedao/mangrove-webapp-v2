@@ -6,8 +6,8 @@ import { Address, parseUnits } from "viem"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
+import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useMarketClient } from "@/hooks/use-market"
-import { useAccount } from "wagmi"
 
 type Props = {
   bs: BS
@@ -18,8 +18,8 @@ type Props = {
 
 export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
   const marketClient = useMarketClient()
-  const { chain } = useAccount()
   const { mangroveChain } = useRegistry()
+  const { pool } = usePool()
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -30,7 +30,7 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
       marketClient?.name,
       sendAmount,
       sendToken?.address?.toString(),
-      mangroveChain?.ghostbook,
+      pool?.pool,
     ],
     queryFn: async () => {
       try {
@@ -55,42 +55,38 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
           return null
         }
 
-        if (!mangroveChain) {
-          console.warn("Mangrove chain is missing")
+        if (!pool?.pool) {
+          console.warn("Pool is missing")
           return null
         }
 
-        // Base case - handle non-Base chain
-        if (chain?.id !== 84532) {
-          try {
-            // Check and increase allowance for Ghostbook to spend user's tokens
-            const allowance = await checkAllowance(
-              marketClient,
-              user,
-              mangroveChain.ghostbook as Address,
-              sendToken.address,
-            )
+        try {
+          // Check and increase allowance for Ghostbook to spend user's tokens
+          const allowance = await checkAllowance(
+            marketClient,
+            user,
+            mangroveChain?.ghostbook as Address,
+            sendToken.address,
+          )
 
-            if (allowance < parseUnits(sendAmount, sendToken.decimals)) {
-              return [
-                {
-                  done: false,
-                  step: `Approve ${sendToken?.symbol}`,
-                },
-              ]
-            }
-
+          if (allowance < parseUnits(sendAmount, sendToken.decimals)) {
             return [
               {
-                done: true,
+                done: false,
                 step: `Approve ${sendToken?.symbol}`,
               },
             ]
-          } catch (allowanceError) {
-            console.error("Error checking allowance:", allowanceError)
-            toast.error("Error checking token allowance")
-            return null
           }
+
+          return [
+            {
+              done: true,
+              step: `Approve ${sendToken?.symbol}`,
+            },
+          ]
+        } catch (allowanceError) {
+          console.error("Error checking allowance:", allowanceError)
+          toast.error("Error checking token allowance")
         }
 
         // Base chain - get market order steps
@@ -118,7 +114,7 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
       !!user &&
       !!sendAmount &&
       !!sendToken?.address &&
-      !!mangroveChain?.ghostbook,
+      !!pool?.pool,
     retry: 1, // Limit retries to avoid spamming the user with error messages
   })
 }

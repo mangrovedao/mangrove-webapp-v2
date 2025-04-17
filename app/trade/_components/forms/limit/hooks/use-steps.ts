@@ -34,6 +34,7 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
     queryFn: async () => {
       try {
         if (!marketClient?.name || !user || !addresses) return null
+
         const userRouter = await getUserRouter(
           networkClient as Client,
           addresses,

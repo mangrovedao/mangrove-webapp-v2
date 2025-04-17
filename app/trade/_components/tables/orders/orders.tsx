@@ -99,14 +99,6 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
           isLoading={isLoading && !data}
           emptyArrayMessage="No orders currently active"
           onRowClick={(order) => {
-            console.log(
-              order,
-              markets?.find(
-                (m) =>
-                  m.base.address.toLocaleLowerCase() ===
-                  order?.baseAddress?.toLocaleLowerCase(),
-              ),
-            )
             setMarket(
               markets?.find(
                 (m) =>

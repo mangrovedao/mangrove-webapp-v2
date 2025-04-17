@@ -12,7 +12,6 @@ import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -24,7 +23,6 @@ import { useTradeInfos } from "../hooks/use-trade-infos"
 import { calcDollarAmt } from "../utils"
 import { useMarketForm } from "./hooks/use-market"
 import { useMarketTransaction } from "./hooks/use-market-transaction"
-import { useMarketSteps } from "./hooks/use-steps"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
@@ -78,22 +76,14 @@ export function Market() {
   })
 
   // Registry and trade infos
-  const { mangroveChain } = useRegistry()
-  const { baseToken, quoteToken, spender } = useTradeInfos("market", tradeSide)
-
-  // Market steps to check if approval is needed
-  const { data: marketOrderSteps } = useMarketSteps({
-    user: address,
-    bs: tradeSide,
-    sendAmount: form.state.values.send,
-    sendToken,
-  })
+  const { baseToken } = useTradeInfos("market", tradeSide)
 
   // Use the transaction hook
   const {
     isButtonLoading,
     onSubmit,
     getButtonText: getTransactionButtonText,
+    marketOrderSteps,
   } = useMarketTransaction({
     form,
     tradeSide,
