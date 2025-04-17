@@ -1,6 +1,6 @@
 import useMarket from "@/providers/market"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Address, TransactionReceipt, parseUnits } from "viem"
+import { Address, parseUnits } from "viem"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useLogics, useMangroveAddresses } from "@/hooks/use-addresses"
@@ -23,11 +23,7 @@ import { TimeInForce } from "../enums"
 import type { Form } from "../types"
 import { estimateTimestamp } from "../utils"
 
-type Props = {
-  onResult?: (result: TransactionReceipt) => void
-}
-
-export function usePostLimitOrder({ onResult }: Props = {}) {
+export function usePostLimitOrder() {
   const { address: account } = useAccount()
   const { currentMarket: market } = useMarket()
   const queryClient = useQueryClient()
