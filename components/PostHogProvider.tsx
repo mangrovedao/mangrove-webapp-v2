@@ -6,20 +6,18 @@ import { PostHogProvider as PHProvider, usePostHog } from "posthog-js/react"
 import { Suspense, useEffect } from "react"
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  if (typeof window === "undefined") {
-    return
-  }
+  useEffect(() => {
+    const protocol = window.location.protocol
+    const host = window.location.host
+    const origin = `${protocol}//${host}`
 
-  const protocol = window.location.protocol
-  const host = window.location.host
-  const origin = `${protocol}//${host}`
-
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-    api_host: origin + "/ingest",
-    ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST,
-    capture_pageview: false, // We capture pageviews manually
-    capture_pageleave: true, // Enable pageleave capture
-  })
+    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+      api_host: origin + "/ingest",
+      ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST,
+      capture_pageview: false,
+      capture_pageleave: true,
+    })
+  }, [])
 
   return (
     <PHProvider client={posthog}>
