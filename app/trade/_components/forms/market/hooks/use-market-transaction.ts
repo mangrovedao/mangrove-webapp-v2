@@ -55,7 +55,7 @@ export function useMarketTransaction({
   const post = usePostMarketOrder({
     onResult: (result) => {
       setTxState("idle")
-      toast.success("Transaction completed successfully!")
+      toast.success("Order submitted successfully!")
       if (onTransactionSuccess) {
         onTransactionSuccess()
       }
