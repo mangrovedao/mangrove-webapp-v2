@@ -15,6 +15,7 @@ import { Title } from "@/components/typography/title"
 import { MangroveLogo, ToucanIllustration } from "@/svgs"
 import { cn } from "@/utils"
 
+import { Spinner } from "@/components/ui/spinner"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { arbitrum } from "viem/chains"
@@ -27,16 +28,17 @@ import { Ms2Table } from "./_components/tables/ms2/ms2-table"
 
 export default function Page() {
   const [tab, setTab] = React.useState("leaderboard")
-  const { data: leaderboard } = useLeaderboard({
+  const {
+    data: leaderboard,
+    isLoading,
+    isFetching,
+  } = useLeaderboard({
     select: (data) => data,
   })
   const { defaultChain } = useDefaultChain()
 
-  // Extract the flattened leaderboard data from the new structure
-  const leaderboardData = leaderboard || []
-
   // Calculate total rewards across all users
-  const totalStats = leaderboardData.reduce(
+  const totalStats = leaderboard?.reduce(
     (
       acc: {
         totalVolumeRewards: number
@@ -70,20 +72,20 @@ export default function Page() {
       </div>
 
       <div className="grid grid-cols-6 gap-10 mt-8">
-        <div className="col-span-full">
+        <div className="col-span-full ">
           <div
-            className="w-full rounded-sm border border-solid p-3 relative "
+            className="rounded-sm border border-solid p-3 relative max-w-[940px] mx-auto"
             style={{
               boxShadow: "0px 0px 24px rgba(0, 203, 111, 0.4)",
             }}
           >
             <div
-              className="absolute inset-[1px] rounded-sm -z-20"
+              className="absolute inset-[1px] rounded-sm -z-20 pl-5!"
               style={{
                 background: "linear-gradient(30deg, #7BAFB9 0%, #00CB6F 100%)",
               }}
             ></div>
-            <div className="absolute inset-[3px] bg-[#0B1819] rounded-sm -z-10"></div>
+            <div className="absolute inset-[3px] bg-[#0B1819] rounded-sm -z-10 pl-5!"></div>
             <div className="absolute top-0 right-0 hidden sm:block md:-translate-x-1/2 -translate-y-2/3">
               <ToucanIllustration />
             </div>
@@ -114,36 +116,50 @@ export default function Page() {
             <div className="flex items-center gap-4 w-full justify-evenly h-[100px]">
               <div className="flex flex-col">
                 <Label>Total Reward</Label>
-                <Value className="flex-wrap text-wrap">
-                  <NumericValue
-                    value={getExactWeiAmount(
-                      totalStats?.totalRewards.toString() ?? "0",
-                      8,
-                    )}
-                  />
-                </Value>
+                {isLoading ? (
+                  <Spinner className="w-4 h-4" />
+                ) : (
+                  <Value size="normal">
+                    <NumericValue
+                      value={getExactWeiAmount(
+                        totalStats?.totalRewards.toString() ?? "0",
+                        8,
+                      )}
+                    />
+                  </Value>
+                )}
               </div>
+
               <div className="flex flex-col">
                 <Label>Volume Rewards</Label>
-                <Value size="normal">
-                  <NumericValue
-                    value={getExactWeiAmount(
-                      totalStats?.totalVolumeRewards.toString() ?? "0",
-                      8,
-                    )}
-                  />
-                </Value>
+                {isLoading ? (
+                  <Spinner className="w-4 h-4" />
+                ) : (
+                  <Value size="normal">
+                    <NumericValue
+                      value={getExactWeiAmount(
+                        totalStats?.totalVolumeRewards.toString() ?? "0",
+                        8,
+                      )}
+                    />
+                  </Value>
+                )}
               </div>
+
               <div className="flex flex-col">
                 <Label>Vault Rewards</Label>
-                <Value size="normal">
-                  <NumericValue
-                    value={getExactWeiAmount(
-                      totalStats?.totalVaultRewards.toString() ?? "0",
-                      8,
-                    )}
-                  />
-                </Value>
+                {isLoading ? (
+                  <Spinner className="w-4 h-4" />
+                ) : (
+                  <Value size="normal">
+                    <NumericValue
+                      value={getExactWeiAmount(
+                        totalStats?.totalVaultRewards.toString() ?? "0",
+                        8,
+                      )}
+                    />
+                  </Value>
+                )}
               </div>
             </div>
 
