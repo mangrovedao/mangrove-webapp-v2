@@ -57,8 +57,8 @@ export default function Page() {
   )
 
   return (
-    <main className="mt-8 px-4">
-      <div className="pl-5 grid">
+    <main className="mt-5">
+      <div className="grid">
         <Title variant={"header1"}>Rewards</Title>
         <Caption className="pl-0.5 text-text-secondary hover:underline !text-sm">
           <Link
