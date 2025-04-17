@@ -1,5 +1,6 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
+import { arbitrum } from "viem/chains"
 import { configurationSchema } from "../schemas/rewards-configuration"
 
 export const useConfiguration = () => {
@@ -9,6 +10,7 @@ export const useConfiguration = () => {
     queryKey: ["rewards-configuration", defaultChain.id],
     queryFn: async () => {
       try {
+        if (defaultChain.id !== arbitrum.id) return null
         const response = await fetch(
           "https://points.mgvinfra.com/configuration",
         )
