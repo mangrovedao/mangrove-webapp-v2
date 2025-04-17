@@ -41,7 +41,6 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
     [ProtocolType.UniswapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
     [ProtocolType.PancakeSwapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
     [ProtocolType.Slipstream]: "0x922F0E2fa80F7dc2E22dBcE5EB3B423E09CE013B",
-    // [ProtocolType.Aerodrome]: "0xF2CACc9ca4eEac1bad53E208C738c728Ab3b381c",
   }
 
   return useMutation({
