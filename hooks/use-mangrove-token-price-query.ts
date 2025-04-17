@@ -33,7 +33,7 @@ const useMangroveTokenPricesQuery = (
         if (!baseAddress || !quoteAddress || !tickSpacing) return null
 
         const res = await fetch(
-          `https://indexer.mgvinfra.com/price/24-hour/${defaultChain.id}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
+          `${process.env.NEXT_PUBLIC_INDEXER_URL}/price/24-hour/${defaultChain.id}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
         )
 
         const data = await res.json()

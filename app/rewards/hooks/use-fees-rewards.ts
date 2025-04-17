@@ -111,7 +111,7 @@ const fetchTokenFeesData = async (
 ): Promise<FeesApiResponse | null> => {
   try {
     const response = await fetch(
-      `https://indexer.mgvinfra.com/incentives/fees/${chainId}/${token.address}?start=${startTimestamp}&end=${endTimestamp}&budget=${budget}&multiplier=${MULTIPLIER}`,
+      `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/fees/${chainId}/${token.address}?start=${startTimestamp}&end=${endTimestamp}&budget=${budget}&multiplier=${MULTIPLIER}`,
     )
 
     if (!response.ok) {

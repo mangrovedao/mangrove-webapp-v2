@@ -19,7 +19,7 @@ export async function getUserVaultIncentives(
     if (!user || !incentives) return null
 
     const userIncentives = await fetch(
-      `https://indexer.mgvinfra.com/incentives/vaults/${client.chain?.id}/${incentives?.vault}/${user}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}`,
+      `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/vaults/${client.chain?.id}/${incentives?.vault}/${user}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}`,
     )
 
     if (!userIncentives?.ok) {

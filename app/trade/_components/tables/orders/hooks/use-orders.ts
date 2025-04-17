@@ -83,7 +83,7 @@ export function useOrders<T = Order[]>({
 
           try {
             const response = await fetch(
-              `https://indexer.mgvinfra.com/orders/active/${defaultChain.id}/${marketItem.base.address}/${marketItem.quote.address}/${marketItem.tickSpacing}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${process.env.NEXT_PUBLIC_INDEXER_URL}/orders/active/${defaultChain.id}/${marketItem.base.address}/${marketItem.quote.address}/${marketItem.tickSpacing}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
 
             if (!response.ok) {

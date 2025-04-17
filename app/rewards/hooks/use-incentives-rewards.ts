@@ -58,7 +58,7 @@ const fetchVaultIncentivesData = async (
   maxRewards: number,
 ): Promise<VaultIncentivesApiResponse | null> => {
   try {
-    const url = `https://indexer.mgvinfra.com/incentives/vaults/${chainId}/${vaultAddress}?startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&rewardRate=${rewardRate}&maxRewards=${maxRewards}&page=0&pageSize=100`
+    const url = `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/vaults/${chainId}/${vaultAddress}?startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&rewardRate=${rewardRate}&maxRewards=${maxRewards}&page=0&pageSize=100`
 
     const response = await fetch(url)
 
