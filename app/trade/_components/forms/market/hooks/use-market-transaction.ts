@@ -55,11 +55,7 @@ export function useMarketTransaction({
   const post = usePostMarketOrder({
     onResult: (result) => {
       setTxState("idle")
-      // tradeService.openTxCompletedDialog({
-      //   address: result.transactionHash ?? "",
-      //   blockExplorerUrl: chain?.blockExplorers?.default.url,
-      // })
-      toast.success("Transaction completed successfully!")
+      toast.success("Order submitted successfully!")
       if (onTransactionSuccess) {
         onTransactionSuccess()
       }
@@ -137,6 +133,7 @@ export function useMarketTransaction({
         {
           onSettled: () => {
             setTxState("idle")
+            form.reset()
           },
         },
       )

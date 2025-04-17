@@ -53,27 +53,19 @@ export function useLimitTransaction({
   const approve = useInfiniteApproveToken()
 
   // Post order mutation
-  const post = usePostLimitOrder({
-    onResult: (result) => {
-      setTxState("idle")
-    },
-  })
+  const post = usePostLimitOrder()
 
   // Wrapping ETH
   const {
     data: wrappingHash,
-    isPending: isPendingWrapping,
     sendTransaction,
     reset: resetSendTransaction,
   } = useSendTransaction()
 
-  const {
-    isLoading: isLoadingWrapping,
-    isSuccess: isSuccessWrapping,
-    isError: isErrorWrapping,
-  } = useWaitForTransactionReceipt({
-    hash: wrappingHash,
-  })
+  const { isSuccess: isSuccessWrapping, isError: isErrorWrapping } =
+    useWaitForTransactionReceipt({
+      hash: wrappingHash,
+    })
 
   // Calculate if wrapping is needed
   const needsWrapping =
@@ -123,6 +115,7 @@ export function useLimitTransaction({
         {
           onSettled: () => {
             setTxState("idle")
+            form.reset()
           },
         },
       )

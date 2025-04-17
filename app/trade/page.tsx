@@ -40,7 +40,7 @@ export default function Page() {
 
   return (
     <main className="flex flex-col h-full overflow-hidden">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <MarketSelector />
         <PricesBar />
       </div>

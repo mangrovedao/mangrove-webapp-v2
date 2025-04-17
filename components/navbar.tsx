@@ -7,7 +7,6 @@ import {
   BurgerIcon,
   EarnIcon,
   HelpIcon,
-  PersonIcon,
   RewardsIcon,
   SwapIcon,
   TelegramIcon,
@@ -28,7 +27,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
-import { useAccount, useDisconnect } from "wagmi"
+import { useAccount } from "wagmi"
 import ChainSelector from "./chain-selector"
 import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog-new"
 import {
@@ -41,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
+import { Spinner } from "./ui/spinner"
 
 const MENUS = [
   {
@@ -61,8 +61,8 @@ const MENUS = [
   {
     href: "/rewards",
     icon: RewardsIcon,
-    text: "Rewards (soon)",
-    disabled: true,
+    text: "Rewards",
+    disabled: false,
   },
   // {
   //   href: "",
@@ -370,10 +370,9 @@ export function MobileOverlay() {
 
 export default function Navbar() {
   const { toggle } = useMenuStore()
-  const { address, isConnected } = useAccount()
+  const { address, isConnected, isConnecting } = useAccount()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
-  const { disconnect } = useDisconnect()
   const pathname = usePathname()
 
   function handleConnect() {
@@ -561,7 +560,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleAccount}
-                  className="hidden lg:flex border-transparent items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden lg:flex border-transparent items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 h-[38px]! text-xs font-medium transition-colors"
                 >
                   {address && <WalletIcon className="w-4" />}
                   <span>{shortenAddress(address || "")}</span>
@@ -571,10 +570,13 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleConnect}
-                  className="hidden lg:flex items-center border-transparent gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden lg:flex items-center border-transparent h-[38px] gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
                 >
-                  <span>Connect</span>
-                  <PersonIcon />
+                  {isConnecting ? (
+                    <Spinner className="h-6" />
+                  ) : (
+                    <span>Connect</span>
+                  )}
                 </Button>
               )}
 
