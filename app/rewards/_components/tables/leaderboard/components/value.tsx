@@ -23,7 +23,7 @@ export function Value({ value }: Props) {
 
   return (
     <div className="flex space-x-3 items-center mx-auto">
-      <span className="font-roboto">{value}</span>
+      <span className="font-sans">{value}</span>
     </div>
   )
 }

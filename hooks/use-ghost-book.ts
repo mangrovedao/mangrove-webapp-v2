@@ -122,20 +122,8 @@ export function useGhostBook(params: { priceIncrement?: number } = {}) {
   const [asksMap, setAsksMap] = useState<Map<string, EnhancedOffer>>(new Map())
   const [bidsMap, setBidsMap] = useState<Map<string, EnhancedOffer>>(new Map())
 
-  const {
-    data: mangroveBook,
-    isLoading: mangroveBookLoading,
-    refetch: refetchMangroveBook,
-    isFetched: mangroveBookFetched,
-  } = useMangroveBook()
-  const {
-    data: poolBook,
-    isLoading: poolBookLoading,
-    refetch: refetchPoolBook,
-    isFetched: poolBookFetched,
-  } = usePoolBook()
-
-  // const { mergedBooks, refetch, isLoading, isFetched } = useMergedBooks()
+  const { data: mangroveBook } = useMangroveBook()
+  const { data: poolBook } = usePoolBook()
 
   const query = useQuery({
     queryKey: [

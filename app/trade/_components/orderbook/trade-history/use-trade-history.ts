@@ -73,7 +73,7 @@ export function useTradeHistory<T = TradeHistory[]>({
         if (!market) return []
 
         const response = await fetch(
-          `https://indexer.mgvinfra.com/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
+          `${process.env.NEXT_PUBLIC_INDEXER_URL}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
         )
         const result = await response.json()
 
@@ -132,7 +132,7 @@ export function useTrades({
         startLoading(TRADE.TABLES.ORDERS)
 
         const response = await fetch(
-          `https://indexer.mgvinfra.com/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+          `${process.env.NEXT_PUBLIC_INDEXER_URL}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
         )
 
         if (!response.ok) {

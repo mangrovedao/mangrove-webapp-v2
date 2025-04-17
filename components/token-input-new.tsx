@@ -70,7 +70,7 @@ export const EnhancedNumericInput = React.forwardRef<
           className={cn(
             "grid z-10 px-3 pt-[10px] pb-[10px] -gap-3 flex-col bg-bg-primary rounded-sm border border-border-tertiary border-[0.5px] transition-all",
             !error?.length &&
-              "focus-within:border focus-within:border-border-brand",
+              "focus-within:border focus-within:border-border-brand focus-within:border-[0.5px]",
             error?.length && "border-red-900 border-[0.5px] bg-red-950 ",
             className,
           )}

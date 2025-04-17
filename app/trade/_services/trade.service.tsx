@@ -3,7 +3,7 @@ import { dialogs } from "@/services/dialogs.service"
 
 // open the alert dialog saying that the network is wrong
 function openTxCompletedDialog({
-  title = "Transaction Completed",
+  title = "Order Submitted",
   address,
   blockExplorerUrl,
 }: {

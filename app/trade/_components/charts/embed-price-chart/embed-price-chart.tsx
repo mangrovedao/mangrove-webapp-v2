@@ -2,7 +2,6 @@
 
 import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { useMemo } from "react"
 
@@ -11,8 +10,7 @@ interface PriceChartProps {
 }
 
 export default function EmbedPriceChart({ className }: PriceChartProps) {
-  const { pool, isLoading } = usePool()
-  const { currentMarket } = useMarket()
+  const { pool } = usePool()
   const { defaultChain } = useDefaultChain()
 
   // Determine the chain name for GeckoTerminal URL
@@ -43,7 +41,7 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
   }, [pool, chainName])
 
   // Show loading state while pool is being fetched
-  if (isLoading) {
+  if (!pool || !embedUrl) {
     return (
       <div
         className={cn(
@@ -54,27 +52,6 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
         <div className="flex flex-col items-center gap-2">
           <div className="animate-spin h-8 w-8 border-t-2 border-[#00A86B] rounded-full"></div>
           <p className="text-sm text-[#999]">Loading chart...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show a message if no pool address is available
-  if (!pool || !embedUrl) {
-    return (
-      <div
-        className={cn(
-          "h-full w-full flex items-center justify-center bg-transparent rounded-md p-4",
-          className,
-        )}
-      >
-        <div className="text-center">
-          <p className="text-lg text-[#999] mb-2">No price chart available</p>
-          <p className="text-sm text-[#777] max-w-md">
-            {currentMarket
-              ? `No liquidity pool found for ${currentMarket.base.symbol}/${currentMarket.quote.symbol}`
-              : "Please select a market to view the price chart"}
-          </p>
         </div>
       </div>
     )
