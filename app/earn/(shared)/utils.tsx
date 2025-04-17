@@ -73,7 +73,7 @@ export async function fetchPnLData(
     if (!user) return undefined
 
     const res = await fetch(
-      `https://indexer.mgvinfra.com/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
+      `${process.env.NEXT_PUBLIC_INDEXER_URL}/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
     )
 
     const data = await res.json()

@@ -22,7 +22,7 @@ export const useIncentivesUserRewards = () => {
         const userIncentives = await Promise.all(
           vaultsIncentives.map((incentive) =>
             fetch(
-              `https://indexer.mgvinfra.com/incentives/vaults/${defaultChain.id}/${incentive.vault}/${user}?startTimestamp=${incentive.startTimestamp}&endTimestamp=${incentive.endTimestamp}&rewardRate=${incentive.rewardRate}&maxRewards=${incentive.maxRewards}`,
+              `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/vaults/${defaultChain.id}/${incentive.vault}/${user}?startTimestamp=${incentive.startTimestamp}&endTimestamp=${incentive.endTimestamp}&rewardRate=${incentive.rewardRate}&maxRewards=${incentive.maxRewards}`,
             ),
           ),
         )

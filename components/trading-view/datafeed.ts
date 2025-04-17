@@ -139,7 +139,7 @@ function datafeed({ base, quote, baseAddress, quoteAddress, chainId }: Params) {
                 : resolution.toLowerCase()
 
           const result = await fetch(
-            `https://indexer.mgvinfra.com/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${newRes}?count=${periodParams.countBack}&to=${periodParams.to}`,
+            `${process.env.NEXT_PUBLIC_INDEXER_URL}/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${newRes}?count=${periodParams.countBack}&to=${periodParams.to}`,
           ).then(async (res) => candlesSchema.safeParse(await res.json()))
 
           if (!result.success) {
