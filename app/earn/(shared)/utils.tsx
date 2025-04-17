@@ -31,20 +31,20 @@ export const VaultABI = parseAbi([
  */
 export async function fetchTokenPrices(
   client: PublicClient,
-  market: [string, string, bigint],
+  market: { base: object; quote: object; tickSpacing: number },
 ): Promise<[number, number]> {
   try {
-    const [base, quote] = market
+    const { base, quote } = market
     const [basePrice, quotePrice] = await Promise.all([
       fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${base}`,
+        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${base.address}`,
       )
         .then((res) => res.json())
         .then((data) => priceSchema.parse(data))
         .then((data) => data.price)
         .catch(() => 1),
       fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${quote}`,
+        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${quote.address}`,
       )
         .then((res) => res.json())
         .then((data) => priceSchema.parse(data))
