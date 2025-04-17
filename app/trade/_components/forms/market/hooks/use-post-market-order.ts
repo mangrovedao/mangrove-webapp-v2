@@ -1,15 +1,19 @@
 import { MarketParams } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Address, TransactionReceipt, erc20Abi, parseUnits } from "viem"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { Address, TransactionReceipt, parseUnits } from "viem"
+import { useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
-import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { trade } from "@/hooks/ghostbook/lib/trade"
-import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMarketClient } from "@/hooks/use-market"
 
+import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
+import {
+  ProtocolType,
+  TickSpacingPool,
+  usePool,
+} from "@/hooks/new_ghostbook/pool"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
@@ -23,7 +27,9 @@ type Props = {
 
 export function usePostMarketOrder({ onResult }: Props = {}) {
   const { currentMarket: market } = useMarket()
-  const { address } = useAccount()
+  const { data: walletClient } = useWalletClient()
+  const { pool } = usePool()
+  const { mangroveChain } = useRegistry()
 
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -31,75 +37,49 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
     state.stopLoading,
   ])
 
-  const publicClient = usePublicClient()
-  const { data: walletClient } = useWalletClient()
-  const marketClient = useMarketClient()
-  const addresses = useMangroveAddresses()
-  const { uniClone, mangroveChain } = useRegistry()
+  const uniModuleAddress = {
+    [ProtocolType.UniswapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
+    [ProtocolType.PancakeSwapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
+    [ProtocolType.Slipstream]: "0x922F0E2fa80F7dc2E22dBcE5EB3B423E09CE013B",
+    // [ProtocolType.Aerodrome]: "0xF2CACc9ca4eEac1bad53E208C738c728Ab3b381c",
+  }
 
   return useMutation({
     mutationFn: async ({
       form,
       swapMarket,
-      swapMarketClient,
     }: {
       form: Form
       swapMarket?: MarketParams
       swapMarketClient?: ReturnType<typeof useMarketClient>
     }) => {
       try {
-        if (
-          !publicClient ||
-          !walletClient ||
-          !addresses ||
-          !market ||
-          !marketClient?.uid ||
-          !address ||
-          !uniClone?.pool ||
-          !mangroveChain?.ghostbook ||
-          !mangroveChain?.univ3Module
-        )
+        if (!pool || !market || !walletClient)
           throw new Error("Market order post, is missing params")
 
         const { bs, send: gives, receive: wants, slippage } = form
         const contextMarket = swapMarket ? swapMarket : market
-        const contextMarketClient = swapMarketClient
-          ? swapMarketClient
-          : marketClient
 
         const { base, quote } = contextMarket
 
         const receiveToken = bs === "buy" ? base : quote
         const sendToken = bs === "buy" ? quote : base
 
-        // Check allowance before trade
-        const allowance = await publicClient.readContract({
-          address: sendToken.address as Address,
-          abi: erc20Abi,
-          functionName: "allowance",
-          args: [address, uniClone?.pool],
-        })
-
-        console.log("market order", {
-          client: walletClient,
-          ghostbook: mangroveChain.ghostbook,
-          market,
-          bs,
-          sendAmount: gives,
-          router: uniClone.router,
-          univ3Module: mangroveChain.univ3Module,
-          fee: 500,
-        })
-
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
-          ghostbook: mangroveChain.ghostbook,
+          ghostbook: mangroveChain?.ghostbook as Address,
           market,
           bs,
           sendAmount: parseUnits(gives, sendToken.decimals),
-          router: uniClone.router,
-          univ3Module: mangroveChain.univ3Module,
+          router: pool?.protocol.router,
+          module: uniModuleAddress[pool?.protocol.type] as Address,
           fee: 500,
+          deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
+          protocol: pool?.protocol.type,
+          tickSpacing:
+            pool?.protocol.type === ProtocolType.Slipstream
+              ? (pool as TickSpacingPool)?.tickSpacing
+              : 0,
           async onTrade({ got, gave, bounty, feePaid }) {
             console.log("OnTrade callback:", {
               got,

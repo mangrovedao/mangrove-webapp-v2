@@ -1,5 +1,5 @@
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
-import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
+import { usePool } from "@/hooks/new_ghostbook/pool"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useEffect } from "react"
 import { toast } from "sonner"
@@ -34,7 +34,7 @@ export function useMarketTransaction({
   onTransactionSuccess,
 }: UseMarketTransactionProps) {
   const { isConnected, address, chain } = useAccount()
-  const { mangroveChain } = useRegistry()
+  const { pool } = usePool()
 
   // Market steps to check if approval is needed
   const { data: marketOrderSteps } = useMarketSteps({
@@ -47,7 +47,7 @@ export function useMarketTransaction({
   // Approve mutation
   const approveAmount = useApproveAmount({
     token: sendToken,
-    spender: mangroveChain?.ghostbook ?? undefined,
+    spender: pool?.pool ?? undefined,
     sendAmount: form.state.values.send,
   })
 

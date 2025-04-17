@@ -11,14 +11,10 @@
  *   - Trade result callbacks
  */
 
+import { ProtocolType } from "@/hooks/new_ghostbook/pool"
 import { MAX_TICK, type MarketParams } from "@mangrovedao/mgv"
 import { BS, getSemibooksOLKeys } from "@mangrovedao/mgv/lib"
-import {
-  encodeAbiParameters,
-  encodeFunctionData,
-  type Address,
-  type Client,
-} from "viem"
+import { encodeAbiParameters, type Address, type Client } from "viem"
 import {
   simulateContract,
   waitForTransactionReceipt,
@@ -45,9 +41,15 @@ export type TradeParams = {
   /** Uniswap V3 router address */
   router: Address
   /** Uniswap V3 module address for Ghostbook */
-  univ3Module: Address
+  module: Address
   /** Uniswap V3 pool fee tier */
   fee: number
+  /** Protocol type */
+  protocol: ProtocolType
+  /** Deadline for the trade */
+  deadline: bigint
+  /** Tick spacing for the trade */
+  tickSpacing?: number
   /** Optional callback that runs after trade simulation but before execution */
   onTrade?: (expectedTradeResult: {
     got: bigint
@@ -79,8 +81,11 @@ export async function trade(params: TradeParams) {
     sendAmount,
     maxTick = MAX_TICK,
     router,
-    univ3Module,
+    module,
     fee,
+    deadline,
+    tickSpacing,
+    protocol,
     onTrade,
   } = params
 
@@ -89,7 +94,7 @@ export async function trade(params: TradeParams) {
   const market = bs === BS.buy ? asksMarket : bidsMarket
 
   // Encode the Uniswap V3 module parameters
-  const moduleData = encodeAbiParameters(
+  const moduleDataV3 = encodeAbiParameters(
     [
       { type: "address", name: "router" },
       { type: "uint24", name: "fee" },
@@ -97,20 +102,16 @@ export async function trade(params: TradeParams) {
     [router, fee],
   )
 
-  // Encode the complete trade function call
-  const data = encodeFunctionData({
-    abi: ghostbookAbi,
-    functionName: "marketOrderByTick",
-    args: [
-      market,
-      maxTick,
-      sendAmount,
-      {
-        module: univ3Module,
-        data: moduleData,
-      },
+  // encode for slipstream: (address router, uint24 fee, uint256 deadline, uint24 tickSpacing)
+  const moduleDataSlipstream = encodeAbiParameters(
+    [
+      { type: "address", name: "router" },
+      { type: "uint24", name: "fee" },
+      { type: "uint256", name: "deadline" },
+      { type: "uint24", name: "tickSpacing" },
     ],
-  })
+    [router, fee, deadline, tickSpacing ?? 0], // note: should not be 0 for slipstream
+  )
 
   // Simulate the trade to check expected results
   const { request, result } = await simulateContract(client, {
@@ -122,8 +123,11 @@ export async function trade(params: TradeParams) {
       maxTick,
       sendAmount,
       {
-        module: univ3Module,
-        data: moduleData,
+        module,
+        data:
+          protocol === ProtocolType.Slipstream
+            ? moduleDataSlipstream
+            : moduleDataV3,
       },
     ],
   })
