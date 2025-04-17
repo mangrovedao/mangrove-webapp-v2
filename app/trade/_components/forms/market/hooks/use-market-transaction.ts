@@ -133,6 +133,7 @@ export function useMarketTransaction({
         {
           onSettled: () => {
             setTxState("idle")
+            form.reset()
           },
         },
       )

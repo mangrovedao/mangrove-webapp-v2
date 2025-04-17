@@ -13,14 +13,14 @@ import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
 import { determineDecimals, formatNumber } from "@/utils/numbers"
 function Container({ children }: React.PropsWithChildren) {
-  return <span className="text-xs font-medium space-y-2 block">{children}</span>
+  return (
+    <span className="text-xs font-medium space-y-[2px] block">{children}</span>
+  )
 }
 
 function Label({ children }: React.PropsWithChildren) {
   return (
-    <div className="text-muted-foreground h-2 text-xs font-light">
-      {children}
-    </div>
+    <div className="text-muted-foreground text-xs font-light">{children}</div>
   )
 }
 
@@ -112,7 +112,7 @@ function Item({
             animate="animate"
             className="flex items-center"
           >
-            <Skeleton className="w-16 h-4 ml-1" />
+            <Skeleton className="w-16 h-4" />
           </motion.div>
         ) : (
           <AnimatePresence mode="popLayout">
@@ -145,7 +145,7 @@ export function PricesBar() {
   } = useMergedBooks()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
-  const { data: stats, isLoading: statsLoading } = useMangrovePoolStatsQuery(
+  const { data: stats } = useMangrovePoolStatsQuery(
     base?.address,
     quote?.address,
   )
@@ -161,12 +161,6 @@ export function PricesBar() {
   const [side, setSide] = React.useState<"base" | "quote">("base")
 
   const token = side === "base" ? quote : base
-
-  // Calculate spread and midpoint
-
-  // if (side === "quote") {
-  //   spotPrice = spotPrice ? 1 / spotPrice : undefined
-  // }
 
   // Calculate variation only if we have valid data
   const hasValidPriceData =
@@ -198,94 +192,90 @@ export function PricesBar() {
       : "-"
 
   return (
-    <>
-      <div className="flex items-center pl-2 pr-2">
+    <ScrollArea className="relative w-full ">
+      <motion.div
+        className="flex items-center w-full space-x-5 whitespace-nowrap h-full min-h-[48px]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <Item
           label={"Price"}
           value={side === "quote" ? 1 / (spotPrice ?? 1) : spotPrice}
           token={side === "quote" ? base : quote}
-          skeleton={false}
+          skeleton={!stats}
         />
-      </div>
-      <ScrollArea className="relative w-full ">
-        <motion.div
-          className="flex items-center w-full space-x-5 whitespace-nowrap h-full min-h-[48px]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Item
-            label={`24h Change`}
-            value={variation24hPercentage}
-            token={token}
-            skeleton={statsLoading}
-            className={variation24hClassnames}
-            rightElement={
-              variation24hPercentage !== undefined &&
-              !isNaN(variation24hPercentage) ? (
-                <motion.span
-                  className={cn(
-                    "space-x-[2px] text-xs inline-flex ml-2",
-                    variation24hClassnames,
-                  )}
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    transition: {
-                      duration: 0.5,
-                      repeat: 0,
-                      repeatType: "reverse",
-                    },
-                  }}
-                >
-                  <VariationArrow
-                    className={cn("h-3", {
-                      "rotate-180": variation24hPercentage < 0,
-                    })}
-                  />
-                  <span>{formattedPercentage}</span>
-                </motion.span>
-              ) : undefined
-            }
-          />
-
-          <Item
-            label="24h High"
-            value={
-              stats?.high && !isNaN(Number(stats.high))
-                ? Number(stats.high)
-                : undefined
-            }
-            token={token}
-            skeleton={statsLoading}
-          />
-
-          <Item
-            label="24h Low"
-            value={
-              stats?.low && !isNaN(Number(stats.low))
-                ? Number(stats.low)
-                : undefined
-            }
-            token={token}
-            skeleton={statsLoading}
-          />
-
-          <Item
-            label="24h Volume"
-            value={
-              stats?.volume && !isNaN(Number(stats.volume))
-                ? Number(stats.volume)
-                : undefined
-            }
-            token={token}
-            skeleton={statsLoading}
-          />
-        </motion.div>
-        <ScrollBar
-          orientation="horizontal"
-          className="shadow-sm bg-transparent"
+        <Item
+          label={`24h Change`}
+          value={variation24hPercentage}
+          token={token}
+          skeleton={!stats}
+          className={variation24hClassnames}
+          rightElement={
+            variation24hPercentage !== undefined &&
+            !isNaN(variation24hPercentage) ? (
+              <motion.span
+                className={cn(
+                  "space-x-[2px] text-xs inline-flex ml-2",
+                  variation24hClassnames,
+                )}
+                animate={{
+                  scale: [1, 1.05, 1],
+                  transition: {
+                    duration: 0.5,
+                    repeat: 0,
+                    repeatType: "reverse",
+                  },
+                }}
+              >
+                <VariationArrow
+                  className={cn("h-3", {
+                    "rotate-180": variation24hPercentage < 0,
+                  })}
+                />
+                <span>{formattedPercentage}</span>
+              </motion.span>
+            ) : undefined
+          }
         />
-      </ScrollArea>
-    </>
+
+        <Item
+          label="24h High"
+          value={
+            stats?.high && !isNaN(Number(stats.high))
+              ? Number(stats.high)
+              : undefined
+          }
+          token={token}
+          skeleton={!stats}
+        />
+
+        <Item
+          label="24h Low"
+          value={
+            stats?.low && !isNaN(Number(stats.low))
+              ? Number(stats.low)
+              : undefined
+          }
+          token={token}
+          skeleton={!stats}
+        />
+
+        <Item
+          label="24h Volume"
+          value={
+            stats?.volume && !isNaN(Number(stats.volume))
+              ? Number(stats.volume)
+              : undefined
+          }
+          token={token}
+          skeleton={!stats}
+        />
+      </motion.div>
+      <ScrollBar
+        orientation="horizontal"
+        className="shadow-sm bg-transparent"
+      />
+    </ScrollArea>
   )
 }

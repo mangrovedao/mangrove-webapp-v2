@@ -7,6 +7,7 @@ import { useSwap } from "@/app/swap/hooks/use-swap"
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
+import { X } from "lucide-react"
 import { TradeMode } from "./enums"
 
 export function successToast(
@@ -43,7 +44,13 @@ export function successToast(
     Number(formatUnits(value, decimals)) <= 0.001 ? "~ " : ""
 
   toast(
-    <div className="grid gap-2 w-full">
+    <div className="grid gap-2 w-full relative">
+      <div
+        onClick={() => toast.dismiss()}
+        className="absolute cursor-pointer top-0 right-0"
+      >
+        <X />
+      </div>
       <div className="flex space-x-2 items-center">
         <TokenIcon
           symbol={sendToken.symbol}
