@@ -74,15 +74,14 @@ export function usePools() {
       market?.quote.address,
     ],
     queryFn: async (): Promise<Pool[]> => {
+      if (!market) return []
       try {
-        if (!market) throw new Error("usePools: market not found")
         return getPools(
           market.base.address,
           market.quote.address,
           defaultChain?.id,
         )
       } catch (error) {
-        console.error(error)
         return []
       }
     },
@@ -90,11 +89,10 @@ export function usePools() {
 }
 
 export function usePool() {
-  const { data: pools, isLoading } = usePools()
+  const { data: pools = [] } = usePools()
   return {
     pool: pools?.sort((a, b) =>
       Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
     )[0],
-    isLoading,
   }
 }

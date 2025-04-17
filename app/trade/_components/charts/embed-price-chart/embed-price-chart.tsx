@@ -2,7 +2,6 @@
 
 import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { useMemo } from "react"
 
@@ -11,8 +10,7 @@ interface PriceChartProps {
 }
 
 export default function EmbedPriceChart({ className }: PriceChartProps) {
-  const { pool, isLoading } = usePool()
-  const { currentMarket } = useMarket()
+  const { pool } = usePool()
   const { defaultChain } = useDefaultChain()
 
   // Determine the chain name for GeckoTerminal URL
@@ -43,7 +41,7 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
   }, [pool, chainName])
 
   // Show loading state while pool is being fetched
-  if (isLoading || !pool || !embedUrl) {
+  if (!pool || !embedUrl) {
     return (
       <div
         className={cn(
