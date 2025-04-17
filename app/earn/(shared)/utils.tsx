@@ -1,6 +1,7 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Skeleton } from "@/components/ui/skeleton"
+import { MarketParams } from "@mangrovedao/mgv"
 import { ReactNode } from "react"
 import { Address, Chain, parseAbi, PublicClient } from "viem"
 import { pnlSchema, priceSchema } from "./schemas"
@@ -31,10 +32,11 @@ export const VaultABI = parseAbi([
  */
 export async function fetchTokenPrices(
   client: PublicClient,
-  market: { base: object; quote: object; tickSpacing: number },
+  market: MarketParams,
 ): Promise<[number, number]> {
   try {
     const { base, quote } = market
+
     const [basePrice, quotePrice] = await Promise.all([
       fetch(
         `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${base.address}`,
