@@ -11,6 +11,7 @@ import {
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { cn } from "@/utils"
+import { motion } from "framer-motion"
 import { AnimatedFormsSkeleton } from "./animated-forms-skeleton"
 import { Limit } from "./limit/limit"
 import { Market } from "./market/market"
@@ -68,7 +69,13 @@ export function Forms({
           ))}
         </CustomTabsList>
 
-        <div className="flex-1 p-1.5 overflow-visible">
+        <motion.div
+          className="flex-1 p-1.5 overflow-visible"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          key={orderType}
+        >
           <CustomTabsContent value={FormType.LIMIT} className="h-full">
             <div className="h-full">
               <LimitComponent />
@@ -79,7 +86,7 @@ export function Forms({
               <MarketComponent />
             </div>
           </CustomTabsContent>
-        </div>
+        </motion.div>
       </CustomTabs>
     </div>
   )

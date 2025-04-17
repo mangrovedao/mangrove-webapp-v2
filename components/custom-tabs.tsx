@@ -58,8 +58,8 @@ const CustomTabsTrigger = React.forwardRef<
         "disabled:data-[state=active]:text-gray-scale-300 disabled:data-[state=active]:decoration-gray-scale-200 disabled:text-gray-scale-300",
         "text-text-tertiary data-[state=active]:text-white",
         "active:!text-gray-scale-200 group space-x-2",
-        "data-[state=active]:border-b-[1px] data-[state=active]: rounded-b-none border-b-[2px] border-b-transparent",
-        "hover:border-b-[2px] hover:border-b-text-primary/90",
+        "data-[state=active]:border-b-[1px] data-[state=active]: rounded-b-none border-b-[1px] border-b-transparent",
+        "hover:border-b-[1px] hover:border-b-text-primary/90",
         "data-[state=inactive]:bg-bg-secondary",
         className,
       )}

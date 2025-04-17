@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Spinner } from "@/components/ui/spinner"
 import useMarket from "@/providers/market"
 import { MarketParams } from "@mangrovedao/mgv"
 import { useEffect, useState } from "react"
@@ -67,7 +68,7 @@ export default function MarketSelector() {
     >
       <SelectTrigger className="rounded-sm w-fit flex justify-between p-1.5 text-sm">
         <SelectValue
-          placeholder={!markets?.length ? "Market" : "No markets"}
+          placeholder={<Spinner className="h-6" />}
           suppressHydrationWarning
         >
           {isMobile ? (
