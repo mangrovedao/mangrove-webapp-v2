@@ -76,7 +76,7 @@ export function useOpenMarkets() {
       }
     },
     enabled: !!defaultChain.id,
-    retry: true,
+    retry: 1,
   })
 
   return {

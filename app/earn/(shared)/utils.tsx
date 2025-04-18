@@ -36,6 +36,8 @@ export async function fetchTokenPrices(
   market: MarketParams,
 ): Promise<[number, number]> {
   try {
+    if (client.chain?.testnet) return [1, 1]
+
     const { base, quote } = market
 
     const [basePrice, quotePrice] = await Promise.all([

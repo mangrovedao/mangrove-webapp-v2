@@ -10,7 +10,7 @@ interface PriceChartProps {
 }
 
 export default function EmbedPriceChart({ className }: PriceChartProps) {
-  const { pool } = usePool()
+  const { pool, isLoading: isPoolLoading } = usePool()
   const { defaultChain } = useDefaultChain()
 
   // Determine the chain name for GeckoTerminal URL
@@ -29,12 +29,11 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
 
   // Build the embed URL
   const embedUrl = useMemo(() => {
-    if (!pool?.pool) return null
     return `https://www.geckoterminal.com/${chainName}/pools/${pool?.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
   }, [pool, chainName])
 
   // Show loading state while pool is being fetched
-  if (!pool || !embedUrl) {
+  if (isPoolLoading) {
     return (
       <div
         className={cn(

@@ -21,7 +21,7 @@ const megaEthTestnetMangrove = {
   mgv: "0x32360BB61fcb9cDCDD44eD44328b848061c0b9D7",
   mgvOrder: "0x981Bd234dA6778a6d0132364AfB30f517a9F5aa8",
   mgvReader: "0xB5C0a4249ee477860D47aD688386F2427F0F072a",
-  smartRouter: "0x531c0B23a1178003Da9274a57f839335325012Bd",
+  smartRouter: "0x5edE1DD8029e59a0eF80CEB0474B3E8322490220",
   routerProxyFactory: "0x9DB89FB4B356D480139792Fa2146A408f8944E3a",
 } as const satisfies MangroveActionsDefaultParams
 

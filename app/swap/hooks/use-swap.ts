@@ -325,6 +325,7 @@ export function useSwap() {
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
     queryFn: async () => {
       try {
+        if (publicClient.chain?.testnet) null
         if (!chainId || !payTknAddress || !receiveTknAddress) return null
 
         const payDollar = await fetch(

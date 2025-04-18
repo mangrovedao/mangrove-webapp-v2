@@ -1,6 +1,5 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -16,10 +15,9 @@ type OrderBookProps = {
 const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
   const { mergedBooks, refetch, isLoading: ghostBookLoading } = useMergedBooks()
   const { currentMarket } = useMarket()
-  const { book, isLoading: bookLoading } = useBook()
 
   const { base, quote } = currentMarket ?? {}
-  const { asks, bids } = mergedBooks ?? book
+  const { asks, bids } = mergedBooks ?? {}
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -75,7 +73,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
     processedBids[processedBids.length - 1]?.cumulative || 0,
   )
 
-  if (ghostBookLoading || bookLoading) return <AnimatedOrderBookSkeleton />
+  if (ghostBookLoading) return <AnimatedOrderBookSkeleton />
 
   return (
     <motion.div
