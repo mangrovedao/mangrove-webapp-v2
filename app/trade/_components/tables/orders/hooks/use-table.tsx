@@ -18,6 +18,7 @@ import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { MarketParams } from "@mangrovedao/mgv"
 import { Timer } from "../components/timer"
 import type { Order } from "../schema"
@@ -49,7 +50,6 @@ export function useTable({
         header: "Market",
         cell: ({ row }) => {
           const { baseAddress, quoteAddress } = row.original
-
           const { data: baseToken } = useTokenFromId(baseAddress as Address)
           const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
 
@@ -111,13 +111,11 @@ export function useTable({
               ? baseToken?.priceDisplayDecimals || 6
               : quoteToken?.priceDisplayDecimals || 6
 
-            const wants = Big(initialWants).toNumber()
-            const filled = Big(takerGot).toNumber()
             const progress = Math.min(
               Math.round(
-                Big(filled)
+                Big(takerGot)
                   .mul(100)
-                  .div(Big(wants).eq(0) ? 1 : wants)
+                  .div(Big(initialWants).eq(0) ? 1 : initialWants)
                   .toNumber(),
               ),
               100,
@@ -126,19 +124,12 @@ export function useTable({
               <div className={cn("flex items-center")}>
                 <CircularProgressBar progress={progress} className="mr-2" />
                 <span className="text-xs text-muted-foreground">
-                  {formatNumber(filled, {
-                    maximumFractionDigits: displayDecimals,
-                    minimumFractionDigits: displayDecimals,
-                  })}
+                  {getExactWeiAmount(takerGot, displayDecimals)}
                   &nbsp;/
                 </span>
                 <span className="text-xs">
                   &nbsp;
-                  {formatNumber(wants, {
-                    maximumFractionDigits: displayDecimals,
-                    minimumFractionDigits: displayDecimals,
-                  })}{" "}
-                  {symbol}
+                  {getExactWeiAmount(initialWants, displayDecimals)} {symbol}
                 </span>
               </div>
             )
