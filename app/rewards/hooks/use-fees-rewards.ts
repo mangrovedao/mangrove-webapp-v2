@@ -1,3 +1,4 @@
+
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { Token } from "@mangrovedao/mgv"
@@ -175,6 +176,7 @@ export const useFeesRewards = () => {
   const { address: user } = useAccount()
   const { defaultChain } = useDefaultChain()
   const { tokens } = useOpenMarkets()
+
 
   return useQuery({
     queryKey: ["fees-rewards", defaultChain.id, user, tokens.length],
