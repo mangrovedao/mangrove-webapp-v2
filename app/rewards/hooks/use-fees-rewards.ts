@@ -1,5 +1,7 @@
 import { useTokens } from "@/hooks/use-addresses"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { getChainObjectById } from "@/utils/chains"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { base } from "viem/chains"
@@ -111,7 +113,7 @@ const fetchTokenFeesData = async (
 ): Promise<FeesApiResponse | null> => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/fees/${chainId}/${token.address}?start=${startTimestamp}&end=${endTimestamp}&budget=${budget}&multiplier=${MULTIPLIER}`,
+      `${getIndexerUrl(getChainObjectById(chainId.toString()))}/incentives/fees/${chainId}/${token.address}?start=${startTimestamp}&end=${endTimestamp}&budget=${budget}&multiplier=${MULTIPLIER}`,
     )
 
     if (!response.ok) {

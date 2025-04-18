@@ -1,6 +1,7 @@
 import { printEvmError } from "@/utils/errors"
 
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { MarketParams, Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
@@ -51,7 +52,7 @@ export function useOpenMarkets() {
         if (!defaultChain.id) throw new Error("Chain ID not found")
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_INDEXER_URL}/markets/open/${defaultChain.id}`,
+          `${getIndexerUrl(defaultChain)}/markets/open/${defaultChain.id}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

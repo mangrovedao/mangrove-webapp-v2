@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { z } from "zod"
 
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useDefaultChain } from "./use-default-chain"
 
 const priceSchema = z.object({
@@ -33,7 +34,7 @@ const useMangroveTokenPricesQuery = (
         if (!baseAddress || !quoteAddress || !tickSpacing) return null
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_INDEXER_URL}/price/24-hour/${defaultChain.id}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
+          `${getIndexerUrl(defaultChain)}/price/24-hour/${defaultChain.id}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
         )
 
         const data = await res.json()
