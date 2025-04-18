@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 
-import { useTokens } from "@/hooks/use-addresses"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { parseStrategies, type Strategy } from "../../../../_schemas/kandels"
 
 type Params<T> = {
@@ -20,7 +20,7 @@ export function useStrategies<T = Strategy[]>({
 }: Params<T> = {}) {
   const { address, isConnected, chainId } = useAccount()
 
-  const tokens = useTokens()
+  const { tokens } = useOpenMarkets()
   const tokensList = tokens.map((token) => token.address.toLowerCase())
 
   return useQuery({

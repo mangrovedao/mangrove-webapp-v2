@@ -3,7 +3,7 @@ import { useAccount } from "wagmi"
 
 import { TokenIcon } from "@/components/token-icon"
 import { CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
-import { useTokens } from "@/hooks/use-addresses"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { toast } from "sonner"
 import { ActionButton } from "../action-button"
 import { Footer } from "../footer"
@@ -11,7 +11,7 @@ import { Footer } from "../footer"
 export function Tokens({ onBack }: { onBack: () => void }) {
   const { chain } = useAccount()
   const blockExplorerUrl = chain?.blockExplorers?.default.url
-  const tokens = useTokens()
+  const { tokens } = useOpenMarkets()
 
   function copyToClipboard() {
     navigator.clipboard.writeText(JSON.stringify(tokens)).then(

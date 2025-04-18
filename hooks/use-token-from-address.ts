@@ -1,10 +1,10 @@
 import { isAddressEqual, type Address } from "viem"
 
 import { useQuery } from "@tanstack/react-query"
-import { useTokens } from "./use-addresses"
+import { useOpenMarkets } from "./use-open-markets"
 
 export function useTokenFromAddress(address: Address) {
-  const tokens = useTokens()
+  const { tokens } = useOpenMarkets()
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
