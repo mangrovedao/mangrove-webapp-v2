@@ -1,7 +1,8 @@
-import { useTokens } from "@/hooks/use-addresses"
+
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getChainObjectById } from "@/utils/chains"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { base } from "viem/chains"
@@ -176,7 +177,8 @@ const buildConsolidatedLeaderboard = (
 export const useFeesRewards = () => {
   const { address: user } = useAccount()
   const { defaultChain } = useDefaultChain()
-  const tokens = useTokens()
+  const { tokens } = useOpenMarkets()
+
 
   return useQuery({
     queryKey: ["fees-rewards", defaultChain.id, user, tokens.length],

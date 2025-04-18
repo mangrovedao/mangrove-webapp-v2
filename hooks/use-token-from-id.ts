@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
 import type { Address } from "viem"
 
-import { useTokens } from "./use-addresses"
+import { useOpenMarkets } from "./use-open-markets"
 
 export function useTokenFromId(address: Address) {
-  const tokens = useTokens()
+  const { tokens } = useOpenMarkets()
   return useQuery({
     queryKey: ["tokenFromId", address, tokens],
     queryFn: () => {
