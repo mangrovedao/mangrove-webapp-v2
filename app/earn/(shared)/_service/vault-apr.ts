@@ -5,10 +5,14 @@ import {
   type Address,
   type PublicClient,
 } from "viem"
-import { arbitrum, baseSepolia } from "viem/chains"
+import { arbitrum, base, baseSepolia } from "viem/chains"
 
 import { getTokenByAddress } from "@/utils/tokens"
-import { arbitrumMarkets, baseSepoliaMarkets } from "@mangrovedao/mgv/addresses"
+import {
+  arbitrumMarkets,
+  baseMarkets,
+  baseSepoliaMarkets,
+} from "@mangrovedao/mgv/addresses"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 import { abi } from "./abi"
 import { calculateIncentiveAPR } from "./vault-incentives-apr"
@@ -155,6 +159,8 @@ export async function getVaultAPR(
   fdv?: number,
 ): Promise<{ totalAPR: number; incentivesApr: number }> {
   try {
+    if (client.chain?.testnet) return { totalAPR: 0, incentivesApr: 0 }
+
     const { base, quote, baseAmount, quoteAmount, fundsState } =
       await getVaultData(client, vault)
 
@@ -204,8 +210,10 @@ const getMarkets = (chainId?: number) => {
       return arbitrumMarkets
     case baseSepolia.id:
       return baseSepoliaMarkets
+    case base.id:
+      return baseMarkets
     default:
-      return arbitrumMarkets
+      return baseMarkets
   }
 }
 

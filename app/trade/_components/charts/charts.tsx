@@ -23,29 +23,5 @@ export function Market({
     <div {...props} className={cn("h-full flex flex-col", className)}>
       <TVChartContainer />
     </div>
-    // <CustomTabs
-    //   {...props}
-    //   defaultValue={Object.values(ChartType)[0]}
-    //   className={cn("h-full flex flex-col", className)}
-    // >
-    //   <CustomTabsList className="w-full flex justify-start border-b">
-    //     {Object.values(ChartType).map((table) => (
-    //       <CustomTabsTrigger
-    //         key={`${table}-tab`}
-    //         value={table}
-    //         className="capitalize"
-    //       >
-    //         {table}
-    //       </CustomTabsTrigger>
-    //     ))}
-    //   </CustomTabsList>
-    //   <div className="w-full p-1 flex-1">
-    //     {Object.values(ChartType).map((chart) => (
-    //       <CustomTabsContent key={`${chart}-content`} value={chart}>
-    //         {renderElement(TABS_CONTENT[chart])}
-    //       </CustomTabsContent>
-    //     ))}
-    //   </div>
-    // </CustomTabs>
   )
 }

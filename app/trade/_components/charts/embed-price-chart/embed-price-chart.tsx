@@ -10,7 +10,7 @@ interface PriceChartProps {
 }
 
 export default function EmbedPriceChart({ className }: PriceChartProps) {
-  const { pool } = usePool()
+  const { pool, isLoading: isPoolLoading } = usePool()
   const { defaultChain } = useDefaultChain()
 
   // Determine the chain name for GeckoTerminal URL
@@ -19,15 +19,9 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
 
     // Map chain IDs to GeckoTerminal chain names
     const chainMap: Record<number, string> = {
-      1: "eth", // Ethereum
       42161: "arbitrum", // Arbitrum
-      56: "bsc", // Binance Smart Chain
-      137: "polygon", // Polygon
-      43114: "avalanche", // Avalanche
       8453: "base", // Base
-      10: "optimism", // Optimism
-      1313161554: "aurora", // Aurora
-      42220: "celo", // Celo
+      6342: "MegaETH Testnet", // MegaETH Testnet
     }
 
     return chainMap[defaultChain.id] || "base" // Default to Base if not found
@@ -35,13 +29,11 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
 
   // Build the embed URL
   const embedUrl = useMemo(() => {
-    if (!pool?.pool) return null
-
-    return `https://www.geckoterminal.com/${chainName}/pools/${pool.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
+    return `https://www.geckoterminal.com/${chainName}/pools/${pool?.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
   }, [pool, chainName])
 
   // Show loading state while pool is being fetched
-  if (!pool || !embedUrl) {
+  if (isPoolLoading) {
     return (
       <div
         className={cn(

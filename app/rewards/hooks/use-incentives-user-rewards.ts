@@ -1,5 +1,6 @@
 import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
 import { incentiveResponseSchema } from "../schemas/rewards-configuration"
@@ -22,7 +23,7 @@ export const useIncentivesUserRewards = () => {
         const userIncentives = await Promise.all(
           vaultsIncentives.map((incentive) =>
             fetch(
-              `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/vaults/${defaultChain.id}/${incentive.vault}/${user}?startTimestamp=${incentive.startTimestamp}&endTimestamp=${incentive.endTimestamp}&rewardRate=${incentive.rewardRate}&maxRewards=${incentive.maxRewards}`,
+              `${getIndexerUrl(defaultChain)}/incentives/vaults/${defaultChain.id}/${incentive.vault}/${user}?startTimestamp=${incentive.startTimestamp}&endTimestamp=${incentive.endTimestamp}&rewardRate=${incentive.rewardRate}&maxRewards=${incentive.maxRewards}`,
             ),
           ),
         )

@@ -1,6 +1,7 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { MarketParams } from "@mangrovedao/mgv"
 import { ReactNode } from "react"
 import { Address, Chain, parseAbi, PublicClient } from "viem"
@@ -35,6 +36,8 @@ export async function fetchTokenPrices(
   market: MarketParams,
 ): Promise<[number, number]> {
   try {
+    if (client.chain?.testnet) return [1, 1]
+
     const { base, quote } = market
 
     const [basePrice, quotePrice] = await Promise.all([
@@ -73,7 +76,7 @@ export async function fetchPnLData(
     if (!user) return undefined
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_INDEXER_URL}/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
+      `${getIndexerUrl(client.chain)}/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
     )
 
     const data = await res.json()

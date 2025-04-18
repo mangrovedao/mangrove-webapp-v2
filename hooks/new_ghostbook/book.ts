@@ -267,7 +267,7 @@ export function usePoolBook() {
         quoteAmountToUse,
         baseAmountToUse,
         nOffers,
-        pool,
+        pool as Pool,
       )
     },
   })

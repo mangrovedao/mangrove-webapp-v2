@@ -2,6 +2,7 @@ import { Address, PublicClient } from "viem"
 import { z } from "zod"
 
 import { incentiveResponseSchema } from "@/app/rewards/schemas/rewards-configuration"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 
 /**
@@ -19,7 +20,7 @@ export async function getUserVaultIncentives(
     if (!user || !incentives) return null
 
     const userIncentives = await fetch(
-      `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/vaults/${client.chain?.id}/${incentives?.vault}/${user}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}`,
+      `${getIndexerUrl(client.chain)}/incentives/vaults/${client.chain?.id}/${incentives?.vault}/${user}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}`,
     )
 
     if (!userIncentives?.ok) {

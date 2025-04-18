@@ -30,7 +30,7 @@ export function Forms({
   className,
   ...props
 }: React.ComponentProps<typeof CustomTabs>) {
-  const { mergedBooks: book, spotPrice } = useMergedBooks()
+  const { isLoading: isGhostBookLoading } = useMergedBooks()
   const [orderType, setOrderType] = useLocalStorage<FormType>(
     "orderType",
     FormType.LIMIT,
@@ -45,7 +45,8 @@ export function Forms({
     },
     [payAmount, setOrderType],
   )
-  if (!book.asks.length || !book.bids.length || !spotPrice) {
+
+  if (isGhostBookLoading) {
     return <AnimatedFormsSkeleton />
   }
 

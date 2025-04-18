@@ -119,7 +119,7 @@ export const OrderBook = React.memo(function OrderBook({
     return () => {}
   }, [activeTab])
 
-  const { mergedBooks, refetch } = useMergedBooks()
+  const { refetch } = useMergedBooks()
 
   useEffect(() => {
     const interval = setInterval(() => {

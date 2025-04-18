@@ -41,6 +41,7 @@ export function useBook(
       currentMarket?.base.address,
       currentMarket?.quote.address,
       currentMarket?.tickSpacing.toString(),
+      client?.chain.id,
     ],
     queryFn: async () => {
       if (!client) return null

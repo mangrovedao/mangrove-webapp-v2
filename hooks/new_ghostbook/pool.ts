@@ -75,7 +75,8 @@ export function usePools() {
       market?.quote.address,
     ],
     queryFn: async (): Promise<Pool[]> => {
-      if (!market) return []
+      if (!market || defaultChain.testnet) return []
+
       try {
         return getPools(
           market.base.address,
@@ -90,10 +91,15 @@ export function usePools() {
 }
 
 export function usePool() {
-  const { data: pools = [] } = usePools()
+  const { data: pools = [], isLoading: isPoolsLoading } = usePools()
+
   return {
-    pool: pools?.sort((a, b) =>
-      Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
-    )[0],
+    isLoading: isPoolsLoading,
+    pool:
+      pools.length > 0
+        ? pools.sort((a, b) =>
+            Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
+          )[0]
+        : null,
   }
 }
