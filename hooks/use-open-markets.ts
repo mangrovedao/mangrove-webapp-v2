@@ -1,6 +1,7 @@
 import { printEvmError } from "@/utils/errors"
 
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { applyPriceDisplayDecimals } from "@/utils/tokens"
 import { MarketParams, Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
@@ -79,7 +80,7 @@ export function useOpenMarkets() {
   })
 
   return {
-    openMarkets: data?.markets || [],
+    openMarkets: applyPriceDisplayDecimals(data?.markets) || [],
     tokens: data?.tokens || [],
     isLoading,
     isError,

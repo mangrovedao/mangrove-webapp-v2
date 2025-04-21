@@ -52,7 +52,6 @@ export function CustomBalance(props: {
                   ) : (
                     <>
                       {getExactWeiAmount(props.balance, token.displayDecimals)}{" "}
-                      {token?.symbol}
                     </>
                   )}
                 </span>

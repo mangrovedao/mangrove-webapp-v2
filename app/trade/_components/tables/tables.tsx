@@ -18,12 +18,12 @@ import { Orders } from "./orders/orders"
 
 export enum TradeTablesLoggedIn {
   ORDERS = "Open Orders",
-  ORDER_HISTORY = "Orders History",
+  ORDER_HISTORY = "Order History",
 }
 
 export enum TradeTablesLoggedOut {
   ORDERS = "Open Orders",
-  ORDER_HISTORY = "Orders History",
+  ORDER_HISTORY = "Order History",
 }
 
 export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
@@ -41,6 +41,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
 
   // Get the total count of orders and history
   const { data: orders } = useOrders()
+
   const ordersCount = React.useMemo(() => {
     if (!orders?.pages) return 0
 
