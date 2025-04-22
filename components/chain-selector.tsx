@@ -74,7 +74,7 @@ export default function ChainSelector() {
                 }}
               >
                 <ImageWithHideOnError
-                  src={getIconFromChainlist(name)}
+                  src={`/assets/chains/${id}.webp`}
                   alt=""
                   className="rounded-full overflow-hidden"
                   width={28}

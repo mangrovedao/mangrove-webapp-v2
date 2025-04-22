@@ -21,6 +21,7 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 // import { useTokenByAddress } from "../../../hooks/use-token-by-address";
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
+import { usePostMarketOrderTestnet } from "@/app/trade/_components/forms/market/hooks/use-post-market.order-testnet"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
@@ -39,6 +40,7 @@ import {
 } from "@/utils/tokens"
 import { MarketParams } from "@mangrovedao/mgv"
 import { toast } from "sonner"
+import { megaethTestnet } from "viem/chains"
 import { z } from "zod"
 
 export const wethAdresses: { [key: number]: Address | undefined } = {
@@ -76,7 +78,11 @@ export function useSwap() {
   } = useOdos()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
-  const postMarketOrder = usePostMarketOrder()
+  const postMarketOrder =
+    chainId === megaethTestnet.id
+      ? usePostMarketOrderTestnet()
+      : usePostMarketOrder()
+
   const markets = useMarkets()
   const [payTknAddress, setPayTknAddress] = useQueryState("payTkn", {
     defaultValue: markets[0]?.base?.address,
@@ -325,7 +331,7 @@ export function useSwap() {
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
     queryFn: async () => {
       try {
-        if (publicClient.chain?.testnet) null
+        if (publicClient.chain?.id === megaethTestnet.id) return null
         if (!chainId || !payTknAddress || !receiveTknAddress) return null
 
         const payDollar = await fetch(
