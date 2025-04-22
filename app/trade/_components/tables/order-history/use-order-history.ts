@@ -80,7 +80,7 @@ export function useOrderHistory({
 
           try {
             const response = await fetch(
-              `${process.env.NEXT_PUBLIC_INDEXER_URL}/orders/history/${defaultChain.id}/${marketItem.base.address}/${marketItem.quote.address}/${marketItem.tickSpacing}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${process.env.NEXT_PUBLIC_INDEXER_URL}/orders/all-history/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
 
             if (!response.ok) {
