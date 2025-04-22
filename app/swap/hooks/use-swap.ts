@@ -1,5 +1,6 @@
 import {
   marketOrderSimulation,
+  MarketParams,
   publicMarketActions,
   type Token,
 } from "@mangrovedao/mgv"
@@ -38,7 +39,6 @@ import {
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
-import { MarketParams } from "@mangrovedao/mgv"
 import { toast } from "sonner"
 import { megaethTestnet } from "viem/chains"
 import { z } from "zod"
@@ -501,17 +501,25 @@ export function useSwap() {
     const send = fields.payValue
     const receive = fields.receiveValue
 
-    await postMarketOrder.mutate(
+    await postMarketOrder.mutateAsync(
       {
         form: {
-          bs: isBasePay ? BS.sell : BS.buy,
-          send,
-          receive,
+          bs:
+            receiveTknAddress.toLowerCase() ===
+            currentMarket?.base?.address?.toLowerCase()
+              ? BS.buy
+              : BS.sell,
+          receive: fields.receiveValue,
+          send: fields.payValue,
           isWrapping: false,
           slippage: Number(slippage),
         },
-        swapMarket: currentMarket as MarketParams,
-        swapMarketClient: marketClient,
+        ...(chainId === megaethTestnet.id
+          ? {
+              swapMarket: currentMarket as MarketParams,
+              swapMarketClient: marketClient,
+            }
+          : {}),
       },
       {
         onError: () => {},
