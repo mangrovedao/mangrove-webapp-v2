@@ -11,12 +11,12 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
+import { useDollarConversion } from "@/hooks/use-dollar-conversion"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { useTradeFormStore } from "../../forms/store"
 import { useTradeInfos } from "../hooks/use-trade-infos"
-import { calcDollarAmt } from "../utils"
 import { useLimit } from "./hooks/use-limit"
 import { useLimitTransaction } from "./hooks/use-limit-transaction"
 import type { Form } from "./types"
@@ -52,6 +52,13 @@ export function Limit() {
 
   const { currentMarket } = useMarket()
 
+  // When the market symbols change, reset the form
+  useEffect(() => {
+    if (currentMarket?.base?.symbol && currentMarket?.quote?.symbol) {
+      form?.reset()
+    }
+  }, [currentMarket?.base?.symbol, currentMarket?.quote?.symbol])
+
   const {
     computeReceiveAmount,
     computeSendAmount,
@@ -69,6 +76,13 @@ export function Limit() {
   } = useLimit({
     onSubmit: (formData) => setFormData(formData),
     bs: tradeSide,
+  })
+
+  const { payDollar, receiveDollar } = useDollarConversion({
+    currentMarket,
+    payAmount: form.state.values.send,
+    receiveAmount: form.state.values.receive,
+    tradeSide,
   })
 
   // Registry and trade infos
@@ -123,8 +137,27 @@ export function Limit() {
     }
   }, [form.state.values.send, setPayAmount, payAmount])
 
+  useEffect(() => {
+    if (!sendBalanceWithEth || sendBalanceWithEth === 0) return
+
+    try {
+      const currentSendValue = Number(form.state.values.send || 0)
+      const newSliderValue = Math.min(
+        (currentSendValue / sendBalanceWithEth) * 100,
+        100,
+      )
+
+      // Only update if the difference is significant to avoid infinite loops
+      if (Math.abs(newSliderValue - sendSliderValue) > 1) {
+        setSendSliderValue(newSliderValue)
+      }
+    } catch (error) {
+      console.error("Error updating slider value:", error)
+    }
+  }, [form.state.values.send, sendBalanceWithEth])
+
   const handleSliderChange = (value: number) => {
-    if (!sendBalanceWithEth || !sendToken) return
+    if (!sendBalanceValid || !sendToken) return
 
     if (!form.getFieldValue("send")) {
       form.setFieldValue("send", "0")
@@ -193,6 +226,11 @@ export function Limit() {
     }
   }
 
+  const sendBalanceValid =
+    sendBalanceWithEth &&
+    sendToken &&
+    Number(sendBalanceWithEth.toFixed(sendToken.displayDecimals)) !== 0
+
   // Get button text based on transaction state
   const getButtonText = () => {
     const allErrors = getAllErrors()
@@ -249,20 +287,16 @@ export function Limit() {
                     // as it's handled by the useEffect
                     computeReceiveAmount()
                   }}
-                  dollarAmount={calcDollarAmt(
-                    field.state.value,
-                    sendToken?.address !== currentMarket?.base.address,
-                    tradeSide,
-                  )}
+                  dollarAmount={payDollar}
                   inputClassName="text-text-primary text-base h-7"
                   balanceAction={{
                     onClick: () => {
+                      if (!sendBalanceValid) return
+
                       field.handleChange(
-                        getExactWeiAmount(
-                          sendBalanceWithEth.toString(),
-                          sendToken?.priceDisplayDecimals || 18,
-                        ),
+                        sendBalanceWithEth.toFixed(sendToken.displayDecimals),
                       )
+                      handleSliderChange(100)
                       computeReceiveAmount()
                     },
                   }}
@@ -270,9 +304,7 @@ export function Limit() {
                   token={sendToken}
                   customBalance={sendBalanceWithEth.toString()}
                   label="Pay"
-                  disabled={
-                    !currentMarket || sendBalanceWithEth.toString() === "0"
-                  }
+                  disabled={!currentMarket || !sendBalanceValid}
                   showBalance
                   error={
                     getAllErrors().send
@@ -318,15 +350,17 @@ export function Limit() {
                     field.handleChange(value)
                     computeSendAmount()
                   }}
-                  dollarAmount={calcDollarAmt(
-                    field.state.value,
-                    receiveToken?.address !== currentMarket?.base.address,
-                    tradeSide,
-                  )}
+                  dollarAmount={receiveDollar}
                   token={receiveToken}
                   inputClassName="text-text-primary text-base h-7"
                   label="Receive"
-                  disabled={!(currentMarket && form.state.isFormValid)}
+                  disabled={
+                    !(
+                      currentMarket &&
+                      form.state.isFormValid &&
+                      sendBalanceValid
+                    )
+                  }
                   error={
                     getAllErrors().receive
                       ? [getAllErrors().receive].flat()
@@ -364,7 +398,7 @@ export function Limit() {
               {/* Slider */}
               <div className="px-2">
                 <Slider
-                  disabled={!currentMarket}
+                  disabled={!currentMarket || !sendBalanceValid}
                   value={[sendSliderValue || 0]}
                   onValueChange={(values) => {
                     handleSliderChange(values[0] || 0)
@@ -380,7 +414,7 @@ export function Limit() {
                     key={`percentage-button-${value}`}
                     variant={"secondary"}
                     size={"md"}
-                    disabled={!currentMarket}
+                    disabled={!currentMarket || !sendBalanceValid}
                     value={sendSliderValue}
                     className={cn(
                       "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
@@ -400,7 +434,7 @@ export function Limit() {
                   key={`percentage-button-max`}
                   variant={"secondary"}
                   size={"md"}
-                  disabled={!currentMarket}
+                  disabled={!currentMarket || !sendBalanceValid}
                   className={cn(
                     "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                   )}
@@ -427,7 +461,11 @@ export function Limit() {
                         <Switch
                           className="data-[state=checked]:!bg-bg-secondary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
                           checked={isWrapping}
-                          onClick={() => field.handleChange(!isWrapping)}
+                          onClick={() => {
+                            field.handleChange(!isWrapping)
+                            handleSliderChange(0)
+                            form?.reset()
+                          }}
                         />
                         <InfoTooltip className="text-text-quaternary text-xs size-4 cursor-pointer">
                           <span className="text-xs font-sans">

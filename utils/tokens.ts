@@ -2,6 +2,7 @@ import type { useMarkets } from "@/hooks/use-addresses"
 import type { Token } from "@mangrovedao/mgv"
 
 import icons from "@/generated/icons.json"
+import { MarketParams } from "@mangrovedao/mgv"
 
 const IMG_BASE_PATH = "/cryptocurrency-icons/svg/color"
 
@@ -23,6 +24,26 @@ export function getTokenInfos(symbol: string) {
   return token
 }
 
+export function applyPriceDisplayDecimals(data?: any[]) {
+  if (!data?.length) return []
+
+  return data.map((item) => {
+    const updateToken = (token: any) => {
+      if (token?.symbol?.toLowerCase().includes("eth")) {
+        token.priceDisplayDecimals = 6
+        token.displayDecimals = 6
+      }
+    }
+
+    if (item?.base && item?.quote) {
+      updateToken(item.base)
+      updateToken(item.quote)
+    }
+
+    return item
+  })
+}
+
 export function getSvgUrl(symbol: string) {
   const token = getTokenInfos(symbol)
   if (token.name === "GENERIC") {
@@ -38,7 +59,7 @@ export function getWebPUrl(symbol: string) {
 
 export function getTokenByAddress(
   address: string,
-  markets: ReturnType<typeof useMarkets>,
+  markets: MarketParams[],
   odosTokens: Token[],
 ): Token | undefined {
   const token =

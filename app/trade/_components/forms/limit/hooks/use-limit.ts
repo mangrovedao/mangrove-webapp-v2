@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 import { BS, getDefaultLimitOrderGasreq, minVolume } from "@mangrovedao/mgv/lib"
-import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
@@ -13,7 +12,6 @@ import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
-import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
@@ -24,13 +22,10 @@ type Props = {
 }
 
 export function useLimit(props: Props) {
-  const { address, isConnected } = useAccount()
-  const { openConnectModal } = useConnectModal()
+  const { address } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
   })
-  const { checkAndShowDisclaimer } = useDisclaimerDialog()
-
   const { currentMarket } = useMarket()
   const bs = props.bs
   const { spotPrice } = useMergedBooks()
@@ -59,7 +54,6 @@ export function useLimit(props: Props) {
 
   const isWrapping = form.useStore((state) => state.values.isWrapping)
 
-  const isBid = bs === BS.buy
   const receiveToken =
     bs === BS.buy ? currentMarket?.base : currentMarket?.quote
   const quoteToken = currentMarket?.quote
@@ -160,24 +154,6 @@ export function useLimit(props: Props) {
     computeReceiveAmount()
   }
 
-  function handleConnect() {
-    if (openConnectModal) {
-      openConnectModal()
-    }
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!isConnected) {
-      handleConnect()
-      return
-    }
-    if (checkAndShowDisclaimer(address)) return
-
-    void form.handleSubmit()
-  }
-
   function computeReceiveAmount() {
     if (!currentMarket || !form) return
 
@@ -221,10 +197,6 @@ export function useLimit(props: Props) {
       console.error("Error in computeSendAmount:", error)
     }
   }
-
-  React.useEffect(() => {
-    form?.reset()
-  }, [currentMarket?.base, currentMarket?.quote])
 
   React.useEffect(() => {
     const send = form?.getFieldValue("send")

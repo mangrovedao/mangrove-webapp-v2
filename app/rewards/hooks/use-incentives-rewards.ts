@@ -1,9 +1,12 @@
-import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
-import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
 import { useAccount } from "wagmi"
 import { z } from "zod"
+
+import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
+import { useDefaultChain } from "@/hooks/use-default-chain"
+import { getChainObjectById } from "@/utils/chains"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useQuery } from "@tanstack/react-query"
 
 // --------- Types ---------
 const vaultIncentivesResponseSchema = z.object({
@@ -58,7 +61,7 @@ const fetchVaultIncentivesData = async (
   maxRewards: number,
 ): Promise<VaultIncentivesApiResponse | null> => {
   try {
-    const url = `${process.env.NEXT_PUBLIC_INDEXER_URL}/incentives/vaults/${chainId}/${vaultAddress}?startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&rewardRate=${rewardRate}&maxRewards=${maxRewards}&page=0&pageSize=100`
+    const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/incentives/vaults/${chainId}/${vaultAddress}?startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&rewardRate=${rewardRate}&maxRewards=${maxRewards}&page=0&pageSize=100`
 
     const response = await fetch(url)
 
