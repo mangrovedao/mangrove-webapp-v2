@@ -24,22 +24,22 @@ export function getTokenInfos(symbol: string) {
 }
 
 export function applyPriceDisplayDecimals(data?: any[]) {
-  if (!data) return
+  if (!data?.length) return []
 
-  return data.map((entry) => {
-    const { base, quote } = entry
-
-    const updateDecimals = (token: any) => {
-      if (token.symbol?.toLowerCase().includes("eth")) {
+  return data.map((item) => {
+    const updateToken = (token: any) => {
+      if (token?.symbol?.toLowerCase().includes("eth")) {
         token.priceDisplayDecimals = 6
         token.displayDecimals = 6
       }
     }
 
-    updateDecimals(base)
-    updateDecimals(quote)
+    if (item?.base && item?.quote) {
+      updateToken(item.base)
+      updateToken(item.quote)
+    }
 
-    return entry
+    return item
   })
 }
 

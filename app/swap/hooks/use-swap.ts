@@ -185,23 +185,6 @@ export function useSwap() {
     }))
   }
 
-  // const getBookQuery = useQuery({
-  //   queryKey: [
-  //     "getBook",
-  //     marketClient?.key,
-  //     currentMarket?.base.address,
-  //     currentMarket?.quote.address,
-  //   ],
-  //   queryFn: () => {
-  //     if (!marketClient) return null
-  //     return marketClient.getBook({
-  //       depth: 50n,
-  //     })
-  //   },
-  //   refetchInterval: 3_000,
-  //   enabled: !!marketClient,
-  // })
-
   React.useEffect(() => {
     if (wrappingHash) {
       toast.success("ETH wrapped successfully!")

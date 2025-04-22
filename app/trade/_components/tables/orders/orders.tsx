@@ -73,8 +73,6 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
     onCancel: setOrderToDelete,
   })
 
-  console.log("table", flatData)
-
   if (!data) {
     return <AnimatedOrdersSkeleton />
   }

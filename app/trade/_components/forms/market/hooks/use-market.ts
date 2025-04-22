@@ -16,12 +16,10 @@ import useMarket from "@/providers/market"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useBook } from "@/hooks/use-book"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
-import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { Book, CompleteOffer } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount } from "wagmi"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
@@ -59,9 +57,6 @@ const determinePrices = (
 }
 
 export function useMarketForm(props: Props) {
-  const { address } = useAccount()
-  const { checkAndShowDisclaimer } = useDisclaimerDialog()
-
   const form = useForm({
     validator: zodValidator,
     defaultValues: {
@@ -201,7 +196,7 @@ export function useMarketForm(props: Props) {
 
   React.useEffect(() => {
     form?.reset()
-  }, [form, market?.base, market?.quote])
+  }, [market?.base?.symbol, market?.quote?.symbol])
 
   // Move the isWrapping hook to the top level
   const isWrapping = form.useStore((state) => state.values.isWrapping)

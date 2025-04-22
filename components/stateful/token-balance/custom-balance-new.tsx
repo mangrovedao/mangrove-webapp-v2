@@ -8,7 +8,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { getExactWeiAmount } from "@/utils/regexp"
 
 export function CustomBalance(props: {
   isWrapping?: boolean
@@ -50,9 +49,7 @@ export function CustomBalance(props: {
                   {!token ? (
                     `${props.balance} ${props.token}`
                   ) : (
-                    <>
-                      {getExactWeiAmount(props.balance, token.displayDecimals)}{" "}
-                    </>
+                    <>{Number(props.balance).toFixed(token.displayDecimals)} </>
                   )}
                 </span>
               </TooltipTrigger>

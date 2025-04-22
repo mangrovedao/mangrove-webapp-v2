@@ -17,7 +17,7 @@ import { Spinner } from "./ui/spinner"
 type EnhancedNumericInputProps = {
   token?: Token | string
   customBalance?: string
-  dollarAmount?: string
+  dollarAmount?: number | string
   minimumVolume?: string
   sendSliderValue?: number
   setSendSliderValue?: (value: number) => void
