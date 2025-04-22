@@ -26,7 +26,7 @@ import {
 } from "@rainbow-me/rainbowkit/wallets"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider, createConfig, http } from "wagmi"
-import { arbitrum, base, baseSepolia } from "wagmi/chains"
+import { arbitrum, base, megaethTestnet } from "wagmi/chains"
 
 import { createFallbackTransport } from "@/config/fallback-transport"
 import { env } from "@/env.mjs"
@@ -74,12 +74,10 @@ const connectors = connectorsForWallets(recommendedWalletList, {
 export const config = createConfig({
   ssr: true,
   connectors,
-  chains: [baseSepolia, arbitrum, base],
+  chains: [arbitrum, base, megaethTestnet],
   transports: {
-    [baseSepolia.id]: http(),
     [arbitrum.id]: http(),
-    // Use fallback transport with multiple RPCs for Base chain
-    // WebSockets provide better performance for subscriptions
+    [megaethTestnet.id]: http(),
     [base.id]: createFallbackTransport(base, true),
   },
 })

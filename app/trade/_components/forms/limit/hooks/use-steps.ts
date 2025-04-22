@@ -4,7 +4,6 @@ import { toast } from "sonner"
 import { Address, Client } from "viem"
 
 import { useMangroveAddresses } from "@/hooks/use-addresses"
-import { useBalances } from "@/hooks/use-balances"
 import { useMarketClient } from "@/hooks/use-market"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { getUserRouter } from "@mangrovedao/mgv/actions"
@@ -12,12 +11,10 @@ import { getUserRouter } from "@mangrovedao/mgv/actions"
 type Props = {
   bs: BS
   user?: Address
-  logic?: string
 }
 
-export const useLimitSteps = ({ bs, user, logic }: Props) => {
+export const useLimitSteps = ({ bs, user }: Props) => {
   const marketClient = useMarketClient()
-  const balances = useBalances()
   const addresses = useMangroveAddresses()
   const networkClient = useNetworkClient()
 
@@ -33,7 +30,7 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
     ],
     queryFn: async () => {
       try {
-        if (!marketClient?.name || !user || !addresses) return null
+        if (!marketClient?.key || !user || !addresses) return null
 
         const userRouter = await getUserRouter(
           networkClient as Client,
@@ -43,15 +40,10 @@ export const useLimitSteps = ({ bs, user, logic }: Props) => {
           },
         )
 
-        const logicToken = balances.balances?.overlying.find(
-          (item) => item.logic.name === logic,
-        )
-
         const steps = await marketClient.getLimitOrderSteps({
           bs,
           user,
           userRouter,
-          logic: logicToken,
         })
 
         return steps

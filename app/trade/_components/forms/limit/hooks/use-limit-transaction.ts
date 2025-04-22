@@ -8,7 +8,6 @@ import {
 
 import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
-import { Logic } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 
 import { useTransactionState } from "../../hooks/use-transaction-state"
@@ -151,7 +150,6 @@ export function useLimitTransaction({
       await approve.mutateAsync(
         {
           token: sendToken,
-          logic: logic as Logic,
           spender: limitOrderSteps?.[0].params.spender,
         },
         {

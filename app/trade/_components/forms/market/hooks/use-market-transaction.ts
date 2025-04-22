@@ -1,9 +1,11 @@
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { BS } from "@mangrovedao/mgv/lib"
+import { MarketOrderSteps } from "@mangrovedao/mgv/types"
 import { useEffect } from "react"
 import { toast } from "sonner"
 import { formatUnits } from "viem"
+import { megaethTestnet } from "viem/chains"
 import {
   useAccount,
   useSendTransaction,
@@ -12,6 +14,7 @@ import {
 import { useTransactionState } from "../../hooks/use-transaction-state"
 import { wethAdresses } from "../market"
 import { usePostMarketOrder } from "./use-post-market-order"
+import { usePostMarketOrderTestnet } from "./use-post-market.order-testnet"
 import { useMarketSteps } from "./use-steps"
 
 interface UseMarketTransactionProps {
@@ -44,23 +47,39 @@ export function useMarketTransaction({
     sendToken,
   })
 
+  const spender =
+    chain?.id === megaethTestnet.id
+      ? (marketOrderSteps as MarketOrderSteps)?.[0]?.params.spender
+      : mangroveChain?.ghostbook
+
   // Approve mutation
   const approveAmount = useApproveAmount({
     token: sendToken,
-    spender: mangroveChain?.ghostbook ?? undefined,
+    spender,
     sendAmount: form.state.values.send,
   })
 
   // Post order mutation
-  const post = usePostMarketOrder({
-    onResult: (result) => {
-      setTxState("idle")
-      toast.success("Order submitted successfully!")
-      if (onTransactionSuccess) {
-        onTransactionSuccess()
-      }
-    },
-  })
+  const post =
+    chain?.id === megaethTestnet.id
+      ? usePostMarketOrderTestnet({
+          onResult: (result) => {
+            setTxState("idle")
+            toast.success("Order submitted successfully!")
+            if (onTransactionSuccess) {
+              onTransactionSuccess()
+            }
+          },
+        })
+      : usePostMarketOrder({
+          onResult: (result) => {
+            setTxState("idle")
+            toast.success("Order submitted successfully!")
+            if (onTransactionSuccess) {
+              onTransactionSuccess()
+            }
+          },
+        })
 
   // Wrapping ETH
   const {
