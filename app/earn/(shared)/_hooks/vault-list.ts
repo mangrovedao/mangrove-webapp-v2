@@ -6,7 +6,6 @@ import {
   arbitrumWETHweETH,
   baseCBBTCEURC,
   baseCBBTCUSDC,
-  baseSepoliaWBTCDAI,
   baseWETHUSDC,
   baseWSTETHWETH,
 } from "@mangrovedao/mgv/addresses"
@@ -85,22 +84,7 @@ export const VAULTS_WHITELIST_ARBITRUM = [
   },
 ]
 
-export const VAULTS_WHITELIST_BASE_SEPOLIA = [
-  {
-    manager: "Redacted Labs",
-    address: "0xae68E2f084bC5B72Dbb5Dc5bD75AF8879eDb5CBC" as Address,
-    market: baseSepoliaWBTCDAI,
-    strategyType: "Kandel",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo ed ut perspiciatis unde omnis iste natus error sit voluptatem perspiciatis ...",
-    descriptionBonus: "More infos...",
-    socials: {
-      x: "https://x.com/RedactedLabs_",
-      website: "https://www.redactedlabs.fr/",
-    },
-  },
-]
-
+// Deprecated vaults
 export const VAULTS_WHITELIST_BASE = [
   {
     isDeprecated: true,

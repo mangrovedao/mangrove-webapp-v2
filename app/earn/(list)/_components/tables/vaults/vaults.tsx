@@ -1,16 +1,12 @@
 "use client"
 import { useRouter } from "next/navigation"
-import React, { useMemo } from "react"
+import React from "react"
 
-import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
-import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { useAccount } from "wagmi"
-import type { Strategy } from "../../../_schemas/kandels"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault } from "@/app/earn/(shared)/types"
-import { useTable } from "./hooks/use-table"
-import { useVaults } from "./hooks/use-vaults"
+import { useNewVaults } from "./hooks/use-new-vaults"
 
 type VaultsProps = {
   showOnlyActive?: boolean
@@ -22,6 +18,10 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
   const containerRef = React.useRef<HTMLDivElement>(null)
 
   const plainVaults = useVaultsWhitelist()
+
+  const { vaults, count } = useNewVaults()
+
+  console.log(vaults, "here")
 
   const defaultData = plainVaults.map(
     (vault) =>
@@ -56,73 +56,70 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
     pageSize: 15, // Increase page size for virtualization
   })
 
-  const { data, isLoading, error, refetch } = useVaults({
-    filters: {
-      skip: (page - 1) * pageSize,
-      first: pageSize,
-    },
-  })
+  // const { data, isLoading, error, refetch } = useVaults({
+  //   filters: {
+  //     skip: (page - 1) * pageSize,
+  //     first: pageSize,
+  //   },
+  // })
 
-  // Apply active vaults filter if needed
-  const filteredData = useMemo(() => {
-    if (!data) return []
-    return showOnlyActive ? data.filter((vault) => vault.isActive) : data
-  }, [data, showOnlyActive])
+  // // Apply active vaults filter if needed
+  // const filteredData = useMemo(() => {
+  //   if (!data) return []
+  //   return showOnlyActive ? data.filter((vault) => vault.isActive) : data
+  // }, [data, showOnlyActive])
 
-  const { data: count } = useVaults({
-    select: (vaults) => vaults.length,
-  })
+  // // temporary fix
+  // React.useEffect(() => {
+  //   refetch?.()
+  // }, [chainId, refetch])
 
-  // temporary fix
-  React.useEffect(() => {
-    refetch?.()
-  }, [chainId, refetch])
+  // // selected strategy to cancel
+  // const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
 
-  // selected strategy to cancel
-  const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
-
-  const table = useTable({
-    pageSize,
-    // If data is loading but empty, provide an array of empty objects to render skeleton rows
-    data: isLoading && filteredData.length === 0 ? defaultData : filteredData,
-    onDeposit: (vault: Vault) => undefined,
-    // Pass isLoading to the table so it can render loading skeletons only for TVL and APR
-    isLoading,
-    defaultData,
-  })
+  // const table = useTable({
+  //   pageSize,
+  //   // If data is loading but empty, provide an array of empty objects to render skeleton rows
+  //   data: isLoading && filteredData.length === 0 ? defaultData : filteredData,
+  //   onDeposit: (vault: Vault) => undefined,
+  //   // Pass isLoading to the table so it can render loading skeletons only for TVL and APR
+  //   isLoading,
+  //   defaultData,
+  // })
 
   return (
-    <div ref={containerRef} className="overflow-hidden">
-      <DataTable
-        table={table}
-        isError={!!error}
-        onRowClick={(vault) => {
-          if (vault) {
-            push(`/earn/${vault.address}`)
-          }
-        }}
-        cellClasses="font-ubuntu text-lg"
-        tableRowClasses="font-ubuntu"
-        pagination={{
-          onPageChange: setPageDetails,
-          page,
-          pageSize,
-          count,
-        }}
-        emptyArrayMessage={
-          showOnlyActive
-            ? "No active vaults found. Try disabling the 'Active Vaults' filter."
-            : isLoading
-              ? "Loading vaults..."
-              : "No vaults available right now."
-        }
-        containerClassName="max-h-[600px]"
-      />
-      <CloseStrategyDialog
-        strategyAddress={closeStrategy?.address || ""}
-        isOpen={!!closeStrategy}
-        onClose={() => setCloseStrategy(undefined)}
-      />
-    </div>
+    <></>
+    // <div ref={containerRef} className="overflow-hidden">
+    //   <DataTable
+    //     table={table}
+    //     isError={!!error}
+    //     onRowClick={(vault) => {
+    //       if (vault) {
+    //         push(`/earn/${vault.address}`)
+    //       }
+    //     }}
+    //     cellClasses="font-ubuntu text-lg"
+    //     tableRowClasses="font-ubuntu"
+    //     pagination={{
+    //       onPageChange: setPageDetails,
+    //       page,
+    //       pageSize,
+    //       count,
+    //     }}
+    //     emptyArrayMessage={
+    //       showOnlyActive
+    //         ? "No active vaults found. Try disabling the 'Active Vaults' filter."
+    //         : isLoading
+    //           ? "Loading vaults..."
+    //           : "No vaults available right now."
+    //     }
+    //     containerClassName="max-h-[600px]"
+    //   />
+    //   <CloseStrategyDialog
+    //     strategyAddress={closeStrategy?.address || ""}
+    //     isOpen={!!closeStrategy}
+    //     onClose={() => setCloseStrategy(undefined)}
+    //   />
+    // </div>
   )
 }
