@@ -127,7 +127,12 @@ export function successToast(
   )
 }
 
-export function calcDollarAmt(amount: string, isBase: boolean, tradeSide: BS) {
+export function calcDollarAmt(
+  amount: string,
+  isBase: boolean,
+  tradeSide: BS,
+  payToken: Token,
+) {
   const { payDollar, receiveDollar } = useSwap()
 
   const conversionRate =

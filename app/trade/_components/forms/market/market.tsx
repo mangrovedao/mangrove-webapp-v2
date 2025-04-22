@@ -12,6 +12,8 @@ import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
+import { useDollarConversion } from "@/hooks/use-dollar-conversion"
+import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -20,7 +22,6 @@ import { useTradeFormStore } from "../../forms/store"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import { useTradeInfos } from "../hooks/use-trade-infos"
-import { calcDollarAmt } from "../utils"
 import { useMarketForm } from "./hooks/use-market"
 import { useMarketTransaction } from "./hooks/use-market-transaction"
 import { type Form } from "./types"
@@ -37,7 +38,7 @@ const slippageValues = ["0.1", "0.5", "1"]
 const sliderValues = [25, 50, 75]
 
 export function Market() {
-  const { isConnected, address, chain } = useAccount()
+  const { isConnected, address } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
   })
@@ -97,6 +98,15 @@ export function Market() {
       setSendSliderValue(0)
       setFormData(undefined)
     },
+  })
+
+  const { currentMarket } = useMarket()
+
+  const { payDollar, receiveDollar } = useDollarConversion({
+    currentMarket,
+    payAmount: form.state.values.send,
+    receiveAmount: form.state.values.receive,
+    tradeSide,
   })
 
   // Initialize form with shared pay amount when component mounts or when switching tabs
@@ -276,11 +286,7 @@ export function Market() {
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  dollarAmount={calcDollarAmt(
-                    field.state.value,
-                    sendToken?.address !== market?.base.address,
-                    tradeSide,
-                  )}
+                  dollarAmount={payDollar}
                   onChange={({ target: { value } }) => {
                     field.handleChange(value)
                     // We don't need to update the shared state here anymore
@@ -347,11 +353,7 @@ export function Market() {
                     field.handleChange(value)
                     computeSendAmount()
                   }}
-                  dollarAmount={calcDollarAmt(
-                    field.state.value,
-                    receiveToken?.address !== market?.base.address,
-                    tradeSide,
-                  )}
+                  dollarAmount={receiveDollar}
                   token={receiveToken}
                   label="Receive"
                   disabled={!(market && form.state.isFormValid)}

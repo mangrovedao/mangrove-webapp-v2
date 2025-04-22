@@ -31,9 +31,8 @@ type OrdersPage = {
 export function useOrders<T = Order[]>({
   pageSize = 25,
   allMarkets = false,
-  select,
 }: Params<T> = {}) {
-  const { address, isConnected } = useAccount()
+  const { address } = useAccount()
   const { currentMarket: market } = useMarket()
   const { openMarkets } = useOpenMarkets()
   const { defaultChain } = useDefaultChain()
@@ -54,17 +53,11 @@ export function useOrders<T = Order[]>({
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
       try {
-        if (!address)
-          return {
-            data: [],
-            meta: { hasNextPage: false, count: 0, page: pageParam as number },
-          }
-        if (!allMarkets && !market)
-          return {
-            data: [],
-            meta: { hasNextPage: false, count: 0, page: pageParam as number },
-          }
-        if (allMarkets && (!openMarkets || openMarkets.length === 0))
+        if (
+          !address ||
+          (!allMarkets && !market) ||
+          (allMarkets && (!openMarkets || openMarkets.length === 0))
+        )
           return {
             data: [],
             meta: { hasNextPage: false, count: 0, page: pageParam as number },
@@ -84,13 +77,10 @@ export function useOrders<T = Order[]>({
 
           try {
             const response = await fetch(
-              `${getIndexerUrl(defaultChain)}/orders/active/${defaultChain.id}/${marketItem.base.address}/${marketItem.quote.address}/${marketItem.tickSpacing}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${getIndexerUrl(defaultChain)}/orders/list/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
 
             if (!response.ok) {
-              console.warn(
-                `Failed to fetch active orders for market ${marketItem.base.symbol}-${marketItem.quote.symbol}`,
-              )
               return { orders: [] }
             }
 

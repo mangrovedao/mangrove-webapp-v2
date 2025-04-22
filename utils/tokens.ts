@@ -24,6 +24,26 @@ export function getTokenInfos(symbol: string) {
   return token
 }
 
+export function applyPriceDisplayDecimals(data?: any[]) {
+  if (!data?.length) return []
+
+  return data.map((item) => {
+    const updateToken = (token: any) => {
+      if (token?.symbol?.toLowerCase().includes("eth")) {
+        token.priceDisplayDecimals = 6
+        token.displayDecimals = 6
+      }
+    }
+
+    if (item?.base && item?.quote) {
+      updateToken(item.base)
+      updateToken(item.quote)
+    }
+
+    return item
+  })
+}
+
 export function getSvgUrl(symbol: string) {
   const token = getTokenInfos(symbol)
   if (token.name === "GENERIC") {

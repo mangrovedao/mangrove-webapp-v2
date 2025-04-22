@@ -1,11 +1,9 @@
 "use client"
 import React, { useEffect, useRef } from "react"
 
-import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { Switch } from "@/components/ui/switch"
 import useMarket from "@/providers/market"
-import { useLoadingStore } from "@/stores/loading.store"
 import { AnimatedOrdersSkeleton } from "./animated-orders-skeleton"
 import EditOrderSheet from "./components/edit-order-sheet"
 import { useOrders } from "./hooks/use-orders"
@@ -20,9 +18,6 @@ type Params = {
 export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
   const { currentMarket, setMarket, markets } = useMarket()
   const loadingRef = useRef<HTMLDivElement>(null)
-  const isLoadingOrders = useLoadingStore((state) =>
-    state.isLoading(TRADE.TABLES.ORDERS),
-  )
 
   const {
     data,
@@ -78,7 +73,7 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
     onCancel: setOrderToDelete,
   })
 
-  if (isLoading && !data) {
+  if (!data) {
     return <AnimatedOrdersSkeleton />
   }
 
@@ -106,7 +101,6 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
                   order?.baseAddress?.toLocaleLowerCase(),
               )!,
             )
-            // setOrderToEdit({ order: order as Order, mode: "view" })
           }}
           animated={true}
           animationVariant="slide"
@@ -130,11 +124,6 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
         market={{ currentMarket, setMarket, markets }}
         onClose={() => setOrderToEdit(undefined)}
       />
-      {/* <CancelOfferDialog
-        order={orderToDelete}
-        market={{ currentMarket, setMarket, markets }}
-        onClose={() => setOrderToDelete(undefined)}
-      /> */}
     </>
   )
 }

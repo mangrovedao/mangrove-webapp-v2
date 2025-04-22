@@ -19,7 +19,6 @@ function isMarketEqual(market1?: MarketParams, market2?: MarketParams) {
 
 export function useMarketContext() {
   const { openMarkets } = useOpenMarkets()
-
   const router = useRouter()
   const pathName = usePathname()
   const searchParams = useSearchParams()
