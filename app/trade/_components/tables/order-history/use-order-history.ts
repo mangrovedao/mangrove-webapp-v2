@@ -81,7 +81,7 @@ export function useOrderHistory({
 
           try {
             const response = await fetch(
-              `${getIndexerUrl(defaultChain)}/orders/history/${defaultChain.id}/${marketItem.base.address}/${marketItem.quote.address}/${marketItem.tickSpacing}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${getIndexerUrl(defaultChain)}/orders/all-history/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
 
             if (!response.ok) {
