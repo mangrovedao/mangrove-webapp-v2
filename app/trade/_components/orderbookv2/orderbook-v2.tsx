@@ -13,8 +13,9 @@ type OrderBookProps = {
 }
 
 const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
-  const { mergedBooks, refetch } = useMergedBooks()
+  const { mergedBooks, refetch, isLoading: ghostBookLoading } = useMergedBooks()
   const { currentMarket } = useMarket()
+
   const { base, quote } = currentMarket ?? {}
   const { asks, bids } = mergedBooks ?? {}
 
@@ -72,8 +73,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
     processedBids[processedBids.length - 1]?.cumulative || 0,
   )
 
-  if (!displayAsks.length || !processedBids.length)
-    return <AnimatedOrderBookSkeleton />
+  if (ghostBookLoading) return <AnimatedOrderBookSkeleton />
 
   return (
     <motion.div

@@ -30,6 +30,8 @@ export const env = createEnv({
     NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST: z.string().url(),
     NEXT_PUBLIC_FEATURE_FLAG: z.string(),
     NEXT_PUBLIC_CLOUDFLARE_BEACON_TOKEN: z.string(),
+    NEXT_PUBLIC_MAINNET_INDEXER_URL: z.string().url(),
+    NEXT_PUBLIC_TESTNET_INDEXER_URL: z.string().url(),
   },
 
   /**
@@ -56,6 +58,10 @@ export const env = createEnv({
     NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST:
       process.env.NEXT_PUBLIC_MANGROVE_JSON_SERVER_HOST,
     NEXT_PUBLIC_FEATURE_FLAG: process.env.NEXT_PUBLIC_FEATURE_FLAG,
+    NEXT_PUBLIC_MAINNET_INDEXER_URL:
+      process.env.NEXT_PUBLIC_MAINNET_INDEXER_URL,
+    NEXT_PUBLIC_TESTNET_INDEXER_URL:
+      process.env.NEXT_PUBLIC_TESTNET_INDEXER_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

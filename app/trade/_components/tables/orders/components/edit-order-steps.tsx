@@ -100,7 +100,6 @@ export default function EditOrderSteps({
   const { data: limitOrderSteps } = useLimitSteps({
     user: address,
     bs: BS.buy,
-    logic: orderLogic?.name,
   })
 
   let steps = ["Update order"]

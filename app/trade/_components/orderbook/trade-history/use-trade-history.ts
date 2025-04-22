@@ -9,6 +9,7 @@ import { useOpenMarkets } from "@/hooks/use-open-markets"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { parseTradeHistory, type TradeHistory } from "./schema"
 
 // Define Trade type based on API response
@@ -73,7 +74,7 @@ export function useTradeHistory<T = TradeHistory[]>({
         if (!market) return []
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_INDEXER_URL}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
+          `${getIndexerUrl(defaultChain)}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
         )
         const result = await response.json()
 
@@ -132,7 +133,7 @@ export function useTrades({
         startLoading(TRADE.TABLES.ORDERS)
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_INDEXER_URL}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+          `${getIndexerUrl(defaultChain)}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
         )
 
         if (!response.ok) {

@@ -9,6 +9,7 @@ import { useOpenMarkets } from "@/hooks/use-open-markets"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { parseOrderHistory, type OrderHistory } from "./schema"
 
 type Params = {
@@ -80,7 +81,7 @@ export function useOrderHistory({
 
           try {
             const response = await fetch(
-              `${process.env.NEXT_PUBLIC_INDEXER_URL}/orders/all-history/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${getIndexerUrl(defaultChain)}/orders/all-history/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
 
             if (!response.ok) {
