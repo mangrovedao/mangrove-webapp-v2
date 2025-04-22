@@ -7,8 +7,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { useDefaultChain } from "@/hooks/use-default-chain"
 import { TradeIcon } from "@/svgs"
 import { useEffect, useState } from "react"
+import { Market } from "./_components/charts/charts"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
 import { OrderBook } from "./_components/orderbook/orderbook"
@@ -23,6 +25,7 @@ export default function Page() {
   const mainTabs = ["Chart", "Order Book", "Trades"]
   const [isMobile, setIsMobile] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const { defaultChain } = useDefaultChain()
 
   // Check if we're on mobile
   useEffect(() => {
@@ -58,8 +61,11 @@ export default function Page() {
                   <div className="flex gap-1 h-full">
                     {/* Chart Section */}
                     <div className="flex-[4] rounded-sm overflow-hidden border border-bg-secondary">
-                      {/* <Market className="w-full h-full" /> */}
-                      <EmbedPriceChart />
+                      {!defaultChain.testnet ? (
+                        <EmbedPriceChart />
+                      ) : (
+                        <Market className="w-full h-full" />
+                      )}
                     </div>
 
                     {/* Order Book Section */}
@@ -106,8 +112,11 @@ export default function Page() {
             <div className="mb-2">
               {activeMainTab === "Chart" && (
                 <div className="h-[400px] w-full rounded-sm border border-bg-secondary">
-                  {/* <Market className="w-full h-full" /> */}
-                  <EmbedPriceChart />
+                  {!defaultChain.testnet ? (
+                    <EmbedPriceChart />
+                  ) : (
+                    <Market className="w-full h-full" />
+                  )}
                 </div>
               )}
               {activeMainTab === "Order Book" && (
@@ -138,7 +147,7 @@ export default function Page() {
 
           {/* Trading Form Drawer */}
           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-            <Drawer.Content className="h-[60vh] p-4">
+            <Drawer.Content className=" p-4">
               <Forms />
             </Drawer.Content>
           </Drawer>

@@ -9,6 +9,7 @@ import { useOpenMarkets } from "@/hooks/use-open-markets"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { parseOrders, type Order } from "../schema"
 
 type Params<T> = {
@@ -76,7 +77,7 @@ export function useOrders<T = Order[]>({
 
           try {
             const response = await fetch(
-              `${process.env.NEXT_PUBLIC_INDEXER_URL}/orders/list/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${getIndexerUrl(defaultChain)}/orders/list/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
 
             if (!response.ok) {

@@ -2,6 +2,7 @@ import type { useMarkets } from "@/hooks/use-addresses"
 import type { Token } from "@mangrovedao/mgv"
 
 import icons from "@/generated/icons.json"
+import { MarketParams } from "@mangrovedao/mgv"
 
 const IMG_BASE_PATH = "/cryptocurrency-icons/svg/color"
 
@@ -58,7 +59,7 @@ export function getWebPUrl(symbol: string) {
 
 export function getTokenByAddress(
   address: string,
-  markets: ReturnType<typeof useMarkets>,
+  markets: MarketParams[],
   odosTokens: Token[],
 ): Token | undefined {
   const token =
