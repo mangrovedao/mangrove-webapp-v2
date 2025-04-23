@@ -10,7 +10,7 @@ import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
-import { PublicClient } from "viem"
+import { Address, PublicClient } from "viem"
 import { useAccount } from "wagmi"
 
 type Params<T> = {
@@ -20,6 +20,7 @@ type Params<T> = {
   }
   select?: (data: (Vault | VaultWhitelist)[]) => T
   whitelist?: VaultWhitelist[]
+  vaultAddress?: Address | null
 }
 
 // Cache key helper for consistency
@@ -32,16 +33,27 @@ const getVaultsQueryKey = (
   first = 10,
 ) => ["vaults", networkKey, fdv, user, chainId, skip, first]
 
-export function useVaults<T = Vault[] | undefined>({
+export function useVaults<T = Vault[] | Vault | undefined>({
   filters: { first = 10, skip = 0 } = {},
+  vaultAddress = null,
   select,
 }: Params<T> = {}) {
   const networkClient = useNetworkClient()
   const { address: user, chainId, isConnected } = useAccount()
-  const plainVaults = useVaultsWhitelist()
+  let plainVaults: VaultWhitelist[] = useVaultsWhitelist()
   const incentives = useVaultsIncentives()
   const { fdv } = useMgvFdv()
   const queryClient = useQueryClient()
+
+  if (!vaultAddress) return
+
+  plainVaults = plainVaults.filter(
+    (vault: VaultWhitelist) => vault.address === vaultAddress,
+  )
+
+  console.log("vaults", plainVaults)
+
+  if (!plainVaults.length) return
 
   // Query key with pagination parameters
   const queryKey = getVaultsQueryKey(
