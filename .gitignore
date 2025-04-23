@@ -44,7 +44,6 @@ yarn-error.log*
 # generated icons data
 generated
 public/cryptocurrency-icons
-# Sentry Config File
-.sentryclirc
+
 
 .env.local
