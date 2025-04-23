@@ -27,7 +27,6 @@ import {
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { Check } from "@/svgs"
 import { formatNumber } from "@/utils/numbers"
-import { CheckIcon } from "lucide-react"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -89,26 +88,16 @@ export function useTable({
       }),
 
       columnHelper.display({
-        header: "Deprecated",
-        size: 50,
-        cell: ({ row }) => {
-          const { deprecated } = row.original
-          return (
-            deprecated && (
-              <div className="relative h-4 w-4 ml-3">
-                <div className="absolute inset-0 bg-bg-tertiary rounded-full"></div>
-                <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
-              </div>
-            )
-          )
-        },
-      }),
-
-      columnHelper.display({
         header: "Strategy",
         cell: ({ row }) => {
           const isTrusted = true
-          return <Value value={row.original.type} trusted={isTrusted} />
+          const { deprecated } = row.original
+          return (
+            <Value
+              value={`${row.original.type} ${deprecated ? "(Deprecated)" : ""}`}
+              trusted={isTrusted}
+            />
+          )
         },
       }),
 
