@@ -298,12 +298,10 @@ const createDexScreenerDatafeed = (options: {
 
         // Check if we have valid cached data
         const now = Date.now()
-        if (
-          cachedBars[cacheKey] &&
-          now - cachedBars[cacheKey].timestamp < CACHE_EXPIRATION
-        ) {
+        const cachedEntry = cachedBars[cacheKey]
+        if (cachedEntry && now - cachedEntry.timestamp < CACHE_EXPIRATION) {
           // Ensure we have a non-null array by providing a default empty array
-          const ohlcvBars = cachedBars[cacheKey].data || []
+          const ohlcvBars = cachedEntry.data || []
 
           // Generate continuous bars if needed
           const processedBars = ensureContinuousBars(
