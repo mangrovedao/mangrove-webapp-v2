@@ -6,7 +6,6 @@ import { useClient, usePublicClient } from "wagmi"
 import { Strategy } from "@/app/strategies/(list)/_schemas/kandels"
 import { useMangroveAddresses } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market"
-import { getTokenPriceInToken } from "@/services/tokens.service"
 
 export type Status = "active" | "inactive" | "closed" | "unknown"
 
@@ -51,14 +50,6 @@ export default function useStrategyStatus({
         const book = await kandelClient?.getBook({})
 
         let midPrice = Number(book?.midPrice ?? 0)
-        if (!midPrice && market.base.symbol && market.quote.symbol) {
-          const { close } = await getTokenPriceInToken(
-            market.base.symbol,
-            market.quote.symbol,
-            "1d",
-          )
-          midPrice = Number(close)
-        }
 
         const kandelInstance = client?.extend(
           kandelActions(
