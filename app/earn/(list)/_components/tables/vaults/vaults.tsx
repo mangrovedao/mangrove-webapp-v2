@@ -9,6 +9,7 @@ import type { Strategy } from "../../../_schemas/kandels"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
+import { Switch } from "@/components/ui/switch"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { Chain } from "viem"
 import { useTable } from "./hooks/use-table"
@@ -18,8 +19,10 @@ export function Vaults() {
   const { chain } = useAccount()
   const containerRef = React.useRef<HTMLDivElement>(null)
   const [data, setData] = useState<any>([])
+  const [filteredData, setFilteredData] = useState<any>([])
 
   const plainVaults = useVaultsWhitelist()
+  const [showDeprecated, setShowDeprecated] = useState<boolean>(false)
 
   const defaultData = plainVaults.map(
     (vault: VaultWhitelist) =>
@@ -70,6 +73,8 @@ export function Vaults() {
         }
       })
       setData(vaults)
+      const filtered = vaults.filter((vault) => vault.deprecated === false)
+      setFilteredData(filtered)
     }
 
     fetchVault(chain)
@@ -86,7 +91,7 @@ export function Vaults() {
   const table = useTable({
     pageSize,
     // If data is loading but empty, provide an array of empty objects to render skeleton rows
-    data,
+    data: showDeprecated ? data : filteredData,
     onDeposit: (vault: Vault) => undefined,
     // Pass isLoading to the table so it can render loading skeletons only for TVL and APR
     isLoading: !data || !data.length,
@@ -94,30 +99,41 @@ export function Vaults() {
   })
 
   return (
-    <div ref={containerRef} className="overflow-hidden">
-      <DataTable
-        table={table}
-        onRowClick={(vault) => {
-          if (vault) {
-            push(`/earn/${vault.address}`)
-          }
-        }}
-        cellClasses="font-ubuntu text-lg"
-        tableRowClasses="font-ubuntu"
-        pagination={{
-          onPageChange: setPageDetails,
-          page,
-          pageSize,
-          count: data.length,
-        }}
-        emptyArrayMessage={"Loading vaults..."}
-        containerClassName="max-h-[600px]"
-      />
-      <CloseStrategyDialog
-        strategyAddress={closeStrategy?.address || ""}
-        isOpen={!!closeStrategy}
-        onClose={() => setCloseStrategy(undefined)}
-      />
+    <div>
+      {data && (
+        <div className="flex gap-2 items-center justify-end mr-2 my-3">
+          <Switch
+            checked={showDeprecated}
+            onCheckedChange={() => setShowDeprecated?.(!showDeprecated)}
+          />
+          <span className="text-sm">Show Deprecated Vaults</span>
+        </div>
+      )}
+      <div ref={containerRef} className="overflow-hidden">
+        <DataTable
+          table={table}
+          onRowClick={(vault) => {
+            if (vault) {
+              push(`/earn/${vault.address}`)
+            }
+          }}
+          cellClasses="font-ubuntu text-lg"
+          tableRowClasses="font-ubuntu"
+          pagination={{
+            onPageChange: setPageDetails,
+            page,
+            pageSize,
+            count: data.length,
+          }}
+          emptyArrayMessage={"Loading vaults..."}
+          containerClassName="max-h-[600px]"
+        />
+        <CloseStrategyDialog
+          strategyAddress={closeStrategy?.address || ""}
+          isOpen={!!closeStrategy}
+          onClose={() => setCloseStrategy(undefined)}
+        />
+      </div>
     </div>
   )
 }

@@ -13,10 +13,6 @@ export function Value({ value, trusted, symbol, className }: Props) {
     return <Skeleton className="h-6 w-full" />
   }
 
-  if (symbol) {
-    console.log(value, "val")
-  }
-
   return (
     <div
       className={cn(
