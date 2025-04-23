@@ -61,11 +61,6 @@ export function useTable({
           const { address } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
 
-          // note: check if we can retrive logos from library directly
-          // const icon = getWhitelistedChainObjects().find(
-          //   (item) => item.id === chain.id,
-          // )
-
           return (
             <div className="flex flex-col underline">
               <Link
@@ -84,10 +79,11 @@ export function useTable({
       columnHelper.display({
         header: "Market",
         cell: ({ row }) => {
+          console.log(row.original, "here11")
           return (
             <Market
-              base={row.original.market.base.address}
-              quote={row.original.market.quote.address}
+              base={row.original.base.address}
+              quote={row.original.quote.address}
             />
           )
         },
@@ -97,7 +93,7 @@ export function useTable({
         header: "Strategy",
         cell: ({ row }) => {
           const isTrusted = true
-          return <Value value={row.original.type} trusted={isTrusted} />
+          return <Value value={row.original.strategyType} trusted={isTrusted} />
         },
       }),
 
@@ -112,10 +108,10 @@ export function useTable({
               </div>
             )
           }
-          const { tvl, market, quoteDollarPrice } = row.original
-          const value =
-            Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
-            quoteDollarPrice
+          const { tvl, quote } = row.original
+          const value = Number(formatUnits(tvl || 0n, quote.decimals || 18))
+          // TODO: rework this if the price is not in dollars
+          // * quoteDollarPrice
 
           return (
             <div className="text-right w-full">
@@ -134,7 +130,7 @@ export function useTable({
         cell: ({ row }) => {
           return (
             <div className="text-right w-full">
-              <Value value={row.original.strategist} className="justify-end" />
+              <Value value={row.original.manager} className="justify-end" />
             </div>
           )
         },
@@ -154,10 +150,6 @@ export function useTable({
 
           const apr = row.original.apr ? `${row.original.apr.toFixed(2)}%` : "-"
 
-          const incentivesApr = row.original.incentivesApr
-            ? `${row.original.incentivesApr.toFixed(2)}%`
-            : "-"
-
           return (
             <div className="group relative w-full text-right">
               <TooltipProvider>
@@ -174,14 +166,6 @@ export function useTable({
                   >
                     <div className="cursor-default">
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm text-text-secondary">
-                            Incentives rate
-                          </span>
-                          <span className="text-sm text-text-primary">
-                            {incentivesApr}
-                          </span>
-                        </div>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
                             Net APR
@@ -230,19 +214,6 @@ export function useTable({
           )
         },
       }),
-
-      // columnHelper.display({
-      //   id: "incentives",
-      //   header: () => <div className="text-right">LP Rewards</div>,
-      //   cell: ({ row }) => {
-      //     const value = row.original.totalRewards
-      //     return (
-      //       <div className="w-full h-full flex justify-end">
-      //         <Value value={formatNumber(value)} symbol="MGV" />
-      //       </div>
-      //     )
-      //   },
-      // }),
     ],
     [onDeposit],
   )

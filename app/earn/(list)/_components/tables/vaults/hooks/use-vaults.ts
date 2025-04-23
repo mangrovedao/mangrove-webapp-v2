@@ -1,175 +1,61 @@
-"use client"
-
-import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
-import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
-import { getVaultIncentives } from "@/app/earn/(shared)/_service/vault-incentives"
-import { getVaultsInformation } from "@/app/earn/(shared)/_service/vaults-infos"
-import { useMgvFdv } from "@/app/earn/(shared)/store/vault-store"
-import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
-import { useNetworkClient } from "@/hooks/use-network-client"
-import { printEvmError } from "@/utils/errors"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
-import { PublicClient } from "viem"
+import { useTokens } from "@/hooks/use-addresses"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useEffect, useState } from "react"
+import { Address, Chain } from "viem"
 import { useAccount } from "wagmi"
 
-type Params<T> = {
-  filters?: {
-    first?: number
-    skip?: number
+const DEPRECATED_VAULTS: Address[] = [
+  "0x8ec6a6BB89ccF694129077954587B25b6c712bc8",
+  "0xC95a225fd311E911a610D8274593C19282012119",
+  "0x365cBDdFc764600D4728006730dd055B18f518ce",
+  "0xCC1beacCdA8024bA968D63e6db9f01A15D593C52",
+]
+
+export function useVaults() {
+  const [vaults, setVaults] = useState([])
+  const { chain } = useAccount()
+  const tokens = useTokens()
+  const 
+
+  const isDeprecated = (item: any) => {
+    const fVaults = DEPRECATED_VAULTS.map((x) => x.toLowerCase())
+    return fVaults.includes(item.vault.toLowerCase())
   }
-  select?: (data: (Vault | VaultWhitelist)[]) => T
-  whitelist?: VaultWhitelist[]
-}
 
-// Cache key helper for consistency
-const getVaultsQueryKey = (
-  networkKey?: string,
-  fdv?: number,
-  user?: string,
-  chainId?: number,
-  skip = 0,
-  first = 10,
-) => ["vaults", networkKey, fdv, user, chainId, skip, first]
+  const findTokenBySymbol = (symbol: string) => {
+    const token = tokens.find(
+      (t) => t.symbol.toLowerCase() === symbol.toLowerCase(),
+    )
+    return token
+  }
 
-export function useVaults<T = Vault[] | undefined>({
-  filters: { first = 10, skip = 0 } = {},
-  select,
-}: Params<T> = {}) {
-  const networkClient = useNetworkClient()
-  const { address: user, chainId, isConnected } = useAccount()
-  const plainVaults = useVaultsWhitelist()
-  const incentives = useVaultsIncentives()
-  const { fdv } = useMgvFdv()
-  const queryClient = useQueryClient()
-
-  // Query key with pagination parameters
-  const queryKey = getVaultsQueryKey(
-    networkClient?.key,
-    fdv,
-    user,
-    chainId,
-    skip,
-    first,
-  )
-
-  // Get the previous data for all pages as potential placeholder
-  const previousVaultsData = queryClient.getQueryData<Vault[]>(
-    getVaultsQueryKey(networkClient?.key, fdv, user, chainId),
-  )
-
-  // Setup the main query
-  const { data, ...rest } = useQuery({
-    queryKey,
-    queryFn: async (): Promise<Vault[]> => {
-      try {
-        if (!networkClient?.key) throw new Error("Public client is not enabled")
-        if (!plainVaults) return []
-
-        // Use the loading store to show loading state for UI feedback
-        // while still leveraging stale data
-
-        // Get incentives data in parallel with other operations
-        const incentivesData = await Promise.all(
-          plainVaults.map(async (vault) => {
-            const data = await getVaultIncentives(
-              networkClient as PublicClient,
-              incentives.find(
-                (i) => i.vault.toLowerCase() === vault.address.toLowerCase(),
-              ),
-            )
-            return {
-              vault: vault.address,
-              total:
-                data?.leaderboard.reduce(
-                  (sum, entry) => sum + entry.rewards,
-                  0,
-                ) ?? 0,
-            }
-          }),
-        )
-
-        const vaults = await getVaultsInformation(
-          networkClient as PublicClient,
-          plainVaults,
-          user,
-          incentives,
-          fdv,
-          incentivesData,
-        )
-
-        return vaults ?? []
-      } catch (error) {
-        printEvmError(error)
-        return []
-      }
-    },
-    placeholderData: previousVaultsData,
-    enabled: !!networkClient && !!plainVaults.length,
-    staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh longer
-    gcTime: 10 * 60 * 1000, // 10 minutes - data stays in cache longer
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-  })
-
-  // Prefetch the next page when we're within 50% of the current page
   useEffect(() => {
-    if (data && data.length >= first / 2) {
-      const nextPageKey = getVaultsQueryKey(
-        networkClient?.key,
-        fdv,
-        user,
-        chainId,
-        skip + first,
-        first,
+    const fetchVault = async (chain?: Chain) => {
+      if (!chain) return
+
+      const response = await fetch(
+        `${getIndexerUrl(chain)}/vault/list/${chain.id}`,
       )
+      const data = await response.json()
 
-      queryClient.prefetchQuery({
-        queryKey: nextPageKey,
-        queryFn: async () => {
-          try {
-            if (!networkClient?.key)
-              throw new Error("Public client is not enabled")
-            if (!plainVaults) return []
-
-            const vaults = await getVaultsInformation(
-              networkClient as PublicClient,
-              plainVaults,
-              user,
-              incentives,
-              fdv,
-            )
-
-            return vaults ?? []
-          } catch (error) {
-            printEvmError(error)
-            return []
-          }
-        },
-        staleTime: 5 * 60 * 1000, // 5 minutes
+      setVaults((prevVaults) => {
+        if (!data.length) return prevVaults
+        return data.map((item: any) => ({
+          ...item,
+          strategyType: "Kandel Aave",
+          manager: "Redacted Labs",
+          address: item.vault,
+          base: findTokenBySymbol(item.market.split("-")[0]),
+          quote: findTokenBySymbol(item.market.split("-")[1]),
+          isDeprecated: isDeprecated(item),
+        }))
       })
     }
-  }, [
-    data,
-    first,
-    skip,
-    networkClient,
-    fdv,
-    user,
-    chainId,
-    plainVaults,
-    incentives,
-    queryClient,
-  ])
-
-  // Refresh data when connection status changes
-  useEffect(() => {
-    // When connection status changes, invalidate the cache
-    queryClient.invalidateQueries({ queryKey: ["vaults"] })
-  }, [isConnected, chainId, queryClient])
+    fetchVault(chain)
+  }, [chain])
 
   return {
-    data: (select ? select(data ?? []) : data) as unknown as T,
-    ...rest,
+    vaults,
+    count: vaults.length,
   }
 }
