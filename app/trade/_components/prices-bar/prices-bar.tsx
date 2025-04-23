@@ -7,11 +7,15 @@ import React from "react"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
+import { useDefaultChain } from "@/hooks/use-default-chain"
+import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import useMangrovePoolStatsQuery from "@/hooks/use-pool-stats"
 import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
 import { determineDecimals, formatNumber } from "@/utils/numbers"
+import { normalizeStats } from "./utils"
+
 function Container({ children }: React.PropsWithChildren) {
   return (
     <span className="text-xs font-medium space-y-[2px] block">{children}</span>
@@ -137,6 +141,8 @@ function Item({
 }
 
 export function PricesBar() {
+  const { defaultChain } = useDefaultChain()
+
   const { currentMarket } = useMarket()
   const {
     mergedBooks: book,
@@ -145,10 +151,19 @@ export function PricesBar() {
   } = useMergedBooks()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
-  const { data: stats } = useMangrovePoolStatsQuery(
+  const { data: poolStats } = useMangrovePoolStatsQuery(
     base?.address,
     quote?.address,
   )
+
+  const { data: priceData } = useMangroveTokenPricesQuery(
+    base?.address,
+    quote?.address,
+    1,
+  )
+
+  // Normalize stats based on which chain we're using
+  const stats = normalizeStats(defaultChain.testnet ? priceData : poolStats)
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -164,8 +179,8 @@ export function PricesBar() {
 
   // Calculate variation only if we have valid data
   const hasValidPriceData =
-    stats?.close &&
-    stats?.open &&
+    stats?.close !== undefined &&
+    stats?.open !== undefined &&
     !isNaN(Number(stats.close)) &&
     !isNaN(Number(stats.open)) &&
     Number(stats.close) > 0
@@ -242,8 +257,8 @@ export function PricesBar() {
         <Item
           label="24h High"
           value={
-            stats?.high && !isNaN(Number(stats.high))
-              ? Number(stats.high)
+            stats?.high !== undefined && !isNaN(stats.high)
+              ? stats.high
               : undefined
           }
           token={token}
@@ -253,8 +268,8 @@ export function PricesBar() {
         <Item
           label="24h Low"
           value={
-            stats?.low && !isNaN(Number(stats.low))
-              ? Number(stats.low)
+            stats?.low !== undefined && !isNaN(stats.low)
+              ? stats.low
               : undefined
           }
           token={token}
@@ -264,8 +279,8 @@ export function PricesBar() {
         <Item
           label="24h Volume"
           value={
-            stats?.volume && !isNaN(Number(stats.volume))
-              ? Number(stats.volume)
+            stats?.volume !== undefined && !isNaN(stats.volume)
+              ? stats.volume
               : undefined
           }
           token={token}

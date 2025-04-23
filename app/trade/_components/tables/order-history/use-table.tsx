@@ -76,16 +76,17 @@ export function useTable({ data, showMarketInfo = false }: Params) {
         }),
         columnHelper.accessor("isBid", {
           header: "Side",
-          cell: (row) => {
-            const isBid = row.getValue()
+          cell: ({ row }) => {
+            const isBid = row.original.isBid
+            console.log(isBid)
             return (
               <span
                 className={cn(
-                  isBid ? "text-green-caribbean" : "text-red-100",
+                  !isBid ? "text-green-caribbean" : "text-red-100",
                   "text-xs",
                 )}
               >
-                {isBid ? "Buy" : "Sell"}
+                {!isBid ? "Buy" : "Sell"}
               </span>
             )
           },

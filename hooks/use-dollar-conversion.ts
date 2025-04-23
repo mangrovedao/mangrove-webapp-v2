@@ -18,7 +18,7 @@ export function useDollarConversion({
   receiveAmount,
   tradeSide,
 }: any) {
-  const { chainId } = useAccount()
+  const { chain } = useAccount()
   const [prices, setPrices] = useState({ payDollar: "0", receiveDollar: "0" })
 
   if (!currentMarket?.base.address || !currentMarket?.quote.address)
@@ -31,16 +31,22 @@ export function useDollarConversion({
     queryKey: ["getMarketPrice", payTokenAddress, receiveTokenAddress],
     queryFn: async () => {
       try {
-        if (!chainId || !payTokenAddress || !receiveTokenAddress) return null
+        if (
+          !chain?.id ||
+          !payTokenAddress ||
+          !receiveTokenAddress ||
+          chain?.testnet
+        )
+          return null
 
         const payDollar = await fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${payTokenAddress}`,
+          `https://price.mgvinfra.com/price-by-address?chain=${chain.id}&address=${payTokenAddress}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
 
         const receiveDollar = await fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${receiveTokenAddress}`,
+          `https://price.mgvinfra.com/price-by-address?chain=${chain.id}&address=${receiveTokenAddress}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))

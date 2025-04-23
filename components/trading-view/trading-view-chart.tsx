@@ -48,12 +48,17 @@ const fetchTestnetOHLCVData = async (
 
     const apiResolution = resolutionMap[resolution] || "1h"
 
-    // Build the API URL
-    const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/price/ohlc/${chainId}/${quoteAddress}/${baseAddress}/1/${apiResolution}?to=${to}&count=100`
+    // Instead of using from/to dates which might be problematic,
+    // we'll just fetch the most recent candles using count parameter
+    const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/price/ohlc/${chainId}/${quoteAddress}/${baseAddress}/1/${apiResolution}?count=100`
 
     const response = await fetch(url)
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorText = await response.text()
+      throw new Error(
+        `HTTP error! status: ${response.status}, text: ${errorText}`,
+      )
     }
 
     const data = await response.json()
@@ -67,7 +72,7 @@ const fetchTestnetOHLCVData = async (
     }
 
     // Map the API response to OHLCVBar format
-    return data.candles.map((candle: any) => ({
+    const bars = data.candles.map((candle: any) => ({
       time: candle.startTimestamp * 1000, // Convert to milliseconds
       open: parseFloat(candle.open),
       high: parseFloat(candle.high),
@@ -75,10 +80,108 @@ const fetchTestnetOHLCVData = async (
       close: parseFloat(candle.close),
       volume: parseFloat(candle.volume),
     }))
+
+    return bars
   } catch (error) {
-    console.error("Error fetching testnet OHLCV data:", error)
     return []
   }
+}
+
+// Helper function to ensure we have a continuous sequence of bars for the requested timeframe
+const ensureContinuousBars = (
+  bars: OHLCVBar[],
+  resolution: string,
+  from: number,
+  to: number,
+): OHLCVBar[] => {
+  if (bars.length === 0) return []
+
+  // Sort bars by time
+  const sortedBars = [...bars].sort((a, b) => a.time - b.time)
+
+  // For daily bars, ensure we have a bar for each day
+  if (resolution === "1D" && sortedBars.length > 0) {
+    const result: OHLCVBar[] = []
+
+    // Get the first real bar - we can be sure it exists because we checked sortedBars.length > 0
+    const firstBar = sortedBars[0]! // Using the non-null assertion because we've checked length
+
+    // Create a daily bar for each day in the requested range
+    const oneDayMs = 24 * 60 * 60 * 1000
+    let currentTime = Math.floor((from * 1000) / oneDayMs) * oneDayMs
+    const endTime = Math.min(to * 1000, Date.now())
+
+    // Add the first real bar to start with
+    result.push(firstBar)
+
+    while (currentTime <= endTime) {
+      // Find if we have a real bar for this timestamp
+      const existingBar = sortedBars.find(
+        (bar) => bar.time >= currentTime && bar.time < currentTime + oneDayMs,
+      )
+
+      if (existingBar) {
+        result.push(existingBar)
+      } else if (result.length > 0) {
+        // If we don't have data for this time, clone the previous bar with the same price
+        // We know this is safe because we added firstBar to result above
+        const previousBar = result[result.length - 1]! // Using non-null assertion
+
+        result.push({
+          time: currentTime,
+          open: previousBar.close,
+          high: previousBar.close,
+          low: previousBar.close,
+          close: previousBar.close,
+          volume: 0,
+        })
+      }
+
+      currentTime += oneDayMs
+    }
+
+    return result
+  }
+
+  return sortedBars
+}
+
+// Override TradingView's date handling to always use modern dates
+const overrideHistoryProvider = (
+  originalProvider: IBasicDataFeed,
+): IBasicDataFeed => {
+  const originalGetBars = originalProvider.getBars
+
+  // Override the getBars method to force using modern date ranges
+  originalProvider.getBars = async (
+    symbolInfo,
+    resolution,
+    periodParams,
+    onHistoryCallback,
+    onErrorCallback,
+  ) => {
+    // Force modern date range (last 2 years)
+    const now = Math.floor(Date.now() / 1000)
+    const twoYearsAgo = now - 2 * 365 * 24 * 60 * 60
+
+    // Create modified params
+    const modifiedParams = {
+      ...periodParams,
+      from: twoYearsAgo,
+      to: now,
+    }
+
+    // Call the original getBars with our modified date range
+    return originalGetBars(
+      symbolInfo,
+      resolution,
+      modifiedParams,
+      onHistoryCallback,
+      onErrorCallback,
+    )
+  }
+
+  return originalProvider
 }
 
 // DexScreener API based datafeed
@@ -95,33 +198,35 @@ const createDexScreenerDatafeed = (options: {
   const pairAddress = `${baseAddress}_${quoteAddress}`
 
   // Cache for storing fetched bars to avoid redundant API calls
-  const cachedBars: Record<string, OHLCVBar[]> = {}
+  const cachedBars: Record<string, { data: OHLCVBar[]; timestamp: number }> = {}
+
+  // Cache expiration time - 1 hour in milliseconds
+  const CACHE_EXPIRATION = 60 * 60 * 1000
 
   // Store active subscriptions
   const subscriptions: Record<string, NodeJS.Timeout> = {}
 
   return {
     onReady: (callback) => {
-      setTimeout(
-        () =>
-          callback({
-            supported_resolutions: [
-              "1",
-              "5",
-              "15",
-              "30",
-              "60",
-              "240",
-              "1D",
-              "1W",
-              "1M",
-            ] as ResolutionString[],
-            supports_time: true,
-            supports_marks: false,
-            supports_timescale_marks: false,
-          }),
-        0,
-      )
+      setTimeout(() => {
+        const config = {
+          supported_resolutions: [
+            "1",
+            "5",
+            "15",
+            "30",
+            "60",
+            "240",
+            "1D",
+            "1W",
+            "1M",
+          ] as ResolutionString[],
+          supports_time: true,
+          supports_marks: false,
+          supports_timescale_marks: false,
+        }
+        callback(config)
+      }, 0)
     },
     searchSymbols: (userInput, exchange, symbolType, onResult) => {
       onResult([])
@@ -171,25 +276,45 @@ const createDexScreenerDatafeed = (options: {
     ) => {
       try {
         const { from, to, countBack } = periodParams
-        const cacheKey = `${symbolInfo.ticker}-${resolution}-${from}-${to}`
 
-        // Check if we have cached data
-        if (cachedBars[cacheKey]) {
+        // Fix for very old date ranges that TradingView might request
+        let adjustedFrom = from
+        let adjustedTo = to
+
+        // If the requested from date is too old (before 2020), adjust it to a more recent date
+        if (from < 1577836800) {
+          // Jan 1, 2020 timestamp
+          // Use current time minus a reasonable period (e.g., 1 year)
+          const oneYearAgo = Math.floor(Date.now() / 1000) - 365 * 24 * 60 * 60
+          adjustedFrom = oneYearAgo
+
+          // If to date is also too old, adjust it to current time
+          if (to < 1577836800) {
+            adjustedTo = Math.floor(Date.now() / 1000)
+          }
+        }
+
+        const cacheKey = `${symbolInfo.ticker}-${resolution}-${adjustedFrom}-${adjustedTo}`
+
+        // Check if we have valid cached data
+        const now = Date.now()
+        if (
+          cachedBars[cacheKey] &&
+          now - cachedBars[cacheKey].timestamp < CACHE_EXPIRATION
+        ) {
           // Ensure we have a non-null array by providing a default empty array
-          const ohlcvBars = cachedBars[cacheKey] || []
+          const ohlcvBars = cachedBars[cacheKey].data || []
 
-          // Convert OHLCVBar[] to Bar[] to match the expected type
-          const bars = ohlcvBars.map((bar) => ({
-            time: bar.time,
-            open: bar.open,
-            high: bar.high,
-            low: bar.low,
-            close: bar.close,
-            volume: bar.volume,
-          }))
+          // Generate continuous bars if needed
+          const processedBars = ensureContinuousBars(
+            ohlcvBars,
+            resolution,
+            adjustedFrom,
+            adjustedTo,
+          )
 
-          onHistoryCallback(bars, {
-            noData: bars.length === 0,
+          onHistoryCallback(processedBars, {
+            noData: processedBars.length === 0,
           })
           return
         }
@@ -201,14 +326,27 @@ const createDexScreenerDatafeed = (options: {
             quoteAddress,
             baseAddress,
             resolution,
-            from,
-            to,
+            adjustedFrom,
+            adjustedTo,
           )
 
-          // Cache the result
-          cachedBars[cacheKey] = bars
+          // Generate continuous bars if needed
+          const processedBars = ensureContinuousBars(
+            bars,
+            resolution,
+            adjustedFrom,
+            adjustedTo,
+          )
 
-          onHistoryCallback(bars, { noData: bars.length === 0 })
+          // Cache the result with timestamp
+          cachedBars[cacheKey] = {
+            data: processedBars,
+            timestamp: Date.now(),
+          }
+
+          onHistoryCallback(processedBars, {
+            noData: processedBars.length === 0,
+          })
           return
         }
 
@@ -233,11 +371,16 @@ const createDexScreenerDatafeed = (options: {
           if (chartData && chartData.length > 0) {
             // Filter and sort the data
             const bars = chartData
-              .filter((bar) => bar.time >= from * 1000 && bar.time <= to * 1000)
+              .filter(
+                (bar) => bar.time >= adjustedFrom && bar.time <= adjustedTo,
+              )
               .sort((a, b) => a.time - b.time)
 
-            // Cache the result
-            cachedBars[cacheKey] = bars
+            // Cache the result with timestamp
+            cachedBars[cacheKey] = {
+              data: bars,
+              timestamp: Date.now(),
+            }
 
             onHistoryCallback(bars, { noData: bars.length === 0 })
             return
@@ -247,10 +390,19 @@ const createDexScreenerDatafeed = (options: {
         }
 
         // Generate bars from price and volume data
-        const bars = generateOHLCVBars(pair, from, to, resolution, chainName)
+        const bars = generateOHLCVBars(
+          pair,
+          adjustedFrom,
+          adjustedTo,
+          resolution,
+          chainName,
+        )
 
-        // Cache the result
-        cachedBars[cacheKey] = bars
+        // Cache the result with timestamp
+        cachedBars[cacheKey] = {
+          data: bars,
+          timestamp: Date.now(),
+        }
 
         onHistoryCallback(bars, { noData: bars.length === 0 })
       } catch (error) {
@@ -265,6 +417,7 @@ const createDexScreenerDatafeed = (options: {
       onResetCacheNeededCallback,
     ) => {
       // Set up a periodic update for real-time data
+      // Use a longer interval (10 minutes) to reduce frequent refetching
       const intervalId = setInterval(async () => {
         try {
           if (isTestnet) {
@@ -290,7 +443,9 @@ const createDexScreenerDatafeed = (options: {
           }
 
           const pair = await getPairInfo(chainId, baseAddress, quoteAddress)
-          if (!pair) return
+          if (!pair) {
+            return
+          }
 
           const currentPrice = parseFloat(pair.priceUsd)
           const currentTime = Math.floor(Date.now() / 1000) * 1000
@@ -338,7 +493,7 @@ export const TVChartContainer = (
   const isTestnet = React.useMemo(() => {
     // Add logic to determine if the chain is testnet
     // For example, chainId 8453 for Base Sepolia testnet
-    return defaultChain.id === 8453 || defaultChain.testnet === true
+    return defaultChain.id === 6342 || defaultChain.testnet === true
   }, [defaultChain])
 
   // Handle unzooming the price scale
@@ -367,18 +522,24 @@ export const TVChartContainer = (
   React.useEffect(() => {
     if (!currentMarket || !chartContainerRef.current) return
 
+    // Create the base datafeed
+    const baseFeed = createDexScreenerDatafeed({
+      base: currentMarket.base.symbol,
+      quote: currentMarket.quote.symbol,
+      baseAddress: currentMarket.base.address,
+      quoteAddress: currentMarket.quote.address,
+      chainId: defaultChain.id,
+      isTestnet: isTestnet,
+    }) as IBasicDataFeed
+
+    // Wrap it with our date range override
+    const overriddenFeed = overrideHistoryProvider(baseFeed)
+
     const tvWidget = new widget({
       symbol: `${currentMarket.base.symbol}-${currentMarket.quote.symbol}`,
-      datafeed: createDexScreenerDatafeed({
-        base: currentMarket.base.symbol,
-        quote: currentMarket.quote.symbol,
-        baseAddress: currentMarket.base.address,
-        quoteAddress: currentMarket.quote.address,
-        chainId: defaultChain.id,
-        isTestnet: isTestnet,
-      }) as IBasicDataFeed,
+      datafeed: overriddenFeed,
       timeframe: "12M",
-      interval: "1W" as ResolutionString,
+      interval: "1D" as ResolutionString,
       container: chartContainerRef.current,
       library_path: "charting_library/",
       locale: "en",
@@ -405,11 +566,6 @@ export const TVChartContainer = (
         "scalesProperties.textColor": "#AAA",
         "scalesProperties.lineColor": "#333",
         "mainSeriesProperties.priceAxisProperties.autoScale": true,
-        "mainSeriesProperties.priceAxisProperties.percentage": false,
-        "mainSeriesProperties.priceAxisProperties.log": false,
-        "mainSeriesProperties.priceFormat.type": "price",
-        "mainSeriesProperties.priceFormat.precision": 2,
-        "mainSeriesProperties.priceFormat.minMove": 0.01,
         "scalesProperties.showSeriesLastValue": true,
         "scalesProperties.showStudyLastValue": false,
       },
@@ -444,7 +600,7 @@ export const TVChartContainer = (
       {!isLoading && (
         <button
           onClick={handleUnzoomPriceScale}
-          className="absolute top-2 right-2 z-20 bg-bg-secondary/80 hover:bg-bg-secondary p-1 rounded-sm text-text-secondary hover:text-text-primary transition-colors"
+          className="absolute top-2 right-2 z-20 bg-bg-secondary/80 hover:bg-bg-secondary p-1 rounded-sm text-secondary hover:text-primary transition-colors"
           title="Reset price scale"
         >
           <ZoomOutIcon size={16} />
