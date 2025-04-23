@@ -16,7 +16,8 @@ export function useDollarConversion({
   currentMarket,
   payAmount,
   receiveAmount,
-  tradeSide,
+  tradeSide = BS.buy,
+  refetchInterval = 3_000,
 }: any) {
   const { chainId } = useAccount()
   const [prices, setPrices] = useState({ payDollar: "0", receiveDollar: "0" })
@@ -45,8 +46,6 @@ export function useDollarConversion({
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
 
-        console.log("running")
-
         return {
           payDollar: payDollar.price,
           receiveDollar: receiveDollar.price,
@@ -56,7 +55,7 @@ export function useDollarConversion({
         return { payDollar: -1, receiveDollar: -1 }
       }
     },
-    refetchInterval: 3_000,
+    refetchInterval,
     enabled: !!payTokenAddress && !!receiveTokenAddress,
   })
 

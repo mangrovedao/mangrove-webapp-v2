@@ -6,8 +6,8 @@ import { Vault } from "@/app/earn/(shared)/types"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { Strategy } from "../../../_schemas/kandels"
+import { useNewVaults } from "./hooks/use-new-vaults"
 import { useTable } from "./hooks/use-table"
-import { useVaults } from "./hooks/use-vaults"
 
 type VaultsProps = {
   showOnlyActive?: boolean
@@ -15,7 +15,7 @@ type VaultsProps = {
 
 export function Vaults({ showOnlyActive = false }: VaultsProps) {
   const { push } = useRouter()
-  const { vaults, count } = useVaults()
+  const { vaults, count } = useNewVaults()
 
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
