@@ -1,7 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { AlertTriangle } from "lucide-react"
 import React, { Suspense, lazy } from "react"
 import { useAccount } from "wagmi"
 
@@ -42,25 +40,6 @@ export function Tables() {
           incentives.
         </Text>
       </div>
-      {/* Deprecated Vaults */}
-      <motion.div
-        className="bg-yellow-900/20 border border-yellow-600/30 rounded-md p-4 mb-6"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
-          <div>
-            <h3 className="text-yellow-500 font-medium mb-1">
-              Deprecated Vaults
-            </h3>
-            <p className="text-sm text-text-secondary">
-              For the deprecated vaults, only withdrawals are allowed
-            </p>
-          </div>
-        </div>
-      </motion.div>
       <div className="w-full border border-bg-secondary rounded-sm">
         <CustomTabs
           value={value}
