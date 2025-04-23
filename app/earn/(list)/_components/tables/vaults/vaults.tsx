@@ -100,7 +100,7 @@ export function Vaults() {
 
   return (
     <div>
-      {data && (
+      {data && data.length && (
         <div className="flex gap-2 items-center justify-end mr-2 my-3">
           <Switch
             checked={showDeprecated}
