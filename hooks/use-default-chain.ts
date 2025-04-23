@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { base, Chain } from "viem/chains"
+import { Chain, megaethTestnet } from "viem/chains"
 import { useAccount } from "wagmi"
 
 /**
@@ -9,7 +9,9 @@ import { useAccount } from "wagmi"
  */
 export function useDefaultChain() {
   const { isConnected, chain } = useAccount()
-  const [defaultChain, setDefaultChain] = React.useState<Chain>(chain ?? base)
+  const [defaultChain, setDefaultChain] = React.useState<Chain>(
+    chain ?? megaethTestnet,
+  )
 
   return {
     defaultChain: isConnected && chain ? chain : defaultChain,
