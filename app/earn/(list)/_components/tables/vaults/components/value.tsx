@@ -3,7 +3,7 @@ import { cn } from "@/utils"
 import { CheckIcon } from "lucide-react"
 
 type Props = {
-  value: string
+  value: string | number
   trusted?: boolean
   symbol?: string
   className?: string
@@ -11,6 +11,10 @@ type Props = {
 export function Value({ value, trusted, symbol, className }: Props) {
   if (!value) {
     return <Skeleton className="h-6 w-full" />
+  }
+
+  if (symbol) {
+    console.log(value, "val")
   }
 
   return (

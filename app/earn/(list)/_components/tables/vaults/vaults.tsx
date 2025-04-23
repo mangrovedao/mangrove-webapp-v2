@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import React, { useMemo } from "react"
+import React, { useEffect, useState } from "react"
 
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
@@ -8,26 +8,23 @@ import { useAccount } from "wagmi"
 import type { Strategy } from "../../../_schemas/kandels"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
-import { Vault } from "@/app/earn/(shared)/types"
+import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { Chain } from "viem"
 import { useTable } from "./hooks/use-table"
-import { useVaults } from "./hooks/use-vaults"
 
-type VaultsProps = {
-  showOnlyActive?: boolean
-}
-
-export function Vaults({ showOnlyActive = false }: VaultsProps) {
+export function Vaults() {
   const { push } = useRouter()
-  const { chainId } = useAccount()
+  const { chain } = useAccount()
   const containerRef = React.useRef<HTMLDivElement>(null)
+  const [data, setData] = useState<any>([])
 
   const plainVaults = useVaultsWhitelist()
 
   const defaultData = plainVaults.map(
-    (vault) =>
+    (vault: VaultWhitelist) =>
       ({
         ...vault,
-        // Required fields from Vault type
         symbol: "",
         incentivesApr: 0,
         apr: 0,
@@ -46,37 +43,42 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
         strategist: vault.manager || "",
         type: vault.strategyType || "",
         isActive: true,
+        deprecated: vault.isDeprecated,
         userBaseBalance: 0n,
         userQuoteBalance: 0n,
       }) as Vault,
   )
 
+  useEffect(() => {
+    const fetchVault = async (chain?: Chain) => {
+      if (!chain) return
+
+      const response = await fetch(
+        `${getIndexerUrl(chain)}/vault/list/${chain.id}`,
+      )
+      const data = await response.json()
+
+      let vaults = defaultData
+
+      data.forEach((item: any) => {
+        const vault = vaults.find(
+          (vault) => vault.address.toLowerCase() === item.vault.toLowerCase(),
+        )
+        if (vault) {
+          vault.tvl = item.tvl
+          vault.apr = item.apr
+        }
+      })
+      setData(vaults)
+    }
+
+    fetchVault(chain)
+  }, [chain])
+
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,
     pageSize: 15, // Increase page size for virtualization
   })
-
-  const { data, isLoading, error, refetch } = useVaults({
-    filters: {
-      skip: (page - 1) * pageSize,
-      first: pageSize,
-    },
-  })
-
-  // Apply active vaults filter if needed
-  const filteredData = useMemo(() => {
-    if (!data) return []
-    return showOnlyActive ? data.filter((vault) => vault.isActive) : data
-  }, [data, showOnlyActive])
-
-  const { data: count } = useVaults({
-    select: (vaults) => vaults.length,
-  })
-
-  // temporary fix
-  React.useEffect(() => {
-    refetch?.()
-  }, [chainId, refetch])
 
   // selected strategy to cancel
   const [closeStrategy, setCloseStrategy] = React.useState<Strategy>()
@@ -84,10 +86,10 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
   const table = useTable({
     pageSize,
     // If data is loading but empty, provide an array of empty objects to render skeleton rows
-    data: isLoading && filteredData.length === 0 ? defaultData : filteredData,
+    data,
     onDeposit: (vault: Vault) => undefined,
     // Pass isLoading to the table so it can render loading skeletons only for TVL and APR
-    isLoading,
+    isLoading: !data || !data.length,
     defaultData,
   })
 
@@ -95,7 +97,6 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
     <div ref={containerRef} className="overflow-hidden">
       <DataTable
         table={table}
-        isError={!!error}
         onRowClick={(vault) => {
           if (vault) {
             push(`/earn/${vault.address}`)
@@ -107,15 +108,9 @@ export function Vaults({ showOnlyActive = false }: VaultsProps) {
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count,
+          count: data.length,
         }}
-        emptyArrayMessage={
-          showOnlyActive
-            ? "No active vaults found. Try disabling the 'Active Vaults' filter."
-            : isLoading
-              ? "Loading vaults..."
-              : "No vaults available right now."
-        }
+        emptyArrayMessage={"Loading vaults..."}
         containerClassName="max-h-[600px]"
       />
       <CloseStrategyDialog

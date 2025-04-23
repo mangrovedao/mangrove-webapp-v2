@@ -12,7 +12,7 @@ import {
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import React, { ReactNode, useEffect, useState } from "react"
-import { formatUnits } from "viem"
+import { Address, formatUnits } from "viem"
 
 import {
   CustomRadioGroup,
@@ -34,6 +34,7 @@ import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
+import { useVaults } from "../(list)/_components/tables/vaults/hooks/use-vaults"
 import { Line, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
@@ -50,7 +51,7 @@ export default function Page() {
   const [action, setAction] = React.useState(Action.Deposit)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const params = useParams<{ address: string }>()
+  const params = useParams<{ address: Address }>()
 
   // Check if we're on mobile
   useEffect(() => {
@@ -65,6 +66,8 @@ export default function Page() {
       window.removeEventListener("resize", checkIfMobile)
     }
   }, [])
+
+  useVaults({ vaultAddress: params.address })
 
   const {
     data: { vault },

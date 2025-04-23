@@ -27,7 +27,7 @@ import {
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { Check } from "@/svgs"
 import { formatNumber } from "@/utils/numbers"
-import { formatUnits } from "viem"
+import { CheckIcon } from "lucide-react"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -61,11 +61,6 @@ export function useTable({
           const { address } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
 
-          // note: check if we can retrive logos from library directly
-          // const icon = getWhitelistedChainObjects().find(
-          //   (item) => item.id === chain.id,
-          // )
-
           return (
             <div className="flex flex-col underline">
               <Link
@@ -94,6 +89,22 @@ export function useTable({
       }),
 
       columnHelper.display({
+        header: "Deprecated",
+        size: 50,
+        cell: ({ row }) => {
+          const { deprecated } = row.original
+          return (
+            deprecated && (
+              <div className="relative h-4 w-4 ml-3">
+                <div className="absolute inset-0 bg-bg-tertiary rounded-full"></div>
+                <CheckIcon className="absolute inset-0 h-3 w-3 m-auto text-white" />
+              </div>
+            )
+          )
+        },
+      }),
+
+      columnHelper.display({
         header: "Strategy",
         cell: ({ row }) => {
           const isTrusted = true
@@ -112,17 +123,14 @@ export function useTable({
               </div>
             )
           }
-          const { tvl, market, quoteDollarPrice } = row.original
-          const value =
-            Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
-            quoteDollarPrice
+          const { tvl, market, deprecated } = row.original
+
+          if (deprecated)
+            return <div className="text-right w-full flex-end">-</div>
 
           return (
             <div className="text-right w-full">
-              <Value
-                value={formatNumber(Number(value.toFixed(2)))}
-                symbol={"$"}
-              />
+              <Value value={Number(tvl).toFixed(2)} symbol={"$"} />
             </div>
           )
         },
@@ -152,7 +160,12 @@ export function useTable({
             )
           }
 
-          const apr = row.original.apr ? `${row.original.apr.toFixed(2)}%` : "-"
+          const { apr: _apr, deprecated } = row.original
+
+          if (deprecated)
+            return <div className="text-right w-full flex-end">-</div>
+
+          const apr = _apr ? `${_apr.toFixed(2)}%` : "-"
 
           const incentivesApr = row.original.incentivesApr
             ? `${row.original.incentivesApr.toFixed(2)}%`

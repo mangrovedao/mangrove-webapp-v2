@@ -56,8 +56,7 @@ export function Tables() {
               Deprecated Vaults
             </h3>
             <p className="text-sm text-text-secondary">
-              These vaults are deprecated and only withdrawals are allowed. A
-              new version will be deployed soon.
+              For the deprecated vaults, only withdrawals are allowed
             </p>
           </div>
         </div>
