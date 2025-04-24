@@ -2,28 +2,7 @@ import { env } from "@/env.mjs"
 import type { Chain } from "viem/chains"
 import * as wagmiChains from "viem/chains"
 
-export const bridgeableSynapseChainIds = [
-  wagmiChains.blast.id,
-  wagmiChains.baseSepolia.id,
-  wagmiChains.mainnet.id,
-  wagmiChains.optimism.id,
-  wagmiChains.opBNB.id,
-  wagmiChains.polygon.id,
-  wagmiChains.fantom.id,
-  wagmiChains.boba.id,
-  wagmiChains.metis.id,
-  wagmiChains.moonriver.id,
-  wagmiChains.dogechain.id,
-  wagmiChains.canto.id,
-  wagmiChains.klaytn.id,
-  wagmiChains.base.id,
-  wagmiChains.arbitrum.id,
-  wagmiChains.avalanche.id,
-  wagmiChains.dfk.id,
-  wagmiChains.aurora.id,
-  wagmiChains.harmonyOne.id,
-  wagmiChains.cronos.id,
-]
+export const bridgeableSynapseChainIds = [wagmiChains.megaethTestnet.id]
 
 const WHITELISTED_CHAIN_IDS = env.NEXT_PUBLIC_WHITELISTED_CHAIN_IDS
 const DEFAULT_CHAIN_ID = "80001"
