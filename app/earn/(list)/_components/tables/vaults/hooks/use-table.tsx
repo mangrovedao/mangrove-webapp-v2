@@ -55,6 +55,7 @@ export function useTable({
     () => [
       columnHelper.display({
         id: "blockchain-explorer",
+
         header: () => "",
         cell: ({ row }) => {
           const { address } = row.original
@@ -88,6 +89,7 @@ export function useTable({
       }),
 
       columnHelper.display({
+        enableResizing: false,
         header: "Strategy",
         cell: ({ row }) => {
           const isTrusted = true
@@ -232,19 +234,6 @@ export function useTable({
           )
         },
       }),
-
-      // columnHelper.display({
-      //   id: "incentives",
-      //   header: () => <div className="text-right">LP Rewards</div>,
-      //   cell: ({ row }) => {
-      //     const value = row.original.totalRewards
-      //     return (
-      //       <div className="w-full h-full flex justify-end">
-      //         <Value value={formatNumber(value)} symbol="MGV" />
-      //       </div>
-      //     )
-      //   },
-      // }),
     ],
     [onDeposit],
   )

@@ -30,6 +30,8 @@ const useMangrovePoolStatsQuery = (
         )
         const data = await res.json()
 
+        console.log("data", data)
+
         const parsedData = priceSchema.parse(data)
         return parsedData
       } catch (error) {

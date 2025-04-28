@@ -12,6 +12,7 @@ import { cn } from "@/utils"
 import { MinimumVolume } from "./minimum-volume"
 import { Caption } from "./typography/caption"
 import { Button } from "./ui/button"
+import { Slider } from "./ui/slider"
 import { Spinner } from "./ui/spinner"
 
 type EnhancedNumericInputProps = {
@@ -31,6 +32,7 @@ type EnhancedNumericInputProps = {
   inputClassName?: string
   isWrapping?: boolean
   loading?: boolean
+  showSlider?: boolean
 } & NumericInputProps
 
 const sliderValues = [25, 50, 75]
@@ -56,6 +58,7 @@ export const EnhancedNumericInput = React.forwardRef<
       sendSliderValue,
       setSendSliderValue,
       isWrapping,
+      showSlider = false,
       loading = false,
       ...inputProps
     },
@@ -130,6 +133,20 @@ export const EnhancedNumericInput = React.forwardRef<
                 ) : undefined}
                 {setSendSliderValue ? (
                   <>
+                    {showSlider && (
+                      <div className="mb-3">
+                        <Slider
+                          disabled={inputProps.disabled}
+                          value={[sendSliderValue || 0]}
+                          onValueChange={(values) => {
+                            setSendSliderValue(values[0] || 0)
+                          }}
+                          max={100}
+                          step={1}
+                          className="z-50"
+                        />
+                      </div>
+                    )}
                     <div className="flex space-x-2">
                       {sliderValues.map((value, i) => (
                         <Button

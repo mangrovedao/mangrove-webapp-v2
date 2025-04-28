@@ -11,6 +11,7 @@ import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addres
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { Switch } from "@/components/ui/switch"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { motion } from "framer-motion"
 import { Chain } from "viem"
 import { useTable } from "./hooks/use-table"
 
@@ -100,7 +101,7 @@ export function Vaults() {
 
   return (
     <div>
-      {data && data.length && (
+      {data?.length > 0 && (
         <div className="flex gap-2 items-center justify-end mr-2 my-3">
           <Switch
             checked={showDeprecated}
@@ -109,7 +110,13 @@ export function Vaults() {
           <span className="text-sm">Show Deprecated Vaults</span>
         </div>
       )}
-      <div ref={containerRef} className="overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        key={`deprecated-${showDeprecated}`}
+        ref={containerRef}
+        className="overflow-hidden"
+      >
         <DataTable
           table={table}
           onRowClick={(vault) => {
@@ -125,7 +132,9 @@ export function Vaults() {
             pageSize,
             count: data.length,
           }}
-          emptyArrayMessage={"Loading vaults..."}
+          emptyArrayMessage={
+            !chain ? "Please connect your wallet" : "Loading vaults..."
+          }
           containerClassName="max-h-[600px]"
         />
         <CloseStrategyDialog
@@ -133,7 +142,7 @@ export function Vaults() {
           isOpen={!!closeStrategy}
           onClose={() => setCloseStrategy(undefined)}
         />
-      </div>
+      </motion.div>
     </div>
   )
 }

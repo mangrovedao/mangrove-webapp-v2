@@ -79,7 +79,6 @@ export function Limit() {
   })
 
   const { payDollar, receiveDollar } = useDollarConversion({
-    currentMarket,
     payAmount: form.state.values.send,
     receiveAmount: form.state.values.receive,
     tradeSide,
