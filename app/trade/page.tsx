@@ -1,5 +1,6 @@
 "use client"
 import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
+import { OHLCVChart } from "@/components/ohlcv-chart/ohlcv-chart"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
 import {
@@ -9,8 +10,8 @@ import {
 } from "@/components/ui/resizable"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { TradeIcon } from "@/svgs"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useEffect, useState } from "react"
-import { Market } from "./_components/charts/charts"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
 import { OrderBook } from "./_components/orderbook/orderbook"
@@ -64,7 +65,11 @@ export default function Page() {
                       {!defaultChain.testnet ? (
                         <EmbedPriceChart />
                       ) : (
-                        <Market className="w-full h-full" />
+                        <OHLCVChart
+                          chainId={defaultChain.id}
+                          indexerUrl={getIndexerUrl(defaultChain)}
+                          className="H-full w-full"
+                        />
                       )}
                     </div>
 
@@ -115,7 +120,11 @@ export default function Page() {
                   {!defaultChain.testnet ? (
                     <EmbedPriceChart />
                   ) : (
-                    <Market className="w-full h-full" />
+                    <OHLCVChart
+                      chainId={defaultChain.id}
+                      indexerUrl={getIndexerUrl(defaultChain)}
+                      className="H-full w-full"
+                    />
                   )}
                 </div>
               )}
