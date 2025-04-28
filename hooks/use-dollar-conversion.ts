@@ -1,3 +1,4 @@
+import useMarket from "@/providers/market"
 import { getErrorMessage } from "@/utils/errors"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
@@ -13,13 +14,13 @@ const priceSchema = z.object({
 })
 
 export function useDollarConversion({
-  currentMarket,
   payAmount,
   receiveAmount,
-  tradeSide,
+  tradeSide = BS.buy,
 }: any) {
   const { chainId } = useAccount()
   const [prices, setPrices] = useState({ payDollar: "0", receiveDollar: "0" })
+  const { currentMarket } = useMarket()
 
   if (!currentMarket?.base.address || !currentMarket?.quote.address)
     return { payDollar: -1, receiveDollar: -1 }
@@ -45,8 +46,6 @@ export function useDollarConversion({
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
 
-        console.log("running")
-
         return {
           payDollar: payDollar.price,
           receiveDollar: receiveDollar.price,
@@ -63,7 +62,7 @@ export function useDollarConversion({
   useEffect(() => {
     if (getMarketPriceQuery.data) {
       const { payDollar, receiveDollar } = getMarketPriceQuery.data
-      if (tradeSide !== BS.buy) {
+      if (tradeSide === BS.sell) {
         setPrices({
           payDollar: Number(payAmount * payDollar).toFixed(2),
           receiveDollar: Number(receiveAmount * receiveDollar).toFixed(2),

@@ -194,7 +194,10 @@ export default function Page() {
               value={defaultChain?.name}
               icon={getChainImage(defaultChain)}
             />
-            <Subline title={"Strategy"} value={vault?.type} />
+            <Subline
+              title={"Performance Fee"}
+              value={`${vault?.performanceFee}%`}
+            />
             <Subline title={"Manager"} value={vault?.manager} />
           </div>
         </div>
@@ -234,12 +237,7 @@ export default function Page() {
               value={vault?.apr ? vault?.apr.toFixed(2) : "0"}
               symbol={"%"}
             />
-            <GridLineHeader
-              title={"Performance fee"}
-              value={vault?.performanceFee}
-              symbol={"%"}
-              info="A fee based on the profits generated from your deposit."
-            />
+            <GridLineHeader title={"Strategy"} value={vault?.strategyType} />
           </motion.div>
 
           {/* Description */}
@@ -282,41 +280,6 @@ export default function Page() {
                     ))}
                   </Text>
                 </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3, delay: 0.6 }}
-                >
-                  <Accordion title="Read more">
-                    <Text
-                      className="text-text-secondary mt-2 font-axiforma text-sm"
-                      variant={"text2"}
-                    >
-                      {vault?.descriptionBonus?.split("\n").map((line, i) => (
-                        <React.Fragment key={i}>
-                          {line.startsWith("- ") ? (
-                            <li className="list-disc ml-4">
-                              {line.substring(2)}
-                            </li>
-                          ) : line.includes(":") ? (
-                            <>
-                              <Title
-                                variant={"title3"}
-                                className="text-text-primary"
-                              >
-                                {line.split(":")[0]}
-                              </Title>
-                            </>
-                          ) : (
-                            line
-                          )}
-                          <br />
-                        </React.Fragment>
-                      ))}
-                    </Text>
-                  </Accordion>
-                </motion.div>
               </>
             ) : (
               <Skeleton className="h-20 w-full" />
@@ -325,7 +288,7 @@ export default function Page() {
 
           {/* Graphs */}
           <motion.div
-            className="flex justify-center items-center"
+            className="flex justify-center items-center mx-5"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{
@@ -352,6 +315,39 @@ export default function Page() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.7 }}
           >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.6 }}
+              className="mb-8"
+            >
+              <Accordion title="Read more">
+                <Text
+                  className="text-text-secondary mt-2 font-axiforma text-sm"
+                  variant={"text2"}
+                >
+                  {vault?.descriptionBonus?.split("\n").map((line, i) => (
+                    <React.Fragment key={i}>
+                      {line.startsWith("- ") ? (
+                        <li className="list-disc ml-4">{line.substring(2)}</li>
+                      ) : line.includes(":") ? (
+                        <>
+                          <Title
+                            variant={"title3"}
+                            className="text-text-primary"
+                          >
+                            {line.split(":")[0]}
+                          </Title>
+                        </>
+                      ) : (
+                        line
+                      )}
+                      <br />
+                    </React.Fragment>
+                  ))}
+                </Text>
+              </Accordion>
+            </motion.div>
             <Title className="text-text-primary text-lg">Vault details</Title>
             {vault ? (
               <div>
@@ -564,7 +560,7 @@ export default function Page() {
                         ))}
                       </CustomRadioGroup>
                     </div>
-                    <div className="relative min-h-[360px]">
+                    <div className="relative min-h-[360px] h-full">
                       <AnimatePresence mode="wait">
                         {action === Action.Deposit && !vault?.isDeprecated ? (
                           <motion.div

@@ -51,8 +51,6 @@ export function useVaults<T = Vault[] | Vault | undefined>({
     (vault: VaultWhitelist) => vault.address === vaultAddress,
   )
 
-  console.log("vaults", plainVaults)
-
   if (!plainVaults.length) return
 
   // Query key with pagination parameters

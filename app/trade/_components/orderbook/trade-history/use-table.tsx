@@ -3,8 +3,6 @@
 import {
   createColumnHelper,
   getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import Big from "big.js"
@@ -18,13 +16,12 @@ import { formatNumber } from "@/utils/numbers"
 import type { TradeHistory } from "../trade-history/schema"
 
 const columnHelper = createColumnHelper<TradeHistory>()
-const DEFAULT_DATA: TradeHistory[] = []
 
 type Params = {
   data?: TradeHistory[]
 }
 
-export function useTable({ data }: Params) {
+export function useTable({ data = [] }: Params) {
   const { currentMarket: market } = useMarket()
 
   const columns = React.useMemo(
@@ -66,10 +63,7 @@ export function useTable({ data }: Params) {
             row.getValue() ? (
               <div className="flex flex-col gap-0">
                 <span className="font-sans text-xs leading-tight">
-                  {formatNumber(Big(row.getValue()).toNumber(), {
-                    maximumFractionDigits: market.quote.displayDecimals,
-                    minimumFractionDigits: market.quote.displayDecimals,
-                  })}
+                  {row.getValue().toFixed(market.quote.displayDecimals)}
                 </span>
                 <span className="text-xs opacity-80 font-sans leading-tight">
                   {market.quote.symbol}
@@ -103,18 +97,18 @@ export function useTable({ data }: Params) {
     [market],
   )
 
-  return useReactTable({
+  const processed = useReactTable({
     initialState: {
       pagination: {
         pageIndex: 0,
         pageSize: data?.length ?? 500,
       },
     },
-    data: data ?? DEFAULT_DATA,
+    data,
     columns,
     enableRowSelection: false,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   })
+
+  return processed
 }
