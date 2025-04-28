@@ -8,11 +8,12 @@ import {
 import Big from "big.js"
 import React from "react"
 
-import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate, formatRelativeTime } from "@/utils/date"
 import { formatNumber } from "@/utils/numbers"
+import { BS } from "@mangrovedao/mgv/lib"
+import { useTradeFormStore } from "../../forms/store"
 import type { TradeHistory } from "../trade-history/schema"
 
 const columnHelper = createColumnHelper<TradeHistory>()
@@ -23,26 +24,28 @@ type Params = {
 
 export function useTable({ data = [] }: Params) {
   const { currentMarket: market } = useMarket()
+  const { tradeSide } = useTradeFormStore()
 
   const columns = React.useMemo(
     () => [
       columnHelper.display({
         header: "Type/Size",
         cell: ({ row }) => {
-          const { type, baseAmount, quoteAmount } = row.original
+          const { type, baseAmount, quoteAmount, price } = row.original
           if (!market) return null
+
           const { base } = market
-          const baseValue = type === "buy" ? baseAmount : quoteAmount
+          const baseValue = baseAmount
 
           return (
             <div className="flex flex-col gap-0">
               <span
                 className={cn("font-sans text-xs leading-tight", {
-                  "text-green-caribbean": type === "buy",
-                  "text-red-100": type === "sell",
+                  "text-green-caribbean": type === BS.buy,
+                  "text-red-100": type === BS.sell,
                 })}
               >
-                {type === "buy" ? "BUY" : "SELL"}
+                {type.toUpperCase()}
               </span>
               <span className="text-xs opacity-80 font-sans">
                 {formatNumber(Big(baseValue).toNumber(), {
@@ -58,23 +61,20 @@ export function useTable({ data = [] }: Params) {
 
       columnHelper.accessor("price", {
         header: "Price",
-        cell: (row) =>
-          market ? (
-            row.getValue() ? (
-              <div className="flex flex-col gap-0">
-                <span className="font-sans text-xs leading-tight">
-                  {row.getValue().toFixed(market.quote.displayDecimals)}
-                </span>
-                <span className="text-xs opacity-80 font-sans leading-tight">
-                  {market.quote.symbol}
-                </span>
-              </div>
-            ) : (
-              <span>-</span>
-            )
+        cell: (row) => {
+          return row.getValue() ? (
+            <div className="flex flex-col gap-0">
+              <span className="font-sans text-xs leading-tight">
+                {row.getValue().toFixed(market.quote.displayDecimals)}
+              </span>
+              <span className="text-xs opacity-80 font-sans leading-tight">
+                {market.quote.symbol}
+              </span>
+            </div>
           ) : (
-            <Skeleton className="w-20 h-6" />
-          ),
+            <span>-</span>
+          )
+        },
       }),
 
       columnHelper.accessor("timestamp", {
@@ -94,7 +94,7 @@ export function useTable({ data = [] }: Params) {
         },
       }),
     ],
-    [market],
+    [market, tradeSide],
   )
 
   const processed = useReactTable({

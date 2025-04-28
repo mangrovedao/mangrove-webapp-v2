@@ -2,11 +2,8 @@
 
 import React, { useEffect, useRef } from "react"
 
-import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import useMarket from "@/providers/market"
-import { useLoadingStore } from "@/stores/loading.store"
 import { DataTable } from "../../../../../components/ui/data-table/data-table"
 import { useOrderHistory } from "./use-order-history"
 import { useTable } from "./use-table"
@@ -20,7 +17,6 @@ export function OrderHistory({
   showAllMarkets = true,
   setShowAllMarkets,
 }: Params) {
-  const { currentMarket: market } = useMarket()
   const loadingRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -34,10 +30,6 @@ export function OrderHistory({
     pageSize: 25,
     allMarkets: showAllMarkets,
   })
-
-  const isLoadingOrders = useLoadingStore((state) =>
-    state.isLoading(TRADE.TABLES.ORDERS),
-  )
 
   // Flatten data pages for the table
   const flatData = React.useMemo(() => {
