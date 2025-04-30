@@ -20,7 +20,7 @@ const useMangrovePoolStatsQuery = (
   const { defaultChain } = useDefaultChain()
 
   return useQuery({
-    queryKey: ["mangrovePoolStats", baseAddress, quoteAddress, defaultChain.id],
+    queryKey: ["pool-stats", baseAddress, quoteAddress, defaultChain.id],
     queryFn: async () => {
       try {
         if (!baseAddress || !quoteAddress) return null
@@ -29,8 +29,6 @@ const useMangrovePoolStatsQuery = (
           `https://pools.mgvinfra.com/stats/?token0=${baseAddress}&token1=${quoteAddress}&chainId=${defaultChain.id}`,
         )
         const data = await res.json()
-
-        console.log("data", data)
 
         const parsedData = priceSchema.parse(data)
         return parsedData
