@@ -31,8 +31,6 @@ const ensureContinuousBars = (
 ): OHLCVBar[] => {
   if (bars.length === 0) return []
 
-  console.log("Ensuring continuous bars")
-
   // Sort bars by time
   const sortedBars = [...bars].sort(
     (a: OHLCVBar, b: OHLCVBar) => a.time - b.time,
@@ -85,10 +83,6 @@ const ensureContinuousBars = (
     currentTime += oneDayMs
   }
 
-  console.log(
-    `Created ${result.length} continuous bars from ${sortedBars.length} original bars`,
-  )
-
   return result
 }
 
@@ -134,7 +128,7 @@ export function OHLCVChart({
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null)
   const { currentMarket } = useMarket()
-  console.log("OHLCVChart", chainId, indexerUrl, className)
+  // console.log("OHLCVChart", chainId, indexerUrl, className)
 
   const { base, quote } = currentMarket || {
     base: { address: "", symbol: "" },
@@ -155,8 +149,6 @@ export function OHLCVChart({
         // Note: The order must be chainId/quoteAddress/baseAddress for testnet indexer
         const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
 
-        console.log("Fetching from URL:", url)
-
         const response = await fetch(url)
         if (!response.ok) {
           const errorText = await response.text()
@@ -165,7 +157,6 @@ export function OHLCVChart({
         }
 
         const data = await response.json()
-        console.log("API response:", data)
 
         if (
           !data.candles ||
@@ -185,8 +176,6 @@ export function OHLCVChart({
           close: parseFloat(candle.close),
           volume: parseFloat(candle.volume),
         }))
-
-        console.log(`Mapped ${rawBars.length} raw bars from API`)
 
         // Create a Set to track timestamps we've seen
         const seenTimestamps = new Set<number>()
@@ -217,8 +206,6 @@ export function OHLCVChart({
             time: uniqueTime,
           })
         }
-
-        console.log(`Processed ${processedBars.length} unique bars`)
 
         return processedBars
       } catch (error) {
@@ -423,7 +410,7 @@ export function OHLCVChart({
       library_path: "charting_library/",
       locale: "en",
       theme: "dark",
-      debug: true,
+      debug: false,
       fullscreen: false,
       custom_css_url: "css/styles.css",
       disabled_features: [

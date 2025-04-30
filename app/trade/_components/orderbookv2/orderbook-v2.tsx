@@ -183,7 +183,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
               <span>
                 Mid:{" "}
                 {midPrice.toLocaleString(undefined, {
-                  minimumFractionDigits: 1,
+                  minimumFractionDigits: 20,
                 })}
               </span>
               <span>Spread: {percentSpread.toFixed(2)}%</span>
