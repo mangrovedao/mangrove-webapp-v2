@@ -78,7 +78,6 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           header: "Side",
           cell: ({ row }) => {
             const isBid = row.original.isBid
-
             return (
               <span
                 className={cn(
