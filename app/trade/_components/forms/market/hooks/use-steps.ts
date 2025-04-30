@@ -6,7 +6,7 @@ import { Address, parseUnits } from "viem"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
-import { usePool } from "@/hooks/new_ghostbook/pool"
+import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import { useMarketClient } from "@/hooks/use-market"
 import { megaethTestnet } from "viem/chains"
 
@@ -20,7 +20,7 @@ type Props = {
 export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
   const marketClient = useMarketClient()
   const { mangroveChain } = useRegistry()
-  const { pool } = usePool()
+  const { selectedPool: pool } = useSelectedPool()
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
