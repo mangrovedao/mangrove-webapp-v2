@@ -69,7 +69,7 @@ export function useMintAmounts({ vault, client }: MintAmountsArgs) {
     (amount: bigint, side: "base" | "quote") => {
       setAmountAndSide({ amount, side })
     },
-    1000,
+    10,
   )
 
   const setAmountAndSideCallback = (amount: bigint, side: "base" | "quote") => {

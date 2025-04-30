@@ -49,9 +49,11 @@ export const ChainsProvider = ({ children }: React.PropsWithChildren) => {
   }, [pathname, chainId])
 
   React.useEffect(() => {
-    const pageConfig = chainsConfig.pages.filter((x) =>
-      x.path.includes(pathname),
-    )[0]
+    console.log("pathname", pathname)
+    const pageConfig =
+      pathname.length > 2
+        ? chainsConfig.pages.filter((x) => x.path.includes(pathname))[0]
+        : undefined
 
     if (pageConfig) {
       const chainObjects = pageConfig.chainIds

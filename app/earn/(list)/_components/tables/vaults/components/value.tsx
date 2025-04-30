@@ -3,7 +3,7 @@ import { cn } from "@/utils"
 import { CheckIcon } from "lucide-react"
 
 type Props = {
-  value: string
+  value: string | number
   trusted?: boolean
   symbol?: string
   className?: string

@@ -5,7 +5,6 @@ import { useAccount } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useOpenMarkets } from "@/hooks/use-open-markets"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
@@ -98,9 +97,8 @@ export function useTrades({
   pageSize = 25,
   allMarkets = false,
 }: TradesParams = {}): UseInfiniteTradesResult {
-  const { address, isConnected } = useAccount()
+  const { address } = useAccount()
   const { currentMarket: market } = useMarket()
-  const { openMarkets } = useOpenMarkets()
   const { defaultChain } = useDefaultChain()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
@@ -116,7 +114,7 @@ export function useTrades({
       pageSize,
       defaultChain.id,
     ],
-    initialPageParam: 1,
+    initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       try {
         if (!market) {
@@ -158,10 +156,6 @@ export function useTrades({
           },
         }
       } catch (error) {
-        console.error(
-          `Error fetching trades for market ${market?.base.symbol}-${market?.quote.symbol}:`,
-          error,
-        )
         console.error(getErrorMessage(error))
         return {
           data: [],

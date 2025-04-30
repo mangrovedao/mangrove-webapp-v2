@@ -1,4 +1,4 @@
-import { MarketParams } from "@mangrovedao/mgv"
+import { MarketParams, tickFromVolumes } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Address, TransactionReceipt, parseUnits } from "viem"
@@ -9,17 +9,29 @@ import { trade } from "@/hooks/ghostbook/lib/trade"
 import { useMarketClient } from "@/hooks/use-market"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
-import {
-  ProtocolType,
-  TickSpacingPool,
-  usePool,
-} from "@/hooks/new_ghostbook/pool"
+import { ProtocolType, TickSpacingPool } from "@/hooks/new_ghostbook/pool"
+import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
 import { TradeMode } from "../../enums"
 import { successToast } from "../../utils"
 import type { Form } from "../types"
+
+// Helper function to calculate the max tick based on price and slippage
+const calculateMaxTick = (
+  inbound: bigint,
+  outbound: bigint,
+  slippage: number,
+): bigint => {
+  // average tick from tickFromVolumes()
+  // if slippage is 5% add to average tick 500n  (5%*10000) = maxtick
+
+  const averageTick = tickFromVolumes(inbound, outbound)
+  const formattedSlippage = (slippage / 100) * 10000
+  const maxTick = averageTick + BigInt(Math.round(formattedSlippage))
+  return maxTick
+}
 
 type Props = {
   onResult?: (result: TransactionReceipt) => void
@@ -28,7 +40,7 @@ type Props = {
 export function usePostMarketOrder({ onResult }: Props = {}) {
   const { currentMarket: market } = useMarket()
   const { data: walletClient } = useWalletClient()
-  const { pool } = usePool()
+  const { selectedPool: pool } = useSelectedPool()
   const { mangroveChain } = useRegistry()
 
   const queryClient = useQueryClient()
@@ -64,15 +76,22 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         const receiveToken = bs === "buy" ? base : quote
         const sendToken = bs === "buy" ? quote : base
 
+        const sendAmount = parseUnits(gives, sendToken.decimals)
+        const receiveAmount = parseUnits(wants, receiveToken.decimals)
+
+        // Calculate max tick based on current price and slippage
+        const maxTick = calculateMaxTick(sendAmount, receiveAmount, slippage)
+
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
           ghostbook: mangroveChain?.ghostbook as Address,
           market,
           bs,
-          sendAmount: parseUnits(gives, sendToken.decimals),
+          sendAmount,
           router: pool?.protocol.router,
           module: uniModuleAddress[pool?.protocol.type] as Address,
           fee: 500,
+          maxTick,
           deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
           protocol: pool?.protocol.type,
           tickSpacing:

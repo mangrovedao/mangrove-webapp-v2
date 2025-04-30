@@ -20,7 +20,7 @@ const useMangrovePoolStatsQuery = (
   const { defaultChain } = useDefaultChain()
 
   return useQuery({
-    queryKey: ["mangrovePoolStats", baseAddress, quoteAddress, defaultChain.id],
+    queryKey: ["pool-stats", baseAddress, quoteAddress, defaultChain.id],
     queryFn: async () => {
       try {
         if (!baseAddress || !quoteAddress) return null

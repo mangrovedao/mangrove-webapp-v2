@@ -79,7 +79,6 @@ export function Limit() {
   })
 
   const { payDollar, receiveDollar } = useDollarConversion({
-    currentMarket,
     payAmount: form.state.values.send,
     receiveAmount: form.state.values.receive,
     tradeSide,
@@ -383,7 +382,11 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   token={quoteToken}
-                  label="When price is at or below"
+                  label={` ${
+                    tradeSide === BS.buy
+                      ? "When price is at or above"
+                      : "When price is at or below"
+                  }`}
                   disabled={!currentMarket}
                   error={
                     getAllErrors().limitPrice

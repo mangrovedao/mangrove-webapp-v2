@@ -24,6 +24,7 @@ export type Vault = {
   incentivesApr: number
   apr: number
   chainId?: number
+  deprecated?: boolean
   decimals: number
   mintedAmount: bigint
   managementFee: number
