@@ -304,22 +304,13 @@ export function OHLCVChart({
             if (to < MIN_REASONABLE_DATE) {
               adjustedTo = now
             }
-
-            console.log(
-              `Adjusted unreasonable date range: ${new Date(from * 1000).toISOString()} → ${new Date(adjustedFrom * 1000).toISOString()}`,
-            )
           }
 
           // For extension requests to very old dates, just return no data
           if (firstDataRequest === false && from < MIN_REASONABLE_DATE) {
-            console.log("Ignoring historical extension request with old date")
             onHistoryCallback([], { noData: true })
             return
           }
-
-          console.log(
-            `Fetching data for ${base.symbol}/${quote.symbol} from ${new Date(adjustedFrom * 1000).toISOString()} to ${new Date(adjustedTo * 1000).toISOString()}`,
-          )
 
           const bars = await fetchOHLCVData(
             resolution,
@@ -340,16 +331,11 @@ export function OHLCVChart({
               adjustedFrom,
               adjustedTo,
             )
-            console.log(
-              `Returning ${processedBars.length} continuous daily bars`,
-            )
+
             onHistoryCallback(processedBars, {
               noData: processedBars.length === 0,
             })
           } else {
-            console.log(
-              `Returning ${bars.length} bars for ${resolution} timeframe`,
-            )
             onHistoryCallback(bars, { noData: bars.length === 0 })
           }
         } catch (error) {

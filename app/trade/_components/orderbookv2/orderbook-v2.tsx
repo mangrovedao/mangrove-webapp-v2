@@ -154,9 +154,13 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
 
                 {/* Content */}
                 <span className="w-1/3 text-[#a92644] text-xs z-10 ">
-                  {ask.price.toLocaleString(undefined, {
-                    minimumFractionDigits: 1,
-                  })}
+                  {ask.price < 0.0001
+                    ? ask.price.toLocaleString(undefined, {
+                        minimumFractionDigits: quote?.priceDisplayDecimals ?? 8,
+                      })
+                    : ask.price.toLocaleString(undefined, {
+                        minimumFractionDigits: 1,
+                      })}
                 </span>
                 <span className="w-1/3 text-right text-[#c3d4c7] text-xs z-10">
                   {ask.volume.toLocaleString(undefined, {
@@ -182,9 +186,13 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
             >
               <span>
                 Mid:{" "}
-                {midPrice.toLocaleString(undefined, {
-                  minimumFractionDigits: 20,
-                })}
+                {midPrice < 0.0001
+                  ? midPrice.toLocaleString(undefined, {
+                      minimumFractionDigits: quote?.priceDisplayDecimals ?? 8,
+                    })
+                  : midPrice.toLocaleString(undefined, {
+                      minimumFractionDigits: 1,
+                    })}
               </span>
               <span>Spread: {percentSpread.toFixed(2)}%</span>
             </motion.div>
@@ -217,9 +225,13 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
 
                 {/* Content */}
                 <span className="w-1/3 text-[#28986f] text-xs z-10">
-                  {bid.price.toLocaleString(undefined, {
-                    minimumFractionDigits: 1,
-                  })}
+                  {bid.price < 0.0001
+                    ? bid.price.toLocaleString(undefined, {
+                        minimumFractionDigits: quote?.priceDisplayDecimals ?? 8,
+                      })
+                    : bid.price.toLocaleString(undefined, {
+                        minimumFractionDigits: 1,
+                      })}
                 </span>
                 <span className="w-1/3 text-right text-[#c3d4c7] text-xs z-10">
                   {bid.volume.toLocaleString(undefined, {
