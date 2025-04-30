@@ -1,5 +1,6 @@
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
+import { usePool } from "@/hooks/new_ghostbook/pool"
 import { BS } from "@mangrovedao/mgv/lib"
 import { MarketOrderSteps } from "@mangrovedao/mgv/types"
 import { useEffect } from "react"
@@ -59,9 +60,11 @@ export function useMarketTransaction({
     sendAmount: form.state.values.send,
   })
 
+  const { pool } = usePool()
+
   // Post order mutation
   const post =
-    chain?.id === megaethTestnet.id
+    chain?.id === megaethTestnet.id || !pool
       ? usePostMarketOrderTestnet({
           onResult: (result) => {
             setTxState("idle")
