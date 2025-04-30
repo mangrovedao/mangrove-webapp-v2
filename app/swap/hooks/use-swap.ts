@@ -315,6 +315,7 @@ export function useSwap() {
     queryFn: async () => {
       try {
         if (publicClient.chain?.testnet) return null
+
         if (!chainId || !payTknAddress || !receiveTknAddress) return null
 
         const payDollar = await fetch(

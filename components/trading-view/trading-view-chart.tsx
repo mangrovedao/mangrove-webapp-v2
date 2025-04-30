@@ -50,7 +50,7 @@ const fetchTestnetOHLCVData = async (
 
     // Instead of using from/to dates which might be problematic,
     // we'll just fetch the most recent candles using count parameter
-    const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/price/ohlc/${chainId}/${quoteAddress}/${baseAddress}/1/${apiResolution}?count=100`
+    const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/price/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${apiResolution}?count=100`
 
     const response = await fetch(url)
 
