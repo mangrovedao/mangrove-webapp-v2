@@ -60,6 +60,8 @@ export function useMarketTransaction({
     sendAmount: form.state.values.send,
   })
 
+  const { pool } = usePool()
+
   // Post order mutation
   const post =
     chain?.testnet || !pool
