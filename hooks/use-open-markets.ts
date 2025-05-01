@@ -1,8 +1,8 @@
 import { printEvmError } from "@/utils/errors"
 
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { applyPriceDisplayDecimals } from "@/utils/tokens"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { applyPriceDisplayDecimals } from "@/utils/tokens"
 import { MarketParams, Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
@@ -20,8 +20,8 @@ const TokenSchema = z
     (token) =>
       ({
         ...token,
-        displayDecimals: token.decimals,
-        priceDisplayDecimals: token.decimals,
+        displayDecimals: token.decimals === 18 ? 6 : token.decimals,
+        priceDisplayDecimals: token.decimals === 18 ? 6 : token.decimals,
         mgvTestToken: false,
       }) as Token,
   )
