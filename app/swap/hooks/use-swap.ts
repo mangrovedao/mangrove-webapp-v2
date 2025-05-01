@@ -22,8 +22,9 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 // import { useTokenByAddress } from "../../../hooks/use-token-by-address";
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
-import { usePostMarketOrderTestnet } from "@/app/trade/_components/forms/market/hooks/use-post-market.order-testnet"
+import { usePostMarketOrderMangrove } from "@/app/trade/_components/forms/market/hooks/use-post-market.order-mangrove"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
+import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useBook } from "@/hooks/use-book"
@@ -40,7 +41,6 @@ import {
   getTradableTokens,
 } from "@/utils/tokens"
 import { toast } from "sonner"
-import { megaethTestnet } from "viem/chains"
 import { z } from "zod"
 
 export const wethAdresses: { [key: number]: Address | undefined } = {
@@ -58,7 +58,7 @@ const priceSchema = z.object({
 })
 
 export function useSwap() {
-  const { isConnected, address, chainId } = useAccount()
+  const { isConnected, address, chainId, chain } = useAccount()
   const { data: ethBalance } = useBalance({
     address,
   })
@@ -78,9 +78,10 @@ export function useSwap() {
   } = useOdos()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
+  const { pool } = usePool()
   const postMarketOrder =
-    chainId === megaethTestnet.id
-      ? usePostMarketOrderTestnet()
+    chain?.testnet || !pool
+      ? usePostMarketOrderMangrove()
       : usePostMarketOrder()
 
   const markets = useMarkets()
@@ -498,7 +499,7 @@ export function useSwap() {
           isWrapping: false,
           slippage: Number(slippage),
         },
-        ...(chainId === megaethTestnet.id
+        ...(chain?.testnet || !pool
           ? {
               swapMarket: currentMarket as MarketParams,
               swapMarketClient: marketClient,
