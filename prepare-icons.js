@@ -80,7 +80,7 @@ function genetareDicFromManifestFile() {
     { USDB: { color: "#FCFC01", name: "USDB", symbol: "USDB" } },
     { BLAST: { color: "#FCFC01", name: "BLAST", symbol: "BLAST" } },
     { USDe: { color: "#FFFFFF", name: "USDe", symbol: "USDe" } },
-    { PRL: { color: "#ffff", name: "PRL Token", symbol: "PRL" } },
+    { PRL: { color: "#A797FF", name: "PRL Token", symbol: "PRL" } },
   )
   fs.mkdirSync("./generated", { recursive: true })
   fs.writeFileSync("./generated/icons.json", JSON.stringify(dic))

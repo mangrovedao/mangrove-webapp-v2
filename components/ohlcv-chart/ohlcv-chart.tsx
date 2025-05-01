@@ -388,7 +388,7 @@ export function OHLCVChart({
     // Create widget
     const tvWidget = new widget({
       symbol: `${base.symbol}/${quote.symbol}`,
-      interval: "1D" as ResolutionString,
+      interval: "60" as ResolutionString,
       container: chartContainerRef.current,
       datafeed: dataFeed,
       library_path: "charting_library/",
