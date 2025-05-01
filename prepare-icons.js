@@ -40,6 +40,11 @@ function copyIcons() {
     "./public/cryptocurrency-icons/svg/color/usdc.svg",
     "./public/cryptocurrency-icons/svg/color/usdc.e.svg",
   )
+  // Copy PRL custom icon
+  fs.copyFileSync(
+    "./public/custom-token-icons/prl.svg",
+    "./public/cryptocurrency-icons/svg/color/prl.svg",
+  )
 }
 
 function genetareDicFromManifestFile() {
@@ -75,6 +80,7 @@ function genetareDicFromManifestFile() {
     { USDB: { color: "#FCFC01", name: "USDB", symbol: "USDB" } },
     { BLAST: { color: "#FCFC01", name: "BLAST", symbol: "BLAST" } },
     { USDe: { color: "#FFFFFF", name: "USDe", symbol: "USDe" } },
+    { PRL: { color: "#ffff", name: "PRL Token", symbol: "PRL" } },
   )
   fs.mkdirSync("./generated", { recursive: true })
   fs.writeFileSync("./generated/icons.json", JSON.stringify(dic))
