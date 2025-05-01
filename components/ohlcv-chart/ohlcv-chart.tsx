@@ -5,8 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { getChainObjectById } from "@/utils/chains"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
 import {
   IChartingLibraryWidget,
   ResolutionString,
@@ -147,7 +145,7 @@ export function OHLCVChart({
 
         // Build the URL with the pairs in the correct order
         // Note: The order must be chainId/quoteAddress/baseAddress for testnet indexer
-        const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
+        const url = `${indexerUrl}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
 
         const response = await fetch(url)
         if (!response.ok) {
