@@ -42,8 +42,8 @@ yarn-error.log*
 *.tsbuildinfo
 
 # generated icons data
-# generated
-# public/cryptocurrency-icons
+generated
+public/cryptocurrency-icons
 
 
 .env.local
