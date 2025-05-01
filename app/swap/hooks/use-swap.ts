@@ -79,10 +79,10 @@ export function useSwap() {
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
   const { pool } = usePool()
+  const mangroveMarketOrder = usePostMarketOrderMangrove()
+  const regularMarketOrder = usePostMarketOrder()
   const postMarketOrder =
-    chain?.testnet || !pool
-      ? usePostMarketOrderMangrove()
-      : usePostMarketOrder()
+    chain?.testnet || !pool ? mangroveMarketOrder : regularMarketOrder
 
   const markets = useMarkets()
   const [payTknAddress, setPayTknAddress] = useQueryState("payTkn", {

@@ -39,10 +39,10 @@ type Props = {
 
 export function usePostMarketOrder({ onResult }: Props = {}) {
   const { currentMarket: market } = useMarket()
-  const { data: walletClient } = useWalletClient()
-  const { selectedPool: pool } = useSelectedPool()
   const { mangroveChain } = useRegistry()
 
+  const { selectedPool: pool } = useSelectedPool()
+  const { data: walletClient } = useWalletClient()
   const queryClient = useQueryClient()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
