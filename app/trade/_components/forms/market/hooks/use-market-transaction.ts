@@ -6,7 +6,6 @@ import { MarketOrderSteps } from "@mangrovedao/mgv/types"
 import { useEffect } from "react"
 import { toast } from "sonner"
 import { formatUnits } from "viem"
-import { megaethTestnet } from "viem/chains"
 import {
   useAccount,
   useSendTransaction,
@@ -15,7 +14,7 @@ import {
 import { useTransactionState } from "../../hooks/use-transaction-state"
 import { wethAdresses } from "../market"
 import { usePostMarketOrder } from "./use-post-market-order"
-import { usePostMarketOrderTestnet } from "./use-post-market.order-testnet"
+import { usePostMarketOrderMangrove } from "./use-post-market.order-mangrove"
 import { useMarketSteps } from "./use-steps"
 
 interface UseMarketTransactionProps {
@@ -39,6 +38,7 @@ export function useMarketTransaction({
 }: UseMarketTransactionProps) {
   const { isConnected, address, chain } = useAccount()
   const { mangroveChain } = useRegistry()
+  const { pool } = usePool()
 
   // Market steps to check if approval is needed
   const { data: marketOrderSteps } = useMarketSteps({
@@ -49,7 +49,7 @@ export function useMarketTransaction({
   })
 
   const spender =
-    chain?.id === megaethTestnet.id
+    chain?.testnet || !pool
       ? (marketOrderSteps as MarketOrderSteps)?.[0]?.params.spender
       : mangroveChain?.ghostbook
 
@@ -60,12 +60,10 @@ export function useMarketTransaction({
     sendAmount: form.state.values.send,
   })
 
-  const { pool } = usePool()
-
   // Post order mutation
   const post =
-    chain?.id === megaethTestnet.id || !pool
-      ? usePostMarketOrderTestnet({
+    chain?.testnet || !pool
+      ? usePostMarketOrderMangrove({
           onResult: (result) => {
             setTxState("idle")
             toast.success("Order submitted successfully!")
