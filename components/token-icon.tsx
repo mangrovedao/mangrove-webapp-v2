@@ -23,7 +23,7 @@ export function TokenIcon({
   return (
     <span
       className={cn("w-6 max-h-6 rounded-full", className)}
-      style={{ backgroundColor: symbol.includes("PRL") ? "#ffff" : color }}
+      style={{ backgroundColor: color }}
     >
       <img
         src={customSrc || src}
