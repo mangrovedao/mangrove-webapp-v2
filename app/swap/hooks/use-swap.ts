@@ -311,7 +311,6 @@ export function useSwap() {
           toast.error("Error checking token allowance")
         }
 
-        console.log(approveStep, simulation)
         return {
           simulation,
           approvalStep: approveStep,
