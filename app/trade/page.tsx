@@ -1,6 +1,6 @@
 "use client"
 import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
-import { OHLCVChart } from "@/components/ohlcv-chart/ohlcv-chart"
+import OHLCVChart from "@/components/ohlcv-chart/ohlcv-chart"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
 import {
@@ -11,7 +11,6 @@ import {
 import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { TradeIcon } from "@/svgs"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useEffect, useState } from "react"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
@@ -65,11 +64,7 @@ export default function Page() {
                     {/* Chart Section */}
                     <div className="flex-[4] rounded-sm overflow-hidden border border-bg-secondary">
                       {defaultChain.testnet || !pool ? (
-                        <OHLCVChart
-                          chainId={defaultChain.id}
-                          indexerUrl={getIndexerUrl(defaultChain)}
-                          className="H-full w-full"
-                        />
+                        <OHLCVChart />
                       ) : (
                         <EmbedPriceChart />
                       )}
@@ -120,11 +115,7 @@ export default function Page() {
               {activeMainTab === "Chart" && (
                 <div className="h-[400px] w-full rounded-sm border border-bg-secondary">
                   {defaultChain.testnet || !pool ? (
-                    <OHLCVChart
-                      chainId={defaultChain.id}
-                      indexerUrl={getIndexerUrl(defaultChain)}
-                      className="H-full w-full"
-                    />
+                    <OHLCVChart />
                   ) : (
                     <EmbedPriceChart />
                   )}
