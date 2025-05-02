@@ -23,6 +23,8 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
 import { usePostMarketOrderMangrove } from "@/app/trade/_components/forms/market/hooks/use-post-market.order-mangrove"
+import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
+import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useOdos } from "@/hooks/odos/use-odos"
@@ -41,6 +43,7 @@ import {
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
+import { Book } from "@mangrovedao/mgv"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -203,6 +206,8 @@ export function useSwap() {
     }
   }, [wrappingHash])
 
+  const { mangroveChain } = useRegistry()
+
   const simulateQuery = useQuery({
     queryKey: [
       "marketOrderSimulation",
@@ -236,29 +241,80 @@ export function useSwap() {
         }
 
         const isBasePay = currentMarket?.base.address === payToken?.address
-        const params: MarketOrderSimulationParams = isBasePay
-          ? {
-              base: payAmount,
-              bs: BS.sell,
-              book: simulationBook as any,
-            }
-          : {
-              quote: payAmount,
-              bs: BS.buy,
-              book: simulationBook as any,
-            }
+        const params: MarketOrderSimulationParams =
+          payToken.address === currentMarket?.base.address
+            ? isBasePay
+              ? {
+                  base: payAmount,
+                  bs: BS.sell,
+                  book: simulationBook as Book,
+                }
+              : {
+                  quote: payAmount,
+                  bs: BS.buy,
+                  book: simulationBook as Book,
+                }
+            : isBasePay
+              ? {
+                  quote: payAmount,
+                  bs: BS.buy,
+                  book: simulationBook as Book,
+                }
+              : {
+                  base: payAmount,
+                  bs: BS.sell,
+                  book: simulationBook as Book,
+                }
 
         const simulation = marketOrderSimulation(params)
 
-        const [approvalStep] = await marketClient.getMarketOrderSteps({
-          bs: isBasePay ? BS.sell : BS.buy,
-          user: address,
-          sendAmount: payAmount,
-        })
+        let approveStep = null
+        if (marketClient?.chain?.testnet || !pool) {
+          // Base chain - get market order steps
+          try {
+            const [approvalStep] = await marketClient.getMarketOrderSteps({
+              bs: isBasePay ? BS.sell : BS.buy,
+              user: address,
+              sendAmount: payAmount,
+            })
 
+            approveStep = approvalStep
+          } catch (stepsError) {
+            console.error("Error getting market order steps:", stepsError)
+            toast.error("Error fetching market order steps")
+            return null
+          }
+        }
+
+        try {
+          // Check and increase allowance for Ghostbook to spend user's tokens
+          const allowance = await checkAllowance(
+            marketClient,
+            address,
+            mangroveChain?.ghostbook as Address,
+            payToken.address,
+          )
+
+          if (allowance < payAmount) {
+            approveStep = {
+              done: false,
+              step: `Approve ${payToken?.symbol}`,
+            }
+          }
+
+          approveStep = {
+            done: true,
+            step: `Approve ${payToken?.symbol}`,
+          }
+        } catch (allowanceError) {
+          console.error("Error checking allowance:", allowanceError)
+          toast.error("Error checking token allowance")
+        }
+
+        console.log(approveStep, simulation)
         return {
           simulation,
-          approvalStep,
+          approvalStep: approveStep,
           receiveValue: formatUnits(
             isBasePay ? simulation.quoteAmount : simulation.baseAmount,
             receiveToken?.decimals ?? 18,
