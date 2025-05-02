@@ -17,7 +17,7 @@ import {
   useWalletClient,
 } from "wagmi"
 
-import { useMangroveAddresses, useMarkets } from "@/hooks/use-addresses"
+import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 // import { useTokenByAddress } from "../../../hooks/use-token-by-address";
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
@@ -29,6 +29,7 @@ import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useBook } from "@/hooks/use-book"
 import { useNetworkClient } from "@/hooks/use-network-client"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
@@ -84,7 +85,8 @@ export function useSwap() {
   const postMarketOrder =
     chain?.testnet || !pool ? mangroveMarketOrder : regularMarketOrder
 
-  const markets = useMarkets()
+  const openMarkets = useOpenMarkets()
+  const { openMarkets: markets } = openMarkets
   const [payTknAddress, setPayTknAddress] = useQueryState("payTkn", {
     defaultValue: markets[0]?.base?.address,
   })
@@ -112,7 +114,7 @@ export function useSwap() {
   const receiveToken = useTokenByAddress(receiveTknAddress)
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
-  const currentMarket = getMarketFromTokens(markets, payToken, receiveToken)
+  const currentMarket = getMarketFromTokens(openMarkets, payToken, receiveToken)
   const publicClient = useNetworkClient()
   const addresses = useMangroveAddresses()
   const approvePayToken = useApproveToken()
@@ -123,12 +125,12 @@ export function useSwap() {
       : undefined
 
   const allTokens = deduplicateTokens([
-    ...getAllMangroveMarketTokens(markets),
+    ...getAllMangroveMarketTokens(openMarkets),
     ...odosTokens,
   ])
   const tradableTokens = deduplicateTokens(
     getTradableTokens({
-      mangroveMarkets: markets,
+      mangroveMarkets: openMarkets,
       odosTokens,
       token: payToken,
     }),
@@ -140,10 +142,11 @@ export function useSwap() {
 
   function onPayTokenSelected(token: Token) {
     const newTradableTokens = getTradableTokens({
-      mangroveMarkets: markets,
+      mangroveMarkets: openMarkets,
       odosTokens,
       token,
     })
+
     setPayTknAddress(token.address)
     setPayTokenDialogOpen(false)
     setFields(() => ({
@@ -549,8 +552,10 @@ export function useSwap() {
 
   const mangroveTradeableTokensForPayToken = React.useMemo(() => {
     if (!payToken) return []
-    return getMangroveTradeableTokens(markets, payToken).map((t) => t.address)
-  }, [markets, payToken])
+    return getMangroveTradeableTokens(openMarkets, payToken).map(
+      (t) => t.address,
+    )
+  }, [openMarkets, payToken])
 
   return {
     simulateQuery,
