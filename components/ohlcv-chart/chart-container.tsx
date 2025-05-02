@@ -349,7 +349,6 @@ export const TVChartContainer = (
         "use_localstorage_for_settings",
       ],
       overrides: {
-        "paneProperties.background": "transparent",
         "paneProperties.backgroundType": "solid",
         "scalesProperties.textColor": "#AAA",
         "scalesProperties.lineColor": "#333",
@@ -368,6 +367,7 @@ export const TVChartContainer = (
 
     tvWidget.onChartReady(() => {
       setLoading(false)
+      console.log("ready")
 
       tvWidget
         .chart()
