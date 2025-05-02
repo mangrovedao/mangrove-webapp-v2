@@ -35,7 +35,7 @@ export default function Page() {
       <InfoBanner />
       <div className="mt-[56px] flex justify-between items-center">
         <Title>Strategies</Title>
-        {featureFlagConfig?.strategy.create.enabled ? (
+        {true ? (
           <Button
             size={"lg"}
             rightIcon

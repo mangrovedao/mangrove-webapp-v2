@@ -103,7 +103,6 @@ export function Market() {
   const { currentMarket } = useMarket()
 
   const { payDollar, receiveDollar } = useDollarConversion({
-    currentMarket,
     payAmount: form.state.values.send,
     receiveAmount: form.state.values.receive,
     tradeSide,

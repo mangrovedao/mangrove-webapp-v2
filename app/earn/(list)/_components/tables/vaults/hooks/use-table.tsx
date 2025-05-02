@@ -27,7 +27,6 @@ import {
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { Check } from "@/svgs"
 import { formatNumber } from "@/utils/numbers"
-import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -56,15 +55,11 @@ export function useTable({
     () => [
       columnHelper.display({
         id: "blockchain-explorer",
+
         header: () => "",
         cell: ({ row }) => {
           const { address } = row.original
           const blockExplorerUrl = chain?.blockExplorers?.default.url
-
-          // note: check if we can retrive logos from library directly
-          // const icon = getWhitelistedChainObjects().find(
-          //   (item) => item.id === chain.id,
-          // )
 
           return (
             <div className="flex flex-col underline">
@@ -94,10 +89,17 @@ export function useTable({
       }),
 
       columnHelper.display({
+        enableResizing: false,
         header: "Strategy",
         cell: ({ row }) => {
           const isTrusted = true
-          return <Value value={row.original.type} trusted={isTrusted} />
+          const { deprecated } = row.original
+          return (
+            <Value
+              value={`${row.original.type} ${deprecated ? "(Deprecated)" : ""}`}
+              trusted={isTrusted}
+            />
+          )
         },
       }),
 
@@ -112,17 +114,14 @@ export function useTable({
               </div>
             )
           }
-          const { tvl, market, quoteDollarPrice } = row.original
-          const value =
-            Number(formatUnits(tvl || 0n, market.quote.decimals || 18)) *
-            quoteDollarPrice
+          const { tvl, market, deprecated } = row.original
+
+          if (deprecated)
+            return <div className="text-right w-full flex-end">-</div>
 
           return (
             <div className="text-right w-full">
-              <Value
-                value={formatNumber(Number(value.toFixed(2)))}
-                symbol={"$"}
-              />
+              <Value value={Number(tvl).toFixed(2)} symbol={"$"} />
             </div>
           )
         },
@@ -152,7 +151,12 @@ export function useTable({
             )
           }
 
-          const apr = row.original.apr ? `${row.original.apr.toFixed(2)}%` : "-"
+          const { apr: _apr, deprecated } = row.original
+
+          if (deprecated)
+            return <div className="text-right w-full flex-end">-</div>
+
+          const apr = _apr ? `${_apr.toFixed(2)}%` : "-"
 
           const incentivesApr = row.original.incentivesApr
             ? `${row.original.incentivesApr.toFixed(2)}%`
@@ -230,19 +234,6 @@ export function useTable({
           )
         },
       }),
-
-      // columnHelper.display({
-      //   id: "incentives",
-      //   header: () => <div className="text-right">LP Rewards</div>,
-      //   cell: ({ row }) => {
-      //     const value = row.original.totalRewards
-      //     return (
-      //       <div className="w-full h-full flex justify-end">
-      //         <Value value={formatNumber(value)} symbol="MGV" />
-      //       </div>
-      //     )
-      //   },
-      // }),
     ],
     [onDeposit],
   )

@@ -65,7 +65,8 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
         frameBorder="0"
         allow="clipboard-write"
         allowFullScreen
-        style={{ backgroundColor: "transparent" }}
+        color="#000000"
+        style={{ backgroundColor: "black" }}
       />
       {/* Top overlay */}
       <div className="bg-bg-primary absolute top-0 left-0 right-0 h-2 z-20" />

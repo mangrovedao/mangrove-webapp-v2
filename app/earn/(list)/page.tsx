@@ -32,7 +32,7 @@ export default function Page() {
   const displayTokens = [...tokens, ...tokens, ...tokens, ...tokens]
 
   return (
-    <main className="flex flex-col min-h-[calc(100vh-80px)]">
+    <main className="flex flex-col min-h-[calc(100vh-80px)] max-w-7xl mx-auto">
       {/* Header */}
       <div className="mt-5 flex justify-between items-center">
         <Title variant={"header1"}>Earn</Title>

@@ -19,7 +19,7 @@ type Props = {
   onResult?: (result: TransactionReceipt) => void
 }
 
-export function usePostMarketOrderTestnet({ onResult }: Props = {}) {
+export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
   const { currentMarket: market } = useMarket()
   const { address } = useAccount()
 

@@ -1,9 +1,12 @@
-import useMarket from "@/providers/market"
 import { CompleteOffer, MarketParams, tickFromVolumes } from "@mangrovedao/mgv"
 import { getBook } from "@mangrovedao/mgv/actions"
 import { BA, multiplyDensity, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
+import React from "react"
 import { PublicClient } from "viem"
+
+import useMarket from "@/providers/market"
+import { useSelectedPoolStore } from "@/stores/selected-pool.store"
 import { useMangroveAddresses } from "../use-addresses"
 import { useDefaultChain } from "../use-default-chain"
 import { useNetworkClient } from "../use-network-client"
@@ -215,6 +218,14 @@ export function usePoolBook() {
   const { defaultChain } = useDefaultChain()
   const { currentMarket: market } = useMarket()
   const { data: mangroveBook } = useMangroveBook()
+  const { selectedPool, setSelectedPool } = useSelectedPoolStore()
+
+  // Update the store with the current pool
+  React.useEffect(() => {
+    if (pool?.pool !== selectedPool?.pool) {
+      setSelectedPool(pool)
+    }
+  }, [pool?.pool])
 
   return useQuery({
     queryKey: [

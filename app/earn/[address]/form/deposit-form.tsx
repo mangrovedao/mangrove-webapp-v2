@@ -1,21 +1,22 @@
 "use client"
 
-import React, { useEffect, useMemo } from "react"
+import React, { useEffect } from "react"
 import { erc20Abi, formatUnits, parseAbi, parseUnits, type Address } from "viem"
 
 import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useDollarConversion } from "@/hooks/use-dollar-conversion"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { BS } from "@mangrovedao/mgv/lib"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import {
   useAccount,
   useReadContracts,
-  useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi"
@@ -43,7 +44,13 @@ export function DepositForm({ className }: { className?: string }) {
     hasErrors,
   } = useForm()
 
-  const { address, chain } = useAccount()
+  const { payDollar, receiveDollar } = useDollarConversion({
+    payAmount: baseDeposit,
+    receiveAmount: quoteDeposit,
+    tradeSide: BS.sell,
+  })
+
+  const { address } = useAccount()
   const queryClient = useQueryClient()
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const mintHelperAddress = useVaultMintHelper()
@@ -51,6 +58,7 @@ export function DepositForm({ className }: { className?: string }) {
   // Calculate slider percentage from manually entered value
   useEffect(() => {
     if (baseBalance?.balance && baseBalance.balance > 0n && baseDeposit) {
+      console.log(3)
       try {
         const enteredValue = parseFloat(baseDeposit)
         const maxValue = parseFloat(
@@ -67,6 +75,7 @@ export function DepositForm({ className }: { className?: string }) {
         // Handle parsing errors silently
       }
     }
+    console.log(4)
   }, [baseDeposit, baseBalance])
 
   // Calculate slider percentage from manually entered value
@@ -112,6 +121,7 @@ export function DepositForm({ className }: { className?: string }) {
   const handleBaseInputChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
+    console.log(1)
     handleBaseDepositChange(e)
     // Slider will be updated by the effect
   }
@@ -125,13 +135,14 @@ export function DepositForm({ className }: { className?: string }) {
   }
 
   React.useEffect(() => {
+    console.log(5)
     refetchAllowance()
+    console.log(6)
   }, [baseDeposit, quoteDeposit])
 
   // Get allowances and approval status
   const {
     data: allowanceData,
-    isFetched,
     refetch: refetchAllowance,
     isLoading: isLoadingAllowance,
   } = useReadContracts({
@@ -181,52 +192,23 @@ export function DepositForm({ className }: { className?: string }) {
   const needsBaseApproval = baseAmount > 0n && baseAllowance < baseAmount
   const needsQuoteApproval = quoteAmount > 0n && quoteAllowance < quoteAmount
 
-  const amount0 = useMemo(() => {
-    return baseAmount
-  }, [baseAmount, quoteAmount])
-  const amount1 = useMemo(() => {
-    return quoteAmount
-  }, [baseAmount, quoteAmount])
-
   // Write contract hooks
   const {
     data: hash,
     isPending,
-    writeContract,
     writeContractAsync,
     reset,
     error,
   } = useWriteContract()
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash: txHash,
-    })
+  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: txHash,
+  })
 
   // Mint ABI
   const mintABI = parseAbi([
     "function mint(address vault, uint256 mintAmount, uint256 baseAmountMax, uint256 quoteAmountMax) external returns (uint256 shares, uint256 baseAmount, uint256 quoteAmount)",
   ])
-
-  // Simulate mint
-  const { data: simulateData } = useSimulateContract({
-    address: mintHelperAddress as Address,
-    abi: mintABI,
-    functionName: "mint",
-    args: [
-      vault?.address as Address,
-      mintParams.mintAmount,
-      baseAmount,
-      quoteAmount,
-    ],
-    query: {
-      enabled:
-        !!vault &&
-        mintParams.mintAmount > 0n &&
-        baseAmount >= 0n &&
-        quoteAmount >= 0n,
-    },
-  })
 
   // Effect for transaction completion
   useEffect(() => {
@@ -351,6 +333,7 @@ export function DepositForm({ className }: { className?: string }) {
     >
       <div className="flex-grow space-y-6">
         <EnhancedNumericInput
+          showSlider
           sendSliderValue={baseSliderValue}
           setSendSliderValue={handleBaseSliderChange}
           token={baseToken}
@@ -359,10 +342,7 @@ export function DepositForm({ className }: { className?: string }) {
             baseBalance?.balance === 0n ||
             isProcessing
           }
-          dollarAmount={
-            (Number(baseDeposit) * (vault?.baseDollarPrice || 0)).toFixed(3) ||
-            "..."
-          }
+          dollarAmount={payDollar}
           label={`Deposit ${baseSliderValue}%`}
           inputClassName="bg-bg-primary"
           value={getExactWeiAmount(baseDeposit, baseToken.priceDisplayDecimals)}
@@ -373,6 +353,7 @@ export function DepositForm({ className }: { className?: string }) {
         />
 
         <EnhancedNumericInput
+          showSlider
           sendSliderValue={quoteSliderValue}
           setSendSliderValue={handleQuoteSliderChange}
           token={quoteToken}
@@ -381,11 +362,7 @@ export function DepositForm({ className }: { className?: string }) {
             quoteBalance?.balance === 0n ||
             isProcessing
           }
-          dollarAmount={
-            (Number(quoteDeposit) * (vault?.quoteDollarPrice || 0)).toFixed(
-              3,
-            ) || "..."
-          }
+          dollarAmount={receiveDollar}
           label={`Deposit ${quoteSliderValue}%`}
           value={getExactWeiAmount(
             quoteDeposit,

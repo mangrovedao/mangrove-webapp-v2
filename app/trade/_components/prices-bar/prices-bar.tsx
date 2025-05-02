@@ -7,6 +7,7 @@ import React from "react"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
+import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import useMangrovePoolStatsQuery from "@/hooks/use-pool-stats"
@@ -149,6 +150,7 @@ export function PricesBar() {
     refetch: refetchBooks,
     spotPrice,
   } = useMergedBooks()
+  const { pool } = usePool()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
   const { data: poolStats } = useMangrovePoolStatsQuery(
@@ -163,7 +165,9 @@ export function PricesBar() {
   )
 
   // Normalize stats based on which chain we're using
-  const stats = normalizeStats(defaultChain.testnet ? priceData : poolStats)
+  const stats = normalizeStats(
+    defaultChain.testnet || !pool ? priceData : poolStats,
+  )
 
   React.useEffect(() => {
     const interval = setInterval(() => {

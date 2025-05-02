@@ -43,6 +43,8 @@ export function Trades({ className }: { className?: string }) {
     }
   }, [tradesHistoryQuery.data])
 
+  const table = useTable({ data: processedTrades })
+
   // Setup scroll listener to detect when user scrolls to bottom
   useEffect(() => {
     const scrollContainer = scrollRef.current
@@ -74,12 +76,8 @@ export function Trades({ className }: { className?: string }) {
     tradesHistoryQuery.fetchNextPage,
   ])
 
-  const table = useTable({
-    data: processedTrades,
-  })
-
   // Only show loading skeleton when market is not available
-  if (!market) {
+  if (!market || !table?.getRowModel()?.rows?.length) {
     return <AnimatedTradesHistorySkeleton />
   }
 

@@ -6,7 +6,7 @@
     "node": "18.x"
   },
   "scripts": {
-    "build": "pnpm run crypto-icons && next build",
+    "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",

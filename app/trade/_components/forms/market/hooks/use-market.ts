@@ -153,8 +153,23 @@ export function useMarketForm(props: Props) {
                 book: orderbook as Book,
               }
 
-      const { baseAmount: baseEstimation, quoteAmount: quoteEstimation } =
-        marketOrderSimulation(params)
+      const {
+        baseAmount: baseEstimation,
+        quoteAmount: quoteEstimation,
+        maxTickEncountered,
+      } = marketOrderSimulation(params)
+
+      ////// todo: pre-fill slippage with ((maxTickEncountered-averageTick)/10000) * 1.1
+      // const averageTick = tickFromVolumes(
+      //   parseUnits(send, market?.base.decimals ?? 18),
+      //   parseUnits(receive, market?.quote.decimals ?? 18),
+      // )
+      // const maxTick = maxTickEncountered
+      // const slippage = (maxTick - averageTick) / 10000n
+      // const formattedSlippage = Number(slippage) * 1.1
+
+      // form.setFieldValue("slippage", formattedSlippage)
+      //////
 
       const formattedBaseEstimation = getExactWeiAmount(
         formatUnits(baseEstimation, market?.base.decimals ?? 18),

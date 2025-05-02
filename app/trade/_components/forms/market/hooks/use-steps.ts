@@ -6,9 +6,8 @@ import { Address, parseUnits } from "viem"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
-import { usePool } from "@/hooks/new_ghostbook/pool"
+import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import { useMarketClient } from "@/hooks/use-market"
-import { megaethTestnet } from "viem/chains"
 
 type Props = {
   bs: BS
@@ -20,7 +19,7 @@ type Props = {
 export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
   const marketClient = useMarketClient()
   const { mangroveChain } = useRegistry()
-  const { pool } = usePool()
+  const { selectedPool: pool } = useSelectedPool()
 
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
@@ -41,50 +40,50 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
           throw new Error("Missing required parameters")
         }
 
-        if (marketClient?.chain?.id !== megaethTestnet.id) {
+        if (marketClient?.chain?.testnet || !pool) {
+          // Base chain - get market order steps
           try {
-            // Check and increase allowance for Ghostbook to spend user's tokens
-            const allowance = await checkAllowance(
-              marketClient,
+            const steps = await marketClient.getMarketOrderSteps({
+              bs,
               user,
-              mangroveChain?.ghostbook as Address,
-              sendToken.address,
-            )
+              sendAmount: parseUnits(sendAmount, sendToken.decimals),
+            })
 
-            if (allowance < parseUnits(sendAmount, sendToken.decimals)) {
-              return [
-                {
-                  done: false,
-                  step: `Approve ${sendToken?.symbol}`,
-                },
-              ]
-            }
-
-            return [
-              {
-                done: true,
-                step: `Approve ${sendToken?.symbol}`,
-              },
-            ]
-          } catch (allowanceError) {
-            console.error("Error checking allowance:", allowanceError)
-            toast.error("Error checking token allowance")
+            return steps
+          } catch (stepsError) {
+            console.error("Error getting market order steps:", stepsError)
+            toast.error("Error fetching market order steps")
+            return null
           }
         }
 
-        // Base chain - get market order steps
         try {
-          const steps = await marketClient.getMarketOrderSteps({
-            bs,
+          // Check and increase allowance for Ghostbook to spend user's tokens
+          const allowance = await checkAllowance(
+            marketClient,
             user,
-            sendAmount: parseUnits(sendAmount, sendToken.decimals),
-          })
+            mangroveChain?.ghostbook as Address,
+            sendToken.address,
+          )
 
-          return steps
-        } catch (stepsError) {
-          console.error("Error getting market order steps:", stepsError)
-          toast.error("Error fetching market order steps")
-          return null
+          if (allowance < parseUnits(sendAmount, sendToken.decimals)) {
+            return [
+              {
+                done: false,
+                step: `Approve ${sendToken?.symbol}`,
+              },
+            ]
+          }
+
+          return [
+            {
+              done: true,
+              step: `Approve ${sendToken?.symbol}`,
+            },
+          ]
+        } catch (allowanceError) {
+          console.error("Error checking allowance:", allowanceError)
+          toast.error("Error checking token allowance")
         }
       } catch (error) {
         console.error("Unexpected error in useMarketSteps:", error)
