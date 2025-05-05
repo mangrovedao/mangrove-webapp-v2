@@ -12,7 +12,6 @@ import {
   ResolutionString,
   widget,
 } from "../../public/charting_library"
-import styles from "./index.module.css"
 
 export const TVChartContainer = (
   props: Partial<ChartingLibraryWidgetOptions>,
@@ -150,7 +149,7 @@ export const TVChartContainer = (
       }
 
       let resultBars = processedBars
-      const REQUIRED_BARS = 400
+      const REQUIRED_BARS = 350
 
       if (processedBars.length < REQUIRED_BARS) {
         const lastBar = processedBars[0] // use first bar to backfill earlier time range
@@ -333,6 +332,7 @@ export const TVChartContainer = (
       theme: "dark",
       debug: false,
       custom_css_url: "css/styles.css",
+
       disabled_features: [
         "left_toolbar",
         "timezone_menu",
@@ -349,16 +349,44 @@ export const TVChartContainer = (
         "use_localstorage_for_settings",
       ],
       overrides: {
-        "paneProperties.background": "transparent",
         "paneProperties.backgroundType": "solid",
-        "scalesProperties.textColor": "#AAA",
+        "scalesProperties.textColor": "#FFFFFF",
         "scalesProperties.lineColor": "#333",
         "mainSeriesProperties.priceAxisProperties.autoScale": true,
         "scalesProperties.showSeriesLastValue": true,
         "scalesProperties.showStudyLastValue": false,
+        "scalesProperties.fontSize": 14,
       },
-      studies_overrides: {
-        "volume.precision": 0,
+      custom_formatters: {
+        priceFormatterFactory: (symbolInfo, minTick) => {
+          if (symbolInfo === null) {
+            return null
+          }
+
+          return {
+            format: (price, signPositive) => {
+              if (price >= 1000000000) {
+                return `${(price / 1000000000).toFixed(3)}B`
+              }
+
+              if (price >= 1000000) {
+                return `${(price / 1000000).toFixed(3)}M`
+              }
+
+              if (price >= 1000) {
+                return `${(price / 1000).toFixed(3)}K`
+              }
+
+              if (price > 0 && price < 0.0001) {
+                return price.toExponential(2)
+              }
+
+              return price.toFixed(2)
+            },
+          }
+
+          return null // The default formatter will be used.
+        },
       },
     }
 
@@ -385,14 +413,19 @@ export const TVChartContainer = (
   }, [base.symbol, quote.symbol, getData])
 
   return (
-    <>
+    <div className="relative h-full">
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background">
-          <div className="animate-pulse text-primary">Loading chart...</div>
+        <div className="flex items-center justify-center bg-background h-full">
+          <div className="flex flex-col items-center gap-2">
+            <div className="animate-spin h-8 w-8 border-t-2 border-[#00A86B] rounded-full"></div>
+            <p className="text-sm text-[#999] animate-pulse">
+              Loading chart...
+            </p>
+          </div>
         </div>
       )}
 
-      {!loading && (
+      {loading && (
         <button
           onClick={handleUnzoomPriceScale}
           className="absolute top-2 right-2 z-20 bg-background/80 hover:bg-background p-1 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -401,7 +434,7 @@ export const TVChartContainer = (
           <ZoomOutIcon size={16} />
         </button>
       )}
-      <div ref={chartContainerRef} className={styles.TVChartContainer} />
-    </>
+      <div className="h-full" ref={chartContainerRef} />
+    </div>
   )
 }

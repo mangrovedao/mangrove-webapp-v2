@@ -29,6 +29,8 @@ export default function Page() {
   const { defaultChain } = useDefaultChain()
   const { pool } = usePool()
 
+  console.log("pool", pool)
+
   // Check if we're on mobile
   useEffect(() => {
     const checkIfMobile = () => {
