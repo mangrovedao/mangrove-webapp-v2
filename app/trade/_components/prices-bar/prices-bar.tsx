@@ -24,9 +24,7 @@ function Container({ children }: React.PropsWithChildren) {
 }
 
 function Label({ children }: React.PropsWithChildren) {
-  return (
-    <div className="text-muted-foreground text-xs font-light">{children}</div>
-  )
+  return <div className="text-neutral-400 text-xs font-light">{children}</div>
 }
 
 function Value({
@@ -129,7 +127,7 @@ function Item({
               variants={numberVariants}
               transition={{ duration: 0.2 }}
             >
-              <Value className={cn(className, "text-neutral-400")}>
+              <Value className={cn(className, "text-white")}>
                 {formattedValue} {isValidValue && token?.symbol && token.symbol}
                 {isValidValue && rightElement}
               </Value>
@@ -194,9 +192,9 @@ export function PricesBar() {
     : undefined
 
   const variation24hClassnames = cn({
-    "text-green-caribbean":
+    "!text-green-caribbean":
       variation24hPercentage !== undefined && variation24hPercentage >= 0,
-    "text-red-100":
+    "!text-red-100":
       variation24hPercentage !== undefined && variation24hPercentage < 0,
   })
 

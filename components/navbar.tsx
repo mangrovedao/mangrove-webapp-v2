@@ -20,7 +20,6 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { useAccount } from "wagmi"
-import ChainSelector from "./chain-selector"
 import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog-new"
 import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Spinner } from "./ui/spinner"
@@ -371,11 +370,6 @@ export default function Navbar() {
 
             {/* Right Side - Network, Account & Mobile Menu */}
             <div className="flex items-center gap-3">
-              {/* Network Selector */}
-              <div className="hidden lg:block">
-                <ChainSelector />
-              </div>
-
               {/* User Account Button */}
               {isConnected ? (
                 <Button

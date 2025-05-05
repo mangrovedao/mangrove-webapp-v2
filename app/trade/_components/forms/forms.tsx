@@ -71,18 +71,18 @@ export function Forms({
         </CustomTabsList>
 
         <motion.div
-          className="flex-1 p-1.5 overflow-visible"
+          className="flex-1 overflow-visible"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
           key={orderType}
         >
-          <CustomTabsContent value={FormType.LIMIT} className="h-full">
+          <CustomTabsContent value={FormType.LIMIT} className="h-full pt-4">
             <div className="h-full">
               <LimitComponent />
             </div>
           </CustomTabsContent>
-          <CustomTabsContent value={FormType.MARKET} className="h-full">
+          <CustomTabsContent value={FormType.MARKET} className="h-ful pt-4">
             <div className="h-full">
               <MarketComponent />
             </div>

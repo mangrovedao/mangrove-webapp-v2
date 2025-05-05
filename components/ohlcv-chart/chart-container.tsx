@@ -366,22 +366,9 @@ export const TVChartContainer = (
 
           return {
             format: (price, signPositive) => {
-              if (price >= 1000000000) {
-                return `${(price / 1000000000).toFixed(3)}B`
-              }
-
-              if (price >= 1000000) {
-                return `${(price / 1000000).toFixed(3)}M`
-              }
-
-              if (price >= 1000) {
-                return `${(price / 1000).toFixed(3)}K`
-              }
-
               if (price > 0 && price < 0.0001) {
                 return price.toExponential(2)
               }
-
               return price.toFixed(2)
             },
           }

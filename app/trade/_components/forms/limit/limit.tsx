@@ -420,7 +420,7 @@ export function Limit() {
                     disabled={!currentMarket || !sendBalanceValid}
                     value={sendSliderValue}
                     className={cn(
-                      "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
+                      "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1 border border-[#78788016] bg-none",
                       {
                         "bg-bg-tertiary": sendSliderValue === value,
                       },
@@ -515,7 +515,8 @@ export function Limit() {
           <div className="mt-auto pt-3 border-t border-border-primary">
             <Button
               className={cn(
-                "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
+                "w-full flex rounded-sm tems-center justify-center capitalize",
+                tradeSide === BS.buy ? "bg-green-500" : "bg-red-500",
               )}
               size={"md"}
               type="submit"

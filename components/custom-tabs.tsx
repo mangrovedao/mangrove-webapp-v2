@@ -23,22 +23,21 @@ const CustomTabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-baseline justify-center text-primary h-8 px-4 space-x-6 relative overflow-hidden",
+      "flex items-baseline justify-center text-primary px-4 space-x-6 relative overflow-hidden",
       className,
     )}
     {...props}
   >
     {children}
-    <div
-      className={cn(
-        "absolute right-0 h-full w-10 flex items-center transition-opacity",
-        {
-          "opacity-0": !loading,
-        },
-      )}
-    >
-      <Spinner className="h-6 w-6" />
-    </div>
+    {loading && (
+      <div
+        className={cn(
+          "absolute right-0 h-full w-10 flex items-center transition-opacity opacity-1",
+        )}
+      >
+        <Spinner className="h-6 w-6" />
+      </div>
+    )}
   </TabsPrimitive.List>
 ))
 CustomTabsList.displayName = TabsPrimitive.List.displayName
@@ -83,7 +82,7 @@ const CustomTabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "ring-offset-primary-dark-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-full",
+      "ring-offset-primary-dark-green p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-full",
       className,
     )}
     {...props}
