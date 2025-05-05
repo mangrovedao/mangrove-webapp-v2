@@ -358,7 +358,7 @@ function TokenContainer({
   ethBalance,
 }: TokenContainerProps) {
   const { isConnected } = useAccount()
-  const tokenBalance = useTokenBalance(token)
+  const { formattedAndFixed, isLoading } = useTokenBalance(token)
   const dollars = (Number(value) * (dollarValue ?? 0)).toString()
 
   return (
@@ -373,7 +373,7 @@ function TokenContainer({
           {type === "pay" ? "Sell" : "Buy"}
         </label>
         <div className="text-sm text-right opacity-70 text-text-quaternary">
-          {isConnected && token && tokenBalance.balance ? (
+          {isConnected && token && !isLoading ? (
             <>
               Balance:
               {type === "pay" ? (
@@ -384,14 +384,13 @@ function TokenContainer({
                 >
                   <span>
                     {isWrapping
-                      ? Number(ethBalance) +
-                        Number(tokenBalance.formattedAndFixed)
-                      : tokenBalance.formattedAndFixed}
+                      ? Number(ethBalance) + Number(formattedAndFixed)
+                      : formattedAndFixed}
                   </span>{" "}
                 </Button>
               ) : (
                 <span className="ml-1 text-text-secondary">
-                  {tokenBalance.formattedAndFixed}
+                  {formattedAndFixed}
                 </span>
               )}
             </>

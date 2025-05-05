@@ -22,15 +22,25 @@ const config = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "assets.odos.xyz",
+        port: "",
+        pathname: "/tokens/**",
+      },
+      {
+        protocol: "https",
+        hostname: "assets.odos.xyz",
+      },
+      {
+        protocol: "https",
+        hostname: "cryptocurrency-icons.s3-us-east-2.amazonaws.com",
+      },
+      {
+        protocol: "https",
         hostname: "explorer-api.walletconnect.com",
       },
       {
         protocol: "https",
         hostname: "icons.llamao.fi",
-      },
-      {
-        protocol: "https",
-        hostname: "assets.odos.xyz",
       },
     ],
   },

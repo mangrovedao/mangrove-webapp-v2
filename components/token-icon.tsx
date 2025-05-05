@@ -30,8 +30,12 @@ export function TokenIcon({
         alt={`${name} token icon`}
         className={imgClasses}
         onError={(e) => {
-          if (useFallback) {
-            e.currentTarget.src = src
+          try {
+            if (useFallback) {
+              e.currentTarget.src = "/assets/illustrations/mangrove-logo.png"
+            }
+          } catch (error) {
+            console.error(error)
           }
         }}
       />
