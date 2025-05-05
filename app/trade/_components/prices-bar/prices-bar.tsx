@@ -129,7 +129,7 @@ function Item({
               variants={numberVariants}
               transition={{ duration: 0.2 }}
             >
-              <Value className={className}>
+              <Value className={cn(className, "text-neutral-400")}>
                 {formattedValue} {isValidValue && token?.symbol && token.symbol}
                 {isValidValue && rightElement}
               </Value>

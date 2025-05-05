@@ -178,12 +178,12 @@ export default function Page() {
 
       <style jsx>{`
         main {
-          height: calc(100vh - 60px);
+          height: calc(100vh - 80px);
         }
 
         @media (max-width: 1024px) {
           main {
-            min-height: calc(100vh - 60px);
+            min-height: calc(100vh - 80px);
             height: auto;
             overflow-y: auto;
           }

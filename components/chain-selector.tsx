@@ -89,7 +89,7 @@ export default function ChainSelector() {
       <Button
         size="sm"
         variant="secondary"
-        className="hidden md:flex items-center h-[38px] gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors border-transparent"
+        className="hidden md:flex items-center h-[38px] gap-1 bg-white hover:bg-[#000] text-black rounded-sm px-3 py-1.5 text-xs font-medium transition-colors border-transparent"
         onClick={openDialog}
       >
         <span className="flex space-x-2">
@@ -101,11 +101,7 @@ export default function ChainSelector() {
             key={defaultChain.id}
             alt={`${chain?.name}-logo`}
           />
-          {/* <span className="text-sm whitespace-nowrap">{chain?.name}</span> */}
         </span>
-        {/* <div className="pl-2"> */}
-        {/* <ChevronDown className="w-5" /> */}
-        {/* </div> */}
       </Button>
     </>
   )

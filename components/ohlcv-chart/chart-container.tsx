@@ -350,8 +350,9 @@ export const TVChartContainer = (
       ],
       overrides: {
         "paneProperties.backgroundType": "solid",
+        "paneProperties.background": "#1f1f1f",
         "scalesProperties.textColor": "#FFFFFF",
-        "scalesProperties.lineColor": "#333",
+        "scalesProperties.lineColor": "#1f1f1f",
         "mainSeriesProperties.priceAxisProperties.autoScale": true,
         "scalesProperties.showSeriesLastValue": true,
         "scalesProperties.showStudyLastValue": false,

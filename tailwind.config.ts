@@ -151,7 +151,6 @@ export default {
         },
         fg: {
           "disabled-subtle": "hsl(var(--fg-disabled-subtle))",
-          primary: "hsl(var(--fg-primary))",
           quaternary: "hsl(var(--fg-quaternary))",
           secondary: "hsl(var(--fg-secondary))",
           tertiary: "hsl(var(--fg-tertiary))",

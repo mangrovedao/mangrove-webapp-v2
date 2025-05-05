@@ -38,6 +38,52 @@ export function ChevronRight(props: React.ComponentProps<"svg">) {
   )
 }
 
+export function Valhalla(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      {...props}
+      width="93"
+      height="12"
+      viewBox="0 0 93 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M5.17295 9.90895L2.03952 0H0L4.07903 12H6.17417L10.1976 0H8.25077L5.17295 9.90895Z"
+        fill="white"
+      />
+      <path
+        d="M17.6141 0H15.5561L11.1804 12H13.0716L13.9801 9.36264H19.116L20.043 12H22.064L17.6141 0ZM14.5363 7.78022L16.5202 2.05338L18.5412 7.78022H14.5363Z"
+        fill="white"
+      />
+      <path
+        d="M43.0157 5.02983H37.0826V0H35.2285V12H37.0826V6.63108H43.0157V12H44.8884V0H43.0157V5.02983Z"
+        fill="white"
+      />
+      <path
+        d="M54.5104 0H52.4524L48.0767 12H49.9679L50.8764 9.36264H56.0123L56.9393 12H58.9603L54.5104 0ZM51.4326 7.78022L53.4165 2.05338L55.4375 7.78022H51.4326Z"
+        fill="white"
+      />
+      <path
+        d="M87.8073 0H85.7492L81.3735 12H83.2647L84.1732 9.36264H89.3091L90.2362 12H92.2571L87.8073 0ZM84.7295 7.78022L86.7134 2.05338L88.7343 7.78022H84.7295Z"
+        fill="white"
+      />
+      <path
+        d="M68.9514 10.3987H64.0937V0H62.2396V12H68.9514V10.3987Z"
+        fill="white"
+      />
+      <path
+        d="M31.9643 10.3987H27.1066V0H25.2525V12H31.9643V10.3987Z"
+        fill="white"
+      />
+      <path
+        d="M79.019 10.3987H74.1612V0H72.3071V12H79.019V10.3987Z"
+        fill="white"
+      />
+    </svg>
+  )
+}
+
 export function Pen(props: React.ComponentProps<"svg">) {
   return (
     <svg
