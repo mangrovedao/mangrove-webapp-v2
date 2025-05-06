@@ -44,6 +44,7 @@ import {
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
+import { Book } from "@mangrovedao/mgv"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -120,6 +121,7 @@ export function useSwap() {
   const receiveToken = useTokenByAddress(receiveTknAddress)
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
+
   const swapMarket = getMarketFromTokens(openMarkets, payToken, receiveToken)
 
   React.useEffect(() => {
@@ -131,6 +133,7 @@ export function useSwap() {
       setOverrideMarket(undefined)
     }
   }, [swapMarket, setOverrideMarket])
+
 
   const publicClient = useNetworkClient()
   const addresses = useMangroveAddresses()
@@ -281,6 +284,7 @@ export function useSwap() {
           }
         }
 
+
         const simulation = marketOrderSimulation(params)
 
         let approveStep = null
@@ -300,7 +304,7 @@ export function useSwap() {
             return null
           }
         }
-
+        
         try {
           // Check and increase allowance for Ghostbook to spend user's tokens
           const allowance = await checkAllowance(
@@ -326,6 +330,7 @@ export function useSwap() {
           toast.error("Error checking token allowance")
         }
 
+        console.log(approveStep, simulation)
         return {
           simulation,
           approvalStep: approveStep,
