@@ -33,6 +33,7 @@ import { useBook } from "@/hooks/use-book"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
+import useMarket, { useMarketOverride } from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { getErrorMessage } from "@/utils/errors"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -43,7 +44,6 @@ import {
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
-import { Book } from "@mangrovedao/mgv"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -69,6 +69,9 @@ export function useSwap() {
 
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
+
+  const { setOverrideMarket } = useMarketOverride()
+  const { currentMarket } = useMarket()
 
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
@@ -117,7 +120,19 @@ export function useSwap() {
   const receiveToken = useTokenByAddress(receiveTknAddress)
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
-  const currentMarket = getMarketFromTokens(openMarkets, payToken, receiveToken)
+
+  const swapMarket = getMarketFromTokens(openMarkets, payToken, receiveToken)
+
+  React.useEffect(() => {
+    if (swapMarket) {
+      setOverrideMarket(swapMarket)
+    }
+
+    return () => {
+      setOverrideMarket(undefined)
+    }
+  }, [swapMarket, setOverrideMarket])
+
   const publicClient = useNetworkClient()
   const addresses = useMangroveAddresses()
   const approvePayToken = useApproveToken()
@@ -224,7 +239,7 @@ export function useSwap() {
       if (!(payToken && receiveToken && isConnected)) return null
 
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
-
+      console.log(currentMarket)
       // Mangrove
       if (marketClient) {
         if (!(book && address)) return null
@@ -240,31 +255,32 @@ export function useSwap() {
           spreadPercent: oldBook?.spreadPercent,
         }
 
-        const isBasePay = currentMarket?.base.address === payToken?.address
-        const params: MarketOrderSimulationParams =
-          payToken.address === currentMarket?.base.address
-            ? isBasePay
-              ? {
-                  base: payAmount,
-                  bs: BS.sell,
-                  book: simulationBook as Book,
-                }
-              : {
-                  quote: payAmount,
-                  bs: BS.buy,
-                  book: simulationBook as Book,
-                }
-            : isBasePay
-              ? {
-                  quote: payAmount,
-                  bs: BS.buy,
-                  book: simulationBook as Book,
-                }
-              : {
-                  base: payAmount,
-                  bs: BS.sell,
-                  book: simulationBook as Book,
-                }
+        // Determine if user is buying or selling the base token based on pay/receive tokens
+        const isBuyingBase =
+          currentMarket?.base.address.toLowerCase() ===
+          receiveToken.address.toLowerCase()
+        const isSendingBase =
+          currentMarket?.base.address.toLowerCase() ===
+          payToken.address.toLowerCase()
+
+        // Set BS direction and parameters based on whether we're buying or selling the base token
+        let params: MarketOrderSimulationParams
+
+        if (isSendingBase) {
+          // Selling base (SELL order)
+          params = {
+            base: payAmount,
+            bs: BS.sell,
+            book: simulationBook as any,
+          }
+        } else {
+          // Buying base (BUY order)
+          params = {
+            quote: payAmount,
+            bs: BS.buy,
+            book: simulationBook as any,
+          }
+        }
 
         const simulation = marketOrderSimulation(params)
 
@@ -273,7 +289,7 @@ export function useSwap() {
           // Base chain - get market order steps
           try {
             const [approvalStep] = await marketClient.getMarketOrderSteps({
-              bs: isBasePay ? BS.sell : BS.buy,
+              bs: isBuyingBase ? BS.buy : BS.sell,
               user: address,
               sendAmount: payAmount,
             })
@@ -284,31 +300,31 @@ export function useSwap() {
             toast.error("Error fetching market order steps")
             return null
           }
-        }
+        } else {
+          try {
+            // Check and increase allowance for Ghostbook to spend user's tokens
+            const allowance = await checkAllowance(
+              marketClient,
+              address,
+              mangroveChain?.ghostbook as Address,
+              payToken.address,
+            )
 
-        try {
-          // Check and increase allowance for Ghostbook to spend user's tokens
-          const allowance = await checkAllowance(
-            marketClient,
-            address,
-            mangroveChain?.ghostbook as Address,
-            payToken.address,
-          )
+            if (allowance < payAmount) {
+              approveStep = {
+                done: false,
+                step: `Approve ${payToken?.symbol}`,
+              }
+            }
 
-          if (allowance < payAmount) {
             approveStep = {
-              done: false,
+              done: true,
               step: `Approve ${payToken?.symbol}`,
             }
+          } catch (allowanceError) {
+            console.error("Error checking allowance:", allowanceError)
+            toast.error("Error checking token allowance")
           }
-
-          approveStep = {
-            done: true,
-            step: `Approve ${payToken?.symbol}`,
-          }
-        } catch (allowanceError) {
-          console.error("Error checking allowance:", allowanceError)
-          toast.error("Error checking token allowance")
         }
 
         console.log(approveStep, simulation)
@@ -316,7 +332,7 @@ export function useSwap() {
           simulation,
           approvalStep: approveStep,
           receiveValue: formatUnits(
-            isBasePay ? simulation.quoteAmount : simulation.baseAmount,
+            isSendingBase ? simulation.quoteAmount : simulation.baseAmount,
             receiveToken?.decimals ?? 18,
           ),
         }
@@ -540,19 +556,17 @@ export function useSwap() {
       return
     }
 
-    const isBasePay = currentMarket?.base.address === payToken.address
-
-    const send = fields.payValue
-    const receive = fields.receiveValue
+    // Determine buy/sell direction based on the currentMarket from the context
+    // We need to determine if the user is buying the base token or selling it
+    const isBuyingBase =
+      currentMarket?.base.address.toLowerCase() ===
+      receiveToken.address.toLowerCase()
+    const tradeSide = isBuyingBase ? BS.buy : BS.sell
 
     await postMarketOrder.mutateAsync(
       {
         form: {
-          bs:
-            receiveTknAddress.toLowerCase() ===
-            currentMarket?.base?.address?.toLowerCase()
-              ? BS.buy
-              : BS.sell,
+          bs: tradeSide,
           receive: fields.receiveValue,
           send: fields.payValue,
           isWrapping: false,
@@ -566,7 +580,10 @@ export function useSwap() {
           : {}),
       },
       {
-        onError: () => {},
+        onError: (error) => {
+          console.error("Swap error:", error)
+          toast.error("Failed to execute swap")
+        },
         onSuccess: () => {
           setFields(() => ({
             payValue: "",
