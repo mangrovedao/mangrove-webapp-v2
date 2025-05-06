@@ -1,5 +1,5 @@
 import useMarket from "@/providers/market"
-import type { BookParams, CompleteOffer } from "@mangrovedao/mgv"
+import type { BookParams, CompleteOffer, MarketParams } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 
 import { useMarketClient } from "./use-market"
@@ -29,9 +29,12 @@ export function useBook(
   params: UseBookParams = {
     aggregateOffersWithSamePrice: false,
   },
+  contextMarket?: MarketParams,
 ) {
   const client = useMarketClient()
-  const { currentMarket } = useMarket()
+  const { currentMarket: market } = useMarket()
+
+  const currentMarket = contextMarket ? contextMarket : market
 
   const { data, isLoading, isError } = useQuery({
     queryKey: [

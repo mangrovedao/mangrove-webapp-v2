@@ -25,6 +25,7 @@ import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { getAllTokensInMarkets } from "@/utils/tokens"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import Rive from "@rive-app/react-canvas-lite"
 import { Address, formatUnits } from "viem"
 import { useAccount } from "wagmi"
@@ -32,6 +33,8 @@ import { Accordion } from "../trade/_components/forms/components/accordion"
 import { SLIPPAGES, useSwap } from "./hooks/use-swap"
 
 export default function Swap() {
+  const { openConnectModal } = useConnectModal()
+
   const {
     payToken,
     receiveToken,
@@ -39,7 +42,6 @@ export default function Swap() {
     fields,
     onPayValueChange,
     onReceiveValueChange,
-    openConnectModal,
     isConnected,
     isSwapDisabled,
     swap,

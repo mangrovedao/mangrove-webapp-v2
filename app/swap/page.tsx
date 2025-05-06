@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic"
-
 const Swap = dynamic(() => import("./swap"), { ssr: false })
 
 export default function Page() {

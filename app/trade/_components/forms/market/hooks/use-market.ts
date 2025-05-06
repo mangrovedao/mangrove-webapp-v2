@@ -18,7 +18,7 @@ import { useBook } from "@/hooks/use-book"
 import useMangroveTokenPricesQuery from "@/hooks/use-mangrove-token-price-query"
 import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { Book, CompleteOffer } from "@mangrovedao/mgv"
+import { CompleteOffer } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
@@ -128,30 +128,17 @@ export function useMarketForm(props: Props) {
 
       const isBasePay = market?.base.address === sendToken?.address
 
-      const params: MarketOrderSimulationParams =
-        estimateFrom === "send"
-          ? isBasePay
-            ? {
-                base: baseAmount,
-                bs: BS.sell,
-                book: orderbook as Book,
-              }
-            : {
-                quote: quoteAmount,
-                bs: BS.buy,
-                book: orderbook as Book,
-              }
-          : isBasePay
-            ? {
-                quote: quoteAmount,
-                bs: BS.buy,
-                book: orderbook as Book,
-              }
-            : {
-                base: baseAmount,
-                bs: BS.sell,
-                book: orderbook as Book,
-              }
+      const params: MarketOrderSimulationParams = isBasePay
+        ? {
+            base: payAmount,
+            bs: BS.sell,
+            book: simulationBook as any,
+          }
+        : {
+            quote: payAmount,
+            bs: BS.buy,
+            book: simulationBook as any,
+          }
 
       const {
         baseAmount: baseEstimation,

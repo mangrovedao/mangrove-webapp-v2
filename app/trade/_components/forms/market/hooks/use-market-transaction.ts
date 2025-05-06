@@ -14,7 +14,7 @@ import {
 import { useTransactionState } from "../../hooks/use-transaction-state"
 import { wethAdresses } from "../market"
 import { usePostMarketOrder } from "./use-post-market-order"
-import { usePostMarketOrderMangrove } from "./use-post-market.order-mangrove"
+import { usePostMarketOrderMangrove } from "./use-post-market-order-mangrove"
 import { useMarketSteps } from "./use-steps"
 
 interface UseMarketTransactionProps {
@@ -52,6 +52,7 @@ export function useMarketTransaction({
     chain?.testnet || !pool
       ? (marketOrderSteps as MarketOrderSteps)?.[0]?.params.spender
       : mangroveChain?.ghostbook
+  console.log({ spender })
 
   // Approve mutation
   const approveAmount = useApproveAmount({
@@ -60,6 +61,7 @@ export function useMarketTransaction({
     sendAmount: form.state.values.send,
   })
 
+  console.log({ chain: chain?.testnet, pool })
   // Post order mutation
   const post =
     chain?.testnet || !pool

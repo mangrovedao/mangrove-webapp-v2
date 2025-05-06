@@ -6,7 +6,6 @@ import { useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { trade } from "@/hooks/ghostbook/lib/trade"
-import { useMarketClient } from "@/hooks/use-market"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { ProtocolType, TickSpacingPool } from "@/hooks/new_ghostbook/pool"
@@ -62,12 +61,10 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
     }: {
       form: Form
       swapMarket?: MarketParams
-      swapMarketClient?: ReturnType<typeof useMarketClient>
     }) => {
       try {
         if (!pool || !market || !walletClient)
           throw new Error("Market order post, is missing params")
-
         const { bs, send: gives, receive: wants, slippage } = form
         const contextMarket = swapMarket ? swapMarket : market
 
@@ -82,10 +79,23 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         // Calculate max tick based on current price and slippage
         const maxTick = calculateMaxTick(sendAmount, receiveAmount, slippage)
 
+        console.log({
+          swapMarket,
+          market,
+          bs,
+          sendAmount,
+          receiveAmount,
+          maxTick,
+          sendToken,
+          receiveToken,
+          pool,
+          contextMarket,
+        })
+
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
           ghostbook: mangroveChain?.ghostbook as Address,
-          market,
+          market: contextMarket,
           bs,
           sendAmount,
           router: pool?.protocol.router,

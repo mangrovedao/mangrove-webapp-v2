@@ -1,4 +1,5 @@
 import useMarket from "@/providers/market"
+import { MarketParams } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
 import { useDefaultChain } from "../use-default-chain"
@@ -63,24 +64,29 @@ async function getPools(
   return data.json() as Promise<Pool[]>
 }
 
-export function usePools() {
+export function usePools({
+  swapMarket,
+}: {
+  swapMarket?: MarketParams | null
+} = {}) {
   const { defaultChain } = useDefaultChain()
   const { currentMarket: market } = useMarket()
+  const defaultMarket = swapMarket ? swapMarket : market
 
   return useQuery({
     queryKey: [
       "pools",
       defaultChain?.id,
-      market?.base.address,
-      market?.quote.address,
+      defaultMarket?.base.address,
+      defaultMarket?.quote.address,
     ],
     queryFn: async (): Promise<Pool[]> => {
-      if (!market || defaultChain.testnet) return []
+      if (!defaultMarket || defaultChain.testnet) return []
 
       try {
         return getPools(
-          market.base.address,
-          market.quote.address,
+          defaultMarket.base.address,
+          defaultMarket.quote.address,
           defaultChain?.id,
         )
       } catch (error) {

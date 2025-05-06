@@ -8,6 +8,7 @@ import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMarketClient } from "@/hooks/use-market"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
+import { MarketParams } from "@mangrovedao/mgv"
 import { toast } from "sonner"
 import { parseUnits } from "viem"
 import { megaethTestnet } from "viem/chains"
@@ -35,19 +36,25 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
   const addresses = useMangroveAddresses()
 
   return useMutation({
-    mutationFn: async ({ form }: { form: Form }) => {
+    mutationFn: async ({
+      form,
+      swapMarket,
+    }: {
+      form: Form
+      swapMarket?: MarketParams
+    }) => {
+      const contextMarket = swapMarket ? swapMarket : market
       try {
         if (
           !publicClient ||
           !walletClient ||
           !addresses ||
-          !market ||
+          !contextMarket ||
           !marketClient ||
           !address
         )
           throw new Error("Market order post, is missing params")
-
-        const { base, quote } = market
+        const { base, quote } = contextMarket
 
         const { bs, send: gives, receive: wants, slippage } = form
         const receiveToken = bs === "buy" ? base : quote
@@ -61,7 +68,13 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
           bs === "buy"
             ? parseUnits(gives, quote.decimals)
             : parseUnits(wants, quote.decimals)
-
+        console.log({
+          baseAmount,
+          quoteAmount,
+          bs,
+          slippage,
+          contextMarket,
+        })
         const { request } =
           await marketClient.simulateMarketOrderByVolumeAndMarket({
             baseAmount,
@@ -81,8 +94,8 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
         })
         //note:  might need to remove marketOrderResultfromlogs function if simulateMarketOrder returns correct values
         const result = marketOrderResultFromLogs(
-          { ...addresses, ...market },
-          market,
+          { ...addresses, ...contextMarket },
+          contextMarket,
           {
             logs: receipt.logs,
             taker: walletClient.account.address,

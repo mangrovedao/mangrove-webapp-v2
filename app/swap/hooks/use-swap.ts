@@ -1,6 +1,5 @@
 import {
   marketOrderSimulation,
-  MarketParams,
   publicMarketActions,
   type Token,
 } from "@mangrovedao/mgv"
@@ -22,11 +21,11 @@ import { useTokenBalance } from "@/hooks/use-token-balance"
 // import { useTokenByAddress } from "../../../hooks/use-token-by-address";
 import { useSpenderAddress } from "@/app/trade/_components/forms/hooks/use-spender-address"
 import { usePostMarketOrder } from "@/app/trade/_components/forms/market/hooks/use-post-market-order"
-import { usePostMarketOrderMangrove } from "@/app/trade/_components/forms/market/hooks/use-post-market.order-mangrove"
+import { usePostMarketOrderMangrove } from "@/app/trade/_components/forms/market/hooks/use-post-market-order-mangrove"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
 import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { usePool } from "@/hooks/new_ghostbook/pool"
+import { usePools } from "@/hooks/new_ghostbook/pool"
 import { useOdos } from "@/hooks/odos/use-odos"
 import { useApproveToken } from "@/hooks/use-approve-token"
 import { useBook } from "@/hooks/use-book"
@@ -34,6 +33,7 @@ import { useNetworkClient } from "@/hooks/use-network-client"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { useTokenByAddress } from "@/hooks/use-token-by-address"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
+import { useSelectedPoolStore } from "@/stores/selected-pool.store"
 import { getErrorMessage } from "@/utils/errors"
 import { getExactWeiAmount } from "@/utils/regexp"
 import {
@@ -43,7 +43,7 @@ import {
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
-import { Book } from "@mangrovedao/mgv"
+import { MarketParams } from "@mangrovedao/mgv"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -67,9 +67,6 @@ export function useSwap() {
     address,
   })
 
-  const { mergedBooks: book } = useMergedBooks()
-  const { book: oldBook } = useBook()
-
   const { checkAndShowDisclaimer } = useDisclaimerDialog()
   const {
     getQuote,
@@ -82,11 +79,6 @@ export function useSwap() {
   } = useOdos()
   const { data: walletClient } = useWalletClient()
   const { openConnectModal } = useConnectModal()
-  const { pool } = usePool()
-  const mangroveMarketOrder = usePostMarketOrderMangrove()
-  const regularMarketOrder = usePostMarketOrder()
-  const postMarketOrder =
-    chain?.testnet || !pool ? mangroveMarketOrder : regularMarketOrder
 
   const openMarkets = useOpenMarkets()
   const { openMarkets: markets } = openMarkets
@@ -117,23 +109,46 @@ export function useSwap() {
   const receiveToken = useTokenByAddress(receiveTknAddress)
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
-  const currentMarket = getMarketFromTokens(openMarkets, payToken, receiveToken)
+  const currentMarket = getMarketFromTokens(markets, payToken, receiveToken)
+
+  const { mergedBooks: book } = useMergedBooks({
+    contextMarket: currentMarket,
+  })
+  const { book: oldBook } = useBook()
+
+  const { data: pools } = usePools({ swapMarket: currentMarket })
+  const pool =
+    pools && pools.length > 0
+      ? pools.sort((a, b) =>
+          Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
+        )[0]
+      : null
+
+  const { mangroveChain } = useRegistry()
+  const mangroveMarketOrder = usePostMarketOrderMangrove()
+  const regularMarketOrder = usePostMarketOrder()
+  const postMarketOrder =
+    chain?.testnet || !pool ? mangroveMarketOrder : regularMarketOrder
+
   const publicClient = useNetworkClient()
   const addresses = useMangroveAddresses()
   const approvePayToken = useApproveToken()
-  const { data: spender } = useSpenderAddress("market")
+  const { data: mgvSpender } = useSpenderAddress("market")
+  const spender =
+    chain?.testnet || !pool ? mgvSpender : mangroveChain?.ghostbook
+
   const marketClient =
     addresses && currentMarket
       ? publicClient?.extend(publicMarketActions(addresses, currentMarket))
       : undefined
 
   const allTokens = deduplicateTokens([
-    ...getAllMangroveMarketTokens(openMarkets),
+    ...getAllMangroveMarketTokens(markets),
     ...odosTokens,
   ])
   const tradableTokens = deduplicateTokens(
     getTradableTokens({
-      mangroveMarkets: openMarkets,
+      mangroveMarkets: markets,
       odosTokens,
       token: payToken,
     }),
@@ -145,7 +160,7 @@ export function useSwap() {
 
   function onPayTokenSelected(token: Token) {
     const newTradableTokens = getTradableTokens({
-      mangroveMarkets: openMarkets,
+      mangroveMarkets: markets,
       odosTokens,
       token,
     })
@@ -206,8 +221,6 @@ export function useSwap() {
     }
   }, [wrappingHash])
 
-  const { mangroveChain } = useRegistry()
-
   const simulateQuery = useQuery({
     queryKey: [
       "marketOrderSimulation",
@@ -240,37 +253,26 @@ export function useSwap() {
           spreadPercent: oldBook?.spreadPercent,
         }
 
+        console.log({ simulationBook })
+
         const isBasePay = currentMarket?.base.address === payToken?.address
-        const params: MarketOrderSimulationParams =
-          payToken.address === currentMarket?.base.address
-            ? isBasePay
-              ? {
-                  base: payAmount,
-                  bs: BS.sell,
-                  book: simulationBook as Book,
-                }
-              : {
-                  quote: payAmount,
-                  bs: BS.buy,
-                  book: simulationBook as Book,
-                }
-            : isBasePay
-              ? {
-                  quote: payAmount,
-                  bs: BS.buy,
-                  book: simulationBook as Book,
-                }
-              : {
-                  base: payAmount,
-                  bs: BS.sell,
-                  book: simulationBook as Book,
-                }
+
+        const params: MarketOrderSimulationParams = isBasePay
+          ? {
+              base: payAmount,
+              bs: BS.sell,
+              book: simulationBook as any,
+            }
+          : {
+              quote: payAmount,
+              bs: BS.buy,
+              book: simulationBook as any,
+            }
 
         const simulation = marketOrderSimulation(params)
 
         let approveStep = null
         if (marketClient?.chain?.testnet || !pool) {
-          // Base chain - get market order steps
           try {
             const [approvalStep] = await marketClient.getMarketOrderSteps({
               bs: isBasePay ? BS.sell : BS.buy,
@@ -284,33 +286,46 @@ export function useSwap() {
             toast.error("Error fetching market order steps")
             return null
           }
-        }
+        } else {
+          try {
+            // Check and increase allowance for Ghostbook to spend user's tokens
+            const allowance = await checkAllowance(
+              marketClient,
+              address,
+              spender as Address,
+              payToken.address,
+            )
 
-        try {
-          // Check and increase allowance for Ghostbook to spend user's tokens
-          const allowance = await checkAllowance(
-            marketClient,
-            address,
-            mangroveChain?.ghostbook as Address,
-            payToken.address,
-          )
+            console.log(
+              formatUnits(allowance, payToken.decimals),
+              formatUnits(payAmount, payToken.decimals),
+            )
 
-          if (allowance < payAmount) {
-            approveStep = {
-              done: false,
-              step: `Approve ${payToken?.symbol}`,
+            if (allowance < payAmount) {
+              approveStep = {
+                params: {
+                  token: payToken,
+                  spender: spender as Address,
+                },
+                done: false,
+                step: `Approve ${payToken?.symbol}`,
+              }
+            } else {
+              approveStep = {
+                params: {
+                  token: payToken,
+                  spender: spender as Address,
+                },
+                done: true,
+                step: `Approve ${payToken?.symbol}`,
+              }
             }
+          } catch (allowanceError) {
+            console.error("Error checking allowance:", allowanceError)
+            toast.error("Error checking token allowance")
           }
-
-          approveStep = {
-            done: true,
-            step: `Approve ${payToken?.symbol}`,
-          }
-        } catch (allowanceError) {
-          console.error("Error checking allowance:", allowanceError)
-          toast.error("Error checking token allowance")
         }
-
+        console.log(simulation)
         return {
           simulation,
           approvalStep: approveStep,
@@ -344,7 +359,7 @@ export function useSwap() {
         approvalStep: { done: !hasToApprove },
         receiveValue: formatUnits(
           simulation.quoteAmount,
-          receiveToken?.decimals ?? 18,
+          receiveToken?.priceDisplayDecimals ?? 18,
         ),
       }
     },
@@ -367,7 +382,7 @@ export function useSwap() {
         ),
       }))
     }
-  }, [simulateQuery.data?.receiveValue])
+  }, [simulateQuery.data?.receiveValue, receiveToken?.priceDisplayDecimals])
 
   const getMarketPriceQuery = useQuery({
     queryKey: ["getMarketPrice", payTknAddress, receiveTknAddress],
@@ -510,6 +525,7 @@ export function useSwap() {
     payTokenBalance.refetch()
     receiveTokenBalance.refetch()
   }
+  const { selectedPool, setSelectedPool } = useSelectedPoolStore()
 
   async function swapMangrove() {
     if (!(marketClient && address && walletClient && payToken && receiveToken))
@@ -525,24 +541,31 @@ export function useSwap() {
     }
 
     if (hasToApprove) {
-      await approvePayToken.mutate(
-        {
-          token: payToken,
-          spender,
-        },
-        {
-          onSuccess: () => {
-            simulateQuery.refetch()
+      try {
+        await approvePayToken.mutateAsync(
+          {
+            token: payToken,
+            spender: spender as Address,
           },
-        },
-      )
-      return
+          {
+            onSuccess: () => {
+              simulateQuery.refetch()
+            },
+          },
+        )
+        return
+      } catch (error) {
+        console.error("Approval error:", error)
+        toast.error("Failed to approve token")
+        return
+      }
     }
 
     const isBasePay = currentMarket?.base.address === payToken.address
 
     const send = fields.payValue
     const receive = fields.receiveValue
+    setSelectedPool(pool)
 
     await postMarketOrder.mutateAsync(
       {
@@ -557,10 +580,9 @@ export function useSwap() {
           isWrapping: false,
           slippage: Number(slippage),
         },
-        ...(chain?.testnet || !pool
+        ...(!chain?.testnet || pool
           ? {
               swapMarket: currentMarket as MarketParams,
-              swapMarketClient: marketClient,
             }
           : {}),
       },
@@ -607,10 +629,8 @@ export function useSwap() {
 
   const mangroveTradeableTokensForPayToken = React.useMemo(() => {
     if (!payToken) return []
-    return getMangroveTradeableTokens(openMarkets, payToken).map(
-      (t) => t.address,
-    )
-  }, [openMarkets, payToken])
+    return getMangroveTradeableTokens(markets, payToken).map((t) => t.address)
+  }, [markets, payToken])
 
   return {
     simulateQuery,
