@@ -44,7 +44,6 @@ import {
   getMarketFromTokens,
   getTradableTokens,
 } from "@/utils/tokens"
-import { Book } from "@mangrovedao/mgv"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -133,7 +132,6 @@ export function useSwap() {
       setOverrideMarket(undefined)
     }
   }, [swapMarket, setOverrideMarket])
-
 
   const publicClient = useNetworkClient()
   const addresses = useMangroveAddresses()
@@ -284,7 +282,6 @@ export function useSwap() {
           }
         }
 
-
         const simulation = marketOrderSimulation(params)
 
         let approveStep = null
@@ -303,31 +300,31 @@ export function useSwap() {
             toast.error("Error fetching market order steps")
             return null
           }
-        }
-        
-        try {
-          // Check and increase allowance for Ghostbook to spend user's tokens
-          const allowance = await checkAllowance(
-            marketClient,
-            address,
-            mangroveChain?.ghostbook as Address,
-            payToken.address,
-          )
+        } else {
+          try {
+            // Check and increase allowance for Ghostbook to spend user's tokens
+            const allowance = await checkAllowance(
+              marketClient,
+              address,
+              mangroveChain?.ghostbook as Address,
+              payToken.address,
+            )
 
-          if (allowance < payAmount) {
+            if (allowance < payAmount) {
+              approveStep = {
+                done: false,
+                step: `Approve ${payToken?.symbol}`,
+              }
+            }
+
             approveStep = {
-              done: false,
+              done: true,
               step: `Approve ${payToken?.symbol}`,
             }
+          } catch (allowanceError) {
+            console.error("Error checking allowance:", allowanceError)
+            toast.error("Error checking token allowance")
           }
-
-          approveStep = {
-            done: true,
-            step: `Approve ${payToken?.symbol}`,
-          }
-        } catch (allowanceError) {
-          console.error("Error checking allowance:", allowanceError)
-          toast.error("Error checking token allowance")
         }
 
         console.log(approveStep, simulation)
