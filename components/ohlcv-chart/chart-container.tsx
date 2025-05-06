@@ -348,16 +348,6 @@ export const TVChartContainer = (
         "create_volume_indicator_by_default",
         "use_localstorage_for_settings",
       ],
-      overrides: {
-        "paneProperties.backgroundType": "solid",
-        "paneProperties.background": "#1f1f1f",
-        "scalesProperties.textColor": "#FFFFFF",
-        "scalesProperties.lineColor": "#1f1f1f",
-        "mainSeriesProperties.priceAxisProperties.autoScale": true,
-        "scalesProperties.showSeriesLastValue": true,
-        "scalesProperties.showStudyLastValue": false,
-        "scalesProperties.fontSize": 14,
-      },
       custom_formatters: {
         priceFormatterFactory: (symbolInfo, minTick) => {
           if (symbolInfo === null) {
@@ -372,8 +362,6 @@ export const TVChartContainer = (
               return price.toFixed(2)
             },
           }
-
-          return null // The default formatter will be used.
         },
       },
     }
@@ -384,7 +372,26 @@ export const TVChartContainer = (
 
     tvWidget.onChartReady(() => {
       setLoading(false)
-      console.log("ready")
+
+      tvWidget.applyOverrides({
+        "paneProperties.backgroundType": "solid",
+        "paneProperties.background": "#000000",
+        "scalesProperties.textColor": "#FFFFFF",
+        "scalesProperties.lineColor": "#333",
+
+        "mainSeriesProperties.candleStyle.borderUpColor": "#00E828",
+        "mainSeriesProperties.candleStyle.borderDownColor": "#FF4A18",
+
+        "mainSeriesProperties.candleStyle.wickUpColor": "#00E828",
+        "mainSeriesProperties.candleStyle.wickDownColor": "#FF4A18",
+
+        "mainSeriesProperties.candleStyle.upColor": "#00E828",
+        "mainSeriesProperties.candleStyle.downColor": "#FF4A18",
+
+        "mainSeriesProperties.priceAxisProperties.autoScale": true,
+        "scalesProperties.showSeriesLastValue": true,
+        "scalesProperties.showStudyLastValue": false,
+      })
 
       tvWidget
         .chart()
