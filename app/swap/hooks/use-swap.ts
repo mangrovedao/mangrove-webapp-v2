@@ -239,10 +239,6 @@ export function useSwap() {
       if (!(payToken && receiveToken && isConnected)) return null
 
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
-      const receiveAmount = parseUnits(
-        fields.receiveValue,
-        receiveToken.decimals,
-      )
 
       // Mangrove
       if (marketClient) {
