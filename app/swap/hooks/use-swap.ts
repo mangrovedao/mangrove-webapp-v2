@@ -69,9 +69,6 @@ export function useSwap() {
 
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
-  const [estimateFrom, setEstimateFrom] = React.useState<
-    "send" | "receive" | undefined
-  >()
 
   const { setOverrideMarket } = useMarketOverride()
   const { currentMarket } = useMarket()
@@ -224,14 +221,6 @@ export function useSwap() {
     }
   }, [wrappingHash])
 
-  React.useEffect(() => {
-    setEstimateFrom("send")
-  }, [fields.payValue])
-
-  React.useEffect(() => {
-    setEstimateFrom("receive")
-  }, [fields.receiveValue])
-
   const { mangroveChain } = useRegistry()
 
   const simulateQuery = useQuery({
@@ -243,7 +232,6 @@ export function useSwap() {
       currentMarket?.quote.address,
       slippage,
       fields.payValue,
-      fields.receiveValue,
       marketClient?.key,
       address,
     ],
@@ -255,7 +243,7 @@ export function useSwap() {
         fields.receiveValue,
         receiveToken.decimals,
       )
-      console.log(currentMarket)
+
       // Mangrove
       if (marketClient) {
         if (!(book && address)) return null
