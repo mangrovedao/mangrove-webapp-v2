@@ -69,6 +69,9 @@ export function useSwap() {
 
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
+  const [estimateFrom, setEstimateFrom] = React.useState<
+    "send" | "receive" | undefined
+  >()
 
   const { setOverrideMarket } = useMarketOverride()
   const { currentMarket } = useMarket()
@@ -221,6 +224,14 @@ export function useSwap() {
     }
   }, [wrappingHash])
 
+  React.useEffect(() => {
+    setEstimateFrom("send")
+  }, [fields.payValue])
+
+  React.useEffect(() => {
+    setEstimateFrom("receive")
+  }, [fields.receiveValue])
+
   const { mangroveChain } = useRegistry()
 
   const simulateQuery = useQuery({
@@ -232,6 +243,7 @@ export function useSwap() {
       currentMarket?.quote.address,
       slippage,
       fields.payValue,
+      fields.receiveValue,
       marketClient?.key,
       address,
     ],
@@ -239,6 +251,10 @@ export function useSwap() {
       if (!(payToken && receiveToken && isConnected)) return null
 
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
+      const receiveAmount = parseUnits(
+        fields.receiveValue,
+        receiveToken.decimals,
+      )
       console.log(currentMarket)
       // Mangrove
       if (marketClient) {
@@ -263,24 +279,20 @@ export function useSwap() {
           currentMarket?.base.address.toLowerCase() ===
           payToken.address.toLowerCase()
 
-        // Set BS direction and parameters based on whether we're buying or selling the base token
-        let params: MarketOrderSimulationParams
+        const isBasePay = currentMarket?.base.address === payToken?.address
 
-        if (isSendingBase) {
-          // Selling base (SELL order)
-          params = {
-            base: payAmount,
-            bs: BS.sell,
-            book: simulationBook as any,
-          }
-        } else {
-          // Buying base (BUY order)
-          params = {
-            quote: payAmount,
-            bs: BS.buy,
-            book: simulationBook as any,
-          }
-        }
+        // Set BS direction and parameters based on whether we're buying or selling the base token
+        const params: MarketOrderSimulationParams = isBasePay
+          ? {
+              base: payAmount,
+              bs: BS.sell,
+              book: simulationBook as any,
+            }
+          : {
+              quote: payAmount,
+              bs: BS.buy,
+              book: simulationBook as any,
+            }
 
         const simulation = marketOrderSimulation(params)
 
