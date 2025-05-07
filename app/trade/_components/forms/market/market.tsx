@@ -1,7 +1,4 @@
-import { BS } from "@mangrovedao/mgv/lib"
 import Big from "big.js"
-import { motion } from "framer-motion"
-import { ArrowDown } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
@@ -12,8 +9,8 @@ import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
+import TradingTabs from "@/components/ui/trading-tabs"
 import { useDollarConversion } from "@/hooks/use-dollar-conversion"
-import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -77,7 +74,7 @@ export function Market() {
   })
 
   // Registry and trade infos
-  const { baseToken } = useTradeInfos("market", tradeSide)
+  const { baseToken, quoteToken } = useTradeInfos("market", tradeSide)
 
   // Use the transaction hook
   const {
@@ -99,8 +96,6 @@ export function Market() {
       setFormData(undefined)
     },
   })
-
-  const { currentMarket } = useMarket()
 
   const { payDollar, receiveDollar } = useDollarConversion({
     payAmount: form.state.values.send,
@@ -189,36 +184,6 @@ export function Market() {
     }
   }, [form.state.values.send, sendBalanceWithEth])
 
-  const handleSwapDirection = () => {
-    try {
-      // Toggle between buy and sell
-      const newSide = tradeSide === BS.buy ? BS.sell : BS.buy
-
-      // Update the shared state
-      setTradeSide(newSide)
-
-      // Reset slider value
-      setSendSliderValue(0)
-
-      // Keep the current pay amount in the shared state
-      const currentPayAmount = form.state.values.send
-
-      // Clear receive value but keep the pay amount
-      if (form && form.setFieldValue) {
-        form.setFieldValue("receive", "")
-
-        // Recompute the receive amount if we have a pay amount
-        if (currentPayAmount) {
-          setTimeout(() => {
-            computeReceiveAmount()
-          }, 0)
-        }
-      }
-    } catch (error) {
-      console.error("Error in swap direction:", error)
-    }
-  }
-
   // Get button text based on transaction state
   const getButtonText = () => {
     const allErrors = getAllErrors()
@@ -241,6 +206,7 @@ export function Market() {
 
   return (
     <div className="flex flex-col h-full">
+      <TradingTabs tradeSide={tradeSide} setTradeSide={setTradeSide} />
       <form.Provider>
         <form
           onSubmit={(e) => {
@@ -299,7 +265,7 @@ export function Market() {
                       computeReceiveAmount()
                     },
                   }}
-                  token={sendToken}
+                  token={baseToken}
                   label="Pay"
                   disabled={!market || sendBalanceWithEth.toString() === "0"}
                   isWrapping={isWrapping}
@@ -316,31 +282,6 @@ export function Market() {
               )}
             </form.Field>
 
-            <div className="flex justify-center -my-1.5">
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              >
-                <motion.div
-                  className="flex items-center justify-center"
-                  initial={{ rotate: 0 }}
-                  whileHover={{ rotate: 180 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
-                    onClick={handleSwapDirection}
-                  >
-                    <ArrowDown className="h-4 w-4" />
-                  </Button>
-                </motion.div>
-              </motion.div>
-            </div>
-
             <form.Field name="receive" onChange={isGreaterThanZeroValidator}>
               {(field) => (
                 <EnhancedNumericInput
@@ -353,7 +294,7 @@ export function Market() {
                     computeSendAmount()
                   }}
                   dollarAmount={receiveDollar}
-                  token={receiveToken}
+                  token={quoteToken}
                   label="Receive"
                   disabled={!(market && form.state.isFormValid)}
                   error={
