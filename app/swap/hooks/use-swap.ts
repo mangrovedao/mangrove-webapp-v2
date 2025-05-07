@@ -121,7 +121,7 @@ export function useSwap() {
   const payTokenBalance = useTokenBalance(payToken)
   const receiveTokenBalance = useTokenBalance(receiveToken)
 
-  const swapMarket = getMarketFromTokens(openMarkets, payToken, receiveToken)
+  const swapMarket = getMarketFromTokens(markets, payToken, receiveToken)
 
   React.useEffect(() => {
     if (swapMarket) {
@@ -137,18 +137,19 @@ export function useSwap() {
   const addresses = useMangroveAddresses()
   const approvePayToken = useApproveToken()
   const { data: spender } = useSpenderAddress("market")
+
   const marketClient =
-    addresses && currentMarket
-      ? publicClient?.extend(publicMarketActions(addresses, currentMarket))
+    addresses && swapMarket
+      ? publicClient?.extend(publicMarketActions(addresses, swapMarket))
       : undefined
 
   const allTokens = deduplicateTokens([
-    ...getAllMangroveMarketTokens(openMarkets),
+    ...getAllMangroveMarketTokens(markets),
     ...odosTokens,
   ])
   const tradableTokens = deduplicateTokens(
     getTradableTokens({
-      mangroveMarkets: openMarkets,
+      markets,
       odosTokens,
       token: payToken,
     }),
@@ -160,7 +161,7 @@ export function useSwap() {
 
   function onPayTokenSelected(token: Token) {
     const newTradableTokens = getTradableTokens({
-      mangroveMarkets: openMarkets,
+      markets,
       odosTokens,
       token,
     })
@@ -232,12 +233,12 @@ export function useSwap() {
       currentMarket?.quote.address,
       slippage,
       fields.payValue,
+      fields.payValue,
       marketClient?.key,
       address,
     ],
     queryFn: async () => {
       if (!(payToken && receiveToken && isConnected)) return null
-
       const payAmount = parseUnits(fields.payValue, payToken.decimals)
 
       // Mangrove
@@ -265,7 +266,6 @@ export function useSwap() {
 
         const isBasePay = currentMarket?.base.address === payToken?.address
 
-        // Set BS direction and parameters based on whether we're buying or selling the base token
         const params: MarketOrderSimulationParams = isBasePay
           ? {
               base: payAmount,
@@ -323,7 +323,6 @@ export function useSwap() {
           }
         }
 
-        console.log(approveStep, simulation)
         return {
           simulation,
           approvalStep: approveStep,
@@ -621,10 +620,8 @@ export function useSwap() {
 
   const mangroveTradeableTokensForPayToken = React.useMemo(() => {
     if (!payToken) return []
-    return getMangroveTradeableTokens(openMarkets, payToken).map(
-      (t) => t.address,
-    )
-  }, [openMarkets, payToken])
+    return getMangroveTradeableTokens(markets, payToken).map((t) => t.address)
+  }, [markets, payToken])
 
   return {
     simulateQuery,
