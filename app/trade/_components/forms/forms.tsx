@@ -18,8 +18,8 @@ import { Market } from "./market/market"
 import { useTradeFormStore } from "./store"
 
 enum FormType {
-  LIMIT = "Limit",
   MARKET = "Market",
+  LIMIT = "Limit",
 }
 
 // Create persistent component instances
@@ -33,7 +33,7 @@ export function Forms({
   const { isLoading: isGhostBookLoading } = useMergedBooks()
   const [orderType, setOrderType] = useLocalStorage<FormType>(
     "orderType",
-    FormType.LIMIT,
+    FormType.MARKET,
   )
 
   // Access the shared state to ensure it's available
@@ -54,7 +54,7 @@ export function Forms({
     <div className="h-full">
       <CustomTabs
         {...props}
-        defaultValue={FormType.LIMIT}
+        defaultValue={FormType.MARKET}
         className="border border-bg-secondary rounded-sm h-full flex flex-col"
         onValueChange={handleTabChange}
       >
