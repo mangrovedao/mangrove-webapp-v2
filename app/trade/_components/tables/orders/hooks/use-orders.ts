@@ -65,54 +65,69 @@ export function useOrders<T = Order[]>({
 
         startLoading(TRADE.TABLES.ORDERS)
 
-        // Determine which markets to query
-        const marketsToQuery =
-          allMarkets && openMarkets ? openMarkets : market ? [market] : []
+        const marketMap: Record<string, string> = {}
 
-        // Fetch active orders for all specified markets
-        const allOrdersPromises = marketsToQuery.map(async (marketItem) => {
-          if (!marketItem || !marketItem.base || !marketItem.quote) {
-            return { orders: [] }
-          }
+        openMarkets.forEach(({ base, quote }) => {
+          marketMap[`${base.address}.${quote.address}`] =
+            `${base.symbol}.${quote.symbol}`
+        })
 
+        const orderPromise = async () => {
           try {
             const response = await fetch(
-              `${getIndexerUrl(defaultChain)}/orders/list/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${getIndexerUrl(defaultChain)}/orders/all/active/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
-
-            if (!response.ok) {
-              return { orders: [] }
-            }
 
             const data = await response.json()
 
             // Add market information to each order
             return {
               ...data,
-              orders: data.orders?.map((order: any) => ({
-                ...order,
-                marketBase: marketItem.base.symbol,
-                marketQuote: marketItem.quote.symbol,
-                baseAddress: marketItem.base.address,
-                quoteAddress: marketItem.quote.address,
-              })),
+              orders: data.orders.map((order: any) => {
+                const { sendToken, receiveToken } = order
+
+                if (!sendToken || !receiveToken) return
+
+                const pairs = Object.keys(marketMap)
+
+                console.log(pairs, `${sendToken}.${receiveToken}`)
+
+                const side = pairs.includes(`${sendToken}.${receiveToken}`)
+                  ? "buy"
+                  : "sell"
+
+                const isBuy = side === "buy"
+
+                const symbols = isBuy
+                  ? marketMap[`${sendToken}.${receiveToken}`]!.split(".")
+                  : marketMap[`${receiveToken}.${sendToken}`]!.split(".")
+
+                const [marketBase, marketQuote] = symbols
+
+                const baseAddress = isBuy ? sendToken : receiveToken
+                const quoteAddress = isBuy ? receiveToken : sendToken
+
+                const price = 1 / order.price
+
+                return {
+                  ...order,
+                  marketBase,
+                  marketQuote,
+                  side,
+                  price,
+                  baseAddress,
+                  quoteAddress,
+                }
+              }),
             }
           } catch (error) {
-            console.error(
-              `Error fetching for market ${marketItem.base.symbol}-${marketItem.quote.symbol}:`,
-              error,
-            )
             return { orders: [] }
           }
-        })
-        const allOrdersResults = await Promise.all(allOrdersPromises)
+        }
 
-        // Combine all order results
-        const combinedOrders = allOrdersResults.flatMap(
-          (result) => result.orders || [],
-        )
+        const data = await orderPromise()
 
-        const transformedData = combinedOrders.map((item: any) => {
+        const transformedData = data?.orders?.map((item: any) => {
           // Safe date parsing function that handles invalid or missing timestamps
           const safeDate = (timestamp: number | undefined | null) => {
             // Check if timestamp is valid number and reasonable (after 2010)
@@ -145,8 +160,8 @@ export function useOrders<T = Order[]>({
             takerGave: item.sent?.toString() || "0",
             penalty: "0", // Default value as it's not in the raw data
             feePaid: item.fee?.toString() || "0",
-            initialWants: item.total?.toString() || "0",
-            initialGives: item.initialGives?.toString() || "0",
+            initialWants: item.totalWants?.toString() || "0",
+            initialGives: item.totalGives?.toString() || "0",
             price: item.price?.toString() || "0",
             offerId: item.offerId?.toString() || "0",
             inboundRoute: item.inboundRoute || "",
