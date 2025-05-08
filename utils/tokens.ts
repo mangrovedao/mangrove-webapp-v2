@@ -1,8 +1,8 @@
-import type { useMarkets } from "@/hooks/use-addresses"
 import type { Token } from "@mangrovedao/mgv"
+import { MarketParams } from "@mangrovedao/mgv"
 
 import icons from "@/generated/icons.json"
-import { MarketParams } from "@mangrovedao/mgv"
+import type { useMarkets } from "@/hooks/use-addresses"
 
 const IMG_BASE_PATH = "/cryptocurrency-icons/svg/color"
 
@@ -62,12 +62,24 @@ export function getTokenByAddress(
   markets: MarketParams[],
   odosTokens: Token[],
 ): Token | undefined {
+  if (!address) return undefined
+  if (!markets?.length && !odosTokens?.length) return undefined
+
+  // Safe array handling
+  const safeMarkets = markets || []
+  const safeOdosTokens = odosTokens || []
+
   const token =
-    markets.find((m) => m.base.address.toLowerCase() === address.toLowerCase())
-      ?.base ??
-    markets.find((m) => m.quote.address.toLowerCase() === address.toLowerCase())
-      ?.quote ??
-    odosTokens.find((t) => t.address.toLowerCase() === address.toLowerCase())
+    safeMarkets.find(
+      (m) => m?.base?.address?.toLowerCase() === address.toLowerCase(),
+    )?.base ??
+    safeMarkets.find(
+      (m) => m?.quote?.address?.toLowerCase() === address.toLowerCase(),
+    )?.quote ??
+    safeOdosTokens.find(
+      (t) => t?.address?.toLowerCase() === address.toLowerCase(),
+    )
+
   return token
 }
 

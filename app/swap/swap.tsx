@@ -1,8 +1,11 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
+import Rive from "@rive-app/react-canvas-lite"
 import { AnimatePresence, motion } from "framer-motion"
 import React from "react"
+import { Address, formatUnits } from "viem"
+import { useAccount } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
@@ -25,11 +28,9 @@ import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { getAllTokensInMarkets } from "@/utils/tokens"
-import Rive from "@rive-app/react-canvas-lite"
-import { Address, formatUnits } from "viem"
-import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
-import { SLIPPAGES, useSwap } from "./hooks/use-swap"
+import { useSwap } from "./hooks/use-swap"
+import { SLIPPAGES } from "./utils/swap-constants"
 
 export default function Swap() {
   const {
