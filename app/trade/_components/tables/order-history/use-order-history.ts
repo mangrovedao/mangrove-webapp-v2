@@ -23,6 +23,7 @@ type OrderHistoryPage = {
   meta: {
     hasNextPage: boolean
     page: number
+    totalItems: number
   }
 }
 
@@ -31,7 +32,7 @@ export function useOrderHistory({
   allMarkets = false,
 }: Params = {}) {
   const { defaultChain } = useDefaultChain()
-  const { address, isConnected } = useAccount()
+  const { address } = useAccount()
   const { currentMarket: market } = useMarket()
   const { openMarkets } = useOpenMarkets()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
@@ -51,76 +52,90 @@ export function useOrderHistory({
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
       try {
-        if (!address)
+        if (
+          !address ||
+          (!allMarkets && !market) ||
+          (allMarkets && (!openMarkets || openMarkets.length === 0))
+        )
           return {
             data: [],
-            meta: { hasNextPage: false, page: pageParam as number },
-          }
-        if (!allMarkets && !market)
-          return {
-            data: [],
-            meta: { hasNextPage: false, page: pageParam as number },
-          }
-        if (allMarkets && (!openMarkets || openMarkets.length === 0))
-          return {
-            data: [],
-            meta: { hasNextPage: false, page: pageParam as number },
+            meta: {
+              hasNextPage: false,
+              page: pageParam as number,
+              totalItems: 0,
+            },
           }
 
         startLoading(TRADE.TABLES.ORDERS)
 
-        // Determine which markets to query
-        const marketsToQuery =
-          allMarkets && openMarkets ? openMarkets : market ? [market] : []
+        const marketMap: Record<string, string> = {}
+
+        openMarkets.forEach(({ base, quote }) => {
+          marketMap[`${base.address}.${quote.address}`] =
+            `${base.symbol}.${quote.symbol}`
+        })
 
         // Fetch order history for all specified markets
-        const allOrdersPromises = marketsToQuery.map(async (marketItem) => {
-          if (!marketItem || !marketItem.base || !marketItem.quote) {
-            return { orders: [] }
-          }
-
+        const orderPromise = async () => {
           try {
             const response = await fetch(
-              `${getIndexerUrl(defaultChain)}/orders/all-history/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
+              `${getIndexerUrl(defaultChain)}/orders/all/history/${defaultChain.id}?user=${address}&page=${pageParam}&limit=${pageSize}`,
             )
-
-            if (!response.ok) {
-              console.warn(
-                `Failed to fetch orders for market ${marketItem.base.symbol}-${marketItem.quote.symbol}`,
-              )
-              return { orders: [] }
-            }
 
             const data = await response.json()
 
             // Add market information to each order
             return {
               ...data,
-              orders: data.orders?.map((order: any) => ({
-                ...order,
-                marketBase: marketItem.base.symbol,
-                marketQuote: marketItem.quote.symbol,
-                baseAddress: marketItem.base.address,
-                quoteAddress: marketItem.quote.address,
-              })),
+              orders: data.orders.map((order: any) => {
+                if (!order.sendToken || !order.receiveToken) return
+                const side = Object.keys(marketMap).includes(
+                  `${order.sendToken}.${order.receiveToken}`,
+                )
+                  ? "buy"
+                  : "sell"
+
+                const symbols =
+                  side === "buy"
+                    ? marketMap[
+                        `${order.sendToken}.${order.receiveToken}`
+                      ]!.split(".")
+                    : marketMap[
+                        `${order.receiveToken}.${order.sendToken}`
+                      ]!.split(".")
+
+                const [marketBase, marketQuote] = symbols
+
+                const baseAddress =
+                  side === "buy" ? order.sendToken : order.receiveToken
+                const quoteAddress =
+                  side === "buy" ? order.receiveToken : order.sendToken
+
+                const price =
+                  side === "buy"
+                    ? order.received / order.sent
+                    : order.sent / order.received
+
+                return {
+                  ...order,
+                  marketBase,
+                  marketQuote,
+                  side,
+                  price,
+                  baseAddress,
+                  quoteAddress,
+                }
+              }),
             }
           } catch (error) {
-            console.error(
-              `Error fetching for market ${marketItem.base.symbol}-${marketItem.quote.symbol}:`,
-              error,
-            )
             return { orders: [] }
           }
-        })
-        const allOrdersResults = await Promise.all(allOrdersPromises)
+        }
 
-        // Combine all order results
-        const combinedOrders = allOrdersResults.flatMap(
-          (result) => result.orders || [],
-        )
+        const data = await orderPromise()
 
         // Transform the raw data to match our schema format
-        const transformedData = combinedOrders.map((item: any) => ({
+        const transformedData = data?.orders?.map((item: any) => ({
           creationDate: new Date(item.timestamp * 1000),
           transactionHash: item.transactionHash,
           isBid: item.side === "buy",
@@ -150,9 +165,11 @@ export function useOrderHistory({
 
         return {
           data: parsedData,
+          count: data.count,
           meta: {
             hasNextPage: parsedData.length >= pageSize,
             page: pageParam as number,
+            totalItems: data.count,
           },
         }
       } catch (e) {
@@ -162,6 +179,7 @@ export function useOrderHistory({
           meta: {
             hasNextPage: false,
             page: pageParam as number,
+            totalItems: 0,
           },
         }
       } finally {

@@ -96,20 +96,8 @@ export function useTable({
         columnHelper.display({
           header: "Filled/Amount",
           cell: ({ row }) => {
-            const { initialWants, takerGot, isBid, baseAddress, quoteAddress } =
+            const { initialWants, takerGot, marketQuote, initialGives } =
               row.original
-
-            const { data: baseToken } = useTokenFromId(baseAddress as Address)
-            const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
-
-            // Use market info from the row if available (for all markets view)
-            // or fall back to current market
-            const symbol = isBid ? baseToken?.symbol : quoteToken?.symbol
-
-            // Determine display decimals - default to 6 if not available
-            const displayDecimals = isBid
-              ? baseToken?.priceDisplayDecimals || 6
-              : quoteToken?.priceDisplayDecimals || 6
 
             const progress = Math.min(
               Math.round(
@@ -124,12 +112,12 @@ export function useTable({
               <div className={cn("flex items-center")}>
                 <CircularProgressBar progress={progress} className="mr-2" />
                 <span className="text-xs text-muted-foreground">
-                  {getExactWeiAmount(takerGot, displayDecimals)}
+                  {getExactWeiAmount(takerGot, 6)}
                   &nbsp;/
                 </span>
                 <span className="text-xs">
                   &nbsp;
-                  {getExactWeiAmount(initialWants, displayDecimals)} {symbol}
+                  {getExactWeiAmount(initialGives, 6)} {marketQuote}
                 </span>
               </div>
             )
@@ -140,6 +128,9 @@ export function useTable({
           header: "Price",
           cell: ({ row }) => {
             const { quoteAddress, price } = row.original
+
+            if (!price || isNaN(Number(price)))
+              return <span className="text-xs">-</span>
 
             const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
             const displayDecimals = quoteToken?.priceDisplayDecimals || 6
@@ -173,7 +164,7 @@ export function useTable({
           id: "actions",
           header: () => <div className="text-right">Action</div>,
           cell: ({ row }) => {
-            const { expiryDate, baseAddress, quoteAddress } = row.original
+            const { baseAddress, quoteAddress } = row.original
 
             const { data: baseToken } = useTokenFromId(baseAddress as Address)
             const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
