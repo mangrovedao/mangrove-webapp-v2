@@ -190,13 +190,7 @@ export function useMarketTransaction({
     setTxState("approving")
     try {
       await approveAmount.mutateAsync(undefined, {
-        onSuccess: () => {
-          if (needsWrapping) {
-            handleWrapEth()
-          } else {
-            handlePostOrder()
-          }
-        },
+        onSuccess: () => {},
         onError: (error) => {
           setTxState("idle")
         },
