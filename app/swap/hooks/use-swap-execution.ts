@@ -144,12 +144,12 @@ export function useSwapExecution() {
           send: fields.payValue,
           isWrapping: false,
           slippage: Number(slippage),
+          maxTickEncountered: simulationData?.maxTickEncountered,
         },
         ...(chain?.testnet || !pool
           ? {
               swapMarket: currentMarket,
               swapMarketClient: marketClient,
-              maxTickEncountered: simulationData?.maxTickEncountered,
             }
           : {}),
       },

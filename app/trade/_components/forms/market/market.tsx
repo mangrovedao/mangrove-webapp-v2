@@ -71,6 +71,7 @@ export function Market() {
     isWrapping,
     slippage,
     getAllErrors,
+    maxTickEncountered,
   } = useMarketForm({
     onSubmit: (formData) => setFormData(formData),
     bs: tradeSide,
@@ -88,6 +89,7 @@ export function Market() {
   } = useMarketTransaction({
     form,
     tradeSide,
+    maxTickEncountered: maxTickEncountered ?? 0n,
     sendToken,
     baseToken,
     sendTokenBalance,

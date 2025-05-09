@@ -83,6 +83,8 @@ export function useSwap() {
     setIsWrapping,
     totalWrapping,
     hasEnoughBalance,
+    maxTickEncountered,
+    setMaxTickEncountered,
   } = form
 
   // Price data
@@ -114,6 +116,12 @@ export function useSwap() {
           receiveToken?.priceDisplayDecimals ?? 18,
         ),
       }))
+    }
+
+    if (simulateQuery.data?.simulation.maxTickEncountered) {
+      form.setMaxTickEncountered(
+        simulateQuery.data?.simulation.maxTickEncountered,
+      )
     }
   }, [simulateQuery.data?.receiveValue])
 

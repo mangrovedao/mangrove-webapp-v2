@@ -53,18 +53,23 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
     mutationFn: async ({
       form,
       swapMarket,
-      maxTickEncountered,
     }: {
       form: Form
       swapMarket?: MarketParams
       swapMarketClient?: ReturnType<typeof useMarketClient>
-      maxTickEncountered?: bigint
     }) => {
       try {
         if (!pool || !market || !walletClient)
           throw new Error("Market order post, is missing params")
 
-        const { bs, send: gives, receive: wants, slippage } = form
+        const {
+          bs,
+          send: gives,
+          receive: wants,
+          slippage,
+          maxTickEncountered,
+        } = form
+
         const contextMarket = swapMarket ? swapMarket : market
 
         const { base, quote } = contextMarket
@@ -76,7 +81,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         const receiveAmount = parseUnits(wants, receiveToken.decimals)
 
         // Calculate max tick based on current price and slippage
-        const maxTick = calculateMaxTick(maxTickEncountered ?? 0n, slippage)
+        const maxTick = calculateMaxTick(maxTickEncountered, slippage)
 
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
