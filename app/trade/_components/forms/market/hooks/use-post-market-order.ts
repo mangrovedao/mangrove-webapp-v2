@@ -23,6 +23,7 @@ const calculateMaxTick = (
   maxTickEncountered: bigint,
   slippage: number,
 ): bigint => {
+  console.log("maxTickEncountered", maxTickEncountered, slippage)
   const maxTick = maxTickEncountered + BigInt(Math.ceil(slippage * 100))
   return maxTick
 }
@@ -69,7 +70,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           slippage,
           maxTickEncountered,
         } = form
-
+        console.log("maxTickEncountered", maxTickEncountered)
         const contextMarket = swapMarket ? swapMarket : market
 
         const { base, quote } = contextMarket
