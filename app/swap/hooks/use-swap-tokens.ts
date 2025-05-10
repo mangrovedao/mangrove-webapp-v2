@@ -44,7 +44,6 @@ export function useSwapTokens(odosTokens: Token[] = []) {
   const swapMarket = getMarketFromTokens(markets, payToken, receiveToken)
 
   React.useEffect(() => {
-    console.log("swapMarket", swapMarket)
     if (swapMarket) {
       setOverrideMarket(swapMarket)
     }

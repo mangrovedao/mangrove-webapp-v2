@@ -2,7 +2,7 @@ import { marketOrderSimulation, type Token } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Address, formatUnits, parseUnits } from "viem"
+import { Address, formatUnits, parseUnits, zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
@@ -54,7 +54,7 @@ export function useSwapSimulation({
       address,
     ],
     queryFn: async (): Promise<SwapSimulationResult | null> => {
-      if (!(payToken && receiveToken && isConnected)) return null
+      if (!(payToken && receiveToken)) return null
 
       if (!payValue || Number(payValue) <= 0) return null
 
@@ -62,7 +62,7 @@ export function useSwapSimulation({
 
       // Mangrove
       if (marketClient && isMangrove) {
-        if (!(book && address)) return null
+        if (!book) return null
 
         // Convert EnhancedOffer arrays to the format expected by marketOrderSimulation
         const simulationBook = {
@@ -120,7 +120,7 @@ export function useSwapSimulation({
             // Check and increase allowance for Ghostbook to spend user's tokens
             const allowance = await checkAllowance(
               marketClient,
-              address,
+              address || zeroAddress,
               mangroveChain?.ghostbook as Address,
               payToken.address,
             )
@@ -164,7 +164,7 @@ export function useSwapSimulation({
             outputTokens: [
               { tokenAddress: receiveToken?.address, proportion: 1 },
             ],
-            userAddr: address,
+            userAddr: address || zeroAddress,
             slippageLimitPercent: Number(slippage),
           })
 
@@ -195,7 +195,7 @@ export function useSwapSimulation({
       !!receiveToken &&
       !!payValue &&
       Number(payValue) > 0 &&
-      (!marketClient || (!!book && !!address)),
+      (!marketClient || !!book),
   })
 }
 
