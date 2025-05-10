@@ -34,7 +34,7 @@ export const wethAdresses: { [key: number]: Address | undefined } = {
   42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 }
 
-const slippageValues = ["0.1", "0.5", "1"]
+const slippageValues = ["0.5", "1", "2"]
 const sliderValues = [25, 50, 75]
 
 export function Market() {

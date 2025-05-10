@@ -62,7 +62,7 @@ export function useMarketForm(props: Props) {
     defaultValues: {
       bs: props.bs,
       sliderPercentage: 25,
-      slippage: 0.5,
+      slippage: 1,
       send: "",
       receive: "",
       isWrapping: false,
