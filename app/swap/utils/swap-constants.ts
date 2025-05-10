@@ -6,4 +6,4 @@ export const WETH_ADDRESSES: { [key: number]: Address | undefined } = {
   42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 }
 
-export const SLIPPAGES = ["0.1", "0.5", "1"]
+export const SLIPPAGES = ["0.5", "1", "2"]

@@ -23,11 +23,6 @@ const calculateMaxTick = (
   maxTickEncountered: bigint,
   slippage: number,
 ): bigint => {
-  console.log(
-    "maxTickEncountered",
-    maxTickEncountered,
-    BigInt(Math.ceil(slippage * 100)),
-  )
   const maxTick = maxTickEncountered + BigInt(Math.ceil(slippage * 100))
   return maxTick
 }

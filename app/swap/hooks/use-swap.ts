@@ -195,7 +195,7 @@ export function useSwap() {
       receiveToken,
       hasToApprove,
       fields,
-      slippage: slippage ?? "0.05",
+      slippage: slippage ?? "1",
       totalWrapping,
       payTokenBalance,
       receiveTokenBalance,
