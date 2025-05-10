@@ -7,4 +7,5 @@ export type Form = {
   slippage: number
   estimatedFee?: string
   isWrapping: boolean
+  maxTickEncountered: bigint
 }

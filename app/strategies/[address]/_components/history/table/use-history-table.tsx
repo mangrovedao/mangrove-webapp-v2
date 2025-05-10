@@ -11,15 +11,15 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { formatDate } from "@/utils/date"
-import { DepositAndWithdraw } from "@mangrovedao/indexer-sdk/dist/src/kandel/types"
+
 import useKandel from "../../../_providers/kandel-strategy"
 import BlockExplorer from "../../block-explorer"
 
-const columnHelper = createColumnHelper<DepositAndWithdraw>()
-const DEFAULT_DATA: DepositAndWithdraw[] = []
+const columnHelper = createColumnHelper<any>()
+const DEFAULT_DATA: any[] = []
 
 type Params = {
-  data?: DepositAndWithdraw[]
+  data?: any[]
 }
 
 export function useHistoryParams({ data }: Params) {

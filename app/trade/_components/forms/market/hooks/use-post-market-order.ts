@@ -1,4 +1,4 @@
-import { MarketParams, tickFromVolumes } from "@mangrovedao/mgv"
+import { MarketParams } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Address, TransactionReceipt, parseUnits } from "viem"
@@ -20,16 +20,10 @@ import type { Form } from "../types"
 
 // Helper function to calculate the max tick based on price and slippage
 const calculateMaxTick = (
-  inbound: bigint,
-  outbound: bigint,
+  maxTickEncountered: bigint,
   slippage: number,
 ): bigint => {
-  // average tick from tickFromVolumes()
-  // if slippage is 5% add to average tick 500n  (5%*10000) = maxtick
-
-  const averageTick = tickFromVolumes(inbound, outbound)
-  const formattedSlippage = (slippage / 100) * 10000
-  const maxTick = averageTick + BigInt(Math.round(formattedSlippage))
+  const maxTick = maxTickEncountered + BigInt(Math.ceil(slippage * 100))
   return maxTick
 }
 
@@ -68,7 +62,14 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         if (!pool || !market || !walletClient)
           throw new Error("Market order post, is missing params")
 
-        const { bs, send: gives, receive: wants, slippage } = form
+        const {
+          bs,
+          send: gives,
+          receive: wants,
+          slippage,
+          maxTickEncountered,
+        } = form
+
         const contextMarket = swapMarket ? swapMarket : market
 
         const { base, quote } = contextMarket
@@ -80,7 +81,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         const receiveAmount = parseUnits(wants, receiveToken.decimals)
 
         // Calculate max tick based on current price and slippage
-        const maxTick = calculateMaxTick(sendAmount, receiveAmount, slippage)
+        const maxTick = calculateMaxTick(maxTickEncountered, slippage)
 
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
