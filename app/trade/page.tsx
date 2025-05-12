@@ -8,8 +8,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
+
+import useMarket from "@/providers/market"
 import { TradeIcon } from "@/svgs"
 import { useEffect, useState } from "react"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
@@ -28,6 +32,16 @@ export default function Page() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { defaultChain } = useDefaultChain()
   const { pool } = usePool()
+  const { currentMarket } = useMarket()
+  const { spotPrice } = useMergedBooks()
+
+  // Update the browser tab title with token price information
+  useUpdatePageTitle({
+    spotPrice,
+    baseToken: currentMarket?.base,
+    quoteToken: currentMarket?.quote,
+    suffix: "Trade | Mangrove DEX",
+  })
 
   // Check if we're on mobile
   useEffect(() => {
