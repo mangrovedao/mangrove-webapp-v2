@@ -51,6 +51,11 @@ function copyIcons() {
     "./public/custom-token-icons/wsei.svg",
     "./public/cryptocurrency-icons/svg/color/wsei.svg",
   )
+  // Copy WSEI custom icon
+  fs.copyFileSync(
+    "./public/custom-token-icons/wsei.webp",
+    "./public/cryptocurrency-icons/svg/color/wsei.webp",
+  )
 }
 
 function genetareDicFromManifestFile() {
