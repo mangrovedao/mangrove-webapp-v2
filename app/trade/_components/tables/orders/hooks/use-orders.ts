@@ -90,8 +90,6 @@ export function useOrders<T = Order[]>({
 
                 const pairs = Object.keys(marketMap)
 
-                console.log(pairs, `${sendToken}.${receiveToken}`)
-
                 const side = pairs.includes(`${sendToken}.${receiveToken}`)
                   ? "buy"
                   : "sell"

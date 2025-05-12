@@ -566,13 +566,13 @@ export function useSwapOld() {
           send: fields.payValue,
           isWrapping: false,
           slippage: Number(slippage),
+          maxTickEncountered:
+            simulateQuery.data?.simulation.maxTickEncountered ?? 0n,
         },
         ...(chain?.testnet || !pool
           ? {
               swapMarket: currentMarket as MarketParams,
               swapMarketClient: marketClient,
-              maxTickEncountered:
-                simulateQuery.data?.simulation.maxTickEncountered,
             }
           : {}),
       },

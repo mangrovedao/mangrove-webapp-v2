@@ -43,6 +43,6 @@ export const normalizeStats = (
     high: Number(data.maxPrice) || 0,
     low: Number(data.minPrice) || 0,
     close: Number(data.close) || 0,
-    volume: Number(data.baseVolume) || Number(data.quoteVolume) || 0,
+    volume: Number(data.quoteVolume) || 0,
   }
 }

@@ -26,6 +26,7 @@ export function useSwapForm({
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [slippage, setSlippage] = React.useState(SLIPPAGES[1])
   const [isWrapping, setIsWrapping] = React.useState(false)
+  const [maxTickEncountered, setMaxTickEncountered] = React.useState<bigint>(0n)
 
   const [fields, setFields] = React.useState<SwapFields>({
     payValue: "",
@@ -140,6 +141,10 @@ export function useSwapForm({
     onMaxClicked,
     handleReverseTokens,
     resetForm,
+
+    // Max tick encountered
+    maxTickEncountered,
+    setMaxTickEncountered,
 
     // Slippage
     slippage,

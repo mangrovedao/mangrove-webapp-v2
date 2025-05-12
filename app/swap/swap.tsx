@@ -374,7 +374,9 @@ function TokenContainer({
           {type === "pay" ? "Sell" : "Buy"}
         </label>
         <div className="text-sm text-right opacity-70 text-text-quaternary">
-          {isConnected && token && !isLoading ? (
+          {token && !isLoading && !formattedAndFixed ? (
+            <></>
+          ) : token && !isLoading && formattedAndFixed ? (
             <>
               Balance:
               {type === "pay" ? (
