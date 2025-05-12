@@ -54,6 +54,7 @@ export function useSwapSimulation({
       address,
     ],
     queryFn: async (): Promise<SwapSimulationResult | null> => {
+
       if (!(payToken && receiveToken)) return null
 
       if (!payValue || Number(payValue) <= 0) return null
@@ -62,6 +63,7 @@ export function useSwapSimulation({
 
       // Mangrove
       if (marketClient && isMangrove) {
+        
         if (!book) return null
 
         // Convert EnhancedOffer arrays to the format expected by marketOrderSimulation
