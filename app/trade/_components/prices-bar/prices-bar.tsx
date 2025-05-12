@@ -226,7 +226,14 @@ export function PricesBar() {
         />
         <Item
           label={`24h Change`}
-          value={variation24hPercentage}
+          value={
+            variation24hPercentage !== undefined &&
+            !isNaN(variation24hPercentage) &&
+            stats?.close !== undefined &&
+            stats?.open !== undefined
+              ? Number(Number(stats.close - stats.open))
+              : undefined
+          }
           token={token}
           skeleton={!stats}
           className={variation24hClassnames}

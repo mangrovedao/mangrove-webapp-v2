@@ -303,7 +303,7 @@ export function Market() {
                   }}
                   token={sendToken}
                   label="Pay"
-                  disabled={!market || sendBalanceWithEth.toString() === "0"}
+                  disabled={!market}
                   isWrapping={isWrapping}
                   customBalance={
                     isWrapping ? sendBalanceWithEth.toString() : undefined
