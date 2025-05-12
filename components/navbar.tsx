@@ -85,6 +85,10 @@ function NetworkSelectionModal() {
   const { toggle } = useMenuStore()
   const [isOpen, setIsOpen] = useState(false)
 
+  const getChainIcon = (chainId: number) => {
+    return `/assets/chains/${chainId}.webp` || `/assets/chains/${chainId}.svg`
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -94,7 +98,7 @@ function NetworkSelectionModal() {
         >
           <span className="flex items-center gap-1.5">
             <ImageWithHideOnError
-              src={`/assets/chains/${defaultChain?.id}.webp`}
+              src={getChainIcon(defaultChain?.id || 0)}
               width={20}
               height={20}
               className="h-5 rounded-sm size-5"
