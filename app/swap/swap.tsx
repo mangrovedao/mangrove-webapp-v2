@@ -26,6 +26,7 @@ import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
+import useMarket from "@/providers/market"
 import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -71,14 +72,14 @@ export default function Swap() {
     isFetchingDollarValue,
   } = useSwap()
 
-  // Get the mid price from the order book
   const { spotPrice } = useMergedBooks()
+  const { currentMarket } = useMarket()
 
   // Update the browser tab title with token price information
   useUpdatePageTitle({
     spotPrice,
-    baseToken: receiveToken,
-    quoteToken: payToken,
+    baseToken: currentMarket?.base,
+    quoteToken: currentMarket?.quote,
     suffix: "Swap | Mangrove DEX",
   })
 

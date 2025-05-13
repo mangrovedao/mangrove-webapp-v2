@@ -32,8 +32,8 @@ export function useUpdatePageTitle({
     if (baseToken && quoteToken && spotPrice && spotPrice > 0) {
       const formattedPrice = formatPriceWithAppropriateDecimals(
         spotPrice,
-        baseToken,
-        { includeSymbol: !!baseToken.symbol },
+        quoteToken,
+        { includeSymbol: !!quoteToken.symbol },
       )
 
       newTitle = `${formattedPrice} | ${pairSymbol} | ${suffix}`
