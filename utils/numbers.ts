@@ -185,10 +185,8 @@ export function formatPriceWithAppropriateDecimals(
     options?.minimumFractionDigits ?? Math.min(2, appropriateDecimals)
 
   const isUSD = token?.symbol?.includes("USD")
-  return ` ${formatNumber(value, {
-    style: isUSD ? "currency" : undefined,
-    currencyDisplay: isUSD ? "symbol" : undefined,
-    currency: isUSD ? "USD" : undefined,
+
+  return `${isUSD ? "$" : ""}${formatNumber(value, {
     minimumFractionDigits: minDecimals,
     maximumFractionDigits: appropriateDecimals,
   })} ${isUSD ? "" : token?.symbol}`
