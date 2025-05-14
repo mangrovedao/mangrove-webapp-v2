@@ -21,9 +21,12 @@ import {
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
+import useMarket from "@/providers/market"
 import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -68,6 +71,17 @@ export default function Swap() {
     isFieldLoading,
     isFetchingDollarValue,
   } = useSwap()
+
+  const { spotPrice } = useMergedBooks()
+  const { currentMarket } = useMarket()
+
+  // Update the browser tab title with token price information
+  useUpdatePageTitle({
+    spotPrice,
+    baseToken: currentMarket?.base,
+    quoteToken: currentMarket?.quote,
+    suffix: "Swap | Mangrove DEX",
+  })
 
   return (
     <>
