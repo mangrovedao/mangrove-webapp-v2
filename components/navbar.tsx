@@ -3,15 +3,7 @@ import { Button } from "@/components/ui/button"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useChains } from "@/providers/chains"
 import { useMenuStore } from "@/stores/menu.store"
-import {
-  BurgerIcon,
-  EarnIcon,
-  HelpIcon,
-  RewardsIcon,
-  SwapIcon,
-  TelegramIcon,
-  TradeIcon,
-} from "@/svgs"
+import { BurgerIcon, HelpIcon, SwapIcon, TelegramIcon, TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import {
@@ -47,21 +39,12 @@ const MENUS = [
     href: "/swap",
     icon: SwapIcon,
     text: "Swap",
+    disabled: false,
   },
   {
     href: "/trade",
     icon: TradeIcon,
     text: "Trade",
-  },
-  {
-    href: "/earn",
-    icon: EarnIcon,
-    text: "Earn",
-  },
-  {
-    href: "/rewards",
-    icon: RewardsIcon,
-    text: "Rewards",
     disabled: false,
   },
   // {
@@ -234,19 +217,11 @@ export function MobileOverlay() {
             <nav>
               <div className="flex mb-6 justify-between items-center">
                 <Link href="/" className="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="26"
-                    fill="none"
-                    className="mr-2"
-                  >
-                    <path
-                      fill="#00BF58"
-                      d="M26.26 13.483c-1.557 0-2.979.607-4.12 1.62a10.195 10.195 0 00-3.01-1.532a5.42 5.42 0 001.558-1.692c1.62-.03 3.156-.586 4.318-1.732 1.421-1.403 1.953-3.367 1.703-5.361a7.597 7.597 0 00-.969-.057c-1.677 0-3.266.555-4.464 1.738-1.198 1.182-1.76 2.755-1.76 4.41A3.932 3.932 0 0116.76 13V9.294c1.166-1.167 1.88-2.663 1.88-4.313 0-1.984-1.026-3.747-2.636-4.981-1.61 1.229-2.635 2.992-2.635 4.981 0 1.65.713 3.151 1.875 4.313v3.727a3.955 3.955 0 01-2.85-2.123c0-1.66-.557-3.244-1.76-4.426C9.437 5.289 7.85 4.734 6.171 4.734c-.317 0-.64.016-.968.057-.256 1.994.276 3.958 1.703 5.361 1.156 1.141 2.687 1.697 4.307 1.732.401.69.948 1.27 1.589 1.712a10.17 10.17 0 00-2.938 1.506c-1.14-1.007-2.562-1.619-4.12-1.619-2.01 0-3.797 1.013-5.047 2.601 1.245 1.589 3.032 2.601 5.047 2.601 1.532 0 2.933-.586 4.063-1.568.042-.036.083-.077.125-.113a5.46 5.46 0 00.177-.17 8.704 8.704 0 015.13-2.21v3.362c-4.192.37-7.51 3.794-7.703 8.014h1.516c.156-3.418 2.812-6.143 6.193-6.508v6.472h1.516v-6.472c3.375.355 6.041 3.084 6.208 6.508h1.516c-.203-4.225-3.532-7.654-7.724-8.014V14.63c1.916.16 3.708.93 5.135 2.216.057.051.11.108.167.16l.13.123c1.13.976 2.531 1.567 4.063 1.567 2.01 0 3.797-1.012 5.047-2.6-1.245-1.589-3.032-2.601-5.047-2.601l.005-.01z"
-                    ></path>
-                  </svg>
-                  <span className="text-white font-bold text-xl">Mangrove</span>
+                  <img
+                    src="/assets/oxium/oxium-full-logo.png"
+                    alt="oxium-logo"
+                    width="130"
+                  />
                 </Link>
 
                 <DialogTrigger asChild>
@@ -402,21 +377,11 @@ export default function Navbar() {
               <div className="grid justify-center">
                 <div className="flex items-center gap-2">
                   <Link href="/" className="flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="32"
-                      height="26"
-                      fill="none"
-                      className="mr-2"
-                    >
-                      <path
-                        fill="#00BF58"
-                        d="M26.26 13.483c-1.557 0-2.979.607-4.12 1.62a10.195 10.195 0 00-3.01-1.532a5.42 5.42 0 001.558-1.692c1.62-.03 3.156-.586 4.318-1.732 1.421-1.403 1.953-3.367 1.703-5.361a7.597 7.597 0 00-.969-.057c-1.677 0-3.266.555-4.464 1.738-1.198 1.182-1.76 2.755-1.76 4.41A3.932 3.932 0 0116.76 13V9.294c1.166-1.167 1.88-2.663 1.88-4.313 0-1.984-1.026-3.747-2.636-4.981-1.61 1.229-2.635 2.992-2.635 4.981 0 1.65.713 3.151 1.875 4.313v3.727a3.955 3.955 0 01-2.85-2.123c0-1.66-.557-3.244-1.76-4.426C9.437 5.289 7.85 4.734 6.171 4.734c-.317 0-.64.016-.968.057-.256 1.994.276 3.958 1.703 5.361 1.156 1.141 2.687 1.697 4.307 1.732.401.69.948 1.27 1.589 1.712a10.17 10.17 0 00-2.938 1.506c-1.14-1.007-2.562-1.619-4.12-1.619-2.01 0-3.797 1.013-5.047 2.601 1.245 1.589 3.032 2.601 5.047 2.601 1.532 0 2.933-.586 4.063-1.568.042-.036.083-.077.125-.113a5.46 5.46 0 00.177-.17 8.704 8.704 0 015.13-2.21v3.362c-4.192.37-7.51 3.794-7.703 8.014h1.516c.156-3.418 2.812-6.143 6.193-6.508v6.472h1.516v-6.472c3.375.355 6.041 3.084 6.208 6.508h1.516c-.203-4.225-3.532-7.654-7.724-8.014V14.63c1.916.16 3.708.93 5.135 2.216.057.051.11.108.167.16l.13.123c1.13.976 2.531 1.567 4.063 1.567 2.01 0 3.797-1.012 5.047-2.6-1.245-1.589-3.032-2.601-5.047-2.601l.005-.01z"
-                      ></path>
-                    </svg>
-                    <span className="text-white font-bold text-xl">
-                      Mangrove
-                    </span>
+                    <img
+                      src="/assets/oxium/oxium-full-logo.png"
+                      alt="oxium-logo"
+                      width="130"
+                    />
                   </Link>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

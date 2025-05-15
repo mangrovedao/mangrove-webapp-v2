@@ -13,7 +13,7 @@
     --color-green-bangladesh: 166, 94%, 20%;
     --color-primary-dark-green: 178 84% 7%;
     --color-primary-bush-green: 180, 73%, 4%;
-    --color-primary-solid-black: 177, 72%, 6%;
+    --color-primary-solid-black: 0, 0%, 2.5%%;
     --color-black-rich: 178, 86%, 6%;
     --color-white-anti-flash: 170, 27%, 96%;
     --color-gray-scale-100: 167, 24%, 73%;
@@ -39,33 +39,37 @@
     --color-mango-300: 50, 42%, 11%;
 
     --tw-ring-color: var(hsl(--color-primary-dark-green));
-    --background: 188.6, 38.9%, 7.1%;
-    --foreground: 210 40% 98%;
+    /* Pure Black - Oxium Primary Background */
+    --background: 0, 0%, 2%;
+    /* Vibrant Red - Oxium Secondary Background */
+    --background-secondary: 0, 100%, 45%;
+    /* Pure White - Oxium Text */
+    --foreground: 0, 0%, 100%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 180 86% 6%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 0 100% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--color-gray-scale-300);
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: var(--color-primary-solid-black);
-    --muted-foreground: 180 5% 46%;
+    --muted: 0 0% 7%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 100% 40%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 85% 40%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: var(--color-bluegray-700);
-    --input: 217.2 32.6% 17.5%;
-    --ring: var(--color-green-bangladesh);
+    --border: 0 0% 15%;
+    --input: 0 0% 10%;
+    --ring: 0 100% 50%;
 
     --radius: 0.5rem;
 
@@ -82,7 +86,6 @@
     --success-bg: var(hsl(--bg-gray-scale-700));
 
     /* New variables from Leo */
-    --color-white: 0, 0%, 100%;
     --color-bluegray-25: 187.5, 30.8%, 94.9%;
     --color-bluegray-50: 191.3, 32%, 90.2%;
     --color-bluegray-100: 189.5, 30.6%, 75.7%;
@@ -135,55 +138,188 @@
     --color-success-900: 156, 83.3%, 16.5%;
     --color-success-950: 156.5, 82.1%, 11%;
 
-    --bg-active: var(--color-bluegray-800);
-    --bg-disabled: var(--color-bluegray-800);
-    --bg-disabled-subtle: var(--color-bluegray-900);
-    --bg-primary: var(--color-bluegray-950);
-    --bg-primary-hover: var(--color-bluegray-900);
-    --bg-secondary: var(--color-bluegray-900);
-    --bg-tertiary: var(--color-bluegray-800);
+    --color-orange-25: 24.4, 100%, 98%;
+    --color-orange-50: 24.4, 100%, 95.9%;
+    --color-orange-100: 24.4, 100%, 92.2%;
+    --color-orange-200: 24.4, 100%, 80.4%;
+    --color-orange-300: 24.4, 100%, 66.9%;
+    --color-orange-400: 24.4, 100%, 54.1%;
+    --color-orange-500: 24.4, 100%, 39.4%;
+    --color-orange-600: 24.4, 100%, 30.4%;
+    --color-orange-700: 24.4, 100%, 24.3%;
+    --color-orange-800: 24.4, 100%, 19.8%;
+    --color-orange-900: 24.4, 100%, 16.5%;
+    --color-orange-950: 24.4, 100%, 11%;
+
+    /* Updated color system using the new palette */
+    --bg-active: 0, 68%, 35%;
+    --bg-disabled: 22, 20%, 40%;
+    --bg-disabled-subtle: 0, 0%, 12%;
+    --bg-primary: var(--background);
+    --bg-primary-hover: 0, 20%, 15%;
+    --bg-secondary: var(--background-secondary);
+    /* Petal Mist */
+    --bg-tertiary: 350, 100%, 88%;
+
+    /* ALTERNATIVE ARRANGEMENT */
+    --bg-primary: 0, 0%, 6%;
+    --bg-secondary: 15, 19%, 35%;
+    --bg-tertiary: 20, 40%, 95%;
+    --bg-active: 0, 68%, 35%;
+    --bg-primary-hover: 0, 65%, 70%;
+    --bg-disabled: 350, 100%, 88%;
+    --bg-disabled-subtle: 350, 100%, 78%;
+
+    /* Oxium Theme */
+    --bg-primary: 0, 0%, 2%;
+    --bg-secondary: 0, 0%, 8%;
+    --bg-tertiary: 0, 100%, 45%;
+    --bg-active: 0, 100%, 50%;
+    --bg-primary-hover: 0, 0%, 10%;
+    --bg-disabled: 0, 0%, 15%;
+    --bg-disabled-subtle: 0, 0%, 20%;
 
     --border-brand: var(--color-brand-400);
-    --border-primary: var(--color-bluegray-600);
-    --border-secondary: var(--color-bluegray-700);
-    --border-tertiary: var(--color-bluegray-800);
+    --border-primary: var(--color-orange-600);
+    --border-secondary: var(--color-orange-700);
+    --border-tertiary: var(--color-orange-800);
 
-    --nav-item-button-bg-active: var(--color-brand-900);
-    --nav-item-button-icon-fg: var(--color-bluegray-200);
-    --nav-item-button-icon-fg-active: var(--color-brand-50);
-    --nav-item-button-icon-fg-hover: var(--color-brand-500);
+    /* Updated border colors from palette */
+    --border-brand: 0, 100%, 50%;
+    /* Sunset Dust */
+    --border-primary: 15, 19%, 35%;
+    /* Brick Garnet */
+    --border-secondary: 0, 68%, 35%;
+    /* Obsidian Black with slight visibility */
+    --border-tertiary: 0, 0%, 15%;
 
-    --button-primary-bg: var(--color-brand-700);
-    --button-primary-bg-hover: var(--color-brand-500);
-    --button-primary-fg: var(--color-brand-25);
-    --button-primary-fg-hover: var(--color-brand-25);
-    --button-primary-fg_disabled: var(--fg-quaternary);
+    --nav-item-button-bg-active: var(--color-orange-900);
+    --nav-item-button-icon-fg: var(--color-orange-200);
+    --nav-item-button-icon-fg-active: var(--color-orange-50);
+    --nav-item-button-icon-fg-hover: var(--color-orange-500);
 
-    --button-secondary-bg: var(--color-bluegray-900);
-    --button-secondary-bg-hover: var(--color-bluegray-700);
-    --button-secondary-fg: var(--color-bluegray-100);
-    --button-secondary-fg-hover: var(--color-bluegray-25);
-    --button-tertiary-bg: var(--color-bluegray-950);
-    --button-tertiary-bg-hover: var(--color-bluegray-700);
-    --button-tertiary-fg: var(--text-tertiary);
-    --button-tertiary-fg-hover: var(--color-bluegray-25);
+    /* Updated navigation colors from palette */
+    /* Obsidian Black with slight visibility */
+    --nav-item-button-bg-active: 0, 0%, 12%;
+    /* Blush Pearl */
+    --nav-item-button-icon-fg: 20, 40%, 95%;
+    /* Petal Mist */
+    --nav-item-button-icon-fg-active: 350, 100%, 88%;
+    /* Coral Dusk */
+    --nav-item-button-icon-fg-hover: 0, 65%, 70%;
 
-    --fg-disabled-subtle: var(--color-bluegray-600);
-    --fg-primary: var(--color-white);
-    --fg-quaternary: var(--color-bluegray-400);
-    --fg-secondary: var(--color-bluegray-200);
-    --fg-tertiary: var(--color-bluegray-300);
-    --fg-tertiary-hover: var(--color-bluegray-200);
+    /* Scarlet Flame - Primary Button Background */
+    --button-primary-bg: 0, 68%, 35%;
+    --button-primary-bg-hover: 0, 100%, 50%;
+    --button-primary-fg: 20, 40%, 95%;
+    --button-primary-fg-hover: 0, 0%, 100%;
+    --button-primary-fg_disabled: 350, 100%, 78%;
 
-    --text-brand: var(--color-brand-400);
-    --text-disabled: var(--color-bluegray-500);
-    --text-placeholder: var(--color-bluegray-400);
-    --text-primary: var(--color-bluegray-50);
-    --text-quaternary: var(--color-bluegray-400);
-    --text-secondary: var(--color-bluegray-200);
-    --text-secondary-hover: var(--color-bluegray-50);
-    --text-tertiary: var(--color-bluegray-300);
-    --text-tertiary-hover: var(--color-bluegray-100);
+    /* Sunset Dust - Secondary Button Background */
+    --button-secondary-bg: 350, 100%, 88%;
+    --button-secondary-bg-hover: 0, 65%, 70%;
+    --button-secondary-fg: 0, 0%, 6%;
+    --button-secondary-fg-hover: 0, 0%, 0%;
+    /* Obsidian Black - Tertiary Button Background */
+    --button-tertiary-bg: 15, 19%, 35%;
+    --button-tertiary-bg-hover: 0, 68%, 35%;
+    --button-tertiary-fg: 20, 40%, 95%;
+    --button-tertiary-fg-hover: 0, 0%, 100%;
+
+    /* Oxium Theme - Buttons */
+    --button-primary-bg: 0, 100%, 45%;
+    --button-primary-bg-hover: 0, 100%, 55%;
+    --button-primary-fg: 0, 0%, 100%;
+    --button-primary-fg-hover: 0, 0%, 100%;
+    --button-primary-fg_disabled: 0, 0%, 60%;
+
+    --button-secondary-bg: 0, 0%, 10%;
+    --button-secondary-bg-hover: 0, 0%, 15%;
+    --button-secondary-fg: 0, 0%, 95%;
+    --button-secondary-fg-hover: 0, 100%, 95%;
+
+    --button-tertiary-bg: 0, 0%, 5%;
+    --button-tertiary-bg-hover: 0, 100%, 45%;
+    --button-tertiary-fg: 0, 0%, 90%;
+    --button-tertiary-fg-hover: 0, 0%, 100%;
+
+    --fg-disabled-subtle: var(--color-orange-600);
+    --fg-quaternary: var(--color-orange-400);
+    --fg-secondary: var(--color-orange-200);
+    --fg-tertiary: var(--color-orange-300);
+    --fg-tertiary-hover: var(--color-orange-200);
+
+    /* Updated text colors */
+    --fg-disabled-subtle: 15, 19%, 55%;
+    --fg-quaternary: 15, 20%, 60%;
+    /* Coral Dusk */
+    --fg-secondary: 0, 65%, 70%;
+    --fg-tertiary: 15, 19%, 65%;
+    --fg-tertiary-hover: 20, 40%, 95%;
+
+    /* Oxium Theme - Text Colors */
+    --fg-disabled-subtle: 0, 0%, 40%;
+    --fg-quaternary: 0, 0%, 50%;
+    --fg-secondary: 0, 70%, 65%;
+    --fg-tertiary: 0, 0%, 75%;
+    --fg-tertiary-hover: 0, 0%, 90%;
+
+    /* Updated text colors from palette */
+    --text-brand: 0, 100%, 50%;
+    /* Sunset Dust */
+    --text-disabled: 15, 19%, 45%;
+    --text-placeholder: 15, 20%, 60%;
+    /* Blush Pearl */
+    --text-primary: 20, 40%, 95%;
+    --text-quaternary: 15, 20%, 60%;
+    /* Coral Dusk */
+    --text-secondary: 0, 65%, 70%;
+    --text-secondary-hover: 20, 40%, 95%;
+    /* Petal Mist */
+    --text-tertiary: 350, 100%, 88%;
+    --text-tertiary-hover: 20, 40%, 95%;
+
+    /* Oxium Theme - Text Colors */
+    --text-brand: 0, 100%, 50%;
+    --text-disabled: 0, 0%, 40%;
+    --text-placeholder: 0, 0%, 50%;
+    --text-primary: 0, 0%, 95%;
+    --text-quaternary: 0, 0%, 60%;
+    --text-secondary: 0, 100%, 65%;
+    --text-secondary-hover: 0, 0%, 100%;
+    --text-tertiary: 0, 0%, 80%;
+    --text-tertiary-hover: 0, 0%, 100%;
+
+    /* Updated border colors from palette */
+    --border-brand: 0, 100%, 50%;
+    /* Sunset Dust */
+    --border-primary: 15, 19%, 35%;
+    /* Brick Garnet */
+    --border-secondary: 0, 68%, 35%;
+    /* Obsidian Black with slight visibility */
+    --border-tertiary: 0, 0%, 15%;
+
+    /* Oxium Theme - Border Colors */
+    --border-brand: 0, 100%, 50%;
+    --border-primary: 0, 0%, 20%;
+    --border-secondary: 0, 100%, 45%;
+    --border-tertiary: 0, 0%, 15%;
+
+    /* Updated navigation colors from palette */
+    /* Obsidian Black with slight visibility */
+    --nav-item-button-bg-active: 0, 0%, 12%;
+    /* Blush Pearl */
+    --nav-item-button-icon-fg: 20, 40%, 95%;
+    /* Petal Mist */
+    --nav-item-button-icon-fg-active: 350, 100%, 88%;
+    /* Coral Dusk */
+    --nav-item-button-icon-fg-hover: 0, 65%, 70%;
+
+    /* Oxium Theme - Navigation */
+    --nav-item-button-bg-active: 0, 100%, 45%;
+    --nav-item-button-icon-fg: 0, 0%, 80%;
+    --nav-item-button-icon-fg-active: 0, 0%, 100%;
+    --nav-item-button-icon-fg-hover: 0, 100%, 65%;
   }
 
   * {
