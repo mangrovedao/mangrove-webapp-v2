@@ -31,7 +31,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
           <Input
             ref={ref}
             className={cn(
-              "rounded-none h-8 ml-[75%] text-text-quaternary text-sm w-10 bg-transparent justify-end !outline-none transition-none overflow-hidden",
+              "rounded-none h-8 ml-[74%] text-text-quaternary text-sm w-10 bg-transparent justify-end !outline-none transition-none overflow-hidden",
               className,
             )}
             {...props}

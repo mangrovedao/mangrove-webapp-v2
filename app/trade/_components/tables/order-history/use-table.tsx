@@ -98,40 +98,24 @@ export function useTable({ data, showMarketInfo = false }: Params) {
             const { takerGot, takerGave, isBid, marketBase, marketQuote } =
               row.original
 
-            // Determine base and quote symbols/decimals
-            let baseSymbol, quoteSymbol, baseDecimals, quoteDecimals
-
-            if (showMarketInfo && marketBase && marketQuote) {
-              baseSymbol = marketBase
-              quoteSymbol = marketQuote
-              baseDecimals = 6 // Default for multi-market view
-              quoteDecimals = 6 // Default for multi-market view
-            } else if (market) {
-              baseSymbol = market.base.symbol
-              quoteSymbol = market.quote.symbol
-              baseDecimals = market.base.displayDecimals
-              quoteDecimals = market.quote.displayDecimals
-            } else {
+            if (!showMarketInfo || !marketBase || !marketQuote) {
               return <Skeleton className="w-20 h-6" />
             }
 
-            const [receivedSymbol, sentSymbol] = isBid
-              ? [baseSymbol, quoteSymbol]
-              : [quoteSymbol, baseSymbol]
-            const [receivedDecimals, sentDecimals] = isBid
-              ? [baseDecimals, quoteDecimals]
-              : [quoteDecimals, baseDecimals]
+            const [sentSymbol, receivedSymbol] = isBid
+              ? [marketBase, marketQuote]
+              : [marketQuote, marketBase]
 
             return (
               <div className={cn("flex flex-col ")}>
                 <span className="text-xs">
-                  {Big(takerGot).toFixed(receivedDecimals)}{" "}
+                  {Big(takerGot).toFixed(6)}{" "}
                   <span className="text-muted-foreground">
                     {receivedSymbol}
                   </span>
                 </span>
                 <span className="text-xs opacity-50 ">
-                  {Big(takerGave).toFixed(sentDecimals)}{" "}
+                  {Big(takerGave).toFixed(6)}{" "}
                   <span className="text-muted-foreground">{sentSymbol}</span>
                 </span>
               </div>
@@ -144,24 +128,20 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           cell: ({ row }) => {
             const { price, marketQuote } = row.original
 
-            // Determine quote symbol and decimals
-            let priceQuoteSymbol, priceQuoteDecimals
-
-            if (showMarketInfo && marketQuote) {
-              priceQuoteSymbol = marketQuote
-              priceQuoteDecimals = 6 // Default for multi-market view
-            } else if (market) {
-              priceQuoteSymbol = market.quote.symbol
-              priceQuoteDecimals = market.quote.displayDecimals
-            } else {
+            if (
+              !showMarketInfo ||
+              !marketQuote ||
+              !price ||
+              isNaN(Number(price))
+            ) {
               return <Skeleton className="w-20 h-6" />
             }
 
             return price ? (
               <span className="text-xs">
-                {Big(price).toFixed(priceQuoteDecimals)}{" "}
+                {Big(price).toFixed(6)}{" "}
                 <span className="text-muted-foreground text-xs">
-                  {priceQuoteSymbol}
+                  {marketQuote}
                 </span>
               </span>
             ) : (

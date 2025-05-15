@@ -53,12 +53,6 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
     allMarkets: true,
   })
 
-  // Calculate the total count from all pages
-  const orderHistoryCount = React.useMemo(() => {
-    if (!data?.pages) return 0
-    return data.pages.reduce((total, page) => total + page.data.length, 0)
-  }, [data])
-
   React.useEffect(() => {
     setDefaultEnum(isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut)
     setValue(Object.values(defaultEnum)[0] || "Open Orders")
@@ -93,7 +87,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                   isConnected && table === TradeTablesLoggedIn.ORDERS
                     ? ordersCount
                     : isConnected && table === TradeTablesLoggedIn.ORDER_HISTORY
-                      ? orderHistoryCount
+                      ? data?.pages[0]?.meta.totalItems
                       : 0
                 }
               >

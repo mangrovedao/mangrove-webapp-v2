@@ -31,7 +31,7 @@ export const wethAdresses: { [key: number]: Address | undefined } = {
   42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
 }
 
-const slippageValues = ["0.1", "0.5", "1"]
+const slippageValues = ["0.5", "1", "2"]
 const sliderValues = [25, 50, 75]
 
 export function Market() {
@@ -68,6 +68,7 @@ export function Market() {
     isWrapping,
     slippage,
     getAllErrors,
+    maxTickEncountered,
   } = useMarketForm({
     onSubmit: (formData) => setFormData(formData),
     bs: tradeSide,
@@ -85,6 +86,7 @@ export function Market() {
   } = useMarketTransaction({
     form,
     tradeSide,
+    maxTickEncountered: maxTickEncountered ?? 0n,
     sendToken,
     baseToken,
     sendTokenBalance,
@@ -267,7 +269,7 @@ export function Market() {
                   }}
                   token={baseToken}
                   label="Pay"
-                  disabled={!market || sendBalanceWithEth.toString() === "0"}
+                  disabled={!market}
                   isWrapping={isWrapping}
                   customBalance={
                     isWrapping ? sendBalanceWithEth.toString() : undefined

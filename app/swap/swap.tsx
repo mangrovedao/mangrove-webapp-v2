@@ -1,8 +1,11 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
+import Rive from "@rive-app/react-canvas-lite"
 import { AnimatePresence, motion } from "framer-motion"
 import React from "react"
+import { Address, formatUnits } from "viem"
+import { useAccount } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
@@ -18,18 +21,19 @@ import {
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { useMarkets } from "@/hooks/use-addresses"
 import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
+import useMarket from "@/providers/market"
 import { ChevronDown, SwapArrowIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { getAllTokensInMarkets } from "@/utils/tokens"
-import Rive from "@rive-app/react-canvas-lite"
-import { Address, formatUnits } from "viem"
-import { useAccount } from "wagmi"
 import { Accordion } from "../trade/_components/forms/components/accordion"
-import { SLIPPAGES, useSwap } from "./hooks/use-swap"
+import { useSwap } from "./hooks/use-swap"
+import { SLIPPAGES } from "./utils/swap-constants"
 
 export default function Swap() {
   const {
@@ -67,6 +71,17 @@ export default function Swap() {
     isFieldLoading,
     isFetchingDollarValue,
   } = useSwap()
+
+  const { spotPrice } = useMergedBooks()
+  const { currentMarket } = useMarket()
+
+  // Update the browser tab title with token price information
+  useUpdatePageTitle({
+    spotPrice,
+    baseToken: currentMarket?.base,
+    quoteToken: currentMarket?.quote,
+    suffix: "Swap | Mangrove DEX",
+  })
 
   return (
     <>
@@ -373,7 +388,9 @@ function TokenContainer({
           {type === "pay" ? "Sell" : "Buy"}
         </label>
         <div className="text-sm text-right opacity-70 text-text-quaternary">
-          {isConnected && token && !isLoading ? (
+          {token && !isLoading && !formattedAndFixed ? (
+            <></>
+          ) : token && !isLoading && formattedAndFixed ? (
             <>
               Balance:
               {type === "pay" ? (

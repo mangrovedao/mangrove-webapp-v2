@@ -101,21 +101,62 @@ const MarketContext = React.createContext<
 >(undefined)
 MarketContext.displayName = "MarketContext"
 
+// Add a context to allow for custom market overrides
+const MarketOverrideContext = React.createContext<{
+  overrideMarket?: MarketParams
+  setOverrideMarket: (market?: MarketParams) => void
+}>({
+  overrideMarket: undefined,
+  setOverrideMarket: () => {},
+})
+MarketOverrideContext.displayName = "MarketOverrideContext"
+
 export function MarketProvider({ children }: React.PropsWithChildren) {
   const marketContext = useMarketContext()
+  // Add state for market override
+  const [overrideMarket, setOverrideMarket] = React.useState<
+    MarketParams | undefined
+  >(undefined)
+
   return (
     <MarketContext.Provider value={marketContext}>
-      {children}
+      <MarketOverrideContext.Provider
+        value={{ overrideMarket, setOverrideMarket }}
+      >
+        {children}
+      </MarketOverrideContext.Provider>
     </MarketContext.Provider>
   )
 }
 
 const useMarket = () => {
   const marketCtx = React.useContext(MarketContext)
+  const { overrideMarket } = React.useContext(MarketOverrideContext)
+
   if (!marketCtx) {
     throw new Error("useMarket must be used within the MarketContext.Provider")
   }
-  return marketCtx
+
+  // Return override market if it exists, otherwise use the context's current market
+  return {
+    ...marketCtx,
+    currentMarket: overrideMarket || marketCtx.currentMarket,
+  }
+}
+
+// Export a hook to set the override market (for use in the swap page)
+export function useMarketOverride() {
+  const { overrideMarket, setOverrideMarket } = React.useContext(
+    MarketOverrideContext,
+  )
+
+  if (!setOverrideMarket) {
+    throw new Error(
+      "useMarketOverride must be used within the MarketContext.Provider",
+    )
+  }
+
+  return { overrideMarket, setOverrideMarket }
 }
 
 export default useMarket

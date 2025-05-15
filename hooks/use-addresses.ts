@@ -10,48 +10,20 @@ import {
   blastLogics,
   blastMangrove,
   blastTokens,
+  seiMangrove,
 } from "@mangrovedao/mgv/addresses"
 import { MangroveActionsDefaultParams } from "@mangrovedao/mgv/types"
-import { arbitrum, base, baseSepolia, blast, megaethTestnet } from "viem/chains"
+import {
+  arbitrum,
+  base,
+  baseSepolia,
+  blast,
+  megaethTestnet,
+  sei,
+} from "viem/chains"
 import { useDefaultChain } from "./use-default-chain"
 
 export const aaveKandelSeeder = "0x55B12De431C6e355b56b79472a3632faec58FB5a"
-
-const megaEthTestnetMangrove = {
-  mgv: "0x32360BB61fcb9cDCDD44eD44328b848061c0b9D7",
-  mgvOrder: "0x981Bd234dA6778a6d0132364AfB30f517a9F5aa8",
-  mgvReader: "0xB5C0a4249ee477860D47aD688386F2427F0F072a",
-  smartRouter: "0x5edE1DD8029e59a0eF80CEB0474B3E8322490220",
-  routerProxyFactory: "0x9DB89FB4B356D480139792Fa2146A408f8944E3a",
-} as const satisfies MangroveActionsDefaultParams
-
-const megaEthTestnetWETH = {
-  address: "0xeFf2212a720aD2a7660251a07cA3fF8512e3Ed6E",
-  symbol: "WETH",
-  decimals: 18,
-  displayDecimals: 5,
-  priceDisplayDecimals: 6,
-  mgvTestToken: true,
-} as const satisfies Token
-
-const megaEthTestnetUSDC = {
-  address: "0x33816848eD5002aC1a3B71bf40A4FEB0B3dC6828",
-  symbol: "USDC",
-  decimals: 6,
-  displayDecimals: 2,
-  priceDisplayDecimals: 4,
-  mgvTestToken: true,
-} as const satisfies Token
-
-export const megaEthTestnetWETHUSDC = {
-  base: megaEthTestnetWETH,
-  quote: megaEthTestnetUSDC,
-  tickSpacing: 1n,
-} as const satisfies MarketParams
-
-export const megaEthTestnetMarkets = [
-  megaEthTestnetWETHUSDC,
-] as const satisfies MarketParams[]
 
 export function useMangroveAddresses() {
   const { defaultChain } = useDefaultChain()
@@ -63,6 +35,8 @@ export function useMangroveAddresses() {
       return arbitrumMangrove
     case base.id:
       return baseMangrove
+    case sei.id:
+      return seiMangrove
     case megaethTestnet.id:
       return megaEthTestnetMangrove
     default:
@@ -95,6 +69,8 @@ export function useAaveKandelSeeder() {
       return "0x55B12De431C6e355b56b79472a3632faec58FB5a"
     case base.id:
       return ""
+    case sei.id:
+      return ""
     case megaethTestnet.id:
       return ""
     default:
@@ -109,6 +85,8 @@ export function useKandelSeeder() {
     case arbitrum.id:
       return "0x89139bed90b1bfb5501f27be6d6f9901ae35745d"
     case base.id:
+      return ""
+    case sei.id:
       return ""
     case megaethTestnet.id:
       return ""
@@ -127,6 +105,8 @@ export function useMarkets() {
       return baseMarkets
     case megaethTestnet.id:
       return megaEthTestnetMarkets
+    case sei.id:
+      return seiMarkets
     default:
       return baseMarkets
   }
@@ -141,6 +121,8 @@ export function useLogics() {
     case arbitrum.id:
       return []
     case base.id:
+      return []
+    case sei.id:
       return []
     case baseSepolia.id:
       return baseSepoliaLogics
@@ -159,6 +141,8 @@ export function useTokens() {
       return arbitrumTokens
     case base.id:
       return baseTokens
+    case sei.id:
+      return [SEIWSEI, SEIUSDC, SEIWETH, SEIWBTC]
     case megaethTestnet.id:
       return [megaEthTestnetWETH, megaEthTestnetUSDC]
     default:
@@ -215,3 +199,103 @@ export function useSymbolOverrides() {
       return {}
   }
 }
+
+// SEI
+
+const SEIWSEI = {
+  address: "0xE30feDd158A2e3b13e9badaeABaFc5516e95e8C7",
+  symbol: "WSEI",
+  decimals: 18,
+  displayDecimals: 2,
+  priceDisplayDecimals: 4,
+  mgvTestToken: true,
+} as const satisfies Token
+
+const SEIUSDC = {
+  address: "0x3894085Ef7Ff0f0aeDf52E2A2704928d1Ec074F1",
+  symbol: "USDC",
+  decimals: 6,
+  displayDecimals: 2,
+  priceDisplayDecimals: 4,
+  mgvTestToken: true,
+} as const satisfies Token
+
+const SEIWETH = {
+  address: "0x160345fC359604fC6e70E3c5fAcbdE5F7A9342d8",
+  symbol: "WETH",
+  decimals: 18,
+  displayDecimals: 2,
+  priceDisplayDecimals: 4,
+  mgvTestToken: true,
+} as const satisfies Token
+
+const SEIWBTC = {
+  address: "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+  symbol: "WBTC",
+  decimals: 8,
+  displayDecimals: 2,
+  priceDisplayDecimals: 4,
+  mgvTestToken: true,
+} as const satisfies Token
+
+export const seiWSEIUSDC = {
+  base: SEIWSEI,
+  quote: SEIUSDC,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const seiWSEIWETH = {
+  base: SEIWSEI,
+  quote: SEIWETH,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const seiWSEIWBT = {
+  base: SEIWSEI,
+  quote: SEIWBTC,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const seiMarkets = [
+  seiWSEIUSDC,
+  seiWSEIWETH,
+  seiWSEIWBT,
+] as const satisfies MarketParams[]
+
+// MEGAETH TESTNET
+
+const megaEthTestnetMangrove = {
+  mgv: "0x32360BB61fcb9cDCDD44eD44328b848061c0b9D7",
+  mgvOrder: "0x981Bd234dA6778a6d0132364AfB30f517a9F5aa8",
+  mgvReader: "0xB5C0a4249ee477860D47aD688386F2427F0F072a",
+  smartRouter: "0x5edE1DD8029e59a0eF80CEB0474B3E8322490220",
+  routerProxyFactory: "0x9DB89FB4B356D480139792Fa2146A408f8944E3a",
+} as const satisfies MangroveActionsDefaultParams
+
+const megaEthTestnetWETH = {
+  address: "0xeFf2212a720aD2a7660251a07cA3fF8512e3Ed6E",
+  symbol: "WETH",
+  decimals: 18,
+  displayDecimals: 5,
+  priceDisplayDecimals: 6,
+  mgvTestToken: true,
+} as const satisfies Token
+
+const megaEthTestnetUSDC = {
+  address: "0x33816848eD5002aC1a3B71bf40A4FEB0B3dC6828",
+  symbol: "USDC",
+  decimals: 6,
+  displayDecimals: 2,
+  priceDisplayDecimals: 4,
+  mgvTestToken: true,
+} as const satisfies Token
+
+export const megaEthTestnetWETHUSDC = {
+  base: megaEthTestnetWETH,
+  quote: megaEthTestnetUSDC,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const megaEthTestnetMarkets = [
+  megaEthTestnetWETHUSDC,
+] as const satisfies MarketParams[]

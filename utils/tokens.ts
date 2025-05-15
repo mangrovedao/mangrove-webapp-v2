@@ -1,9 +1,8 @@
-import type { useMarkets } from "@/hooks/use-addresses"
 import type { Token } from "@mangrovedao/mgv"
+import { MarketParams } from "@mangrovedao/mgv"
 
 import icons from "@/generated/icons.json"
-import { useOpenMarkets } from "@/hooks/use-open-markets"
-import { MarketParams } from "@mangrovedao/mgv"
+import type { useMarkets } from "@/hooks/use-addresses"
 
 const IMG_BASE_PATH = "/cryptocurrency-icons/svg/color"
 
@@ -63,10 +62,24 @@ export function getTokenByAddress(
   markets: MarketParams[],
   odosTokens: Token[],
 ): Token | undefined {
+  if (!address) return undefined
+  if (!markets?.length && !odosTokens?.length) return undefined
+
+  // Safe array handling
+  const safeMarkets = markets || []
+  const safeOdosTokens = odosTokens || []
+
   const token =
-    markets.find((m) => m.base.address === address)?.base ??
-    markets.find((m) => m.quote.address === address)?.quote ??
-    odosTokens.find((t) => t.address === address)
+    safeMarkets.find(
+      (m) => m?.base?.address?.toLowerCase() === address.toLowerCase(),
+    )?.base ??
+    safeMarkets.find(
+      (m) => m?.quote?.address?.toLowerCase() === address.toLowerCase(),
+    )?.quote ??
+    safeOdosTokens.find(
+      (t) => t?.address?.toLowerCase() === address.toLowerCase(),
+    )
+
   return token
 }
 
@@ -74,24 +87,29 @@ export function getTokenByAddressOdos(
   address: string,
   odosTokens: Token[],
 ): Token | undefined {
-  return odosTokens.find((t) => t.address === address)
+  return odosTokens.find(
+    (t) => t.address.toLowerCase() === address.toLowerCase(),
+  )
 }
 
-export function getAllMangroveMarketTokens(
-  mangroveMarkets: ReturnType<typeof useOpenMarkets>,
-): Token[] {
-  const mangroveTokens = mangroveMarkets.openMarkets.reduce<Token[]>(
-    (acc, market) => {
-      if (!acc.some((t) => t.address === market.base.address)) {
-        acc.push(market.base)
-      }
-      if (!acc.some((t) => t.address === market.quote.address)) {
-        acc.push(market.quote)
-      }
-      return acc
-    },
-    [],
-  )
+export function getAllMangroveMarketTokens(markets: MarketParams[]): Token[] {
+  const mangroveTokens = markets.reduce<Token[]>((acc, market) => {
+    if (
+      !acc.some(
+        (t) => t.address.toLowerCase() === market.base.address.toLowerCase(),
+      )
+    ) {
+      acc.push(market.base)
+    }
+    if (
+      !acc.some(
+        (t) => t.address.toLowerCase() === market.quote.address.toLowerCase(),
+      )
+    ) {
+      acc.push(market.quote)
+    }
+    return acc
+  }, [])
 
   return mangroveTokens
 }
@@ -99,24 +117,31 @@ export function getAllMangroveMarketTokens(
 export function deduplicateTokens(tokens: Token[]) {
   return tokens.filter(
     (token, index, self) =>
-      index === self.findIndex((t) => t.address === token.address),
+      index ===
+      self.findIndex(
+        (t) => t.address.toLowerCase() === token.address.toLowerCase(),
+      ),
   )
 }
 
 export function getMangroveTradeableTokens(
-  mangroveMarkets: ReturnType<typeof useOpenMarkets>,
+  markets: MarketParams[],
   token: Token,
 ): Token[] {
-  return mangroveMarkets.openMarkets.reduce<Token[]>((acc, market) => {
+  return markets.reduce<Token[]>((acc, market) => {
     if (
-      market.base.address === token.address &&
-      !acc.some((t) => t.address === market.quote.address)
+      market.base.address.toLowerCase() === token.address.toLowerCase() &&
+      !acc.some(
+        (t) => t.address.toLowerCase() === market.quote.address.toLowerCase(),
+      )
     ) {
       acc.push(market.quote)
     }
     if (
-      market.quote.address === token.address &&
-      !acc.some((t) => t.address === market.base.address)
+      market.quote.address.toLowerCase() === token.address.toLowerCase() &&
+      !acc.some(
+        (t) => t.address.toLowerCase() === market.base.address.toLowerCase(),
+      )
     ) {
       acc.push(market.base)
     }
@@ -125,46 +150,53 @@ export function getMangroveTradeableTokens(
 }
 
 export function getTradableTokens({
-  mangroveMarkets,
+  markets,
   odosTokens,
   token,
 }: {
-  mangroveMarkets: ReturnType<typeof useOpenMarkets>
+  markets: MarketParams[]
   odosTokens: Token[]
   token?: Token
 }): Token[] {
   if (!token) return []
 
-  const mangroveTradableTokens = getMangroveTradeableTokens(
-    mangroveMarkets,
-    token,
-  )
+  const mangroveTradableTokens = getMangroveTradeableTokens(markets, token)
   const odosTradableTokens = odosTokens.filter(
-    (t) => t.address !== token.address,
+    (t) => t.address.toLowerCase() !== token.address.toLowerCase(),
   )
 
   return [...mangroveTradableTokens, ...odosTradableTokens]
 }
 
 export function getMarketFromTokens(
-  markets: ReturnType<typeof useOpenMarkets>,
+  markets: MarketParams[],
   base: Token | undefined,
   quote: Token | undefined,
 ) {
   if (!base || !quote) return null
-  return markets.openMarkets.find(
+  return markets.find(
     (m) =>
-      (m.base.address === base.address && m.quote.address === quote.address) ||
-      (m.base.address === quote.address && m.quote.address === base.address),
+      (m.base.address.toLowerCase() === base.address.toLowerCase() &&
+        m.quote.address.toLowerCase() === quote.address.toLowerCase()) ||
+      (m.base.address.toLowerCase() === quote.address.toLowerCase() &&
+        m.quote.address.toLowerCase() === base.address.toLowerCase()),
   )
 }
 
 export function getAllTokensInMarkets(markets: ReturnType<typeof useMarkets>) {
   return markets.reduce<Token[]>((acc, market) => {
-    if (!acc.some((t) => t.address === market.base.address)) {
+    if (
+      !acc.some(
+        (t) => t.address.toLowerCase() === market.base.address.toLowerCase(),
+      )
+    ) {
       acc.push(market.base)
     }
-    if (!acc.some((t) => t.address === market.quote.address)) {
+    if (
+      !acc.some(
+        (t) => t.address.toLowerCase() === market.quote.address.toLowerCase(),
+      )
+    ) {
       acc.push(market.quote)
     }
     return acc

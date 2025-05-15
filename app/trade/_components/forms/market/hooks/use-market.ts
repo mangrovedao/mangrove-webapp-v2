@@ -62,10 +62,11 @@ export function useMarketForm(props: Props) {
     defaultValues: {
       bs: props.bs,
       sliderPercentage: 25,
-      slippage: 0.5,
+      slippage: 1,
       send: "",
       receive: "",
       isWrapping: false,
+      maxTickEncountered: 0n,
     },
     onSubmit: (values) => props.onSubmit(values),
   })
@@ -190,9 +191,11 @@ export function useMarketForm(props: Props) {
         ? form.setFieldValue("send", estimatedSend)
         : form.setFieldValue("receive", estimatedReceive)
 
+      form.setFieldValue("maxTickEncountered", maxTickEncountered)
+
       form.validateAllFields("submit")
 
-      return { baseEstimation, quoteEstimation }
+      return { baseEstimation, quoteEstimation, maxTickEncountered }
     },
   })
 
@@ -271,6 +274,7 @@ export function useMarketForm(props: Props) {
     computeReceiveAmount,
     computeSendAmount,
     sendTokenBalance,
+    maxTickEncountered: data?.maxTickEncountered,
     form,
     market,
     sendToken,

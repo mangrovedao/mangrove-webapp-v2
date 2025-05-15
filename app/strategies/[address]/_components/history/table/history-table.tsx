@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { DepositAndWithdraw } from "@mangrovedao/indexer-sdk/dist/src/kandel/types"
+
 import useKandel from "../../../_providers/kandel-strategy"
 import { useParameters } from "../../parameters/hook/use-parameters"
 import { useHistoryParams } from "./use-history-table"
@@ -10,7 +10,7 @@ export default function HistoryTable() {
   const { depositsAndWithdraws } = useParameters()
 
   const table = useHistoryParams({
-    data: depositsAndWithdraws as DepositAndWithdraw[],
+    data: depositsAndWithdraws as any[],
   })
 
   const isLoading = strategyQuery.isLoading || strategyStatusQuery.isLoading

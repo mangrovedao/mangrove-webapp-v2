@@ -303,7 +303,7 @@ export function Limit() {
                   token={sendToken}
                   customBalance={sendBalanceWithEth.toString()}
                   label="Pay"
-                  disabled={!currentMarket || !sendBalanceValid}
+                  disabled={!currentMarket}
                   showBalance
                   error={
                     getAllErrors().send

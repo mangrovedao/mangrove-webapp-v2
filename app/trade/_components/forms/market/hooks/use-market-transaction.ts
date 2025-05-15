@@ -23,6 +23,7 @@ interface UseMarketTransactionProps {
   sendToken?: any
   baseToken?: any
   sendTokenBalance: any
+  maxTickEncountered: bigint
   isWrapping: boolean
   onTransactionSuccess?: () => void
 }
@@ -31,6 +32,7 @@ export function useMarketTransaction({
   form,
   tradeSide,
   sendToken,
+  maxTickEncountered,
   baseToken,
   sendTokenBalance,
   isWrapping,
@@ -147,6 +149,7 @@ export function useMarketTransaction({
               baseToken?.symbol === "WETH"
                 ? (Number(form.state.values.send) - 0.0000001).toString()
                 : form.state.values.send,
+            maxTickEncountered,
           },
         },
 
@@ -187,13 +190,7 @@ export function useMarketTransaction({
     setTxState("approving")
     try {
       await approveAmount.mutateAsync(undefined, {
-        onSuccess: () => {
-          if (needsWrapping) {
-            handleWrapEth()
-          } else {
-            handlePostOrder()
-          }
-        },
+        onSuccess: () => {},
         onError: (error) => {
           setTxState("idle")
         },
