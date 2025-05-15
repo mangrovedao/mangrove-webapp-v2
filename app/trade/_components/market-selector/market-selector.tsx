@@ -112,7 +112,7 @@ export default function MarketSelector() {
           <SelectItem
             key={`${m.base.address}/${m.quote.address}/${m.tickSpacing}`}
             value={getValue(m)}
-            className="p-1.5 text-sm"
+            className="text-sm"
           >
             <div className="flex items-center space-x-2">
               <div className="flex -space-x-2">

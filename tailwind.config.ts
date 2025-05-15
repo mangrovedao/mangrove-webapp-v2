@@ -114,6 +114,9 @@ export default {
           "primary-hover": "hsl(var(--bg-primary-hover))",
           secondary: "hsl(var(--bg-secondary))",
           tertiary: "hsl(var(--bg-tertiary))",
+          "petal-mist": "hsl(var(--bg-petal-mist))",
+          "blush-pearl": "hsl(var(--bg-blush-pearl))",
+          "sunset-dust": "hsl(var(--bg-sunset-dust))",
         },
         border: {
           DEFAULT: "hsl(var(--border))",
@@ -167,6 +170,9 @@ export default {
           "secondary-hover": "hsl(var(--text-secondary-hover))",
           tertiary: "hsl(var(--text-tertiary))",
           "tertiary-hover": "hsl(var(--text-tertiary-hover))",
+          "petal-mist": "hsl(var(--text-petal-mist))",
+          "blush-pearl": "hsl(var(--text-blush-pearl))",
+          "sunset-dust": "hsl(var(--text-sunset-dust))",
         },
       },
       maxWidth: {

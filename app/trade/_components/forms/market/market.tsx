@@ -392,7 +392,8 @@ export function Market() {
                     className={cn(
                       "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                       {
-                        "bg-bg-tertiary": Math.abs(sendSliderValue - value) < 1,
+                        "bg-bg-tertiary text-black-rich":
+                          Math.abs(sendSliderValue - value) < 1,
                       },
                     )}
                     onClick={(e) => {
@@ -411,7 +412,8 @@ export function Market() {
                   className={cn(
                     "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                     {
-                      "bg-bg-tertiary": Math.abs(sendSliderValue - 100) < 1,
+                      "bg-bg-tertiary text-black-rich":
+                        Math.abs(sendSliderValue - 100) < 1,
                     },
                   )}
                   onClick={(e) => {
@@ -434,7 +436,6 @@ export function Market() {
                       </span>
                       <div className="flex items-center gap-1 text-xs text-text-secondary">
                         <Switch
-                          className="data-[state=checked]:!bg-bg-secondary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
                           checked={isWrapping}
                           onClick={() => field.handleChange(!isWrapping)}
                         />
@@ -489,10 +490,10 @@ export function Market() {
                           className={cn(
                             "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                             {
-                              "opacity-10":
+                              "opacity-60":
                                 field.state.value !== Number(value) ||
                                 showCustomInput,
-                              "border-none bg-bg-tertiary rounded-sm":
+                              "border-none bg-bg-tertiary rounded-sm text-black-rich":
                                 field.state.value === Number(value) &&
                                 !showCustomInput,
                             },
@@ -518,8 +519,8 @@ export function Market() {
                         className={cn(
                           "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                           {
-                            "opacity-10": !showCustomInput,
-                            "border-none bg-bg-tertiary rounded-sm":
+                            "opacity-60": !showCustomInput,
+                            "border-none bg-bg-tertiary rounded-sm text-black-rich":
                               showCustomInput,
                           },
                         )}
@@ -550,7 +551,7 @@ export function Market() {
           <div className="mt-auto pt-3 border-t border-border-primary">
             <Button
               className={cn(
-                "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
+                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-petal-mist capitalize text-black-rich",
               )}
               size={"md"}
               type="submit"

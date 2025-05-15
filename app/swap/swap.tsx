@@ -1,7 +1,6 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
-import Rive from "@rive-app/react-canvas-lite"
 import { AnimatePresence, motion } from "framer-motion"
 import React from "react"
 import { Address, formatUnits } from "viem"
@@ -86,9 +85,6 @@ export default function Swap() {
   return (
     <>
       <div className="bg-bg-secondary rounded-sm p-5 relative mt-40">
-        <div className="absolute max-w-[234px] top-0 -right-4 -translate-y-[73px] translate-x-[15px] w-full h-[121px]">
-          <Rive src="/assets/rive/iguane.riv" animations="Timeline 1" />
-        </div>
         <h1 className="text-2xl mb-4">Swap</h1>
         <div className="space-y-2 relative">
           <div className="space-y-0.5">
@@ -132,7 +128,8 @@ export default function Swap() {
 
           {!isConnected ? (
             <Button
-              className="w-full text-lg"
+              className="w-full text-lg bg-bg-blush-pearl hover:bg-bg-petal-mist text-black-rich"
+              variant={"secondary"}
               size={"lg"}
               onClick={openConnectModal}
             >
@@ -141,6 +138,7 @@ export default function Swap() {
           ) : (
             <Button
               className="w-full text-lg"
+              variant={"secondary"}
               size={"lg"}
               onClick={swap}
               disabled={isSwapDisabled}
@@ -163,9 +161,9 @@ export default function Swap() {
                     className={cn(
                       "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                       {
-                        "opacity-10":
+                        "opacity-60":
                           Number(slippage) !== Number(value) || showCustomInput,
-                        "border-none bg-bg-tertiary rounded-sm":
+                        "border-none bg-bg-tertiary rounded-sm text-black-rich":
                           Number(slippage) === Number(value) &&
                           !showCustomInput,
                       },
@@ -189,8 +187,9 @@ export default function Swap() {
                   className={cn(
                     "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                     {
-                      "opacity-10": !showCustomInput,
-                      "border-none bg-bg-tertiary rounded-sm": showCustomInput,
+                      "opacity-60": !showCustomInput,
+                      "border-none bg-bg-tertiary rounded-sm text-black-rich":
+                        showCustomInput,
                     },
                   )}
                 >
@@ -316,7 +315,7 @@ function TokenSelectorDialog({
               <div key={token.address}>
                 <Button
                   onClick={() => onSelect(token)}
-                  className="w-full bg-bg-secondary hover:bg-bg-primary px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
+                  className="w-full bg-bg-blush-pearl hover:bg-bg-petal-mist text-black-rich px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
                 >
                   <div className="relative">
                     <TokenIcon
@@ -468,7 +467,7 @@ function TokenContainer({
           {token ? (
             <Button
               onClick={onTokenClicked}
-              className="!bg-button-secondary-bg p-1 border hover:border-border-primary rounded-sm text-sm flex items-center space-x-1"
+              className="bg-bg-blush-pearl hover:bg-bg-petal-mist text-black-rich p-1 border rounded-sm text-sm flex items-center space-x-1"
             >
               <TokenIcon
                 symbol={token.symbol}
@@ -479,7 +478,7 @@ function TokenContainer({
               <span className="font-semibold text-lg text-nowrap pl-2">
                 {token.symbol}
               </span>
-              <ChevronDown className="mx-1 size-6 text-button-secondary-fg" />
+              <ChevronDown className="mx-1 size-6 text-black-rich" />
             </Button>
           ) : (
             <Button onClick={onTokenClicked} className="text-nowrap">

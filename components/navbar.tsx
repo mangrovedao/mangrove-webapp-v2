@@ -310,7 +310,7 @@ export function MobileOverlay() {
                       className={cn(
                         "flex items-center w-full gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium",
                         isActive
-                          ? "text-white bg-bg-tertiary"
+                          ? "text-black-rich bg-bg-tertiary"
                           : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
                         disabled && "opacity-50 pointer-events-none",
                       )}
@@ -318,7 +318,7 @@ export function MobileOverlay() {
                       <span
                         className={cn(
                           "text-nav-item-button-icon-fg",
-                          isActive && "text-white",
+                          isActive && "text-black-rich",
                         )}
                       >
                         <Icon />
@@ -488,7 +488,7 @@ export default function Navbar() {
                         className={cn(
                           "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
                           isActive
-                            ? "text-white bg-bg-tertiary"
+                            ? "text-black-rich bg-bg-tertiary"
                             : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
                           disabled && "opacity-50 pointer-events-none",
                         )}
@@ -496,7 +496,7 @@ export default function Navbar() {
                         <span
                           className={cn(
                             "text-nav-item-button-icon-fg",
-                            isActive && "text-text-primary",
+                            isActive && "text-black-rich",
                           )}
                         >
                           <Icon />
@@ -529,7 +529,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleAccount}
-                  className="hidden lg:flex border-transparent items-center gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 h-[38px]! text-xs font-medium transition-colors"
+                  className="hidden lg:flex border-transparent items-center gap-1 bg-bg-tertiary text-black-rich rounded-sm px-3 py-1.5 h-[38px]! text-xs font-medium transition-colors"
                 >
                   {address && <WalletIcon className="w-4" />}
                   <span>{shortenAddress(address || "")}</span>
@@ -539,7 +539,7 @@ export default function Navbar() {
                   size="sm"
                   variant="secondary"
                   onClick={handleConnect}
-                  className="hidden lg:flex items-center border-transparent h-[38px] gap-1 bg-bg-tertiary hover:bg-bg-secondary text-text-primary rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
+                  className="hidden lg:flex items-center border-transparent h-[38px] gap-1 bg-bg-tertiary text-black-rich rounded-sm px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   {isConnecting ? (
                     <Spinner className="h-6" />

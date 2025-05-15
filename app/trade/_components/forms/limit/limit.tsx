@@ -422,7 +422,8 @@ export function Limit() {
                     className={cn(
                       "!h-5 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                       {
-                        "bg-bg-tertiary": sendSliderValue === value,
+                        "bg-bg-tertiary text-black-rich":
+                          sendSliderValue === value,
                       },
                     )}
                     onClick={(e) => {
@@ -462,12 +463,11 @@ export function Limit() {
                       </span>
                       <div className="flex items-center gap-1 text-xs text-text-secondary">
                         <Switch
-                          className="data-[state=checked]:!bg-bg-secondary data-[state=checked]:text-text-primary h-4 w-8 !bg-bg-secondary"
                           checked={isWrapping}
                           onClick={() => {
                             field.handleChange(!isWrapping)
-                            handleSliderChange(0)
-                            form?.reset()
+                            // // handleSliderChange(0)
+                            // form?.reset()
                           }}
                         />
                         <InfoTooltip className="text-text-quaternary text-xs size-4 cursor-pointer">
@@ -515,7 +515,7 @@ export function Limit() {
           <div className="mt-auto pt-3 border-t border-border-primary">
             <Button
               className={cn(
-                "w-full flex rounded-sm tems-center justify-center capitalize bg-bg-tertiary hover:bg-bg-secondary",
+                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-petal-mist capitalize text-black-rich",
               )}
               size={"md"}
               type="submit"
