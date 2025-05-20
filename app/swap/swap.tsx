@@ -127,7 +127,7 @@ export default function Swap() {
 
           {!isConnected ? (
             <Button
-              className="w-full text-lg bg-bg-blush-pearl hover:bg-bg-petal-mist text-black-rich"
+              className="w-full text-lg bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich"
               variant={"secondary"}
               size={"lg"}
               onClick={openConnectModal}
@@ -314,7 +314,7 @@ function TokenSelectorDialog({
               <div key={token.address}>
                 <Button
                   onClick={() => onSelect(token)}
-                  className="w-full bg-bg-blush-pearl hover:bg-bg-petal-mist text-black-rich px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
+                  className="w-full bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
                 >
                   <div className="relative">
                     <TokenIcon
@@ -466,7 +466,7 @@ function TokenContainer({
           {token ? (
             <Button
               onClick={onTokenClicked}
-              className="bg-bg-blush-pearl hover:bg-bg-petal-mist text-black-rich p-1 border rounded-sm text-sm flex items-center space-x-1"
+              className="bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich p-1 border rounded-sm text-sm flex items-center space-x-1"
             >
               <TokenIcon
                 symbol={token.symbol}

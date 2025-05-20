@@ -145,7 +145,7 @@ export function WithdrawForm({ className }: { className?: string }) {
       <div>
         <Button
           loading={isPending}
-          className="w-full bg-bg-blush-pearl text-black-rich hover:bg-bg-petal-mist"
+          className="w-full bg-bg-blush-pearl text-black-rich hover:bg-bg-blush-pearl"
           onClick={() => {
             if (checkAndShowDisclaimer(address)) return
 

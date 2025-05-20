@@ -17,7 +17,7 @@ const buttonVariants = cva(
         primary:
           "bg-bg-tertiary hover:bg-bg-secondary text-button-primary-fg disabled:bg-bg-disabled disabled:text-button-primary-fg_disabled",
         secondary:
-          "bg-button-secondary-bg hover:bg-bg-petal-mist hover:text-black-rich border-border-primary text-button-secondary-fg",
+          "bg-button-secondary-bg hover:bg-bg-blush-pearl hover:text-black-rich border-border-primary text-button-secondary-fg",
         tertiary: ["", ""],
         link: "text-primary underline-offset-4 hover:underline",
         invisible: "text-white hover:opacity-80 transition-opacity",
