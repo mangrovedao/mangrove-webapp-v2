@@ -3,14 +3,7 @@ import { Button } from "@/components/ui/button"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useChains } from "@/providers/chains"
 import { useMenuStore } from "@/stores/menu.store"
-import {
-  BurgerIcon,
-  EarnIcon,
-  HelpIcon,
-  SwapIcon,
-  TelegramIcon,
-  TradeIcon,
-} from "@/svgs"
+import { BurgerIcon, HelpIcon, TelegramIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import {
@@ -44,19 +37,19 @@ import { Spinner } from "./ui/spinner"
 const MENUS = [
   {
     href: "/swap",
-    icon: SwapIcon,
+    // icon: SwapIcon,
     text: "Swap",
     disabled: false,
   },
   {
     href: "/trade",
-    icon: TradeIcon,
+    // icon: TradeIcon,
     text: "Trade",
     disabled: false,
   },
   {
     href: "/earn",
-    icon: EarnIcon,
+    // icon: EarnIcon,
     text: "Earn",
     disabled: false,
   },
@@ -312,34 +305,41 @@ export function MobileOverlay() {
 
               {/* Navigation Menu */}
               <div className="bg-bg-secondary rounded-sm p-2 mb-6">
-                {MENUS.map(({ href, disabled, icon: Icon, text }) => {
-                  const isActive =
-                    pathname === href || pathname?.startsWith(`${href}/`)
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => toggle()}
-                      className={cn(
-                        "flex items-center w-full gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium",
-                        isActive
-                          ? "text-black-rich bg-bg-tertiary"
-                          : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
-                        disabled && "opacity-50 pointer-events-none",
-                      )}
-                    >
-                      <span
+                {MENUS.map(
+                  ({
+                    href,
+                    disabled,
+                    // icon: Icon,
+                    text,
+                  }) => {
+                    const isActive =
+                      pathname === href || pathname?.startsWith(`${href}/`)
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => toggle()}
+                        className={cn(
+                          "flex items-center w-full gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium",
+                          isActive
+                            ? "text-black-rich bg-bg-tertiary"
+                            : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
+                          disabled && "opacity-50 pointer-events-none",
+                        )}
+                      >
+                        {/* <span
                         className={cn(
                           "text-nav-item-button-icon-fg",
                           isActive && "text-black-rich",
                         )}
                       >
                         <Icon />
-                      </span>
-                      <div>{text}</div>
-                    </Link>
-                  )
-                })}
+                      </span> */}
+                        <div>{text}</div>
+                      </Link>
+                    )
+                  },
+                )}
               </div>
 
               <Link
@@ -488,33 +488,42 @@ export default function Navbar() {
               {/* Desktop Navigation */}
               <div className="hidden lg:block">
                 <div className="flex items-center p-1 space-x-1">
-                  {MENUS.map(({ href, disabled, icon: Icon, text }) => {
-                    const isActive =
-                      pathname === href || pathname?.startsWith(`${href}/`)
-                    return (
-                      <Link
-                        key={href}
-                        href={href}
-                        className={cn(
-                          "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                          isActive
-                            ? "text-black-rich bg-bg-tertiary"
-                            : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
-                          disabled && "opacity-50 pointer-events-none",
-                        )}
-                      >
-                        <span
+                  {MENUS.map(
+                    ({
+                      href,
+                      disabled,
+
+                      // icon: Icon,
+
+                      text,
+                    }) => {
+                      const isActive =
+                        pathname === href || pathname?.startsWith(`${href}/`)
+                      return (
+                        <Link
+                          key={href}
+                          href={href}
                           className={cn(
-                            "text-nav-item-button-icon-fg",
-                            isActive && "text-black-rich",
+                            "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                            isActive
+                              ? "text-black-rich bg-bg-tertiary"
+                              : "text-nav-item-button-icon-fg hover:text-white hover:bg-bg-secondary",
+                            disabled && "opacity-50 pointer-events-none",
                           )}
                         >
-                          <Icon />
-                        </span>
-                        <span>{text}</span>
-                      </Link>
-                    )
-                  })}
+                          {/* <span
+                            className={cn(
+                              "text-nav-item-button-icon-fg",
+                              isActive && "text-black-rich",
+                            )}
+                          >
+                            <Icon />
+                          </span> */}
+                          <span>{text}</span>
+                        </Link>
+                      )
+                    },
+                  )}
                 </div>
               </div>
             </div>
