@@ -75,7 +75,7 @@ export function WithdrawForm({ className }: { className?: string }) {
 
   return (
     <form
-      className={cn("flex flex-col h-full", className)}
+      className={cn("flex flex-col h-full flex-1 gap-6", className)}
       onSubmit={(e) => {
         e.preventDefault()
       }}
@@ -112,7 +112,7 @@ export function WithdrawForm({ className }: { className?: string }) {
                 className={cn(
                   "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none ",
                   {
-                    "bg-bg-tertiary": sliderValue === value,
+                    "bg-bg-tertiary text-black-rich": sliderValue === value,
                   },
                 )}
                 onClick={(e) => {
@@ -142,10 +142,10 @@ export function WithdrawForm({ className }: { className?: string }) {
         </div>
       </div>
 
-      <div className="mt-auto pt-4">
+      <div>
         <Button
           loading={isPending}
-          className="w-full hover:bg-bg-tertiary bg-bg-primary"
+          className="w-full bg-bg-blush-pearl text-black-rich hover:bg-bg-petal-mist"
           onClick={() => {
             if (checkAndShowDisclaimer(address)) return
 

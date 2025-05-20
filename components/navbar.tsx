@@ -3,7 +3,14 @@ import { Button } from "@/components/ui/button"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useChains } from "@/providers/chains"
 import { useMenuStore } from "@/stores/menu.store"
-import { BurgerIcon, HelpIcon, SwapIcon, TelegramIcon, TradeIcon } from "@/svgs"
+import {
+  BurgerIcon,
+  EarnIcon,
+  HelpIcon,
+  SwapIcon,
+  TelegramIcon,
+  TradeIcon,
+} from "@/svgs"
 import { cn } from "@/utils"
 import { shortenAddress } from "@/utils/wallet"
 import {
@@ -45,6 +52,12 @@ const MENUS = [
     href: "/trade",
     icon: TradeIcon,
     text: "Trade",
+    disabled: false,
+  },
+  {
+    href: "/earn",
+    icon: EarnIcon,
+    text: "Earn",
     disabled: false,
   },
   // {

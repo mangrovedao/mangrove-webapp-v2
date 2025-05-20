@@ -3,11 +3,16 @@ import { printEvmError } from "@/utils/errors"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { applyPriceDisplayDecimals } from "@/utils/tokens"
-import { MarketParams, Token } from "@mangrovedao/mgv"
+import { MarketParams, Token, mangroveActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
 import { z } from "zod"
-import { useCashnesses, useSymbolOverrides } from "./use-addresses"
+import {
+  useCashnesses,
+  useMangroveAddresses,
+  useSymbolOverrides,
+} from "./use-addresses"
+import { useNetworkClient } from "./use-network-client"
 
 // Define Zod schemas that match the expected Mangrove types
 const TokenSchema = z
@@ -45,6 +50,8 @@ export function useOpenMarkets() {
   const { defaultChain } = useDefaultChain()
   const cashnesses = useCashnesses()
   const symbolOverride = useSymbolOverrides()
+  const client = useNetworkClient()
+  const mangrove = useMangroveAddresses()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["open-markets", defaultChain.id, cashnesses, symbolOverride],
@@ -52,24 +59,85 @@ export function useOpenMarkets() {
       try {
         if (!defaultChain.id) throw new Error("Chain ID not found")
 
-        const response = await fetch(
-          `${getIndexerUrl(defaultChain)}/markets/open/${defaultChain.id}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              cashnesses,
-              overrides: symbolOverride,
-            }),
-          },
-        )
+        // Try API first
+        try {
+          const response = await fetch(
+            `${getIndexerUrl(defaultChain)}/markets/open/${defaultChain.id}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                cashnesses,
+                overrides: symbolOverride,
+              }),
+            },
+          )
 
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`)
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`)
+          }
+
+          // Parse and validate in one step
+          return OpenMarketsResponseSchema.parse(await response.json())
+        } catch (apiError) {
+          console.error("API fetch failed, falling back to SDK:", apiError)
+
+          // Fallback to SDK
+          if (!mangrove || !client) {
+            throw new Error("Mangrove client not available for fallback")
+          }
+
+          // Convert cashnesses to Record<string, number>
+          const cashnessesRecord: Record<string, number> = {}
+          Object.entries(cashnesses).forEach(([key, value]) => {
+            if (value !== undefined) {
+              cashnessesRecord[key] = value
+            }
+          })
+
+          // Convert symbolOverrides to Record<string, string>
+          const symbolOverridesRecord: Record<string, string> = {}
+          if (symbolOverride) {
+            Object.entries(symbolOverride).forEach(([key, value]) => {
+              if (value !== undefined) {
+                symbolOverridesRecord[key] = value
+              }
+            })
+          }
+
+          const markets = await client
+            .extend(mangroveActions(mangrove))
+            .getOpenMarkets({
+              cashnesses: cashnessesRecord,
+              symbolOverrides: symbolOverridesRecord,
+            })
+
+          // Convert SDK response to match API response format
+          return {
+            tokens: markets.reduce<Token[]>((acc, market) => {
+              if (
+                !acc.some(
+                  (t) =>
+                    t.address.toLowerCase() ===
+                    market.base.address.toLowerCase(),
+                )
+              ) {
+                acc.push(market.base)
+              }
+              if (
+                !acc.some(
+                  (t) =>
+                    t.address.toLowerCase() ===
+                    market.quote.address.toLowerCase(),
+                )
+              ) {
+                acc.push(market.quote)
+              }
+              return acc
+            }, []),
+            markets,
+          }
         }
-
-        // Parse and validate in one step
-        return OpenMarketsResponseSchema.parse(await response.json())
       } catch (error) {
         console.error("Error fetching open markets:", error)
         printEvmError(error)

@@ -18,16 +18,13 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
-import { FlowingNumbers } from "@/components/flowing-numbers"
 import InfoTooltip from "@/components/info-tooltip-new"
-import NeonContainer from "@/components/neon-container"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
-import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { TradeIcon } from "@/svgs"
@@ -299,13 +296,13 @@ export default function Page() {
             }}
             whileHover={{ scale: 1.01 }}
           >
-            <ImageWithHideOnError
+            {/* <ImageWithHideOnError
               src={`/assets/illustrations/vault-graph-placeholder.png`}
               width={832}
               height={382}
               alt={`vault-graph-placeholder`}
               className="rounded-sm shadow-lg"
-            />
+            /> */}
           </motion.div>
 
           {/* Vault details */}
@@ -450,77 +447,6 @@ export default function Page() {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <div className="grid gap-8">
-            <NeonContainer className="relative  ">
-              <motion.div
-                className="absolute -top-4 -right-2 rounded-sm overflow-hidden"
-                initial={{ rotate: -1, y: -1 }}
-                animate={{ rotate: 0, y: 0 }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                }}
-              >
-                <ImageWithHideOnError
-                  src={`/assets/illustrations/earn-leaf.png`}
-                  width={100}
-                  height={90}
-                  alt={`mangrove-logo`}
-                />
-              </motion.div>
-              <GridLine
-                title={"Your incentives rewards"}
-                value={
-                  <div className="flex items-center gap-1">
-                    <span className="text-text-secondary !text-md">MGV</span>
-                    <FlowingNumbers
-                      className="text-md"
-                      initialValue={vault?.incentivesData?.rewards || 0}
-                      ratePerSecond={
-                        vault?.incentivesData?.currentRewardsPerSecond || 0
-                      }
-                      decimals={6}
-                    />
-                  </div>
-                }
-              />
-              <div className="flex justify-start items-center gap-5">
-                <GridLine
-                  title={"Your deposit"}
-                  value={
-                    <motion.div
-                      className="flex items-center justify-center gap-2 text-md"
-                      initial={{ scale: 0.9 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.3, delay: 0.8 }}
-                    >
-                      <span className="flex gap-1 text-md">
-                        {(baseDepositDollar + quoteDepositDollar).toFixed(2)}
-                        <span className="text-text-secondary">$</span>
-                      </span>
-                    </motion.div>
-                  }
-                />
-                <GridLine
-                  title={"Your PNL"}
-                  value={
-                    <motion.span
-                      className={cn("flex gap-1 text-md")}
-                      initial={{ scale: 0.9 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.3, delay: 0.9 }}
-                    >
-                      {vault?.pnlData?.pnl
-                        ? `${vault?.pnlData?.pnl.toFixed(2)}%`
-                        : "0"}
-                    </motion.span>
-                  }
-                  symbol={""}
-                />
-              </div>
-            </NeonContainer>
-
             {/* Only show the form directly on desktop */}
             {!isMobile && (
               <motion.div
@@ -560,7 +486,7 @@ export default function Page() {
                         ))}
                       </CustomRadioGroup>
                     </div>
-                    <div className="relative min-h-[360px] h-full">
+                    <div className="relative min-h-[400px] h-full">
                       <AnimatePresence mode="wait">
                         {action === Action.Deposit && !vault?.isDeprecated ? (
                           <motion.div

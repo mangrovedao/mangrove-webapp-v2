@@ -202,7 +202,7 @@ export function useSymbolOverrides() {
 
 // SEI
 
-const SEIWSEI = {
+export const SEIWSEI = {
   address: "0xE30feDd158A2e3b13e9badaeABaFc5516e95e8C7",
   symbol: "WSEI",
   decimals: 18,
@@ -211,7 +211,7 @@ const SEIWSEI = {
   mgvTestToken: true,
 } as const satisfies Token
 
-const SEIUSDC = {
+export const SEIUSDC = {
   address: "0x3894085Ef7Ff0f0aeDf52E2A2704928d1Ec074F1",
   symbol: "USDC",
   decimals: 6,
@@ -220,7 +220,7 @@ const SEIUSDC = {
   mgvTestToken: true,
 } as const satisfies Token
 
-const SEIWETH = {
+export const SEIWETH = {
   address: "0x160345fC359604fC6e70E3c5fAcbdE5F7A9342d8",
   symbol: "WETH",
   decimals: 18,
@@ -229,7 +229,7 @@ const SEIWETH = {
   mgvTestToken: true,
 } as const satisfies Token
 
-const SEIWBTC = {
+export const SEIWBTC = {
   address: "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
   symbol: "WBTC",
   decimals: 8,
@@ -250,16 +250,30 @@ export const seiWSEIWETH = {
   tickSpacing: 1n,
 } as const satisfies MarketParams
 
-export const seiWSEIWBT = {
+export const seiWSEIWBTC = {
   base: SEIWSEI,
   quote: SEIWBTC,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const seiWBTCUSDC = {
+  base: SEIWBTC,
+  quote: SEIUSDC,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const seiWETHUSDC = {
+  base: SEIWETH,
+  quote: SEIUSDC,
   tickSpacing: 1n,
 } as const satisfies MarketParams
 
 export const seiMarkets = [
   seiWSEIUSDC,
   seiWSEIWETH,
-  seiWSEIWBT,
+  seiWSEIWBTC,
+  seiWBTCUSDC,
+  seiWETHUSDC,
 ] as const satisfies MarketParams[]
 
 // MEGAETH TESTNET

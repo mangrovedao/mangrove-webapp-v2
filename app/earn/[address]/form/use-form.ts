@@ -67,7 +67,6 @@ export default function useForm() {
   const handleBaseDepositChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
-    console.log(2)
     const value = typeof e === "string" ? e : e.target.value
     setBaseAmount(parseUnits(value, baseToken?.decimals || 18))
     setBaseSliderAmount(value)
@@ -82,7 +81,6 @@ export default function useForm() {
   }
 
   React.useEffect(() => {
-    console.log(6)
     const newErrors = { ...errors }
     // Base Deposit Validation
     if (baseBalance?.balance && data.baseAmount > baseBalance?.balance) {
@@ -99,8 +97,6 @@ export default function useForm() {
     } else {
       delete newErrors.quoteDeposit
     }
-
-    console.log(7)
 
     setErrors(newErrors)
   }, [baseDeposit, quoteDeposit])

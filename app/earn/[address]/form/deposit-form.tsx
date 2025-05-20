@@ -58,7 +58,6 @@ export function DepositForm({ className }: { className?: string }) {
   // Calculate slider percentage from manually entered value
   useEffect(() => {
     if (baseBalance?.balance && baseBalance.balance > 0n && baseDeposit) {
-      console.log(3)
       try {
         const enteredValue = parseFloat(baseDeposit)
         const maxValue = parseFloat(
@@ -75,7 +74,6 @@ export function DepositForm({ className }: { className?: string }) {
         // Handle parsing errors silently
       }
     }
-    console.log(4)
   }, [baseDeposit, baseBalance])
 
   // Calculate slider percentage from manually entered value
@@ -121,7 +119,6 @@ export function DepositForm({ className }: { className?: string }) {
   const handleBaseInputChange = (
     e: React.ChangeEvent<HTMLInputElement> | string,
   ) => {
-    console.log(1)
     handleBaseDepositChange(e)
     // Slider will be updated by the effect
   }
@@ -135,9 +132,7 @@ export function DepositForm({ className }: { className?: string }) {
   }
 
   React.useEffect(() => {
-    console.log(5)
     refetchAllowance()
-    console.log(6)
   }, [baseDeposit, quoteDeposit])
 
   // Get allowances and approval status
@@ -331,7 +326,7 @@ export function DepositForm({ className }: { className?: string }) {
         e.preventDefault()
       }}
     >
-      <div className="flex-grow space-y-6">
+      <div className="flex-grow space-y-5">
         <EnhancedNumericInput
           showSlider
           sendSliderValue={baseSliderValue}
@@ -374,25 +369,24 @@ export function DepositForm({ className }: { className?: string }) {
           showBalance
           balanceAction={{ onClick: handleQuoteDepositChange, text: "MAX" }}
         />
-      </div>
-
-      <div className="mt-auto pt-4">
-        <div className="flex gap-2 items-center">
-          <Button
-            className="w-full hover:hover:bg-bg-tertiary bg-bg-primary"
-            onClick={handleAction}
-            disabled={
-              isLoading ||
-              isLoadingAllowance ||
-              mintParams.mintAmount === 0n ||
-              hasErrors ||
-              isPending ||
-              isProcessing
-            }
-            loading={isPending || isProcessing}
-          >
-            {getButtonLabel()}
-          </Button>
+        <div className="mt-auto">
+          <div className="flex gap-2 items-center">
+            <Button
+              className="w-full bg-bg-blush-pearl text-black-rich hover:bg-bg-petal-mist"
+              onClick={handleAction}
+              disabled={
+                isLoading ||
+                isLoadingAllowance ||
+                mintParams.mintAmount === 0n ||
+                hasErrors ||
+                isPending ||
+                isProcessing
+              }
+              loading={isPending || isProcessing}
+            >
+              {getButtonLabel()}
+            </Button>
+          </div>
         </div>
       </div>
     </form>

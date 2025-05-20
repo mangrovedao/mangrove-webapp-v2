@@ -188,7 +188,7 @@ export default function Swap() {
                     "text-xs flex-1 bg-bg-primary border-none rounded-sm",
                     {
                       "opacity-60": !showCustomInput,
-                      "border-none bg-bg-tertiary rounded-sm text-black-rich":
+                      "border-none bg-bg-tertiary rounded-sm text-black-rich p-y h-11":
                         showCustomInput,
                     },
                   )}

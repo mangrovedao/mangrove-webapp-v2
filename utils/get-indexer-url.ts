@@ -1,12 +1,18 @@
 // utils/get-indexer-url.ts
 import { Chain } from "viem"
+import { arbitrum, base, megaethTestnet, sei } from "viem/chains"
 
 export function getIndexerUrl(chain?: Chain | null): string {
-  // Check if chain exists and if it's a testnet
-  if (chain?.testnet) {
-    return process.env.NEXT_PUBLIC_TESTNET_INDEXER_URL || ""
+  switch (chain?.id) {
+    case megaethTestnet.id:
+      return "https://indexer-testnet.mgvinfra.com"
+    case sei.id:
+      return "https://indexer-sei.mgvinfra.com"
+    case base.id:
+      return "https://indexer.mgvinfra.com"
+    case arbitrum.id:
+      return "https://indexer-arbitrum.mgvinfra.com"
+    default:
+      return "https://indexer.mgvinfra.com"
   }
-
-  // Default to mainnet
-  return process.env.NEXT_PUBLIC_MAINNET_INDEXER_URL || ""
 }

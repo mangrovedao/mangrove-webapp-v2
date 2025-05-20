@@ -158,7 +158,8 @@ export const EnhancedNumericInput = React.forwardRef<
                           className={cn(
                             "!h-6 text-xs w-full !rounded-md flex items-center justify-center border-none flex-1",
                             {
-                              "bg-bg-tertiary": sendSliderValue === value,
+                              "bg-bg-tertiary text-black-rich":
+                                sendSliderValue === value,
                             },
                           )}
                           onClick={(e) => {
