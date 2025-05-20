@@ -11,7 +11,7 @@ export function useUpdatePageTitle({
   spotPrice,
   baseToken,
   quoteToken,
-  suffix = "Mangrove DEX",
+  suffix = "Oxium DEX",
   prefix,
 }: {
   spotPrice?: number | null

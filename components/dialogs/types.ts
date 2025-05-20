@@ -3,7 +3,7 @@ export type DialogType =
   | "success"
   | "info"
   | "confirm"
-  | "mangrove"
+  | "oxium"
   | undefined
 
 export type DialogProps = {

@@ -32,7 +32,7 @@ export function TokenIcon({
         onError={(e) => {
           try {
             if (useFallback) {
-              e.currentTarget.src = "/assets/illustrations/mangrove-logo.png"
+              e.currentTarget.src = "/assets/illustrations/oxium-full-logo.png"
             }
           } catch (error) {
             console.error(error)

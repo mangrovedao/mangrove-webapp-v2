@@ -4,8 +4,8 @@ import React from "react"
 import { MarketProvider } from "@/providers/market"
 
 export const metadata: Metadata = {
-  title: "Strategies | Mangrove DEX",
-  description: "Strategies on Mangrove DEX",
+  title: "Earn | DEX",
+  description: "Earn",
 }
 
 export default function Layout({ children }: React.PropsWithChildren) {

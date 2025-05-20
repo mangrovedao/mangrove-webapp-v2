@@ -32,9 +32,9 @@ export function MinimumVolume(props: {
         <InfoTooltip className="flex flex-col">
           <Caption className="text-xs">There is a minimum amount</Caption>
           <Caption>
-            required for limit orders on Mangrove.{" "}
+            required for limit orders on Oxium.{" "}
             <Link
-              href="https://docs.mangrove.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
+              href="https://docs.oxium.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
               target="_blank"
               rel="noreferrer"
               className="text-green-caribbean underline"

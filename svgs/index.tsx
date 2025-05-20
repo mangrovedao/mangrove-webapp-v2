@@ -247,6 +247,23 @@ export function MangroveLogo(props: React.ComponentProps<"svg">) {
   )
 }
 
+export function OxiumLogo(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      width="286"
+      height="286"
+      viewBox="0 0 286 286"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M39.4277 163.217C83.5772 163.66 119.766 196.798 123.312 240.18V246.573H162.739V286H123.312V246.573H77.5599L39.4277 208.404V163.217ZM286 163.074L246.572 162.983V208.44L208.491 246.59H162.739V240.18C166.285 196.849 202.389 163.426 246.572 162.983V123.806H286V163.074ZM39.4277 123.789V163.217H0V123.789H39.4277ZM123.295 45.82C119.749 89.2025 83.5772 123.363 39.4277 123.806V78.1736L78.0883 39.4448H123.278L123.295 45.82ZM162.739 39.4277H207.929L246.555 78.1225L246.572 123.806C202.389 123.363 166.268 89.1684 162.722 45.803V39.4277L123.278 39.4448V0H162.722V39.4277H162.739Z"
+        fill="#FDF1EE"
+      />
+    </svg>
+  )
+}
+
 export function TelegramIcon(props: React.ComponentProps<"svg">) {
   return (
     <svg

@@ -8,8 +8,8 @@ import {
 } from "@/providers/market"
 
 export const metadata: Metadata = {
-  title: "Trade | Mangrove DEX",
-  description: "Trade on Mangrove DEX",
+  title: "Trade | DEX",
+  description: "Trade",
 }
 
 export default function Layout({ children }: React.PropsWithChildren) {

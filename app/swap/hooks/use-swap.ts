@@ -156,7 +156,7 @@ export function useSwap() {
       return `Wrap ${getExactWeiAmount(totalWrapping.toString(), 3)} ETH`
     if (hasToApprove) return `Approve ${payToken?.symbol}`
     if (postMarketOrder.isPending) return "Processing transaction..."
-    return `Swap via ${isMangrove ? "Mangrove" : "Odos"}`
+    return `Swap via ${isMangrove ? "Oxium" : "Odos"}`
   }, [
     hasEnoughBalance,
     fields.payValue,

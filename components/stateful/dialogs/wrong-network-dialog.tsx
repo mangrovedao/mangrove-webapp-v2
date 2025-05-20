@@ -34,9 +34,9 @@ export function WrongNetworkAlertDialog() {
 
   const title = !isNetworkSupported
     ? "Unsupported network"
-    : "Error connecting to Mangrove"
+    : "Error connecting to Oxium"
   const description = !isNetworkSupported ? (
-    "Mangrove does not support this network yet."
+    "Oxium does not support this network yet."
   ) : (
     <div>
       Page failed to load. <br />

@@ -44,7 +44,7 @@ export function Vaults() {
         tvl: 0n,
         baseDollarPrice: 0,
         quoteDollarPrice: 0,
-        strategist: vault.strategist || "",
+        strategist: vault.manager || "",
         type: vault.strategyType || "",
         isActive: true,
         deprecated: (vault as any).isDeprecated ?? false,

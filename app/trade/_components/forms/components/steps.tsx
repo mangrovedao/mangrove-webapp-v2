@@ -46,7 +46,7 @@ function Step({ title, children, number, active = false }: StepProps) {
           {title?.includes("deployment") ? (
             <InfoTooltip side="right">
               <Caption>Make your approvals safer!</Caption>
-              <Caption>If you never used Limit Orders on Mangrove,</Caption>
+              <Caption>If you never used Limit Orders on Oxium,</Caption>
               <Caption>
                 you are required to active your address. Please sign a
                 transaction.
@@ -55,7 +55,7 @@ function Step({ title, children, number, active = false }: StepProps) {
           ) : undefined}
           {title?.includes("activation") ? (
             <InfoTooltip>
-              <Caption>If you never used Limit Orders on Mangrove,</Caption>
+              <Caption>If you never used Limit Orders on Oxium,</Caption>
               <Caption>
                 you are required to activate this functionality. Please sign a
                 transaction.

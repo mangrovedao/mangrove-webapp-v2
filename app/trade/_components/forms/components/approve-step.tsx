@@ -21,7 +21,7 @@ export function ApproveStep({
         />
       </div>
       <h1 className="text-2xl text-white text-center">
-        Allow Mangrove to access your {tokenSymbol}?
+        Allow Oxium to access your {tokenSymbol}?
       </h1>
       <p className="text-base text-gray-scale-300">
         By granting permission, you are allowing{" "}

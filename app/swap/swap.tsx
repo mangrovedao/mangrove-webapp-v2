@@ -17,7 +17,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog-new"
-import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
@@ -79,7 +78,7 @@ export default function Swap() {
     spotPrice,
     baseToken: currentMarket?.base,
     quoteToken: currentMarket?.quote,
-    suffix: "Swap | Mangrove DEX",
+    suffix: "Swap | DEX",
   })
 
   return (
@@ -324,7 +323,7 @@ function TokenSelectorDialog({
                       customSrc={ODOS_API_IMAGE_URL(token.symbol)}
                       useFallback={true}
                     />
-                    {mangroveTradeableTokens.includes(token.address) && (
+                    {/* {mangroveTradeableTokens.includes(token.address) && (
                       <ImageWithHideOnError
                         className="absolute -top-2 -right-2 p-0.5"
                         src={`/assets/illustrations/mangrove-logo.png`}
@@ -332,7 +331,7 @@ function TokenSelectorDialog({
                         height={20}
                         alt={`mangrove-logo`}
                       />
-                    )}
+                    )} */}
                   </div>
                   <span className="font-semibold text-lg">{token.symbol}</span>
                 </Button>

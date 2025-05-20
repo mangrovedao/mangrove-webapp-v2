@@ -21,7 +21,7 @@ const MobileOverlay = () => {
               <br />
               <br />
               <Button className="z-50">
-                <a href="https://swap.mangrove.exchange" target="_blank">
+                <a href="https://swap.oxium.exchange" target="_blank">
                   Go to Swap App
                 </a>
               </Button>

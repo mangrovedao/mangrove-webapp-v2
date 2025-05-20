@@ -80,7 +80,7 @@ export default function UnWrapETHDialog({ isOpen, onClose }: Props) {
       open={!!isOpen}
       onClose={onClose}
       showCloseButton={false}
-      type="mangrove"
+      type="oxium"
     >
       <Dialog.Title className="flex justify-center">
         <Dialog.Close className="absolute right-4 top-4">

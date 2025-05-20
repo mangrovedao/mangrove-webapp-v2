@@ -40,7 +40,7 @@ export default function Page() {
     spotPrice,
     baseToken: currentMarket?.base,
     quoteToken: currentMarket?.quote,
-    suffix: "Trade | Mangrove DEX",
+    suffix: "Trade | Oxium DEX",
   })
 
   // Check if we're on mobile

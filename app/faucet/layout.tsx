@@ -3,8 +3,8 @@ import React from "react"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Faucet | Mangrove DEX",
-  description: "Faucet on Mangrove DEX",
+  title: "Faucet | DEX",
+  description: "Faucet DEX",
 }
 
 export default function Layout({ children }: React.PropsWithChildren) {

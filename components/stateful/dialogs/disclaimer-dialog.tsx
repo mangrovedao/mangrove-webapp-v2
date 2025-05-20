@@ -28,7 +28,7 @@ function DisclaimerDialog() {
     try {
       await signature.signMessageAsync({
         message:
-          "Welcome to the Mangrove dApp!\nThe use of this app is subject to the terms of use\nhttps://mangrove.exchange/terms-of-use\n\nBy signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
+          "Welcome to the Oxium dApp!\nThe use of this app is subject to the terms of use\nhttps://oxium.exchange/terms-of-use\n\nBy signing this message:\nYou confirm that you are not accessing this app from\nor are a resident of the USA or any other restricted\ncountry.",
       })
 
       if (address) {
@@ -47,15 +47,15 @@ function DisclaimerDialog() {
   return (
     <Dialog
       open={isOpen && !hideDisclaimer[address ?? ""]}
-      type="mangrove"
+      type="oxium"
       onClose={closeDisclaimer}
     >
-      <Dialog.Title>Welcome to the Mangrove dApp!</Dialog.Title>
+      <Dialog.Title>Welcome to the Oxium dApp!</Dialog.Title>
       <Dialog.Description>
         <div>
           The use of this app is subject to the following{" "}
           <a
-            href="https://mangrove.exchange/terms-of-use"
+            href="https://oxium.exchange/terms-of-use"
             target="_blank"
             rel="noreferrer"
             className={"text-green-caribbean no-underline hover:underline"}
@@ -79,7 +79,7 @@ function DisclaimerDialog() {
                   {" "}
                   For more information, please read our{" "}
                   <a
-                    href="https://mangrove.exchange/terms-of-use"
+                    href="https://oxium.exchange/terms-of-use"
                     target="_blank"
                     rel="noreferrer"
                     className={

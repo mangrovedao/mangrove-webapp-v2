@@ -343,7 +343,7 @@ export function MobileOverlay() {
               </div>
 
               <Link
-                href={"https://docs.mangrove.exchange/"}
+                href={"https://docs.oxium.exchange/"}
                 target="_blank"
                 className="flex items-center w-full gap-3 px-4 py-3 rounded-lg text-nav-item-button-icon-fg hover:text-white hover:bg-bg-tertiary text-sm font-medium transition-colors"
               >
@@ -409,7 +409,7 @@ export default function Navbar() {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>
                         <Link
-                          href="https://docs.mangrove.exchange/"
+                          href="https://docs.oxium.exchange/"
                           target="_blank"
                           className="text-xs text-text-secondary"
                         >
@@ -418,7 +418,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Link
-                          href="https://docs.mangrove.exchange/dev"
+                          href="https://docs.oxium.exchange/dev"
                           target="_blank"
                           className="text-xs text-text-secondary"
                         >
@@ -434,7 +434,7 @@ export default function Navbar() {
                         <div className="flex justify-center gap-2">
                           <DropdownMenuItem className="hover:bg-bg-tertiary">
                             <Link
-                              href="https://x.com/MangroveDAO"
+                              href="https://x.com/OxiumExchange"
                               target="_blank"
                             >
                               <svg
@@ -470,10 +470,7 @@ export default function Navbar() {
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Link
-                              href="https://t.me/MangroveDAO"
-                              target="_blank"
-                            >
+                            <Link href="https://t.me/Oxium" target="_blank">
                               <TelegramIcon
                                 width="20"
                                 height="20"
