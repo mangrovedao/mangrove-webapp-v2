@@ -27,6 +27,8 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
     return chainMap[defaultChain.id] || "base" // Default to Base if not found
   }, [defaultChain])
 
+  console.log(pool)
+
   // Build the embed URL
   const embedUrl = useMemo(() => {
     return `https://www.geckoterminal.com/sei-evm/pools/${pool?.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
