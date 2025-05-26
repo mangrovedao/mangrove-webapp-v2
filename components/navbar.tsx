@@ -20,7 +20,6 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { useAccount } from "wagmi"
-import ChainSelector from "./chain-selector"
 import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog-new"
 import {
   DropdownMenu,
@@ -516,9 +515,6 @@ export default function Navbar() {
               >
                 any feedback ?
               </Link>
-              <div className="hidden lg:block">
-                <ChainSelector />
-              </div>
 
               {/* User Account Button */}
               {isConnected ? (
