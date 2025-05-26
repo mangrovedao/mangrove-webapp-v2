@@ -44,8 +44,8 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
   ])
 
   const uniModuleAddress = {
-    [ProtocolType.UniswapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
-    [ProtocolType.PancakeSwapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
+    [ProtocolType.UniswapV3]: "0x4bB7F3087664E559365C4C94d3C21a39847d7726",
+    [ProtocolType.PancakeSwapV3]: "0x4bB7F3087664E559365C4C94d3C21a39847d7726",
     [ProtocolType.Slipstream]: "0x922F0E2fa80F7dc2E22dBcE5EB3B423E09CE013B",
   }
 
@@ -83,6 +83,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         // Calculate max tick based on current price and slippage
         const maxTick = calculateMaxTick(maxTickEncountered, slippage)
 
+        console.log(pool?.protocol.type)
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
           ghostbook: mangroveChain?.ghostbook as Address,
