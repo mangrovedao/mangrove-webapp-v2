@@ -202,3 +202,25 @@ export function getAllTokensInMarkets(markets: ReturnType<typeof useMarkets>) {
     return acc
   }, [])
 }
+
+export const SEI_WRAP_CONTRACT = "0xE30feDd158A2e3b13e9badaeABaFc5516e95e8C7"
+
+export const SEI_TOKEN = {
+  address: "0x6f54391fe0386D506b51d69Deeb8b04E0544E088",
+  symbol: "WSEI",
+  name: "Wrapped SEI",
+  decimals: 18,
+  priceDisplayDecimals: 6,
+  displayDecimals: 6,
+  mgvTestToken: false,
+}
+
+export const NATIVE_SEI = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "SEI",
+  name: "SEI",
+  decimals: 18,
+  priceDisplayDecimals: 6,
+  displayDecimals: 6,
+  mgvTestToken: false,
+}

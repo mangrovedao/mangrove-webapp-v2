@@ -117,6 +117,7 @@ export default {
           "petal-mist": "hsl(var(--bg-petal-mist))",
           "blush-pearl": "hsl(var(--bg-blush-pearl))",
           "sunset-dust": "hsl(var(--bg-sunset-dust))",
+          "subtle-hover": "hsl(var(--bg-subtle-hover))",
         },
         border: {
           DEFAULT: "hsl(var(--border))",

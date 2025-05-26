@@ -56,6 +56,17 @@ function copyIcons() {
     "./public/custom-token-icons/wsei.webp",
     "./public/cryptocurrency-icons/svg/color/wsei.webp",
   )
+
+  // Copy WSEI custom icon
+  fs.copyFileSync(
+    "./public/custom-token-icons/sei.svg",
+    "./public/cryptocurrency-icons/svg/color/sei.svg",
+  )
+  // Copy WSEI custom icon
+  fs.copyFileSync(
+    "./public/custom-token-icons/sei.webp",
+    "./public/cryptocurrency-icons/svg/color/sei.webp",
+  )
 }
 
 function genetareDicFromManifestFile() {
@@ -93,6 +104,7 @@ function genetareDicFromManifestFile() {
     { USDe: { color: "#FFFFFF", name: "USDe", symbol: "USDe" } },
     { PRL: { color: "#A797FF", name: "PRL Token", symbol: "PRL" } },
     { WSEI: { color: "", name: "GENERIC", symbol: "WSEI" } },
+    { SEI: { color: "", name: "GENERIC", symbol: "SEI" } },
   )
   fs.mkdirSync("./generated", { recursive: true })
   fs.writeFileSync("./generated/icons.json", JSON.stringify(dic))

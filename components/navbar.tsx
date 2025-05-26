@@ -252,28 +252,6 @@ export function MobileOverlay() {
 
               {/* Quick Actions Bar */}
               <div className="flex items-center justify-between gap-2 mb-6">
-                {/* Network Selection Button */}
-
-                {isConnected ? (
-                  <button
-                    onClick={openNetworkDialog}
-                    className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
-                  >
-                    <ImageWithHideOnError
-                      src={`/assets/chains/${defaultChain?.id}.webp`}
-                      width={20}
-                      height={20}
-                      className="h-5 rounded-sm size-5"
-                      alt={`${defaultChain?.name || "Network"}-logo`}
-                    />
-                    <span className="text-sm font-medium truncate">
-                      {defaultChain?.name || "Select Network"}
-                    </span>
-                  </button>
-                ) : (
-                  <NetworkSelectionModal />
-                )}
-
                 {/* Wallet Button */}
                 {isConnected ? (
                   <button
@@ -411,7 +389,7 @@ export default function Navbar() {
                         <Link
                           href="https://docs.oxium.exchange/"
                           target="_blank"
-                          className="text-xs text-text-secondary"
+                          className="text-xs text-text-secondary hover:text-text-tertiary"
                         >
                           User documentation
                         </Link>

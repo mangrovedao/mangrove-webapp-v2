@@ -29,7 +29,7 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
 
   // Build the embed URL
   const embedUrl = useMemo(() => {
-    return `https://www.geckoterminal.com/${chainName}/pools/${pool?.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
+    return `https://www.geckoterminal.com/sei-evm/pools/${pool?.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
   }, [pool, chainName])
 
   // Show loading state while pool is being fetched

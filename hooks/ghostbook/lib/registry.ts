@@ -1,7 +1,11 @@
 import type { MangroveActionsDefaultParams } from "@mangrovedao/mgv"
-import { arbitrumMangrove, baseMangrove } from "@mangrovedao/mgv/addresses"
+import {
+  arbitrumMangrove,
+  baseMangrove,
+  seiMangrove,
+} from "@mangrovedao/mgv/addresses"
 import type { Address, Chain } from "viem"
-import { arbitrum, base } from "viem/chains"
+import { arbitrum, base, sei } from "viem/chains"
 
 /**
  * Configuration type for Uniswap V3 and its clones/forks
@@ -46,6 +50,14 @@ export const uniClones = [
     name: "Uniswap V3",
     chain: base,
   },
+  {
+    pool: "0x0000000000000000000000000000000000000000",
+    router: "0x0000000000000000000000000000000000000000",
+    quoter: "0x0000000000000000000000000000000000000000",
+    factory: "0x0000000000000000000000000000000000000000",
+    name: "Uniswap V3",
+    chain: sei,
+  },
 ] as const satisfies Array<UniClone & { pool: Address }>
 
 export type MangroveChain = {
@@ -67,5 +79,11 @@ export const mangroveChains = [
     univ3Module: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
     mangroveParams: baseMangrove,
     chain: base,
+  },
+  {
+    ghostbook: "0x127A5a5E086DCe304875e392C8170B04bC81e8B6",
+    univ3Module: "0x4bB7F3087664E559365C4C94d3C21a39847d7726",
+    mangroveParams: seiMangrove,
+    chain: sei,
   },
 ] as const satisfies Array<MangroveChain>

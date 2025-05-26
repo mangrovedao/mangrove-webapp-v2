@@ -77,6 +77,8 @@ export function Market() {
     bs: tradeSide,
   })
 
+  console.log(sendToken)
+
   // Registry and trade infos
   const { baseToken } = useTradeInfos("market", tradeSide)
 

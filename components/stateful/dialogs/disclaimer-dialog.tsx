@@ -58,14 +58,14 @@ function DisclaimerDialog() {
             href="https://oxium.exchange/terms-of-use"
             target="_blank"
             rel="noreferrer"
-            className={"text-green-caribbean no-underline hover:underline"}
+            className={"text-text-petal-mist no-underline hover:underline"}
           >
             Terms of Use.
           </a>
         </div>
       </Dialog.Description>
       <Dialog.Footer>
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-2">
           <div className="items-top flex space-x-2">
             <div className="grid gap-1.5 leading-none hover:opacity-80">
               <label
@@ -83,7 +83,7 @@ function DisclaimerDialog() {
                     target="_blank"
                     rel="noreferrer"
                     className={
-                      "text-green-caribbean no-underline hover:underline"
+                      "text-text-petal-mist no-underline hover:underline"
                     }
                   >
                     Terms of Use.

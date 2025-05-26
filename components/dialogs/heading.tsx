@@ -7,7 +7,7 @@ export function Heading({ type }: { type: DialogType }) {
   if (!type) return null
   return (
     <>
-      <div className="w-full flex justify-center mb-8">
+      <div className="w-full flex justify-center mb-2">
         <div
           className={cn(
             "w-16 aspect-square rounded-lg flex items-center justify-center",
@@ -21,7 +21,7 @@ export function Heading({ type }: { type: DialogType }) {
           {type === "error" ? (
             <ExclamationMark />
           ) : type === "oxium" ? (
-            <OxiumLogo />
+            <OxiumLogo className="h-20 w-auto" />
           ) : type === "info" ? (
             <Info className="h-8 w-auto" />
           ) : (

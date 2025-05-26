@@ -78,7 +78,11 @@ export function useOpenMarkets() {
           }
 
           // Parse and validate in one step
-          return OpenMarketsResponseSchema.parse(await response.json())
+          const apiResponse = OpenMarketsResponseSchema.parse(
+            await response.json(),
+          )
+
+          return apiResponse
         } catch (apiError) {
           console.error("API fetch failed, falling back to SDK:", apiError)
 
@@ -87,29 +91,19 @@ export function useOpenMarkets() {
             throw new Error("Mangrove client not available for fallback")
           }
 
-          // Convert cashnesses to Record<string, number>
-          const cashnessesRecord: Record<string, number> = {}
-          Object.entries(cashnesses).forEach(([key, value]) => {
-            if (value !== undefined) {
-              cashnessesRecord[key] = value
-            }
-          })
-
-          // Convert symbolOverrides to Record<string, string>
-          const symbolOverridesRecord: Record<string, string> = {}
-          if (symbolOverride) {
-            Object.entries(symbolOverride).forEach(([key, value]) => {
-              if (value !== undefined) {
-                symbolOverridesRecord[key] = value
-              }
-            })
-          }
-
           const markets = await client
             .extend(mangroveActions(mangrove))
             .getOpenMarkets({
-              cashnesses: cashnessesRecord,
-              symbolOverrides: symbolOverridesRecord,
+              cashnesses: Object.fromEntries(
+                Object.entries(cashnesses).filter(
+                  ([, value]) => value !== undefined,
+                ),
+              ) as Record<string, number>,
+              symbolOverrides: Object.fromEntries(
+                Object.entries(symbolOverride).filter(
+                  ([, value]) => value !== undefined,
+                ),
+              ) as Record<string, string>,
             })
 
           // Convert SDK response to match API response format

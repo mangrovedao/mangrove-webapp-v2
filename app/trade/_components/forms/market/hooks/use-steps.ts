@@ -39,7 +39,7 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
         if (!marketClient?.key || !user || !sendAmount || !sendToken) {
           throw new Error("Missing required parameters")
         }
-
+        console.log(pool, sendToken?.address)
         if (marketClient?.chain?.testnet || !pool) {
           // Base chain - get market order steps
           try {
@@ -66,6 +66,7 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
             sendToken.address,
           )
 
+          console.log(allowance)
           if (allowance < parseUnits(sendAmount, sendToken.decimals)) {
             return [
               {

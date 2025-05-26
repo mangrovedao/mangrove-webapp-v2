@@ -4,9 +4,14 @@ import { useAccount, useBalance } from "wagmi"
 
 export function useTokenBalance(token?: Token) {
   const { address } = useAccount()
+
+  // For native tokens (zero address), don't pass the token parameter
+  const isNativeToken =
+    token?.address === "0x0000000000000000000000000000000000000000"
+
   const { data, ...rest } = useBalance({
     address,
-    token: token?.address as `0x`,
+    token: isNativeToken ? undefined : (token?.address as `0x${string}`),
   })
 
   return {

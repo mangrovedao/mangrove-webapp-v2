@@ -81,7 +81,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex group bg-secondary text-tertiary-gray hover:!text-text-blush-pearl",
-      "data-[state=checked]:!text-text-petal-mist",
+      "data-[state=checked]:!text-white",
       "data-[state=checked]:bg-secondary",
       "rounded-sm",
       "focus:bg-sunset-dust",

@@ -92,7 +92,7 @@ export default function Swap() {
               token={payToken}
               value={fields.payValue}
               isWrapping={isWrapping}
-              ethBalance={getExactWeiAmount(
+              seiBalance={getExactWeiAmount(
                 formatUnits(
                   ethBalance?.value ?? 0n,
                   ethBalance?.decimals ?? 18,
@@ -137,7 +137,6 @@ export default function Swap() {
           ) : (
             <Button
               className="w-full text-lg"
-              variant={"secondary"}
               size={"lg"}
               onClick={swap}
               disabled={isSwapDisabled}
@@ -213,7 +212,7 @@ export default function Swap() {
             ethBalance.value > 0n && (
               <div className="flex justify-between items-center ">
                 <span className="text-text-secondary flex items-center text-xs">
-                  Use ETH balance
+                  Use SEI balance
                 </span>
                 <div className="flex items-center gap-1 text-xs text-text-secondary">
                   <span>
@@ -224,7 +223,7 @@ export default function Swap() {
                       ),
                       3,
                     )}{" "}
-                    ETH
+                    SEI
                   </span>
                   <Checkbox
                     className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
@@ -232,7 +231,7 @@ export default function Swap() {
                     onClick={() => setIsWrapping(!isWrapping)}
                   />
                   <InfoTooltip className="text-text-quaternary text-sm size-4 cursor-pointer">
-                    Will add a wrap ETH to wETH step during transaction
+                    Will add a wrap SEI to wSEI step during transaction
                   </InfoTooltip>
                 </div>
               </div>
@@ -314,7 +313,7 @@ function TokenSelectorDialog({
               <div key={token.address}>
                 <Button
                   onClick={() => onSelect(token)}
-                  className="w-full bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
+                  className="w-full bg-bg-blush-pearl hover:bg-bg-subtle-hover hover:!text-white text-black-rich px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
                 >
                   <div className="relative">
                     <TokenIcon
@@ -354,7 +353,7 @@ type TokenContainerProps = {
   isFetchingDollarValue?: boolean
   loadingValue?: boolean
   isWrapping?: boolean
-  ethBalance?: string
+  seiBalance?: string
 }
 
 function TokenContainer({
@@ -368,7 +367,7 @@ function TokenContainer({
   isFetchingDollarValue,
   loadingValue,
   isWrapping,
-  ethBalance,
+  seiBalance,
 }: TokenContainerProps) {
   const { isConnected } = useAccount()
   const { formattedAndFixed, isLoading } = useTokenBalance(token)
@@ -399,7 +398,7 @@ function TokenContainer({
                 >
                   <span>
                     {isWrapping
-                      ? Number(ethBalance) + Number(formattedAndFixed)
+                      ? Number(seiBalance) + Number(formattedAndFixed)
                       : formattedAndFixed}
                   </span>{" "}
                 </Button>
@@ -409,9 +408,9 @@ function TokenContainer({
                 </span>
               )}
             </>
-          ) : (
+          ) : isLoading ? (
             <Skeleton className="w-10 h-3" />
-          )}
+          ) : undefined}
         </div>
       </div>
       <div className="flex items-center space-x-2">
@@ -466,7 +465,7 @@ function TokenContainer({
           {token ? (
             <Button
               onClick={onTokenClicked}
-              className="bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich p-1 border rounded-sm text-sm flex items-center space-x-1"
+              className="bg-bg-blush-pearl hover:bg-bg-subtle-hover hover:!text-white text-black-rich p-1 border rounded-sm text-sm flex items-center space-x-1"
             >
               <TokenIcon
                 symbol={token.symbol}
@@ -480,7 +479,7 @@ function TokenContainer({
               <ChevronDown className="mx-1 size-6 text-black-rich" />
             </Button>
           ) : (
-            <Button onClick={onTokenClicked} className="text-nowrap">
+            <Button onClick={onTokenClicked} className="text-nowrap ">
               Select token
             </Button>
           )}

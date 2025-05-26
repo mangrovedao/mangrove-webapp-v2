@@ -32,7 +32,8 @@ export function TokenIcon({
         onError={(e) => {
           try {
             if (useFallback) {
-              e.currentTarget.src = "/assets/illustrations/oxium-full-logo.png"
+              const fallbackSrc = getSvgUrl(symbol)
+              e.currentTarget.src = fallbackSrc
             }
           } catch (error) {
             console.error(error)

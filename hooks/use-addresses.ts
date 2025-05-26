@@ -142,7 +142,7 @@ export function useTokens() {
     case base.id:
       return baseTokens
     case sei.id:
-      return [SEIWSEI, SEIUSDC, SEIWETH, SEIWBTC]
+      return [SEIWSEI, SEINATIVE, SEIUSDC, SEIWETH, SEIWBTC]
     case megaethTestnet.id:
       return [megaEthTestnetWETH, megaEthTestnetUSDC]
     default:
@@ -170,11 +170,19 @@ export function useCashnesses() {
         cbETH: 500,
         wstETH: 600,
       }
+    case sei.id:
+      return {
+        WSEI: 1000,
+        USDC: 1e6,
+        WETH: 1000,
+        WBTC: 2000,
+      }
     case megaethTestnet.id:
       return {
         USDC: 1e6,
         WETH: 1000,
       }
+
     default:
       return {
         WETH: 1000,
@@ -195,6 +203,8 @@ export function useSymbolOverrides() {
       }
     case base.id:
       return {}
+    case sei.id:
+      return {}
     default:
       return {}
   }
@@ -203,8 +213,17 @@ export function useSymbolOverrides() {
 // SEI
 
 export const SEIWSEI = {
-  address: "0xE30feDd158A2e3b13e9badaeABaFc5516e95e8C7",
+  address: "0x6f54391fe0386D506b51d69Deeb8b04E0544E088",
   symbol: "WSEI",
+  decimals: 18,
+  displayDecimals: 2,
+  priceDisplayDecimals: 4,
+  mgvTestToken: true,
+} as const satisfies Token
+
+export const SEINATIVE = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "SEI",
   decimals: 18,
   displayDecimals: 2,
   priceDisplayDecimals: 4,
@@ -265,6 +284,12 @@ export const seiWBTCUSDC = {
 export const seiWETHUSDC = {
   base: SEIWETH,
   quote: SEIUSDC,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const seiSEIWSEI = {
+  base: SEINATIVE,
+  quote: SEIWSEI,
   tickSpacing: 1n,
 } as const satisfies MarketParams
 
