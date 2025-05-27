@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useDollarConversion } from "@/hooks/use-dollar-conversion"
-import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -77,8 +76,6 @@ export function Market() {
     bs: tradeSide,
   })
 
-  console.log(sendToken)
-
   // Registry and trade infos
   const { baseToken } = useTradeInfos("market", tradeSide)
 
@@ -103,8 +100,6 @@ export function Market() {
       setFormData(undefined)
     },
   })
-
-  const { currentMarket } = useMarket()
 
   const { payDollar, receiveDollar } = useDollarConversion({
     payAmount: form.state.values.send,

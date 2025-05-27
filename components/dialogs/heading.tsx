@@ -30,7 +30,7 @@ export function Heading({ type }: { type: DialogType }) {
         </div>
       </div>
 
-      <Illustration type={type} />
+      {/* <Illustration type={type} /> */}
     </>
   )
 }
