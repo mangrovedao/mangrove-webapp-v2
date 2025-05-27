@@ -383,7 +383,7 @@ export function Limit() {
                   }}
                   token={quoteToken}
                   label={` ${
-                    tradeSide === BS.buy
+                    tradeSide === BS.sell
                       ? "When price is at or above"
                       : "When price is at or below"
                   }`}
