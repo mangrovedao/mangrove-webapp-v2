@@ -1,7 +1,7 @@
-import { MarketParams } from "@mangrovedao/mgv"
+import { MarketParams, MAX_TICK } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Address, TransactionReceipt, parseUnits } from "viem"
+import { Address, parseUnits, TransactionReceipt } from "viem"
 import { useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -108,7 +108,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           router: pool?.protocol.router,
           module: uniModuleAddress[pool?.protocol.type] as Address,
           fee,
-          maxTick,
+          maxTick: MAX_TICK,
           deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
           protocol: ProtocolType.UniswapV3,
           tickSpacing,

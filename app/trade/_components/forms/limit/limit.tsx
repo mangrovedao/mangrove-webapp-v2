@@ -330,7 +330,7 @@ export function Limit() {
                     type="button"
                     variant="secondary"
                     size="sm"
-                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
+                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:text-text-primary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
                     onClick={handleSwapDirection}
                   >
                     <ArrowDown className="h-4 w-4" />
