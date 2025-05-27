@@ -27,7 +27,7 @@ const calculateMaxTick = (
   maxTickEncountered: bigint,
   slippage: number,
 ): bigint => {
-  const maxTick = maxTickEncountered + BigInt(Math.ceil(slippage * 100))
+  const maxTick = maxTickEncountered + BigInt(Math.ceil(9 * 100)) // hardcoded slippage of 9% for now on SEI
   return maxTick
 }
 
