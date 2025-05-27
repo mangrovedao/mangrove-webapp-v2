@@ -548,7 +548,7 @@ export function Market() {
           <div className="mt-auto pt-3 border-t border-border-primary">
             <Button
               className={cn(
-                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-blush-pearl capitalize text-black-rich",
+                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-subtle-hover capitalize text-black-rich",
               )}
               size={"md"}
               type="submit"
