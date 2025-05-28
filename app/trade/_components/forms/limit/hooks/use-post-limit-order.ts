@@ -14,7 +14,6 @@ import {
 
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
-import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
 import { megaethTestnet } from "viem/chains"
 import { useAccount, useWalletClient } from "wagmi"
@@ -120,7 +119,7 @@ export function usePostLimitOrder() {
           {
             logs: receipt.logs,
             user: walletClient.account.address,
-            bs: BS.buy,
+            bs,
           },
         )
 

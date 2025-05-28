@@ -62,7 +62,7 @@ export function useMarketForm(props: Props) {
     defaultValues: {
       bs: props.bs,
       sliderPercentage: 25,
-      slippage: 1,
+      slippage: 9, // hardcoded slippage of 9% for now on SEI
       send: "",
       receive: "",
       isWrapping: false,

@@ -3,7 +3,6 @@ import React from "react"
 import { formatUnits } from "viem"
 
 import { getExactWeiAmount } from "@/utils/regexp"
-import { SLIPPAGES } from "../utils/swap-constants"
 import { SwapFields } from "../utils/swap-types"
 
 interface UseSwapFormProps {
@@ -24,7 +23,7 @@ export function useSwapForm({
   ethBalance,
 }: UseSwapFormProps) {
   const [showCustomInput, setShowCustomInput] = React.useState(false)
-  const [slippage, setSlippage] = React.useState(SLIPPAGES[1])
+  const [slippage, setSlippage] = React.useState(9) //!!SLIPPAGES[1] hardcoded slippage of 9% for now on SEI
   const [isWrapping, setIsWrapping] = React.useState(false)
   const [maxTickEncountered, setMaxTickEncountered] = React.useState<bigint>(0n)
 

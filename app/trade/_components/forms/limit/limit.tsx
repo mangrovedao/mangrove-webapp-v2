@@ -382,11 +382,7 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   token={quoteToken}
-                  label={` ${
-                    tradeSide === BS.sell
-                      ? "When price is at or above"
-                      : "When price is at or below"
-                  }`}
+                  label={`When price is at or below`}
                   disabled={!currentMarket}
                   error={
                     getAllErrors().limitPrice
