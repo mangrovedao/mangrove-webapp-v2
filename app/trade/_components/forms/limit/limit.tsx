@@ -382,7 +382,7 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   token={quoteToken}
-                  label={`When price is at or below`}
+                  label={`When price is at`}
                   disabled={!currentMarket}
                   error={
                     getAllErrors().limitPrice
