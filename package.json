@@ -22,8 +22,13 @@
     "@ark-ui/react": "^1.2.1",
     "@ethersproject/providers": "^5.7.2",
     "@gsap/react": "^2.0.2",
+<<<<<<< HEAD
     "@mangrovedao/mgv": "^0.9.23",
     "@mangroveui/trade": "^1.3.15",
+=======
+    "@mangrovedao/mgv": "^0.9.24",
+    "@mangrove-web/mg-template-cli": "1.3.24",
+>>>>>>> 4ee785f0 (fix: mangrove trade ui hooks)
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",
