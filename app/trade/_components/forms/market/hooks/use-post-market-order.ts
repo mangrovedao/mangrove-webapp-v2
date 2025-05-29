@@ -48,8 +48,8 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
   ])
 
   const uniModuleAddress = {
-    [ProtocolType.UniswapV3]: "0x7875bdC8960F007db4f487292426FeF23fe448F2",
-    [ProtocolType.PancakeSwapV3]: "0x7875bdC8960F007db4f487292426FeF23fe448F2",
+    [ProtocolType.UniswapV3]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
+    [ProtocolType.PancakeSwapV3]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
     [ProtocolType.UniswapV2]: "0x4bB7F3087664E559365C4C94d3C21a39847d7726",
     [ProtocolType.Slipstream]: "0x922F0E2fa80F7dc2E22dBcE5EB3B423E09CE013B",
   }
