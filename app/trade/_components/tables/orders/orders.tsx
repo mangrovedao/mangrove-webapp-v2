@@ -6,9 +6,10 @@ import { Switch } from "@/components/ui/switch"
 import useMarket from "@/providers/market"
 import { AnimatedOrdersSkeleton } from "./animated-orders-skeleton"
 import EditOrderSheet from "./components/edit-order-sheet"
-import { useOrders } from "./hooks/use-orders"
+
+import { useOrders } from "@mangroveui/trade"
+import { Order } from "@mangroveui/trade/dist/schema/order"
 import { useTable } from "./hooks/use-table"
-import type { Order } from "./schema"
 
 type Params = {
   showAllMarkets?: boolean
@@ -27,15 +28,12 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
     isLoading,
     isError,
   } = useOrders({
+    type: "active",
     pageSize: 25,
     allMarkets: showAllMarkets,
   })
 
-  // Flatten data pages for the table
-  const flatData = React.useMemo(() => {
-    if (!data?.pages) return []
-    return data.pages.flatMap((page) => page.data)
-  }, [data])
+  console.log("active orders", data)
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<Order>()
@@ -66,8 +64,14 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
     return () => observer.disconnect()
   }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
+  // Flatten data pages for the table
+  const flatData = React.useMemo(() => {
+    if (!data?.pages) return []
+    return data.pages.flatMap((page) => page.data)
+  }, [data])
+
   const table = useTable({
-    data: flatData as Order[],
+    data: flatData,
     showMarketInfo: showAllMarkets,
     onEdit: (order) => setOrderToEdit({ order, mode: "edit" }),
     onCancel: setOrderToDelete,
@@ -98,7 +102,7 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
               markets?.find(
                 (m) =>
                   m.base.address.toLocaleLowerCase() ===
-                  order?.baseAddress?.toLocaleLowerCase(),
+                  order?.market?.base?.address?.toLocaleLowerCase(),
               )!,
             )
           }}

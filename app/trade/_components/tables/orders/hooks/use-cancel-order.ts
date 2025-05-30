@@ -9,7 +9,7 @@ import { useMarketClient } from "@/hooks/use-market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
 import { MarketParams } from "@mangrovedao/mgv"
-import type { Order } from "../schema"
+import { Order } from "@mangroveui/trade/dist/schema/order"
 
 type Props = {
   offerId?: string
@@ -45,7 +45,7 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
 
         const { request } = await marketClient.simulateRemoveOrder({
           offerId: BigInt(offerId),
-          bs: order.isBid ? BS.buy : BS.sell,
+          bs: order.side === "buy" ? BS.buy : BS.sell,
           account: address,
         })
         console.log("request", request)

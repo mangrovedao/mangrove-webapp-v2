@@ -1,7 +1,7 @@
 import Big from "big.js"
 
 import { Token } from "@mangrovedao/mgv"
-import { type Order } from "../schema"
+import { Order } from "@mangroveui/trade/dist/schema/order"
 
 export function getOrderProgress(
   order: Order,
@@ -10,16 +10,18 @@ export function getOrderProgress(
 ) {
   const { takerGot, initialGives, initialWants } = order
 
-  const volumeDecimals = order.isBid
-    ? quoteToken?.displayDecimals
-    : baseToken?.displayDecimals
+  const volumeDecimals =
+    order.side === "buy"
+      ? quoteToken?.displayDecimals
+      : baseToken?.displayDecimals
 
-  const amountDecimals = order.isBid
-    ? baseToken?.displayDecimals
-    : quoteToken?.displayDecimals
+  const amountDecimals =
+    order.side === "buy"
+      ? baseToken?.displayDecimals
+      : quoteToken?.displayDecimals
 
-  const gives = Big(initialGives).toFixed(volumeDecimals)
-  const wants = Big(initialWants).toFixed(amountDecimals)
+  const gives = Big(initialGives ?? "0").toFixed(volumeDecimals)
+  const wants = Big(initialWants ?? "0").toFixed(amountDecimals)
 
   const filled = Big(takerGot).toFixed(baseToken?.displayDecimals)
 

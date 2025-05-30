@@ -8,20 +8,18 @@ import {
 } from "@tanstack/react-table"
 import Big from "big.js"
 import React from "react"
-import { Address } from "viem"
 
 import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import { useTokenFromId } from "@/hooks/use-token-from-id"
 import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { MarketParams } from "@mangrovedao/mgv"
+import { Order } from "@mangroveui/trade/dist/schema/order"
 import { Timer } from "../components/timer"
-import type { Order } from "../schema"
 import { useCancelOrder } from "./use-cancel-order"
 
 const columnHelper = createColumnHelper<Order>()
@@ -40,7 +38,7 @@ export function useTable({
   onCancel,
   onEdit,
 }: Params) {
-  const { currentMarket: market } = useMarket()
+  const { currentMarket: market, markets } = useMarket()
 
   const columnList = React.useMemo(() => {
     const columns = [] as any[]
@@ -49,9 +47,7 @@ export function useTable({
       columnHelper.display({
         header: "Market",
         cell: ({ row }) => {
-          const { baseAddress, quoteAddress } = row.original
-          const { data: baseToken } = useTokenFromId(baseAddress as Address)
-          const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
+          const { market } = row.original
 
           return (
             <div className="flex items-center space-x-2">
@@ -62,8 +58,8 @@ export function useTable({
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
-                baseToken={baseToken}
-                quoteToken={quoteToken}
+                baseToken={market.base}
+                quoteToken={market.quote}
               />
             </div>
           )
@@ -72,18 +68,18 @@ export function useTable({
     ),
       // Rest of the columns
       columns.push(
-        columnHelper.accessor("isBid", {
+        columnHelper.accessor("side", {
           header: "Side",
           cell: (row) => {
-            const isBid = row.getValue()
+            const side = row.getValue()
             return (
               <div
                 className={cn(
-                  isBid ? "text-green-caribbean" : "text-red-100",
+                  side === "buy" ? "text-green-caribbean" : "text-red-100",
                   "text-xs",
                 )}
               >
-                {isBid ? "Buy" : "Sell"}
+                {side === "buy" ? "Buy" : "Sell"}
               </div>
             )
           },
@@ -96,8 +92,13 @@ export function useTable({
         columnHelper.display({
           header: "Filled/Amount",
           cell: ({ row }) => {
-            const { initialWants, takerGot, marketQuote, initialGives } =
+            const { initialWants, takerGot, initialGives, market } =
               row.original
+
+            const marketQuote = market.quote.symbol
+
+            if (!takerGot || !initialWants || !initialGives)
+              return <span className="text-xs">-</span>
 
             const progress = Math.min(
               Math.round(
@@ -108,6 +109,7 @@ export function useTable({
               ),
               100,
             )
+
             return (
               <div className={cn("flex items-center")}>
                 <CircularProgressBar progress={progress} className="mr-2" />
@@ -127,13 +129,14 @@ export function useTable({
         columnHelper.accessor("price", {
           header: "Price",
           cell: ({ row }) => {
-            const { quoteAddress, price } = row.original
+            const { price } = row.original
 
             if (!price || isNaN(Number(price)))
               return <span className="text-xs">-</span>
 
-            const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
-            const displayDecimals = quoteToken?.priceDisplayDecimals || 6
+            const { market } = row.original
+
+            const displayDecimals = market.quote.priceDisplayDecimals || 6
 
             return price ? (
               <span className="text-xs">
@@ -141,7 +144,7 @@ export function useTable({
                   maximumFractionDigits: displayDecimals,
                   minimumFractionDigits: displayDecimals,
                 })}{" "}
-                {quoteToken?.symbol}
+                {market?.quote.symbol}
               </span>
             ) : (
               <span className="text-xs">-</span>
@@ -164,16 +167,7 @@ export function useTable({
           id: "actions",
           header: () => <div className="text-right">Action</div>,
           cell: ({ row }) => {
-            const { baseAddress, quoteAddress } = row.original
-
-            const { data: baseToken } = useTokenFromId(baseAddress as Address)
-            const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
-
-            const market = {
-              base: baseToken,
-              quote: quoteToken,
-              tickSpacing: 1n,
-            }
+            const { market } = row.original
 
             const cancelOrder = useCancelOrder({
               offerId: row.original.offerId,

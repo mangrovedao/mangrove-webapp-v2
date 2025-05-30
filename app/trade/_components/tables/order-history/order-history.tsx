@@ -1,11 +1,11 @@
 "use client"
 
+import { useOrders } from "@mangroveui/trade"
 import React, { useEffect, useRef } from "react"
 
 import { Button } from "@/components/ui/button"
+import { DataTable } from "@/components/ui/data-table/data-table"
 import { Switch } from "@/components/ui/switch"
-import { DataTable } from "../../../../../components/ui/data-table/data-table"
-import { useOrderHistory } from "./use-order-history"
 import { useTable } from "./use-table"
 
 type Params = {
@@ -26,16 +26,13 @@ export function OrderHistory({
     isFetchingNextPage,
     isLoading,
     isError,
-  } = useOrderHistory({
+  } = useOrders({
+    type: "history",
     pageSize: 25,
     allMarkets: showAllMarkets,
   })
 
-  // Flatten data pages for the table
-  const flatData = React.useMemo(() => {
-    if (!data?.pages) return []
-    return data.pages.flatMap((page) => page.data)
-  }, [data])
+  console.log("history orders", data)
 
   // Setup intersection observer for infinite scrolling
   useEffect(() => {
@@ -58,6 +55,12 @@ export function OrderHistory({
     observer.observe(loadingEl)
     return () => observer.disconnect()
   }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+
+  // Flatten data pages for the table
+  const flatData = React.useMemo(() => {
+    if (!data?.pages) return []
+    return data.pages.flatMap((page) => page.data)
+  }, [data])
 
   const table = useTable({
     data: flatData,

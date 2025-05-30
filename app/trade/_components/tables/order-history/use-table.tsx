@@ -13,18 +13,16 @@ import { useAccount } from "wagmi"
 import BlockExplorer from "@/app/strategies/[address]/_components/block-explorer"
 import { TokenPair } from "@/components/token-pair"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useTokenFromId } from "@/hooks/use-token-from-id"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
-import { Address } from "viem"
-import type { OrderHistory } from "./schema"
+import { Order } from "@mangroveui/trade/dist/schema/order"
 
-const columnHelper = createColumnHelper<OrderHistory>()
-const DEFAULT_DATA: OrderHistory[] = []
+const columnHelper = createColumnHelper<Order>()
+const DEFAULT_DATA: Order[] = []
 
 type Params = {
-  data?: OrderHistory[]
+  data?: Order[]
   showMarketInfo?: boolean
 }
 
@@ -39,10 +37,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
       columnHelper.display({
         header: "Market",
         cell: ({ row }) => {
-          const { baseAddress, quoteAddress } = row.original
-
-          const { data: baseToken } = useTokenFromId(baseAddress as Address)
-          const { data: quoteToken } = useTokenFromId(quoteAddress as Address)
+          const { market } = row.original
 
           return (
             <div className="flex items-center space-x-2">
@@ -53,8 +48,8 @@ export function useTable({ data, showMarketInfo = false }: Params) {
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
-                baseToken={baseToken}
-                quoteToken={quoteToken}
+                baseToken={market.base}
+                quoteToken={market.quote}
               />
             </div>
           )
@@ -74,18 +69,18 @@ export function useTable({ data, showMarketInfo = false }: Params) {
             )
           },
         }),
-        columnHelper.accessor("isBid", {
+        columnHelper.accessor("side", {
           header: "Side",
           cell: ({ row }) => {
-            const isBid = row.original.isBid
+            const side = row.original.side
             return (
               <span
                 className={cn(
-                  !isBid ? "text-green-caribbean" : "text-red-100",
+                  side === "buy" ? "text-green-caribbean" : "text-red-100",
                   "text-xs",
                 )}
               >
-                {!isBid ? "Buy" : "Sell"}
+                {side === "buy" ? "Buy" : "Sell"}
               </span>
             )
           },
@@ -95,16 +90,16 @@ export function useTable({ data, showMarketInfo = false }: Params) {
         columnHelper.display({
           header: "Received/Sent",
           cell: ({ row }) => {
-            const { takerGot, takerGave, isBid, marketBase, marketQuote } =
-              row.original
+            const { takerGot, takerGave, side, market } = row.original
 
-            if (!showMarketInfo || !marketBase || !marketQuote) {
+            if (!showMarketInfo || !market) {
               return <Skeleton className="w-20 h-6" />
             }
 
-            const [sentSymbol, receivedSymbol] = isBid
-              ? [marketBase, marketQuote]
-              : [marketQuote, marketBase]
+            const [sentSymbol, receivedSymbol] =
+              side === "buy"
+                ? [market.base.symbol, market.quote.symbol]
+                : [market.quote.symbol, market.base.symbol]
 
             return (
               <div className={cn("flex flex-col ")}>
@@ -126,14 +121,9 @@ export function useTable({ data, showMarketInfo = false }: Params) {
         columnHelper.accessor("price", {
           header: "Price",
           cell: ({ row }) => {
-            const { price, marketQuote } = row.original
+            const { price, market } = row.original
 
-            if (
-              !showMarketInfo ||
-              !marketQuote ||
-              !price ||
-              isNaN(Number(price))
-            ) {
+            if (!showMarketInfo || !market || !price || isNaN(Number(price))) {
               return <Skeleton className="w-20 h-6" />
             }
 
@@ -141,7 +131,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
               <span className="text-xs">
                 {Big(price).toFixed(6)}{" "}
                 <span className="text-muted-foreground text-xs">
-                  {marketQuote}
+                  {market.quote.symbol}
                 </span>
               </span>
             ) : (
@@ -162,16 +152,19 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           },
         }),
 
-        columnHelper.accessor("status", {
+        columnHelper.accessor("takerGot", {
           header: "Status",
-          cell: ({ row }) =>
-            row.original.status ? (
-              <span className="text-xs capitalize">
-                {row.original.status.toLowerCase()}
-              </span>
-            ) : (
-              <Skeleton className="w-20 h-6" />
-            ),
+          cell: ({ row }) => {
+            const isFilled = Big(row.original.initialWants ?? "0").minus(
+              Big(row.original.takerGot ?? "0"),
+            )
+
+            const status = isFilled.eq(0) ? "Filled" : "Partially Filled"
+
+            return (
+              <span className="text-xs capitalize">{status.toString()}</span>
+            )
+          },
         }),
 
         columnHelper.display({

@@ -1,8 +1,8 @@
 import Dialog from "@/components/dialogs/dialog-new"
 import { Button } from "@/components/ui/button"
 import useMarket from "@/providers/market"
+import { Order } from "@mangroveui/trade/dist/schema/order"
 import { useCancelOrder } from "../hooks/use-cancel-order"
-import type { Order } from "../schema"
 
 type Props = {
   order?: Order
