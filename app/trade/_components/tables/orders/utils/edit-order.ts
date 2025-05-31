@@ -1,7 +1,7 @@
 import Big from "big.js"
 
 import { Token } from "@mangrovedao/mgv"
-import { Order } from "@mangroveui/trade/dist/schema/order"
+import { Order } from "../../(shared)/schema"
 
 export function getOrderProgress(
   order: Order,
