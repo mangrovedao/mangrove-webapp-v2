@@ -56,7 +56,6 @@ export function Vaults() {
   useEffect(() => {
     const fetchVault = async (chain?: Chain) => {
       if (!chain) return
-
       try {
         const response = await fetch(
           `${getIndexerUrl(chain)}/vault/list/${chain.id}`,

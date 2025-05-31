@@ -9,10 +9,11 @@ import { formatUnits, parseUnits } from "viem"
 import { useAccount, useBalance } from "wagmi"
 
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { useTokenBalance, useTokenLogics } from "@/hooks/use-balances"
+import { useTokenLogics } from "@/hooks/use-balances"
 import { useBook } from "@/hooks/use-book"
 import useMarket from "@/providers/market"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { useTradeBalances } from "../../hooks/use-trade-balances"
 import { TimeInForce, TimeToLiveUnit } from "../enums"
 import type { Form } from "../types"
 
@@ -71,30 +72,22 @@ export function useLimit(props: Props) {
     receiveLogics.find((l) => l.logic.name === state.values.receiveTo),
   ])
 
-  const { balance: sendTokenBalance } = useTokenBalance({
-    token: sendToken?.address,
-    logic: sendFrom?.logic.logic,
+  const { data: tradeBalances } = useTradeBalances({
+    sendToken,
+    receiveToken,
   })
 
-  const sendTokenBalanceFormatted = formatUnits(
-    sendTokenBalance?.balance || 0n,
-    sendToken?.decimals || 18,
-  )
-
-  const { balance: receiveTokenBalance } = useTokenBalance({
-    token: receiveToken?.address,
-    logic: receiveTo?.logic.logic,
-  })
-
-  const receiveTokenBalanceFormatted = formatUnits(
-    receiveTokenBalance?.balance || 0n,
-    receiveToken?.decimals || 18,
-  )
+  const {
+    sendBalance,
+    receiveBalance,
+    sendBalanceFormatted,
+    receiveBalanceFormatted,
+  } = tradeBalances || {}
 
   const sendBalanceWithEth = isWrapping
-    ? Number(sendTokenBalanceFormatted) +
+    ? Number(sendBalanceFormatted) +
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
-    : Number(sendTokenBalanceFormatted)
+    : Number(sendBalanceFormatted)
 
   const [baseAmount, quoteAmount, humanPrice, sendAmount, receiveAmount] =
     form.useStore((state) => {
@@ -257,10 +250,7 @@ export function useLimit(props: Props) {
         !isWrapping &&
         sendValue - 0.0000001 >
           Number(
-            formatUnits(
-              sendTokenBalance?.balance || 0n,
-              sendToken?.decimals ?? 18,
-            ),
+            formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18),
           )
       ) {
         errors.send = "Insufficient balance"
@@ -290,7 +280,7 @@ export function useLimit(props: Props) {
     form.state.errors,
     form.state.values,
     isWrapping,
-    sendTokenBalance,
+    sendBalance,
     sendToken,
     minVolumeFormatted,
   ])
@@ -298,12 +288,12 @@ export function useLimit(props: Props) {
   return {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
     form,
     sendToken,
     receiveToken,
     quoteToken,
-    receiveTokenBalanceFormatted,
+    receiveBalanceFormatted,
     minVolumeFormatted,
     isWrapping,
     sendBalanceWithEth,

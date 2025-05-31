@@ -1,7 +1,7 @@
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { Token } from "@mangrovedao/mgv"
 import { useMutation } from "@tanstack/react-query"
-import { Address, parseUnits } from "viem"
+import { Address, maxUint256 } from "viem"
 import { useWalletClient } from "wagmi"
 import { approveAmount } from "../lib/allowance"
 
@@ -33,7 +33,7 @@ export function useApproveAmount({
           walletClient,
           spender as Address,
           tokenToApprove,
-          parseUnits(sendAmount, token.decimals),
+          maxUint256,
         )
 
         return receipt

@@ -20,6 +20,7 @@ import { determinePriceDecimalsFromToken } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { Book, CompleteOffer } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
+import { useTradeBalances } from "../../hooks/use-trade-balances"
 import { useTradeInfos } from "../../hooks/use-trade-infos"
 import type { Form } from "../types"
 
@@ -76,13 +77,22 @@ export function useMarketForm(props: Props) {
   const receive = form.useStore((state) => state.values.receive)
 
   const { currentMarket: market } = useMarket()
-  const {
+
+  const { sendToken, quoteToken, receiveToken, feeInPercentageAsString } =
+    useTradeInfos("market", bs)
+
+  const { data: tradeBalances } = useTradeBalances({
     sendToken,
-    quoteToken,
     receiveToken,
-    sendTokenBalance,
-    feeInPercentageAsString,
-  } = useTradeInfos("market", bs)
+  })
+
+  const {
+    sendBalance,
+    ethBalance,
+    receiveBalance,
+    sendBalanceFormatted,
+    receiveBalanceFormatted,
+  } = tradeBalances || {}
 
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
@@ -245,10 +255,7 @@ export function useMarketForm(props: Props) {
         !isWrapping &&
         sendValue - 0.0000001 >
           Number(
-            formatUnits(
-              sendTokenBalance.balance?.balance || 0n,
-              sendToken?.decimals ?? 18,
-            ),
+            formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18),
           )
       ) {
         errors.send = "Insufficient balance"
@@ -265,7 +272,7 @@ export function useMarketForm(props: Props) {
     form.state.errors,
     form.state.values,
     isWrapping,
-    sendTokenBalance,
+    sendBalance,
     sendToken,
     hasEnoughVolume,
   ])
@@ -273,7 +280,8 @@ export function useMarketForm(props: Props) {
   return {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
+    ethBalance,
     maxTickEncountered: data?.maxTickEncountered,
     form,
     market,

@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
-import { useAccount, useBalance } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useDollarConversion } from "@/hooks/use-dollar-conversion"
-import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -39,9 +38,7 @@ const sliderValues = [25, 50, 75]
 
 export function Market() {
   const { isConnected, address } = useAccount()
-  const { data: ethBalance } = useBalance({
-    address,
-  })
+
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [sendSliderValue, setSendSliderValue] = useState(0)
@@ -60,7 +57,8 @@ export function Market() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
+    ethBalance,
     form,
     market,
     sendToken,
@@ -77,8 +75,6 @@ export function Market() {
     bs: tradeSide,
   })
 
-  console.log(sendToken)
-
   // Registry and trade infos
   const { baseToken } = useTradeInfos("market", tradeSide)
 
@@ -94,7 +90,7 @@ export function Market() {
     maxTickEncountered: maxTickEncountered ?? 0n,
     sendToken,
     baseToken,
-    sendTokenBalance,
+    sendTokenBalance: sendBalance,
     isWrapping,
     onTransactionSuccess: () => {
       // Reset form state after successful transaction
@@ -103,8 +99,6 @@ export function Market() {
       setFormData(undefined)
     },
   })
-
-  const { currentMarket } = useMarket()
 
   const { payDollar, receiveDollar } = useDollarConversion({
     payAmount: form.state.values.send,
@@ -140,21 +134,13 @@ export function Market() {
 
   const sendBalanceWithEth = isWrapping
     ? Number(
-        formatUnits(
-          sendTokenBalance.balance?.balance || 0n,
-          sendToken?.decimals ?? 18,
-        ),
+        formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18),
       ) +
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
-    : Number(
-        formatUnits(
-          sendTokenBalance.balance?.balance || 0n,
-          sendToken?.decimals ?? 18,
-        ),
-      )
+    : Number(formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18))
 
   const handleSliderChange = (value: number) => {
-    if (!sendBalanceWithEth || !sendToken) return
+    if (!sendToken) return
 
     try {
       setSendSliderValue(value)
@@ -175,8 +161,6 @@ export function Market() {
 
   // Update slider value when form.state.values.send changes
   useEffect(() => {
-    if (!sendBalanceWithEth || sendBalanceWithEth === 0) return
-
     try {
       const currentSendValue = Number(form.state.values.send || 0)
       const newSliderValue = Math.min(
@@ -335,11 +319,11 @@ export function Market() {
                   <Button
                     type="button"
                     variant="secondary"
+                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 hover:text-text-primary flex items-center justify-center relative overflow-hidden"
                     size="sm"
-                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
                     onClick={handleSwapDirection}
                   >
-                    <ArrowDown className="h-4 w-4" />
+                    <ArrowDown className="h-4 w-4 " />
                   </Button>
                 </motion.div>
               </motion.div>
@@ -553,7 +537,7 @@ export function Market() {
           <div className="mt-auto pt-3 border-t border-border-primary">
             <Button
               className={cn(
-                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-blush-pearl capitalize text-black-rich",
+                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-subtle-hover capitalize text-black-rich",
               )}
               size={"md"}
               type="submit"

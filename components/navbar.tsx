@@ -1,7 +1,5 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useChains } from "@/providers/chains"
 import { useMenuStore } from "@/stores/menu.store"
 import { BurgerIcon, HelpIcon, TelegramIcon } from "@/svgs"
 import { cn } from "@/utils"
@@ -17,11 +15,8 @@ import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit"
 import { ChevronDown, WalletIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon"
 import { useAccount } from "wagmi"
-import ChainSelector from "./chain-selector"
-import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog-new"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,169 +26,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
-import { ImageWithHideOnError } from "./ui/image-with-hide-on-error"
 import { Spinner } from "./ui/spinner"
 
 const MENUS = [
   {
     href: "/swap",
-    // icon: SwapIcon,
     text: "Swap",
     disabled: false,
   },
   {
     href: "/trade",
-    // icon: TradeIcon,
     text: "Trade",
     disabled: false,
   },
   {
     href: "/earn",
-    // icon: EarnIcon,
     text: "Earn",
     disabled: false,
   },
-  // {
-  //   href: "",
-  //   icon: GouvernanceIcon,
-  //   text: "Governance",
-  //   disabled: true,
-  // },
-  // {
-  //   href: "/more",
-  //   icon: MoreIcon,
-  //   text: "More",
-  // },
 ]
-
-// Create separate component for the network selection modal
-function NetworkSelectionModal() {
-  const { defaultChain, setDefaultChain } = useDefaultChain()
-  const { chains, setIsChainDialogOpen } = useChains()
-  const { openConnectModal } = useConnectModal()
-  const { toggle } = useMenuStore()
-  const [isOpen, setIsOpen] = useState(false)
-
-  const getChainIcon = (chainId: number) => {
-    return `/assets/chains/${chainId}.webp` || `/assets/chains/${chainId}.svg`
-  }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button
-          className="flex-1 flex items-center justify-center gap-2 bg-bg-secondary hover:bg-bg-tertiary text-white rounded-lg p-3 transition-colors"
-          onClick={() => setIsOpen(true)}
-        >
-          <span className="flex items-center gap-1.5">
-            <ImageWithHideOnError
-              src={getChainIcon(defaultChain?.id || 0)}
-              width={20}
-              height={20}
-              className="h-5 rounded-sm size-5"
-              alt={`${defaultChain?.name || "Network"}-logo`}
-            />
-            <span className="text-sm font-medium truncate">
-              {defaultChain?.name || "Select Network"}
-            </span>
-          </span>
-        </button>
-      </DialogTrigger>
-      <DialogPortal>
-        <DialogContent
-          className="sm:max-w-md p-0 overflow-hidden z-[999999] fixed"
-          style={{ zIndex: 999999 }}
-        >
-          <DialogHeader className="p-4 border-b border-border-tertiary">
-            <DialogTitle className="text-lg">Choose a Network</DialogTitle>
-            <DialogDescription className="text-sm text-text-secondary">
-              Select a network and connect your wallet
-            </DialogDescription>
-          </DialogHeader>
-          <div className="p-4">
-            {chains?.map((chain) => (
-              <button
-                key={chain.id}
-                onClick={() => {
-                  setDefaultChain(chain)
-                  // Immediately prompt to connect wallet after network selection
-                  setIsOpen(false)
-                  if (openConnectModal) {
-                    setTimeout(() => {
-                      openConnectModal()
-                      toggle() // Close mobile overlay
-                    }, 300)
-                  }
-                }}
-                className={`flex items-center justify-between w-full p-3 mb-2 rounded-lg transition-colors ${
-                  defaultChain?.id === chain.id
-                    ? "bg-bg-tertiary text-white"
-                    : "bg-bg-secondary hover:bg-bg-tertiary text-text-secondary hover:text-white"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <ImageWithHideOnError
-                    src={`/assets/chains/${chain.id}.webp`}
-                    width={24}
-                    height={24}
-                    className="rounded-sm size-6"
-                    alt={`${chain.name} Network`}
-                  />
-                  <div className="text-left">
-                    <p className="font-medium text-sm">{chain.name}</p>
-                    <p className="text-xs text-text-tertiary">
-                      {defaultChain?.id === chain.id
-                        ? "Selected"
-                        : "Tap to select"}
-                    </p>
-                  </div>
-                </div>
-                {defaultChain?.id === chain.id && (
-                  <div className="bg-green-600 rounded-full p-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-          <div className="p-4 border-t border-border-tertiary bg-bg-secondary/50">
-            <button
-              onClick={() => {
-                setIsOpen(false)
-                if (openConnectModal) {
-                  openConnectModal()
-                }
-              }}
-              className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
-            >
-              Connect Wallet with {defaultChain?.name}
-            </button>
-          </div>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
-  )
-}
 
 export function MobileOverlay() {
   const { isOpen, toggle } = useMenuStore()
   const { address, isConnected } = useAccount()
-  const { defaultChain } = useDefaultChain()
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
-  const { setIsChainDialogOpen } = useChains()
   const pathname = usePathname()
 
   function handleConnect() {
@@ -208,11 +65,6 @@ export function MobileOverlay() {
       openAccountModal()
       toggle() // Close overlay after opening account modal
     }
-  }
-
-  function openNetworkDialog() {
-    setIsChainDialogOpen?.(true)
-    toggle() // Close overlay when opening network dialog
   }
 
   return (
@@ -489,14 +341,6 @@ export default function Navbar() {
                             disabled && "opacity-50 pointer-events-none",
                           )}
                         >
-                          {/* <span
-                            className={cn(
-                              "text-nav-item-button-icon-fg",
-                              isActive && "text-black-rich",
-                            )}
-                          >
-                            <Icon />
-                          </span> */}
                           <span>{text}</span>
                         </Link>
                       )
@@ -508,7 +352,6 @@ export default function Navbar() {
 
             {/* Right Side - Network, Account & Mobile Menu */}
             <div className="flex items-center gap-3">
-              {/* Network Selector */}
               <Link
                 href="https://forms.gle/Ukr9BLJYSgN7Rp388"
                 target="_blank"
@@ -516,9 +359,6 @@ export default function Navbar() {
               >
                 any feedback ?
               </Link>
-              <div className="hidden lg:block">
-                <ChainSelector />
-              </div>
 
               {/* User Account Button */}
               {isConnected ? (

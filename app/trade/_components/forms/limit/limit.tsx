@@ -62,12 +62,12 @@ export function Limit() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
     form,
     sendToken,
     receiveToken,
     quoteToken,
-    receiveTokenBalanceFormatted,
+    receiveBalanceFormatted,
     minVolumeFormatted,
     isWrapping,
     sendBalanceWithEth,
@@ -97,7 +97,7 @@ export function Limit() {
     tradeSide,
     sendToken,
     baseToken,
-    sendTokenBalance,
+    sendTokenBalance: sendBalance,
     isWrapping,
   })
 
@@ -330,7 +330,7 @@ export function Limit() {
                     type="button"
                     variant="secondary"
                     size="sm"
-                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
+                    className="h-7 w-7 p-0 rounded-full bg-background-secondary hover:text-text-primary hover:bg-background-secondary/80 flex items-center justify-center relative overflow-hidden"
                     onClick={handleSwapDirection}
                   >
                     <ArrowDown className="h-4 w-4" />
@@ -365,7 +365,7 @@ export function Limit() {
                       ? [getAllErrors().receive].flat()
                       : undefined
                   }
-                  customBalance={receiveTokenBalanceFormatted}
+                  customBalance={receiveBalanceFormatted}
                 />
               )}
             </form.Field>
@@ -382,11 +382,7 @@ export function Limit() {
                     computeReceiveAmount()
                   }}
                   token={quoteToken}
-                  label={` ${
-                    tradeSide === BS.buy
-                      ? "When price is at or above"
-                      : "When price is at or below"
-                  }`}
+                  label={`When price is at`}
                   disabled={!currentMarket}
                   error={
                     getAllErrors().limitPrice
@@ -515,7 +511,7 @@ export function Limit() {
           <div className="mt-auto pt-3 border-t border-border-primary">
             <Button
               className={cn(
-                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-blush-pearl capitalize text-black-rich",
+                "w-full flex rounded-sm tems-center justify-center bg-bg-blush-pearl hover:bg-bg-subtle-hover capitalize text-black-rich",
               )}
               size={"md"}
               type="submit"

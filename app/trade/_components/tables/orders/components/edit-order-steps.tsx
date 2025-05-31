@@ -9,13 +9,13 @@ import { useLogics } from "@/hooks/use-addresses"
 import { useInfiniteApproveToken } from "@/hooks/use-infinite-approve-token"
 import { getTitleDescriptionErrorMessages } from "@/utils/tx-error-messages"
 import { BS } from "@mangrovedao/mgv/lib"
+import { Order } from "../../(shared)/schema"
 import { useStep } from "../../../../../../hooks/use-step"
 import { ApproveStep } from "../../../forms/components/approve-step"
 import { Steps } from "../../../forms/components/steps"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { useLimitSteps } from "../../../forms/limit/hooks/use-steps"
 import { useUpdateOrder } from "../hooks/use-update-order"
-import { Order } from "../schema"
 import { Form } from "../types"
 
 type Values = { price: string; volume: string }
@@ -92,7 +92,7 @@ export default function EditOrderSteps({
 
   const { sendToken, spender } = useTradeInfos(
     "limit",
-    order.isBid ? BS.buy : BS.sell,
+    order.side === "buy" ? BS.buy : BS.sell,
   )
 
   const orderLogic = logics.find((item) => item.logic == order.outboundRoute)
@@ -148,7 +148,7 @@ export default function EditOrderSteps({
           displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
-            volume: order.initialGives,
+            volume: order.initialGives ?? "0",
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />
@@ -199,7 +199,7 @@ export default function EditOrderSteps({
           displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
-            volume: order.initialGives,
+            volume: order.initialGives ?? "0",
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />

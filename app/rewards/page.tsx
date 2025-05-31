@@ -63,7 +63,7 @@ export default function Page() {
         <Caption className="pl-0.5 text-text-secondary hover:underline !text-sm">
           <Link
             className="flex gap-1 items-center w-fit"
-            href="https://docs.mangrove.exchange/mgv-incentives/introduction"
+            href="https://docs.oxium.exchange/oxium-incentives/introduction"
             target="_blank"
           >
             How are my rewards calculated?
