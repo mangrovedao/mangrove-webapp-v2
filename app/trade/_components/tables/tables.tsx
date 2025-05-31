@@ -11,9 +11,8 @@ import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useLoadingStore } from "@/stores/loading.store"
 import { TRADE } from "../../_constants/loading-keys"
+import { useOrders } from "./(shared)/use-orders"
 import { OrderHistory } from "./order-history/order-history"
-import { useOrderHistory } from "./order-history/use-order-history"
-import { useOrders } from "./orders/hooks/use-orders"
 import { Orders } from "./orders/orders"
 
 export enum TradeTablesLoggedIn {
@@ -40,7 +39,10 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
   )
 
   // Get the total count of orders and history
-  const { data: orders } = useOrders({ allMarkets: showAllMarkets })
+  const { data: orders } = useOrders({
+    type: "active",
+    allMarkets: showAllMarkets,
+  })
 
   const ordersCount = React.useMemo(() => {
     if (!orders?.pages) return 0
@@ -48,9 +50,9 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
     return orders.pages.reduce((total, page) => total + page.meta.count, 0)
   }, [orders])
 
-  const { data } = useOrderHistory({
-    pageSize: 25,
-    allMarkets: true,
+  const { data: orderHistory } = useOrders({
+    type: "history",
+    allMarkets: showAllMarkets,
   })
 
   React.useEffect(() => {
@@ -87,7 +89,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                   isConnected && table === TradeTablesLoggedIn.ORDERS
                     ? ordersCount
                     : isConnected && table === TradeTablesLoggedIn.ORDER_HISTORY
-                      ? data?.pages[0]?.meta.totalItems
+                      ? orderHistory?.pages[0]?.meta.count
                       : 0
                 }
               >

@@ -91,8 +91,9 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           header: "Received/Sent",
           cell: ({ row }) => {
             const { takerGot, takerGave, side, market } = row.original
+            console.log({ takerGot, takerGave, side, market })
 
-            if (!showMarketInfo || !market) {
+            if (!market) {
               return <Skeleton className="w-20 h-6" />
             }
 
@@ -123,7 +124,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           cell: ({ row }) => {
             const { price, market } = row.original
 
-            if (!showMarketInfo || !market || !price || isNaN(Number(price))) {
+            if (!market || !price || isNaN(Number(price))) {
               return <Skeleton className="w-20 h-6" />
             }
 

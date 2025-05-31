@@ -145,12 +145,13 @@ export function Market() {
     try {
       setSendSliderValue(value)
 
-      const amount = Big(value).div(100).mul(sendBalanceWithEth)
-
       const decimals = sendToken.priceDisplayDecimals || 18
       // Set the field value without calling validateAllFields
+      const amount = Big(value).div(100).mul(sendBalanceWithEth)
       const safeAmount = Math.min(amount.toNumber(), sendBalanceWithEth)
+
       form.setFieldValue("send", safeAmount.toFixed(decimals).toString())
+      form.validateAllFields("submit")
 
       // Compute receive amount will indirectly validate the form
       computeReceiveAmount()
@@ -162,7 +163,7 @@ export function Market() {
   // Update slider value when form.state.values.send changes
   useEffect(() => {
     try {
-      const currentSendValue = Number(form.state.values.send || 0)
+      const currentSendValue = Number(form.state.values.send)
       const newSliderValue = Math.min(
         (currentSendValue / sendBalanceWithEth) * 100,
         100,

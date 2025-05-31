@@ -6,7 +6,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 import { useEventListener } from "usehooks-ts"
 import { formatUnits, parseUnits } from "viem"
-import { useAccount, useBalance } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useTokenLogics } from "@/hooks/use-balances"
@@ -24,9 +24,7 @@ type Props = {
 
 export function useLimit(props: Props) {
   const { address } = useAccount()
-  const { data: ethBalance } = useBalance({
-    address,
-  })
+
   const { currentMarket } = useMarket()
   const bs = props.bs
   const { spotPrice } = useMergedBooks()
@@ -79,9 +77,9 @@ export function useLimit(props: Props) {
 
   const {
     sendBalance,
-    receiveBalance,
     sendBalanceFormatted,
     receiveBalanceFormatted,
+    ethBalance,
   } = tradeBalances || {}
 
   const sendBalanceWithEth = isWrapping

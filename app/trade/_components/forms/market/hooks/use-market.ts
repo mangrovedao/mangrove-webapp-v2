@@ -86,13 +86,7 @@ export function useMarketForm(props: Props) {
     receiveToken,
   })
 
-  const {
-    sendBalance,
-    ethBalance,
-    receiveBalance,
-    sendBalanceFormatted,
-    receiveBalanceFormatted,
-  } = tradeBalances || {}
+  const { sendBalance, ethBalance } = tradeBalances || {}
 
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
