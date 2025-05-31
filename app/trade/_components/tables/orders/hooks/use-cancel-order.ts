@@ -9,7 +9,7 @@ import { useMarketClient } from "@/hooks/use-market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
 import { MarketParams } from "@mangrovedao/mgv"
-import { Order } from "@mangroveui/trade/dist/schema/order"
+import { Order } from "../../(shared)/schema"
 
 type Props = {
   offerId?: string
@@ -69,6 +69,7 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
         startLoading(TRADE.TABLES.ORDERS)
 
         queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["balances"] })
       } catch (error) {
         console.error(error)
       }

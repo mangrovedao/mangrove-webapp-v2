@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import React from "react"
-import { Button } from "./ui/button-new"
+import { Button } from "./ui/button"
 import {
   Tooltip,
   TooltipContent,
@@ -27,7 +27,7 @@ export function IconButton({
           <Button
             {...props}
             type="button"
-            variant={"tertiary"}
+            variant={"primary"}
             size={"icon"}
             loading={isLoading}
             disabled={isLoading}
