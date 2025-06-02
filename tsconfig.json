@@ -24,6 +24,7 @@
       "@helpers/*": ["./helpers/*"],
       "@hooks/*": ["./hooks/*"],
       "@utils": ["./utils/¨*"],
+      "@mangroveui/trade/*": ["../mangrove-ui/packages/trade/src/*"]
     },
     "plugins": [
       {

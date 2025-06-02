@@ -23,7 +23,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@gsap/react": "^2.0.2",
     "@mangrovedao/mgv": "^0.9.24",
-    "@mangroveui/trade": "^1.2.8",
+    "@mangroveui/trade": "file:../mangrove-ui/packages/trade",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",

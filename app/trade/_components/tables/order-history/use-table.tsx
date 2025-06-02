@@ -48,8 +48,8 @@ export function useTable({ data, showMarketInfo = false }: Params) {
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
-                baseToken={market.base}
-                quoteToken={market.quote}
+                baseToken={market?.base}
+                quoteToken={market?.quote}
               />
             </div>
           )
@@ -98,8 +98,8 @@ export function useTable({ data, showMarketInfo = false }: Params) {
 
             const [sentSymbol, receivedSymbol] =
               side === "buy"
-                ? [market.base.symbol, market.quote.symbol]
-                : [market.quote.symbol, market.base.symbol]
+                ? [market?.base?.symbol, market?.quote?.symbol]
+                : [market?.quote?.symbol, market?.base?.symbol]
 
             return (
               <div className={cn("flex flex-col ")}>
@@ -131,7 +131,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
               <span className="text-xs">
                 {Big(price).toFixed(6)}{" "}
                 <span className="text-muted-foreground text-xs">
-                  {market.quote.symbol}
+                  {market?.quote?.symbol}
                 </span>
               </span>
             ) : (

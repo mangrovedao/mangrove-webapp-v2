@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react"
 
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { Switch } from "@/components/ui/switch"
-import useMarket from "@/providers/market"
+import { useMarket } from "@mangroveui/trade"
 import { AnimatedOrdersSkeleton } from "./animated-orders-skeleton"
 import EditOrderSheet from "./components/edit-order-sheet"
 
@@ -33,7 +33,6 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
     allMarkets: showAllMarkets,
   })
 
-  console.log("active orders", data)
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<Order>()

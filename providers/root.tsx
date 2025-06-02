@@ -6,6 +6,7 @@ import { MangroveProvider } from "./mangrove"
 import { ReactQueryProvider } from "./react-query"
 import { StyledJsxRegistry } from "./style-jsx"
 import { WalletConnectProvider } from "./wallet-connect"
+import { MangroveUiProvider } from '@mangroveui/trade'
 
 export function RootProvider({ children }: React.PropsWithChildren) {
   return (
@@ -13,13 +14,15 @@ export function RootProvider({ children }: React.PropsWithChildren) {
       <WalletConnectProvider>
         <ReactQueryProvider>
           <DialogProvider>
-            <MangroveProvider>
-              <ChainsProvider>
-                <FocusOutline>
-                  <StyledJsxRegistry>{children}</StyledJsxRegistry>
-                </FocusOutline>
-              </ChainsProvider>
-            </MangroveProvider>
+            <MangroveUiProvider>
+              <MangroveProvider>
+                <ChainsProvider>
+                  <FocusOutline>
+                    <StyledJsxRegistry>{children}</StyledJsxRegistry>
+                  </FocusOutline>
+                </ChainsProvider>
+              </MangroveProvider>
+            </MangroveUiProvider>
           </DialogProvider>
         </ReactQueryProvider>
       </WalletConnectProvider>

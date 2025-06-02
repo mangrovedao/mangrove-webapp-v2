@@ -8,10 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
-import useMarket from "@/providers/market"
+import { useMarket } from "@mangroveui/trade"
 import { MarketParams } from "@mangrovedao/mgv"
 import { useEffect, useState } from "react"
-import { getAddress, isAddressEqual } from "viem"
+import { Address, isAddressEqual } from "viem"
 import { TokenIcon } from "../../../../components/token-icon"
 
 function useMediaQuery(query: string) {
@@ -47,11 +47,12 @@ export default function MarketSelector() {
     try {
       const market = markets?.find(
         (m) =>
-          isAddressEqual(m.base.address, getAddress(baseAddress)) &&
-          isAddressEqual(m.quote.address, getAddress(quoteAddress)) &&
+          isAddressEqual(m.base.address, baseAddress as Address) &&
+          isAddressEqual(m.quote.address, quoteAddress as Address) &&
           m.tickSpacing === BigInt(tickSpacing),
       )
       if (!market) return
+
       setMarket(market)
     } catch (e) {}
   }

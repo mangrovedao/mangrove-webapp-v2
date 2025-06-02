@@ -12,8 +12,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useLoadingStore } from "@/stores/loading.store"
 import { TRADE } from "../../_constants/loading-keys"
 import { OrderHistory } from "./order-history/order-history"
-import { useOrderHistory } from "./order-history/use-order-history"
-import { useOrders } from "./orders/hooks/use-orders"
+import { useOrders } from "@mangroveui/trade"
 import { Orders } from "./orders/orders"
 
 export enum TradeTablesLoggedIn {
@@ -39,8 +38,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
     Object.values(defaultEnum)[0] || "Open Orders",
   )
 
-  // Get the total count of orders and history
-  const { data: orders } = useOrders({ allMarkets: showAllMarkets })
+  const { data: orders } = useOrders({ type: 'history', pageSize: 25, allMarkets: showAllMarkets })
 
   const ordersCount = React.useMemo(() => {
     if (!orders?.pages) return 0
@@ -48,10 +46,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
     return orders.pages.reduce((total, page) => total + page.meta.count, 0)
   }, [orders])
 
-  const { data } = useOrderHistory({
-    pageSize: 25,
-    allMarkets: true,
-  })
+
 
   React.useEffect(() => {
     setDefaultEnum(isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut)
@@ -84,11 +79,12 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                 value={table}
                 className="capitalize w-full rounded-none"
                 count={
-                  isConnected && table === TradeTablesLoggedIn.ORDERS
-                    ? ordersCount
-                    : isConnected && table === TradeTablesLoggedIn.ORDER_HISTORY
-                      ? data?.pages[0]?.meta.totalItems
-                      : 0
+                  0
+                  // isConnected && table === TradeTablesLoggedIn.ORDERS
+                  //   ? ordersCount
+                  //   : isConnected && table === TradeTablesLoggedIn.ORDER_HISTORY
+                  //     ? orders?.pages[0]?.meta.totalItems
+                  //     : 0
                 }
               >
                 {table}

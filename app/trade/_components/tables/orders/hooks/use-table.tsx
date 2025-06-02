@@ -7,12 +7,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import Big from "big.js"
-import React from "react"
+import React, { useEffect } from "react"
 
 import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import useMarket from "@/providers/market"
+import { useMarket } from "@mangroveui/trade"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
@@ -38,7 +38,12 @@ export function useTable({
   onCancel,
   onEdit,
 }: Params) {
-  const { currentMarket: market, markets } = useMarket()
+  const { currentMarket: market } = useMarket()
+
+  useEffect(() => {
+    console.log('market', market?.base?.symbol, market?.quote?.symbol)
+  }, [market])
+
 
   const columnList = React.useMemo(() => {
     const columns = [] as any[]
@@ -58,8 +63,8 @@ export function useTable({
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
-                baseToken={market.base}
-                quoteToken={market.quote}
+                baseToken={market?.base}
+                quoteToken={market?.quote}
               />
             </div>
           )
@@ -95,7 +100,7 @@ export function useTable({
             const { initialWants, takerGot, initialGives, market } =
               row.original
 
-            const marketQuote = market.quote.symbol
+            const marketQuote = market?.quote?.symbol
 
             if (!takerGot || !initialWants || !initialGives)
               return <span className="text-xs">-</span>
@@ -136,7 +141,7 @@ export function useTable({
 
             const { market } = row.original
 
-            const displayDecimals = market.quote.priceDisplayDecimals || 6
+            const displayDecimals = market?.quote?.priceDisplayDecimals || 6
 
             return price ? (
               <span className="text-xs">
