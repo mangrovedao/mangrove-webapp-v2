@@ -9,7 +9,11 @@ import { trade } from "@/hooks/ghostbook/lib/trade"
 import { useMarketClient } from "@/hooks/use-market"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
-import { ProtocolType, TickSpacingPool } from "@/hooks/new_ghostbook/pool"
+import {
+  FeePool,
+  ProtocolType,
+  TickSpacingPool,
+} from "@/hooks/new_ghostbook/pool"
 import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
@@ -83,6 +87,17 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         // Calculate max tick based on current price and slippage
         const maxTick = calculateMaxTick(maxTickEncountered, slippage)
 
+        const fee =
+          pool?.protocol.type === ProtocolType.UniswapV3 ||
+          pool?.protocol.type === ProtocolType.PancakeSwapV3
+            ? (pool as FeePool).fee
+            : 0
+
+        const tickSpacing =
+          pool?.protocol.type === ProtocolType.Slipstream
+            ? (pool as TickSpacingPool)?.tickSpacing
+            : 0
+
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
           ghostbook: mangroveChain?.ghostbook as Address,
@@ -91,14 +106,11 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           sendAmount,
           router: pool?.protocol.router,
           module: uniModuleAddress[pool?.protocol.type] as Address,
-          fee: 500,
+          fee,
           maxTick,
           deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
           protocol: pool?.protocol.type,
-          tickSpacing:
-            pool?.protocol.type === ProtocolType.Slipstream
-              ? (pool as TickSpacingPool)?.tickSpacing
-              : 0,
+          tickSpacing,
           async onTrade({ got, gave, bounty, feePaid }) {
             console.log("OnTrade callback:", {
               got,
