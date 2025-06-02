@@ -15,7 +15,8 @@ import { Steps } from "../../../forms/components/steps"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { useLimitSteps } from "../../../forms/limit/hooks/use-steps"
 import { useUpdateOrder } from "../hooks/use-update-order"
-import { Order } from "../schema"
+
+import { Order } from "../../(shared)/schema"
 import { Form } from "../types"
 
 type Values = { price: string; volume: string }
@@ -92,7 +93,7 @@ export default function EditOrderSteps({
 
   const { sendToken, spender } = useTradeInfos(
     "limit",
-    order.isBid ? BS.buy : BS.sell,
+    order.side === "buy" ? BS.buy : BS.sell,
   )
 
   const orderLogic = logics.find((item) => item.logic == order.outboundRoute)
@@ -148,7 +149,7 @@ export default function EditOrderSteps({
           displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
-            volume: order.initialGives,
+            volume: order.initialGives ?? "0",
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />
@@ -199,7 +200,7 @@ export default function EditOrderSteps({
           displayDecimals={displayDecimals}
           oldValues={{
             price: order.price,
-            volume: order.initialGives,
+            volume: order.initialGives ?? "0",
           }}
           newValues={{ price: form.limitPrice, volume: form.send }}
         />

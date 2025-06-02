@@ -12,13 +12,13 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { formatUnits } from "viem"
+import { Order } from "../../(shared)/schema"
 import { TimeInForce } from "../../../forms/limit/enums"
 import {
   isGreaterThanZeroValidator,
   sendValidator,
 } from "../../../forms/limit/validators"
 import { useEditOrder } from "../hooks/use-edit-order"
-import { type Order } from "../schema"
 import { Form } from "../types"
 import { getOrderProgress } from "../utils/edit-order"
 import EditOrderSteps from "./edit-order-steps"
@@ -73,7 +73,8 @@ export default function EditOrderSheet({
   const [formData, setFormData] = React.useState<Form>()
   const order = orderInfos?.order
   const mode = orderInfos?.mode
-  const { expiryDate, isBid } = order
+  const { expiryDate, side } = order
+  const isBid = side === "buy"
   const {
     handleSubmit,
     setToggleEdit,

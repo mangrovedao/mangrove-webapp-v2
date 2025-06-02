@@ -6,9 +6,10 @@ import { Switch } from "@/components/ui/switch"
 import useMarket from "@/providers/market"
 import { AnimatedOrdersSkeleton } from "./animated-orders-skeleton"
 import EditOrderSheet from "./components/edit-order-sheet"
-import { useOrders } from "./hooks/use-orders"
+
+import { Order } from "../(shared)/schema"
+import { useOrders } from "../(shared)/use-orders"
 import { useTable } from "./hooks/use-table"
-import type { Order } from "./schema"
 
 type Params = {
   showAllMarkets?: boolean
@@ -27,6 +28,7 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
     isLoading,
     isError,
   } = useOrders({
+    type: "active",
     pageSize: 25,
     allMarkets: showAllMarkets,
   })
@@ -98,7 +100,7 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
               markets?.find(
                 (m) =>
                   m.base.address.toLocaleLowerCase() ===
-                  order?.baseAddress?.toLocaleLowerCase(),
+                  order?.market?.base.address.toLocaleLowerCase(),
               )!,
             )
           }}
