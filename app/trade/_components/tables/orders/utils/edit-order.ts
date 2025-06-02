@@ -1,25 +1,26 @@
 import Big from "big.js"
 
 import { Token } from "@mangrovedao/mgv"
-import { type Order } from "../schema"
+import { Order } from "../../(shared)/schema"
 
 export function getOrderProgress(
   order: Order,
   baseToken?: Token,
   quoteToken?: Token,
 ) {
-  const { takerGot, initialGives, initialWants } = order
+  const { takerGot, initialGives, initialWants, side } = order
+  const isBid = side === "buy"
 
-  const volumeDecimals = order.isBid
+  const volumeDecimals = isBid
     ? quoteToken?.displayDecimals
     : baseToken?.displayDecimals
 
-  const amountDecimals = order.isBid
+  const amountDecimals = isBid
     ? baseToken?.displayDecimals
     : quoteToken?.displayDecimals
 
-  const gives = Big(initialGives).toFixed(volumeDecimals)
-  const wants = Big(initialWants).toFixed(amountDecimals)
+  const gives = Big(initialGives ?? 0).toFixed(volumeDecimals ?? 0)
+  const wants = Big(initialWants ?? 0).toFixed(amountDecimals ?? 0)
 
   const filled = Big(takerGot).toFixed(baseToken?.displayDecimals)
 

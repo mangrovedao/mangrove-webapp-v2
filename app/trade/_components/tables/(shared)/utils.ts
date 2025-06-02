@@ -1,6 +1,6 @@
 import { Address, isAddressEqual } from "viem"
 import { TimeToLiveUnit } from "../../forms/limit/enums"
-import { Market, Order, Token } from "./type"
+import { Market, Order, Token } from "./types"
 
 export const findToken = (address: Address, tokens: Token[]) => {
   return tokens.find((token) => isAddressEqual(token.address, address))
