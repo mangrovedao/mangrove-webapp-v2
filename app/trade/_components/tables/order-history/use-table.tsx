@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
-import { Order } from "@mangroveui/trade/dist/schema/order"
+import { Order } from "../(shared)/schema"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -91,8 +91,9 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           header: "Received/Sent",
           cell: ({ row }) => {
             const { takerGot, takerGave, side, market } = row.original
+            console.log({ takerGot, takerGave, side, market })
 
-            if (!showMarketInfo || !market) {
+            if (!market) {
               return <Skeleton className="w-20 h-6" />
             }
 
@@ -123,7 +124,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           cell: ({ row }) => {
             const { price, market } = row.original
 
-            if (!showMarketInfo || !market || !price || isNaN(Number(price))) {
+            if (!market || !price || isNaN(Number(price))) {
               return <Skeleton className="w-20 h-6" />
             }
 
@@ -155,11 +156,11 @@ export function useTable({ data, showMarketInfo = false }: Params) {
         columnHelper.accessor("takerGot", {
           header: "Status",
           cell: ({ row }) => {
-            const isFilled = Big(row.original.initialWants ?? "0").minus(
-              Big(row.original.takerGot ?? "0"),
-            )
+            const isFilled =
+              Number(row.original.initialWants ?? "0") -
+              Number(row.original.takerGot ?? "0")
 
-            const status = isFilled.eq(0) ? "Filled" : "Partially Filled"
+            const status = isFilled === 0 ? "Filled" : "Partially Filled"
 
             return (
               <span className="text-xs capitalize">{status.toString()}</span>

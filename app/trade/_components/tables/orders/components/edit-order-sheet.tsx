@@ -11,8 +11,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/sheet-scroll-area"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
-import { Order } from "@mangroveui/trade/dist/schema/order"
 import { formatUnits } from "viem"
+import { Order } from "../../(shared)/schema"
 import { TimeInForce } from "../../../forms/limit/enums"
 import {
   isGreaterThanZeroValidator,

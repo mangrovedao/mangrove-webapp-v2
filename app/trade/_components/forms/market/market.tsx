@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
-import { useAccount, useBalance } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
@@ -38,9 +38,7 @@ const sliderValues = [25, 50, 75]
 
 export function Market() {
   const { isConnected, address } = useAccount()
-  const { data: ethBalance } = useBalance({
-    address,
-  })
+
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [sendSliderValue, setSendSliderValue] = useState(0)
@@ -59,7 +57,8 @@ export function Market() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
+    ethBalance,
     form,
     market,
     sendToken,
@@ -91,7 +90,7 @@ export function Market() {
     maxTickEncountered: maxTickEncountered ?? 0n,
     sendToken,
     baseToken,
-    sendTokenBalance,
+    sendTokenBalance: sendBalance,
     isWrapping,
     onTransactionSuccess: () => {
       // Reset form state after successful transaction
@@ -135,31 +134,24 @@ export function Market() {
 
   const sendBalanceWithEth = isWrapping
     ? Number(
-        formatUnits(
-          sendTokenBalance.balance?.balance || 0n,
-          sendToken?.decimals ?? 18,
-        ),
+        formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18),
       ) +
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
-    : Number(
-        formatUnits(
-          sendTokenBalance.balance?.balance || 0n,
-          sendToken?.decimals ?? 18,
-        ),
-      )
+    : Number(formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18))
 
   const handleSliderChange = (value: number) => {
-    if (!sendBalanceWithEth || !sendToken) return
+    if (!sendToken) return
 
     try {
       setSendSliderValue(value)
 
-      const amount = Big(value).div(100).mul(sendBalanceWithEth)
-
       const decimals = sendToken.priceDisplayDecimals || 18
       // Set the field value without calling validateAllFields
+      const amount = Big(value).div(100).mul(sendBalanceWithEth)
       const safeAmount = Math.min(amount.toNumber(), sendBalanceWithEth)
+
       form.setFieldValue("send", safeAmount.toFixed(decimals).toString())
+      form.validateAllFields("submit")
 
       // Compute receive amount will indirectly validate the form
       computeReceiveAmount()
@@ -170,10 +162,8 @@ export function Market() {
 
   // Update slider value when form.state.values.send changes
   useEffect(() => {
-    if (!sendBalanceWithEth || sendBalanceWithEth === 0) return
-
     try {
-      const currentSendValue = Number(form.state.values.send || 0)
+      const currentSendValue = Number(form.state.values.send)
       const newSliderValue = Math.min(
         (currentSendValue / sendBalanceWithEth) * 100,
         100,

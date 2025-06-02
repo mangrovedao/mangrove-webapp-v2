@@ -92,6 +92,7 @@ export function useUpdateOrder({ offerId, onResult }: useUpdateOrderProps) {
 
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["order-history"] })
+        queryClient.invalidateQueries({ queryKey: ["balances"] })
       } catch (error) {
         console.error(error)
       }

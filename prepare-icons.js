@@ -67,6 +67,11 @@ function copyIcons() {
     "./public/custom-token-icons/sei.webp",
     "./public/cryptocurrency-icons/svg/color/sei.webp",
   )
+  // Copy synnax usd custom icon
+  fs.copyFileSync(
+    "./public/custom-token-icons/syusd.webp",
+    "./public/cryptocurrency-icons/svg/color/syusd.webp",
+  )
 }
 
 function genetareDicFromManifestFile() {
@@ -105,6 +110,7 @@ function genetareDicFromManifestFile() {
     { PRL: { color: "#A797FF", name: "PRL Token", symbol: "PRL" } },
     { WSEI: { color: "", name: "GENERIC", symbol: "WSEI" } },
     { SEI: { color: "", name: "GENERIC", symbol: "SEI" } },
+    { SYUSD: { color: "", name: "GENERIC", symbol: "SYUSD" } },
   )
   fs.mkdirSync("./generated", { recursive: true })
   fs.writeFileSync("./generated/icons.json", JSON.stringify(dic))

@@ -10,6 +10,7 @@ import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useOdos } from "@/hooks/odos/use-odos"
+import { useSymphony } from "@/hooks/symphony/use-symphony"
 import { useBook } from "@/hooks/use-book"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import useMarket from "@/providers/market"
@@ -32,13 +33,14 @@ export function useSwapSimulation({
   isMangrove?: boolean
   slippage: string
 }) {
-  const { address, isConnected, chainId } = useAccount()
+  const { address, chainId } = useAccount()
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
   const { currentMarket } = useMarket()
   const { mangroveChain } = useRegistry()
   const { pool } = usePool()
   const { getQuote, hasToApproveOdos } = useOdos()
+  const { getRoute, tokenList } = useSymphony()
 
   return useQuery({
     queryKey: [
@@ -54,16 +56,21 @@ export function useSwapSimulation({
       address,
     ],
     queryFn: async (): Promise<SwapSimulationResult | null> => {
-
       if (!(payToken && receiveToken)) return null
 
       if (!payValue || Number(payValue) <= 0) return null
 
       const payAmount = parseUnits(payValue, payToken.decimals)
 
+      // const route = await getRoute(
+      //   payToken.address,
+      //   receiveToken.address,
+      //   payAmount,
+      // )
+      // console.log(route, tokenList)
+
       // Mangrove
       if (marketClient && isMangrove) {
-        
         if (!book) return null
 
         // Convert EnhancedOffer arrays to the format expected by marketOrderSimulation

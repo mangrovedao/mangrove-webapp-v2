@@ -18,7 +18,7 @@ import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { MarketParams } from "@mangrovedao/mgv"
-import { Order } from "@mangroveui/trade/dist/schema/order"
+import { Order } from "../../(shared)/schema"
 import { Timer } from "../components/timer"
 import { useCancelOrder } from "./use-cancel-order"
 
@@ -183,7 +183,7 @@ export function useTable({
               <div className="w-full h-full flex justify-end space-x-1">
                 <IconButton
                   tooltip="Close offer"
-                  className="aspect-square w-6 rounded-full"
+                  className="aspect-square w-6 rounded-full bg-bg-subtle-hover"
                   isLoading={cancelOrder.isPending}
                   disabled={cancelOrder.isPending}
                   onClick={(e) => {

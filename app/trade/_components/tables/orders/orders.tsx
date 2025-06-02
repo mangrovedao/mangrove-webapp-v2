@@ -7,8 +7,8 @@ import { useMarket } from "@mangroveui/trade"
 import { AnimatedOrdersSkeleton } from "./animated-orders-skeleton"
 import EditOrderSheet from "./components/edit-order-sheet"
 
-import { useOrders } from "@mangroveui/trade"
-import { Order } from "@mangroveui/trade/dist/schema/order"
+import { Order } from "../(shared)/schema"
+import { useOrders } from "../(shared)/use-orders"
 import { useTable } from "./hooks/use-table"
 
 type Params = {
@@ -32,7 +32,6 @@ export function Orders({ showAllMarkets = true, setShowAllMarkets }: Params) {
     pageSize: 25,
     allMarkets: showAllMarkets,
   })
-
 
   // selected order to delete
   const [orderToDelete, setOrderToDelete] = React.useState<Order>()

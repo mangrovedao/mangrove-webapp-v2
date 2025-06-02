@@ -1,11 +1,11 @@
 "use client"
 
-import { useOrders } from "@mangroveui/trade"
 import React, { useEffect, useRef } from "react"
 
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { Switch } from "@/components/ui/switch"
+import { useOrders } from "../(shared)/use-orders"
 import { useTable } from "./use-table"
 
 type Params = {
@@ -31,8 +31,6 @@ export function OrderHistory({
     pageSize: 25,
     allMarkets: showAllMarkets,
   })
-
-  console.log("history orders", data)
 
   // Setup intersection observer for infinite scrolling
   useEffect(() => {

@@ -62,12 +62,12 @@ export function Limit() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
     form,
     sendToken,
     receiveToken,
     quoteToken,
-    receiveTokenBalanceFormatted,
+    receiveBalanceFormatted,
     minVolumeFormatted,
     isWrapping,
     sendBalanceWithEth,
@@ -97,7 +97,7 @@ export function Limit() {
     tradeSide,
     sendToken,
     baseToken,
-    sendTokenBalance,
+    sendTokenBalance: sendBalance,
     isWrapping,
   })
 
@@ -365,7 +365,7 @@ export function Limit() {
                       ? [getAllErrors().receive].flat()
                       : undefined
                   }
-                  customBalance={receiveTokenBalanceFormatted}
+                  customBalance={receiveBalanceFormatted}
                 />
               )}
             </form.Field>
