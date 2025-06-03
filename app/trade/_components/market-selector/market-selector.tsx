@@ -38,8 +38,40 @@ function getValue(market: MarketParams) {
 }
 
 export default function MarketSelector() {
-  const { markets, currentMarket, setMarket } = useMarket()
+  const { markets: rawMarkets, currentMarket, setMarket } = useMarket()
   const isMobile = useMediaQuery("(max-width: 768px)")
+
+  const PRIORITY_PAIRS = [
+    { base: "WSEI", quote: "USDC" },
+    { base: "WETH", quote: "USDC" },
+    { base: "WBTC", quote: "USDC" },
+  ] as const
+
+  const getPriorityIndex = (market: MarketParams) => {
+    return PRIORITY_PAIRS.findIndex(
+      (pair) =>
+        market.base.symbol === pair.base && market.quote.symbol === pair.quote,
+    )
+  }
+
+  const compareMarkets = (a: MarketParams, b: MarketParams) => {
+    const aIndex = getPriorityIndex(a)
+    const bIndex = getPriorityIndex(b)
+
+    // Handle priority pairs
+    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
+    if (aIndex !== -1) return -1
+    if (bIndex !== -1) return 1
+
+    // Default lexicographical ordering
+    return (
+      a.base.symbol.localeCompare(b.base.symbol) ||
+      a.quote.symbol.localeCompare(b.quote.symbol) ||
+      a.tickSpacing.toString().localeCompare(b.tickSpacing.toString())
+    )
+  }
+
+  const markets = rawMarkets?.sort(compareMarkets)
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress, tickSpacing] = value.split("/")

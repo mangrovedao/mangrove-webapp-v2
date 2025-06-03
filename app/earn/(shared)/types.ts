@@ -45,4 +45,5 @@ export type Vault = {
   isActive: boolean
   userBaseBalance: bigint
   userQuoteBalance: bigint
+  kandel: Address
 }
