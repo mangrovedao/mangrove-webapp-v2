@@ -9,7 +9,6 @@ import { useEffect } from "react"
 import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
 import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"
 import { getVaultsInformation } from "../../(shared)/_service/vaults-infos"
-import { useMgvFdv } from "../../(shared)/store/vault-store"
 import { Vault, VaultWhitelist } from "../../(shared)/types"
 
 // Type for the query result
@@ -30,8 +29,6 @@ export function useVault(address?: string | null) {
   const networkClient = useNetworkClient()
   const vaultsWhitelist = useVaultsWhitelist()
   const incentives = useVaultsIncentives()
-
-  const { fdv } = useMgvFdv()
 
   // Query key with parameters
   const queryKey = getVaultQueryKey(address, user, defaultChain.id)

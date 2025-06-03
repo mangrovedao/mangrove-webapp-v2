@@ -173,7 +173,7 @@ export async function getVaultsInformation(
 
     results.push(...batchResult)
   }
-  console.log(results)
+
   // Step 4: Process Kandel APR calculations in parallel for all vaults
   const kandelAprPromises = vaults.map(async (v, i) => {
     const vaultAddress = v.address as Address
