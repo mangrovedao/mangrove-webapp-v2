@@ -7,12 +7,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import Big from "big.js"
-import React from "react"
+import React, { useEffect } from "react"
 
 import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
-import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
@@ -21,6 +20,7 @@ import { MarketParams } from "@mangrovedao/mgv"
 import { Order } from "../../(shared)/schema"
 import { Timer } from "../components/timer"
 import { useCancelOrder } from "./use-cancel-order"
+import useMarket from "@/providers/market"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -38,7 +38,8 @@ export function useTable({
   onCancel,
   onEdit,
 }: Params) {
-  const { currentMarket: market, markets } = useMarket()
+
+  const { currentMarket: market } = useMarket()
 
   const columnList = React.useMemo(() => {
     const columns = [] as any[]
@@ -58,8 +59,8 @@ export function useTable({
                   as: "span",
                 }}
                 tokenClasses="w-4 h-4"
-                baseToken={market.base}
-                quoteToken={market.quote}
+                baseToken={market?.base}
+                quoteToken={market?.quote}
               />
             </div>
           )
@@ -92,10 +93,10 @@ export function useTable({
         columnHelper.display({
           header: "Filled/Amount",
           cell: ({ row }) => {
-            const { initialWants, takerGot, initialGives, market } =
+            const { initialWants, takerGot, initialGives, market, side } =
               row.original
 
-            const marketQuote = market.quote.symbol
+            const marketQuote = side === 'sell' ? market?.base?.symbol : market?.quote?.symbol
 
             if (!takerGot || !initialWants || !initialGives)
               return <span className="text-xs">-</span>
@@ -136,7 +137,7 @@ export function useTable({
 
             const { market } = row.original
 
-            const displayDecimals = market.quote.priceDisplayDecimals || 6
+            const displayDecimals = market?.quote?.priceDisplayDecimals || 6
 
             return price ? (
               <span className="text-xs">
