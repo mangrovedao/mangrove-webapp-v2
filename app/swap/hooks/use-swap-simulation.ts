@@ -10,7 +10,6 @@ import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { usePool } from "@/hooks/new_ghostbook/pool"
 import { useOdos } from "@/hooks/odos/use-odos"
-import { useSymphony } from "@/hooks/symphony/use-symphony"
 import { useBook } from "@/hooks/use-book"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import useMarket from "@/providers/market"
@@ -40,7 +39,6 @@ export function useSwapSimulation({
   const { mangroveChain } = useRegistry()
   const { pool } = usePool()
   const { getQuote, hasToApproveOdos } = useOdos()
-  const { getRoute, tokenList } = useSymphony()
 
   return useQuery({
     queryKey: [
