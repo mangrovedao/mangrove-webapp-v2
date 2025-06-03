@@ -155,14 +155,10 @@ export function useTable({ data, showMarketInfo = false }: Params) {
         columnHelper.accessor("takerGot", {
           header: "Status",
           cell: ({ row }) => {
-            const isFilled =
-              Number(row.original.initialWants ?? "0") -
-              Number(row.original.takerGot ?? "0")
-
-            const status = isFilled === 0 ? "Filled" : "Partially Filled"
+            const status = row.original.status.toString();
 
             return (
-              <span className="text-xs capitalize">{status.toString()}</span>
+              <span className="text-xs capitalize">{status}</span>
             )
           },
         }),

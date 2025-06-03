@@ -60,6 +60,7 @@ const orderSchema = z.object({
   sendToken: TokenSchema,
   receiveToken: TokenSchema,
   market: MarketSchema,
+  status: z.string(),
 
   // Limit only fields below
   expiryDate: dateTransformer.optional(),
