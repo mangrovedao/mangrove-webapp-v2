@@ -34,6 +34,8 @@ const fetchTestnetOHLCVData = async (
   to: number,
 ): Promise<OHLCVBar[]> => {
   try {
+    if (!chainId || !baseAddress || !quoteAddress) return []
+
     // Convert TradingView resolution to API resolution (e.g., "60" -> "1h")
     const resolutionMap: Record<string, string> = {
       "1": "1m",
