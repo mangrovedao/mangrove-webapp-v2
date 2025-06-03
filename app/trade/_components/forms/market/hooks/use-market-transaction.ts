@@ -36,7 +36,7 @@ export function useMarketTransaction({
   baseToken,
   sendTokenBalance,
   isWrapping,
-  onTransactionSuccess,
+  onTransactionSuccess = () => {},
 }: UseMarketTransactionProps) {
   const { isConnected, address, chain } = useAccount()
   const { mangroveChain } = useRegistry()
@@ -67,21 +67,11 @@ export function useMarketTransaction({
     onResult: (result) => {
       setTxState("idle")
       toast.success("Order submitted successfully!")
-      if (onTransactionSuccess) {
-        onTransactionSuccess()
-      }
+      onTransactionSuccess()
     },
   })
 
-  const postMarket = usePostMarketOrder({
-    onResult: (result) => {
-      setTxState("idle")
-      toast.success("Order submitted successfully!")
-      if (onTransactionSuccess) {
-        onTransactionSuccess()
-      }
-    },
-  })
+  const postMarket = usePostMarketOrder()
 
   // Post order mutation
   const post = chain?.testnet || !pool ? postMangrove : postMarket
@@ -143,7 +133,7 @@ export function useMarketTransaction({
   const handlePostOrder = async () => {
     setTxState("posting")
     try {
-      await post.mutateAsync(
+      const result = await post.mutateAsync(
         {
           form: {
             ...form.state.values,
@@ -162,6 +152,11 @@ export function useMarketTransaction({
           },
         },
       )
+
+      if (result?.receipt?.status === 'success' && onTransactionSuccess) {
+        onTransactionSuccess();
+      }
+
     } catch (error) {
       setTxState("idle")
       toast.error("Failed to post the market order")

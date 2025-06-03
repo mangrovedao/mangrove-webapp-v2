@@ -90,10 +90,14 @@ export function useTable({ data, showMarketInfo = false }: Params) {
         columnHelper.display({
           header: "Received/Sent",
           cell: ({ row }) => {
-            const { takerGot, takerGave, side, market } = row.original
+            const { takerGot, takerGave, side, market, status } = row.original
 
             if (!market) {
               return <Skeleton className="w-20 h-6" />
+            }
+
+            if (status === 'Canceled') {
+              return <div>-</div>
             }
 
             const [sentSymbol, receivedSymbol] =
@@ -127,7 +131,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
               return <Skeleton className="w-20 h-6" />
             }
 
-            return price ? (
+            return Number(price) ? (
               <span className="text-xs">
                 {Big(price).toFixed(6)}{" "}
                 <span className="text-muted-foreground text-xs">

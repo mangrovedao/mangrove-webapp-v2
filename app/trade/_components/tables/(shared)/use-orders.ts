@@ -129,7 +129,7 @@ export function useOrders<T = Order[]>(
             initialWants: item.totalWants?.toString() || "",
             initialGives: item.totalGives?.toString() || "",
             price: item.price?.toString() || "0",
-            status: item.status || "",
+            status: item?.price === 0 ? "Canceled" : item.status || "",
             isMarketOrder: item.type.toLowerCase() === "market",
             market: item.market,
             sendToken: item.sendToken,
