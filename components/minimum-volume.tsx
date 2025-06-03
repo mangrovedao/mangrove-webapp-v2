@@ -34,7 +34,7 @@ export function MinimumVolume(props: {
           <Caption>
             required for limit orders on Oxium.{" "}
             <Link
-              href="https://docs.oxium.exchange/general/web-app/trade/how-to-make-an-order/limit-order"
+              href="https://docs.oxium.xyz/"
               target="_blank"
               rel="noreferrer"
               className="text-green-caribbean underline"
