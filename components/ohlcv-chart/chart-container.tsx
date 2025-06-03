@@ -83,12 +83,14 @@ export const TVChartContainer = (
 
   const getData = async (resolution: string) => {
     try {
+      if (!defaultChain || !base.address || !quote.address) return []
+
       // Map TradingView resolution to API resolution
       const apiResolution = RESOLUTION_MAP[resolution] || "1d"
 
       // Build the URL with the pairs in the correct order
       // Note: The order must be chainId/quoteAddress/baseAddress for testnet indexer
-      const url = `${getIndexerUrl(defaultChain)}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
+      const url = `${getIndexerUrl(defaultChain)}/price/ohlc/${defaultChain.id}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
 
       const response = await fetch(url)
       if (!response.ok) {

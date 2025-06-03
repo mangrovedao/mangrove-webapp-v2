@@ -81,7 +81,10 @@ export function useOrders<T = Order[]>(
 
         startLoading(TRADE.TABLES.ORDERS)
 
-        const getOrders: () => Promise<{ orders: Order[], count: number }> = async () => {
+        const getOrders: () => Promise<{
+          orders: Order[]
+          count: number
+        }> = async () => {
           try {
             const response = await fetch(
               `${config[type].apiRoute}?user=${address}&page=${pageParam}&limit=${pageSize}`,
@@ -179,7 +182,7 @@ export function useOrders<T = Order[]>(
           data: filteredOrders,
           meta: {
             count: data.count,
-            hasNextPage: data.count >= pageSize,
+            hasNextPage: filteredOrders.length >= pageSize,
             page: pageParam as number,
           },
         }
