@@ -173,7 +173,7 @@ export function MobileOverlay() {
               </div>
 
               <Link
-                href={"https://docs.oxium.exchange/"}
+                href={"https://docs.oxium.xyz/"}
                 target="_blank"
                 className="flex items-center w-full gap-3 px-4 py-3 rounded-lg text-nav-item-button-icon-fg hover:text-white hover:bg-bg-tertiary text-sm font-medium transition-colors"
               >
@@ -239,7 +239,7 @@ export default function Navbar() {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>
                         <Link
-                          href="https://docs.oxium.exchange/"
+                          href="https://docs.oxium.xyz/"
                           target="_blank"
                           className="text-xs text-text-secondary hover:text-text-tertiary"
                         >
@@ -248,7 +248,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Link
-                          href="https://docs.oxium.exchange/dev"
+                          href="https://docs.oxium.xyz"
                           target="_blank"
                           className="text-xs text-text-secondary"
                         >
@@ -264,7 +264,7 @@ export default function Navbar() {
                         <div className="flex justify-center gap-2">
                           <DropdownMenuItem className="hover:bg-bg-tertiary">
                             <Link
-                              href="https://x.com/OxiumExchange"
+                              href="https://x.com/oxiumxyz"
                               target="_blank"
                             >
                               <svg
@@ -284,7 +284,7 @@ export default function Navbar() {
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Link
-                              href="https://discord.com/invite/77d4ekhsXH"
+                              href="http://discord.gg/invite/oxium"
                               target="_blank"
                             >
                               <svg
@@ -300,7 +300,7 @@ export default function Navbar() {
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Link href="https://t.me/Oxium" target="_blank">
+                            <Link href="https://www.oxium.xyz/" target="_blank">
                               <TelegramIcon
                                 width="20"
                                 height="20"
