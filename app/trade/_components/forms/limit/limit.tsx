@@ -77,7 +77,7 @@ export function Limit() {
     onSubmit: (formData) => setFormData(formData),
     bs: tradeSide,
   })
-
+  console.log(tradeSide)
   const { payDollar, receiveDollar } = useDollarConversion({
     payAmount: form.state.values.send,
     receiveAmount: form.state.values.receive,
