@@ -25,3 +25,31 @@ export const priceSchema = z.object({
   price: z.number(),
   symbol: z.string(),
 })
+
+export const kandelSchema = z.object({
+  kandelAddress: z.string(),
+  apr: z.object({
+    mangroveKandelAPR: z.number(),
+    aaveAPR: z.number(),
+    baseTokenAaveAPR: z.number(),
+    quoteTokenAaveAPR: z.number(),
+    baseTokenTVL: z.string(),
+    quoteTokenTVL: z.string(),
+    data: z.object({
+      address: z.string(),
+      baseToken: z.string(),
+      quoteToken: z.string(),
+      baseTokenTVL: z.string(),
+      quoteTokenTVL: z.string(),
+      trades: z.object({
+        baseReceived: z.string(),
+        quoteReceived: z.string(),
+      }),
+      tickOffset: z.string(),
+      tick: z.string(),
+      chainId: z.number(),
+      type: z.string(),
+    }),
+  }),
+  timestamp: z.number(),
+})
