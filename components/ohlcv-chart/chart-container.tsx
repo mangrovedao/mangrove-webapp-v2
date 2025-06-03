@@ -83,6 +83,7 @@ export const TVChartContainer = (
 
   const getData = async (resolution: string) => {
     try {
+      if (!chainId || !base.address || !quote.address) return []
       // Map TradingView resolution to API resolution
       const apiResolution = RESOLUTION_MAP[resolution] || "1d"
 
