@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
-import { useAccount } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
@@ -25,6 +25,8 @@ import { useMarketForm } from "./hooks/use-market"
 import { useMarketTransaction } from "./hooks/use-market-transaction"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
+import { useTradeBalances } from "../hooks/use-trade-balances"
+import { useBalances } from "@/hooks/use-balances"
 
 // Reuse the wethAdresses from the dialog
 export const wethAdresses: { [key: number]: Address | undefined } = {
@@ -78,6 +80,8 @@ export function Market() {
   // Registry and trade infos
   const { baseToken } = useTradeInfos("market", tradeSide)
 
+  const { refetch: refetchBalances } = useBalances();
+
   // Use the transaction hook
   const {
     isButtonLoading,
@@ -97,6 +101,9 @@ export function Market() {
       form.reset()
       setSendSliderValue(0)
       setFormData(undefined)
+      setTimeout(() => {
+        refetchBalances();
+      }, 100)
     },
   })
 

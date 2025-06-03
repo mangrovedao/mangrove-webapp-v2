@@ -16,7 +16,7 @@ export function useUserBalances(params: UseUserBalancesParams) {
   const generalClient = useGeneralClient()
   const { markets } = useMarket()
   const logics = useLogics()
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: [
       "balances",
       generalClient?.chain.id,
@@ -34,7 +34,7 @@ export function useUserBalances(params: UseUserBalancesParams) {
     },
     enabled: !!generalClient && !!params.user && (markets?.length ?? 0) > 0,
   })
-  return { balances: data, isLoading, isError }
+  return { balances: data, isLoading, isError, refetch }
 }
 
 export function useBalances() {

@@ -31,11 +31,7 @@ const calculateMaxTick = (
   return maxTick
 }
 
-type Props = {
-  onResult?: (result: TransactionReceipt) => void
-}
-
-export function usePostMarketOrder({ onResult }: Props = {}) {
+export function usePostMarketOrder() {
   const { currentMarket: market } = useMarket()
   const { mangroveChain } = useRegistry()
 

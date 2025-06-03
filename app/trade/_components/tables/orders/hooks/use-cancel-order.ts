@@ -41,8 +41,6 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
         if (!offerId || !walletClient || !marketClient)
           throw new Error("Retract order missing params")
 
-        console.log("order", order, walletClient.account)
-
         const { request } = await marketClient.simulateRemoveOrder({
           offerId: BigInt(offerId),
           bs: order.side === "buy" ? BS.buy : BS.sell,
