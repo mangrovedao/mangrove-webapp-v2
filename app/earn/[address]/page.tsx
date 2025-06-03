@@ -77,16 +77,6 @@ export default function Page() {
     }
   }, [vault])
 
-  const baseDepositDollar = vault?.baseDollarPrice
-    ? Number(formatUnits(vault.userBaseBalance, vault.market.base.decimals)) *
-      vault.baseDollarPrice
-    : 0
-
-  const quoteDepositDollar = vault?.quoteDollarPrice
-    ? Number(formatUnits(vault.userQuoteBalance, vault.market.quote.decimals)) *
-      vault.quoteDollarPrice
-    : 0
-
   React.useEffect(() => {
     setTimeout(() => refetch?.(), 1)
   }, [refetch])

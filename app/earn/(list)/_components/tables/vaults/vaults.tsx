@@ -79,7 +79,8 @@ export function Vaults() {
       const kandelData = await apiAPR.json()
       const parsedKandelData = kandelSchema.parse(kandelData)
       const { mangroveKandelAPR, aaveAPR } = parsedKandelData.apr
-      const apr = mangroveKandelAPR + aaveAPR
+      
+      const apr = (mangroveKandelAPR + aaveAPR) * 100
 
       return { apr }
     } catch (error) {
