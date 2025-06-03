@@ -81,7 +81,7 @@ export function useOrders<T = Order[]>(
 
         startLoading(TRADE.TABLES.ORDERS)
 
-        const getOrders: () => Promise<{ orders: Order[] }> = async () => {
+        const getOrders: () => Promise<{ orders: Order[], count: number }> = async () => {
           try {
             const response = await fetch(
               `${config[type].apiRoute}?user=${address}&page=${pageParam}&limit=${pageSize}`,
@@ -114,9 +114,9 @@ export function useOrders<T = Order[]>(
           }
         }
 
-        const { orders } = await getOrders()
+        const data = await getOrders()
 
-        const transformedData = orders.map((item: any) => {
+        const transformedData = data?.orders.map((item: any) => {
           return {
             creationDate: safeDate(item.timestamp),
             lockedProvision: item.lockedProvision?.toString() || "0",
@@ -178,8 +178,8 @@ export function useOrders<T = Order[]>(
         return {
           data: filteredOrders,
           meta: {
-            count: filteredOrders.length,
-            hasNextPage: filteredOrders.length >= pageSize,
+            count: data.count,
+            hasNextPage: data.count >= pageSize,
             page: pageParam as number,
           },
         }
