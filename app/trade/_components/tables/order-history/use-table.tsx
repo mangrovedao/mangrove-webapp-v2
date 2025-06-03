@@ -91,7 +91,6 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           header: "Received/Sent",
           cell: ({ row }) => {
             const { takerGot, takerGave, side, market } = row.original
-            console.log({ takerGot, takerGave, side, market })
 
             if (!market) {
               return <Skeleton className="w-20 h-6" />
@@ -106,13 +105,13 @@ export function useTable({ data, showMarketInfo = false }: Params) {
               <div className={cn("flex flex-col ")}>
                 <span className="text-xs">
                   {Big(takerGot).toFixed(6)}{" "}
-                  <span className="text-muted-foreground">
-                    {receivedSymbol}
-                  </span>
+                  <span className="text-muted-foreground">{sentSymbol}</span>
                 </span>
                 <span className="text-xs opacity-50 ">
                   {Big(takerGave).toFixed(6)}{" "}
-                  <span className="text-muted-foreground">{sentSymbol}</span>
+                  <span className="text-muted-foreground">
+                    {receivedSymbol}
+                  </span>
                 </span>
               </div>
             )
