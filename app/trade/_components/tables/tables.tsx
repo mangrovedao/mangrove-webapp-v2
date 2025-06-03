@@ -55,6 +55,15 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
     allMarkets: showAllMarkets,
   })
 
+  const orderHistoryCount = React.useMemo(() => {
+    if (!orderHistory?.pages) return 0
+
+    return orderHistory.pages.reduce(
+      (total, page) => total + page.meta.count,
+      0,
+    )
+  }, [orderHistory])
+
   React.useEffect(() => {
     setDefaultEnum(isConnected ? TradeTablesLoggedIn : TradeTablesLoggedOut)
     setValue(Object.values(defaultEnum)[0] || "Open Orders")
@@ -89,7 +98,7 @@ export function Tables(props: React.ComponentProps<typeof CustomTabs>) {
                   isConnected && table === TradeTablesLoggedIn.ORDERS
                     ? ordersCount
                     : isConnected && table === TradeTablesLoggedIn.ORDER_HISTORY
-                      ? orderHistory?.pages[0]?.meta.count
+                      ? orderHistoryCount
                       : 0
                 }
               >

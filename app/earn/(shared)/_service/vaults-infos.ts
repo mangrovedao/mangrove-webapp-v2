@@ -167,6 +167,7 @@ export async function getVaultsInformation(
             functionName: "lastTotalInQuote",
           },
           { address: v.address, abi: VaultABI, functionName: "lastTimestamp" },
+          { address: v.address, abi: VaultABI, functionName: "kandel" },
         ] satisfies MulticallParameters["contracts"],
     )
 
