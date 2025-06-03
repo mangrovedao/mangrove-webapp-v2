@@ -1,6 +1,5 @@
 "use client"
 import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
-import OHLCVChart from "@/components/ohlcv-chart/ohlcv-chart"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
 import {
@@ -77,11 +76,7 @@ export default function Page() {
                   <div className="flex gap-1 h-full">
                     {/* Chart Section */}
                     <div className="flex-[4] rounded-sm overflow-hidden border border-bg-secondary">
-                      {defaultChain.testnet || !pool ? (
-                        <OHLCVChart />
-                      ) : (
-                        <EmbedPriceChart />
-                      )}
+                      <EmbedPriceChart />
                     </div>
 
                     {/* Order Book Section */}
@@ -128,11 +123,7 @@ export default function Page() {
             <div className="mb-2">
               {activeMainTab === "Chart" && (
                 <div className="h-[400px] w-full rounded-sm border border-bg-secondary">
-                  {defaultChain.testnet || !pool ? (
-                    <OHLCVChart />
-                  ) : (
-                    <EmbedPriceChart />
-                  )}
+                  <EmbedPriceChart />
                 </div>
               )}
               {activeMainTab === "Order Book" && (
