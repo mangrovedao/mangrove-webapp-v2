@@ -91,7 +91,6 @@ export function useTable({ data, showMarketInfo = false }: Params) {
           header: "Received/Sent",
           cell: ({ row }) => {
             const { takerGot, takerGave, side, market } = row.original
-            console.log({ takerGot, takerGave, side, market })
 
             if (!market) {
               return <Skeleton className="w-20 h-6" />

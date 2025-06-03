@@ -12,6 +12,8 @@ export function WrongNetworkAlertDialog() {
   const { chains, isChainDialogOpen, setIsChainDialogOpen } = useChains()
   const isNetworkSupported = !!chains?.find((c) => c.id === chain?.id)
 
+  console.log(chains, chain?.id)
+
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {

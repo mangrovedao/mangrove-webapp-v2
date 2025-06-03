@@ -22,7 +22,7 @@ import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
 import { useTradeInfos } from "../hooks/use-trade-infos"
 import { useMarketForm } from "./hooks/use-market"
-import { useMarketTransaction } from "./hooks/use-market-transaction"
+import { useDefaultChain, useMarket, useMarketTransaction } from "@mangroveui/trade"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
 
@@ -79,19 +79,15 @@ export function Market() {
   const { baseToken } = useTradeInfos("market", tradeSide)
 
   // Use the transaction hook
+  const { currentMarket } = useMarket();
   const {
     isButtonLoading,
     onSubmit,
     getButtonText: getTransactionButtonText,
-    marketOrderSteps,
   } = useMarketTransaction({
-    form,
-    tradeSide,
-    maxTickEncountered: maxTickEncountered ?? 0n,
-    sendToken,
-    baseToken,
+    form: form.state.values,
+    market: currentMarket,
     sendTokenBalance: sendBalance,
-    isWrapping,
     onTransactionSuccess: () => {
       // Reset form state after successful transaction
       form.reset()
@@ -215,7 +211,6 @@ export function Market() {
       isConnected,
       errors: allErrors,
       tradeSide,
-      needsApproval: marketOrderSteps ? !marketOrderSteps[0].done : undefined,
     })
   }
 

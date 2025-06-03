@@ -12,13 +12,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useDollarConversion } from "@/hooks/use-dollar-conversion"
-import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { useTradeFormStore } from "../../forms/store"
-import { useTradeInfos } from "../hooks/use-trade-infos"
 import { useLimit } from "./hooks/use-limit"
-import { useLimitTransaction } from "./hooks/use-limit-transaction"
+import { useLimitTransaction, useMarket } from "@mangroveui/trade"
 import type { Form } from "./types"
 import {
   isGreaterThanZeroValidator,
@@ -84,21 +82,15 @@ export function Limit() {
     tradeSide,
   })
 
-  // Registry and trade infos
-  const { baseToken } = useTradeInfos("limit", tradeSide)
-
   // Use the transaction hook
   const {
     isButtonLoading,
     onSubmit,
     getButtonText: getTransactionButtonText,
   } = useLimitTransaction({
-    form,
-    tradeSide,
-    sendToken,
-    baseToken,
+    form: form.state.values,
+    market: currentMarket,
     sendTokenBalance: sendBalance,
-    isWrapping,
   })
 
   useEffect(() => {
