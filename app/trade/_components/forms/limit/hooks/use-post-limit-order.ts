@@ -84,6 +84,26 @@ export function usePostLimitOrder() {
             ? parseUnits(gives, quote.decimals)
             : parseUnits(wants, quote.decimals)
 
+        console.log({
+          account,
+          fillWants: false,
+          baseAmount,
+          quoteAmount,
+          bs,
+          book,
+          orderType: timeInForce as number,
+          // If expiry date is ignored, then it will not expire
+          expiryDate:
+            timeInForce === TimeInForce.GTC || timeInForce === TimeInForce.PO
+              ? BigInt(estimateTimestamp({ timeToLiveUnit: "Day", timeToLive }))
+              : undefined, // 1 hour
+          restingOrderGasreq,
+          // logics can be left to undefined (meaning no logic)
+          takerGivesLogic: takerGivesLogic as Address,
+          takerWantsLogic: takerWantsLogic as Address,
+          gas: 10_000_000n,
+        })
+
         const { request } = await marketClient.simulateLimitOrder({
           account,
           fillWants: false,
@@ -119,7 +139,6 @@ export function usePostLimitOrder() {
           },
         )
 
-        console.log(bs)
         successToast(
           TradeMode.LIMIT,
           bs,
