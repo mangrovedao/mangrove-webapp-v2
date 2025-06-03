@@ -63,26 +63,28 @@ export function useMarketTransaction({
   })
 
   // Post order mutation
-  const post =
-    chain?.testnet || !pool
-      ? usePostMarketOrderMangrove({
-          onResult: (result) => {
-            setTxState("idle")
-            toast.success("Order submitted successfully!")
-            if (onTransactionSuccess) {
-              onTransactionSuccess()
-            }
-          },
-        })
-      : usePostMarketOrder({
-          onResult: (result) => {
-            setTxState("idle")
-            toast.success("Order submitted successfully!")
-            if (onTransactionSuccess) {
-              onTransactionSuccess()
-            }
-          },
-        })
+  const postMangrove = usePostMarketOrderMangrove({
+    onResult: (result) => {
+      setTxState("idle")
+      toast.success("Order submitted successfully!")
+      if (onTransactionSuccess) {
+        onTransactionSuccess()
+      }
+    },
+  })
+
+  const postMarket = usePostMarketOrder({
+    onResult: (result) => {
+      setTxState("idle")
+      toast.success("Order submitted successfully!")
+      if (onTransactionSuccess) {
+        onTransactionSuccess()
+      }
+    },
+  })
+
+  // Post order mutation
+  const post = chain?.testnet || !pool ? postMangrove : postMarket
 
   // Wrapping ETH
   const {
