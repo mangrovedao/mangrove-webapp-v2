@@ -11,13 +11,13 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
 import { useMgvFdv } from "@/app/earn/(shared)/store/vault-store"
 import { Vault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
@@ -110,7 +110,7 @@ export function useTable({
           if (isLoading) {
             return (
               <div className="text-right w-full">
-                <Skeleton className="h-6 w-24 ml-auto" />
+                <AnimatedSkeleton className="h-6 w-24 ml-auto" />
               </div>
             )
           }
@@ -146,7 +146,7 @@ export function useTable({
           if (isLoading) {
             return (
               <div className="text-right w-full">
-                <Skeleton className="h-6 w-24 ml-auto" />
+                <AnimatedSkeleton className="h-6 w-24 ml-auto" />
               </div>
             )
           }

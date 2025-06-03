@@ -9,7 +9,6 @@ import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
 import { Address, PublicClient } from "viem"
 import { useAccount } from "wagmi"
 
@@ -104,7 +103,6 @@ export function useVaults<T = Vault[] | Vault | undefined>({
           plainVaults,
           user,
           incentives,
-          fdv,
           incentivesData,
         )
 
@@ -121,62 +119,6 @@ export function useVaults<T = Vault[] | Vault | undefined>({
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   })
-
-  // Prefetch the next page when we're within 50% of the current page
-  useEffect(() => {
-    if (data && data.length >= first / 2) {
-      const nextPageKey = getVaultsQueryKey(
-        networkClient?.key,
-        fdv,
-        user,
-        chainId,
-        skip + first,
-        first,
-      )
-
-      queryClient.prefetchQuery({
-        queryKey: nextPageKey,
-        queryFn: async () => {
-          try {
-            if (!networkClient?.key)
-              throw new Error("Public client is not enabled")
-            if (!plainVaults) return []
-
-            const vaults = await getVaultsInformation(
-              networkClient as PublicClient,
-              plainVaults,
-              user,
-              incentives,
-              fdv,
-            )
-
-            return vaults ?? []
-          } catch (error) {
-            printEvmError(error)
-            return []
-          }
-        },
-        staleTime: 5 * 60 * 1000, // 5 minutes
-      })
-    }
-  }, [
-    data,
-    first,
-    skip,
-    networkClient,
-    fdv,
-    user,
-    chainId,
-    plainVaults,
-    incentives,
-    queryClient,
-  ])
-
-  // Refresh data when connection status changes
-  useEffect(() => {
-    // When connection status changes, invalidate the cache
-    queryClient.invalidateQueries({ queryKey: ["vaults"] })
-  }, [isConnected, chainId, queryClient])
 
   return {
     data: (select ? select(data ?? []) : data) as unknown as T,

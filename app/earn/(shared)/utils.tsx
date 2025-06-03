@@ -1,10 +1,10 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
-import { Skeleton } from "@/components/ui/skeleton"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { MarketParams } from "@mangrovedao/mgv"
 import { ReactNode } from "react"
 import { Address, Chain, parseAbi, PublicClient } from "viem"
+import { AnimatedSkeleton } from "./components/animated-skeleton"
 import { pnlSchema, priceSchema } from "./schemas"
 
 // ============= CONTRACT INTERFACES =============
@@ -162,7 +162,7 @@ export const Line = ({
       {value ? (
         <Caption className="text-gray !text-sm">{value}</Caption>
       ) : (
-        <Skeleton className="h-4 w-full" />
+        <AnimatedSkeleton className="h-4 w-full" />
       )}
     </div>
   )

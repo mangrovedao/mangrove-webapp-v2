@@ -2,11 +2,11 @@
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
+import { getVaultIncentives } from "@/app/earn/(shared)/_service/vault-incentives"
 import { Vault } from "@/app/earn/(shared)/types"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect } from "react"
 import { PublicClient } from "viem"
 import { useAccount } from "wagmi"
 import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
@@ -33,7 +33,7 @@ export function useMyVaults<T = Vault[]>({
   select,
 }: Params<T> = {}) {
   const networkClient = useNetworkClient()
-  const { address: user, chainId, isConnected } = useAccount()
+  const { address: user } = useAccount()
   const { defaultChain } = useDefaultChain()
   const queryClient = useQueryClient()
 
@@ -60,11 +60,33 @@ export function useMyVaults<T = Vault[]>({
       try {
         if (!networkClient?.key) throw new Error("Public client is not enabled")
         if (!plainVaults) return []
+
+        // Get incentives data in parallel with other operations
+        const incentivesData = await Promise.all(
+          plainVaults.map(async (vault) => {
+            const data = await getVaultIncentives(
+              networkClient as PublicClient,
+              incentives.find(
+                (i) => i.vault.toLowerCase() === vault.address.toLowerCase(),
+              ),
+            )
+            return {
+              vault: vault.address,
+              total:
+                data?.leaderboard.reduce(
+                  (sum, entry) => sum + entry.rewards,
+                  0,
+                ) ?? 0,
+            }
+          }),
+        )
+
         const vaults = await getVaultsInformation(
           networkClient as PublicClient,
           plainVaults,
           user,
           incentives,
+          incentivesData,
         )
         return vaults.filter((v) => v.isActive)
       } catch (error) {
@@ -79,61 +101,6 @@ export function useMyVaults<T = Vault[]>({
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   })
-
-  // Prefetch the next page when we're within 50% of the current page
-  useEffect(() => {
-    if (data && data.length >= first / 2) {
-      const nextPageKey = getMyVaultsQueryKey(
-        networkClient?.key,
-        user,
-        defaultChain.id,
-        skip + first,
-        first,
-      )
-
-      queryClient.prefetchQuery({
-        queryKey: nextPageKey,
-        queryFn: async () => {
-          try {
-            if (!networkClient?.key)
-              throw new Error("Public client is not enabled")
-            if (!plainVaults) return []
-
-            const vaults = await getVaultsInformation(
-              networkClient as PublicClient,
-              plainVaults,
-              user,
-              incentives,
-            )
-
-            return vaults.filter((v) => v.isActive) || []
-          } catch (error) {
-            console.error(error)
-            return []
-          }
-        },
-        staleTime: 5 * 60 * 1000, // 5 minutes
-      })
-    }
-  }, [
-    data,
-    first,
-    skip,
-    networkClient,
-    user,
-    defaultChain.id,
-    plainVaults,
-    incentives,
-    queryClient,
-  ])
-
-  // Refresh data when connection status changes
-  useEffect(() => {
-    // When connection status changes, invalidate the cache
-    if (user) {
-      queryClient.invalidateQueries({ queryKey: ["my-vaults"] })
-    }
-  }, [isConnected, chainId, user, queryClient])
 
   return {
     data: (select ? select(data || []) : data) as unknown as T,

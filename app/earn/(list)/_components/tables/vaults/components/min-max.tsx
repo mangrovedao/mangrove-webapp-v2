@@ -1,6 +1,6 @@
 import type { Address } from "viem"
 
-import { Skeleton } from "@/components/ui/skeleton"
+import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
 import { useTokenFromAddress } from "@/hooks/use-token-from-address"
 
 type Props = {
@@ -14,7 +14,7 @@ export function MinMax({ min, max, quote }: Props) {
   const symbol = quoteToken?.symbol
 
   if (!quoteToken) {
-    return <Skeleton className="h-6 w-full" />
+    return <AnimatedSkeleton className="h-6 w-full" />
   }
 
   return (

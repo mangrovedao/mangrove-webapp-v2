@@ -15,6 +15,10 @@ import React, { ReactNode, useEffect, useState } from "react"
 import { Address, formatUnits } from "viem"
 
 import {
+  AnimatedSkeleton,
+  SkeletonCard,
+} from "@/app/earn/(shared)/components/animated-skeleton"
+import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
@@ -25,13 +29,11 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
-import { useVaults } from "../(list)/_components/tables/vaults/hooks/use-vaults"
 import { Line, getChainImage } from "../(shared)/utils"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
@@ -64,11 +66,8 @@ export default function Page() {
     }
   }, [])
 
-  useVaults({ vaultAddress: params.address })
-
   const {
     data: { vault },
-    refetch,
   } = useVault(params.address)
 
   useEffect(() => {
@@ -76,10 +75,6 @@ export default function Page() {
       setAction(Action.Withdraw)
     }
   }, [vault])
-
-  React.useEffect(() => {
-    setTimeout(() => refetch?.(), 1)
-  }, [refetch])
 
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
@@ -132,7 +127,7 @@ export default function Page() {
       >
         <div className="grid items-center gap-2">
           {!vault?.market?.quote?.symbol || !vault?.market?.base?.symbol ? (
-            <Skeleton className={cn("h-7 w-7", "rounded-sm")} />
+            <AnimatedSkeleton variant="icon" className="h-7 w-7 rounded-sm" />
           ) : (
             <motion.div
               className="flex items-center gap-2"
@@ -144,8 +139,16 @@ export default function Page() {
                 {!vault?.market?.quote?.symbol ||
                 !vault?.market?.base?.symbol ? (
                   <>
-                    <Skeleton className={cn("h-16 w-16", "rounded-sm")} />
-                    <Skeleton className={cn("h-16 w-16", "rounded-sm")} />
+                    <AnimatedSkeleton
+                      variant="circular"
+                      className="h-16 w-16"
+                      delay={0.1}
+                    />
+                    <AnimatedSkeleton
+                      variant="circular"
+                      className="h-16 w-16"
+                      delay={0.2}
+                    />
                   </>
                 ) : (
                   <>
@@ -183,9 +186,9 @@ export default function Page() {
             />
             <Subline
               title={"Performance Fee"}
-              value={`${vault?.performanceFee}%`}
+              value={`${vault?.performanceFee || "..."}%`}
             />
-            <Subline title={"Manager"} value={vault?.manager} />
+            <Subline title={"Manager"} value={vault?.manager || "..."} />
           </div>
         </div>
       </motion.div>
@@ -269,7 +272,7 @@ export default function Page() {
                 </motion.div>
               </>
             ) : (
-              <Skeleton className="h-20 w-full" />
+              <AnimatedSkeleton variant="card" className="h-20 w-full" />
             )}
           </motion.div>
 
@@ -404,6 +407,12 @@ export default function Page() {
                   </div>
                   <div>
                     <GridLine
+                      title="Management Fee"
+                      value={vault?.managementFee}
+                      symbol="%"
+                      info="A fee attributed to the vault manager."
+                    />
+                    <GridLine
                       title="Vault Address"
                       value={shortenAddress(vault?.address || "")}
                       href={`${defaultChain?.blockExplorers?.default.url}/address/${vault?.address}`}
@@ -416,13 +425,11 @@ export default function Page() {
                         </motion.div>
                       }
                     />
-
-                    <GridLine title="Vault Created on" value={"June 2025"} />
                   </div>
                 </div>
               </div>
             ) : (
-              <Skeleton className="h-20 w-full mt-5" />
+              <AnimatedSkeleton variant="card" className="h-20 w-full mt-5" />
             )}
           </motion.div>
         </motion.div>
@@ -445,8 +452,11 @@ export default function Page() {
               >
                 {!vault ? (
                   <>
-                    <Skeleton className="h-10 mb-4 w-full" />
-                    <Skeleton className="h-[200px] w-full bg-bg-primary" />
+                    <AnimatedSkeleton className="h-10 mb-4 w-full" />
+                    <SkeletonCard
+                      className="h-[200px] w-full bg-bg-primary"
+                      hasHeader={false}
+                    />
                   </>
                 ) : (
                   <>
@@ -738,7 +748,7 @@ const GridLine = ({
           </div>
         </>
       ) : (
-        <Skeleton className="h-10 w-full" />
+        <AnimatedSkeleton variant="card" className="h-10 w-full" />
       )}
     </div>
   )

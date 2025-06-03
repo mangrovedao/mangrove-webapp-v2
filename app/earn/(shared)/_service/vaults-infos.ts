@@ -17,7 +17,6 @@ import {
   fetchPnLData,
   fetchTokenPrices,
 } from "../utils"
-import { getVaultAPR } from "./vault-apr"
 import { getUserVaultIncentives } from "./vault-incentives-rewards"
 
 // Cache with TTL implementation
@@ -60,10 +59,6 @@ class TimedCache<K, V> {
 }
 
 // Cache instances with different TTLs for different data types
-const aprCache = new TimedCache<
-  string,
-  { totalAPR: number; incentivesApr: number }
->(5 * 60 * 1000) // 5 minutes
 const tokenPriceCache = new TimedCache<string, number>(10 * 60 * 1000) // 10 minutes
 const pnlCache = new TimedCache<string, any>(2 * 60 * 1000) // 2 minutes
 
@@ -81,7 +76,6 @@ export async function getVaultsInformation(
   vaults: VaultWhitelist[],
   user?: Address,
   incentives?: VaultLPProgram[],
-  fdv?: number,
   incentivesRewards?: { vault: Address; total: number }[],
 ): Promise<(Vault & VaultWhitelist)[]> {
   if (!vaults.length) return []
@@ -179,50 +173,50 @@ export async function getVaultsInformation(
 
     results.push(...batchResult)
   }
-
-  // Step 4: Process APR calculations in parallel for all vaults
-  const aprPromises = vaults.map(async (v) => {
+  console.log(results)
+  // Step 4: Process Kandel APR calculations in parallel for all vaults
+  const kandelAprPromises = vaults.map(async (v, i) => {
     const vaultAddress = v.address as Address
-    const aprCacheKey = `${vaultAddress}_${client.chain?.id}_${fdv}`
 
-    const cachedApr = aprCache.get(aprCacheKey)
-    if (cachedApr) return { address: vaultAddress, apr: cachedApr }
-
-    // Calculate if not in cache
     try {
-      const apr = await getVaultAPR(
-        client,
-        vaultAddress,
-        incentives?.find(
-          (item) => item.vault.toLowerCase() === v.address.toLowerCase(),
-        ),
-        fdv,
+      // Get kandel address from multicall results
+      const kandelResult = results[i * 11 + 10] // kandel is the 11th call (index 10)
+      const kandelAddress = kandelResult.result as Address
+
+      if (
+        !kandelAddress ||
+        kandelAddress === "0x0000000000000000000000000000000000000000"
+      ) {
+        return { address: vaultAddress, kandelApr: 0 }
+      }
+
+      const apiAPR = await fetch(
+        `https://api.mgvinfra.com/kandel/apr/${client.chain?.id}/${kandelAddress}`,
       )
-      aprCache.set(aprCacheKey, apr)
-      return { address: vaultAddress, apr }
+
+      if (!apiAPR.ok) {
+        return { address: vaultAddress, kandelApr: 0 }
+      }
+
+      const kandelData = await apiAPR.json()
+      const parsedKandelData = kandelSchema.parse(kandelData)
+      const { mangroveKandelAPR, aaveAPR } = parsedKandelData.apr
+      const apr = (mangroveKandelAPR + aaveAPR) * 100
+
+      return { address: vaultAddress, kandelApr: apr }
     } catch (e) {
-      console.error(`Failed to get APR for ${vaultAddress}:`, e)
-      return { address: vaultAddress, apr: { totalAPR: 0, incentivesApr: 0 } }
+      console.error(`Failed to get Kandel APR for ${vaultAddress}:`, e)
+      return { address: vaultAddress, kandelApr: 0 }
     }
   })
 
-  // Wait for all APR calculations to complete
-  const aprResults = await Promise.allSettled(aprPromises)
-  const aprMap = new Map<string, { totalAPR: number; incentivesApr: number }>()
-
-  aprResults.forEach((result, index) => {
-    if (result.status === "fulfilled") {
-      aprMap.set(result.value.address, result.value.apr)
-    } else {
-      const vaultAddress = vaults[index]?.address || "unknown"
-      aprMap.set(vaultAddress, { totalAPR: 0, incentivesApr: 0 })
-    }
-  })
+  // Wait for all Kandel APR calculations to complete
+  const kandelAprResults = await Promise.all(kandelAprPromises)
 
   // Step 5: Process all vaults data in parallel with optimizations
   return Promise.all(
     vaults.map(async (v, i): Promise<Vault & VaultWhitelist> => {
-      // Extract and parse multicall results
+      // Extract and parse multicall results (11 calls per vault)
       const [
         _totalInQuote,
         _underlyingBalances,
@@ -235,25 +229,7 @@ export async function getVaultsInformation(
         _lastTotalInQuote,
         _lastTimestamp,
         _kandel,
-      ] = results.slice(i * 10)
-
-      const getApr = async (kandelAddress: Address) => {
-        const apiAPR = await fetch(
-          `https://api.mgvinfra.com/kandel/apr/${client.chain?.id}/${_kandel.result}`,
-        )
-
-        const kandelData = await apiAPR.json()
-
-        const parsedKandelData = kandelSchema.parse(kandelData)
-
-        const { mangroveKandelAPR, aaveAPR } = parsedKandelData.apr
-
-        const apr = (mangroveKandelAPR + aaveAPR) * 100
-
-        return { apr }
-      }
-
-      const kandelApr = await getApr(_kandel.result)
+      ] = results.slice(i * 11)
 
       // Handle potential failures in multicall
       if (!_totalInQuote.result || !_underlyingBalances.result) {
@@ -318,8 +294,8 @@ export async function getVaultsInformation(
       const baseDollarPrice = tokenPriceCache.get(basePriceKey) || 1
       const quoteDollarPrice = tokenPriceCache.get(quotePriceKey) || 1
 
-      // Get APR from parallel calculation
-      const apr = aprMap.get(v.address) || { totalAPR: 0, incentivesApr: 0 }
+      // Get Kandel APR from parallel calculation
+      const kandelApr = kandelAprResults[i]?.kandelApr || 0
 
       // Calculate basic vault data
       const totalBase = underlyingBalances[0] || 0n
@@ -357,8 +333,8 @@ export async function getVaultsInformation(
       const result: Vault & VaultWhitelist = {
         ...v,
         symbol,
-        apr: kandelApr.apr,
-        incentivesApr: apr.incentivesApr,
+        apr: kandelApr,
+        incentivesApr: 0,
         decimals,
         mintedAmount: balanceOf,
         performanceFee: (Number(feeData[0]) / 1e5) * 100,
@@ -366,9 +342,11 @@ export async function getVaultsInformation(
         totalBase,
         totalQuote,
         totalRewards:
-          incentivesRewards?.find(
-            (i) => i.vault.toLowerCase() === v.address.toLowerCase(),
-          )?.total ?? 0,
+          incentivesRewards && Array.isArray(incentivesRewards)
+            ? incentivesRewards.find(
+                (i) => i.vault.toLowerCase() === v.address.toLowerCase(),
+              )?.total ?? 0
+            : 0,
         balanceBase,
         balanceQuote,
         chainId: client.chain?.id,

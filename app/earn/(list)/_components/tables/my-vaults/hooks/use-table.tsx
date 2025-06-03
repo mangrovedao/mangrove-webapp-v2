@@ -11,9 +11,9 @@ import Link from "next/link"
 import React from "react"
 import { formatUnits } from "viem"
 
+import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
 import { Vault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { formatNumber } from "@/utils/numbers"
 import { Market } from "../components/market"
@@ -29,7 +29,6 @@ type Params = {
 }
 
 export function useTable({ pageSize, data, onManage, isLoading }: Params) {
-
   const { defaultChain } = useDefaultChain()
 
   const columns = React.useMemo(
@@ -94,7 +93,7 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
           if (isLoading) {
             return (
               <div className="text-right w-full">
-                <Skeleton className="h-6 w-24 ml-auto" />
+                <AnimatedSkeleton className="h-6 w-24 ml-auto" />
               </div>
             )
           }
@@ -141,11 +140,10 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
         id: "My APY",
         header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
-
           if (isLoading) {
             return (
               <div className="text-right w-full">
-                <Skeleton className="h-6 w-24 ml-auto" />
+                <AnimatedSkeleton className="h-6 w-24 ml-auto" />
               </div>
             )
           }

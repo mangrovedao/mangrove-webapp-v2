@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
 import { cn } from "@/utils"
 import { CheckIcon } from "lucide-react"
 
@@ -10,7 +10,7 @@ type Props = {
 }
 export function Value({ value, trusted, symbol, className }: Props) {
   if (!value) {
-    return <Skeleton className="h-6 w-full" />
+    return <AnimatedSkeleton className="h-6 w-full" />
   }
 
   return (

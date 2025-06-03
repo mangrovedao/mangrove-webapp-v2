@@ -76,7 +76,7 @@ export function useVault(address?: string | null) {
           [vault],
           user,
           vaultIncentives ? [vaultIncentives] : undefined,
-          fdv,
+          [], // incentivesRewards - empty array for now
         )
 
         if (!vaultInfo) {
