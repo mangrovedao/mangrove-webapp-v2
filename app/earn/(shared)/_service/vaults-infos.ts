@@ -248,7 +248,7 @@ export async function getVaultsInformation(
 
         const { mangroveKandelAPR, aaveAPR } = parsedKandelData.apr
 
-        const apr = mangroveKandelAPR + aaveAPR
+        const apr = (mangroveKandelAPR + aaveAPR) * 100
         return { apr }
       }
 
