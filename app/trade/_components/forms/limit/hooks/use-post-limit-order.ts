@@ -14,9 +14,7 @@ import {
 
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
-import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
-import { megaethTestnet } from "viem/chains"
 import { useAccount, useWalletClient } from "wagmi"
 import { TradeMode } from "../../enums"
 import { successToast } from "../../utils"
@@ -103,10 +101,7 @@ export function usePostLimitOrder() {
           // logics can be left to undefined (meaning no logic)
           takerGivesLogic: takerGivesLogic as Address,
           takerWantsLogic: takerWantsLogic as Address,
-          gas:
-            marketClient.chain?.id === megaethTestnet.id
-              ? 10_000_000n
-              : 20_000_000n,
+          gas: 10_000_000n,
         })
 
         const hash = await walletClient.writeContract(request)
@@ -120,7 +115,7 @@ export function usePostLimitOrder() {
           {
             logs: receipt.logs,
             user: walletClient.account.address,
-            bs: BS.buy,
+            bs,
           },
         )
 
@@ -161,7 +156,7 @@ export function usePostLimitOrder() {
         // })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["order-history"] })
-        queryClient.invalidateQueries({ queryKey: ["balances"] })
+        queryClient.invalidateQueries({ queryKey: ["trade-balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {
         console.error(error)

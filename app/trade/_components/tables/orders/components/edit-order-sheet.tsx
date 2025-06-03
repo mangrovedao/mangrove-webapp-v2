@@ -12,13 +12,13 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDateWithoutHours, formatHoursOnly } from "@/utils/date"
 import { formatUnits } from "viem"
+import { Order } from "../../(shared)/schema"
 import { TimeInForce } from "../../../forms/limit/enums"
 import {
   isGreaterThanZeroValidator,
   sendValidator,
 } from "../../../forms/limit/validators"
 import { useEditOrder } from "../hooks/use-edit-order"
-import { type Order } from "../schema"
 import { Form } from "../types"
 import { getOrderProgress } from "../utils/edit-order"
 import EditOrderSteps from "./edit-order-steps"
@@ -73,7 +73,7 @@ export default function EditOrderSheet({
   const [formData, setFormData] = React.useState<Form>()
   const order = orderInfos?.order
   const mode = orderInfos?.mode
-  const { expiryDate, isBid } = order
+  const { expiryDate, side } = order
   const {
     handleSubmit,
     setToggleEdit,
@@ -101,7 +101,8 @@ export default function EditOrderSheet({
     if (mode === "edit") setToggleEdit(true)
   }, [])
 
-  const sendTokenDecimals = isBid ? quote?.decimals : base?.decimals
+  const sendTokenDecimals =
+    order.side === "buy" ? quote?.decimals : base?.decimals
 
   return (
     <SheetRoot.Sheet open={!!order} onOpenChange={onClose}>
@@ -163,10 +164,12 @@ export default function EditOrderSheet({
                     item={
                       <Text
                         className={
-                          isBid ? "text-green-caribbean" : "text-red-100"
+                          order.side === "buy"
+                            ? "text-green-caribbean"
+                            : "text-red-100"
                         }
                       >
-                        {isBid ? "Buy" : "Sell"}
+                        {order.side === "buy" ? "Buy" : "Sell"}
                       </Text>
                     }
                   />
@@ -177,7 +180,7 @@ export default function EditOrderSheet({
                     title={`Filled/Amount`}
                     item={
                       <Text>{`${filled} / ${wants} ${
-                        isBid ? base?.symbol : quote?.symbol
+                        order.side === "buy" ? base?.symbol : quote?.symbol
                       }`}</Text>
                     }
                     secondaryItem={
@@ -231,7 +234,7 @@ export default function EditOrderSheet({
                     item={
                       !toggleEdit ? (
                         <Text>{`${gives} ${
-                          isBid ? quote?.symbol : base?.symbol
+                          order.side === "buy" ? quote?.symbol : base?.symbol
                         }`}</Text>
                       ) : (
                         <form.Field
@@ -257,7 +260,7 @@ export default function EditOrderSheet({
                                 computeReceiveAmount()
                               }}
                               error={field.state.meta.touchedErrors}
-                              token={isBid ? quote : base}
+                              token={order.side === "buy" ? quote : base}
                               disabled={!market}
                               showBalance
                             />
@@ -276,7 +279,7 @@ export default function EditOrderSheet({
                     item={
                       !toggleEdit ? (
                         <Text>{`${wants} ${
-                          isBid ? base?.symbol : quote?.symbol
+                          order.side === "buy" ? base?.symbol : quote?.symbol
                         }`}</Text>
                       ) : (
                         <form.Field
@@ -295,7 +298,7 @@ export default function EditOrderSheet({
                                 computeSendAmount()
                               }}
                               error={field.state.meta.touchedErrors}
-                              token={isBid ? base : quote}
+                              token={order.side === "buy" ? base : quote}
                               disabled={!market}
                               showBalance
                             />

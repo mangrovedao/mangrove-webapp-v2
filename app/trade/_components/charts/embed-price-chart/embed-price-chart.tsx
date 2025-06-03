@@ -1,7 +1,7 @@
 "use client"
 
 import { usePool } from "@/hooks/new_ghostbook/pool"
-import { useDefaultChain } from "@/hooks/use-default-chain"
+import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { useMemo } from "react"
 
@@ -11,26 +11,27 @@ interface PriceChartProps {
 
 export default function EmbedPriceChart({ className }: PriceChartProps) {
   const { pool, isLoading: isPoolLoading } = usePool()
-  const { defaultChain } = useDefaultChain()
+  const { currentMarket } = useMarket()
 
-  // Determine the chain name for GeckoTerminal URL
-  const chainName = useMemo(() => {
-    if (!defaultChain?.id) return "base"
+  // Specific market URL mappings
+  const marketUrlMappings: Record<string, string> = {
+    WSEI: "https://www.geckoterminal.com/eth/pools/0xf8e349d1d827a6edf17ee673664cfad4ca78c533",
+    syUSD:
+      "https://www.geckoterminal.com/sei-evm/pools/0xda5c7d6ca4727350a6b38cba0604003adca08062",
+    wstETH:
+      "https://www.geckoterminal.com/eth/pools/0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa",
+  }
 
-    // Map chain IDs to GeckoTerminal chain names
-    const chainMap: Record<number, string> = {
-      42161: "arbitrum", // Arbitrum
-      8453: "base", // Base
-      6342: "MegaETH Testnet", // MegaETH Testnet
+  const embedUrl = useMemo(() => {
+    const baseSymbol = currentMarket?.base?.symbol
+
+    if (baseSymbol && marketUrlMappings[baseSymbol]) {
+      return `${marketUrlMappings[baseSymbol]}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
     }
 
-    return chainMap[defaultChain.id] || "base" // Default to Base if not found
-  }, [defaultChain])
-
-  // Build the embed URL
-  const embedUrl = useMemo(() => {
+    // Fallback to dynamic URL construction
     return `https://www.geckoterminal.com/sei-evm/pools/${pool?.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
-  }, [pool, chainName])
+  }, [pool, currentMarket, marketUrlMappings])
 
   // Show loading state while pool is being fetched
   if (isPoolLoading) {

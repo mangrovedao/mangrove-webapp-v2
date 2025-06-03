@@ -10,7 +10,7 @@ import {
 
 import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
 import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
-import { multicallSchema } from "../schemas"
+import { kandelSchema, multicallSchema } from "../schemas"
 import {
   VaultABI,
   calculateFees,
@@ -167,6 +167,7 @@ export async function getVaultsInformation(
             functionName: "lastTotalInQuote",
           },
           { address: v.address, abi: VaultABI, functionName: "lastTimestamp" },
+          { address: v.address, abi: VaultABI, functionName: "kandel" },
         ] satisfies MulticallParameters["contracts"],
     )
 
@@ -233,7 +234,25 @@ export async function getVaultsInformation(
         _decimals,
         _lastTotalInQuote,
         _lastTimestamp,
+        _kandel,
       ] = results.slice(i * 10)
+
+      const getApr = async (kandelAddress: Address) => {
+        const apiAPR = await fetch(
+          `https://api.mgvinfra.com/kandel/apr/${client.chain?.id}/${_kandel.result}`,
+        )
+
+        const kandelData = await apiAPR.json()
+
+        const parsedKandelData = kandelSchema.parse(kandelData)
+
+        const { mangroveKandelAPR, aaveAPR } = parsedKandelData.apr
+
+        const apr = mangroveKandelAPR + aaveAPR
+        return { apr }
+      }
+
+      const kandelApr = await getApr(_kandel.result)
 
       // Handle potential failures in multicall
       if (!_totalInQuote.result || !_underlyingBalances.result) {
@@ -262,6 +281,7 @@ export async function getVaultsInformation(
           isActive: false,
           userBaseBalance: 0n,
           userQuoteBalance: 0n,
+          kandel: _kandel.result,
         }
       }
 
@@ -336,7 +356,7 @@ export async function getVaultsInformation(
       const result: Vault & VaultWhitelist = {
         ...v,
         symbol,
-        apr: apr.totalAPR,
+        apr: kandelApr.apr,
         incentivesApr: apr.incentivesApr,
         decimals,
         mintedAmount: balanceOf,
@@ -362,6 +382,7 @@ export async function getVaultsInformation(
         userQuoteBalance,
         pnlData: undefined,
         incentivesData: null,
+        kandel: _kandel.result,
       }
 
       // Only fetch PnL data if user is connected and has a position (do this last as it's expensive)

@@ -372,7 +372,7 @@ export function DepositForm({ className }: { className?: string }) {
         <div className="mt-auto">
           <div className="flex gap-2 items-center">
             <Button
-              className="w-full bg-bg-blush-pearl text-black-rich hover:bg-bg-blush-pearl"
+              className="w-full bg-bg-blush-pearl text-black-rich hover:bg-bg-subtle-hover hover:text-text-blush-pearl"
               onClick={handleAction}
               disabled={
                 isLoading ||

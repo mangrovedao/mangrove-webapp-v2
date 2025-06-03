@@ -7,6 +7,7 @@ export enum ProtocolType {
   PancakeSwapV3 = "PancakeSwapV3",
   Slipstream = "Slipstream",
   UniswapV3 = "UniswapV3",
+  UniswapV2 = "UniswapV2",
 }
 
 export type SlipstreamProtocol = {
@@ -18,7 +19,10 @@ export type SlipstreamProtocol = {
 }
 
 export type UniOrPancakeProtocol = {
-  type: ProtocolType.UniswapV3 | ProtocolType.PancakeSwapV3
+  type:
+    | ProtocolType.UniswapV3
+    | ProtocolType.PancakeSwapV3
+    | ProtocolType.UniswapV2
   fees: number[]
   factory: Address
   quoter: Address

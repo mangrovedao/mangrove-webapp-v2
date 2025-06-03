@@ -109,7 +109,7 @@ export function DataTable<TData>({
               className={cn(
                 "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-sm group-last/cell:rounded-r-sm",
                 {
-                  "!bg-primary-dark-green": isRowHighlighted?.(row.original),
+                  "!bg-bg-subtle-hover": isRowHighlighted?.(row.original),
                 },
               )}
             >
@@ -162,7 +162,7 @@ export function DataTable<TData>({
               className={cn(
                 "group-hover/row:bg-gray-scale-700 py-2 group-first/cell:rounded-l-sm group-last/cell:rounded-r-sm",
                 {
-                  "!bg-primary-dark-green": isRowHighlighted?.(row.original),
+                  "!bg-bg-subtle-hover": isRowHighlighted?.(row.original),
                 },
               )}
             >

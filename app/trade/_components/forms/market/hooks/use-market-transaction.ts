@@ -36,14 +36,14 @@ export function useMarketTransaction({
   baseToken,
   sendTokenBalance,
   isWrapping,
-  onTransactionSuccess,
+  onTransactionSuccess = () => {},
 }: UseMarketTransactionProps) {
   const { isConnected, address, chain } = useAccount()
   const { mangroveChain } = useRegistry()
   const { pool } = usePool()
 
   // Market steps to check if approval is needed
-  const { data: marketOrderSteps } = useMarketSteps({
+  const { data: marketOrderSteps, refetch: refetchSteps } = useMarketSteps({
     user: address,
     bs: tradeSide,
     sendAmount: form.state.values.send,
@@ -63,26 +63,18 @@ export function useMarketTransaction({
   })
 
   // Post order mutation
-  const post =
-    chain?.testnet || !pool
-      ? usePostMarketOrderMangrove({
-          onResult: (result) => {
-            setTxState("idle")
-            toast.success("Order submitted successfully!")
-            if (onTransactionSuccess) {
-              onTransactionSuccess()
-            }
-          },
-        })
-      : usePostMarketOrder({
-          onResult: (result) => {
-            setTxState("idle")
-            toast.success("Order submitted successfully!")
-            if (onTransactionSuccess) {
-              onTransactionSuccess()
-            }
-          },
-        })
+  const postMangrove = usePostMarketOrderMangrove({
+    onResult: (result) => {
+      setTxState("idle")
+      toast.success("Order submitted successfully!")
+      onTransactionSuccess()
+    },
+  })
+
+  const postMarket = usePostMarketOrder()
+
+  // Post order mutation
+  const post = chain?.testnet || !pool ? postMangrove : postMarket
 
   // Wrapping ETH
   const {
@@ -141,7 +133,7 @@ export function useMarketTransaction({
   const handlePostOrder = async () => {
     setTxState("posting")
     try {
-      await post.mutateAsync(
+      const result = await post.mutateAsync(
         {
           form: {
             ...form.state.values,
@@ -160,6 +152,11 @@ export function useMarketTransaction({
           },
         },
       )
+
+      if (result?.receipt?.status === 'success' && onTransactionSuccess) {
+        onTransactionSuccess();
+      }
+
     } catch (error) {
       setTxState("idle")
       toast.error("Failed to post the market order")
@@ -179,6 +176,7 @@ export function useMarketTransaction({
         to: wethAdresses[chain.id],
         value: BigInt(Math.floor(totalWrapping * 10 ** 18)),
       })
+      setTxState("idle")
     } catch (error) {
       console.error("Error wrapping ETH:", error)
       setTxState("idle")
@@ -190,7 +188,10 @@ export function useMarketTransaction({
     setTxState("approving")
     try {
       await approveAmount.mutateAsync(undefined, {
-        onSuccess: () => {},
+        onSuccess: () => {
+          refetchSteps()
+          setTxState("idle")
+        },
         onError: (error) => {
           setTxState("idle")
         },
@@ -219,13 +220,13 @@ export function useMarketTransaction({
     // Reset any previous transaction state
     setTxState("idle")
 
-    // Set a safety timeout to reset the state if the transaction is taking too long
-    const safetyTimeout = setTimeout(() => {
-      // Only reset if we're still in a non-idle state after the timeout
-      if (txState !== "idle") {
-        setTxState("idle")
-      }
-    }, 30000) // 30 seconds should be enough for most wallet interactions
+    // // Set a safety timeout to reset the state if the transaction is taking too long
+    // const safetyTimeout = setTimeout(() => {
+    //   // Only reset if we're still in a non-idle state after the timeout
+    //   if (txState !== "idle") {
+    //     setTxState("idle")
+    //   }
+    // }, 8000) // 8 seconds should be enough for most wallet interactions
 
     try {
       if (needsApproval) {
@@ -241,7 +242,7 @@ export function useMarketTransaction({
     }
 
     // Clear the safety timeout when the function completes
-    return () => clearTimeout(safetyTimeout)
+    // return () => clearTimeout(safetyTimeout)
   }
 
   // Cleanup on unmount

@@ -9,7 +9,11 @@ import { trade } from "@/hooks/ghostbook/lib/trade"
 import { useMarketClient } from "@/hooks/use-market"
 
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
-import { ProtocolType, TickSpacingPool } from "@/hooks/new_ghostbook/pool"
+import {
+  FeePool,
+  ProtocolType,
+  TickSpacingPool,
+} from "@/hooks/new_ghostbook/pool"
 import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
@@ -27,11 +31,7 @@ const calculateMaxTick = (
   return maxTick
 }
 
-type Props = {
-  onResult?: (result: TransactionReceipt) => void
-}
-
-export function usePostMarketOrder({ onResult }: Props = {}) {
+export function usePostMarketOrder() {
   const { currentMarket: market } = useMarket()
   const { mangroveChain } = useRegistry()
 
@@ -44,8 +44,9 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
   ])
 
   const uniModuleAddress = {
-    [ProtocolType.UniswapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
-    [ProtocolType.PancakeSwapV3]: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
+    [ProtocolType.UniswapV3]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
+    [ProtocolType.PancakeSwapV3]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
+    [ProtocolType.UniswapV2]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
     [ProtocolType.Slipstream]: "0x922F0E2fa80F7dc2E22dBcE5EB3B423E09CE013B",
   }
 
@@ -83,6 +84,17 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         // Calculate max tick based on current price and slippage
         const maxTick = calculateMaxTick(maxTickEncountered, slippage)
 
+        const fee =
+          pool?.protocol.type === ProtocolType.UniswapV3 ||
+          pool?.protocol.type === ProtocolType.PancakeSwapV3
+            ? (pool as FeePool).fee
+            : 0
+
+        const tickSpacing =
+          pool?.protocol.type === ProtocolType.Slipstream
+            ? (pool as TickSpacingPool)?.tickSpacing
+            : 0
+
         const { got, gave, bounty, feePaid, receipt } = await trade({
           client: walletClient,
           ghostbook: mangroveChain?.ghostbook as Address,
@@ -91,14 +103,11 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
           sendAmount,
           router: pool?.protocol.router,
           module: uniModuleAddress[pool?.protocol.type] as Address,
-          fee: 500,
+          fee,
           maxTick,
           deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
-          protocol: pool?.protocol.type,
-          tickSpacing:
-            pool?.protocol.type === ProtocolType.Slipstream
-              ? (pool as TickSpacingPool)?.tickSpacing
-              : 0,
+          protocol: ProtocolType.UniswapV3,
+          tickSpacing,
           async onTrade({ got, gave, bounty, feePaid }) {
             console.log("OnTrade callback:", {
               got,
@@ -147,7 +156,7 @@ export function usePostMarketOrder({ onResult }: Props = {}) {
         // })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["order-history"] })
-        queryClient.invalidateQueries({ queryKey: ["balances"] })
+        queryClient.invalidateQueries({ queryKey: ["trade-balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {
         console.error(error)

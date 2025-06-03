@@ -30,6 +30,7 @@ const buttonVariants = cva(
         lg: "text-base",
         xl: "text-lg px-[18px] py-3",
         only: "",
+        icon: "flex justify-center items-center aspect-square p-0 h-6",
       },
       rightIcon: {
         true: "flex items-center justify-center space-x-1",

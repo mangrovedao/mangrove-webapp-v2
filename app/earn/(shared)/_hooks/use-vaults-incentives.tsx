@@ -1,6 +1,6 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { type Address } from "viem"
-import { arbitrum, base, baseSepolia, blast } from "viem/chains"
+import { arbitrum, base, baseSepolia, blast, sei } from "viem/chains"
 
 /**
  * A program that distributes rewards to LP token holders.
@@ -116,6 +116,8 @@ export function useVaultsIncentives() {
       return BASE_SEPOLIA_INCENTIVE_PROGRAMS
     case base.id:
       return BASE_VAULT_INCENTIVE_PROGRAMS
+    case sei.id:
+      return []
     default:
       return ARBITRUM_INCENTIVE_PROGRAMS
   }

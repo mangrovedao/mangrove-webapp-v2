@@ -7,16 +7,26 @@ import { DataTable } from "@/components/ui/data-table-new/data-table"
 import type { Strategy } from "../../../_schemas/kandels"
 
 import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { kandelSchema } from "@/app/earn/(shared)/schemas"
 import { Vault } from "@/app/earn/(shared)/types"
+import { VaultABI } from "@/app/earn/(shared)/utils"
 import { Switch } from "@/components/ui/switch"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { motion } from "framer-motion"
-import { Chain } from "viem"
+import { Chain, type Address } from "viem"
+import { usePublicClient } from "wagmi"
 import { useTable } from "./hooks/use-table"
+
+type PageDetails = {
+  page: number
+  pageSize: number
+}
+
 export function Vaults() {
   const { push } = useRouter()
   const { defaultChain: chain } = useDefaultChain()
+  const publicClient = usePublicClient()
   const containerRef = React.useRef<HTMLDivElement>(null)
   const [data, setData] = useState<any>([])
   const [filteredData, setFilteredData] = useState<any>([])
@@ -50,22 +60,49 @@ export function Vaults() {
         deprecated: (vault as any).isDeprecated ?? false,
         userBaseBalance: 0n,
         userQuoteBalance: 0n,
+        kandel: "0x0000000000000000000000000000000000000000",
       }) as Vault,
   )
 
+  // Function to get APR from kandel address
+  const getApr = async (kandelAddress: Address, chainId: number) => {
+    try {
+      const apiAPR = await fetch(
+        `https://api.mgvinfra.com/kandel/apr/${chainId}/${kandelAddress}`,
+      )
+
+      if (!apiAPR.ok) {
+        console.warn(`Failed to fetch APR for kandel ${kandelAddress}`)
+        return { apr: 0 }
+      }
+
+      const kandelData = await apiAPR.json()
+      const parsedKandelData = kandelSchema.parse(kandelData)
+      const { mangroveKandelAPR, aaveAPR } = parsedKandelData.apr
+      const apr = mangroveKandelAPR + aaveAPR
+
+      return { apr }
+    } catch (error) {
+      console.error(`Error fetching APR for kandel ${kandelAddress}:`, error)
+      return { apr: 0 }
+    }
+  }
+
   useEffect(() => {
     const fetchVault = async (chain?: Chain) => {
-      if (!chain) return
+      if (!chain || !publicClient) return
 
       try {
+        // First, fetch basic vault data from indexer
         const response = await fetch(
           `${getIndexerUrl(chain)}/vault/list/${chain.id}`,
         )
-        const data = await response.json()
+        const indexerData = await response.json()
 
-        let vaults = defaultData
+        let vaults = [...defaultData]
 
-        data.forEach((item: any) => {
+        // Update vaults with indexer data
+        indexerData.forEach((item: any) => {
           const vault = vaults.find(
             (vault) => vault.address.toLowerCase() === item.vault.toLowerCase(),
           )
@@ -74,6 +111,50 @@ export function Vaults() {
             vault.apr = item.apr
           }
         })
+
+        // Now fetch kandel addresses and APR data
+        const kandelContracts = vaults.map((vault) => ({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "kandel",
+        }))
+
+        // Get kandel addresses via multicall
+        const kandelResults = await publicClient.multicall({
+          contracts: kandelContracts,
+          allowFailure: true,
+        })
+
+        // Fetch APR data for each kandel address
+        const aprPromises = kandelResults.map(async (result, index) => {
+          if (result.status === "success" && result.result && vaults[index]) {
+            const kandelAddress = result.result as Address
+            vaults[index]!.kandel = kandelAddress
+
+            // Fetch APR data from backend API
+            const aprData = await getApr(kandelAddress, chain.id)
+            return { index, apr: aprData.apr, kandelAddress }
+          }
+          return {
+            index,
+            apr: 0,
+            kandelAddress:
+              "0x0000000000000000000000000000000000000000" as Address,
+          }
+        })
+
+        // Wait for all APR requests to complete
+        const aprResults = await Promise.allSettled(aprPromises)
+
+        // Update vaults with APR data
+        aprResults.forEach((result, index) => {
+          if (result.status === "fulfilled" && vaults[index]) {
+            const { apr, kandelAddress } = result.value
+            vaults[index]!.apr = apr
+            vaults[index]!.kandel = kandelAddress
+          }
+        })
+
         setData(vaults)
         const filtered = vaults.filter((vault) => vault.deprecated === false)
         setFilteredData(filtered)
@@ -85,13 +166,15 @@ export function Vaults() {
           plainVaults,
         )
         // Fallback to default data from whitelist
-        setData(plainVaults)
-        setFilteredData(plainVaults)
+        setData(defaultData)
+        setFilteredData(
+          defaultData.filter((vault) => vault.deprecated === false),
+        )
       }
     }
 
     fetchVault(chain)
-  }, [chain])
+  }, [chain, publicClient])
 
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
     page: 1,

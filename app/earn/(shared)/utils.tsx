@@ -24,6 +24,7 @@ export const VaultABI = parseAbi([
   "function symbol() public view returns (string)",
   "function lastTotalInQuote() public view returns (uint256)",
   "function lastTimestamp() public view returns (uint256)",
+  "function kandel() external view returns (address)",
 ])
 
 // ============= HELPER FUNCTIONS =============

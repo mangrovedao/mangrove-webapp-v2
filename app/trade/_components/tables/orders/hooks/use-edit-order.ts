@@ -10,9 +10,9 @@ import React from "react"
 import { useLogics } from "@/hooks/use-addresses"
 import useMarket from "@/providers/market"
 import { hasExpired } from "@/utils/date"
+import { Order } from "../../(shared)/schema"
 import { useTradeInfos } from "../../../forms/hooks/use-trade-infos"
 import { TimeToLiveUnit } from "../../../forms/limit/enums"
-import { Order } from "../schema"
 import { Form } from "../types"
 
 type Props = {
@@ -26,7 +26,7 @@ export function useEditOrder({ order, onSubmit }: Props) {
     initialGives,
     initialWants,
     price: currentPrice,
-    isBid,
+    side,
     expiryDate,
     outboundRoute,
     inboundRoute,
@@ -40,17 +40,18 @@ export function useEditOrder({ order, onSubmit }: Props) {
   const receiveTo = findLogicByAddress(inboundRoute)
   const quoteDecimals = market?.quote.displayDecimals
   const baseDecimals = market?.base.displayDecimals
+  const isBid = order.side === "buy"
 
-  const volumeDecimals = order.isBid
+  const volumeDecimals = isBid
     ? market?.quote.displayDecimals
     : market?.base.displayDecimals
 
-  const amountDecimals = order.isBid
+  const amountDecimals = isBid
     ? market?.base.displayDecimals
     : market?.quote.displayDecimals
 
-  const volume = Big(initialGives).toFixed(volumeDecimals)
-  const amount = Big(initialWants).toFixed(amountDecimals)
+  const volume = Big(initialGives ?? "0").toFixed(volumeDecimals)
+  const amount = Big(initialWants ?? "0").toFixed(amountDecimals)
 
   const form = useForm({
     validator: zodValidator,

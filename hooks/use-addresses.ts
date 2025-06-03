@@ -213,7 +213,7 @@ export function useSymbolOverrides() {
 // SEI
 
 export const SEIWSEI = {
-  address: "0x6f54391fe0386D506b51d69Deeb8b04E0544E088",
+  address: "0xe30fedd158a2e3b13e9badaeabafc5516e95e8c7",
   symbol: "WSEI",
   decimals: 18,
   displayDecimals: 2,
