@@ -55,12 +55,12 @@ function DisclaimerDialog() {
         <div>
           The use of this app is subject to the following{" "}
           <a
-            href="https://oxium.exchange/terms-of-use"
+            href="https://docs.oxium.xyz/reference-and-compliance/terms-of-service"
             target="_blank"
             rel="noreferrer"
             className={"text-text-petal-mist no-underline hover:underline"}
           >
-            Terms of Use.
+            terms of use.
           </a>
         </div>
       </Dialog.Description>
@@ -79,14 +79,14 @@ function DisclaimerDialog() {
                   {" "}
                   For more information, please read our{" "}
                   <a
-                    href="https://oxium.exchange/terms-of-use"
+                    href="https://docs.oxium.xyz/reference-and-compliance/privacy-policy"
                     target="_blank"
                     rel="noreferrer"
                     className={
                       "text-text-petal-mist no-underline hover:underline"
                     }
                   >
-                    Terms of Use.
+                    Privacy policy.
                   </a>
                 </span>
               </label>
