@@ -33,7 +33,7 @@ export function TokenBalance(props: {
     ? formatUnits(nativeBalance?.value || 0n, nativeBalance?.decimals || 18)
     : formatUnits(balance?.balance || 0n, token?.decimals || 18)
   const decimals = !token ? nativeBalance?.decimals : token.decimals
-  const formatted = amount
+  const formatted = getExactWeiAmount(amount, token?.displayDecimals) || ""
 
   return (
     <div className="flex justify-between items-center mt-1">
@@ -51,11 +51,11 @@ export function TokenBalance(props: {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
-                  props.action?.onClick(formatted || "")
+                  props.action?.onClick(formatted)
                 }}
               >
                 <span className="text-text-secondary">
-                  {getExactWeiAmount(formatted, token?.displayDecimals)}
+                  {formatted}
                 </span>
               </TooltipTrigger>
 

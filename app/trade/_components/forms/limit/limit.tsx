@@ -349,6 +349,16 @@ export function Limit() {
                     field.handleChange(value)
                     computeSendAmount()
                   }}
+                  balanceAction={{
+                    onClick: () => {
+                      const value = sendBalanceWithEth.toString() || "0"
+                      form.setFieldValue("send", value)
+                      form.validateAllFields("submit")
+                      setSendSliderValue(100)
+                      computeReceiveAmount()
+                    }
+                  }}
+                  showBalance
                   dollarAmount={receiveDollar}
                   token={receiveToken}
                   inputClassName="text-text-primary text-base h-7"

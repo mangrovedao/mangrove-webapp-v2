@@ -146,11 +146,13 @@ export function Market() {
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
     : Number(formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18))
 
-  const handleSliderChange = (value: number) => {
+  const handleSliderChange = (value: number, isSend: boolean = true) => {
     if (!sendToken) return
 
     try {
       setSendSliderValue(value)
+
+      console.log('send', sendBalanceWithEth)
 
       const decimals = sendToken.priceDisplayDecimals || 18
       // Set the field value without calling validateAllFields
@@ -158,7 +160,7 @@ export function Market() {
       const safeAmount = Math.min(amount.toNumber(), sendBalanceWithEth)
 
       form.setFieldValue("send", safeAmount.toFixed(decimals).toString())
-      form.validateAllFields("submit")
+      // form.validateAllFields("submit")
 
       // Compute receive amount will indirectly validate the form
       computeReceiveAmount()
@@ -290,9 +292,10 @@ export function Market() {
                   }}
                   balanceAction={{
                     onClick: () => {
-                      field.handleChange(sendBalanceWithEth.toString() || "0")
-                      setSendSliderValue(100)
-                      computeReceiveAmount()
+                      // field.handleChange(sendBalanceWithEth.toString() || "0")
+                      // setSendSliderValue(100)
+                      // computeReceiveAmount()
+                      // handleSliderChange(100)
                     },
                   }}
                   token={sendToken}
@@ -351,7 +354,15 @@ export function Market() {
                   dollarAmount={receiveDollar}
                   token={receiveToken}
                   label="Receive"
+                  balanceAction={{
+                    onClick: (value: string) => {
+                      // console.log('value', value)
+                      // form.setFieldValue("send", value)
+                      // handleSliderChange(100, false)
+                    },
+                  }}
                   disabled={!(market && form.state.isFormValid)}
+                  showBalance
                   error={
                     getAllErrors().receive
                       ? [getAllErrors().receive].flat()

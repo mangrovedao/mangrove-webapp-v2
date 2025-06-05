@@ -23,8 +23,6 @@ type Props = {
 }
 
 export function useLimit(props: Props) {
-  const { address } = useAccount()
-
   const { currentMarket } = useMarket()
   const bs = props.bs
   const { spotPrice } = useMergedBooks()
