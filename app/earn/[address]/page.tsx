@@ -22,7 +22,9 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
+import { FlowingNumbers } from "@/components/flowing-numbers"
 import InfoTooltip from "@/components/info-tooltip-new"
+import NeonContainer from "@/components/neon-container"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Caption } from "@/components/typography/caption"
 import { Text } from "@/components/typography/text"
@@ -158,7 +160,7 @@ export default function Page() {
                     >
                       <TokenIcon
                         symbol={vault?.market?.base?.symbol}
-                        imgClasses="h-10 w-10 drop-shadow-lg"
+                        imgClasses="h-10 w-10 drop-shadow-lg rounded-full"
                       />
                     </motion.div>
 
@@ -168,7 +170,7 @@ export default function Page() {
                     >
                       <TokenIcon
                         symbol={vault?.market?.quote?.symbol}
-                        imgClasses="h-10 w-10 drop-shadow-lg"
+                        imgClasses="h-10 w-10 drop-shadow-lg rounded-full"
                       />
                     </motion.div>
                   </>
@@ -207,7 +209,7 @@ export default function Page() {
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
-            style={{ boxShadow: "0 0 15px 0 rgba(0, 255, 170, 0.1)" }}
+            style={{ boxShadow: "0 0 15px 0 rgba(240, 171, 171, 0.1)" }}
           >
             <GridLineHeader
               title={"TVL"}
@@ -441,6 +443,75 @@ export default function Page() {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <div className="grid gap-8">
+            <NeonContainer className="relative  ">
+              <motion.div
+                className="absolute -top-4 -right-2 rounded-sm overflow-hidden"
+                initial={{ rotate: -1, y: -1 }}
+                animate={{ rotate: 0, y: 0 }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                }}
+              ></motion.div>
+              <GridLine
+                title={"Partner Rewards"}
+                value={
+                  <div className="flex items-center gap-1">
+                    <span className="text-text-secondary !text-md">SEI</span>
+                    <FlowingNumbers
+                      className="text-md"
+                      initialValue={vault?.incentivesData?.rewards || 0}
+                      ratePerSecond={
+                        vault?.incentivesData?.currentRewardsPerSecond || 0
+                      }
+                      decimals={6}
+                    />
+                  </div>
+                }
+              />
+              <div className="flex justify-start items-center gap-5">
+                <GridLine
+                  title={"Token"}
+                  value={
+                    <motion.div
+                      className="flex items-center justify-center gap-2 text-md"
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.8 }}
+                    >
+                      <span className="flex gap-1 text-md">WSEI</span>
+                    </motion.div>
+                  }
+                />
+                <GridLine
+                  title={"Claimable"}
+                  value={
+                    <motion.span
+                      className={cn("flex gap-1 text-md")}
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.9 }}
+                    >
+                      {vault?.pnlData?.pnl
+                        ? `${vault?.pnlData?.pnl.toFixed(2)}%`
+                        : "0"}
+                    </motion.span>
+                  }
+                  symbol={""}
+                />
+
+                <GridLine
+                  title={"Accruing"}
+                  value={
+                    <div className="flex items-center gap-1">
+                      <span className="text-text-secondary !text-md">SEI</span>
+                    </div>
+                  }
+                />
+              </div>
+            </NeonContainer>
             {/* Only show the form directly on desktop */}
             {!isMobile && (
               <motion.div
@@ -484,6 +555,9 @@ export default function Page() {
                       </CustomRadioGroup>
                     </div>
                     <div className="relative min-h-[400px] h-full">
+                      <div className="flex justify-center items-center mb-4">
+                        sss
+                      </div>
                       <AnimatePresence mode="wait">
                         {action === Action.Deposit && !vault?.isDeprecated ? (
                           <motion.div
