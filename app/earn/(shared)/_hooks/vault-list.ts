@@ -1,4 +1,9 @@
-import { seiWBTCUSDC, seiWETHUSDC, seiWSEIUSDC } from "@/hooks/use-addresses"
+import {
+  seiWBTCUSDC,
+  seiWETHUSDC,
+  seiWSEIUSDC,
+  seiWSTETHWETH,
+} from "@/hooks/use-addresses"
 import {
   arbitrumARBUSDCe,
   arbitrumUSDCUSDT,
@@ -13,11 +18,14 @@ import {
   baseWSTETHWETH,
 } from "@mangrovedao/mgv/addresses"
 import { Address } from "viem"
+import { VaultWhitelist } from "../types"
 
-export const VAULTS_WHITELIST_ARBITRUM = [
+export const VAULTS_WHITELIST_ARBITRUM: VaultWhitelist[] = [
   {
     manager: "Redacted Labs",
     address: "0x17086132Af8d39586c25FF8eA0B0283652108402" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
+
     market: arbitrumARBUSDCe,
     strategyType: "Kandel Aave",
     description:
@@ -32,6 +40,8 @@ export const VAULTS_WHITELIST_ARBITRUM = [
   {
     manager: "Redacted Labs",
     address: "0x533fcD483a7793bfC6f1D1Fe0f25158Cc60e0cC1" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
+
     market: arbitrumWETHUSDC,
     strategyType: "Kandel Aave",
     description:
@@ -46,6 +56,8 @@ export const VAULTS_WHITELIST_ARBITRUM = [
   {
     manager: "Redacted Labs",
     address: "0xD97278e50aFd813C697526AaEAeC5022393d4B7B" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
+
     market: arbitrumWBTCUSDT,
     strategyType: "Kandel Aave",
     description:
@@ -60,6 +72,8 @@ export const VAULTS_WHITELIST_ARBITRUM = [
   {
     manager: "Redacted Labs",
     address: "0x17008340AC68B11E883FC0fd7f82a6106419b12a" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
+
     market: arbitrumWETHweETH,
     strategyType: "Kandel Aave",
     description:
@@ -73,6 +87,7 @@ export const VAULTS_WHITELIST_ARBITRUM = [
   },
   {
     manager: "Redacted Labs",
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     address: "0xa99C55E911c028d610e709603CCCA2Df7a22C19D" as Address,
     market: arbitrumUSDCUSDT,
     strategyType: "Kandel Aave",
@@ -87,10 +102,11 @@ export const VAULTS_WHITELIST_ARBITRUM = [
   },
 ]
 
-export const VAULTS_WHITELIST_BASE_SEPOLIA = [
+export const VAULTS_WHITELIST_BASE_SEPOLIA: VaultWhitelist[] = [
   {
     manager: "Redacted Labs",
     address: "0xae68E2f084bC5B72Dbb5Dc5bD75AF8879eDb5CBC" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     market: baseSepoliaWBTCDAI,
     strategyType: "Kandel",
     description:
@@ -103,7 +119,7 @@ export const VAULTS_WHITELIST_BASE_SEPOLIA = [
   },
 ]
 
-export const VAULTS_WHITELIST_BASE = [
+export const VAULTS_WHITELIST_BASE: VaultWhitelist[] = [
   {
     isDeprecated: true,
     manager: "Redacted Labs",
@@ -156,6 +172,7 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     isDeprecated: false,
     address: "0x5ebDEB4019E0D82537c9490DE89459a050CF9ed3" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     market: baseWETHUSDC,
     strategyType: "Morpho",
     description:
@@ -171,6 +188,7 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     isDeprecated: false,
     address: "0x764c8A041F7CA7ad3C47d38dc6970d3B894Ce481" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     market: baseCBBTCUSDC,
     strategyType: "Morpho",
     description:
@@ -186,6 +204,7 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     isDeprecated: false,
     address: "0x5c5Baf2b2cE96bC5BCb4Cde1B5b7e3FBd176E01C" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     market: baseCBBTCEURC,
     strategyType: "Morpho",
     description:
@@ -201,6 +220,7 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     isDeprecated: false,
     address: "0x1E059d02b7dc5eDA998e0686b28A1e715616F6e5" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     market: baseCBETHWETH,
     strategyType: "Aave",
     description:
@@ -216,6 +236,7 @@ export const VAULTS_WHITELIST_BASE = [
     manager: "Redacted Labs",
     isDeprecated: false,
     address: "0x9bd7f8b3EA501EB5dDB4380f6BA87aF163eA3f12" as Address,
+    oracle: "0x15356207735c7d75Fb268c0cf8e11A4F3Bf68c33" as Address,
     market: baseWSTETHWETH,
     strategyType: "Aave",
     description:
@@ -244,7 +265,7 @@ export const VAULTS_WHITELIST_BASE = [
     },
   },
 ]
-export const VAULTS_WHITELIST_SEI = [
+export const VAULTS_WHITELIST_SEI: VaultWhitelist[] = [
   {
     isDeprecated: false,
     manager: "Redacted Labs",
@@ -284,6 +305,23 @@ export const VAULTS_WHITELIST_SEI = [
     address: "0x62706bc2Eb921D0f33FD7D8771434De41315f113" as Address,
     oracle: "0x37b3291ef17eeF398D2F9Ac010e81827f6Cf6BA1" as Address,
     market: seiWETHUSDC,
+    strategyType: "Kandle Yei",
+    description:
+      "Concentrated Vault Strategy on Oxium.\n This strategy focuses liquidity within targeted price ranges rather than the full spectrum, boosting capital efficiency and fee capture.\n\n",
+    descriptionBonus:
+      "Volatility Management\nUsing predictive models, the vault anticipates high-volatility phases and adjusts by widening the range or exiting positions, limiting exposure and impermanent loss (IL).\n\nFee Optimization\nLiquidity is dynamically placed where trading is most active, maximizing fees for LPs, even in moderate market conditions, without excessive risk.\nImpermanent Loss Mitigation\n- Dynamic Asset Allocation: Unlike traditional LPs with a strict 50-50 asset split, this strategy allows flexible allocation when liquidity is withdrawn from the pool. This approach lowers the risk of overexposure to a volatile asset, thus minimizing potential IL.\n- Yield Optimization through Yei Finance: When assets are not used in the pool, they are temporarily deposited in Yei Finance or other lending platforms. This provides additional yield from lending interest, ensuring productive use of capital even outside trading.\n- Adaptive Range Management: When asset prices move outside the initial liquidity range, the strategy adjusts or withdraws liquidity to prevent significant divergence in asset prices, which often leads to IL. By rebalancing assets only when strategically beneficial, this approach minimizes IL while maximizing returns through fee capture during favorable conditions.",
+    socials: {
+      x: "https://x.com/RedactedLabs_",
+      website: "https://www.redactedlabs.fr/",
+    },
+  },
+
+  {
+    isDeprecated: false,
+    manager: "Redacted Labs",
+    address: "0xB03b8a8D42F4CE4108Ab0CFe6c329022C57C740D" as Address,
+    oracle: "0xB3d323D9Ec222b19Fc8F41FC441538531A44CEb9" as Address,
+    market: seiWSTETHWETH,
     strategyType: "Kandle Yei",
     description:
       "Concentrated Vault Strategy on Oxium.\n This strategy focuses liquidity within targeted price ranges rather than the full spectrum, boosting capital efficiency and fee capture.\n\n",

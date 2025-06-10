@@ -17,6 +17,7 @@ import { printEvmError } from "@/utils/errors"
 import { toast } from "sonner"
 import { useAccount, useWalletClient } from "wagmi"
 import { TradeMode } from "../../enums"
+import { useOptimisticCache } from "../../hooks/use-optimistic-cache"
 import { successToast } from "../../utils"
 import { TimeInForce } from "../enums"
 import type { Form } from "../types"
@@ -36,6 +37,8 @@ export function usePostLimitOrder() {
   const { book } = useBook()
   const logics = useLogics()
   const addresses = useMangroveAddresses()
+
+  const { addOptimisticOrder } = useOptimisticCache()
 
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
@@ -84,6 +87,11 @@ export function usePostLimitOrder() {
             ? parseUnits(gives, quote.decimals)
             : parseUnits(wants, quote.decimals)
 
+        const expiryDate =
+          timeInForce === TimeInForce.GTC || timeInForce === TimeInForce.PO
+            ? BigInt(estimateTimestamp({ timeToLiveUnit: "Day", timeToLive }))
+            : undefined
+
         const { request } = await marketClient.simulateLimitOrder({
           account,
           fillWants: false,
@@ -93,10 +101,7 @@ export function usePostLimitOrder() {
           book,
           orderType: timeInForce as number,
           // If expiry date is ignored, then it will not expire
-          expiryDate:
-            timeInForce === TimeInForce.GTC || timeInForce === TimeInForce.PO
-              ? BigInt(estimateTimestamp({ timeToLiveUnit: "Day", timeToLive }))
-              : undefined, // 1 hour
+          expiryDate,
           restingOrderGasreq,
           // logics can be left to undefined (meaning no logic)
           takerGivesLogic: takerGivesLogic as Address,
@@ -118,6 +123,23 @@ export function usePostLimitOrder() {
             bs,
           },
         )
+
+        // Add optimistic order to cache immediately
+        await addOptimisticOrder({
+          type: "limit",
+          side: bs,
+          receipt,
+          parsedResult: result,
+          form: {
+            send: gives,
+            receive: wants,
+            bs,
+            price: form.limitPrice,
+            expiryDate: expiryDate
+              ? new Date(Number(expiryDate) * 1000)
+              : undefined,
+          },
+        })
 
         successToast(
           TradeMode.LIMIT,
@@ -154,8 +176,12 @@ export function usePostLimitOrder() {
         // await resolveWhenBlockIsIndexed.mutateAsync({
         //   blockNumber: Number(receipt.blockNumber),
         // })
-        queryClient.invalidateQueries({ queryKey: ["orders"] })
-        queryClient.invalidateQueries({ queryKey: ["order-history"] })
+
+        // Note: We don't invalidate order queries immediately anymore since we're using optimistic updates
+        // The optimistic cache hook will handle the invalidation once indexer catches up
+
+        // queryClient.invalidateQueries({ queryKey: ["orders"] })
+        // queryClient.invalidateQueries({ queryKey: ["order-history"] })
         queryClient.invalidateQueries({ queryKey: ["trade-balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {

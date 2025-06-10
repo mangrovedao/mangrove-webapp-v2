@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { parseUnits } from "viem"
 import { megaethTestnet } from "viem/chains"
 import { TradeMode } from "../../enums"
+import { useOptimisticCache } from "../../hooks/use-optimistic-cache"
 import { successToast } from "../../utils"
 import type { Form } from "../types"
 
@@ -33,6 +34,8 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
   const { data: walletClient } = useWalletClient()
   const marketClient = useMarketClient()
   const addresses = useMangroveAddresses()
+
+  const { addOptimisticOrder } = useOptimisticCache()
 
   return useMutation({
     mutationFn: async ({ form }: { form: Form }) => {
@@ -89,6 +92,20 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
             bs,
           },
         )
+
+        // Add optimistic order to cache immediately
+        await addOptimisticOrder({
+          type: "market",
+          side: bs,
+          receipt,
+          parsedResult: result,
+          form: {
+            send: gives,
+            receive: wants,
+            bs,
+          },
+        })
+
         // toast.success("Market order executed")
 
         successToast(
@@ -132,7 +149,10 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
         // Start showing loading state indicator on parts of the UI that depend on
         startLoading([TRADE.TABLES.ORDERS, TRADE.TABLES.ORDER_HISTORY])
 
-        queryClient.invalidateQueries({ queryKey: ["orders"] })
+        // Note: We don't invalidate order queries immediately anymore since we're using optimistic updates
+        // The optimistic cache hook will handle the invalidation once indexer catches up
+
+        // queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
         queryClient.invalidateQueries({ queryKey: ["trade-balances"] })
       } catch (error) {

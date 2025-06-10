@@ -8,6 +8,7 @@ export type VaultWhitelist = {
   isDeprecated?: boolean
   manager: string
   address: Address
+  oracle: Address
   description: string
   descriptionBonus: string
   strategyType: string

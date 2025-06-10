@@ -1,7 +1,7 @@
 import { MarketParams } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Address, TransactionReceipt, parseUnits } from "viem"
+import { Address, parseUnits } from "viem"
 import { useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
@@ -19,6 +19,7 @@ import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
 import { TradeMode } from "../../enums"
+import { useOptimisticCache } from "../../hooks/use-optimistic-cache"
 import { successToast } from "../../utils"
 import type { Form } from "../types"
 
@@ -42,6 +43,8 @@ export function usePostMarketOrder() {
     state.startLoading,
     state.stopLoading,
   ])
+
+  const { addOptimisticOrder } = useOptimisticCache()
 
   const uniModuleAddress = {
     [ProtocolType.UniswapV3]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
@@ -119,6 +122,20 @@ export function usePostMarketOrder() {
         })
 
         const result = { takerGot: got, takerGave: gave, bounty, feePaid }
+
+        // Add optimistic order to cache immediately
+        await addOptimisticOrder({
+          type: "market",
+          side: bs,
+          receipt,
+          parsedResult: result,
+          form: {
+            send: gives,
+            receive: wants,
+            bs,
+          },
+        })
+
         successToast(
           TradeMode.MARKET,
           bs,
@@ -154,8 +171,12 @@ export function usePostMarketOrder() {
         // await resolveWhenBlockIsIndexed.mutateAsync({
         //   blockNumber: Number(receipt.blockNumber),
         // })
-        queryClient.invalidateQueries({ queryKey: ["orders"] })
-        queryClient.invalidateQueries({ queryKey: ["order-history"] })
+
+        // Note: We don't invalidate queries immediately anymore since we're using optimistic updates
+        // The optimistic cache hook will handle the invalidation once indexer catches up
+
+        // queryClient.invalidateQueries({ queryKey: ["orders"] })
+        // queryClient.invalidateQueries({ queryKey: ["order-history"] })
         queryClient.invalidateQueries({ queryKey: ["trade-balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {

@@ -37,16 +37,9 @@ type Params = {
   pageSize: number
   onDeposit: (vault: Vault) => void
   isLoading: boolean
-  defaultData: Vault[]
 }
 
-export function useTable({
-  pageSize,
-  data,
-  onDeposit,
-  isLoading,
-  defaultData,
-}: Params) {
+export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
   const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
   const { fdv, setFdv } = useMgvFdv()
@@ -239,7 +232,7 @@ export function useTable({
   )
 
   return useReactTable({
-    data: data ?? defaultData,
+    data: data ?? [],
     columns,
     initialState: {
       pagination: {

@@ -176,6 +176,7 @@ export function useCashnesses() {
         USDC: 1e6,
         WETH: 1000,
         WBTC: 2000,
+        wstETH: 600,
       }
     case megaethTestnet.id:
       return {
@@ -218,7 +219,7 @@ export const SEIWSEI = {
   decimals: 18,
   displayDecimals: 2,
   priceDisplayDecimals: 4,
-  mgvTestToken: true,
+  mgvTestToken: false,
 } as const satisfies Token
 
 export const SEINATIVE = {
@@ -227,7 +228,7 @@ export const SEINATIVE = {
   decimals: 18,
   displayDecimals: 2,
   priceDisplayDecimals: 4,
-  mgvTestToken: true,
+  mgvTestToken: false,
 } as const satisfies Token
 
 export const SEIUSDC = {
@@ -236,7 +237,7 @@ export const SEIUSDC = {
   decimals: 6,
   displayDecimals: 2,
   priceDisplayDecimals: 4,
-  mgvTestToken: true,
+  mgvTestToken: false,
 } as const satisfies Token
 
 export const SEIWETH = {
@@ -245,7 +246,16 @@ export const SEIWETH = {
   decimals: 18,
   displayDecimals: 2,
   priceDisplayDecimals: 4,
-  mgvTestToken: true,
+  mgvTestToken: false,
+} as const satisfies Token
+
+export const SEIWSTETH = {
+  address: "0xBE574b6219C6D985d08712e90C21A88fd55f1ae8",
+  symbol: "wstETH",
+  decimals: 18,
+  displayDecimals: 2,
+  priceDisplayDecimals: 4,
+  mgvTestToken: false,
 } as const satisfies Token
 
 export const SEIWBTC = {
@@ -254,7 +264,7 @@ export const SEIWBTC = {
   decimals: 8,
   displayDecimals: 2,
   priceDisplayDecimals: 4,
-  mgvTestToken: true,
+  mgvTestToken: false,
 } as const satisfies Token
 
 export const seiWSEIUSDC = {
@@ -290,6 +300,12 @@ export const seiWETHUSDC = {
 export const seiSEIWSEI = {
   base: SEINATIVE,
   quote: SEIWSEI,
+  tickSpacing: 1n,
+} as const satisfies MarketParams
+
+export const seiWSTETHWETH = {
+  base: SEIWSTETH,
+  quote: SEIWETH,
   tickSpacing: 1n,
 } as const satisfies MarketParams
 

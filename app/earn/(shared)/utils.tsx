@@ -3,9 +3,10 @@ import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { MarketParams } from "@mangrovedao/mgv"
 import { ReactNode } from "react"
-import { Address, Chain, parseAbi, PublicClient } from "viem"
+import { Address, Chain, parseAbi, PublicClient, zeroAddress } from "viem"
 import { AnimatedSkeleton } from "./components/animated-skeleton"
 import { pnlSchema, priceSchema } from "./schemas"
+import { Vault } from "./types"
 
 // ============= CONTRACT INTERFACES =============
 
@@ -181,4 +182,38 @@ export const LineRewards = ({
       <Caption className="text-text-primary !text-sm">{value}</Caption>
     </div>
   )
+}
+
+export const createVault = (
+  whitelistVault: any,
+  backendData?: any,
+  kandelAddress?: Address,
+  apr?: number,
+): Vault => {
+  return {
+    symbol: "",
+    incentivesApr: 0,
+    apr: apr || backendData?.apr || 0,
+    decimals: 18,
+    mintedAmount: 0n,
+    managementFee: 0,
+    totalRewards: 0,
+    performanceFee: 0,
+    address: whitelistVault.address,
+    market: whitelistVault.market,
+    totalBase: 0n,
+    totalQuote: 0n,
+    balanceBase: 0n,
+    balanceQuote: 0n,
+    tvl: backendData?.tvl || 0n,
+    baseDollarPrice: 0,
+    quoteDollarPrice: 0,
+    strategist: whitelistVault.manager || "",
+    type: whitelistVault.strategyType || "",
+    isActive: true,
+    deprecated: whitelistVault.isDeprecated ?? false,
+    userBaseBalance: 0n,
+    userQuoteBalance: 0n,
+    kandel: kandelAddress || zeroAddress,
+  }
 }
