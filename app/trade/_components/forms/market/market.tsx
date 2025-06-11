@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
-import { useAccount, useBalance } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useDollarConversion } from "@/hooks/use-dollar-conversion"
-import useMarket from "@/providers/market"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -21,6 +20,7 @@ import { EnhancedNumericInput } from "@components/token-input-new"
 import { useTradeFormStore } from "../../forms/store"
 import { Accordion } from "../components/accordion"
 import { MarketDetails } from "../components/market-details"
+import { useTradeBalances } from "../hooks/use-trade-balances"
 import { useTradeInfos } from "../hooks/use-trade-infos"
 import { useMarketForm } from "./hooks/use-market"
 import { useMarketTransaction } from "./hooks/use-market-transaction"
@@ -39,9 +39,7 @@ const sliderValues = [25, 50, 75]
 
 export function Market() {
   const { isConnected, address } = useAccount()
-  const { data: ethBalance } = useBalance({
-    address,
-  })
+
   const [formData, setFormData] = React.useState<Form>()
   const [showCustomInput, setShowCustomInput] = React.useState(false)
   const [sendSliderValue, setSendSliderValue] = useState(0)
@@ -60,7 +58,8 @@ export function Market() {
   const {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
+    ethBalance,
     form,
     market,
     sendToken,
@@ -75,6 +74,11 @@ export function Market() {
   } = useMarketForm({
     onSubmit: (formData) => setFormData(formData),
     bs: tradeSide,
+  })
+
+  const { refetch: refetchTradeBalances } = useTradeBalances({
+    sendToken,
+    receiveToken,
   })
 
   // Registry and trade infos
@@ -92,17 +96,18 @@ export function Market() {
     maxTickEncountered: maxTickEncountered ?? 0n,
     sendToken,
     baseToken,
-    sendTokenBalance,
+    sendTokenBalance: sendBalance?.balance ?? 0n,
     isWrapping,
     onTransactionSuccess: () => {
       // Reset form state after successful transaction
       form.reset()
       setSendSliderValue(0)
       setFormData(undefined)
+      setTimeout(() => {
+        refetchTradeBalances()
+      }, 100)
     },
   })
-
-  const { currentMarket } = useMarket()
 
   const { payDollar, receiveDollar } = useDollarConversion({
     payAmount: form.state.values.send,
@@ -138,18 +143,10 @@ export function Market() {
 
   const sendBalanceWithEth = isWrapping
     ? Number(
-        formatUnits(
-          sendTokenBalance.balance?.balance || 0n,
-          sendToken?.decimals ?? 18,
-        ),
+        formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18),
       ) +
       Number(formatUnits(ethBalance?.value ?? 0n, ethBalance?.decimals ?? 18))
-    : Number(
-        formatUnits(
-          sendTokenBalance.balance?.balance || 0n,
-          sendToken?.decimals ?? 18,
-        ),
-      )
+    : Number(formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18))
 
   const handleSliderChange = (value: number) => {
     if (!sendBalanceWithEth || !sendToken) return
@@ -163,6 +160,7 @@ export function Market() {
       // Set the field value without calling validateAllFields
       const safeAmount = Math.min(amount.toNumber(), sendBalanceWithEth)
       form.setFieldValue("send", safeAmount.toFixed(decimals).toString())
+      form.validateAllFields("submit")
 
       // Compute receive amount will indirectly validate the form
       computeReceiveAmount()
