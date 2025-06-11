@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider } from "wagmi"
 
 import { config } from "@/config/wagmi"
+import { MangroveUiProvider } from "@mangroveui/trade"
 
 
 // Create a query client for React Query
@@ -18,7 +19,9 @@ export function WalletConnectProvider({ children }: React.PropsWithChildren) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()}>{children}</RainbowKitProvider>
+        <MangroveUiProvider>
+          <RainbowKitProvider theme={darkTheme()}>{children}</RainbowKitProvider>
+        </MangroveUiProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )
