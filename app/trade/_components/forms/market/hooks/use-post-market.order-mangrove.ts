@@ -134,7 +134,7 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
 
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["fills"] })
-        queryClient.invalidateQueries({ queryKey: ["balances"] })
+        queryClient.invalidateQueries({ queryKey: ["trade-balances"] })
       } catch (error) {
         console.error(error)
       }
