@@ -161,7 +161,7 @@ export function usePostLimitOrder() {
         // })
         queryClient.invalidateQueries({ queryKey: ["orders"] })
         queryClient.invalidateQueries({ queryKey: ["order-history"] })
-        queryClient.invalidateQueries({ queryKey: ["balances"] })
+        queryClient.invalidateQueries({ queryKey: ["trade-balances"] })
         queryClient.invalidateQueries({ queryKey: ["mangroveTokenPrice"] })
       } catch (error) {
         console.error(error)
