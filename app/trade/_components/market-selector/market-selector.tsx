@@ -1,18 +1,21 @@
 "use client"
 
+import { DataTable } from "@/components/ui/data-table-new/data-table"
 import {
   Select,
   SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import useMarket from "@/providers/market"
 import { MarketParams } from "@mangrovedao/mgv"
-import { useEffect, useState } from "react"
+import { useMarketStats } from "@mangroveui/trade"
+import { isArray } from "radash"
+import { useEffect, useMemo, useState } from "react"
 import { getAddress, isAddressEqual } from "viem"
 import { TokenIcon } from "../../../../components/token-icon"
+import { useTable } from "./use-table"
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(false)
@@ -40,6 +43,21 @@ function getValue(market: MarketParams) {
 export default function MarketSelector() {
   const { markets, currentMarket, setMarket } = useMarket()
   const isMobile = useMediaQuery("(max-width: 768px)")
+  const { data: stats, isLoading } = useMarketStats({ markets })
+
+  const formattedStats = useMemo(() => {
+    if (!stats || !isArray(stats)) return []
+
+    return stats.map((stat) => ({
+      ...stat,
+      market: {
+        ...stat.market,
+        tickSpacing: BigInt(stat.market.tickSpacing),
+      },
+    }))
+  }, [markets, isLoading])
+
+  const table = useTable({ data: formattedStats as any })
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress, tickSpacing] = value.split("/")
@@ -108,26 +126,10 @@ export default function MarketSelector() {
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
-        {markets?.map((m) => (
-          <SelectItem
-            key={`${m.base.address}/${m.quote.address}/${m.tickSpacing}`}
-            value={getValue(m)}
-            className="p-1.5 text-sm"
-          >
-            <div className="flex items-center space-x-2">
-              <div className="flex -space-x-2">
-                <TokenIcon symbol={m.base.symbol} imgClasses="rounded-full" />
-                <TokenIcon symbol={m.quote.symbol} imgClasses="rounded-full" />
-              </div>
-
-              {!isMobile && (
-                <span className="group-data-[state=checked]:inline-block group-data-[highlighted]:inline-block">
-                  {getSymbol(m)}
-                </span>
-              )}
-            </div>
-          </SelectItem>
-        ))}
+        <DataTable
+          table={table}
+          onRowClick={(row) => row?.market && setMarket(row.market)}
+        />
       </SelectContent>
     </Select>
   )

@@ -5,7 +5,7 @@ import { useAccount, useSignMessage } from "wagmi"
 import Dialog from "@/components/dialogs/dialog"
 import { Button } from "@/components/ui/button"
 import withClientOnly from "@/hocs/withClientOnly"
-import { config } from "@/providers/wallet-connect"
+import { config } from "@/config/wagmi"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 
