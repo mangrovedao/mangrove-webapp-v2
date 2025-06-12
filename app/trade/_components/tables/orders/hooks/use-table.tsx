@@ -7,11 +7,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import Big from "big.js"
-import React, { useEffect } from "react"
+import React from "react"
 
 import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
+import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
@@ -20,7 +21,6 @@ import { MarketParams } from "@mangrovedao/mgv"
 import { Order } from "../../(shared)/schema"
 import { Timer } from "../components/timer"
 import { useCancelOrder } from "./use-cancel-order"
-import useMarket from "@/providers/market"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -38,11 +38,10 @@ export function useTable({
   onCancel,
   onEdit,
 }: Params) {
-
   const { currentMarket: market } = useMarket()
 
   const columnList = React.useMemo(() => {
-    const columns = [] as any[]
+    const columns = []
 
     columns.push(
       columnHelper.display({
@@ -96,7 +95,8 @@ export function useTable({
             const { initialWants, takerGot, initialGives, market, side } =
               row.original
 
-            const marketQuote = side === 'sell' ? market?.base?.symbol : market?.quote?.symbol
+            const marketQuote =
+              side === "sell" ? market?.base?.symbol : market?.quote?.symbol
 
             if (!takerGot || !initialWants || !initialGives)
               return <span className="text-xs">-</span>

@@ -15,9 +15,6 @@ import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skelet
 import { useMgvFdv } from "@/app/earn/(shared)/store/vault-store"
 import { Vault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Tooltip,
   TooltipContent,
@@ -25,8 +22,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { Check } from "@/svgs"
-import { formatNumber } from "@/utils/numbers"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -155,6 +150,7 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
             ? `${row.original.incentivesApr.toFixed(2)}%`
             : "-"
 
+          const netApr = (_apr + Number(row.original.incentivesApr)).toFixed(2)
           return (
             <div className="group relative w-full text-right">
               <TooltipProvider>
@@ -173,51 +169,29 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
-                            Incentives rate
-                          </span>
-                          <span className="text-sm text-text-primary">
-                            {incentivesApr}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm text-text-secondary">
-                            Net APR
+                            Native APY
                           </span>
                           <span className="text-sm text-text-primary">
                             {apr}
                           </span>
                         </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm text-text-secondary">
+                            SEI
+                          </span>
+                          <span className="text-sm text-text-primary">
+                            {incentivesApr}
+                          </span>
+                        </div>
                       </div>
                       <hr className="my-2" />
-                      <div className="flex flex-col">
-                        <Label className="text-sm text-text-secondary">
-                          Update FDV (Fully Diluted Valuation)
-                        </Label>
-
-                        <div className="flex gap-2 items-center">
-                          <form
-                            className="flex gap-2 items-center"
-                            onSubmit={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              const value = (e.target as HTMLFormElement)
-                                .elements[0] as HTMLInputElement
-                              setFdv(Number(value.value))
-                            }}
-                          >
-                            <Input
-                              placeholder={formatNumber(fdv)}
-                              className="w-full bg-bg-tertiary h-8 p-2"
-                            />
-                            <Button
-                              type="submit"
-                              size={"only"}
-                              className="size-6"
-                            >
-                              <Check className="size-6" />
-                            </Button>
-                          </form>
-                        </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm text-text-secondary">
+                          Net APY
+                        </span>
+                        <span className="text-sm text-text-primary">
+                          {netApr}
+                        </span>
                       </div>
                     </div>
                   </TooltipContent>

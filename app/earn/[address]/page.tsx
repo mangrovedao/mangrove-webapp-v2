@@ -396,7 +396,7 @@ export default function Page() {
                   <div>
                     <GridLine
                       title="Performance Fee"
-                      value={vault?.performanceFee}
+                      value={vault?.performanceFee || "0"}
                       symbol="%"
                       info="A fee based on the profits generated from your deposit."
                     />
@@ -410,7 +410,7 @@ export default function Page() {
                   <div>
                     <GridLine
                       title="Management Fee"
-                      value={vault?.managementFee}
+                      value={vault?.managementFee || "0"}
                       symbol="%"
                       info="A fee attributed to the vault manager."
                     />
@@ -486,6 +486,14 @@ export default function Page() {
                   }
                 />
                 <GridLine
+                  title={"Accruing"}
+                  value={
+                    <div className="flex items-center gap-1">
+                      <span className="!text-md">0</span>
+                    </div>
+                  }
+                />
+                <GridLine
                   title={"Claimable"}
                   value={
                     <motion.span
@@ -501,16 +509,10 @@ export default function Page() {
                   }
                   symbol={""}
                 />
-
-                <GridLine
-                  title={"Accruing"}
-                  value={
-                    <div className="flex items-center gap-1">
-                      <span className="text-text-secondary !text-md">SEI</span>
-                    </div>
-                  }
-                />
               </div>
+              <Button className="w-full mt-2" disabled>
+                Claim
+              </Button>
             </NeonContainer>
             {/* Only show the form directly on desktop */}
             {!isMobile && (
