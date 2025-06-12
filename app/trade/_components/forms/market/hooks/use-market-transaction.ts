@@ -43,7 +43,7 @@ export function useMarketTransaction({
   const { pool } = usePool()
 
   // Market steps to check if approval is needed
-  const { data: marketOrderSteps } = useMarketSteps({
+  const { data: marketOrderSteps, refetch: refetchSteps } = useMarketSteps({
     user: address,
     bs: tradeSide,
     sendAmount: form.state.values.send,
@@ -61,28 +61,25 @@ export function useMarketTransaction({
     spender,
     sendAmount: form.state.values.send,
   })
+  // Post order mutation
+  const postMangrove = usePostMarketOrderMangrove({
+    onResult: (result) => {
+      setTxState("idle")
+      toast.success("Order submitted successfully!")
+      onTransactionSuccess?.()
+    },
+  })
+
+  const postMarket = usePostMarketOrder({
+    onResult: (result) => {
+      setTxState("idle")
+      toast.success("Order submitted successfully!")
+      onTransactionSuccess?.()
+    },
+  })
 
   // Post order mutation
-  const post =
-    chain?.testnet || !pool
-      ? usePostMarketOrderMangrove({
-          onResult: (result) => {
-            setTxState("idle")
-            toast.success("Order submitted successfully!")
-            if (onTransactionSuccess) {
-              onTransactionSuccess()
-            }
-          },
-        })
-      : usePostMarketOrder({
-          onResult: (result) => {
-            setTxState("idle")
-            toast.success("Order submitted successfully!")
-            if (onTransactionSuccess) {
-              onTransactionSuccess()
-            }
-          },
-        })
+  const post = chain?.testnet || !pool ? postMangrove : postMarket
 
   // Wrapping ETH
   const {
@@ -141,7 +138,7 @@ export function useMarketTransaction({
   const handlePostOrder = async () => {
     setTxState("posting")
     try {
-      await post.mutateAsync(
+      const result = await post.mutateAsync(
         {
           form: {
             ...form.state.values,
@@ -160,6 +157,10 @@ export function useMarketTransaction({
           },
         },
       )
+
+      if (result?.receipt?.status === "success" && onTransactionSuccess) {
+        onTransactionSuccess()
+      }
     } catch (error) {
       setTxState("idle")
       toast.error("Failed to post the market order")
@@ -190,7 +191,10 @@ export function useMarketTransaction({
     setTxState("approving")
     try {
       await approveAmount.mutateAsync(undefined, {
-        onSuccess: () => {},
+        onSuccess: () => {
+          refetchSteps()
+          setTxState("idle")
+        },
         onError: (error) => {
           setTxState("idle")
         },

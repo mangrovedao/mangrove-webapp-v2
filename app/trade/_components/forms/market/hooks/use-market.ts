@@ -1,5 +1,6 @@
 "use client"
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import useMarket from "@/providers/market"
 import {
   MarketOrderSimulationParams,
   Token,
@@ -10,8 +11,7 @@ import { useForm } from "@tanstack/react-form"
 import { zodValidator } from "@tanstack/zod-form-adapter"
 import React from "react"
 import { formatUnits, parseUnits } from "viem"
-
-import useMarket from "@/providers/market"
+import { useTradeBalances } from "../../hooks/use-trade-balances"
 
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useBook } from "@/hooks/use-book"
@@ -76,16 +76,17 @@ export function useMarketForm(props: Props) {
   const receive = form.useStore((state) => state.values.receive)
 
   const { currentMarket: market } = useMarket()
-  const {
-    sendToken,
-    quoteToken,
-    receiveToken,
-    sendTokenBalance,
-    feeInPercentageAsString,
-  } = useTradeInfos("market", bs)
+  const { sendToken, quoteToken, receiveToken, feeInPercentageAsString } =
+    useTradeInfos("market", bs)
 
   const { mergedBooks: book } = useMergedBooks()
   const { book: oldBook } = useBook()
+  const { data: tradeBalances } = useTradeBalances({
+    sendToken,
+    receiveToken,
+  })
+
+  const { sendBalance, ethBalance } = tradeBalances || {}
 
   const { data: marketPrice } = useMangroveTokenPricesQuery(
     market?.base?.address,
@@ -245,10 +246,7 @@ export function useMarketForm(props: Props) {
         !isWrapping &&
         sendValue - 0.0000001 >
           Number(
-            formatUnits(
-              sendTokenBalance.balance?.balance || 0n,
-              sendToken?.decimals ?? 18,
-            ),
+            formatUnits(sendBalance?.balance || 0n, sendToken?.decimals ?? 18),
           )
       ) {
         errors.send = "Insufficient balance"
@@ -265,7 +263,7 @@ export function useMarketForm(props: Props) {
     form.state.errors,
     form.state.values,
     isWrapping,
-    sendTokenBalance,
+    sendBalance,
     sendToken,
     hasEnoughVolume,
   ])
@@ -273,11 +271,12 @@ export function useMarketForm(props: Props) {
   return {
     computeReceiveAmount,
     computeSendAmount,
-    sendTokenBalance,
+    sendBalance,
     maxTickEncountered: data?.maxTickEncountered,
     form,
     market,
     sendToken,
+    ethBalance,
     receiveToken,
     quote: market?.quote,
     avgPrice: averagePrice.price?.toFixed(averagePrice.decimals),

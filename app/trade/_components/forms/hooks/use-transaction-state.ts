@@ -131,6 +131,7 @@ export function useTransactionState({
     try {
       await approveFunction(approveParams, {
         onSuccess: () => {
+          setTxState("idle")
           if (onSuccess) {
             onSuccess()
           } else if (needsWrapping && handleWrapEth) {

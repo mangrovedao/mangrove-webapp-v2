@@ -1,7 +1,7 @@
 import { BS } from "@mangrovedao/mgv/lib"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { useAccount, useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useMarketClient } from "@/hooks/use-market"
@@ -27,7 +27,6 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
   ])
   const { data: walletClient } = useWalletClient()
   const marketClient = useMarketClient({ market })
-  const publicClient = usePublicClient()
 
   return useMutation({
     /*
@@ -39,7 +38,7 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
     mutationKey: ["retractOrder", offerId],
     mutationFn: async ({ order }: { order: Order }) => {
       try {
-        if (!offerId || !walletClient || !publicClient || !marketClient)
+        if (!offerId || !walletClient || !marketClient)
           throw new Error("Retract order missing params")
 
         const { request } = await marketClient.simulateRemoveOrder({
@@ -47,9 +46,10 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
           bs: order.side === "buy" ? BS.buy : BS.sell,
           account: address,
         })
+        console.log("request", request)
 
         const tx = await walletClient.writeContract(request)
-        const receipt = await publicClient.waitForTransactionReceipt({
+        const receipt = await marketClient.waitForTransactionReceipt({
           hash: tx,
         })
 
@@ -67,6 +67,7 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
         startLoading(TRADE.TABLES.ORDERS)
 
         queryClient.invalidateQueries({ queryKey: ["orders"] })
+        queryClient.invalidateQueries({ queryKey: ["balances"] })
       } catch (error) {
         console.error(error)
       }
