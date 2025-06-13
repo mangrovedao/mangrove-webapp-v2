@@ -14,7 +14,7 @@ import { EnhancedNumericInput } from "@/components/token-input"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button-old"
 import { Close } from "@/svgs"
-import wethAbi from "../../../app/faucet/_abis/weth.json"
+
 import { wethAdresses } from "./wrap-dialog"
 
 type Props = {
@@ -44,7 +44,7 @@ export default function UnWrapETHDialog({ isOpen, onClose }: Props) {
       const parsedAmount = parseUnits(amount, wethBalance.decimals)
       writeContract({
         address: wethAdress,
-        abi: wethAbi,
+        abi: ["function withdraw(uint256 wad) public"],
         functionName: "withdraw",
         args: [parsedAmount],
       })
