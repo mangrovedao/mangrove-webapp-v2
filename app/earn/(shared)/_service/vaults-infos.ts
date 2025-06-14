@@ -228,25 +228,6 @@ export async function getVaultsInformation(
         _kandel,
       ] = results.slice(i * 11)
 
-      // Handle potential failures in multicall
-      if (!_totalInQuote.result || !_underlyingBalances.result) {
-        // Return default stub data for failed vault queries
-        return {
-          ...v,
-          totalInQuote: _totalInQuote.result,
-          underlyingBalances: _underlyingBalances.result,
-          totalSupply: _totalSupply.result,
-          balanceOf: _balanceOf.result,
-          feeData: _feeData.result,
-          symbol: _symbol.result,
-          decimals: _decimals.result,
-          lastTotalInQuote: _lastTotalInQuote.result,
-          lastTimestamp: _lastTimestamp.result,
-          kandel: _kandel.result as Address,
-          kandelApr: 0,
-        }
-      }
-
       // Safely extract data from results
       const {
         totalInQuote,
@@ -259,6 +240,7 @@ export async function getVaultsInformation(
         decimals,
         lastTotalInQuote,
         lastTimestamp,
+        kandel,
       } = multicallSchema.parse({
         totalInQuote: _totalInQuote.result,
         underlyingBalances: _underlyingBalances.result,
@@ -270,6 +252,7 @@ export async function getVaultsInformation(
         decimals: _decimals.result,
         lastTotalInQuote: _lastTotalInQuote.result,
         lastTimestamp: _lastTimestamp.result,
+        kandel: _kandel.result as Address,
       })
 
       // Get token prices from cache
@@ -326,7 +309,7 @@ export async function getVaultsInformation(
         balanceOf,
         feeData: feeData.map((f) => BigInt(f)),
         kandelApr,
-        kandel: _kandel.result as Address,
+        kandel: kandel as Address,
         decimals,
         mintedAmount: balanceOf,
         performanceFee: (Number(feeData[0]) / 1e5) * 100,

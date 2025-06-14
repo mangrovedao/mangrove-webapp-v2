@@ -12,6 +12,7 @@ export const multicallSchema = z.object({
   decimals: z.number(),
   lastTotalInQuote: z.bigint(),
   lastTimestamp: z.bigint(),
+  kandel: z.string(),
 })
 
 export const pnlSchema = z.object({

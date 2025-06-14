@@ -2,7 +2,7 @@ import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Address } from "viem"
+import { Address, parseUnits } from "viem"
 import { simulateContract, waitForTransactionReceipt } from "viem/actions"
 import { useAccount, useWalletClient } from "wagmi"
 
@@ -37,7 +37,7 @@ export function useClaimRewards() {
       proof,
     }: {
       rewardToken: Address
-      amount: bigint
+      amount: number
       proof: `0x${string}`[]
     }) => {
       try {
@@ -47,7 +47,12 @@ export function useClaimRewards() {
           address: rewardDistributorAddress,
           abi: rewardsAbi,
           functionName: "claim",
-          args: [address, rewardToken, amount, proof],
+          args: [
+            address,
+            rewardToken,
+            parseUnits(amount.toString(), 18),
+            proof,
+          ],
         })
 
         const tx = await walletClient?.writeContract(request)

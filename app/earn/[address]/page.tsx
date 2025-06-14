@@ -31,6 +31,7 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { TradeIcon } from "@/svgs"
@@ -74,13 +75,14 @@ export default function Page() {
 
   const {
     data: { vault },
+    isLoading: isLoadingVault,
   } = useVault(params.address)
 
   const incentive = vault?.incentives.find(
     (i) => i.vault.toLowerCase() === vault?.address.toLowerCase(),
   )
 
-  const { data: rewardsInfo } = useRewardsInfo({
+  const { data: rewardsInfo, isLoading: isLoadingRewards } = useRewardsInfo({
     rewardToken: incentive?.tokenAddress,
   })
 
@@ -90,6 +92,8 @@ export default function Page() {
     vault?.incentives?.find(
       (i) => i.vault.toLowerCase() === vault?.address.toLowerCase(),
     )?.apy || 0
+
+  const isLoading = isLoadingVault || isLoadingRewards
 
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
@@ -477,15 +481,18 @@ export default function Page() {
                 title={"Partner Rewards"}
                 value={
                   <div className="flex items-center gap-1">
-                    <span className="text-text-secondary !text-md">SEI</span>
-                    <FlowingNumbers
-                      className="text-md"
-                      initialValue={vault?.incentivesData?.rewards || 0}
-                      ratePerSecond={
-                        vault?.incentivesData?.currentRewardsPerSecond || 0
-                      }
-                      decimals={6}
-                    />
+                    <span className="text-text-secondary !text-md">
+                      {rewardsInfo?.symbol}
+                    </span>
+
+                    {rewardsInfo?.claimable && (
+                      <FlowingNumbers
+                        className="text-md"
+                        initialValue={rewardsInfo?.claimable ?? 0}
+                        ratePerSecond={0}
+                        decimals={2}
+                      />
+                    )}
                   </div>
                 }
               />
@@ -509,7 +516,11 @@ export default function Page() {
                   title={"Accruing"}
                   value={
                     <div className="flex items-center gap-1">
-                      <span className="!text-md">0</span>
+                      {isLoading ? (
+                        <Skeleton className="w-10 h-4" />
+                      ) : (
+                        <span className="!text-md">0</span>
+                      )}
                     </div>
                   }
                 />
@@ -535,7 +546,7 @@ export default function Page() {
                   if (!incentive?.tokenAddress) return
                   claimRewards({
                     rewardToken: incentive?.tokenAddress as Address,
-                    amount: BigInt(rewardsInfo?.claimable || 0),
+                    amount: rewardsInfo?.claimable || 0,
                     proof:
                       (rewardsInfo?.rewards?.proof as `0x${string}`[]) || [],
                   })
