@@ -1,13 +1,14 @@
-import { Vault } from "@/app/earn/(shared)/types"
-import Dialog from "@/components/dialogs/dialog-new"
-import { Caption } from "@/components/typography/caption"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { toast } from "sonner"
 import { parseAbi, parseUnits } from "viem"
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
+
+import Dialog from "@/components/dialogs/dialog-new"
+import { Caption } from "@/components/typography/caption"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { CompleteVault } from "../../../(shared)/types"
 import { DialogAmountLine } from "./utils"
 
 type Props = {
@@ -18,7 +19,7 @@ type Props = {
   }
   amount: string
   isOpen: boolean
-  vault: Vault
+  vault: CompleteVault
   onClose: () => void
 }
 
@@ -60,7 +61,7 @@ export default function RemoveFromVaultDialog({
             maximumFractionDigits: vault?.market.base.displayDecimals || 4,
           })}
           estimationAmount={(
-            Number(infos.baseWithdraw) * vault.baseDollarPrice
+            Number(infos.baseWithdraw) * (vault.baseDollarPrice || 0)
           ).toLocaleString(undefined, {
             maximumFractionDigits: vault?.market.base.displayDecimals || 4,
           })}
@@ -71,7 +72,7 @@ export default function RemoveFromVaultDialog({
             maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
           })}
           estimationAmount={(
-            Number(infos.quoteWithdraw) * vault.quoteDollarPrice
+            Number(infos.quoteWithdraw) * (vault.quoteDollarPrice || 0)
           ).toLocaleString(undefined, {
             maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
           })}
@@ -87,8 +88,8 @@ export default function RemoveFromVaultDialog({
             maximumFractionDigits: 4,
           })}
           estimationAmount={(
-            Number(infos.baseWithdraw) * vault.baseDollarPrice +
-            Number(infos.quoteWithdraw) * vault.quoteDollarPrice
+            Number(infos.baseWithdraw) * (vault.baseDollarPrice || 0) +
+            Number(infos.quoteWithdraw) * (vault.quoteDollarPrice || 0)
           ).toLocaleString(undefined, {
             maximumFractionDigits: vault?.market.quote.displayDecimals || 4,
           })}

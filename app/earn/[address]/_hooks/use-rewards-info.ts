@@ -1,10 +1,11 @@
+import { useQuery } from "@tanstack/react-query"
+import { Address, erc20Abi, formatUnits, parseAbi } from "viem"
+import { useAccount } from "wagmi"
+import { z } from "zod"
+
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
-import { useQuery } from "@tanstack/react-query"
-import { Address, erc20Abi, formatUnits } from "viem"
-import { useAccount } from "wagmi"
-import { z } from "zod"
 
 const RewardProofSchema = z.object({
   account: z.string().transform((val) => val as Address),
@@ -15,18 +16,9 @@ const RewardProofSchema = z.object({
 
 const RewardsResponseSchema = z.array(RewardProofSchema)
 
-const rewardsAbi = [
-  {
-    inputs: [
-      { name: "account", type: "address" },
-      { name: "reward", type: "address" },
-    ],
-    name: "claimed",
-    outputs: [{ type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const
+const rewardsAbi = parseAbi([
+  "function claimed(address account, address reward) view returns (uint256 amount)",
+])
 
 const rewardDistributorAddress = "0xDb6A3A20743f5878732EF73623a51033c80DBB10"
 

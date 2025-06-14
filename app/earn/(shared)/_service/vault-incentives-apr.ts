@@ -1,4 +1,4 @@
-import { VaultLPProgram } from "../_hooks/use-vaults-list"
+import { VaultIncentive } from "../types"
 
 /** Total supply of MGV tokens */
 const MGV_TOTAL_SUPPLY = 1e9 // 1B MGV
@@ -10,7 +10,7 @@ const MGV_TOTAL_SUPPLY = 1e9 // 1B MGV
  * @returns Calculated APR as a percentage, or 0 if no active incentives or on error
  */
 export function calculateIncentiveAPR(
-  incentives?: VaultLPProgram,
+  incentives?: VaultIncentive,
   fdv?: number,
   quoteAssetPrice?: number,
 ): number {

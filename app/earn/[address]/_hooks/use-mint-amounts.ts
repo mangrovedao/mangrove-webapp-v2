@@ -4,10 +4,10 @@ import React from "react"
 import { useDebounceCallback } from "usehooks-ts"
 
 import { maxUint256, parseAbi, PublicClient } from "viem"
-import { Vault } from "../../(shared)/types"
+import { CompleteVault } from "../../(shared)/types"
 
 export type MintAmountsArgs = {
-  vault?: Vault
+  vault?: CompleteVault
   client?: PublicClient
 }
 
