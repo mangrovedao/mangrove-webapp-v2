@@ -3,7 +3,7 @@
 import React, { useEffect } from "react"
 import { erc20Abi, formatUnits, parseAbi, parseUnits, type Address } from "viem"
 
-import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/utils"
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"

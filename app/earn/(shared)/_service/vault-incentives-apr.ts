@@ -1,4 +1,4 @@
-import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
+import { VaultLPProgram } from "../_hooks/use-vaults-list"
 
 /** Total supply of MGV tokens */
 const MGV_TOTAL_SUPPLY = 1e9 // 1B MGV

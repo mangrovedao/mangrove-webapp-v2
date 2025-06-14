@@ -6,13 +6,12 @@ import { useNetworkClient } from "@/hooks/use-network-client"
 import { printEvmError } from "@/utils/errors"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
-import { useVaultsWhitelist } from "../../(shared)/_hooks/use-vaults-addresses"
-import { useVaultsIncentives } from "../../(shared)/_hooks/use-vaults-incentives"
+import { useVaultsList } from "../../(shared)/_hooks/use-vaults-list"
 import { getVaultsInformation } from "../../(shared)/_service/vaults-infos"
-import { Vault, VaultWhitelist } from "../../(shared)/types"
+import { CompleteVault } from "../../(shared)/types"
 
 // Type for the query result
-type VaultResult = { vault: (Vault & VaultWhitelist) | undefined }
+type VaultResult = { vault: CompleteVault | undefined }
 
 // Cache key for consistent querying
 const getVaultQueryKey = (
@@ -27,8 +26,7 @@ export function useVault(address?: string | null) {
   const queryClient = useQueryClient()
 
   const networkClient = useNetworkClient()
-  const vaultsWhitelist = useVaultsWhitelist()
-  const incentives = useVaultsIncentives()
+  const { data: vaultsList } = useVaultsList()
 
   // Query key with parameters
   const queryKey = getVaultQueryKey(address, user, defaultChain.id)
@@ -54,13 +52,8 @@ export function useVault(address?: string | null) {
         if (address && !isAddress(address))
           throw new Error("Invalid vault address")
 
-        // Find the vault in the whitelist
-        const vault = vaultsWhitelist?.find(
+        const vault = vaultsList?.find(
           (v) => v.address.toLowerCase() === address?.toLowerCase(),
-        )
-
-        const vaultIncentives = incentives?.find(
-          (v) => v.vault.toLowerCase() === address?.toLowerCase(),
         )
 
         if (!vault) {
@@ -72,8 +65,6 @@ export function useVault(address?: string | null) {
           networkClient,
           [vault],
           user,
-          vaultIncentives ? [vaultIncentives] : undefined,
-          [], // incentivesRewards - empty array for now
         )
 
         if (!vaultInfo) {
@@ -90,7 +81,7 @@ export function useVault(address?: string | null) {
       }
     },
     placeholderData: previousVaultData,
-    enabled: !!networkClient && !!vaultsWhitelist.length,
+    enabled: !!networkClient && !!vaultsList?.length,
     staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh longer
     gcTime: 10 * 60 * 1000, // 10 minutes - data stays in cache longer
     refetchOnWindowFocus: false,

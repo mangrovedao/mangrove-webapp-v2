@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation"
 import React from "react"
 
-import { Vault } from "@/app/earn/(shared)/types"
+import { CompleteVault } from "@/app/earn/(shared)/types"
 import CloseStrategyDialog from "@/app/strategies/[address]/_components/parameters/dialogs/close"
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { motion } from "framer-motion"
@@ -36,12 +36,12 @@ export function MyVaults() {
   })
 
   // selected strategy to cancel
-  const [closeStrategy, setCloseStrategy] = React.useState<Vault>()
+  const [closeStrategy, setCloseStrategy] = React.useState<CompleteVault>()
 
   const table = useTable({
     pageSize,
     data: vaults,
-    onManage: (vault: Vault) => {
+    onManage: (vault: CompleteVault) => {
       push(`/earn/${vault.address}`)
     },
     isLoading,

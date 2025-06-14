@@ -1,19 +1,19 @@
 "use client"
 
-import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
 import { TokenIcon } from "@/components/token-icon-new"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { useEffect, useState } from "react"
+import { useVaultsList } from "../(shared)/_hooks/use-vaults-list"
 import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
-  const vaults = useVaultsWhitelist()
+  const { data: vaults } = useVaultsList()
   const [tokens, setTokens] = useState<string[]>([])
 
   // Extract unique tokens from vaults' markets
   useEffect(() => {
-    if (!vaults.length) return
+    if (!vaults?.length) return
 
     const uniqueTokens = vaults.reduce<string[]>((acc, vault) => {
       const baseSymbol = vault.market.base.symbol

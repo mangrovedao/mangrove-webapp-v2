@@ -1,25 +1,5 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { arbitrum, base, blast, sei } from "viem/chains"
-import {
-  VAULTS_WHITELIST_ARBITRUM,
-  VAULTS_WHITELIST_BASE,
-  VAULTS_WHITELIST_SEI,
-} from "./vault-list"
-
-export function useVaultsWhitelist() {
-  const { defaultChain } = useDefaultChain()
-
-  switch (defaultChain.id) {
-    case base.id:
-      return VAULTS_WHITELIST_BASE
-    case arbitrum.id:
-      return VAULTS_WHITELIST_ARBITRUM
-    case sei.id:
-      return VAULTS_WHITELIST_SEI
-    default:
-      return VAULTS_WHITELIST_BASE
-  }
-}
 
 export function useVaultMintHelper() {
   const { defaultChain } = useDefaultChain()

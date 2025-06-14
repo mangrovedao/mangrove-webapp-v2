@@ -1,4 +1,4 @@
-import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
+import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-list"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useQuery } from "@tanstack/react-query"

@@ -13,7 +13,7 @@ import { useAccount } from "wagmi"
 
 import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
 import { useMgvFdv } from "@/app/earn/(shared)/store/vault-store"
-import { Vault } from "@/app/earn/(shared)/types"
+import { CompleteVault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import {
   Tooltip,
@@ -22,15 +22,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { useNetworkClient } from "@/hooks/use-network-client"
+import { getTokenSymbol } from "@/utils/tokens"
+import { Address } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
-const columnHelper = createColumnHelper<Vault>()
+const columnHelper = createColumnHelper<CompleteVault>()
 
 type Params = {
-  data?: Vault[]
+  data?: CompleteVault[]
   pageSize: number
-  onDeposit: (vault: Vault) => void
+  onDeposit: (vault: CompleteVault) => void
   isLoading: boolean
 }
 
@@ -38,6 +41,7 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
   const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
   const { fdv, setFdv } = useMgvFdv()
+  const networkClient = useNetworkClient()
 
   const columns = React.useMemo(
     () => [
@@ -81,10 +85,11 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
         header: "Strategy",
         cell: ({ row }) => {
           const isTrusted = true
-          const { deprecated } = row.original
+          const { isDeprecated } = row.original
+
           return (
             <Value
-              value={`${row.original.type} ${deprecated ? "(Deprecated)" : ""}`}
+              value={`${row.original.strategyType} ${isDeprecated ? "(Deprecated)" : ""}`}
               trusted={isTrusted}
             />
           )
@@ -102,9 +107,9 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
               </div>
             )
           }
-          const { tvl, market, deprecated } = row.original
+          const { tvl, isDeprecated } = row.original
 
-          if (deprecated)
+          if (isDeprecated)
             return <div className="text-right w-full flex-end">-</div>
 
           return (
@@ -121,7 +126,7 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
         cell: ({ row }) => {
           return (
             <div className="text-right w-full">
-              <Value value={row.original.strategist} className="justify-end" />
+              <Value value={row.original.manager} className="justify-end" />
             </div>
           )
         },
@@ -139,18 +144,26 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
             )
           }
 
-          const { apr: _apr, deprecated } = row.original
+          const {
+            kandelApr,
+            isDeprecated,
+            incentives,
+            address: vaultAddress,
+          } = row.original
 
-          if (deprecated)
+          if (isDeprecated)
             return <div className="text-right w-full flex-end">-</div>
+          const incentive = incentives?.find(
+            (i) => i.vault === vaultAddress.toLowerCase(),
+          )
 
-          const apr = _apr ? `${_apr.toFixed(2)}%` : "-"
+          const apr = kandelApr ? `${kandelApr.toFixed(2)}%` : "-"
+          const incentivesApr = incentive ? `${incentive.apy.toFixed(2)}%` : "-"
 
-          const incentivesApr = row.original.incentivesApr
-            ? `${row.original.incentivesApr.toFixed(2)}%`
-            : "-"
+          const netApr = `${(
+            Number(kandelApr ?? 0) + Number(incentive?.apy ?? 0)
+          ).toFixed(2)}%`
 
-          const netApr = (_apr + Number(row.original.incentivesApr)).toFixed(2)
           return (
             <div className="group relative w-full text-right">
               <TooltipProvider>
@@ -177,7 +190,10 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
-                            SEI
+                            {getTokenSymbol(
+                              incentive?.token as Address,
+                              networkClient,
+                            ) ?? ""}
                           </span>
                           <span className="text-sm text-text-primary">
                             {incentivesApr}

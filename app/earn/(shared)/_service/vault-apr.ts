@@ -13,7 +13,7 @@ import {
   baseMarkets,
   baseSepoliaMarkets,
 } from "@mangrovedao/mgv/addresses"
-import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
+import { VaultLPProgram } from "../_hooks/use-vaults-list"
 import { abi } from "./abi"
 import { calculateIncentiveAPR } from "./vault-incentives-apr"
 

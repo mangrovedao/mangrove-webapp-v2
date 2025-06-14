@@ -3,7 +3,7 @@ import React, { useEffect, useMemo } from "react"
 
 import { Vault } from "@/app/earn/(shared)/types"
 
-import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/utils"
 import Dialog from "@/components/dialogs/dialog-new"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"

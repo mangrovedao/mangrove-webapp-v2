@@ -3,7 +3,7 @@ import { z } from "zod"
 import { vaultIncentivesSchema } from "@/app/rewards/schemas/rewards-configuration"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { PublicClient } from "viem/_types/clients/createPublicClient"
-import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
+import { VaultLPProgram } from "../_hooks/use-vaults-list"
 
 /**
  * Calculates the total APR for a vault, including AAVE yields, trading fees, and incentives
