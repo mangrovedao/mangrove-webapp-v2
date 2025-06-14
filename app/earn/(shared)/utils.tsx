@@ -6,7 +6,7 @@ import { ReactNode } from "react"
 import { Address, Chain, parseAbi, PublicClient, zeroAddress } from "viem"
 import { AnimatedSkeleton } from "./components/animated-skeleton"
 import { pnlSchema, priceSchema } from "./schemas"
-import { Vault } from "./types"
+import { CompleteVault, VaultList } from "./types"
 
 // ============= CONTRACT INTERFACES =============
 
@@ -185,22 +185,29 @@ export const LineRewards = ({
 }
 
 export const createVault = (
-  whitelistVault: any,
+  vaultList: VaultList,
   backendData?: any,
   kandelAddress?: Address,
   apr?: number,
-): Vault => {
+): CompleteVault => {
   return {
-    symbol: "",
-    incentivesApr: 0,
-    apr: apr || backendData?.apr || 0,
-    decimals: 18,
+    ...vaultList,
+    kandelApr: apr || backendData?.apr || 0,
+    totalInQuote: backendData?.totalInQuote || 0n,
+    underlyingBalances: backendData?.underlyingBalances || [],
+    totalSupply: backendData?.totalSupply || 0n,
+    balanceOf: backendData?.balanceOf || 0n,
+    feeData: backendData?.feeData || [],
+    symbol: backendData?.symbol || "",
+    decimals: backendData?.decimals || 18,
+    lastTotalInQuote: backendData?.lastTotalInQuote || 0n,
+    lastTimestamp: backendData?.lastTimestamp || 0n,
     mintedAmount: 0n,
     managementFee: 0,
     totalRewards: 0,
     performanceFee: 0,
-    address: whitelistVault.address,
-    market: whitelistVault.market,
+    address: vaultList.address,
+    market: vaultList.market,
     totalBase: 0n,
     totalQuote: 0n,
     balanceBase: 0n,
@@ -208,10 +215,6 @@ export const createVault = (
     tvl: backendData?.tvl || 0n,
     baseDollarPrice: 0,
     quoteDollarPrice: 0,
-    strategist: whitelistVault.manager || "",
-    type: whitelistVault.strategyType || "",
-    isActive: true,
-    deprecated: whitelistVault.isDeprecated ?? false,
     userBaseBalance: 0n,
     userQuoteBalance: 0n,
     kandel: kandelAddress || zeroAddress,

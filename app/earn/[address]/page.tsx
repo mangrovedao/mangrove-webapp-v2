@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import React, { ReactNode, useEffect, useState } from "react"
+import React, { ReactNode, useState } from "react"
 import { Address, formatUnits } from "viem"
 
 import {
@@ -31,12 +31,16 @@ import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { useNetworkClient } from "@/hooks/use-network-client"
 import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { shortenAddress } from "@/utils/wallet"
 import { Line, getChainImage } from "../(shared)/utils"
+import { useClaimRewards } from "./_hooks/use-claim-rewards"
+import { useRewardsInfo } from "./_hooks/use-rewards-info"
 import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
 import { DepositForm } from "./form/deposit-form"
@@ -48,14 +52,15 @@ enum Action {
 }
 
 export default function Page() {
+  const params = useParams<{ address: Address }>()
   const { defaultChain } = useDefaultChain()
   const [action, setAction] = React.useState(Action.Deposit)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const params = useParams<{ address: Address }>()
+  const client = useNetworkClient()
 
   // Check if we're on mobile
-  useEffect(() => {
+  React.useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 1024) // lg breakpoint
     }
@@ -70,13 +75,25 @@ export default function Page() {
 
   const {
     data: { vault },
+    isLoading: isLoadingVault,
   } = useVault(params.address)
 
-  useEffect(() => {
-    if (vault?.isDeprecated) {
-      setAction(Action.Withdraw)
-    }
-  }, [vault])
+  const incentive = vault?.incentives.find(
+    (i) => i.vault.toLowerCase() === vault?.address.toLowerCase(),
+  )
+
+  const { data: rewardsInfo, isLoading: isLoadingRewards } = useRewardsInfo({
+    rewardToken: incentive?.tokenAddress,
+  })
+
+  const { mutate: claimRewards, isPending: isClaiming } = useClaimRewards()
+
+  const incentivesApr =
+    vault?.incentives?.find(
+      (i) => i.vault.toLowerCase() === vault?.address.toLowerCase(),
+    )?.apy || 0
+
+  const isLoading = isLoadingVault || isLoadingRewards
 
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
@@ -226,7 +243,12 @@ export default function Page() {
 
             <GridLineHeader
               title={"APR"}
-              value={vault?.apr ? vault?.apr.toFixed(2) : "0"}
+              value={
+                vault?.kandelApr
+                  ? (vault?.kandelApr + incentivesApr).toFixed(2)
+                  : "0"
+              }
+              info={`Strategy APR: ${vault?.kandelApr?.toFixed(2)}% + Incentives APR: ${incentivesApr.toFixed(2)}%`}
               symbol={"%"}
             />
             <GridLineHeader title={"Strategy"} value={vault?.strategyType} />
@@ -459,15 +481,18 @@ export default function Page() {
                 title={"Partner Rewards"}
                 value={
                   <div className="flex items-center gap-1">
-                    <span className="text-text-secondary !text-md">SEI</span>
-                    <FlowingNumbers
-                      className="text-md"
-                      initialValue={vault?.incentivesData?.rewards || 0}
-                      ratePerSecond={
-                        vault?.incentivesData?.currentRewardsPerSecond || 0
-                      }
-                      decimals={6}
-                    />
+                    <span className="text-text-secondary !text-md">
+                      {rewardsInfo?.symbol}
+                    </span>
+
+                    {rewardsInfo?.claimable && (
+                      <FlowingNumbers
+                        className="text-md"
+                        initialValue={rewardsInfo?.claimable ?? 0}
+                        ratePerSecond={0}
+                        decimals={2}
+                      />
+                    )}
                   </div>
                 }
               />
@@ -481,7 +506,9 @@ export default function Page() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.8 }}
                     >
-                      <span className="flex gap-1 text-md">WSEI</span>
+                      <span className="flex gap-1 text-md">
+                        {rewardsInfo?.symbol}
+                      </span>
                     </motion.div>
                   }
                 />
@@ -489,7 +516,11 @@ export default function Page() {
                   title={"Accruing"}
                   value={
                     <div className="flex items-center gap-1">
-                      <span className="!text-md">0</span>
+                      {isLoading ? (
+                        <Skeleton className="w-10 h-4" />
+                      ) : (
+                        <span className="!text-md">0</span>
+                      )}
                     </div>
                   }
                 />
@@ -502,15 +533,25 @@ export default function Page() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.9 }}
                     >
-                      {vault?.pnlData?.pnl
-                        ? `${vault?.pnlData?.pnl.toFixed(2)}%`
-                        : "0"}
+                      {rewardsInfo?.claimable.toFixed(2)}
                     </motion.span>
                   }
                   symbol={""}
                 />
               </div>
-              <Button className="w-full mt-2" disabled>
+              <Button
+                className="w-full mt-2"
+                disabled={!rewardsInfo?.claimable || isClaiming}
+                onClick={() => {
+                  if (!incentive?.tokenAddress) return
+                  claimRewards({
+                    rewardToken: incentive?.tokenAddress as Address,
+                    amount: rewardsInfo?.claimable || 0,
+                    proof:
+                      (rewardsInfo?.rewards?.proof as `0x${string}`[]) || [],
+                  })
+                }}
+              >
                 Claim
               </Button>
             </NeonContainer>
@@ -557,9 +598,6 @@ export default function Page() {
                       </CustomRadioGroup>
                     </div>
                     <div className="relative min-h-[400px] h-full">
-                      <div className="flex justify-center items-center mb-4">
-                        sss
-                      </div>
                       <AnimatePresence mode="wait">
                         {action === Action.Deposit && !vault?.isDeprecated ? (
                           <motion.div
@@ -704,7 +742,10 @@ export default function Page() {
       </motion.div>
 
       {/* Drawer for Action Selection and Form */}
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      <Drawer
+        open={isDrawerOpen}
+        onOpenChange={() => setIsDrawerOpen(!isDrawerOpen)}
+      >
         <Drawer.Content className="h-[80vh] p-4 bg-bg-primary">
           <div className="flex justify-center mb-4">
             <div className="w-12 h-1 bg-bg-tertiary rounded-sm" />

@@ -3,9 +3,9 @@ import { useEffect, useState } from "react"
 import { Address } from "viem"
 import { usePublicClient } from "wagmi"
 
-import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { useVaultsList } from "@/app/earn/(shared)/_hooks/use-vaults-list"
 import { kandelSchema } from "@/app/earn/(shared)/schemas"
-import { Vault } from "@/app/earn/(shared)/types"
+import { CompleteVault } from "@/app/earn/(shared)/types"
 import { createVault, VaultABI } from "@/app/earn/(shared)/utils"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
@@ -13,9 +13,9 @@ import { getIndexerUrl } from "@/utils/get-indexer-url"
 export function useVaultsData() {
   const { defaultChain } = useDefaultChain()
   const publicClient = usePublicClient()
-  const vaultWhitelist = useVaultsWhitelist()
+  const { data: vaultList } = useVaultsList()
 
-  const [vaults, setVaults] = useState<Vault[]>([])
+  const [vaults, setVaults] = useState<CompleteVault[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -43,7 +43,7 @@ export function useVaultsData() {
 
   useEffect(() => {
     const fetchVaults = async () => {
-      if (!defaultChain || !publicClient) return
+      if (!defaultChain || !publicClient || !vaultList) return
 
       setIsLoading(true)
       setError(null)
@@ -73,7 +73,7 @@ export function useVaultsData() {
         let aprMap = new Map()
 
         try {
-          const kandelContracts = vaultWhitelist.map((vault) => ({
+          const kandelContracts = vaultList.map((vault) => ({
             address: vault.address,
             abi: VaultABI,
             functionName: "kandel",
@@ -89,7 +89,7 @@ export function useVaultsData() {
             if (result.status === "success" && result.result) {
               const kandelAddress = result.result as Address
               kandelMap.set(
-                vaultWhitelist[index]!.address.toLowerCase(),
+                vaultList[index]?.address.toLowerCase() ?? "vault-not-found",
                 kandelAddress,
               )
             }
@@ -114,25 +114,19 @@ export function useVaultsData() {
         }
 
         // Transform whitelist to vault objects with all available data
-        const vaultsData = vaultWhitelist.map((whitelistVault) => {
-          const vaultKey = whitelistVault.address.toLowerCase()
+        const vaultsData = vaultList.map((vault) => {
+          const vaultKey = vault.address.toLowerCase()
           const backendData = backendDataMap.get(vaultKey)
           const kandelAddress = kandelMap.get(vaultKey)
           const apr = aprMap.get(vaultKey)
 
-          return createVault(whitelistVault, backendData, kandelAddress, apr)
+          return createVault(vault, backendData, kandelAddress, apr)
         })
 
         setVaults(vaultsData)
       } catch (error) {
         console.error("Failed to fetch vault data:", error)
         setError("Failed to load vault data")
-
-        // Ultimate fallback: just transform whitelist
-        const fallbackVaults = vaultWhitelist.map((whitelistVault) =>
-          createVault(whitelistVault),
-        )
-        setVaults(fallbackVaults)
       } finally {
         setIsLoading(false)
       }

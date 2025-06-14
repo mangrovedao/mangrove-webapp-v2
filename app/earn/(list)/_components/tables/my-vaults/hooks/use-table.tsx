@@ -12,19 +12,19 @@ import React from "react"
 import { formatUnits } from "viem"
 
 import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
-import { Vault } from "@/app/earn/(shared)/types"
+import { CompleteVault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { formatNumber } from "@/utils/numbers"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
-const columnHelper = createColumnHelper<Vault>()
-const DEFAULT_DATA: Vault[] = []
+const columnHelper = createColumnHelper<CompleteVault>()
+const DEFAULT_DATA: CompleteVault[] = []
 
 type Params = {
-  data?: Vault[]
+  data?: CompleteVault[]
   pageSize: number
-  onManage: (vault: Vault) => void
+  onManage: (vault: CompleteVault) => void
   isLoading: boolean
 }
 
@@ -78,9 +78,9 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
       columnHelper.display({
         header: "Strategy",
         cell: ({ row }) => {
-          const { type } = row.original
+          const { strategyType } = row.original
           const isTrusted = true
-          return <Value value={type} trusted={isTrusted} />
+          return <Value value={strategyType} trusted={isTrusted} />
         },
       }),
 
@@ -107,10 +107,10 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
           } = row.original
 
           const value =
-            Number(formatUnits(userBaseBalance, market.base.decimals)) *
-              baseDollarPrice +
-            Number(formatUnits(userQuoteBalance, market.quote.decimals)) *
-              quoteDollarPrice
+            Number(formatUnits(userBaseBalance ?? 0n, market.base.decimals)) *
+              (baseDollarPrice ?? 0) +
+            Number(formatUnits(userQuoteBalance ?? 0n, market.quote.decimals)) *
+              (quoteDollarPrice ?? 0)
 
           return (
             <div className="text-right w-full">
@@ -127,10 +127,10 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
         id: "Curator",
         header: () => <span className="text-right w-full block">Curator</span>,
         cell: ({ row }) => {
-          const { strategist } = row.original
+          const { manager } = row.original
           return (
             <div className="text-right w-full">
-              <Value value={strategist} className="justify-end" />
+              <Value value={manager} className="justify-end" />
             </div>
           )
         },
@@ -148,10 +148,19 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
             )
           }
 
-          const { apr } = row.original
+          const { kandelApr, incentives, address: vaultAddress } = row.original
+
+          const incentive = incentives?.find(
+            (i) => i.vault === vaultAddress.toLowerCase(),
+          )
+
+          const netApr = `${(
+            Number(kandelApr ?? 0) + Number(incentive?.apy ?? 0)
+          ).toFixed(2)}%`
+
           return (
             <div className="text-right w-full">
-              <Value value={`${apr.toFixed(2)}%`} className="justify-end" />
+              <Value value={netApr} className="justify-end" />
             </div>
           )
         },

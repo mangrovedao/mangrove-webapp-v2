@@ -2,7 +2,7 @@ import { Address } from "viem"
 import { useAccount } from "wagmi"
 import { z } from "zod"
 
-import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
+import { useVaultsList } from "@/app/earn/(shared)/_hooks/use-vaults-list"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getChainObjectById } from "@/utils/chains"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
@@ -126,43 +126,42 @@ const buildConsolidatedLeaderboard = (
 export const useIncentivesRewards = () => {
   const { address: user } = useAccount()
   const { defaultChain } = useDefaultChain()
-  const vaultIncentives = useVaultsIncentives()
+  const { data: vaults } = useVaultsList()
 
   return useQuery({
-    queryKey: [
-      "incentives-rewards",
-      vaultIncentives.length,
-      defaultChain.id,
-      user,
-    ],
+    queryKey: ["incentives-rewards", vaults?.length, defaultChain.id, user],
     queryFn: async (): Promise<LeaderboardEntry[]> => {
       try {
-        if (!vaultIncentives.length) {
+        if (!vaults?.length) {
           console.info("No vault incentives found for this chain")
           return []
         }
 
         // Fetch data for all vaults in parallel
         const responses = await Promise.all(
-          vaultIncentives.map((incentive) =>
-            fetchVaultIncentivesData(
-              defaultChain.id,
-              incentive.vault as Address,
-              incentive.startTimestamp,
-              incentive.endTimestamp,
-              incentive.rewardRate,
-              incentive.maxRewards,
-            ),
+          vaults.map((vault) =>
+            vault.incentives.map((incentive) => {
+              fetchVaultIncentivesData(
+                defaultChain.id,
+                vault.address,
+                incentive.startTimestamp,
+                incentive.endTimestamp,
+                incentive.rewardRate,
+                incentive.maxRewards,
+              )
+            }),
           ),
         )
 
         // Build and return consolidated leaderboard
-        return buildConsolidatedLeaderboard(responses)
+        return buildConsolidatedLeaderboard(
+          responses as unknown as VaultIncentivesApiResponse[],
+        )
       } catch (error) {
         console.error("Error fetching vault incentives:", error)
         return []
       }
     },
-    enabled: Boolean(defaultChain) && vaultIncentives.length > 0,
+    enabled: Boolean(defaultChain) && Boolean(vaults?.length),
   })
 }

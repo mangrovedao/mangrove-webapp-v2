@@ -3,7 +3,7 @@ import { z } from "zod"
 import { vaultIncentivesSchema } from "@/app/rewards/schemas/rewards-configuration"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { PublicClient } from "viem/_types/clients/createPublicClient"
-import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
+import { VaultIncentive } from "../types"
 
 /**
  * Calculates the total APR for a vault, including AAVE yields, trading fees, and incentives
@@ -13,7 +13,7 @@ import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
  */
 export async function getVaultIncentives(
   client: PublicClient,
-  incentives?: VaultLPProgram,
+  incentives?: VaultIncentive,
 ): Promise<z.infer<typeof vaultIncentivesSchema> | null> {
   try {
     if (!incentives) return null

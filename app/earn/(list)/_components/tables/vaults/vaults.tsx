@@ -32,7 +32,9 @@ export function Vaults() {
 
   // Filter vaults based on deprecated toggle
   const filteredVaults = useMemo(() => {
-    return showDeprecated ? vaults : vaults.filter((vault) => !vault.deprecated)
+    return showDeprecated
+      ? vaults
+      : vaults.filter((vault) => !vault.isDeprecated)
   }, [vaults, showDeprecated])
 
   const table = useTable({

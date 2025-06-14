@@ -8,14 +8,13 @@ import {
   type PublicClient,
 } from "viem"
 
-import { Vault, VaultWhitelist } from "@/app/earn/(shared)/types"
-import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 import { kandelSchema, multicallSchema } from "../schemas"
+import { CompleteVault, VaultList } from "../types"
 import {
-  VaultABI,
   calculateFees,
   fetchPnLData,
   fetchTokenPrices,
+  VaultABI,
 } from "../utils"
 import { getUserVaultIncentives } from "./vault-incentives-rewards"
 
@@ -73,11 +72,10 @@ const pnlCache = new TimedCache<string, any>(2 * 60 * 1000) // 2 minutes
  */
 export async function getVaultsInformation(
   client: PublicClient,
-  vaults: VaultWhitelist[],
+  vaults: VaultList[],
   user?: Address,
-  incentives?: VaultLPProgram[],
   incentivesRewards?: { vault: Address; total: number }[],
-): Promise<(Vault & VaultWhitelist)[]> {
+): Promise<CompleteVault[]> {
   if (!vaults.length) return []
 
   // Step 1: Efficiently collect all unique markets first to batch token price fetching
@@ -123,7 +121,6 @@ export async function getVaultsInformation(
     })
   }
 
-  // Step 3: Build optimized multicall - use larger batch size for simple read operations
   const batchSize = 25 // Increased batch size for better throughput
   const results: any[] = []
 
@@ -215,7 +212,7 @@ export async function getVaultsInformation(
 
   // Step 5: Process all vaults data in parallel with optimizations
   return Promise.all(
-    vaults.map(async (v, i): Promise<Vault & VaultWhitelist> => {
+    vaults.map(async (v, i): Promise<CompleteVault> => {
       // Extract and parse multicall results (11 calls per vault)
       const [
         _totalInQuote,
@@ -231,37 +228,6 @@ export async function getVaultsInformation(
         _kandel,
       ] = results.slice(i * 11)
 
-      // Handle potential failures in multicall
-      if (!_totalInQuote.result || !_underlyingBalances.result) {
-        // Return default stub data for failed vault queries
-        return {
-          ...v,
-          symbol: "",
-          apr: 0,
-          incentivesApr: 0,
-          decimals: 18,
-          mintedAmount: 0n,
-          managementFee: 0,
-          performanceFee: 0,
-          isDeprecated: true,
-          totalBase: 0n,
-          totalQuote: 0n,
-          totalRewards: 0,
-          balanceBase: 0n,
-          balanceQuote: 0n,
-          chainId: client.chain?.id,
-          tvl: 0n,
-          baseDollarPrice: 0,
-          quoteDollarPrice: 0,
-          strategist: v.manager,
-          type: v.strategyType,
-          isActive: false,
-          userBaseBalance: 0n,
-          userQuoteBalance: 0n,
-          kandel: _kandel.result,
-        }
-      }
-
       // Safely extract data from results
       const {
         totalInQuote,
@@ -274,6 +240,7 @@ export async function getVaultsInformation(
         decimals,
         lastTotalInQuote,
         lastTimestamp,
+        kandel,
       } = multicallSchema.parse({
         totalInQuote: _totalInQuote.result,
         underlyingBalances: _underlyingBalances.result,
@@ -285,6 +252,7 @@ export async function getVaultsInformation(
         decimals: _decimals.result,
         lastTotalInQuote: _lastTotalInQuote.result,
         lastTimestamp: _lastTimestamp.result,
+        kandel: _kandel.result as Address,
       })
 
       // Get token prices from cache
@@ -327,14 +295,21 @@ export async function getVaultsInformation(
         newTotalSupply <= 0n
           ? 0n
           : (underlyingBalances[1] * balanceOf) / newTotalSupply
-      const isActive = userBaseBalance > 0n || userQuoteBalance > 0n
+      const hasPosition = userBaseBalance > 0n || userQuoteBalance > 0n
 
       // Create result without expensive operations
-      const result: Vault & VaultWhitelist = {
+      const result: CompleteVault = {
         ...v,
+        totalInQuote: totalInQuote[0],
+        underlyingBalances,
         symbol,
-        apr: kandelApr,
-        incentivesApr: 0,
+        lastTotalInQuote,
+        lastTimestamp,
+        totalSupply,
+        balanceOf,
+        feeData: feeData.map((f) => BigInt(f)),
+        kandelApr,
+        kandel: kandel as Address,
         decimals,
         mintedAmount: balanceOf,
         performanceFee: (Number(feeData[0]) / 1e5) * 100,
@@ -343,29 +318,24 @@ export async function getVaultsInformation(
         totalQuote,
         totalRewards:
           incentivesRewards && Array.isArray(incentivesRewards)
-            ? incentivesRewards.find(
+            ? (incentivesRewards.find(
                 (i) => i.vault.toLowerCase() === v.address.toLowerCase(),
-              )?.total ?? 0
+              )?.total ?? 0)
             : 0,
         balanceBase,
         balanceQuote,
-        chainId: client.chain?.id,
         tvl: totalInQuote[0],
         baseDollarPrice,
         quoteDollarPrice,
-        strategist: v.manager,
-        type: v.strategyType,
-        isActive,
+        hasPosition,
         userBaseBalance,
-        deprecated: v.isDeprecated,
         userQuoteBalance,
-        pnlData: undefined,
+        pnlData: null,
         incentivesData: null,
-        kandel: _kandel.result,
       }
 
       // Only fetch PnL data if user is connected and has a position (do this last as it's expensive)
-      if (user && isActive) {
+      if (user && hasPosition) {
         // Check PnL cache
         const pnlCacheKey = `${v.address}_${user}_${client.chain?.id}`
         let pnlData = pnlCache.get(pnlCacheKey)
@@ -389,7 +359,7 @@ export async function getVaultsInformation(
           result.incentivesData = await getUserVaultIncentives(
             client,
             user,
-            incentives?.find(
+            v.incentives?.find(
               (item) => item.vault.toLowerCase() === v.address.toLowerCase(),
             ),
           )

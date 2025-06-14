@@ -3,7 +3,7 @@ import { z } from "zod"
 
 import { incentiveResponseSchema } from "@/app/rewards/schemas/rewards-configuration"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
-import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
+import { VaultIncentive } from "../types"
 
 /**
  * Calculates the total APR for a vault, including AAVE yields, trading fees, and incentives
@@ -14,7 +14,7 @@ import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
 export async function getUserVaultIncentives(
   client: PublicClient,
   user?: Address,
-  incentives?: VaultLPProgram,
+  incentives?: VaultIncentive,
 ): Promise<z.infer<typeof incentiveResponseSchema> | null> {
   try {
     if (!user || !incentives) return null

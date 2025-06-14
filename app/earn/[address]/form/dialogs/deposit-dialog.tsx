@@ -1,9 +1,9 @@
 import type { Token } from "@mangrovedao/mgv"
 import React, { useEffect, useMemo } from "react"
 
-import { Vault } from "@/app/earn/(shared)/types"
+import { CompleteVault } from "../../../(shared)/types"
 
-import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
+import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/utils"
 import Dialog from "@/components/dialogs/dialog-new"
 import { TokenPair } from "@/components/token-pair"
 import { Text } from "@/components/typography/text"
@@ -25,7 +25,7 @@ import { ApproveStep } from "../components/approve-step-new"
 import { Steps } from "../components/steps"
 
 type Props = {
-  vault?: Vault
+  vault?: CompleteVault
   baseAmount: string
   quoteAmount: string
   mintAmount: bigint

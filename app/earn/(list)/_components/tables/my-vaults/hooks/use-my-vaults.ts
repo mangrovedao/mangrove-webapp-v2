@@ -1,13 +1,11 @@
 "use client"
 
-import { useVaultsWhitelist } from "@/app/earn/(shared)/_hooks/use-vaults-addresses"
-import { useVaultsIncentives } from "@/app/earn/(shared)/_hooks/use-vaults-incentives"
+import { useVaultsList } from "@/app/earn/(shared)/_hooks/use-vaults-list"
 import { getVaultIncentives } from "@/app/earn/(shared)/_service/vault-incentives"
-import { Vault } from "@/app/earn/(shared)/types"
+import { CompleteVault } from "@/app/earn/(shared)/types"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { PublicClient } from "viem"
 import { useAccount } from "wagmi"
 import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
 
@@ -16,7 +14,7 @@ type Params<T> = {
     first?: number
     skip?: number
   }
-  select?: (data: Vault[]) => T
+  select?: (data: CompleteVault[]) => T
 }
 
 // Cache key helper for consistency
@@ -28,7 +26,7 @@ const getMyVaultsQueryKey = (
   first = 10,
 ) => ["my-vaults", networkKey, user, chainId, skip, first]
 
-export function useMyVaults<T = Vault[]>({
+export function useMyVaults<T = CompleteVault[]>({
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
@@ -37,8 +35,7 @@ export function useMyVaults<T = Vault[]>({
   const { defaultChain } = useDefaultChain()
   const queryClient = useQueryClient()
 
-  const plainVaults = useVaultsWhitelist()
-  const incentives = useVaultsIncentives()
+  const { data: vaultsList } = useVaultsList()
 
   // Query key with pagination parameters
   const queryKey = getMyVaultsQueryKey(
@@ -50,23 +47,23 @@ export function useMyVaults<T = Vault[]>({
   )
 
   // Get the previous data for all pages as potential placeholder
-  const previousVaultsData = queryClient.getQueryData<Vault[]>(
+  const previousVaultsData = queryClient.getQueryData<CompleteVault[]>(
     getMyVaultsQueryKey(networkClient?.key, user, defaultChain.id),
   )
 
   const { data, ...rest } = useQuery({
     queryKey,
-    queryFn: async (): Promise<Vault[]> => {
+    queryFn: async (): Promise<CompleteVault[]> => {
       try {
         if (!networkClient?.key) throw new Error("Public client is not enabled")
-        if (!plainVaults) return []
+        if (!vaultsList) throw new Error("Vaults not found")
 
         // Get incentives data in parallel with other operations
         const incentivesData = await Promise.all(
-          plainVaults.map(async (vault) => {
+          vaultsList.map(async (vault) => {
             const data = await getVaultIncentives(
-              networkClient as PublicClient,
-              incentives.find(
+              networkClient,
+              vault.incentives.find(
                 (i) => i.vault.toLowerCase() === vault.address.toLowerCase(),
               ),
             )
@@ -82,20 +79,19 @@ export function useMyVaults<T = Vault[]>({
         )
 
         const vaults = await getVaultsInformation(
-          networkClient as PublicClient,
-          plainVaults,
+          networkClient,
+          vaultsList,
           user,
-          incentives,
           incentivesData,
         )
-        return vaults.filter((v) => v.isActive)
+        return vaults
       } catch (error) {
         console.error(error)
         return []
       }
     },
     placeholderData: previousVaultsData,
-    enabled: !!networkClient?.key && !!user && !!plainVaults.length,
+    enabled: !!networkClient?.key && !!user && !!vaultsList?.length,
     staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh longer
     gcTime: 10 * 60 * 1000, // 10 minutes - data stays in cache longer
     refetchOnWindowFocus: false,

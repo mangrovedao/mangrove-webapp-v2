@@ -1,5 +1,7 @@
 import type { Token } from "@mangrovedao/mgv"
+import { useQueryClient } from "@tanstack/react-query"
 import React, { useEffect, useMemo } from "react"
+import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 
 import { ApproveStep } from "@/app/trade/_components/forms/components/approve-step"
 import Dialog from "@/components/dialogs/dialog"
@@ -8,8 +10,6 @@ import { Text } from "@/components/typography/text"
 import { Button, type ButtonProps } from "@/components/ui/button-old"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { useQueryClient } from "@tanstack/react-query"
-import { erc20Abi, parseAbi, parseUnits, type Address } from "viem"
 import {
   useAccount,
   useReadContracts,
@@ -18,10 +18,11 @@ import {
   useWriteContract,
 } from "wagmi"
 import { Steps } from "../components/steps"
-import { Vault } from "../types"
+
+import { CompleteVault } from "../../../(shared)/types"
 
 type Props = {
-  vault?: Vault
+  vault?: CompleteVault
   baseAmount: string
   quoteAmount: string
   mintAmount: bigint
@@ -138,12 +139,16 @@ export default function AddToVaultDialog({
       : 2
     : 1
 
+  // note: to check if the base token is the token0 of the market
+  const baseIsToken0 = vault?.market.base.address === baseToken.address
+
   const amount0 = useMemo(() => {
-    return vault?.baseIsToken0 ? baseAmount : quoteAmount
-  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+    return baseIsToken0 ? baseAmount : quoteAmount
+  }, [baseIsToken0, baseAmount, quoteAmount])
+
   const amount1 = useMemo(() => {
-    return vault?.baseIsToken0 ? quoteAmount : baseAmount
-  }, [vault?.baseIsToken0, baseAmount, quoteAmount])
+    return baseIsToken0 ? quoteAmount : baseAmount
+  }, [baseIsToken0, baseAmount, quoteAmount])
 
   const result = useSimulateContract({
     address: vault?.address,

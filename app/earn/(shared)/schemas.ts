@@ -1,3 +1,4 @@
+import { Address } from "viem"
 import { z } from "zod"
 
 export const multicallSchema = z.object({
@@ -11,6 +12,7 @@ export const multicallSchema = z.object({
   decimals: z.number(),
   lastTotalInQuote: z.bigint(),
   lastTimestamp: z.bigint(),
+  kandel: z.string(),
 })
 
 export const pnlSchema = z.object({
@@ -53,3 +55,53 @@ export const kandelSchema = z.object({
   }),
   timestamp: z.number(),
 })
+
+const AddressSchema = z.string().transform((val) => val as Address)
+
+const MarketTokenSchema = z.object({
+  address: AddressSchema,
+  symbol: z.string(),
+  decimals: z.number(),
+  displayDecimals: z.number(),
+  priceDisplayDecimals: z.number(),
+  mgvTestToken: z.boolean(),
+})
+
+const MarketSchema = z.object({
+  base: MarketTokenSchema,
+  quote: MarketTokenSchema,
+  tickSpacing: z.string(),
+})
+
+export const IncentiveSchema = z.object({
+  vault: AddressSchema,
+  startTimestamp: z.number(),
+  endTimestamp: z.number(),
+  maxRewards: z.number(),
+  rewardRate: z.number(),
+  apy: z.number(),
+  stakedTokenPrice: z.number(),
+  rewardTokenPrice: z.number(),
+  token: z.string(),
+  tokenAddress: AddressSchema,
+})
+
+const SocialsSchema = z.object({
+  x: z.string(),
+  website: z.string(),
+})
+
+export const VaultSchema = z.object({
+  isDeprecated: z.boolean(),
+  manager: z.string(),
+  address: AddressSchema,
+  oracle: AddressSchema,
+  market: MarketSchema,
+  strategyType: z.string(),
+  description: z.string(),
+  descriptionBonus: z.string(),
+  socials: SocialsSchema,
+  incentives: z.array(IncentiveSchema),
+})
+
+export const VaultsResponseSchema = z.array(VaultSchema)

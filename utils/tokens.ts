@@ -3,6 +3,7 @@ import { MarketParams } from "@mangrovedao/mgv"
 
 import icons from "@/generated/icons.json"
 import type { useMarkets } from "@/hooks/use-addresses"
+import { Address, erc20Abi, PublicClient } from "viem"
 
 const IMG_BASE_PATH = "/cryptocurrency-icons/svg/color"
 
@@ -81,6 +82,26 @@ export function getTokenByAddress(
     )
 
   return token
+}
+
+export async function getTokenSymbol(
+  address: Address,
+  client: PublicClient,
+): Promise<string | undefined> {
+  try {
+    if (!address) return undefined
+
+    const data = await client.readContract({
+      address: address,
+      abi: erc20Abi,
+      functionName: "symbol",
+    })
+
+    return data
+  } catch (e) {
+    console.error("Error fetching token symbol:", e)
+    return undefined
+  }
 }
 
 export function getTokenByAddressOdos(

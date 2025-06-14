@@ -13,7 +13,8 @@ import {
   baseMarkets,
   baseSepoliaMarkets,
 } from "@mangrovedao/mgv/addresses"
-import { VaultLPProgram } from "../_hooks/use-vaults-incentives"
+
+import { VaultIncentive } from "../types"
 import { abi } from "./abi"
 import { calculateIncentiveAPR } from "./vault-incentives-apr"
 
@@ -155,7 +156,7 @@ async function calculateAaveAPR(
 export async function getVaultAPR(
   client: PublicClient,
   vault: Address,
-  incentives?: VaultLPProgram,
+  incentives?: VaultIncentive,
   fdv?: number,
 ): Promise<{ totalAPR: number; incentivesApr: number }> {
   try {
