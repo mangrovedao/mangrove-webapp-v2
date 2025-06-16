@@ -79,7 +79,7 @@ export const IncentiveSchema = z.object({
   endTimestamp: z.number(),
   maxRewards: z.number(),
   rewardRate: z.number(),
-  apy: z.number(),
+  apy: z.number().transform((val) => val * 100),
   stakedTokenPrice: z.number(),
   rewardTokenPrice: z.number(),
   token: z.string(),

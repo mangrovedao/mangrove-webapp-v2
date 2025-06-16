@@ -1,6 +1,7 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useQuery } from "@tanstack/react-query"
 import { VaultsResponseSchema } from "../schemas"
+import { getCurrentIncentive } from "../utils"
 
 export function useVaultsList() {
   const { defaultChain } = useDefaultChain()
@@ -12,8 +13,12 @@ export function useVaultsList() {
         `https://api.mgvinfra.com/registry/whitelist?chainId=${defaultChain.id}`,
       )
       const data = await response.json()
-      console.log(data)
-      return VaultsResponseSchema.parse(data)
+
+      const parsedData = VaultsResponseSchema.parse(data)
+      return parsedData.map((vault) => ({
+        ...vault,
+        incentives: getCurrentIncentive(vault.incentives),
+      }))
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

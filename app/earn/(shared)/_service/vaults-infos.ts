@@ -252,7 +252,7 @@ export async function getVaultsInformation(
         decimals: _decimals.result,
         lastTotalInQuote: _lastTotalInQuote.result,
         lastTimestamp: _lastTimestamp.result,
-        kandel: _kandel.result as Address,
+        kandel: _kandel.result,
       })
 
       // Get token prices from cache
@@ -339,7 +339,7 @@ export async function getVaultsInformation(
         result.incentivesData = await getUserVaultIncentives(
           client,
           user,
-          v.incentives[0],
+          v.incentives,
         )
       } catch (e) {
         console.error(`Failed to fetch incentives for ${v.address}:`, e)
