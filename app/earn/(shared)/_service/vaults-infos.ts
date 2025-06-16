@@ -252,7 +252,7 @@ export async function getVaultsInformation(
         decimals: _decimals.result,
         lastTotalInQuote: _lastTotalInQuote.result,
         lastTimestamp: _lastTimestamp.result,
-        kandel: _kandel.result as Address,
+        kandel: _kandel.result,
       })
 
       // Get token prices from cache
@@ -334,6 +334,17 @@ export async function getVaultsInformation(
         incentivesData: null,
       }
 
+      // Fetch user-specific incentives data
+      try {
+        result.incentivesData = await getUserVaultIncentives(
+          client,
+          user,
+          v.incentives,
+        )
+      } catch (e) {
+        console.error(`Failed to fetch incentives for ${v.address}:`, e)
+      }
+
       // Only fetch PnL data if user is connected and has a position (do this last as it's expensive)
       if (user && hasPosition) {
         // Check PnL cache
@@ -352,19 +363,6 @@ export async function getVaultsInformation(
           }
         } else {
           result.pnlData = pnlData
-        }
-
-        // Fetch user-specific incentives data
-        try {
-          result.incentivesData = await getUserVaultIncentives(
-            client,
-            user,
-            v.incentives?.find(
-              (item) => item.vault.toLowerCase() === v.address.toLowerCase(),
-            ),
-          )
-        } catch (e) {
-          console.error(`Failed to fetch incentives for ${v.address}:`, e)
         }
       }
 

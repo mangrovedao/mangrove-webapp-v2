@@ -63,9 +63,7 @@ export function useMyVaults<T = CompleteVault[]>({
           vaultsList.map(async (vault) => {
             const data = await getVaultIncentives(
               networkClient,
-              vault.incentives.find(
-                (i) => i.vault.toLowerCase() === vault.address.toLowerCase(),
-              ),
+              vault.incentives,
             )
             return {
               vault: vault.address,

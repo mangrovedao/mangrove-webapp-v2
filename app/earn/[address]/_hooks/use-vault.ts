@@ -84,9 +84,7 @@ export function useVault(address?: string | null) {
     enabled: !!networkClient && !!vaultsList?.length,
     staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh longer
     gcTime: 10 * 60 * 1000, // 10 minutes - data stays in cache longer
-    refetchOnWindowFocus: false,
-    retry: 3, // Retry up to 3 times if fails
-    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000), // Exponential backoff
+    refetchOnWindowFocus: true,
     initialData: { vault: undefined },
   })
 }

@@ -33,10 +33,10 @@ import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useNetworkClient } from "@/hooks/use-network-client"
 import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { shortenAddress } from "@/utils/wallet"
 import { Line, getChainImage } from "../(shared)/utils"
 import { useClaimRewards } from "./_hooks/use-claim-rewards"
@@ -57,7 +57,6 @@ export default function Page() {
   const [action, setAction] = React.useState(Action.Deposit)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const client = useNetworkClient()
 
   // Check if we're on mobile
   React.useEffect(() => {
@@ -78,20 +77,13 @@ export default function Page() {
     isLoading: isLoadingVault,
   } = useVault(params.address)
 
-  const incentive = vault?.incentives.find(
-    (i) => i.vault.toLowerCase() === vault?.address.toLowerCase(),
-  )
-
   const { data: rewardsInfo, isLoading: isLoadingRewards } = useRewardsInfo({
-    rewardToken: incentive?.tokenAddress,
+    rewardToken: vault?.incentives?.tokenAddress,
   })
 
   const { mutate: claimRewards, isPending: isClaiming } = useClaimRewards()
 
-  const incentivesApr =
-    vault?.incentives?.find(
-      (i) => i.vault.toLowerCase() === vault?.address.toLowerCase(),
-    )?.apy || 0
+  const incentivesApr = vault?.incentives?.apy || 0
 
   const isLoading = isLoadingVault || isLoadingRewards
 
@@ -300,28 +292,6 @@ export default function Page() {
             )}
           </motion.div>
 
-          {/* Graphs */}
-          <motion.div
-            className="flex justify-center items-center mx-5"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.5,
-              delay: 0.6,
-              type: "spring",
-              stiffness: 100,
-            }}
-            whileHover={{ scale: 1.01 }}
-          >
-            {/* <ImageWithHideOnError
-              src={`/assets/illustrations/vault-graph-placeholder.png`}
-              width={832}
-              height={382}
-              alt={`vault-graph-placeholder`}
-              className="rounded-sm shadow-lg"
-            /> */}
-          </motion.div>
-
           {/* Vault details */}
           <motion.div
             className="mx-5"
@@ -466,17 +436,6 @@ export default function Page() {
         >
           <div className="grid gap-8">
             <NeonContainer className="relative  ">
-              <motion.div
-                className="absolute -top-4 -right-2 rounded-sm overflow-hidden"
-                initial={{ rotate: -1, y: -1 }}
-                animate={{ rotate: 0, y: 0 }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                }}
-              ></motion.div>
               <GridLine
                 title={"Partner Rewards"}
                 value={
@@ -485,14 +444,7 @@ export default function Page() {
                       {rewardsInfo?.symbol}
                     </span>
 
-                    {rewardsInfo?.claimable && (
-                      <FlowingNumbers
-                        className="text-md"
-                        initialValue={rewardsInfo?.claimable ?? 0}
-                        ratePerSecond={0}
-                        decimals={2}
-                      />
-                    )}
+                    <span>{vault?.incentives?.maxRewards}</span>
                   </div>
                 }
               />
@@ -512,18 +464,7 @@ export default function Page() {
                     </motion.div>
                   }
                 />
-                <GridLine
-                  title={"Accruing"}
-                  value={
-                    <div className="flex items-center gap-1">
-                      {isLoading ? (
-                        <Skeleton className="w-10 h-4" />
-                      ) : (
-                        <span className="!text-md">0</span>
-                      )}
-                    </div>
-                  }
-                />
+
                 <GridLine
                   title={"Claimable"}
                   value={
@@ -538,14 +479,34 @@ export default function Page() {
                   }
                   symbol={""}
                 />
+
+                <GridLine
+                  title={"Accruing"}
+                  value={
+                    <div className="flex items-center gap-1">
+                      {isLoading ? (
+                        <Skeleton className="w-10 h-4" />
+                      ) : (
+                        <FlowingNumbers
+                          className="!text-md"
+                          initialValue={vault?.incentivesData?.rewards || 0}
+                          ratePerSecond={
+                            vault?.incentivesData?.currentRewardsPerSecond || 0
+                          }
+                          decimals={6}
+                        />
+                      )}
+                    </div>
+                  }
+                />
               </div>
               <Button
                 className="w-full mt-2"
                 disabled={!rewardsInfo?.claimable || isClaiming}
                 onClick={() => {
-                  if (!incentive?.tokenAddress) return
+                  if (!vault?.incentives?.tokenAddress) return
                   claimRewards({
-                    rewardToken: incentive?.tokenAddress as Address,
+                    rewardToken: vault?.incentives?.tokenAddress as Address,
                     amount: rewardsInfo?.claimable || 0,
                     proof:
                       (rewardsInfo?.rewards?.proof as `0x${string}`[]) || [],
@@ -668,17 +629,13 @@ export default function Page() {
                     </Caption>
                   </div>
                 }
-                value={
-                  Number(
-                    formatUnits(
-                      vault?.userBaseBalance || 0n,
-                      vault?.market.base.decimals || 18,
-                    ),
-                  ).toLocaleString(undefined, {
-                    maximumFractionDigits:
-                      vault?.market.base.displayDecimals || 3,
-                  }) || "0"
-                }
+                value={getExactWeiAmount(
+                  formatUnits(
+                    vault?.userBaseBalance || 0n,
+                    vault?.market.base.decimals || 18,
+                  ),
+                  vault?.market.base.priceDisplayDecimals || 6,
+                )}
               />
               <Line
                 title={
@@ -698,17 +655,13 @@ export default function Page() {
                     </Caption>
                   </div>
                 }
-                value={
-                  Number(
-                    formatUnits(
-                      vault?.userQuoteBalance || 0n,
-                      vault?.market.quote.decimals || 18,
-                    ),
-                  ).toLocaleString(undefined, {
-                    maximumFractionDigits:
-                      vault?.market.quote.displayDecimals || 3,
-                  }) || "0"
-                }
+                value={getExactWeiAmount(
+                  formatUnits(
+                    vault?.userQuoteBalance || 0n,
+                    vault?.market.quote.decimals || 18,
+                  ),
+                  vault?.market.quote.priceDisplayDecimals || 6,
+                )}
               />
             </div>
           </motion.div>

@@ -140,16 +140,14 @@ export const useIncentivesRewards = () => {
         // Fetch data for all vaults in parallel
         const responses = await Promise.all(
           vaults.map((vault) =>
-            vault.incentives.map((incentive) => {
-              fetchVaultIncentivesData(
-                defaultChain.id,
-                vault.address,
-                incentive.startTimestamp,
-                incentive.endTimestamp,
-                incentive.rewardRate,
-                incentive.maxRewards,
-              )
-            }),
+            fetchVaultIncentivesData(
+              defaultChain.id,
+              vault.address,
+              vault.incentives?.startTimestamp ?? 0,
+              vault.incentives?.endTimestamp ?? 0,
+              vault.incentives?.rewardRate ?? 0,
+              vault.incentives?.maxRewards ?? 0,
+            ),
           ),
         )
 

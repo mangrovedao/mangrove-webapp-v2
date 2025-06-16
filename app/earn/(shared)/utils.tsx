@@ -6,7 +6,7 @@ import { ReactNode } from "react"
 import { Address, Chain, parseAbi, PublicClient, zeroAddress } from "viem"
 import { AnimatedSkeleton } from "./components/animated-skeleton"
 import { pnlSchema, priceSchema } from "./schemas"
-import { CompleteVault, VaultList } from "./types"
+import { CompleteVault, VaultIncentive, VaultList } from "./types"
 
 // ============= CONTRACT INTERFACES =============
 
@@ -219,4 +219,9 @@ export const createVault = (
     userQuoteBalance: 0n,
     kandel: kandelAddress || zeroAddress,
   }
+}
+
+export const getCurrentIncentive = (incentives: VaultIncentive[]) => {
+  const now = Date.now() / 1000
+  return incentives.find((i) => i.startTimestamp < now && i.endTimestamp > now)
 }

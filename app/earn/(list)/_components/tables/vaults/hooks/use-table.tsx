@@ -23,8 +23,6 @@ import {
 } from "@/components/ui/tooltip"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
-import { getTokenSymbol } from "@/utils/tokens"
-import { Address } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -153,23 +151,24 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
 
           if (isDeprecated)
             return <div className="text-right w-full flex-end">-</div>
-          const incentive = incentives?.find(
-            (i) => i.vault === vaultAddress.toLowerCase(),
-          )
 
           const apr = kandelApr ? `${kandelApr.toFixed(2)}%` : "-"
-          const incentivesApr = incentive ? `${incentive.apy.toFixed(2)}%` : "-"
+          const incentivesApr = incentives
+            ? `${incentives.apy.toFixed(2)}%`
+            : "-"
 
-          const netApr = `${(
-            Number(kandelApr ?? 0) + Number(incentive?.apy ?? 0)
-          ).toFixed(2)}%`
+          const netApr = incentives
+            ? `${(
+                Number(kandelApr ?? 0) + Number(incentives?.apy ?? 0)
+              ).toFixed(2)}%`
+            : `${kandelApr?.toFixed(2)}%`
 
           return (
             <div className="group relative w-full text-right">
               <TooltipProvider>
                 <Tooltip delayDuration={200}>
                   <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                    <Value value={apr} className="justify-end" />
+                    <Value value={netApr} className="justify-end" />
                   </TooltipTrigger>
                   <TooltipContent
                     onClick={(e) => {
@@ -182,7 +181,7 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
-                            Native APY
+                            Native APR
                           </span>
                           <span className="text-sm text-text-primary">
                             {apr}
@@ -190,10 +189,7 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-text-secondary">
-                            {getTokenSymbol(
-                              incentive?.token as Address,
-                              networkClient,
-                            ) ?? ""}
+                            Incentive APR
                           </span>
                           <span className="text-sm text-text-primary">
                             {incentivesApr}
@@ -203,7 +199,7 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
                       <hr className="my-2" />
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-sm text-text-secondary">
-                          Net APY
+                          Net APR
                         </span>
                         <span className="text-sm text-text-primary">
                           {netApr}

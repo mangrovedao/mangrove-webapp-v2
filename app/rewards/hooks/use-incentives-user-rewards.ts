@@ -17,10 +17,8 @@ export const useIncentivesUserRewards = () => {
         if (!user) return null
         const userIncentives = await Promise.all(
           vaults?.map((vault) =>
-            vault.incentives.map((incentive) =>
-              fetch(
-                `${getIndexerUrl(defaultChain)}/incentives/vaults/${defaultChain.id}/${incentive.vault}/${user}?startTimestamp=${incentive.startTimestamp}&endTimestamp=${incentive.endTimestamp}&rewardRate=${incentive.rewardRate}&maxRewards=${incentive.maxRewards}`,
-              ),
+            fetch(
+              `${getIndexerUrl(defaultChain)}/incentives/vaults/${defaultChain.id}/${vault.incentives?.vault}/${user}?startTimestamp=${vault.incentives?.startTimestamp}&endTimestamp=${vault.incentives?.endTimestamp}&rewardRate=${vault.incentives?.rewardRate}&maxRewards=${vault.incentives?.maxRewards}`,
             ),
           ) ?? [],
         )

@@ -148,14 +148,10 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
             )
           }
 
-          const { kandelApr, incentives, address: vaultAddress } = row.original
-
-          const incentive = incentives?.find(
-            (i) => i.vault === vaultAddress.toLowerCase(),
-          )
+          const { kandelApr, incentives } = row.original
 
           const netApr = `${(
-            Number(kandelApr ?? 0) + Number(incentive?.apy ?? 0)
+            Number(kandelApr ?? 0) + Number(incentives?.apy ?? 0)
           ).toFixed(2)}%`
 
           return (
