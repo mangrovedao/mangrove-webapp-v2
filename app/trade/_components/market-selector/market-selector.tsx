@@ -36,14 +36,11 @@ function getSymbol(market?: MarketParams) {
   return `${market.base.symbol}/${market.quote.symbol}`
 }
 
-function getValue(market: MarketParams) {
-  return `${market.base.address}/${market.quote.address}/${market.tickSpacing}`
-}
-
 export default function MarketSelector() {
   const { markets, currentMarket, setMarket } = useMarket()
   const isMobile = useMediaQuery("(max-width: 768px)")
   const { data: stats, isLoading } = useMarketStats({ markets })
+  const [open, setOpen] = useState(false);
 
   const formattedStats = useMemo(() => {
     if (!stats || !isArray(stats)) return []
@@ -83,6 +80,8 @@ export default function MarketSelector() {
       }
       onValueChange={onValueChange}
       disabled={!markets?.length}
+      open={true}
+      onOpenChange={setOpen}
     >
       <SelectTrigger className="rounded-sm w-fit flex justify-between p-1.5 text-sm">
         <SelectValue
@@ -125,10 +124,14 @@ export default function MarketSelector() {
           )}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className='overflow-x-auto'>
         <DataTable
           table={table}
-          onRowClick={(row) => row?.market && setMarket(row.market)}
+          onRowClick={(row) => {
+            if (!row?.market) return
+            setMarket(row.market)
+            setOpen(false)
+          }}
         />
       </SelectContent>
     </Select>
