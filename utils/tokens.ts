@@ -104,6 +104,26 @@ export async function getTokenSymbol(
   }
 }
 
+export async function getTokenDecimals(
+  client: PublicClient,
+  address?: Address,
+): Promise<number | undefined> {
+  try {
+    if (!address) return undefined
+
+    const data = await client.readContract({
+      address: address,
+      abi: erc20Abi,
+      functionName: "decimals",
+    })
+
+    return data
+  } catch (e) {
+    console.error("Error fetching token symbol:", e)
+    return undefined
+  }
+}
+
 export function getTokenByAddressOdos(
   address: string,
   odosTokens: Token[],

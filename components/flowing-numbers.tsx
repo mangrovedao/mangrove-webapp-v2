@@ -65,7 +65,7 @@ export const FlowingNumbers = ({
     <div ref={displayRef} className={className}>
       {currentValueRef.current.toFixed(
         currentValueRef.current > 0 ? decimals : 2,
-      )}{" "}
+      )}
     </div>
   )
 }

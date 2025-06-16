@@ -33,10 +33,10 @@ import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useNetworkClient } from "@/hooks/use-network-client"
 import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
+import { getExactWeiAmount } from "@/utils/regexp"
 import { shortenAddress } from "@/utils/wallet"
 import { Line, getChainImage } from "../(shared)/utils"
 import { useClaimRewards } from "./_hooks/use-claim-rewards"
@@ -57,7 +57,7 @@ export default function Page() {
   const [action, setAction] = React.useState(Action.Deposit)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const client = useNetworkClient()
+  console.log("ok")
 
   // Check if we're on mobile
   React.useEffect(() => {
@@ -513,18 +513,6 @@ export default function Page() {
                   }
                 />
                 <GridLine
-                  title={"Accruing"}
-                  value={
-                    <div className="flex items-center gap-1">
-                      {isLoading ? (
-                        <Skeleton className="w-10 h-4" />
-                      ) : (
-                        <span className="!text-md">0</span>
-                      )}
-                    </div>
-                  }
-                />
-                <GridLine
                   title={"Claimable"}
                   value={
                     <motion.span
@@ -537,6 +525,27 @@ export default function Page() {
                     </motion.span>
                   }
                   symbol={""}
+                />
+                <GridLine
+                  title={"Accruing"}
+                  value={
+                    <div className="flex items-center gap-1">
+                      {isLoading ? (
+                        <Skeleton className="w-10 h-4" />
+                      ) : (
+                        <FlowingNumbers
+                          className="!text-md"
+                          initialValue={
+                            vault?.incentivesData?.currentRewardsPerSecond || 0
+                          }
+                          ratePerSecond={
+                            vault?.incentivesData?.currentRewardsPerSecond || 0
+                          }
+                          decimals={rewardsInfo?.decimals}
+                        />
+                      )}
+                    </div>
+                  }
                 />
               </div>
               <Button
@@ -668,17 +677,13 @@ export default function Page() {
                     </Caption>
                   </div>
                 }
-                value={
-                  Number(
-                    formatUnits(
-                      vault?.userBaseBalance || 0n,
-                      vault?.market.base.decimals || 18,
-                    ),
-                  ).toLocaleString(undefined, {
-                    maximumFractionDigits:
-                      vault?.market.base.displayDecimals || 3,
-                  }) || "0"
-                }
+                value={getExactWeiAmount(
+                  formatUnits(
+                    vault?.userBaseBalance || 0n,
+                    vault?.market.base.decimals || 18,
+                  ),
+                  vault?.market.base.priceDisplayDecimals || 6,
+                )}
               />
               <Line
                 title={
@@ -698,17 +703,13 @@ export default function Page() {
                     </Caption>
                   </div>
                 }
-                value={
-                  Number(
-                    formatUnits(
-                      vault?.userQuoteBalance || 0n,
-                      vault?.market.quote.decimals || 18,
-                    ),
-                  ).toLocaleString(undefined, {
-                    maximumFractionDigits:
-                      vault?.market.quote.displayDecimals || 3,
-                  }) || "0"
-                }
+                value={getExactWeiAmount(
+                  formatUnits(
+                    vault?.userQuoteBalance || 0n,
+                    vault?.market.quote.decimals || 18,
+                  ),
+                  vault?.market.quote.priceDisplayDecimals || 6,
+                )}
               />
             </div>
           </motion.div>

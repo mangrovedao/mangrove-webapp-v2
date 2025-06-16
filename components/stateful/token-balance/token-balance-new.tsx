@@ -55,7 +55,7 @@ export function TokenBalance(props: {
                 }}
               >
                 <span className="text-text-secondary">
-                  {getExactWeiAmount(formatted, token?.displayDecimals)}
+                  {getExactWeiAmount(formatted, token?.priceDisplayDecimals)}
                 </span>
               </TooltipTrigger>
 

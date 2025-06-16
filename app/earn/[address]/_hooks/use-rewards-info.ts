@@ -37,7 +37,7 @@ export function useRewardsInfo({ rewardToken }: { rewardToken?: Address }) {
           `https://api.mgvinfra.com/merkle/proofs/${address}`,
         )
         const data = await response.json()
-        console.log(data, "data")
+
         const rewards = RewardsResponseSchema.parse(data)[0]
 
         const multicallResult = await client.multicall({
@@ -91,6 +91,7 @@ export function useRewardsInfo({ rewardToken }: { rewardToken?: Address }) {
           claimed,
           totalRewards,
           symbol: parsedResult.symbol,
+          decimals: parsedResult.decimals,
         }
       } catch (error) {
         printEvmError(error)
@@ -98,7 +99,7 @@ export function useRewardsInfo({ rewardToken }: { rewardToken?: Address }) {
       }
     },
     enabled: !!address,
-    refetchInterval: 10000, // 10 seconds
+    refetchInterval: 3000, // 3 seconds
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: true,
