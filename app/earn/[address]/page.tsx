@@ -541,7 +541,7 @@ export default function Page() {
                           ratePerSecond={
                             vault?.incentivesData?.currentRewardsPerSecond || 0
                           }
-                          decimals={rewardsInfo?.decimals}
+                          decimals={6}
                         />
                       )}
                     </div>
