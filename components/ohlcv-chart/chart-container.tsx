@@ -333,62 +333,13 @@ export const TVChartContainer = (
       theme: "dark",
       debug: false,
       custom_css_url: "css/styles.css",
-
       disabled_features: [
-        "left_toolbar",
-        "timezone_menu",
-        "header_symbol_search",
-        "header_compare",
-        "timeframes_toolbar",
-        "use_localstorage_for_settings",
-        "popup_hints",
+        'study_templates',
+        'use_localstorage_for_settings',
+        'header_quick_search',
+        'header_symbol_search',
+        'header_compare',
       ],
-      enabled_features: [
-        "hide_left_toolbar_by_default",
-        "move_logo_to_main_pane",
-        "create_volume_indicator_by_default",
-        "use_localstorage_for_settings",
-      ],
-      overrides: {
-        "paneProperties.backgroundType": "solid",
-        "scalesProperties.textColor": "#FFFFFF",
-        "scalesProperties.lineColor": "#333",
-        "mainSeriesProperties.priceAxisProperties.autoScale": true,
-        "scalesProperties.showSeriesLastValue": true,
-        "scalesProperties.showStudyLastValue": false,
-        "scalesProperties.fontSize": 14,
-      },
-      custom_formatters: {
-        priceFormatterFactory: (symbolInfo, minTick) => {
-          if (symbolInfo === null) {
-            return null
-          }
-
-          return {
-            format: (price, signPositive) => {
-              if (price >= 1000000000) {
-                return `${(price / 1000000000).toFixed(3)}B`
-              }
-
-              if (price >= 1000000) {
-                return `${(price / 1000000).toFixed(3)}M`
-              }
-
-              if (price >= 1000) {
-                return `${(price / 1000).toFixed(3)}K`
-              }
-
-              if (price > 0 && price < 0.0001) {
-                return price.toExponential(2)
-              }
-
-              return price.toFixed(2)
-            },
-          }
-
-          return null // The default formatter will be used.
-        },
-      },
     }
 
     const tvWidget = new widget(widgetOptions)
@@ -397,6 +348,26 @@ export const TVChartContainer = (
 
     tvWidget.onChartReady(() => {
       setLoading(false)
+
+      tvWidget.applyOverrides({
+        'paneProperties.backgroundType': 'solid',
+        'paneProperties.background': '#000000',
+        'scalesProperties.textColor': '#FFFFFF',
+        'scalesProperties.lineColor': '#333',
+
+        'mainSeriesProperties.candleStyle.borderUpColor': '#00E828',
+        'mainSeriesProperties.candleStyle.borderDownColor': '#FF4A18',
+
+        'mainSeriesProperties.candleStyle.wickUpColor': '#00E828',
+        'mainSeriesProperties.candleStyle.wickDownColor': '#FF4A18',
+
+        'mainSeriesProperties.candleStyle.upColor': '#00E828',
+        'mainSeriesProperties.candleStyle.downColor': '#FF4A18',
+
+        'mainSeriesProperties.priceAxisProperties.autoScale': true,
+        'scalesProperties.showSeriesLastValue': true,
+        'scalesProperties.showStudyLastValue': false,
+      });
 
       tvWidget
         .chart()

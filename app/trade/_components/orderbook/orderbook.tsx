@@ -32,76 +32,6 @@ type ViewOption = "default" | "bids" | "asks"
 // Price increment options for filtering the orderbook
 const PRICE_INCREMENTS = [0, 0.1, 0.5, 1, 10, 100]
 
-// Helper function to filter book entries based on price increment
-const filterBookByPriceIncrement = (
-  entries: any[],
-  priceIncrement: number,
-  basePrice?: number,
-) => {
-  if (!entries.length) return entries
-
-  // Special case: if priceIncrement is 0, return all entries (no filtering)
-  if (priceIncrement === 0) {
-    return entries
-  }
-
-  // For small increments (0.1, 0.5), use a bucketing strategy
-  if (priceIncrement <= 0.5) {
-    // Group entries into price buckets
-    const buckets: Record<string, any[]> = {}
-
-    entries.forEach((entry) => {
-      // Round to the nearest increment
-      const bucketKey =
-        Math.round(entry.price / priceIncrement) * priceIncrement
-      if (!buckets[bucketKey]) {
-        buckets[bucketKey] = []
-      }
-      buckets[bucketKey]?.push(entry)
-    })
-
-    // Take the first entry from each bucket
-    return Object.values(buckets).map((bucket) => bucket[0])
-  }
-
-  // For larger increments (1, 10, 100), use strict bucketing
-  // If no basePrice is provided, use the first entry as base
-  const reference = basePrice ?? entries[0].price
-
-  // Group entries into strict increment buckets
-  const buckets: Record<number, any> = {}
-
-  // For each entry, determine which increment bucket it belongs to
-  entries.forEach((entry) => {
-    // Calculate which bucket this price falls into
-    const bucketNumber = Math.round(entry.price / priceIncrement)
-    const bucketPrice = bucketNumber * priceIncrement
-
-    // If this bucket doesn't exist yet or if this entry is closer to the exact bucket price
-    if (
-      !buckets[bucketNumber] ||
-      Math.abs(entry.price - bucketPrice) <
-        Math.abs(buckets[bucketNumber].price - bucketPrice)
-    ) {
-      buckets[bucketNumber] = entry
-    }
-  })
-
-  // Convert buckets to array and sort by price
-  return Object.values(buckets).sort((a, b) =>
-    entries[0].price > entries[entries.length - 1].price
-      ? a.price - b.price
-      : b.price - a.price,
-  )
-}
-
-// Define a simplified book type that matches what we need
-interface SimpleBook {
-  asks: Array<{ id: any; price: number; volume: number }>
-  bids: Array<{ id: any; price: number; volume: number }>
-  [key: string]: any // Allow other properties
-}
-
 // Wrap the OrderBook component with React.memo to prevent unnecessary re-renders
 export const OrderBook = React.memo(function OrderBook({
   className,
@@ -210,10 +140,6 @@ export const BookContent = React.memo(function BookContent() {
   // Memoize expensive calculations to prevent recalculations on re-renders
   // Must be defined before any conditional returns
   const {
-    lowestAskPrice,
-    highestBidPrice,
-    spread,
-    spreadPercent,
     spreadPercentString,
     midPrice,
   } = React.useMemo(() => {
