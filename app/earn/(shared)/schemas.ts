@@ -90,6 +90,7 @@ export const IncentiveSchema = z
     rewardRate: val.rewardRatePerSecond * 3600 * 24,
   }))
 
+
 const SocialsSchema = z.object({
   x: z.string(),
   website: z.string(),
