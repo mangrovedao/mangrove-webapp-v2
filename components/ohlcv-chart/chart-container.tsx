@@ -105,7 +105,7 @@ export const TVChartContainer = (
         !Array.isArray(data.candles) ||
         data.candles.length === 0
       ) {
-        console.log("No valid candles data in response")
+        console.error("No valid candles data in response")
         return []
       }
 

@@ -61,37 +61,29 @@ export function useRewardsInfo({ rewardToken }: { rewardToken?: Address }) {
           ],
         })
 
-        const parsedResult = {
-          claimed:
-            multicallResult[0].status === "success"
-              ? multicallResult[0].result
-              : 0n,
-          decimals:
-            multicallResult[1].status === "success"
-              ? Number(multicallResult[1].result)
-              : 18,
-          symbol:
-            multicallResult[2].status === "success"
-              ? String(multicallResult[2].result)
-              : "",
-        }
+        const [claimed, decimals, symbol] = multicallResult.map((result) => {
+          if (result.status === "success") {
+            return result.result
+          }
+          return null
+        })
 
         const totalRewards = formatUnits(
           BigInt(rewards?.amount || 0),
-          parsedResult.decimals,
+          Number(decimals),
         )
-
-        const claimed = formatUnits(parsedResult.claimed, parsedResult.decimals)
-
-        const claimable = Number(totalRewards) - Number(claimed)
+        const totalRewardsRaw = BigInt(rewards?.amount || 0)
+        const claimedRaw = BigInt(claimed || 0)
+        const claimableRaw = totalRewardsRaw - claimedRaw
+        const claimable = Number(formatUnits(claimableRaw, Number(decimals)))
 
         return {
           rewards,
           claimable,
           claimed,
           totalRewards,
-          symbol: parsedResult.symbol,
-          decimals: parsedResult.decimals,
+          symbol,
+          decimals,
         }
       } catch (error) {
         printEvmError(error)

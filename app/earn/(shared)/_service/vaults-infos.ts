@@ -338,6 +338,7 @@ export async function getVaultsInformation(
       try {
         result.incentivesData = await getUserVaultIncentives(
           client,
+          v.address,
           user,
           v.incentives,
         )

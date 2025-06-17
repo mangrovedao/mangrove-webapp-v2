@@ -2,6 +2,7 @@ import { z } from "zod"
 
 import { vaultIncentivesSchema } from "@/app/rewards/schemas/rewards-configuration"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { Address } from "viem"
 import { PublicClient } from "viem/_types/clients/createPublicClient"
 import { VaultIncentive } from "../types"
 
@@ -13,13 +14,14 @@ import { VaultIncentive } from "../types"
  */
 export async function getVaultIncentives(
   client: PublicClient,
+  vaultAddress: Address,
   incentives?: VaultIncentive,
 ): Promise<z.infer<typeof vaultIncentivesSchema> | null> {
   try {
     if (!incentives) return null
 
     const userIncentives = await fetch(
-      `${getIndexerUrl(client.chain)}/incentives/vaults/${client.chain?.id}/${incentives?.vault}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}&page=0&pageSize=100`,
+      `${getIndexerUrl(client.chain)}/incentives/vaults/${client.chain?.id}/${vaultAddress}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}&page=0&pageSize=100`,
     )
 
     if (!userIncentives?.ok) {

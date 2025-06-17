@@ -112,12 +112,7 @@ export function usePostMarketOrder() {
           protocol: ProtocolType.UniswapV3,
           tickSpacing,
           async onTrade({ got, gave, bounty, feePaid }) {
-            console.log("OnTrade callback:", {
-              got,
-              gave,
-              bounty,
-              feePaid,
-            })
+            console.log("OnTrade callback:", { got, gave, bounty, feePaid })
           },
         })
 

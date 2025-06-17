@@ -70,21 +70,25 @@ const MarketTokenSchema = z.object({
 const MarketSchema = z.object({
   base: MarketTokenSchema,
   quote: MarketTokenSchema,
-  tickSpacing: z.string(),
+  tickSpacing: z.coerce.bigint(),
 })
 
-export const IncentiveSchema = z.object({
-  vault: AddressSchema,
-  startTimestamp: z.number(),
-  endTimestamp: z.number(),
-  maxRewards: z.number(),
-  rewardRate: z.number(),
-  apy: z.number().transform((val) => val * 100),
-  stakedTokenPrice: z.number(),
-  rewardTokenPrice: z.number(),
-  token: z.string(),
-  tokenAddress: AddressSchema,
-})
+export const IncentiveSchema = z
+  .object({
+    startTimestamp: z.number(),
+    endTimestamp: z.number(),
+    maxRewards: z.number(),
+    rewardRatePerSecond: z.number(),
+    apy: z.number().transform((val) => val * 100),
+    stakedTokenPrice: z.number(),
+    rewardTokenPrice: z.number(),
+    token: z.string(),
+    tokenAddress: AddressSchema,
+  })
+  .transform((val) => ({
+    ...val,
+    rewardRate: val.rewardRatePerSecond * 3600 * 24,
+  }))
 
 const SocialsSchema = z.object({
   x: z.string(),
@@ -95,7 +99,6 @@ export const VaultSchema = z.object({
   isDeprecated: z.boolean(),
   manager: z.string(),
   address: AddressSchema,
-  oracle: AddressSchema,
   market: MarketSchema,
   strategyType: z.string(),
   description: z.string(),
