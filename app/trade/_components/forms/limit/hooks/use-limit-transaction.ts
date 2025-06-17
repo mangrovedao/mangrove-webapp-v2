@@ -105,6 +105,7 @@ export function useLimitTransaction({
         {
           form: {
             ...form.state.values,
+            bs: tradeSide,
             send:
               baseToken?.symbol === "WETH"
                 ? (Number(form.state.values.send) - 0.0000001).toString()
