@@ -9,7 +9,7 @@ import type { Strategy } from "../../../_schemas/kandels"
 import { Switch } from "@/components/ui/switch"
 import { motion } from "framer-motion"
 import { useTable } from "./hooks/use-table"
-import { useVaultsData } from "./hooks/use-vaults-data"
+import { useVaults } from "./hooks/use-vaults-data"
 
 type PageDetails = {
   page: number
@@ -21,7 +21,7 @@ export function Vaults() {
   const containerRef = React.useRef<HTMLDivElement>(null)
 
   // Use the custom hook for data fetching
-  const { vaults, isLoading, error } = useVaultsData()
+  const { data: vaults, isLoading, error } = useVaults()
 
   const [showDeprecated, setShowDeprecated] = useState<boolean>(false)
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
@@ -34,12 +34,12 @@ export function Vaults() {
   const filteredVaults = useMemo(() => {
     return showDeprecated
       ? vaults
-      : vaults.filter((vault) => !vault.isDeprecated)
+      : vaults?.filter((vault) => !vault.isDeprecated)
   }, [vaults, showDeprecated])
 
   const table = useTable({
     pageSize,
-    data: filteredVaults,
+    data: filteredVaults ?? [],
     onDeposit: (vault) => undefined,
     isLoading,
   })
@@ -47,14 +47,14 @@ export function Vaults() {
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
-        <p className="text-red-500">Error loading vaults: {error}</p>
+        <p className="text-red-500">Error loading vaults: {error.message}</p>
       </div>
     )
   }
 
   return (
     <div>
-      {vaults.length > 0 && (
+      {vaults?.length > 0 && (
         <div className="flex gap-2 items-center justify-end mr-2 my-3">
           <Switch
             checked={showDeprecated}
@@ -84,7 +84,7 @@ export function Vaults() {
             onPageChange: setPageDetails,
             page,
             pageSize,
-            count: filteredVaults.length,
+            count: filteredVaults?.length,
           }}
           emptyArrayMessage={
             isLoading ? "Loading vaults..." : "No vaults available"

@@ -35,7 +35,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
-import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { shortenAddress } from "@/utils/wallet"
 import { Line, getChainImage } from "../(shared)/utils"
@@ -86,7 +85,7 @@ export default function Page() {
   const incentivesApr = vault?.incentives?.apy || 0
 
   const isLoading = isLoadingVault || isLoadingRewards
-
+  console.log(vault?.tvl)
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
       <div>
@@ -222,15 +221,16 @@ export default function Page() {
           >
             <GridLineHeader
               title={"TVL"}
-              value={formatNumber(
-                Number(
+              value={
+                getExactWeiAmount(
                   formatUnits(
                     vault?.tvl || 0n,
                     vault?.market.quote.decimals || 18,
                   ),
-                ) * (vault?.quoteDollarPrice ?? 1),
-              )}
-              symbol={` $`}
+                  vault?.market.quote.displayDecimals || 4,
+                ) || " "
+              }
+              symbol={` ${vault?.market?.quote?.symbol || " "}`}
             />
 
             <GridLineHeader
@@ -676,7 +676,7 @@ export default function Page() {
         className="fixed bottom-6 right-6 z-50 lg:hidden"
       >
         <Button
-          className="flex items-center justify-center rounded-full bg-bg-tertiary hover:bg-bg-primary-hover"
+          className="flex items-center justify-center rounded-full bg-bg-tertiary hover:bg-bg-disabled-subtle"
           onClick={() => setIsDrawerOpen(true)}
         >
           <AnimatePresence mode="wait">
@@ -688,7 +688,7 @@ export default function Page() {
               transition={{ duration: 0.2 }}
               className="flex items-center justify-center"
             >
-              <TradeIcon className="w-8 h-8 p-1 text-text-secondary" />
+              <TradeIcon className="w-8 h-8 p-1 text-text-petal-mist" />
             </motion.div>
           </AnimatePresence>
         </Button>
@@ -852,7 +852,7 @@ const GridLineHeader = ({
           <InfoTooltip className="text-text-secondary" iconSize={14}>
             {info}
           </InfoTooltip>
-        ) : undefined}
+        ) : null}
       </div>
       <div
         className={cn("flex items-center -mt-2", {
@@ -864,7 +864,7 @@ const GridLineHeader = ({
             {value}
             {symbol ? (
               <span className="text-text-tertiary">{symbol}</span>
-            ) : undefined}
+            ) : null}
           </Title>
           <span className="text-text-secondary">{icon}</span>
         </>

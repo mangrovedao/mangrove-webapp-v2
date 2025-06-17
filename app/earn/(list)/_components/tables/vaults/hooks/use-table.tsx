@@ -12,7 +12,6 @@ import React from "react"
 import { useAccount } from "wagmi"
 
 import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
-import { useMgvFdv } from "@/app/earn/(shared)/store/vault-store"
 import { CompleteVault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import {
@@ -22,7 +21,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useNetworkClient } from "@/hooks/use-network-client"
+import { getExactWeiAmount } from "@/utils/regexp"
+import { formatUnits } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -38,8 +38,6 @@ type Params = {
 export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
   const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
-  const { fdv, setFdv } = useMgvFdv()
-  const networkClient = useNetworkClient()
 
   const columns = React.useMemo(
     () => [
@@ -100,19 +98,25 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
         cell: ({ row }) => {
           if (isLoading) {
             return (
-              <div className="text-right w-full">
-                <AnimatedSkeleton className="h-6 w-24 ml-auto" />
+              <div className="flex justify-end w-full">
+                <AnimatedSkeleton className="h-6 w-24" />
               </div>
             )
           }
-          const { tvl, isDeprecated } = row.original
+          const { tvl, isDeprecated, market } = row.original
 
           if (isDeprecated)
-            return <div className="text-right w-full flex-end">-</div>
+            return <div className="flex justify-end w-full">-</div>
 
           return (
-            <div className="text-right w-full">
-              <Value value={Number(tvl).toFixed(2)} symbol={"$"} />
+            <div className="flex justify-end w-full">
+              <Value
+                value={getExactWeiAmount(
+                  formatUnits(tvl || 0n, market.quote.decimals || 18),
+                  market.quote.displayDecimals || 4,
+                )}
+                symbol={` ${market.quote.symbol}`}
+              />
             </div>
           )
         },
