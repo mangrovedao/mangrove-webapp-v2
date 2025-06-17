@@ -85,7 +85,7 @@ export default function Page() {
   const incentivesApr = vault?.incentives?.apy || 0
 
   const isLoading = isLoadingVault || isLoadingRewards
-  console.log(vault?.tvl)
+
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
       <div>
