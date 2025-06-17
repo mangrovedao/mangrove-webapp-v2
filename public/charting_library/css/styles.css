@@ -1,80 +1,9 @@
-:root {
-  /* Main background color */
-  --tv-color-platform-background: #0b1719;
-  --tv-color-pane-background: #0b1719;
-  --tv-color-pane-background-secondary: #1a383e;
+.theme-dark:root {
+  --tv-color-platform-background: #1a1a1a;
+  --tv-color-pane-background: #1a1a1a;
+  --tv-color-pane-background-secondary: #1a1a1a;
+  --tv-color-toolbar-button-text-active: #ff852c;
+  --tv-color-toolbar-button-text-active-hover: #ff852c;
 
-  /* Text colors */
-  --tv-color-toolbar-button-text-active: #ffffff;
-  --tv-color-toolbar-button-text-hover: #e0e0e0;
-  --tv-color-toolbar-button-text: #b2b5be;
-
-  /* Toolbar colors */
-  --tv-color-toolbar-button-background-hover: #1a383e;
-  --tv-color-toolbar-button-background-expanded: #1a383e;
-  --tv-color-toolbar-button-background-active: #1a383e;
-
-  /* Chart grid colors */
-  --tv-color-platform-background-secondary: #1a383e;
-  --tv-color-chart-grid: #1a383e;
-  --tv-color-chart-axis: #b2b5be;
-
-  /* Borders */
-  --tv-color-popup-background: #0b1719;
-  --tv-color-toolbar-divider-background: #1a383e;
-
-  /* Volume bars */
-  --tv-color-volume-underlay-up: rgba(76, 175, 80, 0.2);
-  --tv-color-volume-underlay-down: rgba(255, 82, 82, 0.2);
-  /* Buttons */
-  --tv-color-toolbar-button-background: transparent;
-  --tv-color-toolbar-toggle-button-background-active: #1a383e;
-  --tv-color-toolbar-toggle-button-background-hover: #1a383e;
-
-  /* Popup */
-  --tv-color-popup-element-background-hover: #1a383e;
-  --tv-color-popup-element-text: #b2b5be;
-  --tv-color-popup-element-text-active: #ffffff;
-  --tv-color-popup-element-text-hover: #e0e0e0;
-
-  /* Dialog */
-  --tv-color-dialog-background: #0b1719;
-  --tv-color-dialog-text: #b2b5be;
-  --tv-color-dialog-text-active: #ffffff;
-  --tv-color-dialog-text-hover: #e0e0e0;
-
-  /* Scroll */
-  --tv-color-scroll-thumb: #363a45;
-  --tv-color-scroll-track: #1a1b20;
-
-  /* Cross */
-  --tv-color-price-axis-crossing-label: #b2b5be;
-  --tv-color-pane-legend-item-value-title: #b2b5be;
-  --tv-color-pane-legend-line: #1a383e;
-
-  /* Loading */
-  --tv-color-loading-screen-background: #0b1719;
-  --tv-color-loading-screen-spin: #1a383e;
-
-  /* Chart properties */
-  --tv-color-toolbar-button-text-disabled: #363a45;
-  --tv-color-pane-legend-expanded-background: #0b1719;
-
-  /* Candlestick colors */
-  --tv-color-base-candle-up: #4caf50;
-  --tv-color-base-candle-down: #ff5252;
-  --tv-color-base-candle-border-up: #4caf50;
-  --tv-color-base-candle-border-down: #ff5252;
-}
-
-body {
-  background-color: var(--tv-color-platform-background);
-}
-
-.chart-page {
-  background-color: var(--tv-color-platform-background);
-}
-
-.tv-chart-container {
-  background-color: var(--tv-color-pane-background);
+  --themed-color-selection-bg: #ff852c;
 }
