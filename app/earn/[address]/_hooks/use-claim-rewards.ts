@@ -42,7 +42,7 @@ export function useClaimRewards() {
     }) => {
       try {
         if (!address) throw new Error("No address connected")
-        console.log(rewardToken, amount, proof)
+
         const { request } = await simulateContract(client, {
           address: rewardDistributorAddress,
           abi: rewardsAbi,

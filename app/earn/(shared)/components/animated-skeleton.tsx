@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/utils"
-import { motion } from "framer-motion"
+import { motion, easeInOut, easeOut } from "framer-motion"
 
 interface AnimatedSkeletonProps {
   className?: string
@@ -35,7 +35,7 @@ export const AnimatedSkeleton = ({
       transition: {
         repeat: Infinity,
         duration: 1.8,
-        ease: "easeInOut",
+        ease: easeInOut,
         delay,
       },
     },
@@ -48,7 +48,7 @@ export const AnimatedSkeleton = ({
       transition: {
         repeat: Infinity,
         duration: 2,
-        ease: "easeInOut",
+        ease: easeInOut,
         delay,
       },
     },
@@ -64,7 +64,7 @@ export const AnimatedSkeleton = ({
       scale: 1,
       transition: {
         duration: 0.4,
-        ease: "easeOut",
+        ease: easeInOut,
         delay,
       },
     },
@@ -124,7 +124,7 @@ export const SkeletonText = ({
       x: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   }
@@ -167,7 +167,7 @@ export const SkeletonCard = ({
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: easeOut,
         delay,
         staggerChildren: 0.1,
       },
@@ -181,7 +181,7 @@ export const SkeletonCard = ({
       scale: 1,
       transition: {
         duration: 0.4,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   }

@@ -64,7 +64,7 @@ dependencies:
     version: 1.2.7(@types/react-dom@18.3.7)(@types/react@18.3.23)(react-dom@18.2.0)(react@18.2.0)
   '@rainbow-me/rainbowkit':
     specifier: ^2.2.5
-    version: 2.2.6(@tanstack/react-query@5.80.6)(@types/react@18.3.23)(react-dom@18.2.0)(react@18.2.0)(viem@2.23.9)(wagmi@2.14.15)
+    version: 2.2.6(@tanstack/react-query@5.80.7)(@types/react@18.3.23)(react-dom@18.2.0)(react@18.2.0)(viem@2.23.9)(wagmi@2.14.15)
   '@rive-app/react-canvas-lite':
     specifier: ^4.14.1
     version: 4.21.3(react@18.2.0)
@@ -84,8 +84,8 @@ dependencies:
     specifier: 0.10.3
     version: 0.10.3(react-dom@18.2.0)(react@18.2.0)
   '@tanstack/react-query':
-    specifier: ^5.17.10
-    version: 5.80.6(react@18.2.0)
+    specifier: ^5.80.7
+    version: 5.80.7(react@18.2.0)
   '@tanstack/react-table':
     specifier: ^8.11.6
     version: 8.21.3(react-dom@18.2.0)(react@18.2.0)
@@ -217,7 +217,7 @@ dependencies:
     version: 2.23.9(typescript@5.8.3)(zod@3.25.56)
   wagmi:
     specifier: 2.14.15
-    version: 2.14.15(@tanstack/react-query@5.80.6)(@types/react@18.3.23)(react@18.2.0)(typescript@5.8.3)(viem@2.23.9)(zod@3.25.56)
+    version: 2.14.15(@tanstack/react-query@5.80.7)(@types/react@18.3.23)(react@18.2.0)(typescript@5.8.3)(viem@2.23.9)(zod@3.25.56)
   zod:
     specifier: ^3.22.4
     version: 3.25.56
@@ -249,7 +249,7 @@ devDependencies:
     version: 4.39.1(eslint@8.57.1)
   '@tanstack/react-query-devtools':
     specifier: ^5.17.10
-    version: 5.80.6(@tanstack/react-query@5.80.6)(react@18.2.0)
+    version: 5.80.6(@tanstack/react-query@5.80.7)(react@18.2.0)
   '@tanstack/zod-form-adapter':
     specifier: ^0.10.3
     version: 0.10.3(zod@3.25.56)
@@ -5086,7 +5086,7 @@ packages:
     resolution: {integrity: sha512-HPwpGIzkl28mWyZqG52jiqDJ12waP11Pa1lGoiyUkIEuMLBP0oeK/C89esbXrxsky5we7dfd8U58nm0SgAWpVw==}
     dev: false
 
-  /@rainbow-me/rainbowkit@2.2.6(@tanstack/react-query@5.80.6)(@types/react@18.3.23)(react-dom@18.2.0)(react@18.2.0)(viem@2.23.9)(wagmi@2.14.15):
+  /@rainbow-me/rainbowkit@2.2.6(@tanstack/react-query@5.80.7)(@types/react@18.3.23)(react-dom@18.2.0)(react@18.2.0)(viem@2.23.9)(wagmi@2.14.15):
     resolution: {integrity: sha512-mJhKC+5BCyC+/O2rL3q8iJDrhb58p7o4kp26yWcmY/Aeur3M5OooETcHFe/LhWR2EGbBKRq2pzM75BIlrf4/PA==}
     engines: {node: '>=12.4'}
     peerDependencies:
@@ -5096,7 +5096,7 @@ packages:
       viem: 2.x
       wagmi: ^2.9.0
     dependencies:
-      '@tanstack/react-query': 5.80.6(react@18.2.0)
+      '@tanstack/react-query': 5.80.7(react@18.2.0)
       '@vanilla-extract/css': 1.15.5
       '@vanilla-extract/dynamic': 2.1.2
       '@vanilla-extract/sprinkles': 1.6.3(@vanilla-extract/css@1.15.5)
@@ -5107,7 +5107,7 @@ packages:
       react-remove-scroll: 2.6.2(@types/react@18.3.23)(react@18.2.0)
       ua-parser-js: 1.0.40
       viem: 2.23.9(typescript@5.8.3)(zod@3.25.56)
-      wagmi: 2.14.15(@tanstack/react-query@5.80.6)(@types/react@18.3.23)(react@18.2.0)(typescript@5.8.3)(viem@2.23.9)(zod@3.25.56)
+      wagmi: 2.14.15(@tanstack/react-query@5.80.7)(@types/react@18.3.23)(react@18.2.0)(typescript@5.8.3)(viem@2.23.9)(zod@3.25.56)
     transitivePeerDependencies:
       - '@types/react'
       - babel-plugin-macros
@@ -6582,8 +6582,8 @@ packages:
     dependencies:
       '@tanstack/store': 0.1.3
 
-  /@tanstack/query-core@5.80.6:
-    resolution: {integrity: sha512-nl7YxT/TAU+VTf+e2zTkObGTyY8YZBMnbgeA1ee66lIVqzKlYursAII6z5t0e6rXgwUMJSV4dshBTNacNpZHbQ==}
+  /@tanstack/query-core@5.80.7:
+    resolution: {integrity: sha512-s09l5zeUKC8q7DCCCIkVSns8zZrK4ZDT6ryEjxNBFi68G4z2EBobBS7rdOY3r6W1WbUDpc1fe5oY+YO/+2UVUg==}
 
   /@tanstack/query-devtools@5.80.0:
     resolution: {integrity: sha512-D6gH4asyjaoXrCOt5vG5Og/YSj0D/TxwNQgtLJIgWbhbWCC/emu2E92EFoVHh4ppVWg1qT2gKHvKyQBEFZhCuA==}
@@ -6608,23 +6608,23 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@tanstack/react-query-devtools@5.80.6(@tanstack/react-query@5.80.6)(react@18.2.0):
+  /@tanstack/react-query-devtools@5.80.6(@tanstack/react-query@5.80.7)(react@18.2.0):
     resolution: {integrity: sha512-y7Es0OJ4RYQxrPYsuuQP0jxjgJ40a03UbEPmJ6vwf/ERVMRoRIMkpjtvPxf1D+n9nwPfWmGdD0jW8Wxd+TxeEw==}
     peerDependencies:
       '@tanstack/react-query': ^5.80.6
       react: ^18 || ^19
     dependencies:
       '@tanstack/query-devtools': 5.80.0
-      '@tanstack/react-query': 5.80.6(react@18.2.0)
+      '@tanstack/react-query': 5.80.7(react@18.2.0)
       react: 18.2.0
     dev: true
 
-  /@tanstack/react-query@5.80.6(react@18.2.0):
-    resolution: {integrity: sha512-izX+5CnkpON3NQGcEm3/d7LfFQNo9ZpFtX2QsINgCYK9LT2VCIdi8D3bMaMSNhrAJCznRoAkFic76uvLroALBw==}
+  /@tanstack/react-query@5.80.7(react@18.2.0):
+    resolution: {integrity: sha512-u2F0VK6+anItoEvB3+rfvTO9GEh2vb00Je05OwlUe/A0lkJBgW1HckiY3f9YZa+jx6IOe4dHPh10dyp9aY3iRQ==}
     peerDependencies:
       react: ^18 || ^19
     dependencies:
-      '@tanstack/query-core': 5.80.6
+      '@tanstack/query-core': 5.80.7
       react: 18.2.0
 
   /@tanstack/react-store@0.1.3(react-dom@18.2.0)(react@18.2.0):
@@ -17765,7 +17765,7 @@ packages:
     resolution: {integrity: sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==}
     dev: true
 
-  /wagmi@2.14.15(@tanstack/react-query@5.80.6)(@types/react@18.3.23)(react@18.2.0)(typescript@5.8.3)(viem@2.23.9)(zod@3.25.56):
+  /wagmi@2.14.15(@tanstack/react-query@5.80.7)(@types/react@18.3.23)(react@18.2.0)(typescript@5.8.3)(viem@2.23.9)(zod@3.25.56):
     resolution: {integrity: sha512-sRa7FsEmgph1KsIK93wCS2MhZgUae18jI/+Ger+INSxytJbhzNkukpHxWlNfV/Skl8zxDAQfxucotZLi8UadZQ==}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
@@ -17776,7 +17776,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@tanstack/react-query': 5.80.6(react@18.2.0)
+      '@tanstack/react-query': 5.80.7(react@18.2.0)
       '@wagmi/connectors': 5.7.11(@types/react@18.3.23)(@wagmi/core@2.16.7)(react@18.2.0)(typescript@5.8.3)(viem@2.23.9)(zod@3.25.56)
       '@wagmi/core': 2.16.7(@types/react@18.3.23)(react@18.2.0)(typescript@5.8.3)(use-sync-external-store@1.4.0)(viem@2.23.9)
       react: 18.2.0

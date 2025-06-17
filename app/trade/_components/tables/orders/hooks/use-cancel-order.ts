@@ -46,7 +46,6 @@ export function useCancelOrder({ offerId, market, onCancel }: Props = {}) {
           bs: order.side === "buy" ? BS.buy : BS.sell,
           account: address,
         })
-        console.log("request", request)
 
         const tx = await walletClient.writeContract(request)
         const receipt = await marketClient.waitForTransactionReceipt({

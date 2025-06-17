@@ -1,15 +1,43 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { motion } from "framer-motion"
-import React, { useMemo } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { AnimatedOrderBookSkeleton } from "../orderbook/animated-skeleton"
 
 type OrderBookProps = {
   className?: string
   maxHeight?: string
+}
+
+function getGranularities(priceStr: string = ""): number[] {
+  const price = parseFloat(priceStr)
+  if (isNaN(price) || price <= 0) return []
+
+  const baseGranularities = [1, 5, 10, 100, 1000]
+
+  let scale = 1
+
+  if (price >= 100000) {
+    scale = 1
+  } else if (price >= 1000) {
+    scale = 1 / 100
+  } else if (price >= 1) {
+    scale = 1 / 1000
+  } else {
+    scale = 1 / 10000
+  }
+
+  return baseGranularities.map((g) => parseFloat((g * scale).toFixed(10)))
 }
 
 const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
@@ -18,6 +46,26 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
 
   const { base, quote } = currentMarket ?? {}
   const { asks, bids } = mergedBooks ?? {}
+
+  const [granularity, setGranularity] = useState<number | null>(null)
+  const [granularities, setGranularities] = useState<number[]>([])
+
+  React.useEffect(() => {
+    if (asks?.length && !granularities.length) {
+      const price = asks[0]?.price.toString()
+      const _granularities = getGranularities(price)
+      if (_granularities.length) {
+        setGranularities(_granularities)
+        setGranularity(_granularities[0]!)
+      }
+    }
+  }, [asks?.length])
+
+  useEffect(() => {
+    if (currentMarket) {
+      setGranularities([])
+    }
+  }, [currentMarket])
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -29,17 +77,42 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
 
   // Calculate cumulative volumes
   const processedAsks = useMemo(() => {
-    const sorted = [...asks].sort((a, b) => a.price - b.price)
-    let cumulative = 0
+    if (!granularity) {
+      return []
+    }
 
-    return sorted.map((ask) => {
+    const bucketed: Record<string, { total: number; volume: number }> = {}
+
+    asks.forEach((ask) => {
+      const bucketPrice = (
+        Math.round(ask.price / granularity) * granularity
+      ).toFixed(10)
+
+      if (!bucketed[bucketPrice]) {
+        bucketed[bucketPrice] = { total: 0, volume: 0 }
+      }
+
+      bucketed[bucketPrice].total += ask.total
+      bucketed[bucketPrice].volume += ask.volume
+    })
+
+    const aggregated = Object.entries(bucketed)
+      .map(([price, { total, volume }]) => ({
+        price: parseFloat(price),
+        total,
+        volume,
+      }))
+      .sort((a, b) => a.price - b.price)
+
+    let cumulative = 0
+    return aggregated.map((ask) => {
       cumulative += ask.total
       return {
         ...ask,
         cumulative,
       }
     })
-  }, [asks])
+  }, [asks, granularity])
 
   // For display, we want to show asks in reverse order (highest to lowest)
   const displayAsks = useMemo(() => {
@@ -47,17 +120,42 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
   }, [processedAsks])
 
   const processedBids = useMemo(() => {
-    const sorted = [...bids].sort((a, b) => b.price - a.price)
-    let cumulative = 0
+    if (!granularity) {
+      return []
+    }
 
-    return sorted.map((bid) => {
+    const bucketed: Record<string, { total: number; volume: number }> = {}
+
+    bids.forEach((bid) => {
+      const bucketPrice = (
+        Math.round(bid.price / granularity) * granularity
+      ).toFixed(10)
+
+      if (!bucketed[bucketPrice]) {
+        bucketed[bucketPrice] = { total: 0, volume: 0 }
+      }
+
+      bucketed[bucketPrice].total += bid.total
+      bucketed[bucketPrice].volume += bid.volume
+    })
+
+    const aggregated = Object.entries(bucketed)
+      .map(([price, { total, volume }]) => ({
+        price: parseFloat(price),
+        total,
+        volume,
+      }))
+      .sort((a, b) => b.price - a.price)
+
+    let cumulative = 0
+    return aggregated.map((bid) => {
       cumulative += bid.total
       return {
         ...bid,
         cumulative,
       }
     })
-  }, [bids])
+  }, [bids, granularity])
 
   // Calculate spread and midpoint
   const lowestAsk = processedAsks[0]?.price || 0
@@ -84,6 +182,29 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
         className,
       )}
     >
+      <div className="flex w-full justify-end">
+        {granularity && (
+          <Select
+            value={granularity.toString()}
+            onValueChange={(value: string) => setGranularity(parseFloat(value))}
+          >
+            <SelectTrigger className="w-fit py-1 text-xs py-0 px-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="w-[65px] min-w-[50px]">
+              {granularities.map((value) => (
+                <SelectItem
+                  className="text-xs py-[2px] px-1 w-full"
+                  key={value}
+                  value={value.toString()}
+                >
+                  {value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
       {/* Column Headers */}
       <div className="flex items-center px-2 py-2 text-white sticky top-0 bg-transparent z-10 border-b border-bg-secondary">
         <motion.span
@@ -158,9 +279,11 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
                     ? ask.price.toLocaleString(undefined, {
                         minimumFractionDigits: quote?.priceDisplayDecimals ?? 8,
                       })
-                    : ask.price.toLocaleString(undefined, {
-                        minimumFractionDigits: 1,
-                      })}
+                    : ask.price >= 1
+                      ? ask.price
+                      : ask.price.toLocaleString(undefined, {
+                          minimumFractionDigits: 1,
+                        })}
                 </span>
                 <span className="w-1/3 text-right text-[#c3d4c7] text-xs z-10">
                   {ask.volume.toLocaleString(undefined, {
@@ -229,9 +352,11 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
                     ? bid.price.toLocaleString(undefined, {
                         minimumFractionDigits: quote?.priceDisplayDecimals ?? 8,
                       })
-                    : bid.price.toLocaleString(undefined, {
-                        minimumFractionDigits: 1,
-                      })}
+                    : bid.price >= 1
+                      ? bid.price
+                      : bid.price.toLocaleString(undefined, {
+                          minimumFractionDigits: 1,
+                        })}
                 </span>
                 <span className="w-1/3 text-right text-[#c3d4c7] text-xs z-10">
                   {bid.volume.toLocaleString(undefined, {

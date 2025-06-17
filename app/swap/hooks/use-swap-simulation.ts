@@ -60,13 +60,6 @@ export function useSwapSimulation({
 
       const payAmount = parseUnits(payValue, payToken.decimals)
 
-      // const route = await getRoute(
-      //   payToken.address,
-      //   receiveToken.address,
-      //   payAmount,
-      // )
-      // console.log(route, tokenList)
-
       // Mangrove
       if (marketClient && isMangrove) {
         if (!book) return null
