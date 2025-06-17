@@ -22,6 +22,7 @@ interface UseLimitTransactionProps {
   baseToken?: any
   sendTokenBalance: any
   isWrapping: boolean
+  onTransactionSuccess?: () => void
 }
 
 export function useLimitTransaction({
@@ -31,6 +32,7 @@ export function useLimitTransaction({
   baseToken,
   sendTokenBalance,
   isWrapping,
+  onTransactionSuccess = () => {},
 }: UseLimitTransactionProps) {
   const { isConnected, address, chain } = useAccount()
 
@@ -101,7 +103,7 @@ export function useLimitTransaction({
   const handlePostOrder = async () => {
     setTxState("posting")
     try {
-      await post.mutateAsync(
+      const result = await post.mutateAsync(
         {
           form: {
             ...form.state.values,
@@ -119,6 +121,10 @@ export function useLimitTransaction({
           },
         },
       )
+
+      if (result?.receipt?.status === "success" && onTransactionSuccess) {
+        onTransactionSuccess()
+      }
     } catch (error) {
       console.error("Error posting order:", error)
       setTxState("idle")
