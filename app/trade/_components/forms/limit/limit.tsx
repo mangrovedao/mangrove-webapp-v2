@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
+import { useBalances } from "@/hooks/use-balances"
 import { useDollarConversion } from "@/hooks/use-dollar-conversion"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
@@ -86,6 +87,7 @@ export function Limit() {
 
   // Registry and trade infos
   const { baseToken } = useTradeInfos("limit", tradeSide)
+  const { refetch: refetchBalances } = useBalances()
 
   // Use the transaction hook
   const {
@@ -99,6 +101,15 @@ export function Limit() {
     baseToken,
     sendTokenBalance: sendBalance,
     isWrapping,
+    onTransactionSuccess: () => {
+      // Reset form state after successful transaction
+      form.reset()
+      setSendSliderValue(0)
+      setFormData(undefined)
+      setTimeout(() => {
+        refetchBalances()
+      }, 100)
+    },
   })
 
   useEffect(() => {
