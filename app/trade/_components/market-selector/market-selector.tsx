@@ -15,7 +15,8 @@ import { isArray } from "radash"
 import { useEffect, useMemo, useState } from "react"
 import { getAddress, isAddressEqual } from "viem"
 import { TokenIcon } from "../../../../components/token-icon"
-import { useTable } from "./use-table"
+import { OHLCVData, useTable } from "./use-table"
+import { useAccount } from "wagmi"
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(false)
@@ -41,20 +42,21 @@ export default function MarketSelector() {
   const isMobile = useMediaQuery("(max-width: 768px)")
   const { data: stats, isLoading } = useMarketStats({ markets })
   const [open, setOpen] = useState(false);
+  const { chain } = useAccount();
 
   const formattedStats = useMemo(() => {
     if (!stats || !isArray(stats)) return []
 
-    return stats.map((stat) => ({
+    return stats.map((stat: OHLCVData) => ({
       ...stat,
       market: {
         ...stat.market,
         tickSpacing: BigInt(stat.market.tickSpacing),
       },
     }))
-  }, [markets, isLoading])
+  }, [markets, isLoading, chain])
 
-  const table = useTable({ data: formattedStats as any })
+  const table = useTable({ data: formattedStats as OHLCVData[] })
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress, tickSpacing] = value.split("/")
@@ -80,7 +82,7 @@ export default function MarketSelector() {
       }
       onValueChange={onValueChange}
       disabled={!markets?.length}
-      open={true}
+      open={open}
       onOpenChange={setOpen}
     >
       <SelectTrigger className="rounded-sm w-fit flex justify-between p-1.5 text-sm">
@@ -124,12 +126,12 @@ export default function MarketSelector() {
           )}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className='overflow-x-auto'>
+      <SelectContent className='max-md:min-w-screen max-md:w-[calc(100vw-16px)]'>
         <DataTable
           table={table}
           onRowClick={(row) => {
             if (!row?.market) return
-            setMarket(row.market)
+            setMarket(row.market as MarketParams)
             setOpen(false)
           }}
         />

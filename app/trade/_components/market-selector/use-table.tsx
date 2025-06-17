@@ -18,7 +18,7 @@ export type OHLCVData = {
   market: {
     base: Token
     quote: Token
-    tickSpacing: bigint
+    tickSpacing: bigint | number
   }
   open: number | null
   high: number | null
@@ -28,7 +28,7 @@ export type OHLCVData = {
   price: number | null
   dailyChange: number | null
   dailyPercentChange: number | null
-  variantDailyPercentChange: "up" | "down"
+  variantDailyPrice: string;
 }
 
 const columnHelper = createColumnHelper<OHLCVData>()
