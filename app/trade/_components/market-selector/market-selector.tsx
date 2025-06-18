@@ -40,23 +40,10 @@ function getSymbol(market?: MarketParams) {
 export default function MarketSelector() {
   const { markets, currentMarket, setMarket } = useMarket()
   const isMobile = useMediaQuery("(max-width: 768px)")
-  const { data: stats, isLoading } = useMarketStats({ markets })
+  const { data: stats } = useMarketStats({ markets })
   const [open, setOpen] = useState(false);
-  const { chain } = useAccount();
 
-  const formattedStats = useMemo(() => {
-    if (!stats || !isArray(stats)) return []
-
-    return stats.map((stat: OHLCVData) => ({
-      ...stat,
-      market: {
-        ...stat.market,
-        tickSpacing: BigInt(stat.market.tickSpacing),
-      },
-    }))
-  }, [markets, isLoading, chain])
-
-  const table = useTable({ data: formattedStats as OHLCVData[] })
+  const table = useTable({ data: stats as OHLCVData[] })
 
   const onValueChange = (value: string) => {
     const [baseAddress, quoteAddress, tickSpacing] = value.split("/")
