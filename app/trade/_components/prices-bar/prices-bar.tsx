@@ -1,7 +1,7 @@
 "use client"
 
 import type { Token } from "@mangrovedao/mgv"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, easeInOut, motion } from "framer-motion"
 import React from "react"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
@@ -59,7 +59,7 @@ const loadingVariants = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: easeInOut,
     },
   },
 }
