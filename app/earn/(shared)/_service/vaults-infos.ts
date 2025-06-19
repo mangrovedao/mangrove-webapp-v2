@@ -10,12 +10,7 @@ import {
 
 import { kandelSchema, multicallSchema } from "../schemas"
 import { CompleteVault, VaultList } from "../types"
-import {
-  calculateFees,
-  fetchPnLData,
-  fetchTokenPrices,
-  VaultABI,
-} from "../utils"
+import { calculateFees, fetchPnLData, VaultABI } from "../utils"
 import { getUserVaultIncentives } from "./vault-incentives-rewards"
 
 // Cache with TTL implementation
@@ -77,49 +72,6 @@ export async function getVaultsInformation(
   incentivesRewards?: { vault: Address; total: number }[],
 ): Promise<CompleteVault[]> {
   if (!vaults.length) return []
-
-  // Step 1: Efficiently collect all unique markets first to batch token price fetching
-  const uniqueMarkets = new Map()
-  vaults.forEach((v) => {
-    const marketKey = `${v.market.base.address}_${v.market.quote.address}`
-    uniqueMarkets.set(marketKey, v.market)
-  })
-
-  // Step 2: Prefetch all token prices in parallel
-  const pricePromises: Promise<[string, number]>[] = []
-  uniqueMarkets.forEach((market, key) => {
-    // Check if base price is cached
-    const basePriceKey = `${market.base.address}_${client.chain?.id}`
-    if (!tokenPriceCache.get(basePriceKey)) {
-      pricePromises.push(
-        fetchTokenPrices(client, market).then(([basePrice, quotePrice]) => [
-          basePriceKey,
-          basePrice,
-        ]),
-      )
-    }
-
-    // Check if quote price is cached
-    const quotePriceKey = `${market.quote.address}_${client.chain?.id}`
-    if (!tokenPriceCache.get(quotePriceKey)) {
-      pricePromises.push(
-        fetchTokenPrices(client, market).then(([basePrice, quotePrice]) => [
-          quotePriceKey,
-          quotePrice,
-        ]),
-      )
-    }
-  })
-
-  // Fetch all prices in parallel and update cache
-  if (pricePromises.length) {
-    ;(await Promise.allSettled(pricePromises)).forEach((result) => {
-      if (result.status === "fulfilled") {
-        const [key, price] = result.value
-        tokenPriceCache.set(key, price)
-      }
-    })
-  }
 
   const batchSize = 25 // Increased batch size for better throughput
   const results: any[] = []

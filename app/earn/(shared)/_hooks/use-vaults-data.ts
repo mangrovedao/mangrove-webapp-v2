@@ -7,9 +7,10 @@ import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
-import { getVaultsInformation } from "../../../../../(shared)/_service/vaults-infos"
+import { getVaultsInformation } from "../_service/vaults-infos"
 
 type Params<T> = {
+  isUserVaults?: boolean
   filters?: {
     first?: number
     skip?: number
@@ -24,9 +25,11 @@ const getVaultsQueryKey = (
   chainId?: number,
   skip = 0,
   first = 10,
-) => ["vaults", networkKey, user, chainId, skip, first]
+  vaultsListLength = 0,
+) => ["vaults", networkKey, user, chainId, skip, first, vaultsListLength]
 
 export function useVaults<T = CompleteVault[]>({
+  isUserVaults = false,
   filters: { first = 10, skip = 0 } = {},
   select,
 }: Params<T> = {}) {
@@ -44,6 +47,7 @@ export function useVaults<T = CompleteVault[]>({
     defaultChain.id,
     skip,
     first,
+    vaultsList?.length,
   )
 
   // Get the previous data for all pages as potential placeholder
@@ -83,7 +87,8 @@ export function useVaults<T = CompleteVault[]>({
           user,
           incentivesData,
         )
-        return vaults
+
+        return vaults.filter((v) => (isUserVaults ? v.hasPosition : true))
       } catch (error) {
         console.error(error)
         return []
