@@ -8,8 +8,8 @@ import type { Strategy } from "../../../_schemas/kandels"
 
 import { Switch } from "@/components/ui/switch"
 import { motion } from "framer-motion"
+import { useVaults } from "../../../../(shared)/_hooks/use-vaults-data"
 import { useTable } from "./hooks/use-table"
-import { useVaults } from "./hooks/use-vaults-data"
 
 type PageDetails = {
   page: number

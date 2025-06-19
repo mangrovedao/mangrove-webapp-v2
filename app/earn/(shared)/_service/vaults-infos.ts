@@ -10,13 +10,7 @@ import {
 
 import { kandelSchema, multicallSchema } from "../schemas"
 import { CompleteVault, VaultList } from "../types"
-import {
-  calculateFees,
-  fetchPnLData,
-  fetchTokenPrices,
-  VaultABI,
-} from "../utils"
-import { getUserVaultIncentives } from "./vault-incentives-rewards"
+import { calculateFees, fetchPnLData, VaultABI } from "../utils"
 
 // Cache with TTL implementation
 interface CacheEntry<T> {
@@ -74,52 +68,8 @@ export async function getVaultsInformation(
   client: PublicClient,
   vaults: VaultList[],
   user?: Address,
-  incentivesRewards?: { vault: Address; total: number }[],
 ): Promise<CompleteVault[]> {
   if (!vaults.length) return []
-
-  // Step 1: Efficiently collect all unique markets first to batch token price fetching
-  const uniqueMarkets = new Map()
-  vaults.forEach((v) => {
-    const marketKey = `${v.market.base.address}_${v.market.quote.address}`
-    uniqueMarkets.set(marketKey, v.market)
-  })
-
-  // Step 2: Prefetch all token prices in parallel
-  const pricePromises: Promise<[string, number]>[] = []
-  uniqueMarkets.forEach((market, key) => {
-    // Check if base price is cached
-    const basePriceKey = `${market.base.address}_${client.chain?.id}`
-    if (!tokenPriceCache.get(basePriceKey)) {
-      pricePromises.push(
-        fetchTokenPrices(client, market).then(([basePrice, quotePrice]) => [
-          basePriceKey,
-          basePrice,
-        ]),
-      )
-    }
-
-    // Check if quote price is cached
-    const quotePriceKey = `${market.quote.address}_${client.chain?.id}`
-    if (!tokenPriceCache.get(quotePriceKey)) {
-      pricePromises.push(
-        fetchTokenPrices(client, market).then(([basePrice, quotePrice]) => [
-          quotePriceKey,
-          quotePrice,
-        ]),
-      )
-    }
-  })
-
-  // Fetch all prices in parallel and update cache
-  if (pricePromises.length) {
-    ;(await Promise.allSettled(pricePromises)).forEach((result) => {
-      if (result.status === "fulfilled") {
-        const [key, price] = result.value
-        tokenPriceCache.set(key, price)
-      }
-    })
-  }
 
   const batchSize = 25 // Increased batch size for better throughput
   const results: any[] = []
@@ -316,12 +266,6 @@ export async function getVaultsInformation(
         managementFee: (Number(feeData[1]) / 1e5) * 100,
         totalBase,
         totalQuote,
-        totalRewards:
-          incentivesRewards && Array.isArray(incentivesRewards)
-            ? (incentivesRewards.find(
-                (i) => i.vault.toLowerCase() === v.address.toLowerCase(),
-              )?.total ?? 0)
-            : 0,
         balanceBase,
         balanceQuote,
         tvl: totalInQuote[0],
@@ -331,19 +275,6 @@ export async function getVaultsInformation(
         userBaseBalance,
         userQuoteBalance,
         pnlData: null,
-        incentivesData: null,
-      }
-
-      // Fetch user-specific incentives data
-      try {
-        result.incentivesData = await getUserVaultIncentives(
-          client,
-          v.address,
-          user,
-          v.incentives,
-        )
-      } catch (e) {
-        console.error(`Failed to fetch incentives for ${v.address}:`, e)
       }
 
       // Only fetch PnL data if user is connected and has a position (do this last as it's expensive)

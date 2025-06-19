@@ -7,8 +7,8 @@ import CloseStrategyDialog from "@/app/strategies/[address]/_components/paramete
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import { motion } from "framer-motion"
 import { useAccount } from "wagmi"
+import { useVaults } from "../../../../(shared)/_hooks/use-vaults-data"
 import { TableLoadingSkeleton } from "../tables"
-import { useMyVaults } from "./hooks/use-my-vaults"
 import { useTable } from "./hooks/use-table"
 
 export function MyVaults() {
@@ -24,15 +24,12 @@ export function MyVaults() {
     isLoading,
     error,
     refetch,
-  } = useMyVaults({
+  } = useVaults({
+    isUserVaults: true,
     filters: {
       skip: (page - 1) * pageSize,
       first: pageSize,
     },
-  })
-
-  const { data: count } = useMyVaults({
-    select: (vaults) => vaults.length,
   })
 
   // selected strategy to cancel
@@ -75,7 +72,7 @@ export function MyVaults() {
           onPageChange: setPageDetails,
           page,
           pageSize,
-          count,
+          count: vaults?.length ?? 0,
         }}
         containerClassName="max-h-[600px]"
         skeletonRows={5}
