@@ -95,7 +95,7 @@ export function useVaults<T = CompleteVault[]>({
       }
     },
     placeholderData: previousVaultsData,
-    enabled: !!networkClient?.key && !!user && !!vaultsList?.length,
+    enabled: !!networkClient?.key && !!vaultsList?.length,
     staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh longer
     gcTime: 10 * 60 * 1000, // 10 minutes - data stays in cache longer
     refetchOnWindowFocus: false,
