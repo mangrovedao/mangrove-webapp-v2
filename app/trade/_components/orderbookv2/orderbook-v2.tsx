@@ -11,7 +11,7 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { motion } from "framer-motion"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import { AnimatedOrderBookSkeleton } from "../orderbook/animated-skeleton"
 
 type OrderBookProps = {
@@ -51,21 +51,18 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
   const [granularities, setGranularities] = useState<number[]>([])
 
   React.useEffect(() => {
-    if (asks?.length && !granularities.length) {
+    if (asks?.length || bids?.length) {
       const price = asks[0]?.price.toString()
       const _granularities = getGranularities(price)
       if (_granularities.length) {
         setGranularities(_granularities)
         setGranularity(_granularities[0]!)
       }
-    }
-  }, [asks?.length])
-
-  useEffect(() => {
-    if (currentMarket) {
+    } else {
       setGranularities([])
+      setGranularity(null)
     }
-  }, [currentMarket])
+  }, [asks?.length, bids?.length, currentMarket])
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -184,25 +181,33 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
     >
       <div className="flex w-full justify-end">
         {granularity && (
-          <Select
-            value={granularity.toString()}
-            onValueChange={(value: string) => setGranularity(parseFloat(value))}
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            <SelectTrigger className="w-fit py-1 text-xs py-0 px-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="w-[65px] min-w-[50px]">
-              {granularities.map((value) => (
-                <SelectItem
-                  className="text-xs py-[2px] px-1 w-full"
-                  key={value}
-                  value={value.toString()}
-                >
-                  {value}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select
+              value={granularity?.toString()}
+              onValueChange={(value: string) =>
+                setGranularity(parseFloat(value))
+              }
+            >
+              <SelectTrigger className="w-fit py-1 text-xs py-0 px-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="w-[65px] min-w-[50px]">
+                {granularities.map((value) => (
+                  <SelectItem
+                    className="text-xs py-[2px] px-1 w-full"
+                    key={value}
+                    value={value.toString()}
+                  >
+                    {value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </motion.div>
         )}
       </div>
       {/* Column Headers */}
