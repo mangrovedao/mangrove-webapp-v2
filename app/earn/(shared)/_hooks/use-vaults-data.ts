@@ -1,7 +1,6 @@
 "use client"
 
 import { useVaultsList } from "@/app/earn/(shared)/_hooks/use-vaults-list"
-import { getVaultIncentives } from "@/app/earn/(shared)/_service/vault-incentives"
 import { CompleteVault } from "@/app/earn/(shared)/types"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useNetworkClient } from "@/hooks/use-network-client"
@@ -62,30 +61,10 @@ export function useVaults<T = CompleteVault[]>({
         if (!networkClient?.key) throw new Error("Public client is not enabled")
         if (!vaultsList) throw new Error("Vaults not found")
 
-        // Get incentives data in parallel with other operations
-        const incentivesData = await Promise.all(
-          vaultsList.map(async (vault) => {
-            const data = await getVaultIncentives(
-              networkClient,
-              vault.address,
-              vault.incentives,
-            )
-            return {
-              vault: vault.address,
-              total:
-                data?.leaderboard.reduce(
-                  (sum, entry) => sum + entry.rewards,
-                  0,
-                ) ?? 0,
-            }
-          }),
-        )
-
         const vaults = await getVaultsInformation(
           networkClient,
           vaultsList,
           user,
-          incentivesData,
         )
 
         return vaults.filter((v) => (isUserVaults ? v.hasPosition : true))

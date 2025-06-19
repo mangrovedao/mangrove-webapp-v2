@@ -204,7 +204,6 @@ export const createVault = (
     lastTimestamp: backendData?.lastTimestamp || 0n,
     mintedAmount: 0n,
     managementFee: 0,
-    totalRewards: 0,
     performanceFee: 0,
     address: vaultList.address,
     market: vaultList.market,

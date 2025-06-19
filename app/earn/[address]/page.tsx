@@ -441,7 +441,7 @@ export default function Page() {
                 value={
                   <div className="flex items-center gap-1">
                     <span className="text-text-secondary !text-md">
-                      {rewardsInfo?.symbol}
+                      {vault?.incentives?.token}
                     </span>
 
                     <span>{vault?.incentives?.maxRewards}</span>
@@ -458,8 +458,8 @@ export default function Page() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.8 }}
                     >
-                      <span className="flex gap-1 text-md">
-                        {rewardsInfo?.symbol}
+                      <span className="text-text-secondary !text-md">
+                        {vault?.incentives?.token}
                       </span>
                     </motion.div>
                   }
@@ -474,7 +474,7 @@ export default function Page() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.9 }}
                     >
-                      {rewardsInfo?.claimable.toFixed(2)}
+                      {rewardsInfo?.claimable.toFixed(2) || 0}
                     </motion.span>
                   }
                   symbol={""}
@@ -486,15 +486,18 @@ export default function Page() {
                     <div className="flex items-center gap-1">
                       {isLoading ? (
                         <Skeleton className="w-10 h-4" />
-                      ) : (
+                      ) : vault?.incentives?.rewardRatePerSecond &&
+                        vault?.hasPosition ? (
                         <FlowingNumbers
                           className="!text-md"
-                          initialValue={vault?.incentivesData?.rewards || 0}
+                          initialValue={vault?.incentives?.rewardRate || 0}
                           ratePerSecond={
-                            vault?.incentivesData?.currentRewardsPerSecond || 0
+                            vault?.incentives?.rewardRatePerSecond || 0
                           }
                           decimals={6}
                         />
+                      ) : (
+                        <span className="text-text-secondary">0</span>
                       )}
                     </div>
                   }

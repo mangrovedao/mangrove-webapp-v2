@@ -11,7 +11,6 @@ import {
 import { kandelSchema, multicallSchema } from "../schemas"
 import { CompleteVault, VaultList } from "../types"
 import { calculateFees, fetchPnLData, VaultABI } from "../utils"
-import { getUserVaultIncentives } from "./vault-incentives-rewards"
 
 // Cache with TTL implementation
 interface CacheEntry<T> {
@@ -69,7 +68,6 @@ export async function getVaultsInformation(
   client: PublicClient,
   vaults: VaultList[],
   user?: Address,
-  incentivesRewards?: { vault: Address; total: number }[],
 ): Promise<CompleteVault[]> {
   if (!vaults.length) return []
 
@@ -268,12 +266,6 @@ export async function getVaultsInformation(
         managementFee: (Number(feeData[1]) / 1e5) * 100,
         totalBase,
         totalQuote,
-        totalRewards:
-          incentivesRewards && Array.isArray(incentivesRewards)
-            ? (incentivesRewards.find(
-                (i) => i.vault.toLowerCase() === v.address.toLowerCase(),
-              )?.total ?? 0)
-            : 0,
         balanceBase,
         balanceQuote,
         tvl: totalInQuote[0],
@@ -283,19 +275,6 @@ export async function getVaultsInformation(
         userBaseBalance,
         userQuoteBalance,
         pnlData: null,
-        incentivesData: null,
-      }
-
-      // Fetch user-specific incentives data
-      try {
-        result.incentivesData = await getUserVaultIncentives(
-          client,
-          v.address,
-          user,
-          v.incentives,
-        )
-      } catch (e) {
-        console.error(`Failed to fetch incentives for ${v.address}:`, e)
       }
 
       // Only fetch PnL data if user is connected and has a position (do this last as it's expensive)
