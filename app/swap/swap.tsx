@@ -83,7 +83,7 @@ export default function Swap() {
 
   return (
     <>
-      <div className="bg-bg-secondary rounded-sm p-5 relative mt-40">
+      <div className="bg-bg-secondary rounded-sm p-5 relative mt-50">
         <h1 className="text-2xl mb-4">Swap</h1>
         <div className="space-y-2 relative">
           <div className="space-y-0.5">
