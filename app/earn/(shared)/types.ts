@@ -1,3 +1,4 @@
+import { userIncentiveResponseSchema } from "@/app/rewards/schemas/rewards-configuration"
 import { Address } from "viem"
 import { z } from "zod"
 import { IncentiveSchema, pnlSchema, VaultSchema } from "./schemas"
@@ -28,6 +29,7 @@ export type VaultMulticall = {
   userBaseBalance?: bigint
   userQuoteBalance?: bigint
   pnlData?: z.infer<typeof pnlSchema> | null
+  userIncentives?: z.infer<typeof userIncentiveResponseSchema> | null
 }
 
 export type VaultList = Omit<z.infer<typeof VaultSchema>, "incentives"> & {

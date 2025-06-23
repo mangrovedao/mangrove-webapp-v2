@@ -3,7 +3,7 @@ import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount } from "wagmi"
-import { incentiveResponseSchema } from "../schemas/rewards-configuration"
+import { userIncentiveResponseSchema } from "../schemas/rewards-configuration"
 
 export const useIncentivesUserRewards = () => {
   const { address: user } = useAccount()
@@ -29,7 +29,7 @@ export const useIncentivesUserRewards = () => {
 
         const incentivesData = await Promise.all(
           userIncentives.map(async (incentive) =>
-            incentiveResponseSchema.parse(await incentive),
+            userIncentiveResponseSchema.parse(await incentive),
           ),
         )
 

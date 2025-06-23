@@ -13,8 +13,8 @@ import { cn } from "@/utils"
 import { formatDate, formatRelativeTime } from "@/utils/date"
 import { formatNumber } from "@/utils/numbers"
 import { BS } from "@mangrovedao/mgv/lib"
-import { useTradeFormStore } from "../../forms/store"
-import type { TradeHistory } from "../trade-history/schema"
+import { useTradeFormStore } from "../forms/store"
+import type { TradeHistory } from "./schema"
 
 const columnHelper = createColumnHelper<TradeHistory>()
 
