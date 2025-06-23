@@ -11,7 +11,6 @@ import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
 import { toast } from "sonner"
 import { parseUnits } from "viem"
-import { megaethTestnet } from "viem/chains"
 import { TradeMode } from "../../enums"
 import { useOptimisticCache } from "../../hooks/use-optimistic-cache"
 import { successToast } from "../../utils"
@@ -72,10 +71,10 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
             quoteAmount,
             bs,
             slippage,
-            gas:
-              marketClient.chain?.id === megaethTestnet.id
-                ? 10_000_000n
-                : 20_000_000n,
+            // gas:
+            //   marketClient.chain?.id === megaethTestnet.id
+            //     ? 10_000_000n
+            //     : 20_000_000n,
             account: address,
           })
 
