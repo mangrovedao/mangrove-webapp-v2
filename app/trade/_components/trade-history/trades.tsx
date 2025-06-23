@@ -17,7 +17,7 @@ export function Trades({ className }: { className?: string }) {
   const { currentMarket: market } = useMarket()
   const scrollRef = useRef<HTMLDivElement>(null)
   const tradesHistoryQuery = useTrades()
-  console.log({ tradesHistoryQuery })
+
   // Process trades data with proper type safety
   const processedTrades = useMemo(() => {
     // Handle the case when data hasn't loaded yet
@@ -83,7 +83,7 @@ export function Trades({ className }: { className?: string }) {
 
   // Only show loading state if we're loading and don't have data yet
   const isLoading = tradesHistoryQuery.isLoading
-  console.log(tradesHistoryQuery.isLoading)
+
   return (
     <motion.div
       initial={{ opacity: 0 }}

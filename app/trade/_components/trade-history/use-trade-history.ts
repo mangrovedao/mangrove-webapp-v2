@@ -76,7 +76,7 @@ export function useTradeHistory<T = TradeHistory[]>({
           `${getIndexerUrl(defaultChain)}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
         )
         const result = await response.json()
-        console.log({ result })
+
         const parsedData = parseTradeHistory(result)
         return parsedData
       } catch (e) {

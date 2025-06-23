@@ -5,14 +5,14 @@ import { ArrowDown } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Address, formatUnits } from "viem"
-import { useAccount, useBalance } from "wagmi"
+import { useAccount } from "wagmi"
 
 import { CustomInput } from "@/components/custom-input-new"
 import InfoTooltip from "@/components/info-tooltip-new"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { useDollarConversion } from "@/hooks/use-dollar-conversion"
+import { useBalances } from "@/hooks/use-balances"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -25,8 +25,6 @@ import { useMarketForm } from "./hooks/use-market"
 import { useMarketTransaction } from "./hooks/use-market-transaction"
 import { type Form } from "./types"
 import { isGreaterThanZeroValidator, sendValidator } from "./validators"
-import { useTradeBalances } from "../hooks/use-trade-balances"
-import { useBalances } from "@/hooks/use-balances"
 
 // Reuse the wethAdresses from the dialog
 export const wethAdresses: { [key: number]: Address | undefined } = {
@@ -80,7 +78,7 @@ export function Market() {
   // Registry and trade infos
   const { baseToken } = useTradeInfos("market", tradeSide)
 
-  const { refetch: refetchBalances } = useBalances();
+  const { refetch: refetchBalances } = useBalances()
 
   // Use the transaction hook
   const {
@@ -102,16 +100,17 @@ export function Market() {
       setSendSliderValue(0)
       setFormData(undefined)
       setTimeout(() => {
-        refetchBalances();
+        refetchBalances()
       }, 100)
     },
   })
 
-  const { payDollar, receiveDollar } = useDollarConversion({
-    payAmount: form.state.values.send,
-    receiveAmount: form.state.values.receive,
-    tradeSide,
-  })
+  const { payDollar, receiveDollar } = { payDollar: 0, receiveDollar: 0 }
+  // const { payDollar, receiveDollar } = useDollarConversion({
+  //   payAmount: form.state.values.send,
+  //   receiveAmount: form.state.values.receive,
+  //   tradeSide,
+  // })
 
   // Initialize form with shared pay amount when component mounts or when switching tabs
   useEffect(() => {

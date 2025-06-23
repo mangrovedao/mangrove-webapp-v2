@@ -12,7 +12,6 @@ import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { cn } from "@/utils"
 import { motion } from "framer-motion"
-import { AnimatedFormsSkeleton } from "./animated-forms-skeleton"
 import { Limit } from "./limit/limit"
 import { Market } from "./market/market"
 import { useTradeFormStore } from "./store"
@@ -46,9 +45,9 @@ export function Forms({
     [payAmount, setOrderType],
   )
 
-  if (isGhostBookLoading) {
-    return <AnimatedFormsSkeleton />
-  }
+  // if (isGhostBookLoading) {
+  //   return <AnimatedFormsSkeleton />
+  // }
 
   return (
     <div className="h-full">

@@ -1,6 +1,6 @@
 import { useApproveAmount } from "@/hooks/ghostbook/hooks/use-approve-amount"
 import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
-import { usePool } from "@/hooks/new_ghostbook/pool"
+import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import { BS } from "@mangrovedao/mgv/lib"
 import { MarketOrderSteps } from "@mangrovedao/mgv/types"
 import { useEffect } from "react"
@@ -40,7 +40,7 @@ export function useMarketTransaction({
 }: UseMarketTransactionProps) {
   const { isConnected, address, chain } = useAccount()
   const { mangroveChain } = useRegistry()
-  const { pool } = usePool()
+  const { selectedPool: pool } = useSelectedPool()
 
   // Market steps to check if approval is needed
   const { data: marketOrderSteps, refetch: refetchSteps } = useMarketSteps({
@@ -153,10 +153,9 @@ export function useMarketTransaction({
         },
       )
 
-      if (result?.receipt?.status === 'success' && onTransactionSuccess) {
-        onTransactionSuccess();
+      if (result?.receipt?.status === "success" && onTransactionSuccess) {
+        onTransactionSuccess()
       }
-
     } catch (error) {
       setTxState("idle")
       toast.error("Failed to post the market order")
