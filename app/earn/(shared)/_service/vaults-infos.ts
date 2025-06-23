@@ -11,6 +11,7 @@ import {
 import { kandelSchema, multicallSchema } from "../schemas"
 import { CompleteVault, VaultList } from "../types"
 import { calculateFees, fetchPnLData, VaultABI } from "../utils"
+import { getUserVaultIncentives } from "./vault-incentives-rewards"
 
 // Cache with TTL implementation
 interface CacheEntry<T> {
@@ -275,10 +276,21 @@ export async function getVaultsInformation(
         userBaseBalance,
         userQuoteBalance,
         pnlData: null,
+        userIncentives: null,
       }
 
       // Only fetch PnL data if user is connected and has a position (do this last as it's expensive)
       if (user && hasPosition) {
+        if (v.incentives) {
+          const incentives = await getUserVaultIncentives(
+            client,
+            v.address,
+            user,
+            v.incentives,
+          )
+          result.userIncentives = incentives
+        }
+
         // Check PnL cache
         const pnlCacheKey = `${v.address}_${user}_${client.chain?.id}`
         let pnlData = pnlCache.get(pnlCacheKey)

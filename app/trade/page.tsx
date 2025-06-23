@@ -1,4 +1,6 @@
 "use client"
+import { useEffect, useState } from "react"
+
 import MarketSelector from "@/app/trade/_components/market-selector/market-selector"
 import { Button } from "@/components/ui/button"
 import { Drawer } from "@/components/ui/drawer"
@@ -8,20 +10,16 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { usePool } from "@/hooks/new_ghostbook/pool"
-import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
-
 import useMarket from "@/providers/market"
 import { TradeIcon } from "@/svgs"
-import { useEffect, useState } from "react"
 import EmbedPriceChart from "./_components/charts/embed-price-chart/embed-price-chart"
 import { Forms } from "./_components/forms/forms"
 import { OrderBook } from "./_components/orderbook/orderbook"
-import { Trades } from "./_components/orderbook/trade-history/trades"
 import OrderBookV2 from "./_components/orderbookv2/orderbook-v2"
 import { PricesBar } from "./_components/prices-bar/prices-bar"
 import { Tables } from "./_components/tables/tables"
+import { Trades } from "./_components/trade-history/trades"
 import { TradeTabs } from "./_components/trade-tabs/trade-tabs"
 
 export default function Page() {
@@ -29,8 +27,7 @@ export default function Page() {
   const mainTabs = ["Chart", "Order Book", "Trades"]
   const [isMobile, setIsMobile] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const { defaultChain } = useDefaultChain()
-  const { pool } = usePool()
+
   const { currentMarket } = useMarket()
   const { spotPrice } = useMergedBooks()
 

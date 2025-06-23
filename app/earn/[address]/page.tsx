@@ -81,9 +81,7 @@ export default function Page() {
   })
 
   const { mutate: claimRewards, isPending: isClaiming } = useClaimRewards()
-
   const incentivesApr = vault?.incentives?.apy || 0
-
   const isLoading = isLoadingVault || isLoadingRewards
 
   return (
@@ -486,13 +484,13 @@ export default function Page() {
                     <div className="flex items-center gap-1">
                       {isLoading ? (
                         <Skeleton className="w-10 h-4" />
-                      ) : vault?.incentives?.rewardRatePerSecond &&
+                      ) : vault?.userIncentives?.currentRewardsPerSecond &&
                         vault?.hasPosition ? (
                         <FlowingNumbers
                           className="!text-md"
-                          initialValue={vault?.incentives?.rewardRate || 0}
+                          initialValue={vault?.userIncentives?.rewards || 0}
                           ratePerSecond={
-                            vault?.incentives?.rewardRatePerSecond || 0
+                            vault?.userIncentives?.currentRewardsPerSecond || 0
                           }
                           decimals={6}
                         />

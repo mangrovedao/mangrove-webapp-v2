@@ -21,9 +21,9 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { Check, ChevronDown } from "lucide-react"
 import OrderBookV2 from "../orderbookv2/orderbook-v2"
+import { Trades } from "../trade-history/trades"
 import { AnimatedOrderBookSkeleton } from "./animated-skeleton"
 import { OrderBookTableHead } from "./table-head"
-import { Trades } from "./trade-history/trades"
 import useScrollToMiddle from "./use-scroll-to-middle"
 
 // View options for the orderbook
@@ -139,10 +139,7 @@ export const BookContent = React.memo(function BookContent() {
 
   // Memoize expensive calculations to prevent recalculations on re-renders
   // Must be defined before any conditional returns
-  const {
-    spreadPercentString,
-    midPrice,
-  } = React.useMemo(() => {
+  const { spreadPercentString, midPrice } = React.useMemo(() => {
     if (!filteredBook || !currentMarket)
       return {
         lowestAskPrice: 0,

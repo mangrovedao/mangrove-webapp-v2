@@ -10,7 +10,6 @@ export function useVaultsList() {
   return useQuery({
     queryKey: ["vaults-list", defaultChain.id],
     queryFn: async () => {
-
       try {
         const response = await fetch(
           `https://api.mgvinfra.com/registry/whitelist?chainId=${defaultChain.id}`,

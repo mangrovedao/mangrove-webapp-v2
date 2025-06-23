@@ -1,12 +1,12 @@
 "use client"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { motion } from "framer-motion"
 import { useEffect, useMemo, useRef } from "react"
 
+import { DataTable } from "@/components/ui/data-table/data-table"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
-import { DataTable } from "../../../../../components/ui/data-table/data-table"
 import { AnimatedTradesHistorySkeleton } from "./animated-trades-skeleton"
 import { parseTradeHistory } from "./schema"
 import { useTable } from "./use-table"
@@ -17,7 +17,7 @@ export function Trades({ className }: { className?: string }) {
   const { currentMarket: market } = useMarket()
   const scrollRef = useRef<HTMLDivElement>(null)
   const tradesHistoryQuery = useTrades()
-
+  console.log({ tradesHistoryQuery })
   // Process trades data with proper type safety
   const processedTrades = useMemo(() => {
     // Handle the case when data hasn't loaded yet
@@ -83,7 +83,7 @@ export function Trades({ className }: { className?: string }) {
 
   // Only show loading state if we're loading and don't have data yet
   const isLoading = tradesHistoryQuery.isLoading
-
+  console.log(tradesHistoryQuery.isLoading)
   return (
     <motion.div
       initial={{ opacity: 0 }}
