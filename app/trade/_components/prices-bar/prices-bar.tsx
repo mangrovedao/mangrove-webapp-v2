@@ -145,30 +145,22 @@ export function PricesBar() {
   const { defaultChain } = useDefaultChain()
 
   const { currentMarket } = useMarket()
-  const {
-    mergedBooks: book,
-    refetch: refetchBooks,
-    spotPrice,
-  } = useMergedBooks()
+  const { refetch: refetchBooks, spotPrice } = useMergedBooks()
   const { pool } = usePool()
   const base = currentMarket?.base
   const quote = currentMarket?.quote
-  const { data: poolStats } = useMangrovePoolStatsQuery(
-    base?.address,
-    quote?.address,
-  )
+  const { data: poolStats, isFetched: poolStatsFetched } =
+    useMangrovePoolStatsQuery(base?.address, quote?.address)
 
-  const { data: priceData } = useMangroveTokenPricesQuery(
-    base?.address,
-    quote?.address,
-    1,
-  )
+  const { data: priceData, isFetched: priceDataFetched } =
+    useMangroveTokenPricesQuery(base?.address, quote?.address, 1)
 
   // Normalize stats based on which chain we're using
   const stats = normalizeStats(
     defaultChain.testnet || !pool ? priceData : poolStats,
   )
 
+  const isFetched = poolStatsFetched && priceDataFetched
   React.useEffect(() => {
     const interval = setInterval(() => {
       refetchBooks()
@@ -222,7 +214,7 @@ export function PricesBar() {
           label={"Price"}
           value={side === "quote" ? 1 / (spotPrice ?? 1) : spotPrice}
           token={side === "quote" ? base : quote}
-          skeleton={!stats}
+          skeleton={!isFetched}
         />
         <Item
           label={`24h Change`}
@@ -235,7 +227,7 @@ export function PricesBar() {
               : undefined
           }
           token={token}
-          skeleton={!stats}
+          skeleton={!isFetched}
           className={variation24hClassnames}
           rightElement={
             variation24hPercentage !== undefined &&
@@ -273,7 +265,7 @@ export function PricesBar() {
               : undefined
           }
           token={token}
-          skeleton={!stats}
+          skeleton={!isFetched}
         />
 
         <Item
@@ -284,7 +276,7 @@ export function PricesBar() {
               : undefined
           }
           token={token}
-          skeleton={!stats}
+          skeleton={!isFetched}
         />
 
         <Item
@@ -295,7 +287,7 @@ export function PricesBar() {
               : undefined
           }
           token={token}
-          skeleton={!stats}
+          skeleton={!isFetched}
         />
       </motion.div>
       <ScrollBar

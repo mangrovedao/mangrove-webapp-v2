@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { useBalances } from "@/hooks/use-balances"
+import { useDollarConversion } from "@/hooks/use-dollar-conversion"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
@@ -105,12 +106,11 @@ export function Market() {
     },
   })
 
-  const { payDollar, receiveDollar } = { payDollar: 0, receiveDollar: 0 }
-  // const { payDollar, receiveDollar } = useDollarConversion({
-  //   payAmount: form.state.values.send,
-  //   receiveAmount: form.state.values.receive,
-  //   tradeSide,
-  // })
+  const { payDollar, receiveDollar } = useDollarConversion({
+    payAmount: form.state.values.send,
+    receiveAmount: form.state.values.receive,
+    tradeSide,
+  })
 
   // Initialize form with shared pay amount when component mounts or when switching tabs
   useEffect(() => {
