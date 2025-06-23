@@ -8,6 +8,7 @@ import { useMangroveAddresses } from "@/hooks/use-addresses"
 import { useMarketClient } from "@/hooks/use-market"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
+import { printEvmError } from "@/utils/errors"
 import { toast } from "sonner"
 import { parseUnits } from "viem"
 import { megaethTestnet } from "viem/chains"
@@ -121,16 +122,8 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
 
         return { result, receipt }
       } catch (error) {
-        console.error("Market order error details:", error)
-
-        // More detailed error message for debugging
-        if (error instanceof Error) {
-          toast.error(`Failed to post market order: ${error.message}`)
-        } else {
-          toast.error("Failed to post the market order")
-        }
-
-        throw error // Re-throw to ensure onError handlers can process it
+        printEvmError(error)
+        toast.error("Failed to post the market order")
       }
     },
     meta: {
