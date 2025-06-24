@@ -494,7 +494,13 @@ export default function Page() {
                               ? vault.userIncentives.currentRewardsPerSecond
                               : 0
                           }
-                          decimals={6}
+                          decimals={
+                            (vault?.userIncentives?.rewards || 0) < 1
+                              ? 4
+                              : (vault?.userIncentives?.rewards || 0) > 10000
+                                ? 2
+                                : 4
+                          }
                         />
                       )}
                     </div>
