@@ -47,7 +47,7 @@ export function useClaimRewards() {
           toast.success("Rewards claimed successfully")
           return receipt
         } else {
-          throw new Error()
+          throw new Error(receipt.status)
         }
       } catch (error) {
         printEvmError(error)
@@ -58,9 +58,6 @@ export function useClaimRewards() {
       queryClient.invalidateQueries({
         queryKey: ["rewards-proofs", address, defaultChain.id],
       })
-    },
-    onError: (error) => {
-      printEvmError(error)
     },
   })
 }
