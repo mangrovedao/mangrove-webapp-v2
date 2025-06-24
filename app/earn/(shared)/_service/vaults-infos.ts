@@ -279,18 +279,18 @@ export async function getVaultsInformation(
         userIncentives: null,
       }
 
+      if (v.incentives && user) {
+        const incentives = await getUserVaultIncentives(
+          client,
+          v.address,
+          user,
+          v.incentives,
+        )
+        result.userIncentives = incentives
+      }
+
       // Only fetch PnL data if user is connected and has a position (do this last as it's expensive)
       if (user && hasPosition) {
-        if (v.incentives) {
-          const incentives = await getUserVaultIncentives(
-            client,
-            v.address,
-            user,
-            v.incentives,
-          )
-          result.userIncentives = incentives
-        }
-
         // Check PnL cache
         const pnlCacheKey = `${v.address}_${user}_${client.chain?.id}`
         let pnlData = pnlCache.get(pnlCacheKey)
