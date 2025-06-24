@@ -47,7 +47,7 @@ export function useClaimRewards() {
           toast.success("Rewards claimed successfully")
           return receipt
         } else {
-          throw new Error("Transaction failed")
+          throw new Error()
         }
       } catch (error) {
         printEvmError(error)
