@@ -489,7 +489,10 @@ export default function Page() {
                           className="!text-md"
                           initialValue={vault?.userIncentives?.rewards || 0}
                           ratePerSecond={
-                            vault?.userIncentives?.currentRewardsPerSecond || 0
+                            vault?.hasPosition &&
+                            vault?.userIncentives?.currentRewardsPerSecond
+                              ? vault.userIncentives.currentRewardsPerSecond
+                              : 0
                           }
                           decimals={6}
                         />
