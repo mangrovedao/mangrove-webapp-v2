@@ -36,7 +36,7 @@ export const FlowingNumbers = ({
   const animationFrameRef = useRef<number>()
   const displayRef = useRef<HTMLDivElement>(null)
   const currentValueRef = useRef<number>(initialValue)
-  console.log(initialValue, ratePerSecond)
+
   useEffect(() => {
     const updateNumber = () => {
       const currentTime = Date.now() / 1000
