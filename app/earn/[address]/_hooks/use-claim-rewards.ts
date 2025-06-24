@@ -44,6 +44,7 @@ export function useClaimRewards() {
         if (!tx) throw new Error("Transaction failed")
         const receipt = await waitForTransactionReceipt(client, { hash: tx })
         if (receipt.status === "success") {
+          toast.success("Rewards claimed successfully")
           return receipt
         } else {
           throw new Error("Transaction failed")
