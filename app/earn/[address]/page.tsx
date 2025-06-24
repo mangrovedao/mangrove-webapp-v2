@@ -508,7 +508,7 @@ export default function Page() {
                   if (!vault?.incentives?.tokenAddress) return
                   claimRewards({
                     rewardToken: vault?.incentives?.tokenAddress as Address,
-                    amount: rewardsInfo?.claimable || 0,
+                    amount: rewardsInfo?.rewards?.amount || "0",
                     proof:
                       (rewardsInfo?.rewards?.proof as `0x${string}`[]) || [],
                   })
