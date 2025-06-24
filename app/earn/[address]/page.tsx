@@ -238,7 +238,7 @@ export default function Page() {
                   ? (vault?.kandelApr + incentivesApr).toFixed(2)
                   : "0"
               }
-              info={`Strategy APR: ${vault?.kandelApr?.toFixed(2)}% + Incentives APR: ${incentivesApr.toFixed(2)}%`}
+              info={`Native APR: ${vault?.kandelApr?.toFixed(2)}% + Incentives APR: ${incentivesApr.toFixed(2)}%`}
               symbol={"%"}
             />
             <GridLineHeader title={"Strategy"} value={vault?.strategyType} />
