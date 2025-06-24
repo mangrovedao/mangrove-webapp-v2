@@ -484,8 +484,7 @@ export default function Page() {
                     <div className="flex items-center gap-1">
                       {isLoading ? (
                         <Skeleton className="w-10 h-4" />
-                      ) : vault?.userIncentives?.currentRewardsPerSecond &&
-                        vault?.hasPosition ? (
+                      ) : (
                         <FlowingNumbers
                           className="!text-md"
                           initialValue={vault?.userIncentives?.rewards || 0}
@@ -494,8 +493,6 @@ export default function Page() {
                           }
                           decimals={6}
                         />
-                      ) : (
-                        <span className="text-text-secondary">0</span>
                       )}
                     </div>
                   }
