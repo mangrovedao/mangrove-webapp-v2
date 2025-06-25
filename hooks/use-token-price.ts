@@ -10,7 +10,7 @@ export async function getTokenPrice(tokenAddress?: string, chainId?: number) {
     if (!tokenAddress || chainId === megaethTestnet.id) return 0
 
     const response = await fetch(
-      `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${tokenAddress}`,
+      `https://api.mgvinfra.com/prices/price-by-address?chain=${chainId}&address=${tokenAddress}`,
     )
     const data = await response.json()
     const parsed = priceSchema.parse(data)

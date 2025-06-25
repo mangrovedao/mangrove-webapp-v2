@@ -41,13 +41,13 @@ export function useDollarConversion({
           return null
 
         const payDollar = await fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${chain.id}&address=${payTokenAddress}`,
+          `https://api.mgvinfra.com/prices/price-by-address?chain=${chain.id}&address=${payTokenAddress}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
 
         const receiveDollar = await fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${chain.id}&address=${receiveTokenAddress}`,
+          `https://api.mgvinfra.com/prices/price-by-address?chain=${chain.id}&address=${receiveTokenAddress}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))

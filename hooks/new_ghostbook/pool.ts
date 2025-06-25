@@ -52,16 +52,16 @@ export interface FeePool {
 export type Pool = TickSpacingPool | FeePool
 
 async function getPools(
-  token0: Address,
-  token1: Address,
+  tokenIn: Address,
+  tokenOut: Address,
   chainId: number,
 ): Promise<Pool[]> {
   const params = new URLSearchParams()
-  params.set("token0", token0)
-  params.set("token1", token1)
+  params.set("tokenIn", tokenIn)
+  params.set("tokenOut", tokenOut)
   params.set("chainId", chainId.toString())
   const data = await fetch(
-    `https://pools.mgvinfra.com/pool/?${params.toString()}`,
+    `https://api.mgvinfra.com/pool-finder/pool?${params.toString()}`,
   )
 
   return data.json() as Promise<Pool[]>
