@@ -11,8 +11,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import React, { ReactNode, useState } from "react"
-import { Address, formatUnits } from "viem"
+import React, { ReactNode, useEffect, useRef, useState } from "react"
+import { Address, formatUnits, isAddressEqual } from "viem"
 
 import {
   AnimatedSkeleton,
@@ -22,7 +22,6 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
-import { FlowingNumbers } from "@/components/flowing-numbers"
 import InfoTooltip from "@/components/info-tooltip-new"
 import NeonContainer from "@/components/neon-container"
 import { TokenIcon } from "@/components/token-icon-new"
@@ -37,11 +36,17 @@ import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { shortenAddress } from "@/utils/wallet"
+import { useAccount } from "wagmi"
+import { useFlowingRewards } from "../(shared)/_hooks/use-flowing-rewards"
+import { useLeaderboards } from "../(shared)/_hooks/use-kandel-rewards"
+import { useKandelApr } from "../(shared)/_hooks/use-kandel.apr"
+import { useVaultWhiteList } from "../(shared)/_hooks/use-vault-whitelist"
+import { useCurrentVaultsInfos } from "../(shared)/_hooks/use-vault.info"
 import { Line, getChainImage } from "../(shared)/utils"
 import { useClaimRewards } from "./_hooks/use-claim-rewards"
 import { useRewardsInfo } from "./_hooks/use-rewards-info"
-import { useVault } from "./_hooks/use-vault"
 import { Accordion } from "./form/components/accordion"
+import { FlowingNumber } from "./form/components/flowing-numbers"
 import { DepositForm } from "./form/deposit-form"
 import { WithdrawForm } from "./form/withdraw-form"
 
@@ -57,6 +62,22 @@ export default function Page() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
+  const { data: vaultsInfos, isLoading: isLoadingVaultsInfos } =
+    useCurrentVaultsInfos()
+  const { data: vaultWhitelist, isLoading: isLoadingVaultWhitelist } =
+    useVaultWhiteList()
+  const vaultInfos = vaultsInfos?.find((v) => v.vault === params.address)
+  const vaultRegistry = vaultWhitelist?.find(
+    (v) => v.address === params.address,
+  )
+
+  const vault = {
+    ...vaultRegistry,
+    ...vaultInfos,
+  }
+
+  const { address } = useAccount()
+
   // Check if we're on mobile
   React.useEffect(() => {
     const checkIfMobile = () => {
@@ -71,19 +92,64 @@ export default function Page() {
     }
   }, [])
 
-  const {
-    data: { vault },
-    isLoading: isLoadingVault,
-  } = useVault(params.address)
-
   const { data: rewardsInfo, isLoading: isLoadingRewards } = useRewardsInfo({
-    rewardToken: vault?.incentives?.tokenAddress,
+    rewardToken: vault?.incentives?.[0]?.tokenAddress,
   })
 
   const { mutate: claimRewards, isPending: isClaiming } = useClaimRewards()
-  const incentivesApr = vault?.incentives?.apy || 0
-  const isLoading = isLoadingVault || isLoadingRewards
 
+  const incentivesApr = vault?.incentives?.[0]?.apy || 0
+  const isLoading =
+    isLoadingVaultsInfos || isLoadingVaultWhitelist || isLoadingRewards
+
+  const { isLoading: isLoadingFlowingRewards, subscribe } = useFlowingRewards(
+    vault?.address,
+    address,
+    defaultChain.id,
+    vault?.incentives,
+  )
+
+  const rewardsRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    const unsubscribe = subscribe((rewards) => {
+      if (!rewardsRef.current) return
+      rewardsRef.current.textContent = Object.entries(rewards)
+        .map(([token, rewards]) => `${token}: ${rewards}`)
+        .join(", ")
+    })
+
+    return () => unsubscribe()
+  }, [subscribe])
+  const { data: leaderboard } = useLeaderboards()
+
+  const currentIncentives = React.useMemo(() => {
+    if (!vault.incentives) return []
+    const date = new Date()
+    return vault.incentives.filter((i) => {
+      const inRange =
+        i.startTimestamp < date.getTime() / 1000 &&
+        i.endTimestamp > date.getTime() / 1000
+      const done = !!leaderboard.find(
+        (l) =>
+          isAddressEqual(l.vault as Address, vault.address as Address) &&
+          l.incentiveId === i.id,
+      )?.isOver
+      return inRange && !done
+    })
+  }, [vault.incentives, vault.address, leaderboard])
+
+  const { data: kandelApr } = useKandelApr(vault?.kandel, vault.chainId)
+
+  const totalApr = React.useMemo(() => {
+    return (
+      (kandelApr?.apr.mangroveKandelAPR ?? 0) +
+      (kandelApr?.apr.aaveAPR ?? 0) +
+      currentIncentives.reduce((acc, i) => acc + i.apy, 0)
+    )
+  }, [kandelApr, currentIncentives])
+
+  console.log(vault?.incentives, rewardsInfo)
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
       <div>
@@ -222,10 +288,10 @@ export default function Page() {
               value={
                 getExactWeiAmount(
                   formatUnits(
-                    vault?.tvl || 0n,
-                    vault?.market.quote.decimals || 18,
+                    vault?.TVL || 0n,
+                    vault?.market?.quote?.decimals || 18,
                   ),
-                  vault?.market.quote.displayDecimals || 4,
+                  vault?.market?.quote?.displayDecimals || 4,
                 ) || " "
               }
               symbol={` ${vault?.market?.quote?.symbol || " "}`}
@@ -233,12 +299,8 @@ export default function Page() {
 
             <GridLineHeader
               title={"APR"}
-              value={
-                vault?.kandelApr
-                  ? (vault?.kandelApr + incentivesApr).toFixed(2)
-                  : "0"
-              }
-              info={`Native APR: ${vault?.kandelApr?.toFixed(2)}% + Incentives APR: ${incentivesApr.toFixed(2)}%`}
+              value={totalApr ? totalApr.toFixed(2) : "0"}
+              info={`Native APR: ${(kandelApr?.apr.mangroveKandelAPR || 0)?.toFixed(2)}% + Incentives APR: ${(incentivesApr || 0)?.toFixed(2)}%`}
               symbol={"%"}
             />
             <GridLineHeader title={"Strategy"} value={vault?.strategyType} />
@@ -360,7 +422,7 @@ export default function Page() {
                             transition={{ duration: 0.2 }}
                           >
                             <Link
-                              href={vault?.socials.website || "#"}
+                              href={vault?.socials?.website || "#"}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -372,7 +434,7 @@ export default function Page() {
                             transition={{ duration: 0.2 }}
                           >
                             <Link
-                              href={vault?.socials.x || "#"}
+                              href={vault?.socials?.x || "#"}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -386,7 +448,7 @@ export default function Page() {
                   <div>
                     <GridLine
                       title="Performance Fee"
-                      value={vault?.performanceFee || "0"}
+                      value={`${vault?.performanceFee || "..."}`}
                       symbol="%"
                       info="A fee based on the profits generated from your deposit."
                     />
@@ -400,7 +462,7 @@ export default function Page() {
                   <div>
                     <GridLine
                       title="Management Fee"
-                      value={vault?.managementFee || "0"}
+                      value={`${vault?.managementFee || "..."}`}
                       symbol="%"
                       info="A fee attributed to the vault manager."
                     />
@@ -439,10 +501,10 @@ export default function Page() {
                 value={
                   <div className="flex items-center gap-1">
                     <span className="text-text-secondary !text-md">
-                      {vault?.incentives?.token}
+                      {vault?.incentives?.[0]?.token}
                     </span>
 
-                    <span>{vault?.incentives?.maxRewards}</span>
+                    <span>{vault?.incentives?.[0]?.maxRewards}</span>
                   </div>
                 }
               />
@@ -457,7 +519,7 @@ export default function Page() {
                       transition={{ duration: 0.3, delay: 0.8 }}
                     >
                       <span className="text-text-secondary !text-md">
-                        {vault?.incentives?.token}
+                        {vault?.incentives?.[0]?.token}
                       </span>
                     </motion.div>
                   }
@@ -485,23 +547,36 @@ export default function Page() {
                       {isLoading ? (
                         <Skeleton className="w-10 h-4" />
                       ) : (
-                        <FlowingNumbers
-                          className="!text-md"
-                          initialValue={vault?.userIncentives?.rewards || 0}
-                          ratePerSecond={
-                            vault?.hasPosition &&
-                            vault?.userIncentives?.currentRewardsPerSecond
-                              ? vault.userIncentives.currentRewardsPerSecond
-                              : 0
-                          }
-                          decimals={
-                            (vault?.userIncentives?.rewards || 0) < 1
-                              ? 4
-                              : (vault?.userIncentives?.rewards || 0) > 10000
-                                ? 2
-                                : 4
-                          }
-                        />
+                        <div>
+                          <FlowingNumber
+                            bias={Number(rewardsInfo?.totalRewards || 0)}
+                            multipliers={
+                              vault?.incentives?.map((incentive) => ({
+                                start: Number(incentive.startTimestamp),
+                                multiplier: Number(
+                                  incentive.rewardRatePerSecond,
+                                ),
+                              })) || []
+                            }
+                          />
+                        </div>
+                        // <FlowingNumbers
+                        //   className="!text-md"
+                        //   initialValue={vault?.userIncentives?.rewards || 0}
+                        //   ratePerSecond={
+                        //     vault?.hasPosition &&
+                        //     vault?.userIncentives?.currentRewardsPerSecond
+                        //       ? vault.userIncentives.currentRewardsPerSecond
+                        //       : 0
+                        //   }
+                        //   decimals={
+                        //     (vault?.userIncentives?.rewards || 0) < 1
+                        //       ? 4
+                        //       : (vault?.userIncentives?.rewards || 0) > 10000
+                        //         ? 2
+                        //         : 4
+                        //   }
+                        // />
                       )}
                     </div>
                   }
@@ -511,9 +586,10 @@ export default function Page() {
                 className="w-full mt-2"
                 disabled={!rewardsInfo?.claimable || isClaiming}
                 onClick={() => {
-                  if (!vault?.incentives?.tokenAddress) return
+                  if (!vault?.incentives?.[0]?.tokenAddress) return
                   claimRewards({
-                    rewardToken: vault?.incentives?.tokenAddress as Address,
+                    rewardToken: vault?.incentives?.[0]
+                      ?.tokenAddress as Address,
                     amount: rewardsInfo?.rewards?.amount || "0",
                     proof:
                       (rewardsInfo?.rewards?.proof as `0x${string}`[]) || [],
@@ -626,22 +702,22 @@ export default function Page() {
                       transition={{ duration: 0.2 }}
                     >
                       <TokenIcon
-                        symbol={vault?.market.base.symbol}
+                        symbol={vault?.market?.base?.symbol}
                         className="h-4 w-4"
                         imgClasses="w-5 h-5"
                       />
                     </motion.div>
                     <Caption className="text-text-secondary !text-sm">
-                      {vault?.market.base.symbol}
+                      {vault?.market?.base?.symbol}
                     </Caption>
                   </div>
                 }
                 value={getExactWeiAmount(
                   formatUnits(
                     vault?.userBaseBalance || 0n,
-                    vault?.market.base.decimals || 18,
+                    vault?.market?.base?.decimals || 18,
                   ),
-                  vault?.market.base.priceDisplayDecimals || 6,
+                  vault?.market?.base?.priceDisplayDecimals || 6,
                 )}
               />
               <Line
@@ -652,22 +728,22 @@ export default function Page() {
                       transition={{ duration: 0.2 }}
                     >
                       <TokenIcon
-                        symbol={vault?.market.quote.symbol}
+                        symbol={vault?.market?.quote?.symbol}
                         className="h-4 w-4"
                         imgClasses="w-5 h-5"
                       />
                     </motion.div>
                     <Caption className="text-text-secondary !text-sm">
-                      {vault?.market.quote.symbol}
+                      {vault?.market?.quote?.symbol}
                     </Caption>
                   </div>
                 }
                 value={getExactWeiAmount(
                   formatUnits(
                     vault?.userQuoteBalance || 0n,
-                    vault?.market.quote.decimals || 18,
+                    vault?.market?.quote?.decimals || 18,
                   ),
-                  vault?.market.quote.priceDisplayDecimals || 6,
+                  vault?.market?.quote?.priceDisplayDecimals || 6,
                 )}
               />
             </div>

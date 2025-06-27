@@ -1,4 +1,4 @@
-import { useVaultsList } from "@/app/earn/(shared)/_hooks/use-vaults-list"
+import { useVaultWhiteList } from "@/app/earn/(shared)/_hooks/use-vault-whitelist"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useQuery } from "@tanstack/react-query"
@@ -7,7 +7,7 @@ import { userIncentiveResponseSchema } from "../schemas/rewards-configuration"
 
 export const useIncentivesUserRewards = () => {
   const { address: user } = useAccount()
-  const { data: vaults } = useVaultsList()
+  const { data: vaults } = useVaultWhiteList()
   const { defaultChain } = useDefaultChain()
 
   return useQuery({
@@ -18,7 +18,7 @@ export const useIncentivesUserRewards = () => {
         const userIncentives = await Promise.all(
           vaults?.map((vault) =>
             fetch(
-              `${getIndexerUrl(defaultChain)}/incentives/vaults/${defaultChain.id}/${vault.address}/${user}?startTimestamp=${vault.incentives?.startTimestamp}&endTimestamp=${vault.incentives?.endTimestamp}&rewardRate=${vault.incentives?.rewardRate}&maxRewards=${vault.incentives?.maxRewards}`,
+              `${getIndexerUrl(defaultChain)}/incentives/vaults/${defaultChain.id}/${vault.address}/${user}?startTimestamp=${vault.incentives?.[0]?.startTimestamp}&endTimestamp=${vault.incentives?.[0]?.endTimestamp}&rewardRate=${vault.incentives?.[0]?.rewardRatePerSecond}&maxRewards=${vault.incentives?.[0]?.maxRewards}`,
             ),
           ) ?? [],
         )

@@ -4,10 +4,11 @@ import React from "react"
 import { useDebounceCallback } from "usehooks-ts"
 
 import { maxUint256, parseAbi, PublicClient } from "viem"
-import { CompleteVault } from "../../(shared)/types"
+
+import { Vault } from "../../(shared)/_hooks/use-vault-whitelist"
 
 export type MintAmountsArgs = {
-  vault?: CompleteVault
+  vault?: Vault
   client?: PublicClient
 }
 

@@ -7,11 +7,10 @@ import { useVaultMintHelper } from "@/app/earn/(shared)/_hooks/utils"
 import { EnhancedNumericInput } from "@/components/token-input-new"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useDollarConversion } from "@/hooks/use-dollar-conversion"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { BS } from "@mangrovedao/mgv/lib"
+import { Token } from "@mangrovedao/mgv"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import {
@@ -44,11 +43,13 @@ export function DepositForm({ className }: { className?: string }) {
     hasErrors,
   } = useForm()
 
-  const { payDollar, receiveDollar } = useDollarConversion({
-    payAmount: baseDeposit,
-    receiveAmount: quoteDeposit,
-    tradeSide: BS.sell,
-  })
+  const payDollar = 0
+  const receiveDollar = 0
+  // const { payDollar, receiveDollar } = useDollarConversion({
+  //   payAmount: baseDeposit,
+  //   receiveAmount: quoteDeposit,
+  //   tradeSide: BS.sell,
+  // })
 
   const { address } = useAccount()
   const queryClient = useQueryClient()
@@ -331,9 +332,9 @@ export function DepositForm({ className }: { className?: string }) {
           showSlider
           sendSliderValue={baseSliderValue}
           setSendSliderValue={handleBaseSliderChange}
-          token={baseToken}
+          token={baseToken as unknown as Token}
           disabled={
-            (vault?.totalBase === 0n && vault?.totalQuote !== 0n) ||
+            (vault?.userBaseBalance === 0n && vault?.userQuoteBalance !== 0n) ||
             baseBalance?.balance === 0n ||
             isProcessing
           }
@@ -351,9 +352,9 @@ export function DepositForm({ className }: { className?: string }) {
           showSlider
           sendSliderValue={quoteSliderValue}
           setSendSliderValue={handleQuoteSliderChange}
-          token={quoteToken}
+          token={quoteToken as unknown as Token}
           disabled={
-            (vault?.totalQuote === 0n && vault?.totalBase !== 0n) ||
+            (vault?.userQuoteBalance === 0n && vault?.userBaseBalance !== 0n) ||
             quoteBalance?.balance === 0n ||
             isProcessing
           }

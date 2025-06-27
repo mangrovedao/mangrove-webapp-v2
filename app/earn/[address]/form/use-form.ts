@@ -5,8 +5,9 @@ import { useParams } from "next/navigation"
 
 import { useTokenBalance } from "@/hooks/use-balances"
 import { formatUnits, parseUnits } from "viem"
+import { useVaultWhiteList } from "../../(shared)/_hooks/use-vault-whitelist"
+import { useCurrentVaultsInfos } from "../../(shared)/_hooks/use-vault.info"
 import { useMintAmounts } from "../_hooks/use-mint-amounts"
-import { useVault } from "../_hooks/use-vault"
 
 export const MIN_NUMBER_OF_OFFERS = 1
 export const MIN_STEP_SIZE = 1
@@ -15,12 +16,20 @@ export default function useForm() {
   const params = useParams<{ address: string }>()
   const client = usePublicClient()
   const { address } = useAccount()
-  const {
-    data: { vault },
-  } = useVault(params.address)
+  const { data: vaultsInfos } = useCurrentVaultsInfos()
+  const { data: vaultWhitelist } = useVaultWhiteList()
+  const vaultInfos = vaultsInfos?.find((v) => v.vault === params.address)
+  const vaultRegistry = vaultWhitelist?.find(
+    (v) => v.address === params.address,
+  )
+
+  const vault = {
+    ...vaultRegistry,
+    ...vaultInfos,
+  }
 
   const { data, isLoading, setBaseAmount, setQuoteAmount } = useMintAmounts({
-    vault,
+    vault: vaultRegistry,
     client,
   })
 
@@ -28,8 +37,8 @@ export default function useForm() {
   const [baseAmount, setBaseSliderAmount] = React.useState("")
   const [quoteAmount, setQuoteSliderAmount] = React.useState("")
 
-  const baseToken = vault?.market.base
-  const quoteToken = vault?.market.quote
+  const baseToken = vault?.market?.base
+  const quoteToken = vault?.market?.quote
 
   const { balance: baseBalance } = useTokenBalance({
     token: baseToken?.address,
@@ -40,12 +49,12 @@ export default function useForm() {
 
   const baseDeposited = formatUnits(
     vault?.userBaseBalance || 0n,
-    vault?.market.base.decimals || 18,
+    vault?.market?.base.decimals || 18,
   )
 
   const quoteDeposited = formatUnits(
     vault?.userQuoteBalance || 0n,
-    vault?.market.quote.decimals || 18,
+    vault?.market?.quote.decimals || 18,
   )
 
   const baseDeposit = useMemo(() => {

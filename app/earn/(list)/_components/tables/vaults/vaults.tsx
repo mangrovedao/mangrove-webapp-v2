@@ -6,9 +6,9 @@ import CloseStrategyDialog from "@/app/strategies/[address]/_components/paramete
 import { DataTable } from "@/components/ui/data-table-new/data-table"
 import type { Strategy } from "../../../_schemas/kandels"
 
+import { useVaultWhiteList } from "@/app/earn/(shared)/_hooks/use-vault-whitelist"
 import { Switch } from "@/components/ui/switch"
 import { motion } from "framer-motion"
-import { useVaults } from "../../../../(shared)/_hooks/use-vaults-data"
 import { useTable } from "./hooks/use-table"
 
 type PageDetails = {
@@ -21,7 +21,7 @@ export function Vaults() {
   const containerRef = React.useRef<HTMLDivElement>(null)
 
   // Use the custom hook for data fetching
-  const { data: vaults, isLoading, error } = useVaults()
+  const { data: vaults, isLoading, error } = useVaultWhiteList()
 
   const [showDeprecated, setShowDeprecated] = useState<boolean>(false)
   const [{ page, pageSize }, setPageDetails] = React.useState<PageDetails>({
@@ -54,7 +54,7 @@ export function Vaults() {
 
   return (
     <div>
-      {vaults?.length > 0 && (
+      {vaults?.length && vaults?.length > 0 && (
         <div className="flex gap-2 items-center justify-end mr-2 my-3">
           <Switch
             checked={showDeprecated}

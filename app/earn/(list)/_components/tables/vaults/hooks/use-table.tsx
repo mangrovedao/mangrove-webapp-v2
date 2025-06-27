@@ -11,33 +11,31 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import { Vault } from "@/app/earn/(shared)/_hooks/use-vault-whitelist"
+import { useCurrentVaultsInfos } from "@/app/earn/(shared)/_hooks/use-vault.info"
 import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
-import { CompleteVault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { formatUnits } from "viem"
+import { Apr } from "../../../../../(shared)/components/apr"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
-const columnHelper = createColumnHelper<CompleteVault>()
+const columnHelper = createColumnHelper<Vault>()
 
 type Params = {
-  data?: CompleteVault[]
+  data?: Vault[]
   pageSize: number
-  onDeposit: (vault: CompleteVault) => void
+  onDeposit: (vault: Vault) => void
   isLoading: boolean
 }
 
 export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
   const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
+
+  const { data: vaultsInfos } = useCurrentVaultsInfos()
 
   const columns = React.useMemo(
     () => [
@@ -103,7 +101,12 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
               </div>
             )
           }
-          const { tvl, isDeprecated, market } = row.original
+
+          const { isDeprecated, market, incentives } = row.original
+
+          const tvl =
+            vaultsInfos?.find((vault) => vault.vault === row.original.address)
+              ?.TVL || 0n
 
           if (isDeprecated)
             return <div className="flex justify-end w-full">-</div>
@@ -138,82 +141,19 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
         id: "APR",
         header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
-          if (isLoading) {
-            return (
-              <div className="text-right w-full">
-                <AnimatedSkeleton className="h-6 w-24 ml-auto" />
-              </div>
-            )
-          }
-
-          const {
-            kandelApr,
-            isDeprecated,
-            incentives,
-            address: vaultAddress,
-          } = row.original
-
-          if (isDeprecated)
-            return <div className="text-right w-full flex-end">-</div>
-
-          const apr = kandelApr ? `${kandelApr.toFixed(2)}%` : "-"
-          const incentivesApr = incentives
-            ? `${incentives.apy.toFixed(2)}%`
-            : "-"
-
-          const netApr = incentives
-            ? `${(
-                Number(kandelApr ?? 0) + Number(incentives?.apy ?? 0)
-              ).toFixed(2)}%`
-            : `${kandelApr?.toFixed(2)}%`
+          const { isDeprecated } = row.original
 
           return (
-            <div className="group relative w-full text-right">
-              <TooltipProvider>
-                <Tooltip delayDuration={200}>
-                  <TooltipTrigger className="hover:opacity-80 transition-opacity">
-                    <Value value={netApr} className="justify-end" />
-                  </TooltipTrigger>
-                  <TooltipContent
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                    }}
-                    className="p-4 bg-bg-secondary border border-border-primary"
-                  >
-                    <div className="cursor-default">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm text-text-secondary">
-                            Native APR
-                          </span>
-                          <span className="text-sm text-text-primary">
-                            {apr}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm text-text-secondary">
-                            Incentive APR
-                          </span>
-                          <span className="text-sm text-text-primary">
-                            {incentivesApr}
-                          </span>
-                        </div>
-                      </div>
-                      <hr className="my-2" />
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm text-text-secondary">
-                          Net APR
-                        </span>
-                        <span className="text-sm text-text-primary">
-                          {netApr}
-                        </span>
-                      </div>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+            <Apr
+              isLoading={isLoading}
+              isDeprecated={isDeprecated}
+              kandelAddress={
+                vaultsInfos?.find(
+                  (vault) => vault.vault === row.original.address,
+                )?.kandel
+              }
+              vault={row.original}
+            />
           )
         },
       }),

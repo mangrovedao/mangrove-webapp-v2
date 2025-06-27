@@ -4,11 +4,11 @@ import { TokenIcon } from "@/components/token-icon-new"
 import { Text } from "@/components/typography/text"
 import { Title } from "@/components/typography/title"
 import { useEffect, useState } from "react"
-import { useVaultsList } from "../(shared)/_hooks/use-vaults-list"
+import { useVaultWhiteList } from "../(shared)/_hooks/use-vault-whitelist"
 import { Tables } from "./_components/tables/tables"
 
 export default function Page() {
-  const { data: vaults } = useVaultsList()
+  const { data: vaults } = useVaultWhiteList()
   const [tokens, setTokens] = useState<string[]>([])
 
   // Extract unique tokens from vaults' markets

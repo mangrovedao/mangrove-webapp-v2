@@ -2,7 +2,7 @@ import { Address } from "viem"
 import { useAccount } from "wagmi"
 import { z } from "zod"
 
-import { useVaultsList } from "@/app/earn/(shared)/_hooks/use-vaults-list"
+import { useVaultWhiteList } from "@/app/earn/(shared)/_hooks/use-vault-whitelist"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getChainObjectById } from "@/utils/chains"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
@@ -126,7 +126,7 @@ const buildConsolidatedLeaderboard = (
 export const useIncentivesRewards = () => {
   const { address: user } = useAccount()
   const { defaultChain } = useDefaultChain()
-  const { data: vaults } = useVaultsList()
+  const { data: vaults } = useVaultWhiteList()
 
   return useQuery({
     queryKey: ["incentives-rewards", vaults?.length, defaultChain.id, user],
@@ -143,10 +143,10 @@ export const useIncentivesRewards = () => {
             fetchVaultIncentivesData(
               defaultChain.id,
               vault.address,
-              vault.incentives?.startTimestamp ?? 0,
-              vault.incentives?.endTimestamp ?? 0,
-              vault.incentives?.rewardRate ?? 0,
-              vault.incentives?.maxRewards ?? 0,
+              vault.incentives?.[0]?.startTimestamp ?? 0,
+              vault.incentives?.[0]?.endTimestamp ?? 0,
+              vault.incentives?.[0]?.rewardRatePerSecond ?? 0,
+              vault.incentives?.[0]?.maxRewards ?? 0,
             ),
           ),
         )

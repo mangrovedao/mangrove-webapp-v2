@@ -11,18 +11,21 @@ import Link from "next/link"
 import React from "react"
 import { formatUnits } from "viem"
 
+import { Vault } from "@/app/earn/(shared)/_hooks/use-vault-whitelist"
+import { useCurrentVaultsInfos } from "@/app/earn/(shared)/_hooks/use-vault.info"
 import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
 import { CompleteVault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { formatNumber } from "@/utils/numbers"
+import { Apr } from "../../../../../(shared)/components/apr"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
-const columnHelper = createColumnHelper<CompleteVault>()
-const DEFAULT_DATA: CompleteVault[] = []
+const columnHelper = createColumnHelper<Vault>()
+const DEFAULT_DATA: Vault[] = []
 
 type Params = {
-  data?: CompleteVault[]
+  data?: Vault[]
   pageSize: number
   onManage: (vault: CompleteVault) => void
   isLoading: boolean
@@ -30,6 +33,8 @@ type Params = {
 
 export function useTable({ pageSize, data, onManage, isLoading }: Params) {
   const { defaultChain } = useDefaultChain()
+
+  const { data: vaultsInfos } = useCurrentVaultsInfos()
 
   const columns = React.useMemo(
     () => [
@@ -98,24 +103,18 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
             )
           }
 
-          const {
-            userBaseBalance,
-            userQuoteBalance,
-            market,
-            baseDollarPrice,
-            quoteDollarPrice,
-          } = row.original
+          const { market } = row.original
 
           const value =
-            Number(formatUnits(userBaseBalance ?? 0n, market.base.decimals)) *
-              (baseDollarPrice ?? 0) +
-            Number(formatUnits(userQuoteBalance ?? 0n, market.quote.decimals)) *
-              (quoteDollarPrice ?? 0)
+            vaultsInfos?.find((vault) => vault.vault === row.original.address)
+              ?.userBalance ?? 0n
 
           return (
             <div className="text-right w-full">
               <Value
-                value={formatNumber(Number(value.toFixed(2)))}
+                value={formatNumber(
+                  Number(formatUnits(value ?? 0n, market.quote.decimals)),
+                )}
                 symbol={"$"}
               />
             </div>
@@ -140,24 +139,19 @@ export function useTable({ pageSize, data, onManage, isLoading }: Params) {
         id: "My APY",
         header: () => <span className="text-right w-full block">APR</span>,
         cell: ({ row }) => {
-          if (isLoading) {
-            return (
-              <div className="text-right w-full">
-                <AnimatedSkeleton className="h-6 w-24 ml-auto" />
-              </div>
-            )
-          }
-
-          const { kandelApr, incentives } = row.original
-
-          const netApr = `${(
-            Number(kandelApr ?? 0) + Number(incentives?.apy ?? 0)
-          ).toFixed(2)}%`
+          const { isDeprecated } = row.original
 
           return (
-            <div className="text-right w-full">
-              <Value value={netApr} className="justify-end" />
-            </div>
+            <Apr
+              isLoading={isLoading}
+              isDeprecated={isDeprecated}
+              kandelAddress={
+                vaultsInfos?.find(
+                  (vault) => vault.vault === row.original.address,
+                )?.kandel
+              }
+              vault={row.original}
+            />
           )
         },
       }),

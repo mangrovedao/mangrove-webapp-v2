@@ -4,7 +4,7 @@ import { cn } from "@/utils"
 import { useQueryClient } from "@tanstack/react-query"
 import React, { ReactNode } from "react"
 import { toast } from "sonner"
-import { formatUnits, parseAbi, parseUnits } from "viem"
+import { Address, formatUnits, parseAbi, parseUnits } from "viem"
 import {
   useAccount,
   useWaitForTransactionReceipt,
@@ -58,12 +58,12 @@ export function WithdrawForm({ className }: { className?: string }) {
     const quoteAmount =
       (BigInt(value * 100) * (vault?.userQuoteBalance || 0n)) / 10_000n
     const mintedAmunt =
-      (BigInt(value * 100) * (vault?.mintedAmount || 0n)) / 10_000n
+      (BigInt(value * 100) * (vault?.userBalance || 0n)) / 10_000n
 
     setSliderValue(value)
     setBaseWithdraw(formatUnits(baseAmount, baseToken?.decimals ?? 18))
     setQuoteWithdraw(formatUnits(quoteAmount, quoteToken?.decimals ?? 18))
-    setWithdrawAmount(formatUnits(mintedAmunt, vault?.decimals ?? 18))
+    setWithdrawAmount(formatUnits(mintedAmunt, 18))
   }
 
   if (!baseToken || !quoteToken || !vault)
@@ -88,15 +88,15 @@ export function WithdrawForm({ className }: { className?: string }) {
           </Title>
           <div className="grid gap-2">
             <Line
-              icon={vault?.market.base.symbol}
-              title={vault?.market.base.symbol}
+              icon={vault?.market?.base.symbol || ""}
+              title={vault?.market?.base.symbol || ""}
               value={Number(baseWithdraw).toFixed(
                 baseToken?.displayDecimals ?? 4,
               )}
             />
             <Line
-              title={vault?.market.quote.symbol}
-              icon={vault?.market.quote.symbol}
+              title={vault?.market?.quote.symbol || ""}
+              icon={vault?.market?.quote.symbol || ""}
               value={Number(quoteWithdraw).toFixed(
                 quoteToken?.displayDecimals ?? 4,
               )}
@@ -150,10 +150,10 @@ export function WithdrawForm({ className }: { className?: string }) {
             if (checkAndShowDisclaimer(address)) return
 
             writeContract({
-              address: vault.address,
+              address: vault.address as Address,
               abi: burnABI,
               functionName: "burn",
-              args: [parseUnits(withdrawAmount, vault.decimals), 0n, 0n],
+              args: [parseUnits(withdrawAmount, 18), 0n, 0n],
             })
           }}
           disabled={Number(withdrawAmount) === 0 || isPending}
