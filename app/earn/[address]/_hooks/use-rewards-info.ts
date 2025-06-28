@@ -91,9 +91,6 @@ export function useRewardsInfo({ rewardToken }: { rewardToken?: Address }) {
       }
     },
     enabled: !!address,
-    refetchInterval: 3000, // 3 seconds
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   })

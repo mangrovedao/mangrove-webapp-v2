@@ -12,7 +12,7 @@ import {
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import React, { ReactNode, useState } from "react"
-import { Address, formatUnits } from "viem"
+import { Address, formatUnits, isAddressEqual } from "viem"
 
 import {
   AnimatedSkeleton,
@@ -22,7 +22,6 @@ import {
   CustomRadioGroup,
   CustomRadioGroupItem,
 } from "@/components/custom-radio-group-new"
-import { FlowingNumbers } from "@/components/flowing-numbers"
 import InfoTooltip from "@/components/info-tooltip-new"
 import NeonContainer from "@/components/neon-container"
 import { TokenIcon } from "@/components/token-icon-new"
@@ -35,8 +34,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
+import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { shortenAddress } from "@/utils/wallet"
+import { useLeaderboards } from "../(shared)/_hooks/use-kandel-rewards"
+import { FlowingNumber } from "../(shared)/components/flowing-numbers"
 import { Line, getChainImage } from "../(shared)/utils"
 import { useClaimRewards } from "./_hooks/use-claim-rewards"
 import { useRewardsInfo } from "./_hooks/use-rewards-info"
@@ -77,12 +79,35 @@ export default function Page() {
   } = useVault(params.address)
 
   const { data: rewardsInfo, isLoading: isLoadingRewards } = useRewardsInfo({
-    rewardToken: vault?.incentives?.tokenAddress,
+    rewardToken: vault?.currentIncentives?.tokenAddress,
   })
 
   const { mutate: claimRewards, isPending: isClaiming } = useClaimRewards()
-  const incentivesApr = vault?.incentives?.apy || 0
+  const { data: leaderboard } = useLeaderboards()
+
+  const currentIncentives = React.useMemo(() => {
+    const date = new Date()
+    return vault?.incentives?.filter((i) => {
+      const inRange =
+        i.startTimestamp < date.getTime() / 1000 &&
+        i.endTimestamp > date.getTime() / 1000
+      const done = !!leaderboard.find(
+        (l) =>
+          isAddressEqual(l.vault as Address, vault.address) &&
+          l.incentiveId === i.id,
+      )?.isOver
+      return inRange && !done
+    })
+  }, [vault?.incentives, vault?.address, leaderboard])
+
+  const incentivesApr =
+    currentIncentives?.reduce((acc, i) => acc + i.apy, 0) || 0
   const isLoading = isLoadingVault || isLoadingRewards
+
+  const tvlValue = getExactWeiAmount(
+    formatUnits(vault?.tvl || 0n, vault?.market.quote.decimals || 18),
+    vault?.market.quote.displayDecimals || 4,
+  )
 
   return (
     <div className="max-w-7xl mx-auto px-3 pb-4">
@@ -220,13 +245,9 @@ export default function Page() {
             <GridLineHeader
               title={"TVL"}
               value={
-                getExactWeiAmount(
-                  formatUnits(
-                    vault?.tvl || 0n,
-                    vault?.market.quote.decimals || 18,
-                  ),
-                  vault?.market.quote.displayDecimals || 4,
-                ) || " "
+                formatNumber(Number(tvlValue), {
+                  maximumFractionDigits: 2,
+                }) || " "
               }
               symbol={` ${vault?.market?.quote?.symbol || " "}`}
             />
@@ -439,10 +460,10 @@ export default function Page() {
                 value={
                   <div className="flex items-center gap-1">
                     <span className="text-text-secondary !text-md">
-                      {vault?.incentives?.token}
+                      {vault?.currentIncentives?.token}
                     </span>
 
-                    <span>{vault?.incentives?.maxRewards}</span>
+                    <span>{vault?.currentIncentives?.maxRewards}</span>
                   </div>
                 }
               />
@@ -457,7 +478,7 @@ export default function Page() {
                       transition={{ duration: 0.3, delay: 0.8 }}
                     >
                       <span className="text-text-secondary !text-md">
-                        {vault?.incentives?.token}
+                        {vault?.currentIncentives?.token}
                       </span>
                     </motion.div>
                   }
@@ -485,21 +506,13 @@ export default function Page() {
                       {isLoading ? (
                         <Skeleton className="w-10 h-4" />
                       ) : (
-                        <FlowingNumbers
-                          className="!text-md"
-                          initialValue={vault?.userIncentives?.rewards || 0}
-                          ratePerSecond={
-                            vault?.hasPosition &&
-                            vault?.userIncentives?.currentRewardsPerSecond
-                              ? vault.userIncentives.currentRewardsPerSecond
-                              : 0
-                          }
-                          decimals={
-                            (vault?.userIncentives?.rewards || 0) < 1
-                              ? 4
-                              : (vault?.userIncentives?.rewards || 0) > 10000
-                                ? 2
-                                : 4
+                        <FlowingNumber
+                          bias={vault?.userIncentives?.rewards || 0}
+                          multipliers={
+                            vault?.incentives?.map((incentive) => ({
+                              start: incentive.startTimestamp,
+                              multiplier: incentive.rewardRatePerSecond,
+                            })) ?? []
                           }
                         />
                       )}
@@ -511,9 +524,10 @@ export default function Page() {
                 className="w-full mt-2"
                 disabled={!rewardsInfo?.claimable || isClaiming}
                 onClick={() => {
-                  if (!vault?.incentives?.tokenAddress) return
+                  if (!vault?.currentIncentives?.tokenAddress) return
                   claimRewards({
-                    rewardToken: vault?.incentives?.tokenAddress as Address,
+                    rewardToken: vault?.currentIncentives
+                      ?.tokenAddress as Address,
                     amount: rewardsInfo?.rewards?.amount || "0",
                     proof:
                       (rewardsInfo?.rewards?.proof as `0x${string}`[]) || [],

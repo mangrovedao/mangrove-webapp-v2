@@ -1,11 +1,15 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { useQuery } from "@tanstack/react-query"
-import { ZodError } from "zod"
+import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import { z, ZodError } from "zod"
 import { VaultsResponseSchema } from "../schemas"
 import { getCurrentIncentive } from "../utils"
 
-export function useVaultsList() {
+export function useVaultsList(): UseQueryResult<
+  z.infer<typeof VaultsResponseSchema>,
+  Error
+> {
   const { defaultChain } = useDefaultChain()
+  // const { data: leaderboard } = useLeaderboards()
 
   return useQuery({
     queryKey: ["vaults-list", defaultChain.id],
@@ -20,7 +24,10 @@ export function useVaultsList() {
 
         return parsedData.map((vault) => ({
           ...vault,
-          incentives: getCurrentIncentive(vault.incentives),
+          incentives: vault.incentives,
+          currentIncentives: getCurrentIncentive(vault.incentives),
+          // userIncentives: leaderboard?.find((l) => l.vault === vault.address)
+          //   ?.leaderboard,
         }))
       } catch (error) {
         if (error instanceof ZodError) {

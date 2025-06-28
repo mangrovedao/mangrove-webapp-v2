@@ -143,10 +143,10 @@ export const useIncentivesRewards = () => {
             fetchVaultIncentivesData(
               defaultChain.id,
               vault.address,
-              vault.incentives?.startTimestamp ?? 0,
-              vault.incentives?.endTimestamp ?? 0,
-              vault.incentives?.rewardRate ?? 0,
-              vault.incentives?.maxRewards ?? 0,
+              vault.incentives[0]?.startTimestamp ?? 0,
+              vault.incentives[0]?.endTimestamp ?? 0,
+              vault.incentives[0]?.rewardRate ?? 0,
+              vault.incentives[0]?.maxRewards ?? 0,
             ),
           ),
         )
