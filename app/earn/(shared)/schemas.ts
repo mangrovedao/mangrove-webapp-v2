@@ -75,6 +75,9 @@ const MarketSchema = z.object({
 
 export const IncentiveSchema = z
   .object({
+    id: z.string(),
+    name: z.string(),
+    chainId: z.number(),
     startTimestamp: z.number(),
     endTimestamp: z.number(),
     maxRewards: z.number(),
@@ -90,13 +93,14 @@ export const IncentiveSchema = z
     rewardRate: val.rewardRatePerSecond * 3600 * 24,
   }))
 
-
 const SocialsSchema = z.object({
   x: z.string(),
   website: z.string(),
 })
 
 export const VaultSchema = z.object({
+  id: z.string(),
+  chainId: z.number(),
   isDeprecated: z.boolean(),
   manager: z.string(),
   address: AddressSchema,
@@ -106,6 +110,7 @@ export const VaultSchema = z.object({
   descriptionBonus: z.string(),
   socials: SocialsSchema,
   incentives: z.array(IncentiveSchema),
+  currentIncentives: IncentiveSchema.optional(),
 })
 
 export const VaultsResponseSchema = z.array(VaultSchema)

@@ -39,7 +39,7 @@ export function usePools({
     queryKey: ["pools", tokenOut, tokenIn, chainId || chain?.id],
     queryFn: async () => {
       const response = await fetch(
-        `https://pools.mgvinfra.com/pool?tokenOut=${tokenOut}&tokenIn=${tokenIn}&chainId=${
+        `https://api.mgvinfra.com/pool-finder/pool?tokenIn=${tokenOut}&tokenOut=${tokenIn}&chainId=${
           chainId || chain?.id
         }`,
       )

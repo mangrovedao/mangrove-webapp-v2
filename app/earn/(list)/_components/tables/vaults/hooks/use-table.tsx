@@ -11,6 +11,7 @@ import Link from "next/link"
 import React from "react"
 import { useAccount } from "wagmi"
 
+import { useLeaderboards } from "@/app/earn/(shared)/_hooks/use-kandel-rewards"
 import { AnimatedSkeleton } from "@/app/earn/(shared)/components/animated-skeleton"
 import { CompleteVault } from "@/app/earn/(shared)/types"
 import { getChainImage } from "@/app/earn/(shared)/utils"
@@ -21,8 +22,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useDefaultChain } from "@/hooks/use-default-chain"
+import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
-import { formatUnits } from "viem"
+import { Address, formatUnits, isAddressEqual } from "viem"
 import { Market } from "../components/market"
 import { Value } from "../components/value"
 
@@ -38,6 +40,8 @@ type Params = {
 export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
   const { defaultChain } = useDefaultChain()
   const { chain } = useAccount()
+
+  const { data: leaderboard } = useLeaderboards()
 
   const columns = React.useMemo(
     () => [
@@ -108,13 +112,17 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
           if (isDeprecated)
             return <div className="flex justify-end w-full">-</div>
 
+          const tvlValue = getExactWeiAmount(
+            formatUnits(tvl || 0n, market.quote.decimals || 18),
+            market.quote.displayDecimals || 4,
+          )
+
           return (
             <div className="flex justify-end w-full">
               <Value
-                value={getExactWeiAmount(
-                  formatUnits(tvl || 0n, market.quote.decimals || 18),
-                  market.quote.displayDecimals || 4,
-                )}
+                value={formatNumber(Number(tvlValue), {
+                  maximumFractionDigits: 2,
+                })}
                 symbol={` ${market.quote.symbol}`}
               />
             </div>
@@ -156,14 +164,32 @@ export function useTable({ pageSize, data, onDeposit, isLoading }: Params) {
           if (isDeprecated)
             return <div className="text-right w-full flex-end">-</div>
 
+          const currentIncentives = React.useMemo(() => {
+            const date = new Date()
+            return incentives?.filter((i) => {
+              const inRange =
+                i.startTimestamp < date.getTime() / 1000 &&
+                i.endTimestamp > date.getTime() / 1000
+              const done = !!leaderboard.find(
+                (l) =>
+                  isAddressEqual(l.vault as Address, vaultAddress) &&
+                  l.incentiveId === i.id,
+              )?.isOver
+              return inRange && !done
+            })
+          }, [incentives, vaultAddress, leaderboard])
+
           const apr = kandelApr ? `${kandelApr.toFixed(2)}%` : "-"
-          const incentivesApr = incentives
-            ? `${incentives.apy.toFixed(2)}%`
+          const incentivesApr = currentIncentives
+            ? `${currentIncentives.reduce((acc, i) => acc + i.apy, 0).toFixed(2)}%`
             : "-"
 
           const netApr = incentives
             ? `${(
-                Number(kandelApr ?? 0) + Number(incentives?.apy ?? 0)
+                Number(kandelApr ?? 0) +
+                Number(
+                  currentIncentives?.reduce((acc, i) => acc + i.apy, 0) ?? 0,
+                )
               ).toFixed(2)}%`
             : `${kandelApr?.toFixed(2)}%`
 

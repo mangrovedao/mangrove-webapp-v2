@@ -26,7 +26,7 @@ const useMangrovePoolStatsQuery = (
         if (!baseAddress || !quoteAddress) return null
 
         const res = await fetch(
-          `https://pools.mgvinfra.com/stats/?token0=${baseAddress}&token1=${quoteAddress}&chainId=${defaultChain.id}`,
+          `https://api.mgvinfra.com/pool-finder/stats?tokenIn=${baseAddress}&tokenOut=${quoteAddress}&chainId=${defaultChain.id}`,
         )
         const data = await res.json()
 

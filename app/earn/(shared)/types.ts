@@ -33,7 +33,8 @@ export type VaultMulticall = {
 }
 
 export type VaultList = Omit<z.infer<typeof VaultSchema>, "incentives"> & {
-  incentives?: z.infer<typeof IncentiveSchema> | undefined
+  incentives?: z.infer<typeof IncentiveSchema>[] | undefined
+  currentIncentives?: z.infer<typeof IncentiveSchema> | undefined
 }
 
 export type VaultIncentive = z.infer<typeof IncentiveSchema>

@@ -44,14 +44,14 @@ export async function fetchTokenPrices(
 
     const [basePrice, quotePrice] = await Promise.all([
       fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${base.address}`,
+        `https://api.mgvinfra.com/prices/price-by-address?chain=${client.chain?.id}&address=${base.address}`,
       )
         .then((res) => res.json())
         .then((data) => priceSchema.parse(data))
         .then((data) => data.price)
         .catch(() => 1),
       fetch(
-        `https://price.mgvinfra.com/price-by-address?chain=${client.chain?.id}&address=${quote.address}`,
+        `https://api.mgvinfra.com/prices/price-by-address?chain=${client.chain?.id}&address=${quote.address}`,
       )
         .then((res) => res.json())
         .then((data) => priceSchema.parse(data))

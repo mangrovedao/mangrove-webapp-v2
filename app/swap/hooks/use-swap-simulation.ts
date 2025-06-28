@@ -216,13 +216,13 @@ export function useTokenPrices(
         if (!chainId || !payTknAddress || !receiveTknAddress) return null
 
         const payDollar = await fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${payTknAddress}`,
+          `https://api.mgvinfra.com/prices/price-by-address?chain=${chainId}&address=${payTknAddress}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
 
         const receiveDollar = await fetch(
-          `https://price.mgvinfra.com/price-by-address?chain=${chainId}&address=${receiveTknAddress}`,
+          `https://api.mgvinfra.com/prices/price-by-address?chain=${chainId}&address=${receiveTknAddress}`,
         )
           .then((res) => res.json())
           .then((data) => priceSchema.parse(data))
