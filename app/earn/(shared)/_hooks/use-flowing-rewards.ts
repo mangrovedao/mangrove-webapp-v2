@@ -48,7 +48,6 @@ export function useFlowingRewards(
           url.searchParams.set("maxRewards", incentive.maxRewards.toString())
           const response = await fetch(url)
           const data = await response.json()
-          console.log(data)
           return RewardsSchema.parse({ ...data, token: incentive.token })
         },
         enabled: !!user && !!vault && !!chainId,
