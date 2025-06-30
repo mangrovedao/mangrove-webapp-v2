@@ -23,8 +23,8 @@ export const MarketSchema = z
   .object({
     base: TokenSchema,
     quote: TokenSchema,
-    bidsOlKeyHash: z.string(),
-    asksOlKeyHash: z.string(),
+    bidsOlKeyHash: z.string().optional(),
+    asksOlKeyHash: z.string().optional(),
     tickSpacing: z
       .number()
       .or(z.bigint())

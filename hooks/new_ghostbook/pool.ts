@@ -1,6 +1,6 @@
 import useMarket from "@/providers/market"
 import { useQuery } from "@tanstack/react-query"
-import { Address } from "viem"
+import { Address, Hex } from "viem"
 import { useDefaultChain } from "../use-default-chain"
 
 export enum ProtocolType {
@@ -8,6 +8,7 @@ export enum ProtocolType {
   Slipstream = "Slipstream",
   UniswapV3 = "UniswapV3",
   UniswapV2 = "UniswapV2",
+  JellyverseV2 = "JellyverseV2",
 }
 
 export type SlipstreamProtocol = {
@@ -29,7 +30,16 @@ export type UniOrPancakeProtocol = {
   router: Address
 }
 
-export type Protocol = SlipstreamProtocol | UniOrPancakeProtocol
+export type JellyverseV2Protocol = {
+  type: ProtocolType.JellyverseV2
+  vault: Address
+  poolIds: Hex[]
+}
+
+export type Protocol =
+  | SlipstreamProtocol
+  | UniOrPancakeProtocol
+  | JellyverseV2Protocol
 
 export interface TickSpacingPool {
   tickSpacing: number
@@ -49,7 +59,16 @@ export interface FeePool {
   liquidity: string
 }
 
-export type Pool = TickSpacingPool | FeePool
+export interface JellyverseV2Pool {
+  tickSpacing: number
+  protocol: JellyverseV2Protocol
+  pool: Address
+  token0Balance: string
+  token1Balance: string
+  liquidity: string // TODO: verify this is correct
+}
+
+export type Pool = TickSpacingPool | FeePool | JellyverseV2Pool
 
 async function getPools(
   tokenIn: Address,
