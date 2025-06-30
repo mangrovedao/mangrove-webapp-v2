@@ -73,7 +73,7 @@ export function useTradeHistory<T = TradeHistory[]>({
         if (!market) return []
 
         const response = await fetch(
-          `${getIndexerUrl(defaultChain)}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
+          `${getIndexerUrl()}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
         )
         const result = await response.json()
 
@@ -131,7 +131,7 @@ export function useTrades({
         startLoading(TRADE.TABLES.ORDERS)
 
         const response = await fetch(
-          `${getIndexerUrl(defaultChain)}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+          `${getIndexerUrl()}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
         )
 
         if (!response.ok) {

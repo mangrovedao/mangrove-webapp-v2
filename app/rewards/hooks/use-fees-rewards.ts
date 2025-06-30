@@ -1,8 +1,6 @@
-
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { getChainObjectById } from "@/utils/chains"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
+import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { Token } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
 import { base } from "viem/chains"
@@ -114,7 +112,7 @@ const fetchTokenFeesData = async (
 ): Promise<FeesApiResponse | null> => {
   try {
     const response = await fetch(
-      `${getIndexerUrl(getChainObjectById(chainId.toString()))}/incentives/fees/${chainId}/${token.address}?start=${startTimestamp}&end=${endTimestamp}&budget=${budget}&multiplier=${MULTIPLIER}`,
+      `${getIndexerUrl()}/incentives/fees/${chainId}/${token.address}?start=${startTimestamp}&end=${endTimestamp}&budget=${budget}&multiplier=${MULTIPLIER}`,
     )
 
     if (!response.ok) {
@@ -178,7 +176,6 @@ export const useFeesRewards = () => {
   const { address: user } = useAccount()
   const { defaultChain } = useDefaultChain()
   const { tokens } = useOpenMarkets()
-
 
   return useQuery({
     queryKey: ["fees-rewards", defaultChain.id, user, tokens.length],

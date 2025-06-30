@@ -183,7 +183,7 @@ export function useOptimisticCache() {
     const checkSync = async () => {
       attempts++
       try {
-        const response = await fetch(`${getIndexerUrl(defaultChain)}/status`)
+        const response = await fetch(`${getIndexerUrl()}/status`)
         const data = await response.json()
         const schema = z.object({
           sei: z.object({ block: z.object({ number: z.number() }) }),

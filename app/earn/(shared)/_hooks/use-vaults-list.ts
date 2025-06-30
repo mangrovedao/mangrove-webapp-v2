@@ -9,7 +9,6 @@ export function useVaultsList(): UseQueryResult<
   Error
 > {
   const { defaultChain } = useDefaultChain()
-  // const { data: leaderboard } = useLeaderboards()
 
   return useQuery({
     queryKey: ["vaults-list", defaultChain.id],
@@ -26,8 +25,6 @@ export function useVaultsList(): UseQueryResult<
           ...vault,
           incentives: vault.incentives,
           currentIncentives: getCurrentIncentive(vault.incentives),
-          // userIncentives: leaderboard?.find((l) => l.vault === vault.address)
-          //   ?.leaderboard,
         }))
       } catch (error) {
         if (error instanceof ZodError) {

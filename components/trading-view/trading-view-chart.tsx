@@ -11,7 +11,6 @@ import {
   type OHLCVBar,
 } from "@/services/dexscreener-api"
 import { cn } from "@/utils"
-import { getChainObjectById } from "@/utils/chains"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { ZoomOutIcon } from "lucide-react"
 import React, { useCallback } from "react"
@@ -52,7 +51,7 @@ const fetchTestnetOHLCVData = async (
 
     // Instead of using from/to dates which might be problematic,
     // we'll just fetch the most recent candles using count parameter
-    const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/price/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${apiResolution}?count=100`
+    const url = `${getIndexerUrl()}/price/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${apiResolution}?count=100`
 
     const response = await fetch(url)
 

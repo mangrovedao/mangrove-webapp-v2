@@ -34,7 +34,7 @@ const useMangroveTokenPricesQuery = (
         if (!baseAddress || !quoteAddress || !tickSpacing) return null
 
         const res = await fetch(
-          `${getIndexerUrl(defaultChain)}/price/24-hour/${defaultChain.id}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
+          `${getIndexerUrl()}/price/24-hour/${defaultChain.id}/${baseAddress}/${quoteAddress}/${tickSpacing}`,
         )
 
         const data = await res.json()

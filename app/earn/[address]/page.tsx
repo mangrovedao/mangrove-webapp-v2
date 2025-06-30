@@ -37,6 +37,8 @@ import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { shortenAddress } from "@/utils/wallet"
+import { useAccount } from "wagmi"
+import { useFlowingRewards } from "../(shared)/_hooks/use-flowing-rewards"
 import { useLeaderboards } from "../(shared)/_hooks/use-kandel-rewards"
 import { FlowingNumber } from "../(shared)/components/flowing-numbers"
 import { Line, getChainImage } from "../(shared)/utils"
@@ -81,6 +83,10 @@ export default function Page() {
   const { data: rewardsInfo, isLoading: isLoadingRewards } = useRewardsInfo({
     rewardToken: vault?.currentIncentives?.tokenAddress,
   })
+  const { address: user } = useAccount()
+
+  const { data: rewardsInfoFlowing, isLoading: isLoadingRewardsFlowing } =
+    useFlowingRewards(vault?.address, user, defaultChain.id, vault?.incentives)
 
   const { mutate: claimRewards, isPending: isClaiming } = useClaimRewards()
   const { data: leaderboard } = useLeaderboards()
@@ -102,6 +108,7 @@ export default function Page() {
 
   const incentivesApr =
     currentIncentives?.reduce((acc, i) => acc + i.apy, 0) || 0
+  console.log(incentivesApr, currentIncentives, leaderboard)
   const isLoading = isLoadingVault || isLoadingRewards
 
   const tvlValue = getExactWeiAmount(
@@ -503,15 +510,20 @@ export default function Page() {
                   title={"Accruing"}
                   value={
                     <div className="flex items-center gap-1">
-                      {isLoading ? (
+                      {isLoading || isLoadingRewardsFlowing ? (
                         <Skeleton className="w-10 h-4" />
                       ) : (
                         <FlowingNumber
-                          bias={vault?.userIncentives?.rewards || 0}
+                          bias={
+                            rewardsInfoFlowing.reduce(
+                              (acc, curr) => acc + curr.rewards,
+                              0,
+                            ) || 0
+                          }
                           multipliers={
-                            vault?.incentives?.map((incentive) => ({
-                              start: incentive.startTimestamp,
-                              multiplier: incentive.rewardRatePerSecond,
+                            rewardsInfoFlowing.map((incentive) => ({
+                              start: incentive.timestamp,
+                              multiplier: incentive.currentRewardsPerSecond,
                             })) ?? []
                           }
                         />
