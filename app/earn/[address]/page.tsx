@@ -108,7 +108,6 @@ export default function Page() {
 
   const incentivesApr =
     currentIncentives?.reduce((acc, i) => acc + i.apy, 0) || 0
-  console.log(incentivesApr, currentIncentives, leaderboard)
   const isLoading = isLoadingVault || isLoadingRewards
 
   const tvlValue = getExactWeiAmount(
@@ -524,6 +523,7 @@ export default function Page() {
                             rewardsInfoFlowing.map((incentive) => ({
                               start: incentive.timestamp,
                               multiplier: incentive.currentRewardsPerSecond,
+
                             })) ?? []
                           }
                         />
