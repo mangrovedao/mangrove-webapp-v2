@@ -21,7 +21,7 @@ export async function getVaultIncentives(
     if (!incentives) return null
 
     const userIncentives = await fetch(
-      `${getIndexerUrl(client.chain)}/incentives/vaults/${client.chain?.id}/${vaultAddress}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}&page=0&pageSize=100`,
+      `${getIndexerUrl()}/incentives/vaults/${client.chain?.id}/${vaultAddress}?startTimestamp=${incentives?.startTimestamp}&endTimestamp=${incentives?.endTimestamp}&rewardRate=${incentives?.rewardRate}&maxRewards=${incentives?.maxRewards}&page=0&pageSize=100`,
     )
 
     if (!userIncentives?.ok) {

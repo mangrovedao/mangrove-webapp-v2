@@ -89,7 +89,7 @@ export const TVChartContainer = (
 
       // Build the URL with the pairs in the correct order
       // Note: The order must be chainId/quoteAddress/baseAddress for testnet indexer
-      const url = `${getIndexerUrl(defaultChain)}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
+      const url = `${getIndexerUrl()}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
 
       const response = await fetch(url)
       if (!response.ok) {
@@ -334,11 +334,11 @@ export const TVChartContainer = (
       debug: false,
       custom_css_url: "css/styles.css",
       disabled_features: [
-        'study_templates',
-        'use_localstorage_for_settings',
-        'header_quick_search',
-        'header_symbol_search',
-        'header_compare',
+        "study_templates",
+        "use_localstorage_for_settings",
+        "header_quick_search",
+        "header_symbol_search",
+        "header_compare",
       ],
     }
 
@@ -350,24 +350,24 @@ export const TVChartContainer = (
       setLoading(false)
 
       tvWidget.applyOverrides({
-        'paneProperties.backgroundType': 'solid',
-        'paneProperties.background': '#000000',
-        'scalesProperties.textColor': '#FFFFFF',
-        'scalesProperties.lineColor': '#333',
+        "paneProperties.backgroundType": "solid",
+        "paneProperties.background": "#000000",
+        "scalesProperties.textColor": "#FFFFFF",
+        "scalesProperties.lineColor": "#333",
 
-        'mainSeriesProperties.candleStyle.borderUpColor': '#00E828',
-        'mainSeriesProperties.candleStyle.borderDownColor': '#FF4A18',
+        "mainSeriesProperties.candleStyle.borderUpColor": "#00E828",
+        "mainSeriesProperties.candleStyle.borderDownColor": "#FF4A18",
 
-        'mainSeriesProperties.candleStyle.wickUpColor': '#00E828',
-        'mainSeriesProperties.candleStyle.wickDownColor': '#FF4A18',
+        "mainSeriesProperties.candleStyle.wickUpColor": "#00E828",
+        "mainSeriesProperties.candleStyle.wickDownColor": "#FF4A18",
 
-        'mainSeriesProperties.candleStyle.upColor': '#00E828',
-        'mainSeriesProperties.candleStyle.downColor': '#FF4A18',
+        "mainSeriesProperties.candleStyle.upColor": "#00E828",
+        "mainSeriesProperties.candleStyle.downColor": "#FF4A18",
 
-        'mainSeriesProperties.priceAxisProperties.autoScale': true,
-        'scalesProperties.showSeriesLastValue': true,
-        'scalesProperties.showStudyLastValue': false,
-      });
+        "mainSeriesProperties.priceAxisProperties.autoScale": true,
+        "scalesProperties.showSeriesLastValue": true,
+        "scalesProperties.showStudyLastValue": false,
+      })
 
       tvWidget
         .chart()

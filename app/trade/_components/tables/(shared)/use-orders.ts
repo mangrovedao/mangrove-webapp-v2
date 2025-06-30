@@ -42,15 +42,11 @@ export function useOrders<T = Order[]>(
   const config = {
     active: {
       queryKey: "orders",
-      apiRoute: `${getIndexerUrl(defaultChain)}/orders/all/active/${
-        defaultChain.id
-      }`,
+      apiRoute: `${getIndexerUrl()}/orders/all/active/${defaultChain.id}`,
     },
     history: {
       queryKey: "order-history",
-      apiRoute: `${getIndexerUrl(defaultChain)}/orders/all/history/${
-        defaultChain.id
-      }`,
+      apiRoute: `${getIndexerUrl()}/orders/all/history/${defaultChain.id}`,
     },
   }
 

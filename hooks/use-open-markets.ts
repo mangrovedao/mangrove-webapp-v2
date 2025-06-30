@@ -62,7 +62,7 @@ export function useOpenMarkets() {
         // Try API first
         try {
           const response = await fetch(
-            `${getIndexerUrl(defaultChain)}/markets/open/${defaultChain.id}`,
+            `${getIndexerUrl()}/markets/open/${defaultChain.id}`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

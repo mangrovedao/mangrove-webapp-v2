@@ -78,7 +78,7 @@ export async function fetchPnLData(
     if (!user) return undefined
 
     const res = await fetch(
-      `${getIndexerUrl(client.chain)}/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
+      `${getIndexerUrl()}/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
     )
 
     const data = await res.json()

@@ -4,7 +4,6 @@ import { z } from "zod"
 
 import { useVaultsList } from "@/app/earn/(shared)/_hooks/use-vaults-list"
 import { useDefaultChain } from "@/hooks/use-default-chain"
-import { getChainObjectById } from "@/utils/chains"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { useQuery } from "@tanstack/react-query"
 
@@ -61,7 +60,7 @@ const fetchVaultIncentivesData = async (
   maxRewards: number,
 ): Promise<VaultIncentivesApiResponse | null> => {
   try {
-    const url = `${getIndexerUrl(getChainObjectById(chainId.toString()))}/incentives/vaults/${chainId}/${vaultAddress}?startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&rewardRate=${rewardRate}&maxRewards=${maxRewards}&page=0&pageSize=100`
+    const url = `${getIndexerUrl()}/incentives/vaults/${chainId}/${vaultAddress}?startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&rewardRate=${rewardRate}&maxRewards=${maxRewards}&page=0&pageSize=100`
 
     const response = await fetch(url)
 
