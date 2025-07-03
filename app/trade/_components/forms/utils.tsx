@@ -1,4 +1,4 @@
-import { LimitOrderResult, type Token } from "@mangrovedao/mgv"
+import { type Token } from "@mangrovedao/mgv"
 import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
 import { formatUnits, parseUnits } from "viem"
@@ -16,7 +16,12 @@ export function successToast(
   baseToken: Token,
   quoteToken: Token,
   wants: string,
-  result: LimitOrderResult,
+  result: {
+    takerGot: bigint
+    takerGave: bigint
+    bounty: bigint
+    feePaid: bigint
+  },
   receiveToken: Token,
   sendToken: Token,
 ) {
@@ -24,7 +29,7 @@ export function successToast(
 
   const filledOrder = `Filled with ${Number(
     formatUnits(
-      result.takerGot,
+      BigInt(result.takerGot),
       isSell ? quoteToken.decimals : baseToken.decimals,
     ),
   ).toFixed(

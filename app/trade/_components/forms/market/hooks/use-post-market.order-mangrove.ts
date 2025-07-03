@@ -98,7 +98,12 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
           type: "market",
           side: bs,
           receipt,
-          parsedResult: result,
+          parsedResult: {
+            takerGot: result.takerGot,
+            takerGave: result.takerGave,
+            bounty: result.bounty,
+            feePaid: result.feePaid,
+          },
           form: {
             send: gives,
             receive: wants,
@@ -114,7 +119,12 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
           base,
           quote,
           wants,
-          result,
+          {
+            takerGot: result.takerGot,
+            takerGave: result.takerGave,
+            bounty: result.bounty,
+            feePaid: result.feePaid,
+          },
           receiveToken,
           sendToken,
         )
