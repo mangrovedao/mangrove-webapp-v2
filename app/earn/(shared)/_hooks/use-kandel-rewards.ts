@@ -1,4 +1,4 @@
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { AddressSchema } from "@/utils/schema"
 import { useQueries } from "@tanstack/react-query"
 import { z } from "zod/v4"
@@ -28,12 +28,18 @@ export type LeaderboardEntry = z.infer<typeof LeaderboardEntrySchema>
 export type Leaderboard = z.infer<typeof LeaderboardSchema>
 
 export function useLeaderboards() {
-  const indexerUrl = getIndexerUrl()
+  const indexerUrl = useIndexerUrl()
   const { data: whitelist } = useVaultsList()
   return useQueries({
     queries: (whitelist ?? []).flatMap((vault) => {
       return vault.incentives.map((incentive) => ({
-        queryKey: ["leaderboard", vault.chainId, vault.address, incentive.id],
+        queryKey: [
+          "leaderboard",
+          vault.chainId,
+          vault.address,
+          incentive.id,
+          indexerUrl,
+        ],
         queryFn: async () => {
           const url = new URL(
             `${indexerUrl}/incentives/vaults/${vault.chainId}/${vault.address}`,

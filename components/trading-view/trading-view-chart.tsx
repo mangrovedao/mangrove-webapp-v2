@@ -11,7 +11,7 @@ import {
   type OHLCVBar,
 } from "@/services/dexscreener-api"
 import { cn } from "@/utils"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { ZoomOutIcon } from "lucide-react"
 import React, { useCallback } from "react"
 import {
@@ -35,6 +35,7 @@ const fetchTestnetOHLCVData = async (
   try {
     if (!chainId || !baseAddress || !quoteAddress) return []
 
+    const indexerUrl = useIndexerUrl()
     // Convert TradingView resolution to API resolution (e.g., "60" -> "1h")
     const resolutionMap: Record<string, string> = {
       "1": "1m",
@@ -51,7 +52,7 @@ const fetchTestnetOHLCVData = async (
 
     // Instead of using from/to dates which might be problematic,
     // we'll just fetch the most recent candles using count parameter
-    const url = `${getIndexerUrl()}/price/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${apiResolution}?count=100`
+    const url = `${indexerUrl}/price/ohlc/${chainId}/${baseAddress}/${quoteAddress}/1/${apiResolution}?count=100`
 
     const response = await fetch(url)
 

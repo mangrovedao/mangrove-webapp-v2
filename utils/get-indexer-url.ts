@@ -10,7 +10,7 @@ const INDEXER_URLS: Record<number, string> = {
 
 const DEFAULT_INDEXER_URL = "https://indexer.mgvinfra.com"
 
-export function getIndexerUrl() {
+export function useIndexerUrl() {
   const chainId = useChainId()
   if (!chainId) return DEFAULT_INDEXER_URL
   return INDEXER_URLS[chainId] ?? DEFAULT_INDEXER_URL

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { z } from "zod"
 
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { useDefaultChain } from "./use-default-chain"
 
 const priceSchema = z.object({
@@ -20,7 +20,7 @@ const useMangroveTokenPricesQuery = (
   tickSpacing?: number,
 ) => {
   const { defaultChain } = useDefaultChain()
-  const indexerUrl = getIndexerUrl();
+  const indexerUrl = useIndexerUrl()
 
   return useQuery({
     queryKey: [
@@ -28,6 +28,7 @@ const useMangroveTokenPricesQuery = (
       baseAddress,
       quoteAddress,
       tickSpacing,
+      indexerUrl,
       defaultChain.id,
     ],
     queryFn: async () => {
@@ -48,8 +49,7 @@ const useMangroveTokenPricesQuery = (
       }
     },
     enabled: !!baseAddress && !!quoteAddress && !!tickSpacing,
-    refetchInterval: 1000 * 60, // every minute
-    staleTime: 1000 * 60, // 1 minute for 1m interval
+    refetchInterval: 10000, // every 10 seconds
   })
 }
 
