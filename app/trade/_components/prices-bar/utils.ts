@@ -29,6 +29,7 @@ export const normalizeStats = (
     | null
     | undefined,
 ): NormalizedStats | null => {
+  console.log('data', data)
   if (!data) return null
 
   // If data already has the new format (high, low, volume)

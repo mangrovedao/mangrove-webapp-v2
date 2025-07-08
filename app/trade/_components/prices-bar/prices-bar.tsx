@@ -157,7 +157,7 @@ export function PricesBar() {
 
   // Normalize stats based on which chain we're using
   const stats = normalizeStats(
-    defaultChain.testnet || !pool ? priceData : poolStats,
+    priceData ?? poolStats,
   )
 
   const isFetched = poolStatsFetched && priceDataFetched
