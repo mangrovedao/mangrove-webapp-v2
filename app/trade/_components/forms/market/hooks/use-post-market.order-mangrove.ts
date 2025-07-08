@@ -52,6 +52,7 @@ export function usePostMarketOrderMangrove({ onResult }: Props = {}) {
 
         const { base, quote } = market
 
+        console.log("mangrove order")
         const { bs, send: gives, receive: wants, slippage } = form
         const receiveToken = bs === "buy" ? base : quote
         const sendToken = bs === "buy" ? quote : base

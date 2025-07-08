@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query"
 import { Address } from "viem"
 import { useChainId } from "wagmi"
 import { z } from "zod/v4"
+import { useSelectedPool } from "./use-selected-pool"
+
 
 const UniswapV3ProtocolSchema = z.object({
   type: z.literal("UNISWAP_V3"),
@@ -78,6 +80,7 @@ export function usePools({ token0, token1 }: UsePoolProps) {
       url.searchParams.set("chainId", chainId.toString())
       const response = await fetch(url)
       const data = await response.json()
+
       return data as Pool[]
     },
   })
