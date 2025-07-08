@@ -3,15 +3,29 @@ import { getBook } from "@mangrovedao/mgv/actions"
 import { BA, multiplyDensity, rpcOfferToHumanOffer } from "@mangrovedao/mgv/lib"
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
-import { PublicClient } from "viem"
+import {
+  Abi,
+  Address,
+  ContractFunctionReturnType,
+  Hex,
+  MulticallParameters,
+  PublicClient,
+} from "viem"
 
 import useMarket from "@/providers/market"
 import { useSelectedPoolStore } from "@/stores/selected-pool.store"
 import { useMangroveAddresses } from "../use-addresses"
 import { useDefaultChain } from "../use-default-chain"
 import { useNetworkClient } from "../use-network-client"
-import { slipstreamQuoterAbi, uniQuoterABI } from "./abi/quoter"
-import { Pool, ProtocolType, usePool } from "./pool"
+import { jellyverseQuoterABI, uniQuoterABI } from "./abi/quoter"
+import {
+  FeePool,
+  JellyverseV2Pool,
+  Pool,
+  ProtocolType,
+  TickSpacingPool,
+  usePool,
+} from "./pool"
 
 export function useMangroveBook() {
   const mangrove = useMangroveAddresses()
@@ -34,6 +48,156 @@ export function useMangroveBook() {
     },
     refetchInterval: 2000,
   })
+}
+interface ProtocolSwapCalculator {
+  calculateSwap(
+    tokenIn: Address,
+    tokenOut: Address,
+    amountIn: bigint,
+    pool: Pool,
+  ): MulticallParameters["contracts"][number][]
+  parseResult(
+    result: ContractFunctionReturnType<Abi>,
+  ): [amountOut: bigint, gasEstimate: bigint]
+}
+
+function getSwapCalculator(type: ProtocolType): ProtocolSwapCalculator {
+  switch (type) {
+    case ProtocolType.Slipstream:
+      return new SlipstreamSwapCalculator()
+    case ProtocolType.UniswapV3:
+      return new UniSwapCalculator()
+    case ProtocolType.JellyverseV2:
+      return new JellyverseSwapCalculator()
+    default:
+      return new UniSwapCalculator()
+  }
+}
+class UniSwapCalculator implements ProtocolSwapCalculator {
+  calculateSwap(
+    tokenIn: Address,
+    tokenOut: Address,
+    amountIn: bigint,
+    pool: FeePool,
+  ): MulticallParameters["contracts"][number][] {
+    return [
+      {
+        address: pool.protocol.quoter,
+        abi: uniQuoterABI,
+        functionName: "quoteExactInputSingle",
+        args: [
+          {
+            tokenIn,
+            tokenOut,
+            amountIn,
+            fee: pool.fee,
+            tickSpacing: undefined,
+            sqrtPriceLimitX96: 0n,
+          },
+        ],
+      },
+    ]
+  }
+  parseResult(
+    result: ContractFunctionReturnType<
+      typeof uniQuoterABI,
+      "view",
+      "quoteExactInputSingle"
+    >,
+  ): [amountOut: bigint, gasEstimate: bigint] {
+    const [amountOutRaw, , , gasEstimateRaw] = result as [
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+    ]
+    return [amountOutRaw, gasEstimateRaw]
+  }
+}
+class SlipstreamSwapCalculator implements ProtocolSwapCalculator {
+  calculateSwap(
+    tokenIn: Address,
+    tokenOut: Address,
+    amountIn: bigint,
+    pool: TickSpacingPool,
+  ): MulticallParameters["contracts"][number][] {
+    return [
+      {
+        address: pool.protocol.quoter,
+        abi: uniQuoterABI,
+        functionName: "quoteExactInputSingle",
+        args: [
+          {
+            tokenIn,
+            tokenOut,
+            amountIn,
+            fee: undefined,
+            tickSpacing: pool.tickSpacing,
+            sqrtPriceLimitX96: 0n,
+          },
+        ],
+      },
+    ]
+  }
+  parseResult(
+    result: ContractFunctionReturnType<
+      typeof uniQuoterABI,
+      "view",
+      "quoteExactInputSingle"
+    >,
+  ): [amountOut: bigint, gasEstimate: bigint] {
+    const [amountOutRaw, , , gasEstimateRaw] = result as [
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+    ]
+    return [amountOutRaw, gasEstimateRaw]
+  }
+}
+class JellyverseSwapCalculator implements ProtocolSwapCalculator {
+  private readonly gasEstimate = 1000n
+
+  calculateSwap(
+    tokenIn: Address,
+    tokenOut: Address,
+    amountIn: bigint,
+    pool: JellyverseV2Pool,
+  ): MulticallParameters["contracts"][number][] {
+    return [{
+        address: pool.protocol.vault,
+        abi: jellyverseQuoterABI,
+        functionName: "queryBatchSwap",
+        args: [
+          0,
+          [{
+            poolId: pool.poolId,
+            assetInIndex: 0,
+            assetOutIndex: 1,
+            amount: amountIn,
+            userData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          }],
+          [tokenIn, tokenOut],
+          {
+            sender: "0x0000000000000000000000000000000000000000",
+            fromInternalBalance: false,
+            recipient: "0x0000000000000000000000000000000000000000",
+            toInternalBalance: false
+          },
+        ]
+      }
+    ]
+  }
+  parseResult(
+    result: ContractFunctionReturnType<
+      typeof jellyverseQuoterABI,
+      "view",
+      "queryBatchSwap"
+    >,
+  ): [amountOut: bigint, gasEstimate: bigint] {
+    const [_, amount2] = result as [bigint, bigint]
+    return [-1n * amount2, this.gasEstimate]
+  }
 }
 
 async function getPoolBook(
@@ -74,55 +238,31 @@ async function getPoolBook(
     acc[index] = index === 0 ? current : acc[index - 1] + current
     return acc
   }, new Array(nOffers).fill(0n))
-
+  const swapsCalculator = getSwapCalculator(pool.protocol.type)
   const quotes = await client.multicall({
     contracts: [
       // Asks quotes (WETH -> USDC)
-      ...quoteAmountsIn.map(
-        (amountIn) =>
-          ({
-            address: pool.protocol.quoter,
-            abi:
-              pool.protocol.type === ProtocolType.Slipstream
-                ? slipstreamQuoterAbi
-                : uniQuoterABI,
-            functionName: "quoteExactInputSingle",
-            args: [
-              {
-                tokenIn: market.quote.address,
-                tokenOut: market.base.address,
-                amountIn,
-                fee: "fee" in pool ? pool.fee : undefined,
-                tickSpacing:
-                  "tickSpacing" in pool ? pool.tickSpacing : undefined,
-                sqrtPriceLimitX96: 0n,
-              },
-            ],
-          }) as const,
-      ),
+      ...quoteAmountsIn
+        .map((amountIn) =>
+          swapsCalculator.calculateSwap(
+            market.quote.address,
+            market.base.address,
+            amountIn,
+            pool,
+          ),
+        )
+        .flat(),
       // Bids quotes (USDC -> WETH)
-      ...baseAmountsIn.map(
-        (amountIn) =>
-          ({
-            address: pool.protocol.quoter,
-            abi:
-              pool.protocol.type === ProtocolType.Slipstream
-                ? slipstreamQuoterAbi
-                : uniQuoterABI,
-            functionName: "quoteExactInputSingle",
-            args: [
-              {
-                tokenIn: market.base.address,
-                tokenOut: market.quote.address,
-                amountIn,
-                fee: "fee" in pool ? pool.fee : undefined,
-                tickSpacing:
-                  "tickSpacing" in pool ? pool.tickSpacing : undefined,
-                sqrtPriceLimitX96: 0n,
-              },
-            ],
-          }) as const,
-      ),
+      ...baseAmountsIn
+        .map((amountIn) =>
+          swapsCalculator.calculateSwap(
+            market.base.address,
+            market.quote.address,
+            amountIn,
+            pool,
+          ),
+        )
+        .flat(),
     ],
     batchSize: 5096,
     allowFailure: false,
@@ -132,12 +272,9 @@ async function getPoolBook(
   let previousAsksGasEstimate = 0n
   const asks: CompleteOffer[] = []
   for (let i = 0; i < nOffers; i++) {
-    const [amountOutRaw, , , gasEstimateRaw] = quotes[i] as [
-      bigint,
-      bigint,
-      number,
-      bigint,
-    ]
+    const [amountOutRaw, gasEstimateRaw] = swapsCalculator.parseResult(
+      quotes[i],
+    )
     const amountIn =
       i === 0 ? quoteAmountsIn[i] : quoteAmountsIn[i] - quoteAmountsIn[i - 1]
     const amountOut = amountOutRaw - previousAsksAmountOut
@@ -172,12 +309,7 @@ async function getPoolBook(
   let previousBidsGasEstimate = 0n
   const bids: CompleteOffer[] = []
   for (let i = nOffers; i < 2 * nOffers; i++) {
-    const [amountOutRaw, , , gasEstimateRaw] = quotes[i] as [
-      bigint,
-      bigint,
-      number,
-      bigint,
-    ]
+    const [amountOutRaw, gasEstimateRaw] = swapsCalculator.parseResult(quotes[i])
     const amountIn =
       i === nOffers
         ? baseAmountsIn[i - nOffers]
@@ -211,7 +343,6 @@ async function getPoolBook(
 
   return { asks, bids }
 }
-
 export function usePoolBook() {
   const { pool } = usePool()
   const client = useNetworkClient()

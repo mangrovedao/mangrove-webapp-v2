@@ -39,7 +39,7 @@ export function parseOrders(data: unknown[]): Order[] {
         // More detailed error logging
         if (error instanceof z.ZodError) {
           console.error(
-            "Zod validation error for order:",
+            "Zod validation error for orders:",
             item,
             error.issues.map((issue) => ({
               path: issue.path,

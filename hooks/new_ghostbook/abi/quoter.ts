@@ -32,7 +32,7 @@ export const slipstreamQuoterAbi = [
     stateMutability: "nonpayable",
     type: "function",
   },
-] as const;
+] as const
 
 export const uniQuoterABI = [
   {
@@ -68,4 +68,90 @@ export const uniQuoterABI = [
     stateMutability: "nonpayable",
     type: "function",
   },
-] as const;
+] as const
+
+export const jellyverseQuoterABI = [
+  {
+    inputs: [
+      {
+        internalType: "enum IVault.SwapKind",
+        name: "kind",
+        type: "uint8",
+      },
+      {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "poolId",
+            type: "bytes32",
+          },
+          {
+            internalType: "uint256",
+            name: "assetInIndex",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "assetOutIndex",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "bytes",
+            name: "userData",
+            type: "bytes",
+          },
+        ],
+        internalType: "struct IVault.BatchSwapStep[]",
+        name: "swaps",
+        type: "tuple[]",
+      },
+      {
+        internalType: "contract IAsset[]",
+        name: "assets",
+        type: "address[]",
+      },
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "sender",
+            type: "address",
+          },
+          {
+            internalType: "bool",
+            name: "fromInternalBalance",
+            type: "bool",
+          },
+          {
+            internalType: "address payable",
+            name: "recipient",
+            type: "address",
+          },
+          {
+            internalType: "bool",
+            name: "toInternalBalance",
+            type: "bool",
+          },
+        ],
+        internalType: "struct IVault.FundManagement",
+        name: "funds",
+        type: "tuple",
+      },
+    ],
+    name: "queryBatchSwap",
+    outputs: [
+      {
+        internalType: "int256[]",
+        name: "",
+        type: "int256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const

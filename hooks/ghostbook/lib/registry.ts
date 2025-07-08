@@ -65,6 +65,7 @@ export type MangroveChain = {
   univ3Module: Address
   mangroveParams: MangroveActionsDefaultParams
   chain: Chain
+  balancerV2Module?: Address
 }
 
 export const mangroveChains = [
@@ -72,17 +73,20 @@ export const mangroveChains = [
     ghostbook: "0x46708Dd6E68e1f09c6f4830C2586f73659dFafEA",
     univ3Module: "0x22Ba67Eb361Ec40e0949ED034F3CE08Af51099fA",
     mangroveParams: arbitrumMangrove,
+    balancerV2Module: "0x0000000000000000000000000000000000000000",
     chain: arbitrum,
   },
   {
     ghostbook: "0x15F02Fb9c9Bb772A3303349F88c94Fc971bd549F",
     univ3Module: "0xAf31bEb21d2b1f8C3BdD211eC02470265A21ea3f",
+    balancerV2Module: "0x0000000000000000000000000000000000000000",
     mangroveParams: baseMangrove,
     chain: base,
   },
   {
     ghostbook: "0x127A5a5E086DCe304875e392C8170B04bC81e8B6",
     univ3Module: "0x4bB7F3087664E559365C4C94d3C21a39847d7726",
+    balancerV2Module: "0x369022670f2C623Ee6894Ae4053eF54C2c685Dd0",
     mangroveParams: seiMangrove,
     chain: sei,
   },
