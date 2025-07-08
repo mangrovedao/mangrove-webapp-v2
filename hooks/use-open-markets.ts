@@ -53,12 +53,7 @@ export function useOpenMarkets() {
   const symbolOverride = useSymbolOverrides()
   const client = useNetworkClient()
   const mangrove = useMangroveAddresses()
-
-  // Create the extended client outside of queryFn to avoid hook call issues
-  const mangroveClient = React.useMemo(() => {
-    if (!mangrove || !client) return null
-    return client.extend(mangroveActions(mangrove))
-  }, [client, mangrove])
+  const indexerUrl = getIndexerUrl()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["open-markets", chainId, cashnesses, symbolOverride],
@@ -69,7 +64,7 @@ export function useOpenMarkets() {
         // Try API first
         try {
           const response = await fetch(
-            `${getIndexerUrl()}/markets/open/${chainId}`,
+            `${indexerUrl}/markets/open/${chainId}`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

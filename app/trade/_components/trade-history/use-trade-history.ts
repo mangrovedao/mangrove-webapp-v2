@@ -62,6 +62,7 @@ export function useTrades({
     state.startLoading,
     state.stopLoading,
   ])
+  const indexerUrl = getIndexerUrl()
 
   return useInfiniteQuery<TradesPage, Error>({
     queryKey: [
@@ -78,12 +79,6 @@ export function useTrades({
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       try {
-        console.log(
-          "market",
-          chainId,
-          market,
-          `${getIndexerUrl()}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
-        )
         if (
           !market?.base.address ||
           !market?.quote.address ||
@@ -100,12 +95,8 @@ export function useTrades({
         }
 
         startLoading(TRADE.TABLES.ORDERS)
-        console.log(
-          "market",
-          `${getIndexerUrl()}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
-        )
         const response = await fetch(
-          `${getIndexerUrl()}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+          `${indexerUrl}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
         )
 
         if (!response.ok) {
@@ -122,7 +113,7 @@ export function useTrades({
         }))
 
         stopLoading(TRADE.TABLES.ORDERS)
-        console.log("transformedData", transformedData)
+
         return {
           data: transformedData,
           meta: {
