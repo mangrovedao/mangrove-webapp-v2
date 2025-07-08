@@ -35,8 +35,8 @@ const MarketSchema = z
   .object({
     base: TokenSchema,
     quote: TokenSchema,
-    bidsOlKeyHash: z.string(),
-    asksOlKeyHash: z.string(),
+    bidsOlKeyHash: z.string().optional(),
+    asksOlKeyHash: z.string().optional(),
     tickSpacing: z.number().transform((val) => BigInt(val)),
   })
   .transform((market) => market as MarketParams)
