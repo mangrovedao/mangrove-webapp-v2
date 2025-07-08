@@ -8,7 +8,7 @@ export enum ProtocolType {
   Slipstream = "Slipstream",
   UniswapV3 = "UniswapV3",
   UniswapV2 = "UniswapV2",
-  JellyverseV2 = "JellyverseV2",
+  JellyverseV2 = "JELLYVERSE_V2",
 }
 
 export type SlipstreamProtocol = {
@@ -63,6 +63,7 @@ export interface JellyverseV2Pool {
   tickSpacing: number
   protocol: JellyverseV2Protocol
   pool: Address
+  poolId: Hex
   token0Balance: string
   token1Balance: string
   liquidity: string // TODO: verify this is correct

@@ -1,15 +1,14 @@
 "use client"
 
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
-import { useAccount } from "wagmi"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { useAccount, useChainId } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
-import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
-import { parseTradeHistory, type TradeHistory } from "./schema"
+import { type TradeHistory } from "./schema"
 
 // Define Trade type based on API response
 export type Trade = {
@@ -52,54 +51,13 @@ type TradesParams = {
   allMarkets?: boolean
 }
 
-export function useTradeHistory<T = TradeHistory[]>({
-  filters: { first = 100, skip = 0 } = {},
-  select,
-}: TradeHistoryParams<T> = {}) {
-  const { currentMarket: market } = useMarket()
-  const { defaultChain } = useDefaultChain()
-
-  return useQuery<TradeHistory[], Error, T>({
-    queryKey: [
-      "trade-history",
-      market?.base.address,
-      market?.quote.address,
-      defaultChain.id,
-      first,
-      skip,
-    ],
-    queryFn: async ({ pageParam = 0 }) => {
-      try {
-        if (!market) return []
-
-        const response = await fetch(
-          `${getIndexerUrl()}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${first}`,
-        )
-        const result = await response.json()
-
-        const parsedData = parseTradeHistory(result)
-        return parsedData
-      } catch (e) {
-        console.error(getErrorMessage(e))
-        return []
-      }
-    },
-    select,
-    enabled: !!market,
-    meta: {
-      error: "Unable to retrieve trade history",
-    },
-    refetchInterval: 10 * 1000, // 10 seconds
-  })
-}
-
 export function useTrades({
   pageSize = 25,
   allMarkets = false,
 }: TradesParams = {}): UseInfiniteTradesResult {
   const { address } = useAccount()
   const { currentMarket: market } = useMarket()
-  const { defaultChain } = useDefaultChain()
+  const chainId = useChainId()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
@@ -111,13 +69,26 @@ export function useTrades({
       allMarkets ? "all-markets" : market?.base.address,
       allMarkets ? "" : market?.quote.address,
       address,
+      market?.base.address.toString(),
+      market?.quote.address.toString(),
+      market?.tickSpacing.toString(),
       pageSize,
-      defaultChain.id,
+      chainId,
     ],
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       try {
-        if (!market) {
+        console.log(
+          "market",
+          chainId,
+          market,
+          `${getIndexerUrl()}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+        )
+        if (
+          !market?.base.address ||
+          !market?.quote.address ||
+          !market?.tickSpacing
+        ) {
           return {
             data: [],
             meta: {
@@ -129,9 +100,12 @@ export function useTrades({
         }
 
         startLoading(TRADE.TABLES.ORDERS)
-
+        console.log(
+          "market",
+          `${getIndexerUrl()}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+        )
         const response = await fetch(
-          `${getIndexerUrl()}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+          `${getIndexerUrl()}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
         )
 
         if (!response.ok) {
@@ -141,12 +115,14 @@ export function useTrades({
         }
 
         const result = (await response.json()) as TradesResponse
-
+        console.log("result", result)
         // Transform the response to match our expected format
         const transformedData: Trade[] = result.trades.map((trade) => ({
           ...trade,
         }))
 
+        stopLoading(TRADE.TABLES.ORDERS)
+        console.log("transformedData", transformedData)
         return {
           data: transformedData,
           meta: {
@@ -165,8 +141,6 @@ export function useTrades({
             page: Number(pageParam),
           },
         }
-      } finally {
-        stopLoading(TRADE.TABLES.ORDERS)
       }
     },
 
@@ -178,9 +152,6 @@ export function useTrades({
     meta: {
       error: "Unable to retrieve trade history",
     },
-    enabled: !!market,
-    refetchInterval: 5 * 1000, // 5 seconds
-    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
 

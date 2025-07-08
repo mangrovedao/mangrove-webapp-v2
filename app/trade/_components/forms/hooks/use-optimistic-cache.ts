@@ -16,8 +16,13 @@ type OrderSide = "buy" | "sell"
 interface OptimisticOrderData {
   type: OrderType
   side: OrderSide
-  receipt: TransactionReceipt
-  parsedResult: any
+  receipt: TransactionReceipt | undefined
+  parsedResult: {
+    takerGot: bigint
+    takerGave: bigint
+    bounty: bigint
+    feePaid: bigint
+  }
   form: {
     send: string
     receive: string
@@ -31,7 +36,7 @@ export function useOptimisticCache() {
   const queryClient = useQueryClient()
   const { address } = useAccount()
   const { currentMarket } = useMarket()
-  const { tokens, openMarkets } = useOpenMarkets()
+  const { tokens } = useOpenMarkets()
   const { defaultChain } = useDefaultChain()
 
   const updateQueryCache = (
@@ -91,16 +96,16 @@ export function useOptimisticCache() {
       const optimisticOrder: Order = {
         creationDate: new Date(),
         transactionHash: `optimistic_${receipt.transactionHash}`,
-        feePaid: parsedResult.feePaid?.toString() || "0",
+        feePaid: parsedResult.feePaid.toString(),
         lockedProvision: "0",
         side,
-        takerGot: parsedResult.takerGot?.toString() || "0",
-        takerGave: parsedResult.takerGave?.toString() || "0",
+        takerGot: parsedResult.takerGot.toString(),
+        takerGave: parsedResult.takerGave.toString(),
         initialWants: form.receive,
         initialGives: form.send,
         price: form.price || "0",
         isMarketOrder: type === "market",
-        offerId: parsedResult.offer?.id?.toString() || "0",
+        offerId: "0",
         sendToken:
           findToken(
             side === "buy"

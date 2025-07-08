@@ -66,7 +66,6 @@ export function useMarketTransaction({
   const postMangrove = usePostMarketOrderMangrove({
     onResult: (result) => {
       setTxState("idle")
-      toast.success("Order submitted successfully!")
       onTransactionSuccess()
     },
   })

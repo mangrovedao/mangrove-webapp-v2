@@ -164,29 +164,29 @@ class JellyverseSwapCalculator implements ProtocolSwapCalculator {
     amountIn: bigint,
     pool: JellyverseV2Pool,
   ): MulticallParameters["contracts"][number][] {
-    return pool.protocol.poolIds.map((poolId: Hex) => ({
-      address: pool.protocol.vault,
-      abi: jellyverseQuoterABI,
-      functionName: "queryBatchSwap",
-      args: [
-        0,
-        [
-          {
-            poolId: poolId,
+    return [{
+        address: pool.protocol.vault,
+        abi: jellyverseQuoterABI,
+        functionName: "queryBatchSwap",
+        args: [
+          0,
+          [{
+            poolId: pool.poolId,
             assetInIndex: 0,
             assetOutIndex: 1,
             amount: amountIn,
+            userData: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          }],
+          [tokenIn, tokenOut],
+          {
+            sender: "0x0000000000000000000000000000000000000000",
+            fromInternalBalance: false,
+            recipient: "0x0000000000000000000000000000000000000000",
+            toInternalBalance: false
           },
-        ],
-        [tokenIn, tokenOut],
-        {
-          sender: "0x0000000000000000000000000000000000000000",
-          fromInternalBalance: false,
-          recipient: "0x0000000000000000000000000000000000000000",
-          toInternalBalance: false,
-        },
-      ],
-    }))
+        ]
+      }
+    ]
   }
   parseResult(
     result: ContractFunctionReturnType<
@@ -196,7 +196,7 @@ class JellyverseSwapCalculator implements ProtocolSwapCalculator {
     >,
   ): [amountOut: bigint, gasEstimate: bigint] {
     const [_, amount2] = result as [bigint, bigint]
-    return [amount2, this.gasEstimate]
+    return [-1n * amount2, this.gasEstimate]
   }
 }
 
@@ -309,12 +309,7 @@ async function getPoolBook(
   let previousBidsGasEstimate = 0n
   const bids: CompleteOffer[] = []
   for (let i = nOffers; i < 2 * nOffers; i++) {
-    const [amountOutRaw, , , gasEstimateRaw] = quotes[i] as [
-      bigint,
-      bigint,
-      number,
-      bigint,
-    ]
+    const [amountOutRaw, gasEstimateRaw] = swapsCalculator.parseResult(quotes[i])
     const amountIn =
       i === nOffers
         ? baseAmountsIn[i - nOffers]

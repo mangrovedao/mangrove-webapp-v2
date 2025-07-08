@@ -1,20 +1,14 @@
 import { MarketParams } from "@mangrovedao/mgv"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Address, parseUnits } from "viem"
+import { parseUnits } from "viem"
 import { useWalletClient } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
-import { trade } from "@/hooks/ghostbook/lib/trade"
 import { useMarketClient } from "@/hooks/use-market"
 
-import { useRegistry } from "@/hooks/ghostbook/hooks/use-registry"
-import {
-  FeePool,
-  ProtocolType,
-  TickSpacingPool,
-} from "@/hooks/new_ghostbook/pool"
 import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
+import { useGhostBookTrade } from "@/hooks/new_ghostbook/use-trade"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { printEvmError } from "@/utils/errors"
@@ -34,7 +28,6 @@ const calculateMaxTick = (
 
 export function usePostMarketOrder() {
   const { currentMarket: market } = useMarket()
-  const { mangroveChain } = useRegistry()
 
   const { selectedPool: pool } = useSelectedPool()
   const { data: walletClient } = useWalletClient()
@@ -45,12 +38,13 @@ export function usePostMarketOrder() {
   ])
 
   const { addOptimisticOrder } = useOptimisticCache()
-
-  const uniModuleAddress = {
-    [ProtocolType.UniswapV3]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
-    [ProtocolType.PancakeSwapV3]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
-    [ProtocolType.UniswapV2]: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
-    [ProtocolType.Slipstream]: "0x922F0E2fa80F7dc2E22dBcE5EB3B423E09CE013B",
+  const { trade, result } = useGhostBookTrade({ market })
+  const { takerGot, takerGave, bounty, feePaid } = result || {}
+  const parsedResult = {
+    takerGot: takerGot || 0n,
+    takerGave: takerGave || 0n,
+    bounty: bounty || 0n,
+    feePaid: feePaid || 0n,
   }
 
   return useMutation({
@@ -82,48 +76,23 @@ export function usePostMarketOrder() {
         const sendToken = bs === "buy" ? quote : base
 
         const sendAmount = parseUnits(gives, sendToken.decimals)
-        const receiveAmount = parseUnits(wants, receiveToken.decimals)
 
-        // Calculate max tick based on current price and slippage
         const maxTick = calculateMaxTick(maxTickEncountered, slippage)
 
-        const fee =
-          pool?.protocol.type === ProtocolType.UniswapV3 ||
-          pool?.protocol.type === ProtocolType.PancakeSwapV3
-            ? (pool as FeePool).fee
-            : 0
-
-        const tickSpacing =
-          pool?.protocol.type === ProtocolType.Slipstream
-            ? (pool as TickSpacingPool)?.tickSpacing
-            : 0
-
-        const { got, gave, bounty, feePaid, receipt } = await trade({
-          client: walletClient,
-          ghostbook: mangroveChain?.ghostbook as Address,
-          market,
+        const res = await trade({
           bs,
           sendAmount,
-          router: pool?.protocol.router,
-          module: uniModuleAddress[pool?.protocol.type] as Address,
-          fee,
           maxTick,
-          deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
-          protocol: ProtocolType.UniswapV3,
-          tickSpacing,
-          async onTrade({ got, gave, bounty, feePaid }) {
-            console.log("OnTrade callback:", { got, gave, bounty, feePaid })
-          },
         })
 
-        const result = { takerGot: got, takerGave: gave, bounty, feePaid }
+        const { receipt, hash } = res || {}
 
         // Add optimistic order to cache immediately
         await addOptimisticOrder({
           type: "market",
           side: bs,
           receipt,
-          parsedResult: result,
+          parsedResult,
           form: {
             send: gives,
             receive: wants,
@@ -137,7 +106,7 @@ export function usePostMarketOrder() {
           base,
           quote,
           wants,
-          result,
+          parsedResult,
           receiveToken,
           sendToken,
         )
