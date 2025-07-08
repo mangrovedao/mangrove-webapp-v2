@@ -1,6 +1,7 @@
 "use client"
 
 import { usePool } from "@/hooks/new_ghostbook/pool"
+import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { useMemo } from "react"
@@ -10,7 +11,7 @@ interface PriceChartProps {
 }
 
 export default function EmbedPriceChart({ className }: PriceChartProps) {
-  const { pool, isLoading: isPoolLoading } = usePool()
+  const { selectedPool } = useSelectedPool()
   const { currentMarket } = useMarket()
 
   // Specific market URL mappings
@@ -30,11 +31,11 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
     }
 
     // Fallback to dynamic URL construction
-    return `https://www.geckoterminal.com/sei-evm/pools/${pool?.pool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
-  }, [pool, currentMarket, marketUrlMappings])
+    return `https://www.geckoterminal.com/sei-evm/pools/${selectedPool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
+  }, [selectedPool, currentMarket, marketUrlMappings])
 
   // Show loading state while pool is being fetched
-  if (isPoolLoading) {
+  if (!selectedPool) {
     return (
       <div
         className={cn(

@@ -30,7 +30,7 @@ export const useMarketSteps = ({ bs, user, sendAmount, sendToken }: Props) => {
       marketClient?.name,
       sendAmount,
       sendToken?.address?.toString(),
-      pool?.pool,
+      pool,
       marketClient?.chain?.id,
     ],
     queryFn: async () => {
