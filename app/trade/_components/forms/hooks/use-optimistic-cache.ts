@@ -36,7 +36,7 @@ export function useOptimisticCache() {
   const queryClient = useQueryClient()
   const { address } = useAccount()
   const { currentMarket } = useMarket()
-  const { tokens, openMarkets } = useOpenMarkets()
+  const { tokens } = useOpenMarkets()
   const { defaultChain } = useDefaultChain()
 
   const updateQueryCache = (

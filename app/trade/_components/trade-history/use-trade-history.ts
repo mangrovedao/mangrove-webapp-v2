@@ -1,7 +1,7 @@
 "use client"
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
-import { useAccount } from "wagmi"
+import { useAccount, useChainId } from "wagmi"
 
 import { TRADE } from "@/app/trade/_constants/loading-keys"
 import { useDefaultChain } from "@/hooks/use-default-chain"
@@ -99,7 +99,7 @@ export function useTrades({
 }: TradesParams = {}): UseInfiniteTradesResult {
   const { address } = useAccount()
   const { currentMarket: market } = useMarket()
-  const { defaultChain } = useDefaultChain()
+  const chainId = useChainId()
   const [startLoading, stopLoading] = useLoadingStore((state) => [
     state.startLoading,
     state.stopLoading,
@@ -112,11 +112,12 @@ export function useTrades({
       allMarkets ? "" : market?.quote.address,
       address,
       pageSize,
-      defaultChain.id,
+      chainId,
     ],
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       try {
+        console.log("market 2", market)
         if (!market) {
           return {
             data: [],
@@ -131,7 +132,7 @@ export function useTrades({
         startLoading(TRADE.TABLES.ORDERS)
 
         const response = await fetch(
-          `${getIndexerUrl()}/trades/list/${defaultChain.id}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
+          `${getIndexerUrl()}/trades/list/${chainId}/${market.base.address}/${market.quote.address}/${market.tickSpacing}?page=${pageParam}&limit=${pageSize}`,
         )
 
         if (!response.ok) {

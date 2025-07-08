@@ -1,11 +1,12 @@
 import { printEvmError } from "@/utils/errors"
 
-import { useDefaultChain } from "@/hooks/use-default-chain"
 import { getIndexerUrl } from "@/utils/get-indexer-url"
 import { applyPriceDisplayDecimals } from "@/utils/tokens"
 import { MarketParams, Token, mangroveActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
+import React from "react"
 import { Address } from "viem"
+import { useChainId } from "wagmi"
 import { z } from "zod"
 import {
   useCashnesses,
@@ -35,8 +36,8 @@ const MarketSchema = z
   .object({
     base: TokenSchema,
     quote: TokenSchema,
-    bidsOlKeyHash: z.string(),
-    asksOlKeyHash: z.string(),
+    bidsOlKeyHash: z.string().optional(),
+    asksOlKeyHash: z.string().optional(),
     tickSpacing: z.number().transform((val) => BigInt(val)),
   })
   .transform((market) => market as MarketParams)
@@ -47,22 +48,28 @@ const OpenMarketsResponseSchema = z.object({
 })
 
 export function useOpenMarkets() {
-  const { defaultChain } = useDefaultChain()
+  const chainId = useChainId()
   const cashnesses = useCashnesses()
   const symbolOverride = useSymbolOverrides()
   const client = useNetworkClient()
   const mangrove = useMangroveAddresses()
 
+  // Create the extended client outside of queryFn to avoid hook call issues
+  const mangroveClient = React.useMemo(() => {
+    if (!mangrove || !client) return null
+    return client.extend(mangroveActions(mangrove))
+  }, [client, mangrove])
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["open-markets", defaultChain.id, cashnesses, symbolOverride],
+    queryKey: ["open-markets", chainId, cashnesses, symbolOverride],
     queryFn: async () => {
       try {
-        if (!defaultChain.id) throw new Error("Chain ID not found")
+        if (!chainId) throw new Error("Chain ID not found")
 
         // Try API first
         try {
           const response = await fetch(
-            `${getIndexerUrl()}/markets/open/${defaultChain.id}`,
+            `${getIndexerUrl()}/markets/open/${chainId}`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -84,6 +91,7 @@ export function useOpenMarkets() {
 
           return apiResponse
         } catch (apiError) {
+          console.log("apiError", apiError)
           console.error("API fetch failed, falling back to SDK:", apiError)
 
           // Fallback to SDK
@@ -138,7 +146,7 @@ export function useOpenMarkets() {
         return { tokens: [], markets: [] }
       }
     },
-    enabled: !!defaultChain.id,
+    // enabled: !!chainId,
     retry: 1,
   })
 

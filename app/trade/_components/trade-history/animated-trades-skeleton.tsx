@@ -40,20 +40,17 @@ export function AnimatedTradesHistorySkeleton() {
             >
               {/* Type/Size Column */}
               <div className="flex flex-col gap-0">
-                <Skeleton className="h-3 w-8" />
                 <Skeleton className="h-2 w-12" />
               </div>
 
               {/* Price Column */}
               <div className="flex flex-col gap-0">
                 <Skeleton className="h-3 w-10" />
-                <Skeleton className="h-2 w-6" />
               </div>
 
               {/* Time Column */}
               <div className="flex flex-col gap-0">
                 <Skeleton className="h-3 w-14" />
-                <Skeleton className="h-2 w-10" />
               </div>
             </motion.div>
           ))}
