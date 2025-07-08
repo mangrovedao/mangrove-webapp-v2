@@ -71,7 +71,7 @@ export function useMarketTransaction({
   })
 
   const postMarket = usePostMarketOrder()
-
+  console.log(chain?.testnet, pool)
   // Post order mutation
   const post = chain?.testnet || !pool ? postMangrove : postMarket
 

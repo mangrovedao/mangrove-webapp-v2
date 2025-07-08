@@ -92,11 +92,8 @@ export function useGhostBookTrade({ market }: UseTradeProps) {
   const trade = useCallback(
     async (params: TradeParams) => {
       if (!bestPool || !ghostbook || !market || !walletClient) return
-      console.log("bestPool", bestPool)
-      console.log("ghostbook", ghostbook)
-      console.log("market", market)
       const moduleAddress =
-        bestPool.protocol.type === ProtocolType.UniswapV3
+        bestPool.protocol.type === "UNISWAP_V3"
           ? v3Module
           : balancerV2Module
       if (!moduleAddress) return

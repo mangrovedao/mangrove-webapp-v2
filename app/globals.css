@@ -674,8 +674,3 @@ body.mouse-down *:focus {
 .bg-sunset-dust-important {
   background-color: hsl(15, 19%, 35%) !important;
 }
-
-.body-wrapper,
-.disable-scroll {
-  overflow: auto !important;
-}

@@ -2,6 +2,9 @@ import useMarket from "@/providers/market"
 import { useQuery } from "@tanstack/react-query"
 import { Address, Hex } from "viem"
 import { useDefaultChain } from "../use-default-chain"
+import { usePools } from "./use-pools"
+import { useSelectedPool } from "./use-selected-pool"
+import { useEffect } from "react"
 
 export enum ProtocolType {
   PancakeSwapV3 = "PancakeSwapV3",
@@ -71,59 +74,31 @@ export interface JellyverseV2Pool {
 
 export type Pool = TickSpacingPool | FeePool | JellyverseV2Pool
 
-async function getPools(
-  tokenIn: Address,
-  tokenOut: Address,
-  chainId: number,
-): Promise<Pool[]> {
-  const params = new URLSearchParams()
-  params.set("tokenIn", tokenIn)
-  params.set("tokenOut", tokenOut)
-  params.set("chainId", chainId.toString())
-  const data = await fetch(
-    `https://api.mgvinfra.com/pool-finder/pool?${params.toString()}`,
-  )
 
-  return data.json() as Promise<Pool[]>
-}
-
-export function usePools() {
-  const { defaultChain } = useDefaultChain()
-  const { currentMarket: market } = useMarket()
-
-  return useQuery({
-    queryKey: [
-      "pools",
-      defaultChain?.id,
-      market?.base.address,
-      market?.quote.address,
-    ],
-    queryFn: async (): Promise<Pool[]> => {
-      if (!market || defaultChain.testnet) return []
-
-      try {
-        return getPools(
-          market.base.address,
-          market.quote.address,
-          defaultChain?.id,
-        )
-      } catch (error) {
-        return []
-      }
-    },
-  })
-}
 
 export function usePool() {
-  const { data: pools = [], isLoading: isPoolsLoading } = usePools()
+  const { currentMarket } = useMarket()
+  const { data: pools = [], isLoading: isPoolsLoading } = usePools({
+    token0: currentMarket?.base.address,
+    token1: currentMarket?.quote.address,
+  })
+  const { setSelectedPool } = useSelectedPool()
+
+
+  const best_pool =  pools.length > 0
+  ? pools.sort((a, b) =>
+      Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
+    )[0]
+  : null
+
+  useEffect(() => {
+    if (best_pool) {
+      setSelectedPool(best_pool)
+    } 
+  }, [best_pool, setSelectedPool])
 
   return {
     isLoading: isPoolsLoading,
-    pool:
-      pools.length > 0
-        ? pools.sort((a, b) =>
-            Number(BigInt(b.liquidity) - BigInt(a.liquidity)),
-          )[0]
-        : null,
+    pool: best_pool,
   }
 }

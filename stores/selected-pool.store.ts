@@ -1,4 +1,4 @@
-import { Pool } from "@/hooks/new_ghostbook/pool"
+import { Pool } from "@/hooks/new_ghostbook/use-pools"
 import { create } from "zustand"
 
 interface SelectedPoolStore {

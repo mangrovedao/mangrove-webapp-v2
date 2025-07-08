@@ -60,6 +60,10 @@ export function usePostMarketOrder() {
         if (!pool || !market || !walletClient)
           throw new Error("Market order post, is missing params")
 
+
+        
+        console.log("ghostbook trade")
+
         const {
           bs,
           send: gives,

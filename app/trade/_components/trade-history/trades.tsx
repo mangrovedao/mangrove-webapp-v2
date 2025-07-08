@@ -17,7 +17,7 @@ export function Trades({ className }: { className?: string }) {
   const { currentMarket: market } = useMarket()
   const scrollRef = useRef<HTMLDivElement>(null)
   const tradesHistoryQuery = useTrades()
-
+  
   // Process trades data with proper type safety
   const processedTrades = useMemo(() => {
     // Handle the case when data hasn't loaded yet

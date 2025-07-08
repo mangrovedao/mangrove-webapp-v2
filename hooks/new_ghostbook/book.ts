@@ -353,16 +353,16 @@ export function usePoolBook() {
 
   // Update the store with the current pool
   React.useEffect(() => {
-    if (pool?.pool !== selectedPool?.pool) {
+    if (pool !== selectedPool) {
       setSelectedPool(pool)
     }
-  }, [pool?.pool])
+  }, [pool])
 
   return useQuery({
     queryKey: [
       "pool-book",
       defaultChain?.id,
-      pool?.pool,
+      pool,
       market?.base.address,
       market?.quote.address,
       mangroveBook?.asksConfig.density,
