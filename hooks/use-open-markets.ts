@@ -1,10 +1,9 @@
 import { printEvmError } from "@/utils/errors"
 
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { applyPriceDisplayDecimals } from "@/utils/tokens"
 import { MarketParams, Token, mangroveActions } from "@mangrovedao/mgv"
 import { useQuery } from "@tanstack/react-query"
-import React from "react"
 import { Address } from "viem"
 import { useChainId } from "wagmi"
 import { z } from "zod"
@@ -53,10 +52,10 @@ export function useOpenMarkets() {
   const symbolOverride = useSymbolOverrides()
   const client = useNetworkClient()
   const mangrove = useMangroveAddresses()
-  const indexerUrl = getIndexerUrl()
+  const indexerUrl = useIndexerUrl()
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["open-markets", chainId, cashnesses, symbolOverride],
+    queryKey: ["open-markets", chainId, cashnesses, symbolOverride, indexerUrl],
     queryFn: async () => {
       try {
         if (!chainId) throw new Error("Chain ID not found")
@@ -141,7 +140,7 @@ export function useOpenMarkets() {
         return { tokens: [], markets: [] }
       }
     },
-    // enabled: !!chainId,
+    enabled: !!chainId,
     retry: 1,
   })
 

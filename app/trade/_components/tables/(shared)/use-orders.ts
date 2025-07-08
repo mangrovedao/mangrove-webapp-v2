@@ -8,7 +8,7 @@ import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { parseOrders, type Order } from "../(shared)/schema"
 import { findToken, safeDate, transformOrders } from "../(shared)/utils"
 
@@ -39,14 +39,15 @@ export function useOrders<T = Order[]>(
   const startLoading = useLoadingStore((state) => state.startLoading)
   const stopLoading = useLoadingStore((state) => state.stopLoading)
 
+  const indexerUrl = useIndexerUrl()
   const config = {
     active: {
       queryKey: "orders",
-      apiRoute: `${getIndexerUrl()}/orders/all/active/${defaultChain.id}`,
+      apiRoute: `${indexerUrl}/orders/all/active/${defaultChain.id}`,
     },
     history: {
       queryKey: "order-history",
-      apiRoute: `${getIndexerUrl()}/orders/all/history/${defaultChain.id}`,
+      apiRoute: `${indexerUrl}/orders/all/history/${defaultChain.id}`,
     },
   }
 

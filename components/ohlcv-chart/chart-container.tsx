@@ -1,7 +1,7 @@
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import useMarket from "@/providers/market"
 import { OHLCVBar } from "@/services/dexscreener-api"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { ZoomOutIcon } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useAccount } from "wagmi"
@@ -84,12 +84,15 @@ export const TVChartContainer = (
   const getData = async (resolution: string) => {
     try {
       if (!chainId || !base.address || !quote.address) return []
+
+      const indexerUrl = useIndexerUrl()
+
       // Map TradingView resolution to API resolution
       const apiResolution = RESOLUTION_MAP[resolution] || "1d"
 
       // Build the URL with the pairs in the correct order
       // Note: The order must be chainId/quoteAddress/baseAddress for testnet indexer
-      const url = `${getIndexerUrl()}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
+      const url = `${indexerUrl}/price/ohlc/${chainId}/${base.address}/${quote.address}/1/${apiResolution}?count=100`
 
       const response = await fetch(url)
       if (!response.ok) {

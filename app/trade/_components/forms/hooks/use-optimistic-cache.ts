@@ -5,7 +5,7 @@ import { useAccount } from "wagmi"
 import { useDefaultChain } from "@/hooks/use-default-chain"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
 import useMarket from "@/providers/market"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { z } from "zod"
 import { Order } from "../../tables/(shared)/schema"
 import { findToken } from "../../tables/(shared)/utils"
@@ -188,7 +188,9 @@ export function useOptimisticCache() {
     const checkSync = async () => {
       attempts++
       try {
-        const response = await fetch(`${getIndexerUrl()}/status`)
+        const indexerUrl = useIndexerUrl()
+
+        const response = await fetch(`${indexerUrl}/status`)
         const data = await response.json()
         const schema = z.object({
           sei: z.object({ block: z.object({ number: z.number() }) }),

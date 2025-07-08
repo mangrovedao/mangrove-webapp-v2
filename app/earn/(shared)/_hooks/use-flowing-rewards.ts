@@ -1,4 +1,4 @@
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { AddressSchema } from "@/utils/schema"
 import { useQueries } from "@tanstack/react-query"
 import { Address } from "viem"
@@ -21,7 +21,7 @@ export function useFlowingRewards(
   chainId?: number,
   incentivesPrograms?: VaultIncentive[],
 ) {
-  const indexerUrl = getIndexerUrl()
+  const indexerUrl = useIndexerUrl()
   return useQueries({
     queries:
       incentivesPrograms?.map((incentive) => ({

@@ -1,6 +1,6 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { MarketParams } from "@mangrovedao/mgv"
 import { ReactNode } from "react"
 import { Address, Chain, parseAbi, PublicClient, zeroAddress } from "viem"
@@ -76,9 +76,9 @@ export async function fetchPnLData(
 ) {
   try {
     if (!user) return undefined
-
+    const indexerUrl = useIndexerUrl()
     const res = await fetch(
-      `${getIndexerUrl()}/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
+      `${indexerUrl}/vault/pnl/${client.chain?.id}/${vaultAddress}/${user}`,
     )
 
     const data = await res.json()

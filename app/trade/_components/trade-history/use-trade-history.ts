@@ -7,8 +7,7 @@ import { TRADE } from "@/app/trade/_constants/loading-keys"
 import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { getErrorMessage } from "@/utils/errors"
-import { getIndexerUrl } from "@/utils/get-indexer-url"
-import { type TradeHistory } from "./schema"
+import { useIndexerUrl } from "@/utils/get-indexer-url"
 
 // Define Trade type based on API response
 export type Trade = {
@@ -38,14 +37,6 @@ export interface TradesPage {
   }
 }
 
-type TradeHistoryParams<T> = {
-  filters?: {
-    first?: number
-    skip?: number
-  }
-  select?: (data: TradeHistory[]) => T
-}
-
 type TradesParams = {
   pageSize?: number
   allMarkets?: boolean
@@ -62,7 +53,7 @@ export function useTrades({
     state.startLoading,
     state.stopLoading,
   ])
-  const indexerUrl = getIndexerUrl()
+  const indexerUrl = useIndexerUrl()
 
   return useInfiniteQuery<TradesPage, Error>({
     queryKey: [
@@ -75,6 +66,7 @@ export function useTrades({
       market?.tickSpacing.toString(),
       pageSize,
       chainId,
+      indexerUrl,
     ],
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
@@ -143,6 +135,7 @@ export function useTrades({
     meta: {
       error: "Unable to retrieve trade history",
     },
+    refetchInterval: 2000, // every 2 seconds
   })
 }
 
