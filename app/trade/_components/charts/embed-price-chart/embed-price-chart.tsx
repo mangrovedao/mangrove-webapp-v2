@@ -1,6 +1,7 @@
 "use client"
 
 import { usePool } from "@/hooks/new_ghostbook/pool"
+import { SlipstreamPool } from "@/hooks/new_ghostbook/use-pools"
 import { useSelectedPool } from "@/hooks/new_ghostbook/use-selected-pool"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
@@ -26,12 +27,16 @@ export default function EmbedPriceChart({ className }: PriceChartProps) {
   const embedUrl = useMemo(() => {
     const baseSymbol = currentMarket?.base?.symbol
 
+    if (!selectedPool) return;
+
     if (baseSymbol && marketUrlMappings[baseSymbol]) {
       return `${marketUrlMappings[baseSymbol]}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
     }
 
+    const poolAddress = (selectedPool as SlipstreamPool).pool;
+
     // Fallback to dynamic URL construction
-    return `https://www.geckoterminal.com/sei-evm/pools/${selectedPool}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
+    return `https://www.geckoterminal.com/sei-evm/pools/${poolAddress}?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m&transparent=1`
   }, [selectedPool, currentMarket, marketUrlMappings])
 
   // Show loading state while pool is being fetched
