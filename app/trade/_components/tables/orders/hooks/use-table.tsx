@@ -21,6 +21,7 @@ import { MarketParams } from "@mangrovedao/mgv"
 import { Order } from "../../(shared)/schema"
 import { Timer } from "../components/timer"
 import { useCancelOrder } from "./use-cancel-order"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -39,6 +40,7 @@ export function useTable({
   onEdit,
 }: Params) {
   const { currentMarket: market } = useMarket()
+  const { spotPrice } = useMergedBooks()
 
   const columnList = React.useMemo(() => {
     const columns = []
@@ -114,7 +116,7 @@ export function useTable({
             return (
               <div className={cn("flex items-center")}>
                 <CircularProgressBar progress={progress} className="mr-2" />
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs opacity-70">
                   {getExactWeiAmount(takerGot, 6)}
                   &nbsp;/
                 </span>
@@ -128,9 +130,9 @@ export function useTable({
           enableSorting: false,
         }),
         columnHelper.accessor("price", {
-          header: "Price",
+          header: "Fills at",
           cell: ({ row }) => {
-            const { price } = row.original
+            const { price, side } = row.original
 
             if (!price || isNaN(Number(price)))
               return <span className="text-xs">-</span>
@@ -138,15 +140,18 @@ export function useTable({
             const { market } = row.original
 
             const displayDecimals = market?.quote?.priceDisplayDecimals || 6
-
+            const distance = side === 'sell' ? (Number(price) / spotPrice * 100).toFixed(2) : ((spotPrice / Number(price)) * 100).toFixed(2)
             return price ? (
-              <span className="text-xs">
+              <div>
+              <div className="text-xs">
                 {formatNumber(Big(price).toNumber(), {
                   maximumFractionDigits: displayDecimals,
                   minimumFractionDigits: displayDecimals,
                 })}{" "}
-                {market?.quote.symbol}
-              </span>
+                <span className='opacity-70'>{market?.quote.symbol}</span>
+              </div>
+              <div className="text-[10px] italic leading-[10px] opacity-80">-{distance}%</div>
+              </div>
             ) : (
               <span className="text-xs">-</span>
             )
