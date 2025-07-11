@@ -91,7 +91,8 @@ export function usePostLimitOrder() {
           timeInForce === TimeInForce.GTC || timeInForce === TimeInForce.PO
             ? BigInt(estimateTimestamp({ timeToLiveUnit: "Day", timeToLive }))
             : undefined
-
+        
+        
         const { request } = await marketClient.simulateLimitOrder({
           account,
           fillWants: false,
@@ -106,8 +107,9 @@ export function usePostLimitOrder() {
           // logics can be left to undefined (meaning no logic)
           takerGivesLogic: takerGivesLogic as Address,
           takerWantsLogic: takerWantsLogic as Address,
-          gas: 10_000_000n,
         })
+
+        console.log('req', request)
 
         const hash = await walletClient.writeContract(request)
         const receipt = await networkClient.waitForTransactionReceipt({

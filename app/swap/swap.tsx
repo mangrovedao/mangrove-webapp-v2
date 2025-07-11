@@ -2,7 +2,7 @@
 
 import type { Token } from "@mangrovedao/mgv"
 import { AnimatePresence, motion } from "framer-motion"
-import React from "react"
+import React, { useEffect } from "react"
 import { Address, formatUnits } from "viem"
 import { useAccount } from "wagmi"
 
@@ -30,8 +30,10 @@ import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
 import { getAllTokensInMarkets } from "@/utils/tokens"
 import { Accordion } from "../trade/_components/forms/components/accordion"
+import { useKame } from "./hooks/use-kame"
 import { useSwap } from "./hooks/use-swap"
 import { SLIPPAGES } from "./utils/swap-constants"
+import { toast } from "sonner"
 
 export default function Swap() {
   const {
@@ -44,7 +46,6 @@ export default function Swap() {
     openConnectModal,
     isConnected,
     isSwapDisabled,
-    swap,
     allTokens,
     tradableTokens,
     payTokenDialogOpen,
@@ -56,8 +57,6 @@ export default function Swap() {
     isReverseDisabled,
     onMaxClicked,
     swapButtonText,
-    payDollar,
-    receiveDollar,
     slippage,
     showCustomInput,
     setShowCustomInput,
@@ -67,8 +66,25 @@ export default function Swap() {
     isWrapping,
     setIsWrapping,
     isFieldLoading,
-    isFetchingDollarValue,
+    payTokenBalance,
+    receiveTokenBalance
   } = useSwap()
+
+  const { usdAmounts, quote, swap } = useKame({
+    payToken,
+    receiveToken,
+    payValue: fields.payValue,
+    receiveValue: fields.receiveValue,
+    onSwapError: (e) => {
+      console.error('Error swapping', e)
+      toast.error("Swap failed")
+    },
+    onSwapSuccess(receipt) {
+      toast.success("Swap completed")
+      payTokenBalance.refetch()
+      receiveTokenBalance.refetch()
+    }
+  })
 
   const { spotPrice } = useMergedBooks()
   const { currentMarket } = useMarket()
@@ -80,6 +96,10 @@ export default function Swap() {
     quoteToken: currentMarket?.quote,
     suffix: "Swap | DEX",
   })
+
+  useEffect(() => {
+    console.log(fields.receiveValue, 'here')
+  }, [onReceiveValueChange])
 
   return (
     <>
@@ -100,10 +120,9 @@ export default function Swap() {
                 3,
               )}
               onChange={onPayValueChange}
-              dollarValue={payDollar}
+              dollarValue={usdAmounts?.baseUsd ?? 0}
               onTokenClicked={() => setPayTokenDialogOpen(true)}
               onMaxClicked={onMaxClicked}
-              isFetchingDollarValue={isFetchingDollarValue}
             />
             <Button
               variant={"secondary"}
@@ -118,10 +137,9 @@ export default function Swap() {
               type="receive"
               token={receiveToken}
               value={fields.receiveValue}
-              dollarValue={receiveDollar}
+              dollarValue={usdAmounts?.quoteUsd ?? 0}
               onChange={onReceiveValueChange}
               onTokenClicked={() => setReceiveTokenDialogOpen(true)}
-              isFetchingDollarValue={isFetchingDollarValue}
             />
           </div>
 
@@ -364,14 +382,11 @@ function TokenContainer({
   value,
   onChange,
   dollarValue,
-  isFetchingDollarValue,
   loadingValue,
   isWrapping,
   seiBalance,
 }: TokenContainerProps) {
-  const { isConnected } = useAccount()
   const { formattedAndFixed, isLoading } = useTokenBalance(token)
-  const dollars = (Number(value) * (dollarValue ?? 0)).toString()
 
   return (
     <div
@@ -511,7 +526,7 @@ function TokenContainer({
                   className="h-4 bg-gradient-to-r from-transparent via-bg-tertiary to-transparent rounded-sm"
                 />
               </motion.div>
-            ) : Number(dollars) <= 0 ? (
+            ) : dollarValue <= 0 ? (
               <motion.div
                 key="zero-dollars"
                 initial={{ opacity: 0 }}
@@ -533,8 +548,8 @@ function TokenContainer({
               >
                 ≈{" "}
                 <span className="text-text-secondary">
-                  {token && Number(dollars) !== 0
-                    ? dollars.slice(0, dollars.indexOf(".") + 3)
+                  {token && dollarValue !== 0
+                    ? dollarValue.toString().slice(0, dollarValue.toString().indexOf(".") + 3)
                     : "0"}
                 </span>{" "}
                 $

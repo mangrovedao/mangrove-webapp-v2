@@ -141,6 +141,7 @@ export function useTable({
 
             const displayDecimals = market?.quote?.priceDisplayDecimals || 6
             const distance = side === 'sell' ? (Number(price) / spotPrice * 100).toFixed(2) : ((spotPrice / Number(price)) * 100).toFixed(2)
+
             return price ? (
               <div>
               <div className="text-xs">

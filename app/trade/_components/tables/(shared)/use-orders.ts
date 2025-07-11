@@ -10,7 +10,7 @@ import useMarket from "@/providers/market"
 import { useLoadingStore } from "@/stores/loading.store"
 import { useIndexerUrl } from "@/utils/get-indexer-url"
 import { parseOrders, type Order } from "../(shared)/schema"
-import { findToken, safeDate, transformOrders } from "../(shared)/utils"
+import { cleanPrice, findToken, safeDate, transformOrders } from "../(shared)/utils"
 
 type Params<T> = {
   type: "active" | "history"
@@ -116,6 +116,7 @@ export function useOrders<T = Order[]>(
 
         const data = await getOrders()
 
+        
         const transformedData = data?.orders.map((item: any) => {
           return {
             creationDate: safeDate(item.timestamp),
@@ -128,7 +129,7 @@ export function useOrders<T = Order[]>(
             feePaid: item.fee?.toString() || "0", // No fees for limit orders
             initialWants: item.totalWants?.toString() || "",
             initialGives: item.totalGives?.toString() || "",
-            price: item.price?.toString() || "0",
+            price: item.price.toString(),
             status: item?.price === 0 ? "Canceled" : item.status || "",
             isMarketOrder: item.type.toLowerCase() === "market",
             market: item.market,

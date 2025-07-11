@@ -24,9 +24,6 @@ export function useSwap() {
 
   const {
     odosTokens,
-    getAssembledTransactionOfLastQuote,
-    executeOdosTransaction,
-    odosRouterContractAddress,
     isOdosLoading,
   } = useOdos()
 
@@ -83,15 +80,7 @@ export function useSwap() {
     setIsWrapping,
     totalWrapping,
     hasEnoughBalance,
-    maxTickEncountered,
-    setMaxTickEncountered,
   } = form
-
-  // Price data
-  const { data: priceData, isFetching: isFetchingDollarValue } = useTokenPrices(
-    payToken?.address,
-    receiveToken?.address,
-  )
 
   // Determine if we should use Mangrove or Odos
   const isMangrove = !!marketClient
@@ -127,7 +116,6 @@ export function useSwap() {
 
   // Execution
   const {
-    executeSwap,
     isPendingWrapping,
     wrappingHash,
     postMarketOrder,
@@ -186,27 +174,6 @@ export function useSwap() {
   const isFieldLoading =
     isOdosLoading || (fields.payValue !== "" && simulateQuery.isPending)
 
-  // Main swap function
-  async function swap() {
-    await executeSwap({
-      isMangrove,
-      marketClient,
-      payToken,
-      receiveToken,
-      hasToApprove,
-      fields,
-      slippage: slippage ?? "1",
-      totalWrapping,
-      payTokenBalance,
-      receiveTokenBalance,
-      resetForm,
-      simulationData: simulateQuery.data?.simulation,
-      // Odos specific params
-      odosRouterContractAddress,
-      getAssembledTransactionOfLastQuote,
-      executeOdosTransaction,
-    })
-  }
 
   return {
     // Tokens
@@ -233,7 +200,6 @@ export function useSwap() {
     onPayTokenSelected,
     onReceiveTokenSelected,
     onMaxClicked,
-    swap,
 
     // State
     isConnected,
@@ -244,10 +210,7 @@ export function useSwap() {
 
     // Prices
     simulateQuery,
-    payDollar: priceData?.payDollar ?? 0,
-    receiveDollar: priceData?.receiveDollar ?? 0,
-    isFetchingDollarValue,
-
+    
     // Slippage
     setShowCustomInput,
     setSlippage,
@@ -258,5 +221,9 @@ export function useSwap() {
     ethBalance,
     isWrapping,
     setIsWrapping,
+
+    // Balances
+    payTokenBalance,
+    receiveTokenBalance,
   }
 }

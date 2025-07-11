@@ -9,7 +9,6 @@ import { SwapFields } from "../utils/swap-types"
 interface UseSwapFormProps {
   payToken?: Token
   receiveToken?: Token
-  receiveValueFromSimulation?: string
   reverseTokens: () => void
   tokenBalance?: { balance?: bigint }
   ethBalance?: { value?: bigint; decimals?: number }
@@ -18,7 +17,6 @@ interface UseSwapFormProps {
 export function useSwapForm({
   payToken,
   receiveToken,
-  receiveValueFromSimulation,
   reverseTokens,
   tokenBalance,
   ethBalance,
@@ -32,19 +30,6 @@ export function useSwapForm({
     payValue: "",
     receiveValue: "",
   })
-
-  // Update receive value when simulation changes
-  React.useEffect(() => {
-    if (receiveValueFromSimulation) {
-      setFields((fields) => ({
-        ...fields,
-        receiveValue: getExactWeiAmount(
-          receiveValueFromSimulation,
-          receiveToken?.priceDisplayDecimals ?? 18,
-        ),
-      }))
-    }
-  }, [receiveValueFromSimulation, receiveToken?.priceDisplayDecimals])
 
   function onPayValueChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFields((fields) => ({ ...fields, payValue: e.target.value }))

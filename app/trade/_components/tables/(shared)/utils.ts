@@ -25,8 +25,8 @@ export function transformOrders(orders: Order[], markets: Market[]) {
 
     const side = isBuy ? "buy" : "sell"
 
-    const sent = order?.sent ? order.sent : order?.totalGives ?? 0
-    const received = order?.received ? order.received : order.totalWants ?? 0
+    const sent = order?.sent ? order.sent : (order?.totalGives ?? 0)
+    const received = order?.received ? order.received : (order.totalWants ?? 0)
 
     const price =
       sent && received ? (isBuy ? sent / received : received / sent) : 0
@@ -38,6 +38,12 @@ export function transformOrders(orders: Order[], markets: Market[]) {
       price,
     }
   })
+}
+
+export function cleanPrice(price: number) {
+  if (price < 1) return Math.ceil(2 - Math.log10(price)).toString()
+  const decimals = Math.max(0, Math.ceil(4 - Math.log10(price)))
+  return price.toFixed(decimals).toString()
 }
 
 function getNumberOfSeconds(timeToLiveUnit: `${TimeToLiveUnit}`) {
