@@ -6,7 +6,7 @@ export default function EmbedSwap() {
   return (
     <iframe
       src={
-        'https://kame.ag/widget?hideLogo=1'
+        'https://kame.ag/swap-frame'
       }
       className="max-h-screen w-full z-10"
       style={{
