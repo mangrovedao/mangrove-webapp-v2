@@ -1,90 +1,74 @@
 "use client"
 
-import type { Token } from "@mangrovedao/mgv"
-import { AnimatePresence, motion } from "framer-motion"
-import React, { useEffect } from "react"
-import { Address, formatUnits } from "viem"
-import { useAccount } from "wagmi"
+import { useEffect, useState } from "react"
+import { injected, useAccount, useConnect } from "wagmi"
 
-import { CustomInput } from "@/components/custom-input-new"
-import InfoTooltip from "@/components/info-tooltip-new"
-import { TokenIcon } from "@/components/token-icon"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog-new"
 import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
-import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
-import { useMarkets } from "@/hooks/use-addresses"
-import { useTokenBalance } from "@/hooks/use-token-balance"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
+import { formatPrice, useTokenBalance } from "@/hooks/use-token-balance"
 import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
 import useMarket from "@/providers/market"
-import { ChevronDown, SwapArrowIcon } from "@/svgs"
-import { cn } from "@/utils"
-import { getExactWeiAmount } from "@/utils/regexp"
-import { getAllTokensInMarkets } from "@/utils/tokens"
-import { Accordion } from "../trade/_components/forms/components/accordion"
-import { useKame } from "./hooks/use-kame"
-import { useSwap } from "./hooks/use-swap"
-import { SLIPPAGES } from "./utils/swap-constants"
+import { SwapArrowIcon } from "@/svgs"
 import { toast } from "sonner"
+import { SwapInput } from "./components/SwapInput"
+import { useKame } from "./hooks/use-kame"
 
 export default function Swap() {
-  const {
-    payToken,
-    receiveToken,
-    reverseTokens,
-    fields,
-    onPayValueChange,
-    onReceiveValueChange,
-    openConnectModal,
-    isConnected,
-    isSwapDisabled,
-    allTokens,
-    tradableTokens,
-    payTokenDialogOpen,
-    setPayTokenDialogOpen,
-    receiveTokenDialogOpen,
-    setReceiveTokenDialogOpen,
-    onPayTokenSelected,
-    onReceiveTokenSelected,
-    isReverseDisabled,
-    onMaxClicked,
-    swapButtonText,
-    slippage,
-    showCustomInput,
-    setShowCustomInput,
-    setSlippage,
-    mangroveTradeableTokensForPayToken,
-    ethBalance,
-    isWrapping,
-    setIsWrapping,
-    isFieldLoading,
-    payTokenBalance,
-    receiveTokenBalance
-  } = useSwap()
+  const { openMarkets: markets } = useOpenMarkets()
+  const { isConnected } = useAccount()
+  const { connect } = useConnect()
+  const [payTokenDialogOpen, setPayTokenDialogOpen] = useState(false)
+  const [receiveTokenDialogOpen, setReceiveTokenDialogOpen] = useState(false)
+  const [{ payToken, receiveToken }, setTokens] = useState({
+    payToken: undefined,
+    receiveToken: undefined,
+  })
 
-  const { usdAmounts, quote, swap } = useKame({
+  useEffect(() => {
+    if (markets && (!payToken || !receiveToken)) {
+      setTokens({
+        payToken: markets[0]?.base, 
+        receiveToken: markets[0]?.quote,
+      })
+    }
+  }, [markets])
+
+  const payTokenBalance = useTokenBalance(payToken)
+  const receiveTokenBalance = useTokenBalance(receiveToken)
+  const [fields, setFields] = useState({
+    payValue: "",
+    receiveValue: "",
+  })
+  const [slippage, setSlippage] = useState<string>("1")
+  const [swapButtonText, setSwapButtonText] = useState("Swap")
+
+  const { usdAmounts, quote, swap, fetchingQuote, setFetchingQuote } = useKame({
     payToken,
     receiveToken,
     payValue: fields.payValue,
     receiveValue: fields.receiveValue,
     onSwapError: (e) => {
-      console.error('Error swapping', e)
+      console.error("Error swapping", e)
       toast.error("Swap failed")
     },
     onSwapSuccess(receipt) {
       toast.success("Swap completed")
       payTokenBalance.refetch()
       receiveTokenBalance.refetch()
-    }
+    },
   })
+
+  useEffect(() => {
+    if (quote) {
+      const key = quote.forToken === payToken ? "payValue" : "receiveValue"
+      setFields({
+        ...fields,
+        [key]: formatPrice(quote.receive),
+      })
+    }
+  }, [quote])
 
   const { spotPrice } = useMergedBooks()
   const { currentMarket } = useMarket()
@@ -97,29 +81,60 @@ export default function Swap() {
     suffix: "Swap | DEX",
   })
 
-  useEffect(() => {
-    console.log(fields.receiveValue, 'here')
-  }, [onReceiveValueChange])
+  const reverseTokens = () => {
+    setTokens({
+      payToken: receiveToken,
+      receiveToken: payToken,
+    })
+    setFields((fields) => ({
+      payValue: formatPrice(fields.receiveValue),
+      receiveValue: formatPrice(fields.payValue),
+    }))
+  }
+
+  const onMaxClicked = () => {
+    setFetchingQuote("receive")
+    setFields((fields) => ({
+      ...fields,
+      payValue: payTokenBalance.formattedAndFixed,
+    }))
+  }
+
+  const onPayValueChange = (val: string) => {
+    if (!val) {
+      setFields((fields) => ({
+        payValue: "",
+        receiveValue: "",
+      }))
+      return
+    }
+    setFetchingQuote("receive")
+    setFields((fields) => ({
+      ...fields,
+      payValue: val,
+    }))
+  }
+
+  const onReceiveValueChange = (val: string) => {
+    setFetchingQuote("pay")
+    setFields((fields) => ({
+      ...fields,
+      receiveValue: val,
+    }))
+  }
 
   return (
     <>
-      <div className="bg-bg-secondary rounded-sm p-5 relative mt-50">
-        <h1 className="text-2xl mb-4">Swap</h1>
-        <div className="space-y-2 relative">
+      <div className="rounded-sm p-5 relative">
+        <h1 className="text-2xl mb-4 ml-4">Swap</h1>
+        <div className="relative bg-bg-secondary px-4 rounded-md">
           <div className="space-y-0.5">
-            <TokenContainer
+            <SwapInput
               type="pay"
               token={payToken}
               value={fields.payValue}
-              isWrapping={isWrapping}
-              seiBalance={getExactWeiAmount(
-                formatUnits(
-                  ethBalance?.value ?? 0n,
-                  ethBalance?.decimals ?? 18,
-                ),
-                3,
-              )}
-              onChange={onPayValueChange}
+              fetchingQuote={fetchingQuote}
+              onChange={(e) => onPayValueChange(e.target.value)}
               dollarValue={usdAmounts?.baseUsd ?? 0}
               onTokenClicked={() => setPayTokenDialogOpen(true)}
               onMaxClicked={onMaxClicked}
@@ -128,17 +143,16 @@ export default function Swap() {
               variant={"secondary"}
               onClick={reverseTokens}
               className="absolute left-1/2 -translate-y-1/2 -translate-x-1/2 !p-1"
-              disabled={isReverseDisabled}
             >
               <SwapArrowIcon className="size-6" />
             </Button>
-            <TokenContainer
-              loadingValue={isFieldLoading}
+            <SwapInput
               type="receive"
               token={receiveToken}
+              fetchingQuote={fetchingQuote}
               value={fields.receiveValue}
               dollarValue={usdAmounts?.quoteUsd ?? 0}
-              onChange={onReceiveValueChange}
+              onChange={(e) => onReceiveValueChange(e.target.value)}
               onTokenClicked={() => setReceiveTokenDialogOpen(true)}
             />
           </div>
@@ -148,114 +162,30 @@ export default function Swap() {
               className="w-full text-lg bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich"
               variant={"secondary"}
               size={"lg"}
-              onClick={openConnectModal}
+              onClick={() => connect({ connector: injected() })}
             >
               Connect wallet
             </Button>
           ) : (
             <Button
-              className="w-full text-lg"
-              size={"lg"}
+              className="w-full text-md"
+              size={"md"}
               onClick={swap}
-              disabled={isSwapDisabled}
+              disabled={false}
             >
               {swapButtonText}
             </Button>
           )}
-          <Accordion
-            title="Slippage tolerance"
-            chevronValue={`${slippage}%`}
-            tooltip="How much price slippage you're willing to accept so that your order can be executed"
-          >
-            <div className="space-y-2 mt-1">
-              <div className="flex justify-around bg-bg-primary rounded-sm">
-                {SLIPPAGES.map((value) => (
-                  <Button
-                    key={`percentage-button-${value}`}
-                    variant={"secondary"}
-                    size={"sm"}
-                    className={cn(
-                      "text-xs flex-1 bg-bg-primary border-none rounded-sm",
-                      {
-                        "opacity-60":
-                          Number(slippage) !== Number(value) || showCustomInput,
-                        "border-none bg-bg-tertiary rounded-sm text-black-rich":
-                          Number(slippage) === Number(value) &&
-                          !showCustomInput,
-                      },
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      showCustomInput && setShowCustomInput(!showCustomInput)
-                      setSlippage(value)
-                    }}
-                  >
-                    {value}%
-                  </Button>
-                ))}
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setShowCustomInput(!showCustomInput)
-                  }}
-                  variant={"secondary"}
-                  size={"sm"}
-                  className={cn(
-                    "text-xs flex-1 bg-bg-primary border-none rounded-sm",
-                    {
-                      "opacity-60": !showCustomInput,
-                      "border-none bg-bg-tertiary rounded-sm text-black-rich p-y h-11":
-                        showCustomInput,
-                    },
-                  )}
-                >
-                  Custom
-                </Button>
-              </div>
-              {/* Render the custom input component */}
-              {showCustomInput && (
-                <CustomInput
-                  symbol={"%"}
-                  maxLength={2}
-                  value={slippage}
-                  onChange={({ target: { value } }) => {
-                    setSlippage(value)
-                  }}
-                />
-              )}
-            </div>
-          </Accordion>
-          {payToken?.symbol.includes("ETH") &&
-            ethBalance?.value &&
-            ethBalance.value > 0n && (
-              <div className="flex justify-between items-center ">
-                <span className="text-text-secondary flex items-center text-xs">
-                  Use SEI balance
-                </span>
-                <div className="flex items-center gap-1 text-xs text-text-secondary">
-                  <span>
-                    {getExactWeiAmount(
-                      formatUnits(
-                        ethBalance?.value ?? 0n,
-                        ethBalance?.decimals ?? 18,
-                      ),
-                      3,
-                    )}{" "}
-                    SEI
-                  </span>
-                  <Checkbox
-                    className="border-border-primary data-[state=checked]:bg-bg-tertiary data-[state=checked]:text-text-primary"
-                    checked={isWrapping}
-                    onClick={() => setIsWrapping(!isWrapping)}
-                  />
-                  <InfoTooltip className="text-text-quaternary text-sm size-4 cursor-pointer">
-                    Will add a wrap SEI to wSEI step during transaction
-                  </InfoTooltip>
-                </div>
-              </div>
-            )}
+          <div className="flex items-center justify-between w-full">
+            <div>Max Slippage</div>
+            <Input
+              value={slippage}
+              onChange={(e) => setSlippage(e.target.value)}
+              className="w-[100px]"
+            />
+          </div>
         </div>
-        <TokenSelectorDialog
+        {/* <TokenSelectorDialog
           type="sell"
           open={payTokenDialogOpen}
           tokens={allTokens}
@@ -272,292 +202,8 @@ export default function Swap() {
           onSelect={onReceiveTokenSelected}
           onOpenChange={setReceiveTokenDialogOpen}
           mangroveTradeableTokens={mangroveTradeableTokensForPayToken}
-        />
+        /> */}
       </div>
     </>
-  )
-}
-
-function TokenSelectorDialog({
-  tokens,
-  onSelect,
-  open = false,
-  onOpenChange,
-  type,
-  mangroveTradeableTokens,
-}: {
-  open?: boolean
-  tokens: Token[]
-  onSelect: (token: Token) => void
-  onOpenChange: (open: boolean) => void
-  type: "buy" | "sell"
-  mangroveTradeableTokens: Address[]
-}) {
-  const [search, setSearch] = React.useState("")
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Select a token to {type}</DialogTitle>
-        </DialogHeader>
-        <Input
-          placeholder="Search"
-          className="m-3 w-[90%] mr-5 h-10"
-          type="text"
-          value={search}
-          // @ts-ignore
-          onInput={(e) => setSearch(e.target.value)}
-        />
-        <div className="flex flex-col space-y-2 justify-start p-3 pt-1 overflow-y-auto max-h-[400px]">
-          {tokens
-            .filter(
-              (token) =>
-                token.symbol.toLowerCase().includes(search.toLowerCase()) ||
-                token.address.toLowerCase().includes(search.toLowerCase()),
-            )
-            .sort((a, b) => {
-              const aIsTradeableOnMangrove = mangroveTradeableTokens.includes(
-                a.address,
-              )
-              const bIsTradeableOnMangrove = mangroveTradeableTokens.includes(
-                b.address,
-              )
-              if (aIsTradeableOnMangrove && !bIsTradeableOnMangrove) return -1
-              if (!aIsTradeableOnMangrove && bIsTradeableOnMangrove) return 1
-              return a.symbol.localeCompare(b.symbol)
-            })
-            .map((token) => (
-              <div key={token.address}>
-                <Button
-                  onClick={() => onSelect(token)}
-                  className="w-full bg-bg-blush-pearl hover:bg-bg-subtle-hover hover:!text-white text-black-rich px-2 py-1 border rounded-sm text-sm flex items-center space-x-2"
-                >
-                  <div className="relative">
-                    <TokenIcon
-                      symbol={token.symbol}
-                      imgClasses="rounded-sm w-7"
-                      customSrc={ODOS_API_IMAGE_URL(token.symbol)}
-                      useFallback={true}
-                    />
-                    {/* {mangroveTradeableTokens.includes(token.address) && (
-                      <ImageWithHideOnError
-                        className="absolute -top-2 -right-2 p-0.5"
-                        src={`/assets/illustrations/mangrove-logo.png`}
-                        width={20}
-                        height={20}
-                        alt={`mangrove-logo`}
-                      />
-                    )} */}
-                  </div>
-                  <span className="font-semibold text-lg">{token.symbol}</span>
-                </Button>
-              </div>
-            ))}
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-type TokenContainerProps = {
-  token?: Token
-  type: "pay" | "receive"
-  value: string
-  dollarValue: number
-  onTokenClicked?: () => void
-  onMaxClicked?: () => void
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
-  isFetchingDollarValue?: boolean
-  loadingValue?: boolean
-  isWrapping?: boolean
-  seiBalance?: string
-}
-
-function TokenContainer({
-  token,
-  type,
-  onTokenClicked,
-  onMaxClicked,
-  value,
-  onChange,
-  dollarValue,
-  loadingValue,
-  isWrapping,
-  seiBalance,
-}: TokenContainerProps) {
-  const { formattedAndFixed, isLoading } = useTokenBalance(token)
-
-  return (
-    <div
-      className={cn(
-        "flex bg-primary-solid-black px-6 py-4 flex-col border border-transparent transition-all focus-within:!border-green-caribbean hover:border-border-primary",
-        type === "pay" ? "rounded-t-sm" : "rounded-b-sm",
-      )}
-    >
-      <div className="flex justify-between items-center w-full">
-        <label className="text-sm text-text-secondary">
-          {type === "pay" ? "Sell" : "Buy"}
-        </label>
-        <div className="text-sm text-right opacity-70 text-text-quaternary">
-          {token && !isLoading && !formattedAndFixed ? (
-            <></>
-          ) : token && !isLoading && formattedAndFixed ? (
-            <>
-              Balance:
-              {type === "pay" ? (
-                <Button
-                  variant={"invisible"}
-                  onClick={onMaxClicked}
-                  className="hover:opacity-80 transition-all px-0 ml-1 text-sm text-text-secondary"
-                >
-                  <span>
-                    {isWrapping
-                      ? Number(seiBalance) + Number(formattedAndFixed)
-                      : formattedAndFixed}
-                  </span>{" "}
-                </Button>
-              ) : (
-                <span className="ml-1 text-text-secondary">
-                  {formattedAndFixed}
-                </span>
-              )}
-            </>
-          ) : isLoading ? (
-            <Skeleton className="w-10 h-3" />
-          ) : undefined}
-        </div>
-      </div>
-      <div className="flex items-center space-x-2">
-        <div className="flex-1 relative h-12">
-          <AnimatePresence mode="wait">
-            {loadingValue ? (
-              <motion.div
-                key="loading-input"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 flex items-center"
-              >
-                <motion.div
-                  initial={{ width: 0, opacity: 0.5 }}
-                  animate={{
-                    width: "60%",
-                    opacity: [0.3, 0.6, 0.3],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    ease: "easeInOut",
-                  }}
-                  className="h-9 bg-gradient-to-r from-transparent via-bg-tertiary to-transparent rounded-sm"
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="actual-input"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0"
-              >
-                <Input
-                  aria-label="You pay"
-                  className="border-none outline-none p-0 text-3xl h-full"
-                  placeholder="0"
-                  value={value}
-                  onChange={onChange}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <span>
-          {token ? (
-            <Button
-              onClick={onTokenClicked}
-              className="bg-bg-blush-pearl hover:bg-bg-subtle-hover hover:!text-white text-black-rich p-1 border rounded-sm text-sm flex items-center space-x-1"
-            >
-              <TokenIcon
-                symbol={token.symbol}
-                customSrc={ODOS_API_IMAGE_URL(token.symbol)}
-                imgClasses="rounded-sm"
-                useFallback={true}
-              />
-              <span className="font-semibold text-lg text-nowrap pl-2">
-                {token.symbol}
-              </span>
-              <ChevronDown className="mx-1 size-6 text-black-rich" />
-            </Button>
-          ) : (
-            <Button onClick={onTokenClicked} className="text-nowrap ">
-              Select token
-            </Button>
-          )}
-        </span>
-      </div>
-      <div className="flex justify-between items-center opacity-70 h-5">
-        <div className="relative w-full h-full">
-          <AnimatePresence mode="wait">
-            {loadingValue ? (
-              <motion.div
-                key="loading-dollars"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 text-sm text-left text-text-quaternary"
-              >
-                <motion.div
-                  initial={{ width: 0, opacity: 0.5 }}
-                  animate={{
-                    width: "50px",
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    ease: "easeInOut",
-                  }}
-                  className="h-4 bg-gradient-to-r from-transparent via-bg-tertiary to-transparent rounded-sm"
-                />
-              </motion.div>
-            ) : dollarValue <= 0 ? (
-              <motion.div
-                key="zero-dollars"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 text-sm text-left text-text-quaternary"
-              >
-                ≈ <span className="text-text-secondary">0</span> $
-              </motion.div>
-            ) : (
-              <motion.div
-                key="actual-dollars"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 text-sm text-left text-text-quaternary"
-              >
-                ≈{" "}
-                <span className="text-text-secondary">
-                  {token && dollarValue !== 0
-                    ? dollarValue.toString().slice(0, dollarValue.toString().indexOf(".") + 3)
-                    : "0"}
-                </span>{" "}
-                $
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
   )
 }

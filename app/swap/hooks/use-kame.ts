@@ -6,8 +6,14 @@ import {
 } from "@kame-ag/aggregator-sdk"
 import { Address, Token as KameToken } from "@kame-ag/sdk-core"
 import { Token as MgvToken } from "@mangrovedao/mgv"
-import { useEffect, useMemo, useState } from "react"
-import { erc20Abi, formatUnits, maxInt256, maxUint256, parseUnits, TransactionReceipt } from "viem"
+import { useEffect, useMemo, useRef, useState } from "react"
+import {
+  erc20Abi,
+  formatUnits,
+  maxUint256,
+  parseUnits,
+  TransactionReceipt,
+} from "viem"
 import { useChainId, usePublicClient, useWalletClient } from "wagmi"
 
 interface KameParams {
@@ -21,6 +27,7 @@ interface KameParams {
 
 interface Quote {
   receive: string
+  forToken: MgvToken
   params: GetQuoteParametersParams
 }
 
@@ -38,6 +45,9 @@ export function useKame({
     { quotePrice: string; basePrice: string } | undefined
   >()
   const [quote, setQuote] = useState<Quote>()
+  const [fetchingQuote, setFetchingQuote] = useState<"pay" | "receive" | null>(
+    null,
+  )
   const chainId = useChainId()
   const publicClient = usePublicClient()
 
@@ -63,28 +73,94 @@ export function useKame({
     fetchPrices()
   }, [payToken, receiveToken])
 
+  // useEffect(() => {    
+  //   const fetchQuote = async () => {
+  //     if (!payToken || !receiveToken || !chainId || !walletClient || !payValue)
+  //       return
+
+  //     console.log('refeshing quote')
+      
+  //     const isCalculatingReceive = fetchingQuote === "receive"
+  //     const fromToken = isCalculatingReceive ? payToken : receiveToken
+  //     const value = isCalculatingReceive ? payValue : receiveValue
+  //     const toToken = isCalculatingReceive ? receiveToken : payToken
+
+  //     const amount = parseUnits(value, payToken.decimals).toString()
+  //     const params = {
+  //       fromToken: new KameToken(chainId, fromToken.address, fromToken.decimals),
+  //       amount,
+  //       toToken: new KameToken(
+  //         chainId,
+  //         toToken.address,
+  //         toToken.decimals,
+  //       ),
+  //     }
+  //     const _quote = await aggregatorAPI.getQuote(params)
+  //     console.log("_quote", _quote, formatUnits(BigInt(_quote.dstAmount), toToken.decimals))
+  //     setQuote({
+  //       receive: formatUnits(BigInt(_quote.dstAmount), toToken.decimals),
+  //       params,
+  //     })
+  //     setFetchingQuote(null)
+  //   }
+  //   fetchQuote()
+  // }, [payToken, receiveToken, payValue, receiveValue])
+
+    const debounceRef = useRef<NodeJS.Timeout | null>(null)
+
   useEffect(() => {
-    const fetchQuote = async () => {
-      if (!payToken || !receiveToken || !chainId || !walletClient) return
-      const amount = parseUnits(payValue, payToken.decimals).toString()
-      const params = {
-        fromToken: new KameToken(chainId, payToken.address, payToken.decimals),
-        amount,
-        toToken: new KameToken(
-          chainId,
-          receiveToken.address,
-          receiveToken.decimals,
-        ),
+    if (!fetchingQuote) return
+
+    if (!payToken || !receiveToken || !chainId || !walletClient || !fetchingQuote) return
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+
+    debounceRef.current = setTimeout(() => {
+      const fetchQuote = async () => {
+        const isCalculatingReceive = fetchingQuote === "receive"
+        const fromToken = isCalculatingReceive ? payToken : receiveToken
+        const toToken = isCalculatingReceive ? receiveToken : payToken
+        const value = isCalculatingReceive ? payValue : receiveValue
+
+        if (!value) return
+
+        const amount = parseUnits(value, fromToken.decimals).toString()
+
+        const params = {
+          fromToken: new KameToken(chainId, fromToken.address, fromToken.decimals),
+          amount,
+          toToken: new KameToken(chainId, toToken.address, toToken.decimals),
+        }
+
+        try {
+          const _quote = await aggregatorAPI.getQuote(params)
+          setQuote({
+            forToken: toToken,
+            receive: formatUnits(BigInt(_quote.dstAmount), toToken.decimals),
+            params,
+          })
+        } catch (err) {
+          console.error("Failed to fetch quote", err)
+        } finally {
+          setFetchingQuote(null)
+        }
       }
-      const quote = await aggregatorAPI.getQuote(params)
-      console.log(quote)
-      setQuote({
-        receive: formatUnits(BigInt(quote.dstAmount), receiveToken.decimals),
-        params,
-      })
+
+      fetchQuote()
+    }, 300) // 300ms debounce delay
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-    fetchQuote()
-  }, [payToken, receiveToken, payValue, receiveValue])
+  }, [
+    payToken,
+    receiveToken,
+    payValue,
+    receiveValue,
+    chainId,
+    walletClient,
+    fetchingQuote,
+  ])
 
   const usdAmounts = useMemo(() => {
     if (!tokenPrices) return
@@ -97,6 +173,7 @@ export function useKame({
       quoteUsd: Number(quotePrice) * Number(receiveValue),
       baseUsd: Number(basePrice) * Number(payValue),
     }
+    console.log('value', values)
     return values
   }, [tokenPrices, receiveValue, payValue])
 
@@ -120,7 +197,7 @@ export function useKame({
       return res.status === "success"
     }
     return true
-  };
+  }
 
   const swap = async () => {
     if (!walletClient || !quote || !publicClient || !payToken) return
@@ -130,10 +207,10 @@ export function useKame({
         ...quote.params,
         origin: new Address(walletClient?.account.address),
       })
-      
+
       const approved = await isApproved(result.tx.to)
       if (!approved) return
-      
+
       const hash = await walletClient.sendTransaction({
         account: walletClient.account.address,
         to: result.tx.to as `0x${string}`,
@@ -157,5 +234,7 @@ export function useKame({
     usdAmounts,
     quote,
     swap,
+    fetchingQuote,
+    setFetchingQuote,
   }
 }

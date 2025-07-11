@@ -47,10 +47,10 @@ export function applyPriceDisplayDecimals(data?: any[]) {
 
 export function getSvgUrl(symbol: string) {
   const token = getTokenInfos(symbol)
-  if (token.name === "GENERIC") {
-    const webpToken = getWebPUrl(symbol)
-    return webpToken
-  }
+  // if (token.name === "GENERIC") {
+  //   const webpToken = getWebPUrl(symbol)
+  //   return webpToken
+  // }
   return `${IMG_BASE_PATH}/${token.symbol.toLocaleLowerCase()}.svg`
 }
 
