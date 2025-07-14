@@ -506,7 +506,7 @@ export default function Page() {
                 />
 
                 <GridLine
-                  title={"Accruing"}
+                  title={"Accuring"}
                   value={
                     <div className="flex items-center gap-1">
                       {isLoading || isLoadingRewardsFlowing ? (
@@ -515,15 +515,14 @@ export default function Page() {
                         <FlowingNumber
                           bias={
                             rewardsInfoFlowing.reduce(
-                              (acc, curr) => acc + curr.rewards,
+                              (acc, curr) => acc + curr?.rewards,
                               0,
                             ) || 0
                           }
                           multipliers={
                             rewardsInfoFlowing.map((incentive) => ({
-                              start: incentive.timestamp,
-                              multiplier: incentive.currentRewardsPerSecond,
-
+                              start: incentive?.timestamp,
+                              multiplier: incentive?.currentRewardsPerSecond,
                             })) ?? []
                           }
                         />
