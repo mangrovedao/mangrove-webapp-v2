@@ -45,7 +45,6 @@ yarn-error.log*
 
 # generated icons data
 generated/icons.json
-public/cryptocurrency-icons
 
 
 .env.local
