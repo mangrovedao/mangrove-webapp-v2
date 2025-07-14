@@ -67,6 +67,7 @@
     "date-fns": "^2.30.0",
     "ethers": "^6.13.1",
     "framer-motion": "^12.4.10",
+    "fs": "0.0.1-security",
     "get-user-locale": "^2.3.1",
     "gsap": "^3.12.4",
     "js-yaml": "^4.1.0",
