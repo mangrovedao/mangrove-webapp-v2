@@ -122,7 +122,7 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 function XClose() {
   return (
-    <DialogClose className="rounded-sm opacity-70 ring-offset-primary-dark-green transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground flex">
+    <DialogClose className="rounded-sm opacity-70 ring-offset-primary-dark-green transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-white flex">
       <X className="h-6 w-6 text-text-secondary" />
       <span className="sr-only">Close</span>
     </DialogClose>

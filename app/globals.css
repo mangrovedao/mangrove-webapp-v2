@@ -297,7 +297,7 @@
     --text-brand: 0, 100%, 50%;
     /* Sunset Dust */
     --text-disabled: 15, 19%, 45%;
-    --text-placeholder: 15, 20%, 60%;
+    --text-placeholder: 0, 0%, 70%;
     /* Blush Pearl */
     --text-primary: 20, 40%, 95%;
     --text-quaternary: 15, 20%, 60%;
@@ -311,7 +311,7 @@
     /* Oxium Theme - Text Colors */
     --text-brand: 0, 100%, 50%;
     --text-disabled: 0, 0%, 40%;
-    --text-placeholder: 0, 0%, 50%;
+    --text-placeholder: 0, 0%, 70%;
     --text-primary: 0, 0%, 95%;
     --text-quaternary: 0, 0%, 60%;
     --text-secondary: 0, 100%, 65%;
@@ -322,7 +322,7 @@
     /* Oxium Theme - Text Colors with Petal Mist */
     --text-brand: 350, 100%, 88%;
     --text-disabled: 0, 0%, 40%;
-    --text-placeholder: 0, 0%, 50%;
+    --text-placeholder: 0, 0%, 70%;
     --text-primary: 0, 0%, 95%;
     --text-quaternary: 0, 0%, 60%;
     --text-secondary: 350, 100%, 80%;
@@ -333,7 +333,7 @@
     /* Oxium Theme - Text Colors with Blush Pearl */
     --text-brand: 20, 40%, 95%;
     --text-disabled: 0, 0%, 40%;
-    --text-placeholder: 0, 0%, 50%;
+    --text-placeholder: 0, 0%, 70%;
     --text-primary: 0, 0%, 95%;
     --text-quaternary: 0, 0%, 60%;
     --text-secondary: 20, 40%, 85%;

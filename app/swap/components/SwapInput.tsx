@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
+import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
 import { Token } from "@mangrovedao/mgv"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, Wallet } from "lucide-react"
+import { useMemo } from "react"
 
 type TokenContainerProps = {
   token?: Token
@@ -20,6 +22,9 @@ type TokenContainerProps = {
   isWrapping?: boolean
   seiBalance?: string
   fetchingQuote: "pay" | "receive" | null
+  isLoading?: boolean
+  conversionPercentage?: number
+  disabled?: boolean
 }
 
 export function SwapInput({
@@ -31,10 +36,19 @@ export function SwapInput({
   onChange,
   dollarValue,
   fetchingQuote,
+  isLoading,
+  conversionPercentage,
+  disabled = false,
 }: TokenContainerProps) {
-  const { formattedAndFixed, isLoading } = useTokenBalance(token)
+  const { formattedAndFixed, isLoading: loadingBalance } =
+    useTokenBalance(token)
   const isPay = type === "pay"
-  const isFetching = fetchingQuote === type
+  const isFetching = fetchingQuote === type || isLoading
+
+  const conversion = useMemo(() => {
+    if (!conversionPercentage) return
+    return (conversionPercentage - 1)
+  }, [conversionPercentage])
 
   return (
     <div
@@ -65,7 +79,7 @@ export function SwapInput({
                   className="border-none outline-none p-0 text-2xl h-full !text-white opacity-80"
                   placeholder="0"
                   value={value}
-                  disabled={isFetching}
+                  disabled={isFetching || disabled}
                   onChange={onChange}
                 />
               </motion.div>
@@ -81,6 +95,7 @@ export function SwapInput({
             >
               <TokenIcon
                 symbol={token.symbol}
+                customSrc={ODOS_API_IMAGE_URL(token.symbol)}
                 imgClasses="rounded-sm"
                 useFallback={true}
               />
@@ -104,17 +119,22 @@ export function SwapInput({
             <motion.span
               key={`dollar-price-${token?.symbol}`}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
+              animate={{ opacity: 0.6 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
               ${token && dollarValue !== 0 ? dollarValue.toFixed(2) : "0.00"}
+              {conversion && (
+                <span className={`${conversion > 0 ? "text-green-caribbean" : "text-red-100"} ml-1`}>
+                  {conversion > 0 ? "+" : ""}({(conversion).toFixed(2)}%)
+                </span>
+              )}
             </motion.span>
           )}
         </AnimatePresence>
-        {token && !isLoading && !formattedAndFixed ? (
+        {token && !loadingBalance && !formattedAndFixed ? (
           <></>
-        ) : token && !isLoading && formattedAndFixed ? (
+        ) : token && !loadingBalance && formattedAndFixed ? (
           <div className="text-sm flex items-center space-x-1">
             <Wallet className="mb-1" size={14} />
             <span className="text-white opacity-60">{formattedAndFixed}</span>
@@ -122,14 +142,14 @@ export function SwapInput({
               <Button
                 onClick={onMaxClicked}
                 variant={"invisible"}
-                className="text-purple-300 p-0"
-                disabled={value === formattedAndFixed}
+                className="text-green-caribbean p-0"
+                disabled={(value === formattedAndFixed) || disabled}
               >
                 Max
               </Button>
             )}
           </div>
-        ) : isLoading ? (
+        ) : loadingBalance ? (
           <Skeleton className="w-10 h-3" />
         ) : undefined}
       </div>
