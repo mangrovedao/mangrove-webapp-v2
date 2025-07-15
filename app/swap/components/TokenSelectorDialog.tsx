@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { Token } from "@mangrovedao/mgv"
 import { CopyCheck, CopyIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { formatUnits } from "viem"
 
 export function TokenSelectorDialog({
@@ -30,6 +30,7 @@ export function TokenSelectorDialog({
   const [search, setSearch] = useState<string>("")
   const [copiedAddress, setCopiedAddress] = useState<string>("")
 
+  console.log('search', search)
   useEffect(() => {
     if (copiedAddress) {
       setTimeout(() => {
@@ -37,6 +38,16 @@ export function TokenSelectorDialog({
       }, 2500)
     }
   }, [copiedAddress])
+
+  const filteredTokens = useMemo(() => {
+    if (!search) return tokens
+    return tokens.filter((token) => {
+      return (
+        token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+        token.address.toLowerCase().includes(search.toLowerCase())
+      )
+    })
+  }, [tokens, search])
 
   return (
     <Dialog open={open} onOpenChange={() => onOpenChange(null)}>
@@ -55,10 +66,11 @@ export function TokenSelectorDialog({
           className="m-3 w-[90%] mr-5 h-10 placeholder:text-xs"
           type="text"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          /* @ts-ignore */
+          onInput={(e) => setSearch(e.target.value)}
         />
-        <div className="flex flex-col overflow-y-auto max-h-[400px]">
-          {tokens.map((token, index) => {
+        <div className="flex flex-col overflow-y-auto min-h-[400px] max-h-[400px]">
+          {filteredTokens.map((token) => {
             const balance = balances.find(
               (b) => b.address === token.address,
             )?.balance

@@ -6,7 +6,6 @@ import {
 } from "@kame-ag/aggregator-sdk"
 import { Address, Token as KameToken } from "@kame-ag/sdk-core"
 import { Token as MgvToken } from "@mangrovedao/mgv"
-import { set } from "date-fns"
 import { useEffect, useMemo, useRef, useState } from "react"
 import {
   erc20Abi,
@@ -51,7 +50,9 @@ export function useKame({
   )
   const chainId = useChainId()
   const publicClient = usePublicClient()
-  const [swapState, setSwapState] = useState<"fetch-quote" | "approving" | "swapping" | null>(null);
+  const [swapState, setSwapState] = useState<
+    "fetch-quote" | "approving" | "swapping" | null
+  >(null)
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -83,10 +84,9 @@ export function useKame({
       !chainId ||
       !walletClient ||
       !fetchingQuote
-    )
-      {
-        return
-      }
+    ) {
+      return
+    }
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
@@ -96,10 +96,11 @@ export function useKame({
         const fromToken = isCalculatingReceive ? payToken : receiveToken
         const toToken = isCalculatingReceive ? receiveToken : payToken
         const value = isCalculatingReceive ? payValue : receiveValue
-        
-        
-        const amount = parseUnits(value, fromToken.decimals).toString()
-        
+
+        const amount = isNaN(parseFloat(value))
+          ? "0"
+          : parseUnits(value, fromToken.decimals).toString()
+
         const params = {
           fromToken: new KameToken(
             chainId,
@@ -191,7 +192,7 @@ export function useKame({
   const swap = async (slippage: string) => {
     if (!walletClient || !quote || !publicClient || !payToken) return
 
-    setSwapState('fetch-quote')
+    setSwapState("fetch-quote")
     try {
       const result = await aggregatorAPI.getSwap({
         ...quote.params,
@@ -199,22 +200,19 @@ export function useKame({
         tradeConfig: {
           recipient: new Address(walletClient?.account.address),
           slippage: Number(slippage) * 100,
-        }
+        },
       })
 
-      setSwapState('approving')
+      setSwapState("approving")
       const approved = await isApproved(result.tx.to)
       if (!approved) return
 
-      setSwapState('swapping')
+      setSwapState("swapping")
       const hash = await walletClient.sendTransaction({
-        account: walletClient.account.address,
         to: result.tx.to as `0x${string}`,
         data: result.tx.data as `0x${string}`,
         value: BigInt(result.tx.value),
       })
-
-      console.log('hash', hash)
 
       const res = await publicClient.waitForTransactionReceipt({ hash })
       if (res.status === "success") {

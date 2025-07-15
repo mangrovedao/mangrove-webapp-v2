@@ -234,12 +234,11 @@ export default function Swap() {
     }
 
     if (type === "pay") {
-      const payValue = Math.min(parseFloat(fields.payValue), balance)
+      const payValue = Math.min(parseFloat(fields.payValue ?? 0), balance)
       onPayChange(payValue.toString())
       setSliderValue((payValue / balance) * 100)
     } else {
-      const receiveValue = Math.min(parseFloat(fields.receiveValue), balance)
-      console.log(receiveValue)
+      const receiveValue = Math.min(parseFloat(fields.receiveValue ?? 0), balance)
       onReceiveChange(receiveValue.toString())
     }
   }
