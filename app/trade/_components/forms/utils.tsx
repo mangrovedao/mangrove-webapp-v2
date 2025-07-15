@@ -131,23 +131,3 @@ export function successToast(
     { duration: 5000, dismissible: true },
   )
 }
-
-export function calcDollarAmt(
-  amount: string,
-  isBase: boolean,
-  tradeSide: BS,
-  payToken: Token,
-) {
-  const { payDollar, receiveDollar } = useSwap()
-
-  const conversionRate =
-    tradeSide === BS.buy
-      ? !isBase
-        ? payDollar
-        : receiveDollar
-      : isBase
-        ? receiveDollar
-        : payDollar
-
-  return (conversionRate * Number(amount ?? 0)).toFixed(2)
-}
