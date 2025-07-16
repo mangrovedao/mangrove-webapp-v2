@@ -95,7 +95,7 @@ export function SwapInput({
             >
               <TokenIcon
                 symbol={token.symbol}
-                customSrc={ODOS_API_IMAGE_URL(token.symbol)}
+                customSrc={`/custom-token-icons/${token.symbol}.webp`}
                 imgClasses="rounded-sm"
                 useFallback={true}
               />

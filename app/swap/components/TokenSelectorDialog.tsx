@@ -19,6 +19,8 @@ export function TokenSelectorDialog({
   onOpenChange,
   type,
   balances,
+  search,
+  onSearchChange,
 }: {
   open?: boolean
   tokens: Token[]
@@ -26,11 +28,11 @@ export function TokenSelectorDialog({
   onOpenChange: (type: "pay" | "receive" | null) => void
   type: "pay" | "receive" | null
   balances: { balance: bigint; address: string }[]
+  search?: string
+  onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
-  const [search, setSearch] = useState<string>("")
   const [copiedAddress, setCopiedAddress] = useState<string>("")
 
-  console.log('search', search)
   useEffect(() => {
     if (copiedAddress) {
       setTimeout(() => {
@@ -51,7 +53,7 @@ export function TokenSelectorDialog({
 
   return (
     <Dialog open={open} onOpenChange={() => onOpenChange(null)}>
-      <DialogContent>
+      <DialogContent forceMount>
         <DialogHeader className="border-none">
           <DialogTitle className="border-none font-normal">
             <div>Select a token to {type === "pay" ? "Buy" : "Sell"}</div>
@@ -64,10 +66,9 @@ export function TokenSelectorDialog({
         <Input
           placeholder="Search by symbol or address"
           className="m-3 w-[90%] mr-5 h-10 placeholder:text-xs"
-          type="text"
           value={search}
-          /* @ts-ignore */
-          onInput={(e) => setSearch(e.target.value)}
+          type="text"
+          onChange={onSearchChange}
         />
         <div className="flex flex-col overflow-y-auto min-h-[400px] max-h-[400px]">
           {filteredTokens.map((token) => {
@@ -85,7 +86,7 @@ export function TokenSelectorDialog({
                     <TokenIcon
                       symbol={token.symbol}
                       imgClasses="rounded-sm w-7"
-                      customSrc={ODOS_API_IMAGE_URL(token.symbol)}
+                      customSrc={`/custom-token-icons/${token.symbol}.webp`}
                       useFallback={true}
                     />
                   </div>
@@ -93,7 +94,10 @@ export function TokenSelectorDialog({
                 </div>
                 <div className="text-white text-right">
                   <div className="opacity-80">
-                    {balance && Number(formatUnits(balance as bigint, token.decimals))?.toFixed(4)}
+                    {balance &&
+                      Number(
+                        formatUnits(balance as bigint, token.decimals),
+                      )?.toFixed(4)}
                   </div>
                   <div className="opacity-70 text-xs flex items-center gap-1">
                     {`${token.address.slice(0, 4)}...${token.address.slice(-3)}`}{" "}

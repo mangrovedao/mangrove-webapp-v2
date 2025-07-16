@@ -22,6 +22,7 @@ export type InputProps = {
   value?: string | number | null | undefined
   allowNegative?: boolean
   decimals?: number
+  showPercentage?: boolean
   onInput?: ({
     value,
     floatValue,
@@ -46,28 +47,33 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       placeholder,
       disabled,
       name,
+      showPercentage = false,
       ...rest
     },
     ref,
   ) => {
     const decimalSeparator = getSeparator()
     return type === InputType.TEXT ? (
-      <input
-        ref={ref}
-        type={type}
-        className={cn(
-          inputClasses,
-          disabled ? disabledClasses : undefined,
-          rest["aria-invalid"] ? errorClasses : undefined,
-          className,
-        )}
-        onInput={onInput}
-        placeholder={placeholder}
-        value={value}
-        disabled={disabled}
-        name={name}
-        {...rest}
-      />
+      <div className='relative'>
+        <input
+          ref={ref}
+          type={type}
+          className={cn(
+            inputClasses,
+            disabled ? disabledClasses : undefined,
+            rest["aria-invalid"] ? errorClasses : undefined,
+            className,
+          )}
+          onInput={onInput}
+          onChange={onChange}
+          placeholder={placeholder}
+          value={value}
+          disabled={disabled}
+          name={name}
+          {...rest}
+        />
+        {showPercentage && <span className='absolute right-[5px] top-[6px] text-xs text-white opacity-60'>%</span>}
+      </div>
     ) : (
       <NumericFormat
         // @ts-expect-error

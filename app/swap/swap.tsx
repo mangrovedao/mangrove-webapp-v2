@@ -5,6 +5,7 @@ import { injected, useAccount, useConnect, useReadContracts } from "wagmi"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
 import { Slider } from "@/components/ui/swap-slider"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
@@ -19,7 +20,6 @@ import { Address, erc20Abi, formatUnits } from "viem"
 import { SwapInput } from "./components/SwapInput"
 import { TokenSelectorDialog } from "./components/TokenSelectorDialog"
 import { useKame } from "./hooks/use-kame"
-import { Spinner } from "@/components/ui/spinner"
 
 export default function Swap() {
   const { openMarkets: markets } = useOpenMarkets()
@@ -27,6 +27,7 @@ export default function Swap() {
   const { connect } = useConnect()
   const [dialogOpen, setDialogOpen] = useState<"pay" | "receive" | null>(null)
   const [sliderValue, setSliderValue] = useState<number>(0)
+  const [search, setSearch] = useState<string>("")
 
   const [{ payToken, receiveToken }, setTokens] = useState({
     payToken: undefined,
@@ -77,7 +78,14 @@ export default function Swap() {
   const [slippage, setSlippage] = useState<string>("1")
   const [isDragging, setIsDragging] = useState<boolean>(false)
 
-  const { usdAmounts, quote, swap, fetchingQuote, setFetchingQuote, swapState } = useKame({
+  const {
+    usdAmounts,
+    quote,
+    swap,
+    fetchingQuote,
+    setFetchingQuote,
+    swapState,
+  } = useKame({
     payToken,
     receiveToken,
     payValue: fields.payValue,
@@ -117,7 +125,9 @@ export default function Swap() {
         setSliderValue(
           Math.min(
             100,
-            Number(formatPrice(quote.receive)) / Number(payTokenBalance.formattedAndFixed) * 100,
+            (Number(formatPrice(quote.receive)) /
+              Number(payTokenBalance.formattedAndFixed)) *
+              100,
           ),
         )
       }
@@ -228,8 +238,10 @@ export default function Swap() {
       (b) => b.address === token.address,
     )?.balance
     if (!tokenBalance) return
-    let balance = parseFloat(formatUnits(tokenBalance as bigint, token.decimals))
-    if (balance.toString().includes('e')) {
+    let balance = parseFloat(
+      formatUnits(tokenBalance as bigint, token.decimals),
+    )
+    if (balance.toString().includes("e")) {
       balance = 0
     }
 
@@ -238,7 +250,10 @@ export default function Swap() {
       onPayChange(payValue.toString())
       setSliderValue((payValue / balance) * 100)
     } else {
-      const receiveValue = Math.min(parseFloat(fields.receiveValue ?? 0), balance)
+      const receiveValue = Math.min(
+        parseFloat(fields.receiveValue ?? 0),
+        balance,
+      )
       onReceiveChange(receiveValue.toString())
     }
   }
@@ -311,23 +326,31 @@ export default function Swap() {
               className="w-full flex items-center gap-2 justify-center text-md bg-green-caribbean opacity-80 text-sm py-2 mt-4"
               size={"md"}
               onClick={() => swap(slippage)}
-              disabled={Number(payTokenBalance.formattedAndFixed) < Number(fields.payValue) || Boolean(swapState)}
+              disabled={
+                Number(payTokenBalance.formattedAndFixed) <
+                  Number(fields.payValue) || Boolean(swapState)
+              }
             >
-              {swapState !== null &&<Spinner className='h-5 w-5 mb-1' />} {swapButtonText}
+              {swapState !== null && <Spinner className="h-5 w-5 mb-1" />}{" "}
+              {swapButtonText}
             </Button>
           )}
-          <div className='py-8'>
-          <div className="flex items-center justify-between w-full">
-            <div className='text-sm text-white opacity 80'>Max Slippage</div>
-            <Input
-              value={slippage}
-              onChange={(e) => setSlippage(e.target.value)}
-              className="w-[50px] h-7 text-sm px-2 py-1 text-right"
-            />
+          <div className="py-8">
+            <div className="flex items-center justify-between w-full">
+              <div className="text-sm text-white opacity 80">Max Slippage</div>
+              <Input
+                type="text"
+                value={slippage}
+                onChange={(e) => setSlippage(e.target.value)}
+                className="w-[50px] h-7 text-sm pl-2 pr-4 py-1 text-right ml-2"
+                showPercentage
+              />
+            </div>
           </div>
         </div>
-          </div>
         <TokenSelectorDialog
+          search={search}
+          onSearchChange={(e) => setSearch(e.target.value)}
           type={dialogOpen}
           open={Boolean(dialogOpen)}
           tokens={allTokens}
