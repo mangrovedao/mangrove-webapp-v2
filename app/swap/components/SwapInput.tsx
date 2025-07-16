@@ -95,7 +95,7 @@ export function SwapInput({
             >
               <TokenIcon
                 symbol={token.symbol}
-                customSrc={`/custom-token-icons/${token.symbol}.webp`}
+                customSrc={`/custom-token-icons/${token.symbol.toLowerCase()}.webp`}
                 imgClasses="rounded-sm"
                 useFallback={true}
               />

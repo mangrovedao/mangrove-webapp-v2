@@ -86,7 +86,7 @@ export function TokenSelectorDialog({
                     <TokenIcon
                       symbol={token.symbol}
                       imgClasses="rounded-sm w-7"
-                      customSrc={`/custom-token-icons/${token.symbol}.webp`}
+                      customSrc={`/custom-token-icons/${token.symbol.toLowerCase()}.webp`}
                       useFallback={true}
                     />
                   </div>
