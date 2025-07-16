@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { injected, useAccount, useConnect, useReadContracts } from "wagmi"
+import { injected, useAccount, useConnect } from "wagmi"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,9 +14,9 @@ import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
 import useMarket from "@/providers/market"
 import { SwapArrowIcon } from "@/svgs"
 import { deduplicateTokens, getAllMangroveMarketTokens } from "@/utils/tokens"
+import { TokenInfo } from "@kame-ag/aggregator-sdk"
 import { Token } from "@mangrovedao/mgv"
 import { toast } from "sonner"
-import { Address, erc20Abi, formatUnits } from "viem"
 import { SwapInput } from "./components/SwapInput"
 import { TokenSelectorDialog } from "./components/TokenSelectorDialog"
 import { useKame } from "./hooks/use-kame"
@@ -29,36 +29,21 @@ export default function Swap() {
   const [sliderValue, setSliderValue] = useState<number>(0)
   const [search, setSearch] = useState<string>("")
 
-  const [{ payToken, receiveToken }, setTokens] = useState({
+  const [{ payToken, receiveToken }, setTokens] = useState<{
+    payToken?: Token
+    receiveToken?: Token
+  }>({
     payToken: undefined,
     receiveToken: undefined,
   })
 
-  const allTokens = deduplicateTokens([...getAllMangroveMarketTokens(markets)])
-
-  const {
-    data: tokenBalances,
-    isLoading,
-    error,
-  } = useReadContracts({
-    contracts: allTokens.map((token) => ({
-      address: token.address as Address,
-      abi: erc20Abi,
-      functionName: "balanceOf",
-      args: [address],
-    })),
-    allowFailure: false, // set to true if you want to handle partial failures
-  })
-
-  const balances = useMemo(() => {
-    if (tokenBalances) {
-      return allTokens.map((token, index) => ({
-        address: token.address,
-        balance: tokenBalances[index] as bigint,
-      }))
-    }
-    return []
-  }, [tokenBalances])
+  const mgvTokenAddresses: string[] = useMemo(
+    () =>
+      deduplicateTokens([...getAllMangroveMarketTokens(markets)]).map(
+        (t) => t.address,
+      ),
+    [markets],
+  )
 
   useEffect(() => {
     if (markets && (!payToken || !receiveToken)) {
@@ -85,11 +70,14 @@ export default function Swap() {
     fetchingQuote,
     setFetchingQuote,
     swapState,
+    tokens,
+    isMgvMarket,
   } = useKame({
     payToken,
     receiveToken,
     payValue: fields.payValue,
     receiveValue: fields.receiveValue,
+    mgvTokens: mgvTokenAddresses,
     onSwapError: (e) => {
       console.error("Error swapping", e)
       toast.error("Swap failed")
@@ -110,9 +98,9 @@ export default function Swap() {
       case "swapping":
         return "Swapping..."
       default:
-        return "Swap"
+        return `Swap ${isMgvMarket ? "via Oxium" : ""}`
     }
-  }, [swapState])
+  }, [swapState, isMgvMarket])
 
   useEffect(() => {
     if (quote) {
@@ -226,36 +214,40 @@ export default function Swap() {
     onPayChange(fields.payValue)
   }
 
-  const onTokenSelected = (token: Token, type: "pay" | "receive" | null) => {
-    if (token === payToken || token === receiveToken) return
+  const onTokenSelected = (
+    token: TokenInfo,
+    type: "pay" | "receive" | null,
+  ) => {
+    if (token.id === payToken?.address || token.id === receiveToken?.address)
+      return
     if (!token || !type) return
     setTokens((tokens) => ({
       ...tokens,
-      [`${type}Token`]: token,
+      [`${type}Token`]: { ...token, address: token.id },
     }))
     setDialogOpen(null)
-    const tokenBalance = balances.find(
-      (b) => b.address === token.address,
-    )?.balance
-    if (!tokenBalance) return
-    let balance = parseFloat(
-      formatUnits(tokenBalance as bigint, token.decimals),
-    )
-    if (balance.toString().includes("e")) {
-      balance = 0
-    }
+    // const tokenBalance = balances.find(
+    //   (b) => b.address === token.address,
+    // )?.balance
+    // if (!tokenBalance) return
+    // let balance = parseFloat(
+    //   formatUnits(tokenBalance as bigint, token.decimals),
+    // )
+    // if (balance.toString().includes("e")) {
+    //   balance = 0
+    // }
 
-    if (type === "pay") {
-      const payValue = Math.min(parseFloat(fields.payValue ?? 0), balance)
-      onPayChange(payValue.toString())
-      setSliderValue((payValue / balance) * 100)
-    } else {
-      const receiveValue = Math.min(
-        parseFloat(fields.receiveValue ?? 0),
-        balance,
-      )
-      onReceiveChange(receiveValue.toString())
-    }
+    // if (type === "pay") {
+    //   const payValue = Math.min(parseFloat(fields.payValue ?? 0), balance)
+    //   onPayChange(payValue.toString())
+    //   setSliderValue((payValue / balance) * 100)
+    // } else {
+    //   const receiveValue = Math.min(
+    //     parseFloat(fields.receiveValue ?? 0),
+    //     balance,
+    //   )
+    //   onReceiveChange(receiveValue.toString())
+    // }
   }
 
   return (
@@ -353,10 +345,9 @@ export default function Swap() {
           onSearchChange={(e) => setSearch(e.target.value)}
           type={dialogOpen}
           open={Boolean(dialogOpen)}
-          tokens={allTokens}
+          tokens={tokens}
           onSelect={onTokenSelected}
           onOpenChange={setDialogOpen}
-          balances={balances}
         />
       </div>
     </>

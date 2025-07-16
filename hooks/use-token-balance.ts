@@ -27,7 +27,6 @@ export const formatPrice = (amount: string) => {
   return precise
 }
 
-
 export function useTokenBalance(token?: Token) {
   const { address } = useAccount()
 
@@ -39,7 +38,6 @@ export function useTokenBalance(token?: Token) {
     address,
     token: isNativeToken ? undefined : (token?.address as `0x${string}`),
   })
-
 
   return {
     balance: data?.value,

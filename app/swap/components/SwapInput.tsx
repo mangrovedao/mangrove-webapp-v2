@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
 import { useTokenBalance } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
 import { Token } from "@mangrovedao/mgv"
@@ -47,7 +46,7 @@ export function SwapInput({
 
   const conversion = useMemo(() => {
     if (!conversionPercentage) return
-    return (conversionPercentage - 1)
+    return conversionPercentage - 1
   }, [conversionPercentage])
 
   return (
@@ -123,10 +122,15 @@ export function SwapInput({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              ${token && dollarValue !== 0 && !isNaN(dollarValue) ? dollarValue.toFixed(2) : "0.00"}
+              $
+              {token && dollarValue !== 0 && !isNaN(dollarValue)
+                ? dollarValue.toFixed(2)
+                : "0.00"}
               {conversion && (
-                <span className={`${conversion > 0 ? "text-green-caribbean" : "text-red-100"} ml-1`}>
-                  {conversion > 0 ? "+" : ""}({(conversion).toFixed(2)}%)
+                <span
+                  className={`${conversion > 0 ? "text-green-caribbean" : "text-red-100"} ml-1`}
+                >
+                  {conversion > 0 ? "+" : ""}({conversion.toFixed(2)}%)
                 </span>
               )}
             </motion.span>
@@ -143,7 +147,7 @@ export function SwapInput({
                 onClick={onMaxClicked}
                 variant={"invisible"}
                 className="text-green-caribbean p-0"
-                disabled={(value === formattedAndFixed) || disabled}
+                disabled={value === formattedAndFixed || disabled}
               >
                 Max
               </Button>

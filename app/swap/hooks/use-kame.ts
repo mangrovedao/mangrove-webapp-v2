@@ -3,6 +3,7 @@ import {
   Api,
   FetchProviderConnector,
   GetQuoteParametersParams,
+  TokenInfo,
 } from "@kame-ag/aggregator-sdk"
 import { Address, Token as KameToken } from "@kame-ag/sdk-core"
 import { Token as MgvToken } from "@mangrovedao/mgv"
@@ -23,6 +24,7 @@ interface KameParams {
   receiveValue: string
   onSwapError?: (e: any) => void
   onSwapSuccess?: (receipt: TransactionReceipt) => void
+  mgvTokens: string[]
 }
 
 interface Quote {
@@ -38,6 +40,7 @@ export function useKame({
   receiveValue,
   onSwapError,
   onSwapSuccess,
+  mgvTokens,
 }: KameParams) {
   const aggregatorAPI = new Api({ httpConnector: new FetchProviderConnector() })
   const { data: walletClient } = useWalletClient()
@@ -53,6 +56,24 @@ export function useKame({
   const [swapState, setSwapState] = useState<
     "fetch-quote" | "approving" | "swapping" | null
   >(null)
+  const [tokens, setTokens] = useState<Record<string, TokenInfo>>({})
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      const tokens = await aggregatorAPI.getTokens({
+        count: 10000,
+      })
+      setTokens(tokens.tokenById)
+    }
+    fetchTokens()
+  }, [])
+
+  const isMgvMarket = useMemo(
+    () =>
+      mgvTokens.includes(payToken?.address as string) &&
+      mgvTokens.includes(receiveToken?.address as string),
+    [mgvTokens, payToken, receiveToken],
+  )
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -120,6 +141,13 @@ export function useKame({
           setFetchingQuote(null)
           return
         }
+
+        if (isMgvMarket) {
+          //@ts-ignore
+          params["includedProtocols"] = ["oxium"]
+        }
+
+        console.log("params", params)
 
         try {
           const _quote = await aggregatorAPI.getQuote(params)
@@ -235,5 +263,7 @@ export function useKame({
     fetchingQuote,
     setFetchingQuote,
     swapState,
+    tokens,
+    isMgvMarket,
   }
 }

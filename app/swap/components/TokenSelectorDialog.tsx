@@ -1,4 +1,3 @@
-import { TokenIcon } from "@/components/token-icon"
 import {
   Dialog,
   DialogContent,
@@ -6,11 +5,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog-new"
 import { Input } from "@/components/ui/input"
-import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
-import { Token } from "@mangrovedao/mgv"
+import { TokenInfo } from "@kame-ag/aggregator-sdk"
 import { CopyCheck, CopyIcon } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
-import { formatUnits } from "viem"
 
 export function TokenSelectorDialog({
   tokens,
@@ -18,16 +15,14 @@ export function TokenSelectorDialog({
   open = false,
   onOpenChange,
   type,
-  balances,
   search,
   onSearchChange,
 }: {
   open?: boolean
-  tokens: Token[]
-  onSelect: (token: Token, type: "pay" | "receive" | null) => void
+  tokens: Record<string, TokenInfo>
+  onSelect: (token: TokenInfo, type: "pay" | "receive" | null) => void
   onOpenChange: (type: "pay" | "receive" | null) => void
   type: "pay" | "receive" | null
-  balances: { balance: bigint; address: string }[]
   search?: string
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) {
@@ -43,12 +38,16 @@ export function TokenSelectorDialog({
 
   const filteredTokens = useMemo(() => {
     if (!search) return tokens
-    return tokens.filter((token) => {
-      return (
-        token.symbol.toLowerCase().includes(search.toLowerCase()) ||
-        token.address.toLowerCase().includes(search.toLowerCase())
-      )
-    })
+    const lowerSearch = search.toLowerCase()
+
+    return Object.fromEntries(
+      Object.entries(tokens).filter(([address, token]) => {
+        return (
+          token.symbol.toLowerCase().includes(lowerSearch) ||
+          address.toLowerCase().includes(lowerSearch)
+        )
+      }),
+    )
   }, [tokens, search])
 
   return (
@@ -71,44 +70,35 @@ export function TokenSelectorDialog({
           onChange={onSearchChange}
         />
         <div className="flex flex-col overflow-y-auto min-h-[400px] max-h-[400px]">
-          {filteredTokens.map((token) => {
-            const balance = balances.find(
-              (b) => b.address === token.address,
-            )?.balance
+          {Object.entries(filteredTokens).map(([address, token]) => {
             return (
               <div
-                key={token.address}
+                key={address}
                 onClick={() => onSelect(token, type)}
                 className="w-full text-white px-4 cursor-pointer transition-all py-4 flex items-center justify-between text-sm hover:bg-[#ffffff20]"
               >
                 <div className="flex items-center gap-2 ">
                   <div className="relative">
-                    <TokenIcon
+                    {/* <TokenIcon
                       symbol={token.symbol}
                       imgClasses="rounded-sm w-7"
                       customSrc={`/custom-token-icons/${token.symbol.toLowerCase()}.webp`}
                       useFallback={true}
-                    />
+                    /> */}
                   </div>
                   <span className="text-md mt-1">{token.symbol}</span>
                 </div>
                 <div className="text-white text-right">
-                  <div className="opacity-80">
-                    {balance &&
-                      Number(
-                        formatUnits(balance as bigint, token.decimals),
-                      )?.toFixed(4)}
-                  </div>
                   <div className="opacity-70 text-xs flex items-center gap-1">
-                    {`${token.address.slice(0, 4)}...${token.address.slice(-3)}`}{" "}
-                    {copiedAddress === token.address ? (
+                    {`${address.slice(0, 4)}...${address.slice(-3)}`}{" "}
+                    {copiedAddress === address ? (
                       <CopyCheck size={10} />
                     ) : (
                       <CopyIcon
                         className="cursor-pointer"
                         onClick={() => {
-                          navigator.clipboard.writeText(token.address)
-                          setCopiedAddress(token.address)
+                          navigator.clipboard.writeText(address)
+                          setCopiedAddress(address)
                         }}
                         size={10}
                       />
