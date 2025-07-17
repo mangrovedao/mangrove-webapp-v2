@@ -3,10 +3,8 @@ import {
   Api,
   FetchProviderConnector,
   GetQuoteParametersParams,
-  TokenInfo,
 } from "@kame-ag/aggregator-sdk"
 import { Address, Token as KameToken } from "@kame-ag/sdk-core"
-import { Token as MgvToken } from "@mangrovedao/mgv"
 import { useEffect, useMemo, useRef, useState } from "react"
 import {
   erc20Abi,
@@ -16,10 +14,11 @@ import {
   TransactionReceipt,
 } from "viem"
 import { useChainId, usePublicClient, useWalletClient } from "wagmi"
+import { TokenMetadata } from "../utils/tokens"
 
 interface KameParams {
-  payToken?: MgvToken
-  receiveToken?: MgvToken
+  payToken?: TokenMetadata
+  receiveToken?: TokenMetadata
   payValue: string
   receiveValue: string
   onSwapError?: (e: any) => void
@@ -29,7 +28,7 @@ interface KameParams {
 
 interface Quote {
   receive: string
-  forToken: MgvToken
+  forToken: TokenMetadata
   params: GetQuoteParametersParams
 }
 
@@ -56,17 +55,17 @@ export function useKame({
   const [swapState, setSwapState] = useState<
     "fetch-quote" | "approving" | "swapping" | null
   >(null)
-  const [tokens, setTokens] = useState<Record<string, TokenInfo>>({})
 
-  useEffect(() => {
-    const fetchTokens = async () => {
-      const tokens = await aggregatorAPI.getTokens({
-        count: 10000,
-      })
-      setTokens(tokens.tokenById)
-    }
-    fetchTokens()
-  }, [])
+  // Enable once kame fix their API
+  // useEffect(() => {
+  //   const fetchTokens = async () => {
+  //     const tokens = await aggregatorAPI.getTokens({
+  //       count: 10000,
+  //     })
+  //     setTokens(tokens.tokenById)
+  //   }
+  //   fetchTokens()
+  // }, [])
 
   const isMgvMarket = useMemo(
     () =>
@@ -202,11 +201,11 @@ export function useKame({
       walletClient,
       walletClient.account.address,
       spender,
-      payToken.address,
+      payToken.address as `0x${string}`,
     )
     if (allowance < maxUint256) {
       const hash = await walletClient.writeContract({
-        address: payToken.address,
+        address: payToken.address as `0x${string}`,
         abi: erc20Abi,
         functionName: "approve",
         args: [spender, maxUint256],
@@ -263,7 +262,6 @@ export function useKame({
     fetchingQuote,
     setFetchingQuote,
     swapState,
-    tokens,
     isMgvMarket,
   }
 }

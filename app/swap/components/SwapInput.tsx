@@ -3,15 +3,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
-import { useTokenBalance } from "@/hooks/use-token-balance"
+import { formatPrice } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
-import { Token } from "@mangrovedao/mgv"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, Wallet } from "lucide-react"
 import { useMemo } from "react"
+import { useAccount, useBalance } from "wagmi"
+import { TokenMetadata } from "../utils/tokens"
 
 type TokenContainerProps = {
-  token?: Token
+  token?: TokenMetadata
   type: "pay" | "receive"
   value: string
   dollarValue: number
@@ -39,8 +40,11 @@ export function SwapInput({
   conversionPercentage,
   disabled = false,
 }: TokenContainerProps) {
-  const { formattedAndFixed, isLoading: loadingBalance } =
-    useTokenBalance(token)
+  const { address } = useAccount()
+  const { data, isLoading: loadingBalance } = useBalance({
+    address,
+    token: token?.address as `0x${string}`,
+  })
   const isPay = type === "pay"
   const isFetching = fetchingQuote === type || isLoading
 
@@ -94,9 +98,8 @@ export function SwapInput({
             >
               <TokenIcon
                 symbol={token.symbol}
-                customSrc={`/custom-token-icons/${token.symbol.toLowerCase()}.webp`}
+                customSrc={token.icon}
                 imgClasses="rounded-sm"
-                useFallback={true}
               />
               <span className="mt-1 text-xl text-nowrap text-white opacity-80">
                 {token.symbol}
@@ -136,18 +139,20 @@ export function SwapInput({
             </motion.span>
           )}
         </AnimatePresence>
-        {token && !loadingBalance && !formattedAndFixed ? (
-          <></>
-        ) : token && !loadingBalance && formattedAndFixed ? (
+        {token && !loadingBalance && formatPrice(data?.formatted ?? "0") ? (
           <div className="text-sm flex items-center space-x-1">
             <Wallet className="mb-1" size={14} />
-            <span className="text-white opacity-60">{formattedAndFixed}</span>
+            <span className="text-white opacity-60">
+              {formatPrice(data?.formatted ?? "0")}
+            </span>
             {isPay && (
               <Button
                 onClick={onMaxClicked}
                 variant={"invisible"}
                 className="text-green-caribbean p-0"
-                disabled={value === formattedAndFixed || disabled}
+                disabled={
+                  value === formatPrice(data?.formatted ?? "0") || disabled
+                }
               >
                 Max
               </Button>

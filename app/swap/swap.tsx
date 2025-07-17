@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { injected, useAccount, useConnect } from "wagmi"
+import { injected, useAccount, useBalance, useConnect } from "wagmi"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,17 +9,18 @@ import { Spinner } from "@/components/ui/spinner"
 import { Slider } from "@/components/ui/swap-slider"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
-import { formatPrice, useTokenBalance } from "@/hooks/use-token-balance"
+import { formatPrice } from "@/hooks/use-token-balance"
 import { useUpdatePageTitle } from "@/hooks/use-update-page-title"
 import useMarket from "@/providers/market"
 import { SwapArrowIcon } from "@/svgs"
 import { deduplicateTokens, getAllMangroveMarketTokens } from "@/utils/tokens"
-import { TokenInfo } from "@kame-ag/aggregator-sdk"
 import { Token } from "@mangrovedao/mgv"
 import { toast } from "sonner"
+import { Address } from "viem"
 import { SwapInput } from "./components/SwapInput"
 import { TokenSelectorDialog } from "./components/TokenSelectorDialog"
 import { useKame } from "./hooks/use-kame"
+import { TokenMetadata, VERIFIED_TOKEN } from "./utils/tokens"
 
 export default function Swap() {
   const { openMarkets: markets } = useOpenMarkets()
@@ -28,34 +29,48 @@ export default function Swap() {
   const [dialogOpen, setDialogOpen] = useState<"pay" | "receive" | null>(null)
   const [sliderValue, setSliderValue] = useState<number>(0)
   const [search, setSearch] = useState<string>("")
+  const tokens = VERIFIED_TOKEN
 
   const [{ payToken, receiveToken }, setTokens] = useState<{
-    payToken?: Token
-    receiveToken?: Token
+    payToken?: TokenMetadata
+    receiveToken?: TokenMetadata
   }>({
     payToken: undefined,
     receiveToken: undefined,
   })
 
-  const mgvTokenAddresses: string[] = useMemo(
-    () =>
-      deduplicateTokens([...getAllMangroveMarketTokens(markets)]).map(
-        (t) => t.address,
-      ),
+  const mgvTokens: Token[] = useMemo(
+    () => deduplicateTokens([...getAllMangroveMarketTokens(markets)]),
     [markets],
   )
 
   useEffect(() => {
     if (markets && (!payToken || !receiveToken)) {
       setTokens({
-        payToken: markets[0]?.base,
-        receiveToken: markets[0]?.quote,
+        payToken: tokens[0],
+        receiveToken: tokens[1],
       })
     }
   }, [markets])
 
-  const payTokenBalance = useTokenBalance(payToken)
-  const receiveTokenBalance = useTokenBalance(receiveToken)
+  const { data: payTokenBalance, refetch: payTokenBalanceRefetch } = useBalance(
+    {
+      address,
+      token: payToken?.address as Address,
+    },
+  )
+  const payTokenBalanceFormatted = formatPrice(
+    payTokenBalance?.formatted ?? "0",
+  )
+  const { data: receiveTokenBalance, refetch: receiveTokenBalanceRefetch } =
+    useBalance({
+      address,
+      token: receiveToken?.address as Address,
+    })
+  const receiveTokenBalanceFormatted = formatPrice(
+    receiveTokenBalance?.formatted ?? "0",
+  )
+
   const [fields, setFields] = useState({
     payValue: "",
     receiveValue: "",
@@ -70,22 +85,26 @@ export default function Swap() {
     fetchingQuote,
     setFetchingQuote,
     swapState,
-    tokens,
     isMgvMarket,
   } = useKame({
     payToken,
     receiveToken,
     payValue: fields.payValue,
     receiveValue: fields.receiveValue,
-    mgvTokens: mgvTokenAddresses,
+    mgvTokens: mgvTokens.map((t) => t.address),
     onSwapError: (e) => {
       console.error("Error swapping", e)
       toast.error("Swap failed")
     },
     onSwapSuccess(receipt) {
       toast.success("Swap completed")
-      payTokenBalance.refetch()
-      receiveTokenBalance.refetch()
+      payTokenBalanceRefetch()
+      receiveTokenBalanceRefetch()
+      setFields({
+        payValue: "",
+        receiveValue: "",
+      })
+      setSliderValue(0)
     },
   })
 
@@ -114,7 +133,7 @@ export default function Swap() {
           Math.min(
             100,
             (Number(formatPrice(quote.receive)) /
-              Number(payTokenBalance.formattedAndFixed)) *
+              Number(formatPrice(payTokenBalance?.formatted ?? "0"))) *
               100,
           ),
         )
@@ -146,8 +165,7 @@ export default function Swap() {
     setSliderValue(
       Math.min(
         100,
-        (Number(fields.receiveValue) /
-          Number(receiveTokenBalance.formattedAndFixed)) *
+        (Number(fields.receiveValue) / Number(receiveTokenBalanceFormatted)) *
           100,
       ),
     )
@@ -157,7 +175,7 @@ export default function Swap() {
     setFetchingQuote("receive")
     setFields((fields) => ({
       ...fields,
-      payValue: payTokenBalance.formattedAndFixed,
+      payValue: payTokenBalanceFormatted,
     }))
     setSliderValue(100)
   }
@@ -177,10 +195,7 @@ export default function Swap() {
       payValue: val,
     }))
     setSliderValue(
-      Math.min(
-        100,
-        (Number(val) / Number(payTokenBalance.formattedAndFixed)) * 100,
-      ),
+      Math.min(100, (Number(val) / Number(payTokenBalanceFormatted)) * 100),
     )
   }
 
@@ -202,7 +217,7 @@ export default function Swap() {
 
   const onSliderChange = (val: number) => {
     setSliderValue(val)
-    const amount = (val / 100) * Number(payTokenBalance.formattedAndFixed)
+    const amount = (val / 100) * Number(payTokenBalanceFormatted)
     setFields((fields) => ({
       ...fields,
       payValue: formatPrice(amount.toString()),
@@ -215,15 +230,18 @@ export default function Swap() {
   }
 
   const onTokenSelected = (
-    token: TokenInfo,
+    token: TokenMetadata,
     type: "pay" | "receive" | null,
   ) => {
-    if (token.id === payToken?.address || token.id === receiveToken?.address)
+    if (
+      token.address === payToken?.address ||
+      token.address === receiveToken?.address
+    )
       return
     if (!token || !type) return
     setTokens((tokens) => ({
       ...tokens,
-      [`${type}Token`]: { ...token, address: token.id },
+      [`${type}Token`]: token,
     }))
     setDialogOpen(null)
     // const tokenBalance = balances.find(
@@ -319,8 +337,8 @@ export default function Swap() {
               size={"md"}
               onClick={() => swap(slippage)}
               disabled={
-                Number(payTokenBalance.formattedAndFixed) <
-                  Number(fields.payValue) || Boolean(swapState)
+                Number(payTokenBalanceFormatted) < Number(fields.payValue) ||
+                Boolean(swapState)
               }
             >
               {swapState !== null && <Spinner className="h-5 w-5 mb-1" />}{" "}

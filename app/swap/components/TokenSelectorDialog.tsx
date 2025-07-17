@@ -5,9 +5,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog-new"
 import { Input } from "@/components/ui/input"
-import { TokenInfo } from "@kame-ag/aggregator-sdk"
 import { CopyCheck, CopyIcon } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
+import { TokenMetadata } from "../utils/tokens"
 
 export function TokenSelectorDialog({
   tokens,
@@ -19,8 +19,8 @@ export function TokenSelectorDialog({
   onSearchChange,
 }: {
   open?: boolean
-  tokens: Record<string, TokenInfo>
-  onSelect: (token: TokenInfo, type: "pay" | "receive" | null) => void
+  tokens: TokenMetadata[]
+  onSelect: (token: TokenMetadata, type: "pay" | "receive" | null) => void
   onOpenChange: (type: "pay" | "receive" | null) => void
   type: "pay" | "receive" | null
   search?: string
@@ -40,14 +40,12 @@ export function TokenSelectorDialog({
     if (!search) return tokens
     const lowerSearch = search.toLowerCase()
 
-    return Object.fromEntries(
-      Object.entries(tokens).filter(([address, token]) => {
-        return (
-          token.symbol.toLowerCase().includes(lowerSearch) ||
-          address.toLowerCase().includes(lowerSearch)
-        )
-      }),
-    )
+    return tokens.filter((token) => {
+      return (
+        token.symbol.toLowerCase().includes(lowerSearch) ||
+        token.address.toLowerCase().includes(lowerSearch)
+      )
+    })
   }, [tokens, search])
 
   return (
@@ -70,35 +68,30 @@ export function TokenSelectorDialog({
           onChange={onSearchChange}
         />
         <div className="flex flex-col overflow-y-auto min-h-[400px] max-h-[400px]">
-          {Object.entries(filteredTokens).map(([address, token]) => {
+          {filteredTokens.map((token) => {
             return (
               <div
-                key={address}
+                key={token.address}
                 onClick={() => onSelect(token, type)}
                 className="w-full text-white px-4 cursor-pointer transition-all py-4 flex items-center justify-between text-sm hover:bg-[#ffffff20]"
               >
                 <div className="flex items-center gap-2 ">
                   <div className="relative">
-                    {/* <TokenIcon
-                      symbol={token.symbol}
-                      imgClasses="rounded-sm w-7"
-                      customSrc={`/custom-token-icons/${token.symbol.toLowerCase()}.webp`}
-                      useFallback={true}
-                    /> */}
+                    <img src={token.icon} className="rounded-sm w-7" />
                   </div>
                   <span className="text-md mt-1">{token.symbol}</span>
                 </div>
                 <div className="text-white text-right">
                   <div className="opacity-70 text-xs flex items-center gap-1">
-                    {`${address.slice(0, 4)}...${address.slice(-3)}`}{" "}
-                    {copiedAddress === address ? (
+                    {`${token.address.slice(0, 4)}...${token.address.slice(-3)}`}{" "}
+                    {copiedAddress === token.address ? (
                       <CopyCheck size={10} />
                     ) : (
                       <CopyIcon
                         className="cursor-pointer"
                         onClick={() => {
-                          navigator.clipboard.writeText(address)
-                          setCopiedAddress(address)
+                          navigator.clipboard.writeText(token.address)
+                          setCopiedAddress(token.address)
                         }}
                         size={10}
                       />
