@@ -5,8 +5,8 @@ import { injected, useAccount, useBalance, useConnect } from "wagmi"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Slider } from "@/components/ui/slider"
 import { Spinner } from "@/components/ui/spinner"
-import { Slider } from "@/components/ui/swap-slider"
 import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import { useOpenMarkets } from "@/hooks/use-open-markets"
 import { formatPrice } from "@/hooks/use-token-balance"
@@ -71,6 +71,14 @@ export default function Swap() {
     receiveTokenBalance?.formatted ?? "0",
   )
 
+  useEffect(() => {
+    setFetchingQuote("receive")
+  }, [receiveToken])
+
+  useEffect(() => {
+    setFetchingQuote("pay")
+  }, [payToken])
+
   const [fields, setFields] = useState({
     payValue: "",
     receiveValue: "",
@@ -97,7 +105,18 @@ export default function Swap() {
       toast.error("Swap failed")
     },
     onSwapSuccess(receipt) {
-      toast.success("Swap completed")
+      toast.success(
+        <div className="flex items-center justify-between w-full">
+          <span>Swap completed </span>
+          <a
+            className="text-green-caribbean"
+            target="_blank"
+            href={`https://seistream.app/transactions/${receipt.transactionHash}`}
+          >
+            View
+          </a>
+        </div>,
+      )
       payTokenBalanceRefetch()
       receiveTokenBalanceRefetch()
       setFields({
@@ -244,28 +263,6 @@ export default function Swap() {
       [`${type}Token`]: token,
     }))
     setDialogOpen(null)
-    // const tokenBalance = balances.find(
-    //   (b) => b.address === token.address,
-    // )?.balance
-    // if (!tokenBalance) return
-    // let balance = parseFloat(
-    //   formatUnits(tokenBalance as bigint, token.decimals),
-    // )
-    // if (balance.toString().includes("e")) {
-    //   balance = 0
-    // }
-
-    // if (type === "pay") {
-    //   const payValue = Math.min(parseFloat(fields.payValue ?? 0), balance)
-    //   onPayChange(payValue.toString())
-    //   setSliderValue((payValue / balance) * 100)
-    // } else {
-    //   const receiveValue = Math.min(
-    //     parseFloat(fields.receiveValue ?? 0),
-    //     balance,
-    //   )
-    //   onReceiveChange(receiveValue.toString())
-    // }
   }
 
   return (
@@ -314,7 +311,7 @@ export default function Swap() {
               max={100}
               step={1}
               className="my-5"
-              showValues={["0%", "25%", "50%", "100%"]}
+              // showValues={["0%", "25%", "50%", "100%"]}
               onPointerDown={() => setIsDragging(true)}
               onPointerUp={() => onSliderUp()}
               onPointerLeave={() => isDragging && onSliderUp()}
@@ -333,7 +330,7 @@ export default function Swap() {
             </Button>
           ) : (
             <Button
-              className="w-full flex items-center gap-2 justify-center text-md bg-green-caribbean opacity-80 text-sm py-2 mt-4"
+              className="w-full flex items-center gap-2 justify-center text-md bg-white opacity-80 text-sm py-2 mt-4"
               size={"md"}
               onClick={() => swap(slippage)}
               disabled={

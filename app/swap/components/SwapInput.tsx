@@ -149,7 +149,7 @@ export function SwapInput({
               <Button
                 onClick={onMaxClicked}
                 variant={"invisible"}
-                className="text-green-caribbean p-0"
+                className="text-white p-0"
                 disabled={
                   value === formatPrice(data?.formatted ?? "0") || disabled
                 }

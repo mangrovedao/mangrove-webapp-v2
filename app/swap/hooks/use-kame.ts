@@ -1,4 +1,5 @@
 import { checkAllowance } from "@/hooks/ghostbook/lib/allowance"
+import { useOpenMarkets } from "@/hooks/use-open-markets"
 import {
   Api,
   FetchProviderConnector,
@@ -43,6 +44,7 @@ export function useKame({
 }: KameParams) {
   const aggregatorAPI = new Api({ httpConnector: new FetchProviderConnector() })
   const { data: walletClient } = useWalletClient()
+  const { openMarkets: markets } = useOpenMarkets()
   const [tokenPrices, setTokenPrices] = useState<
     { quotePrice: string; basePrice: string } | undefined
   >()
@@ -69,8 +71,11 @@ export function useKame({
 
   const isMgvMarket = useMemo(
     () =>
-      mgvTokens.includes(payToken?.address as string) &&
-      mgvTokens.includes(receiveToken?.address as string),
+      markets.some(
+        (m) =>
+          m.base.address.toLowerCase() === payToken?.address.toLowerCase() &&
+          m.quote.address.toLowerCase() === receiveToken?.address.toLowerCase(),
+      ),
     [mgvTokens, payToken, receiveToken],
   )
 

@@ -74,7 +74,7 @@ const Slider = React.forwardRef<
           {showTooltip && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50">
               <div className="text-[10px] font-extralight bg-bg-secondary px-1 py-0.5 rounded-sm whitespace-nowrap">
-                {value}%
+                {value?.toFixed(0)}%
               </div>
             </div>
           )}
