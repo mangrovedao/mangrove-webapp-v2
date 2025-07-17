@@ -102,12 +102,27 @@ export default function Swap() {
     mgvTokens: mgvTokens.map((t) => t.address),
     onSwapError: (e) => {
       console.error("Error swapping", e)
-      toast.error("Swap failed")
+      toast.error(
+        <div className="flex items-center justify-between w-full">
+          <span>Swap Failed</span>
+          {e.transactionHash ? (
+            <a
+              className="text-red-200"
+              target="_blank"
+              href={`https://seistream.app/transactions/${e?.transactionHash}`}
+            >
+              View
+            </a>
+          ) : (
+            <></>
+          )}
+        </div>,
+      )
     },
     onSwapSuccess(receipt) {
       toast.success(
         <div className="flex items-center justify-between w-full">
-          <span>Swap completed </span>
+          <span>Swap completed</span>
           <a
             className="text-green-caribbean"
             target="_blank"
