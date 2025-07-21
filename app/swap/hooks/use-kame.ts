@@ -172,13 +172,11 @@ export function useKame({
 
     const { quotePrice, basePrice } = tokenPrices
 
-    // console.log("tokenPrices", tokenPrices)
-
     const values = {
       quoteUsd: Number(quotePrice) * Number(receiveValue),
       baseUsd: Number(basePrice) * Number(payValue),
     }
-    // console.log("values", values)
+
     return values
   }, [tokenPrices, fetchingQuote, receiveValue, payValue])
 
