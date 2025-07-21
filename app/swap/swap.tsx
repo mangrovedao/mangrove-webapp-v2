@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { injected, useAccount, useBalance, useConnect } from "wagmi"
+import { useAccount, useBalance, useConnect } from "wagmi"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,7 @@ import useMarket from "@/providers/market"
 import { SwapArrowIcon } from "@/svgs"
 import { deduplicateTokens, getAllMangroveMarketTokens } from "@/utils/tokens"
 import { Token } from "@mangrovedao/mgv"
+import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { toast } from "sonner"
 import { Address } from "viem"
 import { SwapInput } from "./components/SwapInput"
@@ -25,6 +26,7 @@ import { TokenMetadata, VERIFIED_TOKEN } from "./utils/tokens"
 export default function Swap() {
   const { openMarkets: markets } = useOpenMarkets()
   const { isConnected, address } = useAccount()
+  const { openConnectModal } = useConnectModal()
   const { connect } = useConnect()
   const [dialogOpen, setDialogOpen] = useState<"pay" | "receive" | null>(null)
   const [sliderValue, setSliderValue] = useState<number>(0)
@@ -71,13 +73,13 @@ export default function Swap() {
     receiveTokenBalance?.formatted ?? "0",
   )
 
-  useEffect(() => {
-    setFetchingQuote("receive")
-  }, [receiveToken])
+  // useEffect(() => {
+  //   setFetchingQuote("receive")
+  // }, [receiveToken])
 
-  useEffect(() => {
-    setFetchingQuote("pay")
-  }, [payToken])
+  // useEffect(() => {
+  //   setFetchingQuote("pay")
+  // }, [payToken])
 
   const [fields, setFields] = useState({
     payValue: "",
@@ -267,6 +269,7 @@ export default function Swap() {
     token: TokenMetadata,
     type: "pay" | "receive" | null,
   ) => {
+    setDialogOpen(null)
     if (
       token.address === payToken?.address ||
       token.address === receiveToken?.address
@@ -277,7 +280,7 @@ export default function Swap() {
       ...tokens,
       [`${type}Token`]: token,
     }))
-    setDialogOpen(null)
+    setFetchingQuote(type)
   }
 
   return (
@@ -326,7 +329,6 @@ export default function Swap() {
               max={100}
               step={1}
               className="my-5"
-              // showValues={["0%", "25%", "50%", "100%"]}
               onPointerDown={() => setIsDragging(true)}
               onPointerUp={() => onSliderUp()}
               onPointerLeave={() => isDragging && onSliderUp()}
@@ -336,16 +338,16 @@ export default function Swap() {
 
           {!isConnected ? (
             <Button
-              className="w-full text-lg bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich"
+              className="w-full text-md py-2 mt-4 bg-bg-blush-pearl hover:bg-bg-blush-pearl text-black-rich"
               variant={"secondary"}
               size={"lg"}
-              onClick={() => connect({ connector: injected() })}
+              onClick={() => openConnectModal?.()}
             >
               Connect wallet
             </Button>
           ) : (
             <Button
-              className="w-full flex items-center gap-2 justify-center text-md bg-white opacity-80 text-sm py-2 mt-4"
+              className="w-full flex items-center gap-2 justify-center text-md bg-white opacity-80 py-2 mt-4"
               size={"md"}
               onClick={() => swap(slippage)}
               disabled={

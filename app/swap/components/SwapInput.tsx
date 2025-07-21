@@ -47,6 +47,7 @@ export function SwapInput({
   })
   const isPay = type === "pay"
   const isFetching = fetchingQuote === type || isLoading
+  const isConnected = !!address
 
   const conversion = useMemo(() => {
     if (!conversionPercentage) return
@@ -79,7 +80,7 @@ export function SwapInput({
               >
                 <Input
                   aria-label="You pay"
-                  className="border-none outline-none p-0 text-2xl h-full !text-white opacity-80"
+                  className="border-none !bg-bg-secondary outline-none p-0 text-2xl h-full !text-white opacity-80"
                   placeholder="0"
                   value={value}
                   disabled={isFetching || disabled}
@@ -139,7 +140,10 @@ export function SwapInput({
             </motion.span>
           )}
         </AnimatePresence>
-        {token && !loadingBalance && formatPrice(data?.formatted ?? "0") ? (
+        {token &&
+        isConnected &&
+        !loadingBalance &&
+        formatPrice(data?.formatted ?? "0") ? (
           <div className="text-sm flex items-center space-x-1">
             <Wallet className="mb-1" size={14} />
             <span className="text-white opacity-60">

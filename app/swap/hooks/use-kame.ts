@@ -58,17 +58,6 @@ export function useKame({
     "fetch-quote" | "approving" | "swapping" | null
   >(null)
 
-  // Enable once kame fix their API
-  // useEffect(() => {
-  //   const fetchTokens = async () => {
-  //     const tokens = await aggregatorAPI.getTokens({
-  //       count: 10000,
-  //     })
-  //     setTokens(tokens.tokenById)
-  //   }
-  //   fetchTokens()
-  // }, [])
-
   const isMgvMarket = useMemo(
     () =>
       markets.some(
@@ -79,43 +68,42 @@ export function useKame({
     [mgvTokens, payToken, receiveToken],
   )
 
-  useEffect(() => {
-    const fetchPrices = async () => {
-      if (!payToken || !receiveToken) return
+  const fetchPrices = async () => {
+    if (!payToken || !receiveToken) return
 
-      const { priceById: prices } = await aggregatorAPI.getPrices({
-        ids: [payToken.address, receiveToken.address],
-      })
-      const apiReceiveToken = prices[receiveToken.address]
-      const apiPayToken = prices[payToken.address]
-
-      if (!apiPayToken || !apiReceiveToken) return
-
-      setTokenPrices({
-        quotePrice: apiReceiveToken.pyxis.price,
-        basePrice: apiPayToken.pyxis.price,
-      })
+    const addressOverrides: Record<string, string> = {
+      SEI: "0xe30fedd158a2e3b13e9badaeabafc5516e95e8c7",
     }
+    payToken.address = addressOverrides[payToken.name] || payToken.address
+    receiveToken.address =
+      addressOverrides[receiveToken.name] || receiveToken.address
 
-    fetchPrices()
-  }, [payToken, receiveToken])
+    const { priceById: prices } = await aggregatorAPI.getPrices({
+      ids: [payToken.address, receiveToken.address],
+    })
+    const apiReceiveToken = prices[receiveToken.address]
+    const apiPayToken = prices[payToken.address]
+
+    if (!apiPayToken || !apiReceiveToken) return
+
+    setTokenPrices({
+      quotePrice: apiReceiveToken.pyxis.price,
+      basePrice: apiPayToken.pyxis.price,
+    })
+  }
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    if (
-      !payToken ||
-      !receiveToken ||
-      !chainId ||
-      !walletClient ||
-      !fetchingQuote
-    ) {
+    if (!payToken || !receiveToken || !chainId || !fetchingQuote) {
       return
     }
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
     debounceRef.current = setTimeout(() => {
+      fetchPrices()
+
       const fetchQuote = async () => {
         const isCalculatingReceive = fetchingQuote === "receive"
         const fromToken = isCalculatingReceive ? payToken : receiveToken
@@ -136,7 +124,7 @@ export function useKame({
           toToken: new KameToken(chainId, toToken.address, toToken.decimals),
         }
 
-        if (value === "0") {
+        if (amount === "0") {
           setQuote({
             forToken: toToken,
             receive: "0",
@@ -173,15 +161,7 @@ export function useKame({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [
-    payToken,
-    receiveToken,
-    payValue,
-    receiveValue,
-    chainId,
-    walletClient,
-    fetchingQuote,
-  ])
+  }, [payToken, receiveToken, payValue, receiveValue, chainId, fetchingQuote])
 
   const usdAmounts = useMemo(() => {
     if (!tokenPrices?.basePrice || !tokenPrices?.quotePrice)
@@ -192,12 +172,15 @@ export function useKame({
 
     const { quotePrice, basePrice } = tokenPrices
 
+    // console.log("tokenPrices", tokenPrices)
+
     const values = {
       quoteUsd: Number(quotePrice) * Number(receiveValue),
       baseUsd: Number(basePrice) * Number(payValue),
     }
+    // console.log("values", values)
     return values
-  }, [tokenPrices, receiveValue, payValue])
+  }, [tokenPrices, fetchingQuote, receiveValue, payValue])
 
   const isApproved = async (spender: any) => {
     if (!walletClient || !payToken || !publicClient) return false
@@ -214,6 +197,7 @@ export function useKame({
         abi: erc20Abi,
         functionName: "approve",
         args: [spender, maxUint256],
+        gas: BigInt(100_000),
       })
       const res = await publicClient.waitForTransactionReceipt({ hash })
       return res.status === "success"
