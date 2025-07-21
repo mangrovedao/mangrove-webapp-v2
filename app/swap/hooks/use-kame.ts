@@ -58,12 +58,12 @@ export function useKame({
     "fetch-quote" | "approving" | "swapping" | null
   >(null)
 
-  const isMgvMarket = useMemo(
+  const routeMangrove = useMemo(
     () =>
       markets.some(
         (m) =>
-          m.base.address.toLowerCase() === payToken?.address.toLowerCase() &&
-          m.quote.address.toLowerCase() === receiveToken?.address.toLowerCase(),
+          mgvTokens.includes(m.base.address.toLowerCase()) &&
+          mgvTokens.includes(m.quote.address.toLowerCase()),
       ),
     [mgvTokens, payToken, receiveToken],
   )
@@ -134,7 +134,7 @@ export function useKame({
           return
         }
 
-        if (isMgvMarket) {
+        if (routeMangrove) {
           //@ts-ignore
           params["includedProtocols"] = ["oxium"]
         }
@@ -219,6 +219,8 @@ export function useKame({
         },
       })
 
+      console.log(result)
+
       setSwapState("approving")
       const approved = await isApproved(result.tx.to)
       if (!approved) return
@@ -251,6 +253,6 @@ export function useKame({
     fetchingQuote,
     setFetchingQuote,
     swapState,
-    isMgvMarket,
+    routeMangrove,
   }
 }

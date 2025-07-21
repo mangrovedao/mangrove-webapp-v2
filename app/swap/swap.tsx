@@ -73,13 +73,10 @@ export default function Swap() {
     receiveTokenBalance?.formatted ?? "0",
   )
 
-  // useEffect(() => {
-  //   setFetchingQuote("receive")
-  // }, [receiveToken])
-
-  // useEffect(() => {
-  //   setFetchingQuote("pay")
-  // }, [payToken])
+  const maxPayValue = useMemo(
+    () => Number(payTokenBalance?.formatted) * 0.99,
+    [payTokenBalance],
+  )
 
   const [fields, setFields] = useState({
     payValue: "",
@@ -95,7 +92,7 @@ export default function Swap() {
     fetchingQuote,
     setFetchingQuote,
     swapState,
-    isMgvMarket,
+    routeMangrove,
   } = useKame({
     payToken,
     receiveToken,
@@ -153,9 +150,9 @@ export default function Swap() {
       case "swapping":
         return "Swapping..."
       default:
-        return `Swap ${isMgvMarket ? "via Oxium" : ""}`
+        return `Swap ${routeMangrove ? "via Oxium" : ""}`
     }
-  }, [swapState, isMgvMarket])
+  }, [swapState, routeMangrove])
 
   useEffect(() => {
     if (quote) {
@@ -211,7 +208,7 @@ export default function Swap() {
     setFetchingQuote("receive")
     setFields((fields) => ({
       ...fields,
-      payValue: payTokenBalanceFormatted,
+      payValue: maxPayValue.toString(),
     }))
     setSliderValue(100)
   }
