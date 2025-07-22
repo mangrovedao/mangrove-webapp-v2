@@ -15,6 +15,7 @@ import useMarket from "@/providers/market"
 import { VariationArrow } from "@/svgs"
 import { cn } from "@/utils"
 import { determineDecimals, formatNumber } from "@/utils/numbers"
+import { overrideSymbol } from "@/utils/symbol"
 import { normalizeStats } from "./utils"
 
 function Container({ children }: React.PropsWithChildren) {
@@ -130,7 +131,8 @@ function Item({
               transition={{ duration: 0.2 }}
             >
               <Value className={className}>
-                {formattedValue} {isValidValue && token?.symbol && token.symbol}
+                {formattedValue}{" "}
+                {isValidValue && token?.symbol && overrideSymbol(token.symbol)}
                 {isValidValue && rightElement}
               </Value>
             </motion.div>
@@ -156,9 +158,7 @@ export function PricesBar() {
     useMangroveTokenPricesQuery(base?.address, quote?.address, 1)
 
   // Normalize stats based on which chain we're using
-  const stats = normalizeStats(
-    priceData ?? poolStats,
-  )
+  const stats = normalizeStats(priceData ?? poolStats)
 
   const isFetched = poolStatsFetched && priceDataFetched
   React.useEffect(() => {

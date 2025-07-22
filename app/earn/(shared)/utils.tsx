@@ -1,6 +1,7 @@
 import { Caption } from "@/components/typography/caption"
 import { ImageWithHideOnError } from "@/components/ui/image-with-hide-on-error"
 import { useIndexerUrl } from "@/utils/get-indexer-url"
+import { overrideSymbol } from "@/utils/symbol"
 import { MarketParams } from "@mangrovedao/mgv"
 import { ReactNode } from "react"
 import { Address, Chain, parseAbi, PublicClient, zeroAddress } from "viem"
@@ -198,7 +199,7 @@ export const createVault = (
     totalSupply: backendData?.totalSupply || 0n,
     balanceOf: backendData?.balanceOf || 0n,
     feeData: backendData?.feeData || [],
-    symbol: backendData?.symbol || "",
+    symbol: overrideSymbol(backendData?.symbol) || "",
     decimals: backendData?.decimals || 18,
     lastTotalInQuote: backendData?.lastTotalInQuote || 0n,
     lastTimestamp: backendData?.lastTimestamp || 0n,

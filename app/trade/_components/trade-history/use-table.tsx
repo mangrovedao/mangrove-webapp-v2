@@ -12,6 +12,7 @@ import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate, formatRelativeTime } from "@/utils/date"
 import { formatNumber } from "@/utils/numbers"
+import { overrideSymbol } from "@/utils/symbol"
 import { BS } from "@mangrovedao/mgv/lib"
 import { useTradeFormStore } from "../forms/store"
 import type { TradeHistory } from "./schema"
@@ -52,7 +53,7 @@ export function useTable({ data = [] }: Params) {
                   maximumFractionDigits: base.displayDecimals,
                   minimumFractionDigits: base.displayDecimals,
                 })}{" "}
-                {base.symbol}
+                {overrideSymbol(base.symbol)}
               </span>
             </div>
           )
@@ -68,7 +69,7 @@ export function useTable({ data = [] }: Params) {
                 {row.getValue().toFixed(market.quote.displayDecimals)}
               </span>
               <span className="text-xs opacity-80 font-sans leading-tight">
-                {market.quote.symbol}
+                {overrideSymbol(market.quote.symbol)}
               </span>
             </div>
           ) : (

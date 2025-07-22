@@ -36,6 +36,7 @@ import { TradeIcon } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { overrideSymbol } from "@/utils/symbol"
 import { shortenAddress } from "@/utils/wallet"
 import { useAccount } from "wagmi"
 import { useFlowingRewards } from "../(shared)/_hooks/use-flowing-rewards"
@@ -213,7 +214,7 @@ export default function Page() {
                   </>
                 )}
               </div>
-              <Title className="!text-2xl bg-clip-text text-white">{`${vault?.market?.base?.symbol}-${vault?.market?.quote?.symbol}`}</Title>
+              <Title className="!text-2xl bg-clip-text text-white">{`${overrideSymbol(vault?.market?.base?.symbol)}-${overrideSymbol(vault?.market?.quote?.symbol)}`}</Title>
             </motion.div>
           )}
 
@@ -255,7 +256,7 @@ export default function Page() {
                   maximumFractionDigits: 2,
                 }) || " "
               }
-              symbol={` ${vault?.market?.quote?.symbol || " "}`}
+              symbol={` ${overrideSymbol(vault?.market?.quote?.symbol as string) || " "}`}
             />
 
             <GridLineHeader
@@ -657,7 +658,7 @@ export default function Page() {
                       />
                     </motion.div>
                     <Caption className="text-text-secondary !text-sm">
-                      {vault?.market.base.symbol}
+                      {overrideSymbol(vault?.market.base.symbol as string)}
                     </Caption>
                   </div>
                 }
@@ -683,7 +684,7 @@ export default function Page() {
                       />
                     </motion.div>
                     <Caption className="text-text-secondary !text-sm">
-                      {vault?.market.quote.symbol}
+                      {overrideSymbol(vault?.market.quote.symbol as string)}
                     </Caption>
                   </div>
                 }

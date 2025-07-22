@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog-new"
 import { Input } from "@/components/ui/input"
+import { overrideSymbol } from "@/utils/symbol"
 import { CopyCheck, CopyIcon } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { TokenMetadata } from "../utils/tokens"
@@ -79,7 +80,9 @@ export function TokenSelectorDialog({
                   <div className="relative">
                     <img src={token.icon} className="rounded-sm w-7" />
                   </div>
-                  <span className="text-md mt-1">{token.symbol}</span>
+                  <span className="text-md mt-1">
+                    {overrideSymbol(token.symbol)}
+                  </span>
                 </div>
                 <div className="text-white text-right">
                   <div className="opacity-70 text-xs flex items-center gap-1">

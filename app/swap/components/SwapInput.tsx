@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { formatPrice } from "@/hooks/use-token-balance"
 import { cn } from "@/utils"
+import { overrideSymbol } from "@/utils/symbol"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, Wallet } from "lucide-react"
 import { useMemo } from "react"
@@ -103,7 +104,7 @@ export function SwapInput({
                 imgClasses="rounded-sm"
               />
               <span className="mt-1 text-xl text-nowrap text-white opacity-80">
-                {token.symbol}
+                {overrideSymbol(token.symbol)}
               </span>
               <ChevronDown className="mx-1 size-4 text-white opacity-70" />
             </Button>

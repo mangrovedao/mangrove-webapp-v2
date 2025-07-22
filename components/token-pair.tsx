@@ -1,6 +1,7 @@
 import type { Token } from "@mangrovedao/mgv"
 
 import { cn } from "@/utils"
+import { overrideSymbol } from "@/utils/symbol"
 import { TokenIcon } from "./token-icon"
 import { Title } from "./typography/title"
 import { Skeleton } from "./ui/skeleton"
@@ -48,7 +49,7 @@ export function TokenPair({
       ) : (
         <Title
           {...titleProps}
-        >{`${baseToken.symbol}-${quoteToken.symbol}`}</Title>
+        >{`${overrideSymbol(baseToken.symbol)}-${overrideSymbol(quoteToken.symbol)}`}</Title>
       )}
     </div>
   )

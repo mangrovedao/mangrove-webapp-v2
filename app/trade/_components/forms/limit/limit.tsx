@@ -16,6 +16,7 @@ import { useDollarConversion } from "@/hooks/use-dollar-conversion"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { overrideSymbol } from "@/utils/symbol"
 import { useTradeFormStore } from "../../forms/store"
 import { useTradeInfos } from "../hooks/use-trade-infos"
 import { useLimit } from "./hooks/use-limit"
@@ -512,7 +513,7 @@ export function Limit() {
                     {Number(minVolumeFormatted).toFixed(
                       sendToken?.displayDecimals || 18,
                     )}{" "}
-                    {sendToken?.symbol}
+                    {overrideSymbol(sendToken?.symbol)}
                   </span>
                 )}
               </div>

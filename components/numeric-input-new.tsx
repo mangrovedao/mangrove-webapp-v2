@@ -1,6 +1,7 @@
 import * as React from "react"
 
 import { cn } from "@/utils"
+import { overrideSymbol } from "@/utils/symbol"
 import { TokenIcon } from "./token-icon"
 import { Input, type InputProps } from "./ui/input-new"
 
@@ -16,7 +17,9 @@ const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
         {icon && (
           <div className="flex items-center absolute inset-y-0 right-0 gap-2">
             <TokenIcon symbol={icon} />
-            <div className="text-text-primary leading-[1]">{icon}</div>
+            <div className="text-text-primary leading-[1]">
+              {overrideSymbol(icon)}
+            </div>
           </div>
         )}
         <Input

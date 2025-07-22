@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useAccount, useBalance, useConnect } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,11 +27,12 @@ export default function Swap() {
   const { openMarkets: markets } = useOpenMarkets()
   const { isConnected, address } = useAccount()
   const { openConnectModal } = useConnectModal()
-  const { connect } = useConnect()
   const [dialogOpen, setDialogOpen] = useState<"pay" | "receive" | null>(null)
   const [sliderValue, setSliderValue] = useState<number>(0)
   const [search, setSearch] = useState<string>("")
   const tokens = VERIFIED_TOKEN
+
+  console.log("openMarkets", markets)
 
   const [{ payToken, receiveToken }, setTokens] = useState<{
     payToken?: TokenMetadata
