@@ -17,6 +17,7 @@ import { useDollarConversion } from "@/hooks/use-dollar-conversion"
 import { useDisclaimerDialog } from "@/stores/disclaimer-dialog.store"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { overrideSymbol } from "@/utils/symbol"
 import { EnhancedNumericInput } from "@components/token-input-new"
 import { useTradeFormStore } from "../../forms/store"
 import { Accordion } from "../components/accordion"
@@ -460,7 +461,7 @@ export function Market() {
                 Average market price
               </span>
               <span className="text-xs text-text-secondary">
-                {avgPrice} {quote?.symbol}
+                {avgPrice} {overrideSymbol(quote?.symbol)}
               </span>
             </div>
 

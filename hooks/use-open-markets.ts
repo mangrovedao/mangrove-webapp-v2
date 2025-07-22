@@ -143,7 +143,7 @@ export function useOpenMarkets() {
     enabled: !!chainId,
     retry: 1,
   })
-
+  console.log("data", data)
   return {
     openMarkets: applyPriceDisplayDecimals(data?.markets) || [],
     tokens: data?.tokens || [],

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import useMarket from "@/providers/market"
+import { overrideSymbol } from "@/utils/symbol"
 import { MarketParams } from "@mangrovedao/mgv"
 import { useEffect, useState } from "react"
 import { getAddress, isAddressEqual } from "viem"
@@ -30,7 +31,7 @@ function useMediaQuery(query: string) {
 
 function getSymbol(market?: MarketParams) {
   if (!market) return
-  return `${market.base.symbol}/${market.quote.symbol}`
+  return `${overrideSymbol(market.base.symbol)}/${overrideSymbol(market.quote.symbol)}`
 }
 
 function getValue(market: MarketParams) {

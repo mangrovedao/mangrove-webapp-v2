@@ -10,6 +10,7 @@ import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { overrideSymbol } from "@/utils/symbol"
 import { motion } from "framer-motion"
 import React, { useMemo, useState } from "react"
 import { AnimatedOrderBookSkeleton } from "../orderbook/animated-skeleton"
@@ -226,7 +227,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          Size [{base?.symbol}]
+          Size [{overrideSymbol(base?.symbol)}]
         </motion.span>
         <motion.span
           className="w-1/3 text-right text-xs"
@@ -234,7 +235,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          Total [{quote?.symbol}]
+          Total [{overrideSymbol(quote?.symbol)}]
         </motion.span>
       </div>
 
