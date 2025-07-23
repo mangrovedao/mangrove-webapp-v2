@@ -21,7 +21,7 @@ import { Address } from "viem"
 import { SwapInput } from "./components/SwapInput"
 import { TokenSelectorDialog } from "./components/TokenSelectorDialog"
 import { useKame } from "./hooks/use-kame"
-import { TokenMetadata, VERIFIED_TOKEN } from "./utils/tokens"
+import { SEI_TYPE, TokenMetadata, VERIFIED_TOKEN } from "./utils/tokens"
 
 export default function Swap() {
   const { openMarkets: markets } = useOpenMarkets()
@@ -31,8 +31,6 @@ export default function Swap() {
   const [sliderValue, setSliderValue] = useState<number>(0)
   const [search, setSearch] = useState<string>("")
   const tokens = VERIFIED_TOKEN
-
-  console.log("openMarkets", markets)
 
   const [{ payToken, receiveToken }, setTokens] = useState<{
     payToken?: TokenMetadata
@@ -59,7 +57,10 @@ export default function Swap() {
   const { data: payTokenBalance, refetch: payTokenBalanceRefetch } = useBalance(
     {
       address,
-      token: payToken?.address as Address,
+      token:
+        payToken?.address === SEI_TYPE
+          ? undefined
+          : (payToken?.address as Address),
     },
   )
   const payTokenBalanceFormatted = formatPrice(
@@ -68,8 +69,12 @@ export default function Swap() {
   const { data: receiveTokenBalance, refetch: receiveTokenBalanceRefetch } =
     useBalance({
       address,
-      token: receiveToken?.address as Address,
+      token:
+        receiveToken?.address === SEI_TYPE
+          ? undefined
+          : (receiveToken?.address as Address),
     })
+
   const receiveTokenBalanceFormatted = formatPrice(
     receiveTokenBalance?.formatted ?? "0",
   )
@@ -141,6 +146,18 @@ export default function Swap() {
       setSliderValue(0)
     },
   })
+
+  useEffect(() => {
+    if (payToken) {
+      payTokenBalanceRefetch()
+    }
+  }, [payToken])
+
+  useEffect(() => {
+    if (receiveToken) {
+      receiveTokenBalanceRefetch()
+    }
+  }, [receiveToken])
 
   const swapButtonText = useMemo(() => {
     switch (swapState) {

@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, Wallet } from "lucide-react"
 import { useMemo } from "react"
 import { useAccount, useBalance } from "wagmi"
-import { TokenMetadata } from "../utils/tokens"
+import { SEI_TYPE, TokenMetadata } from "../utils/tokens"
 
 type TokenContainerProps = {
   token?: TokenMetadata
@@ -44,8 +44,12 @@ export function SwapInput({
   const { address } = useAccount()
   const { data, isLoading: loadingBalance } = useBalance({
     address,
-    token: token?.address as `0x${string}`,
+    token:
+      token?.address === SEI_TYPE
+        ? undefined
+        : (token?.address as `0x${string}`),
   })
+
   const isPay = type === "pay"
   const isFetching = fetchingQuote === type || isLoading
   const isConnected = !!address
