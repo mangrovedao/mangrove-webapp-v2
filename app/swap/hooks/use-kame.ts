@@ -83,8 +83,8 @@ export function useKame({
       ids: [payTokenAddressOverride, receiveTokenAddressOverride],
     })
 
-    const apiPayToken = prices[payTokenAddressOverride]
-    const apiReceiveToken = prices[receiveTokenAddressOverride]
+    const apiPayToken = prices[payTokenAddressOverride.toLowerCase()]
+    const apiReceiveToken = prices[receiveTokenAddressOverride.toLowerCase()]
 
     if (!apiPayToken || !apiReceiveToken) return
 
@@ -106,15 +106,18 @@ export function useKame({
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
+    if (!payToken || !receiveToken) return
+    fetchPrices()
+  }, [payToken, receiveToken])
+
+  useEffect(() => {
     if (!payToken || !receiveToken || !chainId || !fetchingQuote) {
       return
     }
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
-    debounceRef.current = setTimeout(() => {
-      fetchPrices()
-
+    debounceRef.current = setTimeout(async () => {
       const fetchQuote = async () => {
         const isCalculatingReceive = fetchingQuote === "receive"
         const fromToken = isCalculatingReceive ? payToken : receiveToken
@@ -160,8 +163,6 @@ export function useKame({
           params["includedProtocols"] = ["oxium"]
         }
 
-        console.log("params", params)
-
         try {
           const _quote = await aggregatorAPI.getQuote(params)
           setQuote({
@@ -175,9 +176,9 @@ export function useKame({
           setFetchingQuote(null)
         }
       }
-
-      fetchQuote()
-    }, 1) // 300ms debounce delay
+      await fetchQuote()
+      await fetchPrices()
+    }, 1)
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -199,11 +200,9 @@ export function useKame({
         baseUsd: 0,
       }
 
-    const { quotePrice, basePrice } = tokenPrices
-
     const values = {
-      quoteUsd: Number(quotePrice) * Number(receiveValue),
-      baseUsd: Number(basePrice) * Number(payValue),
+      quoteUsd: Number(tokenPrices.quotePrice) * Number(receiveValue),
+      baseUsd: Number(tokenPrices.basePrice) * Number(payValue),
     }
 
     return values

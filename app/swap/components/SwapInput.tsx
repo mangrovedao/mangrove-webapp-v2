@@ -135,7 +135,7 @@ export function SwapInput({
               {token && dollarValue !== 0 && !isNaN(dollarValue)
                 ? dollarValue.toFixed(2)
                 : "0.00"}
-              {conversion && (
+              {conversion && !isNaN(conversion) && (
                 <span
                   className={`${conversion > 0 ? "text-green-caribbean" : "text-red-100"} ml-1`}
                 >
