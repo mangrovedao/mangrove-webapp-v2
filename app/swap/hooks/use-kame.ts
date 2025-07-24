@@ -60,6 +60,13 @@ export function useKame({
 
   const routeMangrove = useMemo(() => {
     if (!payToken || !receiveToken) return false
+    if (
+      [
+        payToken.address.toLowerCase(),
+        receiveToken.address.toLowerCase(),
+      ].includes("0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392".toLowerCase())
+    )
+      return false
     return markets.some(
       (m) =>
         mgvTokens.includes(payToken.address.toLowerCase()) &&

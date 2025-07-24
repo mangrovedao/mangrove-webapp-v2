@@ -31,7 +31,7 @@ function useMediaQuery(query: string) {
 
 function getSymbol(market?: MarketParams) {
   if (!market) return
-  return `${overrideSymbol(market.base.symbol)}/${overrideSymbol(market.quote.symbol)}`
+  return `${overrideSymbol(market.base)}/${overrideSymbol(market.quote)}`
 }
 
 function getValue(market: MarketParams) {

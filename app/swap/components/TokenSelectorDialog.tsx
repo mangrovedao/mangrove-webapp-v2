@@ -80,9 +80,7 @@ export function TokenSelectorDialog({
                   <div className="relative">
                     <img src={token.icon} className="rounded-sm w-7" />
                   </div>
-                  <span className="text-md mt-1">
-                    {overrideSymbol(token.symbol)}
-                  </span>
+                  <span className="text-md mt-1">{overrideSymbol(token)}</span>
                 </div>
                 <div className="text-white text-right">
                   <div className="opacity-70 text-xs flex items-center gap-1">

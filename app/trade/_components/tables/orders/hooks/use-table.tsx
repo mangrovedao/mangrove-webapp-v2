@@ -12,16 +12,17 @@ import React from "react"
 import { IconButton } from "@/components/icon-button"
 import { TokenPair } from "@/components/token-pair"
 import { CircularProgressBar } from "@/components/ui/circle-progress-bar"
+import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 import useMarket from "@/providers/market"
 import { Close } from "@/svgs"
 import { cn } from "@/utils"
 import { formatNumber } from "@/utils/numbers"
 import { getExactWeiAmount } from "@/utils/regexp"
+import { overrideSymbol } from "@/utils/symbol"
 import { MarketParams } from "@mangrovedao/mgv"
 import { Order } from "../../(shared)/schema"
 import { Timer } from "../components/timer"
 import { useCancelOrder } from "./use-cancel-order"
-import { useMergedBooks } from "@/hooks/new_ghostbook/book"
 
 const columnHelper = createColumnHelper<Order>()
 const DEFAULT_DATA: Order[] = []
@@ -98,7 +99,9 @@ export function useTable({
               row.original
 
             const marketQuote =
-              side === "sell" ? market?.base?.symbol : market?.quote?.symbol
+              side === "sell"
+                ? overrideSymbol(market?.base)
+                : overrideSymbol(market?.quote)
 
             if (!takerGot || !initialWants || !initialGives)
               return <span className="text-xs">-</span>
@@ -140,18 +143,25 @@ export function useTable({
             const { market } = row.original
 
             const displayDecimals = market?.quote?.priceDisplayDecimals || 6
-            const distance = side === 'sell' ? (Number(price) / spotPrice * 100).toFixed(2) : ((spotPrice / Number(price)) * 100).toFixed(2)
+            const distance =
+              side === "sell"
+                ? ((Number(price) / spotPrice) * 100).toFixed(2)
+                : ((spotPrice / Number(price)) * 100).toFixed(2)
 
             return price ? (
               <div>
-              <div className="text-xs">
-                {formatNumber(Big(price).toNumber(), {
-                  maximumFractionDigits: displayDecimals,
-                  minimumFractionDigits: displayDecimals,
-                })}{" "}
-                <span className='opacity-70'>{market?.quote.symbol}</span>
-              </div>
-              <div className="text-[10px] italic leading-[10px] opacity-80">-{distance}%</div>
+                <div className="text-xs">
+                  {formatNumber(Big(price).toNumber(), {
+                    maximumFractionDigits: displayDecimals,
+                    minimumFractionDigits: displayDecimals,
+                  })}{" "}
+                  <span className="opacity-70">
+                    {overrideSymbol(market.quote)}
+                  </span>
+                </div>
+                <div className="text-[10px] italic leading-[10px] opacity-80">
+                  -{distance}%
+                </div>
               </div>
             ) : (
               <span className="text-xs">-</span>

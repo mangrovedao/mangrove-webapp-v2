@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useMarket from "@/providers/market"
 import { cn } from "@/utils"
 import { formatDate } from "@/utils/date"
+import { overrideSymbol } from "@/utils/symbol"
 import { Order } from "../(shared)/schema"
 
 const columnHelper = createColumnHelper<Order>()
@@ -96,14 +97,14 @@ export function useTable({ data, showMarketInfo = false }: Params) {
               return <Skeleton className="w-20 h-6" />
             }
 
-            if (status === 'Canceled') {
+            if (status === "Canceled") {
               return <div>-</div>
             }
 
+            const base = overrideSymbol(market.base)
+            const quote = overrideSymbol(market.quote)
             const [sentSymbol, receivedSymbol] =
-              side === "buy"
-                ? [market.base.symbol, market.quote.symbol]
-                : [market.quote.symbol, market.base.symbol]
+              side === "buy" ? [base, quote] : [quote, base]
 
             return (
               <div className={cn("flex flex-col ")}>
@@ -135,7 +136,7 @@ export function useTable({ data, showMarketInfo = false }: Params) {
               <span className="text-xs">
                 {Big(price).toFixed(6)}{" "}
                 <span className="text-muted-foreground text-xs">
-                  {market.quote.symbol}
+                  {overrideSymbol(market.quote)}
                 </span>
               </span>
             ) : (
@@ -159,11 +160,9 @@ export function useTable({ data, showMarketInfo = false }: Params) {
         columnHelper.accessor("takerGot", {
           header: "Status",
           cell: ({ row }) => {
-            const status = row.original.status.toString();
+            const status = row.original.status.toString()
 
-            return (
-              <span className="text-xs capitalize">{status}</span>
-            )
+            return <span className="text-xs capitalize">{status}</span>
           },
         }),
 

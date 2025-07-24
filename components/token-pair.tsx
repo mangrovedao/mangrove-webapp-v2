@@ -49,7 +49,7 @@ export function TokenPair({
       ) : (
         <Title
           {...titleProps}
-        >{`${overrideSymbol(baseToken.symbol)}-${overrideSymbol(quoteToken.symbol)}`}</Title>
+        >{`${overrideSymbol(baseToken)}-${overrideSymbol(quoteToken)}`}</Title>
       )}
     </div>
   )

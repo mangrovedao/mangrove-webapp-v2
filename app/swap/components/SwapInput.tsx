@@ -108,7 +108,7 @@ export function SwapInput({
                 imgClasses="rounded-sm"
               />
               <span className="mt-1 text-xl text-nowrap text-white opacity-80">
-                {overrideSymbol(token.symbol)}
+                {overrideSymbol(token)}
               </span>
               <ChevronDown className="mx-1 size-4 text-white opacity-70" />
             </Button>

@@ -64,9 +64,6 @@ export const EnhancedNumericInput = React.forwardRef<
     },
     ref,
   ) => {
-    const isNativeToken = typeof token === "string"
-    const tokenSymbol = isNativeToken ? token : token?.symbol
-
     return (
       <div className="grid">
         <div
@@ -118,7 +115,7 @@ export const EnhancedNumericInput = React.forwardRef<
                   "border-border-tertiary": !error?.length,
                 })}
                 ref={ref}
-                icon={tokenSymbol}
+                token={token}
                 aria-invalid={!!error?.length}
               />
               <div>

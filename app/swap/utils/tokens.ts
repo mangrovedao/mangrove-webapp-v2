@@ -24,6 +24,13 @@ export const VERIFIED_TOKEN: TokenMetadata[] = [
     icon: "https://dzyb4dm7r8k8w.cloudfront.net/prod/logos/0x3894085Ef7Ff0f0aeDf52E2A2704928d1Ec074F1/logo.png",
   },
   {
+    address: "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
+    symbol: "USDC",
+    name: "USDC",
+    decimals: 6,
+    icon: "https://dzyb4dm7r8k8w.cloudfront.net/prod/logos/0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392/logo.png",
+  },
+  {
     address: SEI_TYPE,
     symbol: "SEI",
     name: "SEI",
