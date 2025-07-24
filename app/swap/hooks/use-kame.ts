@@ -52,14 +52,22 @@ export function useKame({
   const [fetchingQuote, setFetchingQuote] = useState<"pay" | "receive" | null>(
     null,
   )
+  const [mgvFailed, setMgvFailed] = useState<boolean>(false)
   const chainId = useChainId()
   const publicClient = usePublicClient()
   const [swapState, setSwapState] = useState<
     "fetch-quote" | "approving" | "swapping" | null
   >(null)
 
+  useEffect(() => {
+    if (payToken && receiveToken && mgvFailed) {
+      setMgvFailed(false)
+    }
+  }, [payToken, receiveToken])
+
   const routeMangrove = useMemo(() => {
     if (!payToken || !receiveToken) return false
+    // Block the USDC market for now
     if (
       [
         payToken.address.toLowerCase(),
@@ -165,7 +173,7 @@ export function useKame({
           return
         }
 
-        if (routeMangrove) {
+        if (routeMangrove && !mgvFailed) {
           //@ts-ignore
           params["includedProtocols"] = ["oxium"]
         }
@@ -179,6 +187,12 @@ export function useKame({
           })
         } catch (err) {
           console.error("Failed to fetch quote", err)
+          // if mangrove fails, set the flag
+          // then rerun the quote fetch
+          if (routeMangrove) {
+            setMgvFailed(true)
+            fetchQuote()
+          }
         } finally {
           setFetchingQuote(null)
         }

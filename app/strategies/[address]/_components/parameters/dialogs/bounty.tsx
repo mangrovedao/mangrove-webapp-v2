@@ -61,7 +61,7 @@ export function Bounty({ open, onClose }: Props) {
           <EnhancedNumericInput
             label={`${nativeBalance?.symbol} amount`}
             showBalance
-            token={nativeBalance?.symbol}
+            token={nativeBalance?.symbol as string}
             onChange={(e) => setBounty(e.target.value)}
             error={
               Number(bounty) > Number(nativeBalance?.value)
