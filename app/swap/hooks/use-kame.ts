@@ -52,21 +52,35 @@ export function useKame({
   const [fetchingQuote, setFetchingQuote] = useState<"pay" | "receive" | null>(
     null,
   )
+  const [mgvFailed, setMgvFailed] = useState<boolean>(false)
   const chainId = useChainId()
   const publicClient = usePublicClient()
   const [swapState, setSwapState] = useState<
     "fetch-quote" | "approving" | "swapping" | null
   >(null)
 
-  const routeMangrove = useMemo(
-    () =>
-      markets.some(
-        (m) =>
-          mgvTokens.includes(m.base.address.toLowerCase()) &&
-          mgvTokens.includes(m.quote.address.toLowerCase()),
-      ),
-    [mgvTokens, payToken, receiveToken],
-  )
+  useEffect(() => {
+    if (payToken && receiveToken && mgvFailed) {
+      setMgvFailed(false)
+    }
+  }, [payToken, receiveToken])
+
+  const routeMangrove = useMemo(() => {
+    if (!payToken || !receiveToken) return false
+    // Block the USDC market for now
+    if (
+      [
+        payToken.address.toLowerCase(),
+        receiveToken.address.toLowerCase(),
+      ].includes("0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392".toLowerCase())
+    )
+      return false
+    return markets.some(
+      (m) =>
+        mgvTokens.includes(payToken.address.toLowerCase()) &&
+        mgvTokens.includes(receiveToken.address.toLowerCase()),
+    )
+  }, [mgvTokens, payToken, receiveToken])
 
   const fetchPrices = async () => {
     if (!payToken || !receiveToken) return
@@ -74,15 +88,18 @@ export function useKame({
     const addressOverrides: Record<string, string> = {
       SEI: "0xe30fedd158a2e3b13e9badaeabafc5516e95e8c7",
     }
-    payToken.address = addressOverrides[payToken.name] || payToken.address
-    receiveToken.address =
+
+    const payTokenAddressOverride =
+      addressOverrides[payToken.name] || payToken.address
+    const receiveTokenAddressOverride =
       addressOverrides[receiveToken.name] || receiveToken.address
 
     const { priceById: prices } = await aggregatorAPI.getPrices({
-      ids: [payToken.address, receiveToken.address],
+      ids: [payTokenAddressOverride, receiveTokenAddressOverride],
     })
-    const apiReceiveToken = prices[receiveToken.address]
-    const apiPayToken = prices[payToken.address]
+
+    const apiPayToken = prices[payTokenAddressOverride.toLowerCase()]
+    const apiReceiveToken = prices[receiveTokenAddressOverride.toLowerCase()]
 
     if (!apiPayToken || !apiReceiveToken) return
 
@@ -92,7 +109,21 @@ export function useKame({
     })
   }
 
+  const isWrap = useMemo(() => {
+    if (!payToken || !receiveToken) return false
+    const validSymbols = ["SEI", "WSEI"]
+    return (
+      validSymbols.includes(payToken.symbol) &&
+      validSymbols.includes(receiveToken.symbol)
+    )
+  }, [payToken, receiveToken])
+
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (!payToken || !receiveToken) return
+    fetchPrices()
+  }, [payToken, receiveToken])
 
   useEffect(() => {
     if (!payToken || !receiveToken || !chainId || !fetchingQuote) {
@@ -101,9 +132,7 @@ export function useKame({
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
-    debounceRef.current = setTimeout(() => {
-      fetchPrices()
-
+    debounceRef.current = setTimeout(async () => {
       const fetchQuote = async () => {
         const isCalculatingReceive = fetchingQuote === "receive"
         const fromToken = isCalculatingReceive ? payToken : receiveToken
@@ -134,12 +163,20 @@ export function useKame({
           return
         }
 
-        if (routeMangrove) {
+        if (isWrap) {
+          setQuote({
+            forToken: toToken,
+            receive: value,
+            params,
+          })
+          setFetchingQuote(null)
+          return
+        }
+
+        if (routeMangrove && !mgvFailed) {
           //@ts-ignore
           params["includedProtocols"] = ["oxium"]
         }
-
-        console.log("params", params)
 
         try {
           const _quote = await aggregatorAPI.getQuote(params)
@@ -150,18 +187,32 @@ export function useKame({
           })
         } catch (err) {
           console.error("Failed to fetch quote", err)
+          // if mangrove fails, set the flag
+          // then rerun the quote fetch
+          if (routeMangrove) {
+            setMgvFailed(true)
+            fetchQuote()
+          }
         } finally {
           setFetchingQuote(null)
         }
       }
-
-      fetchQuote()
-    }, 1) // 300ms debounce delay
+      await fetchQuote()
+      await fetchPrices()
+    }, 1)
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [payToken, receiveToken, payValue, receiveValue, chainId, fetchingQuote])
+  }, [
+    payToken,
+    isWrap,
+    receiveToken,
+    payValue,
+    receiveValue,
+    chainId,
+    fetchingQuote,
+  ])
 
   const usdAmounts = useMemo(() => {
     if (!tokenPrices?.basePrice || !tokenPrices?.quotePrice)
@@ -170,11 +221,9 @@ export function useKame({
         baseUsd: 0,
       }
 
-    const { quotePrice, basePrice } = tokenPrices
-
     const values = {
-      quoteUsd: Number(quotePrice) * Number(receiveValue),
-      baseUsd: Number(basePrice) * Number(payValue),
+      quoteUsd: Number(tokenPrices.quotePrice) * Number(receiveValue),
+      baseUsd: Number(tokenPrices.basePrice) * Number(payValue),
     }
 
     return values
@@ -206,32 +255,80 @@ export function useKame({
   const swap = async (slippage: string) => {
     if (!walletClient || !quote || !publicClient || !payToken) return
 
-    setSwapState("fetch-quote")
     try {
-      const result = await aggregatorAPI.getSwap({
-        ...quote.params,
-        origin: new Address(walletClient?.account.address),
-        tradeConfig: {
-          recipient: new Address(walletClient?.account.address),
-          slippage: Number(slippage) * 100,
-        },
-      })
+      let res = null
 
-      console.log(result)
+      if (isWrap) {
+        const isUnwrapping =
+          payToken.symbol === "WSEI" && receiveToken?.symbol === "SEI"
+        const isWrapping =
+          payToken.symbol === "SEI" && receiveToken?.symbol === "WSEI"
 
-      setSwapState("approving")
-      const approved = await isApproved(result.tx.to)
-      if (!approved) return
+        setSwapState("swapping")
+        if (isUnwrapping) {
+          const hash = await walletClient.writeContract({
+            address: payToken.address as `0x${string}`, // WSEI contract
+            abi: [
+              {
+                name: "withdraw",
+                type: "function",
+                stateMutability: "nonpayable",
+                inputs: [{ name: "wad", type: "uint256" }],
+                outputs: [],
+              },
+            ],
+            functionName: "withdraw",
+            args: [parseUnits(payValue, payToken.decimals)],
+          })
+          res = await publicClient.waitForTransactionReceipt({ hash })
+        }
 
-      setSwapState("swapping")
-      const hash = await walletClient.sendTransaction({
-        to: result.tx.to as `0x${string}`,
-        data: result.tx.data as `0x${string}`,
-        value: BigInt(result.tx.value),
-      })
+        if (isWrapping) {
+          const hash = await walletClient.writeContract({
+            address: receiveToken?.address as `0x${string}`, // WSEI contract
+            abi: [
+              {
+                name: "deposit",
+                type: "function",
+                stateMutability: "payable",
+                inputs: [],
+                outputs: [],
+              },
+            ],
+            functionName: "deposit",
+            args: [],
+            value: parseUnits(payValue, payToken.decimals),
+          })
+          res = await publicClient.waitForTransactionReceipt({ hash })
+        }
+      } else {
+        setSwapState("fetch-quote")
+        const result = await aggregatorAPI.getSwap({
+          ...quote.params,
+          origin: new Address(walletClient?.account.address),
+          tradeConfig: {
+            recipient: new Address(walletClient?.account.address),
+            slippage: Number(slippage) * 100,
+          },
+        })
 
-      const res = await publicClient.waitForTransactionReceipt({ hash })
-      if (res.status === "success") {
+        setSwapState("approving")
+        if (payToken.name !== "SEI") {
+          const approved = await isApproved(result.tx.to)
+          if (!approved) return
+        }
+
+        setSwapState("swapping")
+        const hash = await walletClient.sendTransaction({
+          to: result.tx.to as `0x${string}`,
+          data: result.tx.data as `0x${string}`,
+          value: BigInt(result.tx.value),
+        })
+
+        res = await publicClient.waitForTransactionReceipt({ hash })
+      }
+
+      if (res?.status === "success") {
         onSwapSuccess?.(res)
       } else {
         onSwapError?.(res)

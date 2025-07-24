@@ -227,7 +227,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          Size [{overrideSymbol(base?.symbol)}]
+          Size [{overrideSymbol(base)}]
         </motion.span>
         <motion.span
           className="w-1/3 text-right text-xs"
@@ -235,7 +235,7 @@ const OrderBookV2: React.FC<OrderBookProps> = ({ className }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          Total [{overrideSymbol(quote?.symbol)}]
+          Total [{overrideSymbol(quote)}]
         </motion.span>
       </div>
 

@@ -21,7 +21,7 @@ import { Address } from "viem"
 import { SwapInput } from "./components/SwapInput"
 import { TokenSelectorDialog } from "./components/TokenSelectorDialog"
 import { useKame } from "./hooks/use-kame"
-import { TokenMetadata, VERIFIED_TOKEN } from "./utils/tokens"
+import { SEI_TYPE, TokenMetadata, VERIFIED_TOKEN } from "./utils/tokens"
 
 export default function Swap() {
   const { openMarkets: markets } = useOpenMarkets()
@@ -31,8 +31,6 @@ export default function Swap() {
   const [sliderValue, setSliderValue] = useState<number>(0)
   const [search, setSearch] = useState<string>("")
   const tokens = VERIFIED_TOKEN
-
-  console.log("openMarkets", markets)
 
   const [{ payToken, receiveToken }, setTokens] = useState<{
     payToken?: TokenMetadata
@@ -59,7 +57,10 @@ export default function Swap() {
   const { data: payTokenBalance, refetch: payTokenBalanceRefetch } = useBalance(
     {
       address,
-      token: payToken?.address as Address,
+      token:
+        payToken?.address === SEI_TYPE
+          ? undefined
+          : (payToken?.address as Address),
     },
   )
   const payTokenBalanceFormatted = formatPrice(
@@ -68,8 +69,12 @@ export default function Swap() {
   const { data: receiveTokenBalance, refetch: receiveTokenBalanceRefetch } =
     useBalance({
       address,
-      token: receiveToken?.address as Address,
+      token:
+        receiveToken?.address === SEI_TYPE
+          ? undefined
+          : (receiveToken?.address as Address),
     })
+
   const receiveTokenBalanceFormatted = formatPrice(
     receiveTokenBalance?.formatted ?? "0",
   )
@@ -101,7 +106,6 @@ export default function Swap() {
     receiveValue: fields.receiveValue,
     mgvTokens: mgvTokens.map((t) => t.address),
     onSwapError: (e) => {
-      console.error("Error swapping", e)
       toast.error(
         <div className="flex items-center justify-between w-full">
           <span>Swap Failed</span>
@@ -142,6 +146,18 @@ export default function Swap() {
     },
   })
 
+  useEffect(() => {
+    if (payToken) {
+      payTokenBalanceRefetch()
+    }
+  }, [payToken])
+
+  useEffect(() => {
+    if (receiveToken) {
+      receiveTokenBalanceRefetch()
+    }
+  }, [receiveToken])
+
   const swapButtonText = useMemo(() => {
     switch (swapState) {
       case "fetch-quote":
@@ -168,7 +184,7 @@ export default function Swap() {
             100,
             (Number(formatPrice(quote.receive)) /
               Number(formatPrice(payTokenBalance?.formatted ?? "0"))) *
-              100,
+              99,
           ),
         )
       }
@@ -200,7 +216,7 @@ export default function Swap() {
       Math.min(
         100,
         (Number(fields.receiveValue) / Number(receiveTokenBalanceFormatted)) *
-          100,
+          99,
       ),
     )
   }
@@ -229,7 +245,7 @@ export default function Swap() {
       payValue: val,
     }))
     setSliderValue(
-      Math.min(100, (Number(val) / Number(payTokenBalanceFormatted)) * 100),
+      Math.min(100, (Number(val) / Number(payTokenBalanceFormatted)) * 99),
     )
   }
 
@@ -330,7 +346,7 @@ export default function Swap() {
               onPointerDown={() => setIsDragging(true)}
               onPointerUp={() => onSliderUp()}
               onPointerLeave={() => isDragging && onSliderUp()}
-              disabled={Boolean(swapState)}
+              disabled={Boolean(swapState) || !payTokenBalance}
             />
           )}
 

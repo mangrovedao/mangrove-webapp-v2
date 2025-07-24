@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown, Wallet } from "lucide-react"
 import { useMemo } from "react"
 import { useAccount, useBalance } from "wagmi"
-import { TokenMetadata } from "../utils/tokens"
+import { SEI_TYPE, TokenMetadata } from "../utils/tokens"
 
 type TokenContainerProps = {
   token?: TokenMetadata
@@ -44,8 +44,12 @@ export function SwapInput({
   const { address } = useAccount()
   const { data, isLoading: loadingBalance } = useBalance({
     address,
-    token: token?.address as `0x${string}`,
+    token:
+      token?.address === SEI_TYPE
+        ? undefined
+        : (token?.address as `0x${string}`),
   })
+
   const isPay = type === "pay"
   const isFetching = fetchingQuote === type || isLoading
   const isConnected = !!address
@@ -104,7 +108,7 @@ export function SwapInput({
                 imgClasses="rounded-sm"
               />
               <span className="mt-1 text-xl text-nowrap text-white opacity-80">
-                {overrideSymbol(token.symbol)}
+                {overrideSymbol(token)}
               </span>
               <ChevronDown className="mx-1 size-4 text-white opacity-70" />
             </Button>
@@ -131,7 +135,7 @@ export function SwapInput({
               {token && dollarValue !== 0 && !isNaN(dollarValue)
                 ? dollarValue.toFixed(2)
                 : "0.00"}
-              {conversion && (
+              {conversion && !isNaN(conversion) && (
                 <span
                   className={`${conversion > 0 ? "text-green-caribbean" : "text-red-100"} ml-1`}
                 >

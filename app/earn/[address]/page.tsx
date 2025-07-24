@@ -214,7 +214,7 @@ export default function Page() {
                   </>
                 )}
               </div>
-              <Title className="!text-2xl bg-clip-text text-white">{`${overrideSymbol(vault?.market?.base?.symbol)}-${overrideSymbol(vault?.market?.quote?.symbol)}`}</Title>
+              <Title className="!text-2xl bg-clip-text text-white">{`${overrideSymbol(vault?.market?.base)}-${overrideSymbol(vault?.market?.quote)}`}</Title>
             </motion.div>
           )}
 
@@ -256,7 +256,7 @@ export default function Page() {
                   maximumFractionDigits: 2,
                 }) || " "
               }
-              symbol={` ${overrideSymbol(vault?.market?.quote?.symbol as string) || " "}`}
+              symbol={`${overrideSymbol(vault?.market?.quote)}`}
             />
 
             <GridLineHeader
@@ -658,7 +658,7 @@ export default function Page() {
                       />
                     </motion.div>
                     <Caption className="text-text-secondary !text-sm">
-                      {overrideSymbol(vault?.market.base.symbol as string)}
+                      {overrideSymbol(vault?.market.base)}
                     </Caption>
                   </div>
                 }
@@ -684,7 +684,7 @@ export default function Page() {
                       />
                     </motion.div>
                     <Caption className="text-text-secondary !text-sm">
-                      {overrideSymbol(vault?.market.quote.symbol as string)}
+                      {overrideSymbol(vault?.market.quote)}
                     </Caption>
                   </div>
                 }

@@ -132,7 +132,7 @@ function Item({
             >
               <Value className={className}>
                 {formattedValue}{" "}
-                {isValidValue && token?.symbol && overrideSymbol(token.symbol)}
+                {isValidValue && token?.symbol && overrideSymbol(token)}
                 {isValidValue && rightElement}
               </Value>
             </motion.div>

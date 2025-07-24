@@ -53,7 +53,7 @@ export function useTable({ data = [] }: Params) {
                   maximumFractionDigits: base.displayDecimals,
                   minimumFractionDigits: base.displayDecimals,
                 })}{" "}
-                {overrideSymbol(base.symbol)}
+                {overrideSymbol(base)}
               </span>
             </div>
           )
@@ -69,7 +69,7 @@ export function useTable({ data = [] }: Params) {
                 {row.getValue().toFixed(market.quote.displayDecimals)}
               </span>
               <span className="text-xs opacity-80 font-sans leading-tight">
-                {overrideSymbol(market.quote.symbol)}
+                {overrideSymbol(market.quote)}
               </span>
             </div>
           ) : (
