@@ -85,7 +85,7 @@ export const mangroveChains = [
   },
   {
     ghostbook: "0x127A5a5E086DCe304875e392C8170B04bC81e8B6",
-    univ3Module: "0x4bB7F3087664E559365C4C94d3C21a39847d7726",
+    univ3Module: "0x1EfAD8af168A85C655851Dc90b19a2F9E346b690",
     balancerV2Module: "0x369022670f2C623Ee6894Ae4053eF54C2c685Dd0",
     mangroveParams: seiMangrove,
     chain: sei,

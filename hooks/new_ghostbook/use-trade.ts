@@ -5,10 +5,9 @@ import {
   marketOrderResultFromLogs,
 } from "@mangrovedao/mgv/lib"
 import { useCallback, useMemo, useState } from "react"
-import { encodeAbiParameters, Hex, parseAbi } from "viem"
+import { encodeAbiParameters, Hex, parseAbi, parseEventLogs } from "viem"
 import { useChainId, usePublicClient, useWalletClient } from "wagmi"
 import { mangroveChains } from "../ghostbook/lib/registry"
-import { ProtocolType } from "./pool"
 import {
   JellyVerseV2Pool,
   Pool,
@@ -33,6 +32,21 @@ const abi = parseAbi([
   "function marketOrderByTick(OLKey memory olKey, int256 maxTick, uint256 amountToSell, ModuleData calldata moduleData) public returns (uint256 takerGot, uint256 takerGave, uint256 bounty, uint256 feePaid)",
 ])
 
+const orderCompletedAbi = [
+  {
+    type: "event",
+    name: "OrderCompleted",
+    inputs: [
+      { indexed: true, name: "taker", type: "address" },
+      { indexed: true, name: "olKeyHash", type: "bytes32" },
+      { indexed: false, name: "got", type: "uint256" },
+      { indexed: false, name: "gave", type: "uint256" },
+      { indexed: false, name: "fee", type: "uint256" },
+      { indexed: false, name: "bounty", type: "uint256" },
+    ],
+  },
+]
+
 function isUniswapV3Pool(pool: Pool): pool is UniswapV3Pool {
   return pool.protocol.type === "UNISWAP_V3"
 }
@@ -49,15 +63,9 @@ function poolToModuleData(pool: Pool) {
   if (isUniswapV3Pool(pool)) {
     return encodeAbiParameters(
       [{ type: "address" }, { type: "uint24" }],
-      [pool.pool, pool.fee],
+      [pool.protocol.router, pool.fee],
     )
   }
-  // if (isSlipstreamPool(pool)) {
-  //   return encodeAbiParameters(
-  //     [{ type: "address" }, { type: "int24" }],
-  //     [pool.pool, pool.tickSpacing]
-  //   );
-  // }
   if (isJellyVerseV2Pool(pool)) {
     return encodeAbiParameters(
       [{ type: "address" }, { type: "bytes32" }, { type: "uint256" }],
@@ -93,9 +101,7 @@ export function useGhostBookTrade({ market }: UseTradeProps) {
     async (params: TradeParams) => {
       if (!bestPool || !ghostbook || !market || !walletClient) return
       const moduleAddress =
-        bestPool.protocol.type === "UNISWAP_V3"
-          ? v3Module
-          : balancerV2Module
+        bestPool.protocol.type === "UNISWAP_V3" ? v3Module : balancerV2Module
       if (!moduleAddress) return
       const moduleData = poolToModuleData(bestPool as Pool)
       if (!moduleData) return
@@ -116,18 +122,29 @@ export function useGhostBookTrade({ market }: UseTradeProps) {
             data: moduleData,
           },
         ],
+        gas: BigInt(500_000),
       })
 
       const receipt = await publicClient?.waitForTransactionReceipt({ hash })
 
       if (receipt?.status === "success" && mangrove && ghostbook && market) {
-        const result = marketOrderResultFromLogs(mangrove, market, {
-          logs: receipt?.logs,
-          taker: ghostbook,
-          bs: params.bs,
+        const parsedLogs = parseEventLogs({
+          abi: orderCompletedAbi,
+          logs: receipt.logs,
         })
-        setResult(result)
-        return { result, receipt, hash }
+
+        const orderCompletedLog: any = parsedLogs.find((log) => {
+          return (log as any).eventName === "OrderCompleted"
+        })
+
+        const formatted = {
+          takerGot: orderCompletedLog?.args.got,
+          takerGave: orderCompletedLog?.args.gave,
+          feePaid: orderCompletedLog?.args.fee,
+          bounty: orderCompletedLog?.args.bounty,
+        }
+
+        return { result: formatted, receipt, hash }
       }
 
       return { receipt, hash }

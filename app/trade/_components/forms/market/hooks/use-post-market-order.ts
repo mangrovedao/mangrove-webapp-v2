@@ -60,10 +60,6 @@ export function usePostMarketOrder() {
         if (!pool || !market || !walletClient)
           throw new Error("Market order post, is missing params")
 
-
-        
-        console.log("ghostbook trade")
-
         const {
           bs,
           send: gives,
@@ -89,14 +85,14 @@ export function usePostMarketOrder() {
           maxTick,
         })
 
-        const { receipt, hash } = res || {}
+        const { receipt, result } = res || {}
 
         // Add optimistic order to cache immediately
         await addOptimisticOrder({
           type: "market",
           side: bs,
           receipt,
-          parsedResult,
+          parsedResult: result ?? parsedResult,
           form: {
             send: gives,
             receive: wants,
@@ -110,7 +106,7 @@ export function usePostMarketOrder() {
           base,
           quote,
           wants,
-          parsedResult,
+          result ?? parsedResult,
           receiveToken,
           sendToken,
         )

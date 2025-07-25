@@ -78,18 +78,14 @@ export function useMarketTransaction({
   // Wrapping ETH
   const {
     data: wrappingHash,
-    isPending: isPendingWrapping,
     sendTransaction,
     reset: resetSendTransaction,
   } = useSendTransaction()
 
-  const {
-    isLoading: isLoadingWrapping,
-    isSuccess: isSuccessWrapping,
-    isError: isErrorWrapping,
-  } = useWaitForTransactionReceipt({
-    hash: wrappingHash,
-  })
+  const { isSuccess: isSuccessWrapping, isError: isErrorWrapping } =
+    useWaitForTransactionReceipt({
+      hash: wrappingHash,
+    })
 
   // Calculate if wrapping is needed
   const needsWrapping =

@@ -3,7 +3,6 @@ import { BS } from "@mangrovedao/mgv/lib"
 import { toast } from "sonner"
 import { formatUnits, parseUnits } from "viem"
 
-import { useSwap } from "@/app/swap/hooks/use-swap"
 import { TokenIcon } from "@/components/token-icon"
 import { Separator } from "@/components/ui/separator"
 import { ODOS_API_IMAGE_URL } from "@/hooks/odos/constants"
